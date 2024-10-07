@@ -46,11 +46,37 @@ namespace Kenedia.Modules.BuildsManager.Services
 			_timer = new System.Timers.Timer(1000.0);
 			_timer.Elapsed += OnTimerElapsed;
 			TagGroups.GroupRemoved += new EventHandler<TagGroup>(TagGroups_TagRemoved);
+			TagGroups.GroupChanged += new PropertyAndValueChangedEventHandler(TagGroups_GroupChanged);
+		}
+
+		private void TagGroups_GroupChanged(object sender, PropertyAndValueChangedEventArgs e)
+		{
+			if (!(sender is TagGroup) || !(e.PropertyName == "Name"))
+			{
+				return;
+			}
+			string old = e.OldValue as string;
+			string oldGroup = ((old != null) ? old : string.Empty);
+			string newgrp = e.NewValue as string;
+			string newGroup = ((newgrp != null) ? newgrp : string.Empty);
+			List<TemplateTag> tags = _tags;
+			List<TemplateTag> list = new List<TemplateTag>(tags.Count);
+			list.AddRange(tags);
+			foreach (TemplateTag tag in list)
+			{
+				if (tag.Group == oldGroup)
+				{
+					tag.Group = newGroup;
+				}
+			}
 		}
 
 		private void TagGroups_TagRemoved(object sender, TagGroup e)
 		{
-			foreach (TemplateTag tag in _tags)
+			List<TemplateTag> tags = _tags;
+			List<TemplateTag> list = new List<TemplateTag>(tags.Count);
+			list.AddRange(tags);
+			foreach (TemplateTag tag in list)
 			{
 				if (tag.Group == e.Name)
 				{

@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -30,7 +29,7 @@ namespace Kenedia.Modules.BuildsManager.Services
 
 		private bool _saveRequested;
 
-		public event PropertyChangedEventHandler GroupChanged;
+		public event PropertyAndValueChangedEventHandler GroupChanged;
 
 		public event EventHandler<TagGroup> GroupAdded;
 
@@ -81,11 +80,11 @@ namespace Kenedia.Modules.BuildsManager.Services
 			foreach (TagGroup group in _groups)
 			{
 				group.Icon = new DetailedTexture(group.AssetId);
-				group.PropertyChanged += new PropertyChangedEventHandler(Tag_PropertyChanged);
+				group.PropertyChanged += new PropertyAndValueChangedEventHandler(Tag_PropertyChanged);
 			}
 		}
 
-		private void Tag_PropertyChanged(object sender, PropertyChangedEventArgs e)
+		private void Tag_PropertyChanged(object sender, PropertyAndValueChangedEventArgs e)
 		{
 			TagGroup tag = sender as TagGroup;
 			if (tag != null)
@@ -94,7 +93,7 @@ namespace Kenedia.Modules.BuildsManager.Services
 			}
 		}
 
-		private void Tag_TagChanged(object sender, PropertyChangedEventArgs e)
+		private void Tag_TagChanged(object sender, PropertyAndValueChangedEventArgs e)
 		{
 			TagGroup tag = sender as TagGroup;
 			if (tag != null)
@@ -103,7 +102,7 @@ namespace Kenedia.Modules.BuildsManager.Services
 			}
 		}
 
-		private void OnTagChanged(TagGroup tag, PropertyChangedEventArgs e)
+		private void OnTagChanged(TagGroup tag, PropertyAndValueChangedEventArgs e)
 		{
 			this.GroupChanged?.Invoke(tag, e);
 			RequestSave();
@@ -115,7 +114,7 @@ namespace Kenedia.Modules.BuildsManager.Services
 			if (!_groups.Any((TagGroup t) => t.Name == tag2.Name))
 			{
 				_groups.Add(tag2);
-				tag2.PropertyChanged += new PropertyChangedEventHandler(Tag_TagChanged);
+				tag2.PropertyChanged += new PropertyAndValueChangedEventHandler(Tag_TagChanged);
 				OnTagAdded(tag2);
 			}
 		}
@@ -136,7 +135,7 @@ namespace Kenedia.Modules.BuildsManager.Services
 		{
 			if (_groups.Remove(tag))
 			{
-				tag.PropertyChanged -= new PropertyChangedEventHandler(Tag_TagChanged);
+				tag.PropertyChanged -= new PropertyAndValueChangedEventHandler(Tag_TagChanged);
 				OnTagRemoved(tag);
 				return true;
 			}

@@ -33,7 +33,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 
 		private readonly Kenedia.Modules.Core.Controls.Label _tagsLabel;
 
-		private readonly ButtonImage _editTags;
+		private readonly ButtonImage _addTag;
 
 		private readonly FilterBox _tagFilter;
 
@@ -129,20 +129,11 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 				TextChangedAction = delegate(string txt)
 				{
 					string txt2 = txt;
-					_editTags.Enabled = !string.IsNullOrEmpty(txt2.Trim()) && TemplateTags.FirstOrDefault((TemplateTag e) => e.Name.ToLower() == txt2.ToLower()) == null;
+					_addTag.Enabled = !string.IsNullOrEmpty(txt2.Trim()) && TemplateTags.FirstOrDefault((TemplateTag e) => e.Name.ToLower() == txt2.ToLower()) == null;
 				},
-				PerformFiltering = delegate(string txt)
-				{
-					string value = txt.ToLower();
-					bool flag = string.IsNullOrEmpty(value);
-					foreach (TagControl current in _tagPanel.GetChildrenOfType<TagControl>())
-					{
-						current.Visible = flag || current.Tag.Name.ToLower().Contains(value);
-					}
-					_tagPanel.Invalidate();
-				}
+				PerformFiltering = new Action<string>(FilterTags)
 			};
-			_editTags = new ButtonImage
+			_addTag = new ButtonImage
 			{
 				Parent = this,
 				Size = new Point(_tagFilter.Height),
@@ -213,6 +204,9 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 				}
 			};
 			TemplatePresenter.TemplateChanged += new ValueChangedEventHandler<Template>(TemplatePresenter_TemplateChanged);
+			TagGroups.GroupChanged += new PropertyAndValueChangedEventHandler(TagGroups_GroupChanged);
+			TagGroups.GroupAdded += new EventHandler<TagGroup>(TagGroups_GroupAdded);
+			TagGroups.GroupRemoved += new EventHandler<TagGroup>(TagGroups_GroupRemoved);
 			TemplateTags.TagAdded += new EventHandler<TemplateTag>(TemplateTags_TagAdded);
 			TemplateTags.TagRemoved += new EventHandler<TemplateTag>(TemplateTags_TagRemoved);
 			TemplateTags.TagChanged += new PropertyChangedEventHandler(TemplateTags_TagChanged);
@@ -221,6 +215,40 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 			CreateTagControls();
 			ApplyTemplate();
 			_created = true;
+		}
+
+		private void FilterTags(string txt)
+		{
+			string t = txt.ToLower();
+			bool any = string.IsNullOrEmpty(t);
+			_tagControls.SelectMany<KeyValuePair<Kenedia.Modules.Core.Controls.FlowPanel, List<TagControl>>, TagControl>((KeyValuePair<Kenedia.Modules.Core.Controls.FlowPanel, List<TagControl>> x) => x.Value);
+			foreach (KeyValuePair<Kenedia.Modules.Core.Controls.FlowPanel, List<TagControl>> p in _tagControls)
+			{
+				foreach (TagControl tag in p.Value)
+				{
+					tag.Tag.Name.ToLower();
+					tag.Tag.Group.ToLower();
+					tag.Visible = any || tag.Tag.Name.ToLower().Contains(t) || tag.Tag.Group.ToLower().Contains(t);
+				}
+				p.Key.Visible = p.Value.Any((TagControl x) => x.Visible);
+				p.Key.Invalidate();
+			}
+			_tagPanel.Invalidate();
+		}
+
+		private void TagGroups_GroupAdded(object sender, TagGroup e)
+		{
+			SortPanels();
+		}
+
+		private void TagGroups_GroupRemoved(object sender, TagGroup e)
+		{
+			SortPanels();
+		}
+
+		private void TagGroups_GroupChanged(object sender, PropertyAndValueChangedEventArgs e)
+		{
+			SortPanels();
 		}
 
 		public override void Draw(SpriteBatch spriteBatch, Rectangle drawBounds, Rectangle scissor)
@@ -270,23 +298,29 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 				foreach (KeyValuePair<Kenedia.Modules.Core.Controls.FlowPanel, List<TagControl>> t2 in _tagControls)
 				{
 					TagControl control = t2.Value.FirstOrDefault((TagControl x) => x.Tag == tag);
-					if (control != null)
+					if (control == null)
 					{
-						Kenedia.Modules.Core.Controls.FlowPanel p = GetPanel(tag.Group);
-						control.Parent = p;
-						p.Children.Add(control);
-						p.SortChildren<TagControl>(SortTagControls);
-						_tagControls[p].Add(control);
-						Kenedia.Modules.Core.Controls.FlowPanel panel = t2.Key;
-						_tagControls[panel].Remove(control);
-						panel.Children.Remove(control);
-						if (panel.Children.Where((Control x) => x != control).Count() <= 0)
-						{
-							flowPanelsToDelete.Add(panel);
-							panel.Dispose();
-						}
-						break;
+						continue;
 					}
+					Kenedia.Modules.Core.Controls.FlowPanel panel = t2.Key;
+					Kenedia.Modules.Core.Controls.FlowPanel p = GetPanel(tag.Group);
+					if (panel == p)
+					{
+						SortPanels();
+						return;
+					}
+					control.Parent = p;
+					p.Children.Add(control);
+					p.SortChildren<TagControl>(SortTagControls);
+					_tagControls[p].Add(control);
+					_tagControls[panel].Remove(control);
+					panel.Children.Remove(control);
+					if (panel != _ungroupedPanel && panel.Children.Where((Control x) => x != control).Count() <= 0)
+					{
+						flowPanelsToDelete.Add(panel);
+						panel.Dispose();
+					}
+					break;
 				}
 				if (flowPanelsToDelete.Count <= 0)
 				{
@@ -361,11 +395,11 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 			return panel;
 		}
 
-		private void RemoveEmptyPanels(Kenedia.Modules.Core.Controls.FlowPanel? fp = null)
+		private void RemoveEmptyPanels()
 		{
 			foreach (Kenedia.Modules.Core.Controls.FlowPanel p in _tagControls.Keys.ToList())
 			{
-				if (p != fp && !p.Children.Any())
+				if (p != _ungroupedPanel && !p.Children.Any())
 				{
 					_tagControls.Remove(p);
 					p.Dispose();
@@ -395,6 +429,11 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 			if (panel.Children.Any())
 			{
 				panel.SortChildren<TagControl>(SortTagControls);
+				panel.Visible = panel.Children.OfType<TagControl>().Any((TagControl x) => x.Visible);
+			}
+			else
+			{
+				panel.Visible = panel.Children.OfType<TagControl>().Any((TagControl x) => x.Visible);
 			}
 			RemoveEmptyPanels();
 		}
@@ -507,6 +546,14 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 		{
 			base.DisposeControl();
 			TemplatePresenter.TemplateChanged -= new ValueChangedEventHandler<Template>(TemplatePresenter_TemplateChanged);
+			_tagPanel.ChildAdded -= TagPanel_ChildsChanged;
+			_tagPanel.ChildRemoved -= TagPanel_ChildsChanged;
+			TagGroups.GroupChanged -= new PropertyAndValueChangedEventHandler(TagGroups_GroupChanged);
+			TagGroups.GroupAdded -= new EventHandler<TagGroup>(TagGroups_GroupAdded);
+			TagGroups.GroupRemoved -= new EventHandler<TagGroup>(TagGroups_GroupRemoved);
+			TemplateTags.TagAdded -= new EventHandler<TemplateTag>(TemplateTags_TagAdded);
+			TemplateTags.TagRemoved -= new EventHandler<TemplateTag>(TemplateTags_TagRemoved);
+			TemplateTags.TagChanged -= new PropertyChangedEventHandler(TemplateTags_TagChanged);
 			foreach (Control child in base.Children)
 			{
 				child?.Dispose();

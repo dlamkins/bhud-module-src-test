@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using Blish_HUD;
@@ -38,7 +39,11 @@ namespace Kenedia.Modules.BuildsManager.Views
 
 		private TagGroupPanel _ungroupedPanel;
 
+		private TagGroupPanel _specPanel;
+
 		private List<TagToggle> _specToggles = new List<TagToggle>();
+
+		public TemplateCollection Templates { get; }
 
 		public TemplateTags TemplateTags { get; }
 
@@ -48,14 +53,15 @@ namespace Kenedia.Modules.BuildsManager.Views
 
 		public Settings Settings { get; }
 
-		public QuickFiltersPanel(TemplateTags templateTags, TagGroups tagGroups, SelectionPanel selectionPanel, Settings settings)
+		public QuickFiltersPanel(TemplateCollection templates, TemplateTags templateTags, TagGroups tagGroups, SelectionPanel selectionPanel, Settings settings)
 		{
 			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0142: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0196: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0105: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0159: Unknown result type (might be due to invalid IL or missing references)
+			Templates = templates;
 			TemplateTags = templateTags;
 			TagGroups = tagGroups;
 			SelectionPanel = selectionPanel;
@@ -72,9 +78,6 @@ namespace Kenedia.Modules.BuildsManager.Views
 			base.BorderColor = Color.get_Black();
 			base.BorderWidth = new RectangleDimensions(2);
 			base.Visible = false;
-			TemplateTags.TagAdded += new EventHandler<TemplateTag>(TemplateTags_TagAdded);
-			TemplateTags.TagRemoved += new EventHandler<TemplateTag>(TemplateTags_TagRemoved);
-			TemplateTags.TagChanged += new PropertyChangedEventHandler(TemplateTags_TagChanged);
 			Kenedia.Modules.Core.Controls.FlowPanel fp = new Kenedia.Modules.Core.Controls.FlowPanel
 			{
 				Parent = this,
@@ -98,17 +101,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 				SetLocalizedText = () => string.Format(strings.ResetAll, strings.Filters),
 				Width = 192,
 				Parent = fp,
-				ClickAction = delegate
-				{
-					_specToggles.ForEach(delegate(TagToggle x)
-					{
-						x.Selected = false;
-					});
-					_tagControls.SelectMany<KeyValuePair<TagGroupPanel, List<TagToggle>>, TagToggle>((KeyValuePair<TagGroupPanel, List<TagToggle>> x) => x.Value).ForEach(delegate(TagToggle x)
-					{
-						x.Selected = false;
-					});
-				}
+				ClickAction = new Action(ResetAllToggles)
 			};
 			CreateTagControls();
 			base.FadeSteps = 150;
@@ -118,6 +111,55 @@ namespace Kenedia.Modules.BuildsManager.Views
 			Settings.QuickFiltersPanelFadeDuration.SettingChanged += QuickFiltersPanelFadeDuration_SettingChanged;
 			ApplySettings();
 			SetAutoFilters(GameService.Gw2Mumble.PlayerCharacter?.Specialization ?? 0);
+			TagGroups.GroupAdded += new EventHandler<TagGroup>(TagGroups_GroupAdded);
+			TagGroups.GroupRemoved += new EventHandler<TagGroup>(TagGroups_GroupRemoved);
+			TagGroups.GroupChanged += new PropertyAndValueChangedEventHandler(TagGroups_GroupChanged);
+			TemplateTags.TagAdded += new EventHandler<TemplateTag>(TemplateTags_TagAdded);
+			TemplateTags.TagRemoved += new EventHandler<TemplateTag>(TemplateTags_TagRemoved);
+			TemplateTags.TagChanged += new PropertyChangedEventHandler(TemplateTags_TagChanged);
+			TemplateCollection templates2 = Templates;
+			templates2.CollectionChanged = (NotifyCollectionChangedEventHandler)Delegate.Combine(templates2.CollectionChanged, new NotifyCollectionChangedEventHandler(Templates_CollectionChanged));
+			GameService.Graphics.QueueMainThreadRender(delegate
+			{
+				SortPanels();
+			});
+			SetHeightToTags();
+		}
+
+		private void ResetAllToggles()
+		{
+			_specToggles.ForEach(delegate(TagToggle x)
+			{
+				x.Selected = false;
+			});
+			_tagControls.SelectMany<KeyValuePair<TagGroupPanel, List<TagToggle>>, TagToggle>((KeyValuePair<TagGroupPanel, List<TagToggle>> x) => x.Value).ForEach(delegate(TagToggle x)
+			{
+				x.Selected = false;
+			});
+		}
+
+		private void Templates_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		{
+			NotifyCollectionChangedAction? notifyCollectionChangedAction = e?.Action;
+			if (notifyCollectionChangedAction.HasValue && notifyCollectionChangedAction.GetValueOrDefault() == NotifyCollectionChangedAction.Add)
+			{
+				ResetAllToggles();
+			}
+		}
+
+		private void TagGroups_GroupChanged(object sender, PropertyAndValueChangedEventArgs e)
+		{
+			SortPanels();
+		}
+
+		private void TagGroups_GroupRemoved(object sender, TagGroup e)
+		{
+			SortPanels();
+		}
+
+		private void TagGroups_GroupAdded(object sender, TagGroup e)
+		{
+			SortPanels();
 		}
 
 		private void QuickFiltersPanelFadeDelay_SettingChanged(object sender, Blish_HUD.ValueChangedEventArgs<double> e)
@@ -210,32 +252,38 @@ namespace Kenedia.Modules.BuildsManager.Views
 				foreach (KeyValuePair<TagGroupPanel, List<TagToggle>> t2 in _tagControls)
 				{
 					TagToggle control = t2.Value.FirstOrDefault((TagToggle x) => x.Tag == tag);
-					if (control != null)
+					if (control == null)
 					{
-						TagGroupPanel p = GetPanel(tag.Group);
-						control.Parent = p;
-						p.Children.Add(control);
-						p.SortChildren<TagToggle>(SortTagControls);
-						_tagControls[p].Add(control);
-						TagGroupPanel panel = t2.Key;
-						_tagControls[panel].Remove(control);
-						panel.Children.Remove(control);
-						if (panel.Children.Where((Control x) => x != control).Count() <= 0)
-						{
-							flowPanelsToDelete.Add(panel);
-							panel.Dispose();
-						}
-						break;
+						continue;
 					}
-				}
-				if (flowPanelsToDelete.Count <= 0)
-				{
+					TagGroupPanel panel = t2.Key;
+					TagGroupPanel p = GetPanel(tag.Group);
+					if (panel == p)
+					{
+						SortPanels();
+						return;
+					}
+					control.Parent = p;
+					p.Children.Add(control);
+					p.SortChildren<TagToggle>(SortTagControls);
+					_tagControls[p].Add(control);
+					_tagControls[panel].Remove(control);
+					panel.Children.Remove(control);
+					if (panel != _ungroupedPanel && panel.Children.Where((Control x) => x != control).Count() <= 0)
+					{
+						flowPanelsToDelete.Add(panel);
+						panel.Dispose();
+					}
 					break;
 				}
-				foreach (TagGroupPanel t in flowPanelsToDelete)
+				if (flowPanelsToDelete.Count > 0)
 				{
-					_tagControls.Remove(t);
+					foreach (TagGroupPanel t in flowPanelsToDelete)
+					{
+						_tagControls.Remove(t);
+					}
 				}
+				SortPanels();
 				break;
 			}
 			}
@@ -268,28 +316,31 @@ namespace Kenedia.Modules.BuildsManager.Views
 			spriteBatch.DrawCenteredRotationOnCtrl(this, (Texture2D)_headerSeparator.Texture, _headerSeparator.Bounds, _headerSeparator.TextureRegion, Color.get_White(), 1.56f, flipVertically: false, flipHorizontally: false);
 		}
 
-		public TagGroupPanel GetPanel(string title)
+		public TagGroupPanel GetPanel(string groupName)
 		{
-			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-			string title2 = title;
+			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
+			string groupName2 = groupName;
 			TagGroupPanel panel = null;
-			if (!string.IsNullOrEmpty(title2))
+			if (!string.IsNullOrEmpty(groupName2))
 			{
-				TagGroupPanel p = _tagControls.Keys.FirstOrDefault((TagGroupPanel x) => x.TagGroup.Name == title2);
-				if (p != null)
+				TagGroup tagGroup = TagGroups.FirstOrDefault((TagGroup x) => x.Name == groupName2);
+				if (tagGroup != null)
 				{
-					panel = p;
-				}
-				TagGroup groupName = TagGroups.FirstOrDefault((TagGroup x) => x.Name == title2);
-				if (groupName != null && panel == null)
-				{
-					panel = new TagGroupPanel(groupName, _tagPanel)
+					TagGroupPanel p = _tagControls.Keys.FirstOrDefault((TagGroupPanel x) => x.TagGroup == tagGroup);
+					if (p != null)
 					{
-						WidthSizingMode = SizingMode.Fill,
-						HeightSizingMode = SizingMode.AutoSize,
-						AutoSizePadding = new Point(0, 2)
-					};
+						panel = p;
+					}
+					if (panel == null)
+					{
+						panel = new TagGroupPanel(tagGroup, _tagPanel)
+						{
+							WidthSizingMode = SizingMode.Fill,
+							HeightSizingMode = SizingMode.AutoSize,
+							AutoSizePadding = new Point(0, 2)
+						};
+					}
 				}
 			}
 			if (panel == null)
@@ -376,27 +427,48 @@ namespace Kenedia.Modules.BuildsManager.Views
 			{
 				TagGroupPanel x2 = x;
 				TagGroupPanel y2 = y;
-				TagGroup a = TagGroups.FirstOrDefault((TagGroup group) => group.Name == x2.Title);
-				TagGroup b = TagGroups.FirstOrDefault((TagGroup group) => group.Name == y2.Title);
+				if (x2 == _ungroupedPanel)
+				{
+					if (y2 != _specPanel)
+					{
+						return 1;
+					}
+					return -1;
+				}
+				if (x2 == _specPanel)
+				{
+					if (y2 != _ungroupedPanel)
+					{
+						return -1;
+					}
+					return 1;
+				}
+				TagGroup a = TagGroups.FirstOrDefault((TagGroup group) => group == x2.TagGroup);
+				TagGroup b = TagGroups.FirstOrDefault((TagGroup group) => group == y2.TagGroup);
 				return TemplateTagComparer.CompareGroups(a, b);
 			});
 			SetHeightToTags();
+			GameService.Graphics.QueueMainThreadRender(delegate
+			{
+				SetHeightToTags();
+			});
 		}
 
 		private void SetHeightToTags()
 		{
-			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-			int height = _specializationHeight;
+			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
+			int height = _specializationHeight + 15;
 			foreach (KeyValuePair<TagGroupPanel, List<TagToggle>> t in _tagControls)
 			{
 				if (!(t.Key.TagGroup.Name == strings.Specializations))
 				{
 					int rows = (int)Math.Ceiling((double)t.Value.Count / 6.0);
-					height += rows * TagToggle.TagHeight + (rows - 1) * TagGroupPanel.ControlPaddingY + TagGroupPanel.OuterControlPaddingY + (int)_tagPanel.ControlPadding.Y;
+					int rowHeight = ((t.Key.Height <= 20) ? (rows * TagToggle.TagHeight + (rows - 1) * TagGroupPanel.ControlPaddingY + TagGroupPanel.OuterControlPaddingY + (int)_tagPanel.ControlPadding.Y) : (t.Key.Height + (int)_tagPanel.ControlPadding.Y));
+					height += rowHeight;
 				}
 			}
-			_tagPanel.Height = height - (int)_tagPanel.ControlPadding.Y - 5;
+			_tagPanel.Height = height;
 			base.Height = _tagPanel.Height + 30 + 30 + _tagPanel.ContentPadding.Vertical;
 		}
 
@@ -446,7 +518,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 				AddTemplateTag(tag);
 				added.Add(tag.Name);
 			}
-			TagGroupPanel specs = new TagGroupPanel(new TagGroup(strings.Specializations), _tagPanel)
+			_specPanel = new TagGroupPanel(new TagGroup(strings.Specializations), _tagPanel)
 			{
 				FlowDirection = ControlFlowDirection.LeftToRight,
 				WidthSizingMode = SizingMode.Fill,
@@ -467,7 +539,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 					Group = strings.Specializations,
 					AssetId = p.IconAssetId,
 					Priority = prio
-				}, specs, delegate
+				}, _specPanel, delegate
 				{
 					if (SelectionPanel.BuildSelection.SpecializationFilterQueries.Contains(isProfession))
 					{
@@ -493,7 +565,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 						Group = strings.Specializations,
 						AssetId = s.ProfessionIconAssetId.GetValueOrDefault(),
 						Priority = prio + s.Id
-					}, specs, delegate
+					}, _specPanel, delegate
 					{
 						if (SelectionPanel.BuildSelection.SpecializationFilterQueries.Contains(isSpecialization))
 						{

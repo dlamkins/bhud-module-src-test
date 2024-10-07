@@ -1,6 +1,7 @@
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Kenedia.Modules.BuildsManager.Models;
+using Kenedia.Modules.BuildsManager.Services;
 using Kenedia.Modules.Core.Extensions;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -37,6 +38,15 @@ namespace Kenedia.Modules.BuildsManager.Views
 			base.Parent = container;
 			base.OuterControlPadding = new Vector2(4f, (float)OuterControlPaddingY);
 			base.ControlPadding = new Vector2((float)ControlPaddingY, (float)ControlPaddingY);
+			TagGroup.PropertyChanged += new PropertyAndValueChangedEventHandler(TagGroup_PropertyChanged);
+		}
+
+		private void TagGroup_PropertyChanged(object sender, PropertyAndValueChangedEventArgs e)
+		{
+			if (e.PropertyName == "Name")
+			{
+				_ = e.NewValue is string;
+			}
 		}
 
 		public override void RecalculateLayout()

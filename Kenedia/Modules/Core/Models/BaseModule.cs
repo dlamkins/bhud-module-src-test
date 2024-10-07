@@ -13,14 +13,16 @@ using Blish_HUD.Settings;
 using Gw2Sharp.WebApi;
 using Kenedia.Modules.Core.Services;
 using Kenedia.Modules.Core.Views;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
+using Newtonsoft.Json;
 using SemVer;
 
 namespace Kenedia.Modules.Core.Models
 {
 	public abstract class BaseModule<ModuleType, ModuleWindow, ModuleSettings, ModulePaths> : Module where ModuleType : Module where ModuleWindow : Container where ModuleSettings : BaseSettingsModel where ModulePaths : PathCollection, new()
 	{
-		public static readonly Logger Logger = Blish_HUD.Logger.GetLogger<ModuleType>();
+		public static Logger Logger = Blish_HUD.Logger.GetLogger<ModuleType>();
 
 		protected bool HasGUI;
 
@@ -28,48 +30,102 @@ namespace Kenedia.Modules.Core.Models
 
 		protected bool IsGUICreated;
 
+		public StaticHosting StaticHosting { get; private set; }
+
 		public static string ModuleName => ModuleInstance.Name;
 
-		public static ModuleType ModuleInstance { get; protected set; }
+		public static ModuleType ModuleInstance { get; private set; }
 
 		public static VirtualKeyShort[] ModKeyMapping { get; private set; }
 
 		public Version ModuleVersion { get; private set; }
 
-		public ModulePaths Paths { get; protected set; }
+		public ModulePaths Paths { get; private set; }
 
 		public SettingCollection SettingCollection { get; private set; }
 
-		public ServiceCollection Services { get; private set; }
+		public CoreServiceCollection CoreServices { get; private set; }
 
 		public SharedSettingsView SharedSettingsView { get; private set; }
 
-		public SettingsManager SettingsManager => ModuleParameters.SettingsManager;
+		public SettingsManager SettingsManager { get; private set; }
 
-		public ContentsManager ContentsManager => ModuleParameters.ContentsManager;
+		public ContentsManager ContentsManager { get; private set; }
 
-		public DirectoriesManager DirectoriesManager => ModuleParameters.DirectoriesManager;
+		public DirectoriesManager DirectoriesManager { get; private set; }
 
-		public Gw2ApiManager Gw2ApiManager => ModuleParameters.Gw2ApiManager;
+		public Gw2ApiManager Gw2ApiManager { get; private set; }
 
 		public ModuleWindow MainWindow { get; protected set; }
 
 		public BaseSettingsWindow SettingsWindow { get; protected set; }
 
-		public ModuleSettings Settings { get; protected set; }
+		public ModuleSettings Settings { get; private set; }
 
 		protected SettingEntry<KeyBinding> ReloadKey { get; set; }
+
+		public IServiceProvider ServiceProvider { get; private set; }
 
 		protected BaseModule([Import("ModuleParameters")] ModuleParameters moduleParameters)
 			: base(moduleParameters)
 		{
-			ClientWindowService clientWindowService = new ClientWindowService();
-			SharedSettings sharedSettings = new SharedSettings();
-			InputDetectionService inputDetectionService = new InputDetectionService();
-			GameStateDetectionService gameState = new GameStateDetectionService(clientWindowService, sharedSettings);
-			Services = new ServiceCollection(gameState, clientWindowService, sharedSettings, inputDetectionService);
-			SharedSettingsView = new SharedSettingsView(sharedSettings, clientWindowService);
+			ModuleInstance = this as ModuleType;
 			GameService.Overlay.UserLocale.SettingChanged += OnLocaleChanged;
+			JsonConvert.set_DefaultSettings((Func<JsonSerializerSettings>)delegate
+			{
+				//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0014: Expected O, but got Unknown
+				JsonSerializerSettings val = new JsonSerializerSettings();
+				val.set_Formatting((Formatting)1);
+				val.set_NullValueHandling((NullValueHandling)1);
+				return val;
+			});
+			SetupServices();
+		}
+
+		private void SetupServices()
+		{
+			ServiceCollection services = new ServiceCollection();
+			DefineServices(services);
+			ServiceProvider = services.BuildServiceProvider();
+			AssignServiceInstaces(ServiceProvider);
+		}
+
+		protected virtual ServiceCollection DefineServices(ServiceCollection services)
+		{
+			((IServiceCollection)services).AddSingleton((Module)this);
+			services.AddSingleton<ModuleWindow>();
+			services.AddSingleton<ModuleSettings>();
+			services.AddSingleton<ModulePaths>();
+			services.AddSingleton(ModuleParameters.ContentsManager);
+			services.AddSingleton(ModuleParameters.SettingsManager);
+			services.AddSingleton(ModuleParameters.Gw2ApiManager);
+			services.AddSingleton(ModuleParameters.DirectoriesManager);
+			services.AddSingleton(Logger);
+			services.AddSingleton<StaticHosting>();
+			services.AddSingleton<ClientWindowService>();
+			services.AddSingleton<SharedSettings>();
+			services.AddSingleton<InputDetectionService>();
+			services.AddSingleton<GameStateDetectionService>();
+			services.AddSingleton<SharedSettingsView>();
+			services.AddSingleton<CoreServiceCollection>();
+			return services;
+		}
+
+		protected virtual void AssignServiceInstaces(IServiceProvider serviceProvider)
+		{
+			CoreServices = ServiceProviderServiceExtensions.GetRequiredService<CoreServiceCollection>(serviceProvider);
+			SharedSettingsView = ServiceProviderServiceExtensions.GetRequiredService<SharedSettingsView>(serviceProvider);
+			ContentsManager = ServiceProviderServiceExtensions.GetRequiredService<ContentsManager>(serviceProvider);
+			DirectoriesManager = ServiceProviderServiceExtensions.GetRequiredService<DirectoriesManager>(serviceProvider);
+			Gw2ApiManager = ServiceProviderServiceExtensions.GetRequiredService<Gw2ApiManager>(serviceProvider);
+			SettingsManager = ServiceProviderServiceExtensions.GetRequiredService<SettingsManager>(serviceProvider);
+			Logger = ServiceProviderServiceExtensions.GetRequiredService<Logger>(serviceProvider);
+			StaticHosting = ServiceProviderServiceExtensions.GetRequiredService<StaticHosting>(serviceProvider);
+			Paths = ServiceProviderServiceExtensions.GetRequiredService<ModulePaths>(serviceProvider);
+			Settings = ServiceProviderServiceExtensions.GetRequiredService<ModuleSettings>(serviceProvider);
 			TexturesService.Initilize(ContentsManager);
 		}
 
@@ -99,7 +155,7 @@ namespace Kenedia.Modules.Core.Models
 		protected override async Task LoadAsync()
 		{
 			await base.LoadAsync();
-			await Services.SharedSettings.Load(Paths.SharedSettingsPath);
+			await CoreServices.SharedSettings.Load(Paths.SharedSettingsPath);
 		}
 
 		protected virtual void OnLocaleChanged(object sender, Blish_HUD.ValueChangedEventArgs<Locale> eventArgs)
@@ -131,9 +187,9 @@ namespace Kenedia.Modules.Core.Models
 		protected override void Update(GameTime gameTime)
 		{
 			base.Update(gameTime);
-			Services.GameStateDetectionService.Run(gameTime);
-			Services.ClientWindowService.Run(gameTime);
-			Services.InputDetectionService.Run(gameTime);
+			CoreServices.GameStateDetectionService.Run(gameTime);
+			CoreServices.ClientWindowService.Run(gameTime);
+			CoreServices.InputDetectionService.Run(gameTime);
 			if (HasGUI && !IsGUICreated && AutoLoadGUI)
 			{
 				PlayerCharacter player = GameService.Gw2Mumble.PlayerCharacter;
@@ -147,7 +203,7 @@ namespace Kenedia.Modules.Core.Models
 		protected override void Unload()
 		{
 			UnloadGUI();
-			Services?.Dispose();
+			CoreServices?.Dispose();
 			GameService.Overlay.UserLocale.SettingChanged -= OnLocaleChanged;
 			ModuleInstance = null;
 			base.Unload();

@@ -40,6 +40,15 @@ namespace Kenedia.Modules.BuildsManager.Extensions
 			return false;
 		}
 
+		public static bool IsMainHand(this TemplateSlotType slot)
+		{
+			if (slot == TemplateSlotType.MainHand || slot == TemplateSlotType.AltMainHand)
+			{
+				return true;
+			}
+			return false;
+		}
+
 		public static TemplateSlotType? GetOffhand(this TemplateSlotType slot)
 		{
 			return slot switch

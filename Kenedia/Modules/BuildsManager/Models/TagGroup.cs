@@ -1,5 +1,5 @@
-using System.ComponentModel;
 using Kenedia.Modules.BuildsManager.Res;
+using Kenedia.Modules.BuildsManager.Services;
 using Kenedia.Modules.Core.Models;
 using Kenedia.Modules.Core.Utility;
 using Microsoft.Xna.Framework;
@@ -85,7 +85,7 @@ namespace Kenedia.Modules.BuildsManager.Models
 		public static TagGroup Empty { get; internal set; } = new TagGroup();
 
 
-		public event PropertyChangedEventHandler? PropertyChanged;
+		public event PropertyAndValueChangedEventHandler? PropertyChanged;
 
 		public TagGroup()
 		{
@@ -108,7 +108,7 @@ namespace Kenedia.Modules.BuildsManager.Models
 			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
 			Icon = new DetailedTexture(e.NewValue);
 			Icon.TextureRegion = (Rectangle)(((_003F?)TextureRegion) ?? Icon.Texture?.Bounds ?? Rectangle.get_Empty());
-			this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("AssetId"));
+			this.PropertyChanged?.Invoke(this, new PropertyAndValueChangedEventArgs("AssetId", e.OldValue, e.NewValue));
 		}
 
 		private void OnTextureRegionChanged(object sender, ValueChangedEventArgs<Rectangle?> e)
@@ -120,17 +120,17 @@ namespace Kenedia.Modules.BuildsManager.Models
 			{
 				Icon.TextureRegion = (Rectangle)(((_003F?)e.NewValue) ?? Icon.Texture?.Bounds ?? Rectangle.get_Empty());
 			}
-			this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("TextureRegion"));
+			this.PropertyChanged?.Invoke(this, new PropertyAndValueChangedEventArgs("TextureRegion", e.OldValue, e.NewValue));
 		}
 
 		private void OnNameChanged(object sender, ValueChangedEventArgs<string> e)
 		{
-			this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Name"));
+			this.PropertyChanged?.Invoke(this, new PropertyAndValueChangedEventArgs("Name", e.OldValue, e.NewValue));
 		}
 
 		private void OnPriorityChanged(object sender, ValueChangedEventArgs<int> e)
 		{
-			this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Priority"));
+			this.PropertyChanged?.Invoke(this, new PropertyAndValueChangedEventArgs("Priority", e.OldValue, e.NewValue));
 		}
 	}
 }

@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
@@ -39,7 +38,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 
 		private new readonly Kenedia.Modules.Core.Controls.Image _icon;
 
-		private Blish_HUD.Controls.Container? _draggingStartParent;
+		private Container? _draggingStartParent;
 
 		private Point _draggingStart;
 
@@ -242,17 +241,17 @@ namespace Kenedia.Modules.BuildsManager.Views
 			TagGroup group = e.OldValue;
 			if (group != null)
 			{
-				group.PropertyChanged -= new PropertyChangedEventHandler(Group_TagChanged);
+				group.PropertyChanged -= new PropertyAndValueChangedEventHandler(Group_TagChanged);
 			}
 			group = e.NewValue;
 			if (group != null)
 			{
-				group.PropertyChanged += new PropertyChangedEventHandler(Group_TagChanged);
+				group.PropertyChanged += new PropertyAndValueChangedEventHandler(Group_TagChanged);
 			}
 			ApplyGroup(group);
 		}
 
-		private void Group_TagChanged(object sender, PropertyChangedEventArgs e)
+		private void Group_TagChanged(object sender, PropertyAndValueChangedEventArgs e)
 		{
 			TagGroup group = sender as TagGroup;
 			if (group != null)

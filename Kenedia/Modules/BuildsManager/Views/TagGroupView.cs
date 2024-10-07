@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
@@ -29,7 +28,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 
 		public GroupSelectable SelectedGroup { get; set; }
 
-		public Blish_HUD.Controls.Container BuildPanel { get; private set; }
+		public Container BuildPanel { get; private set; }
 
 		public TagGroups TagGroups { get; }
 
@@ -38,13 +37,13 @@ namespace Kenedia.Modules.BuildsManager.Views
 			TagGroups = tagGroups;
 		}
 
-		protected override void Build(Blish_HUD.Controls.Container buildPanel)
+		protected override void Build(Container buildPanel)
 		{
 			base.Build(buildPanel);
 			BuildGroupView(buildPanel);
 		}
 
-		private void BuildGroupView(Blish_HUD.Controls.Container buildPanel)
+		private void BuildGroupView(Container buildPanel)
 		{
 			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
@@ -114,7 +113,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 			}
 			TagGroups.GroupAdded += new EventHandler<TagGroup>(TagGroups_TagAdded);
 			TagGroups.GroupRemoved += new EventHandler<TagGroup>(TagGroups_TagRemoved);
-			TagGroups.GroupChanged += new PropertyChangedEventHandler(TagGroups_TagChanged);
+			TagGroups.GroupChanged += new PropertyAndValueChangedEventHandler(TagGroups_TagChanged);
 			BuildPanel.Resized += BuildPanel_Resized;
 		}
 
@@ -183,7 +182,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 			}
 		}
 
-		private void TagGroups_TagChanged(object sender, PropertyChangedEventArgs e)
+		private void TagGroups_TagChanged(object sender, PropertyAndValueChangedEventArgs e)
 		{
 			FilterGroups();
 		}
@@ -210,7 +209,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 			base.Unload();
 			TagGroups.GroupAdded -= new EventHandler<TagGroup>(TagGroups_TagAdded);
 			TagGroups.GroupRemoved -= new EventHandler<TagGroup>(TagGroups_TagRemoved);
-			TagGroups.GroupChanged -= new PropertyChangedEventHandler(TagGroups_TagChanged);
+			TagGroups.GroupChanged -= new PropertyAndValueChangedEventHandler(TagGroups_TagChanged);
 			BuildPanel.Resized -= BuildPanel_Resized;
 		}
 	}

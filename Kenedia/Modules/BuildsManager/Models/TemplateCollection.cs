@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Linq;
 using Gw2Sharp.Models;
 using Kenedia.Modules.Core.Models;
 
@@ -20,7 +21,12 @@ namespace Kenedia.Modules.BuildsManager.Models
 
 		public TemplateCollection()
 		{
-			_templates.CollectionChanged += CollectionChanged;
+			_templates.CollectionChanged += OnCollectionChanged;
+		}
+
+		private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		{
+			CollectionChanged?.Invoke(sender, e);
 		}
 
 		public void Add(Template template)
@@ -74,6 +80,24 @@ namespace Kenedia.Modules.BuildsManager.Models
 		IEnumerator IEnumerable.GetEnumerator()
 		{
 			return GetEnumerator();
+		}
+
+		public string GetNewName(string name)
+		{
+			string name2 = name;
+			if (_templates.All((Template t) => t.Name != name2))
+			{
+				return name2;
+			}
+			for (int i = 1; i < int.MaxValue; i++)
+			{
+				string newName = $"{name2} ({i})";
+				if (_templates.All((Template t) => t.Name != newName))
+				{
+					return newName;
+				}
+			}
+			return name2;
 		}
 	}
 }

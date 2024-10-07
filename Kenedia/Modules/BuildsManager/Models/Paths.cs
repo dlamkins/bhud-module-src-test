@@ -1,4 +1,5 @@
 using System.IO;
+using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
 using Kenedia.Modules.Core.Models;
 
@@ -14,8 +15,8 @@ namespace Kenedia.Modules.BuildsManager.Models
 		{
 		}
 
-		public Paths(DirectoriesManager directoriesManager, string moduleName)
-			: base(directoriesManager, moduleName)
+		public Paths(DirectoriesManager directoriesManager, Module module)
+			: base(directoriesManager, module)
 		{
 			if (!Directory.Exists(TemplatesPath))
 			{

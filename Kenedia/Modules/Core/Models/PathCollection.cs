@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
 using Kenedia.Modules.Core.Utility;
 
@@ -49,10 +50,10 @@ namespace Kenedia.Modules.Core.Models
 		{
 		}
 
-		public PathCollection(DirectoriesManager directoriesManager, string moduleName)
+		public PathCollection(DirectoriesManager directoriesManager, Module module)
 		{
 			DirectoriesManager = directoriesManager;
-			ModuleName = moduleName.Replace(' ', '_').ToLower();
+			ModuleName = module.Name.Replace(' ', '_').ToLower();
 			BasePath = DirectoriesManager.GetFullDirectoryPath("kenedia");
 			if (!Directory.Exists(ModulePath))
 			{

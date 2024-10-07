@@ -199,7 +199,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 			}
 			TagGroups.GroupAdded += new EventHandler<TagGroup>(TagGroups_TagAdded);
 			TagGroups.GroupRemoved += new EventHandler<TagGroup>(TagGroups_TagRemoved);
-			TagGroups.GroupChanged += new PropertyChangedEventHandler(TagGroups_TagChanged);
+			TagGroups.GroupChanged += new PropertyAndValueChangedEventHandler(TagGroups_TagChanged);
 			buildPanel.Resized += GroupBuildPanel_Resized;
 			TagGroup group = MainWindowPresenter.SelectedGroup ?? _tagsPanel.OfType<GroupSelectable>().FirstOrDefault((GroupSelectable x) => x.Visible)?.Group;
 			SetGroupToEdit(group);
@@ -357,9 +357,9 @@ namespace Kenedia.Modules.BuildsManager.Views
 			}
 			_tagsPanel.SuspendLayout();
 			obj = obj!.ToLowerInvariant();
-			foreach (TagSelectable tagSelectable in _tagSelectables)
+			foreach (TagSelectable g in _tagSelectables)
 			{
-				tagSelectable.Visible = tagSelectable.Tag.Name.ToLowerInvariant().Contains(obj);
+				g.Visible = g.Tag.Name.ToLowerInvariant().Contains(obj) || g.Tag.Group.ToLowerInvariant().Contains(obj);
 			}
 			_tagsPanel.ResumeLayout();
 			_tagsPanel.Invalidate();
@@ -370,6 +370,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 		{
 			TemplateTagComparer comparerer = new TemplateTagComparer(TagGroups);
 			_tagsPanel.SortChildren((TagSelectable a, TagSelectable b) => comparerer.Compare(a.Tag, b.Tag));
+			_groupsPanel.SortChildren((GroupSelectable a, GroupSelectable b) => TemplateTagComparer.CompareGroups(a.Group, b.Group));
 		}
 
 		private void AddTag(TemplateTag g)
@@ -418,7 +419,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 			FilterTags();
 		}
 
-		private void TagGroups_TagChanged(object sender, PropertyChangedEventArgs e)
+		private void TagGroups_TagChanged(object sender, PropertyAndValueChangedEventArgs e)
 		{
 			FilterGroups();
 		}

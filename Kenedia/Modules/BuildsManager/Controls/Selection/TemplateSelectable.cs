@@ -282,11 +282,12 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 
 		private void DuplicateTemplate()
 		{
-			string name = (Template?.Name ?? strings.NewTemplate) + " - " + strings.Copy;
+			string name = Templates.GetNewName((Template?.Name ?? strings.NewTemplate) + " - " + strings.Copy);
 			if (Templates.Where((Template e) => e.Name == name).Count() == 0)
 			{
 				Template t;
 				Templates.Add(t = TemplateFactory.CreateTemplate(name, Template?.BuildCode, Template?.GearCode));
+				t.RequestSave("DuplicateTemplate");
 			}
 			else
 			{

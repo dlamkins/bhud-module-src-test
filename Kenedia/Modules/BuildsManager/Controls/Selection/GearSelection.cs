@@ -574,6 +574,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 				}
 				break;
 			}
+			SelectionContent.SortChildren((SelectionPanelSelectable a, SelectionPanelSelectable b) => a.Item.Name.CompareTo(b.Item.Name));
 			SelectionContent.Invalidate();
 		}
 

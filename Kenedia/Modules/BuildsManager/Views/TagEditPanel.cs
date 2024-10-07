@@ -240,7 +240,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 			}));
 			SetGroupDropdownItems();
 			TagGroups.GroupAdded += new EventHandler<TagGroup>(TagGroups_GroupAdded);
-			TagGroups.GroupChanged += new PropertyChangedEventHandler(TagGroups_GroupChanged);
+			TagGroups.GroupChanged += new PropertyAndValueChangedEventHandler(TagGroups_GroupChanged);
 			TagGroups.GroupRemoved += new EventHandler<TagGroup>(TagGroups_GroupRemoved);
 			ApplyTag();
 		}
@@ -261,7 +261,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 			SetGroupDropdownItems();
 		}
 
-		private void TagGroups_GroupChanged(object sender, PropertyChangedEventArgs e)
+		private void TagGroups_GroupChanged(object sender, PropertyAndValueChangedEventArgs e)
 		{
 			SetGroupDropdownItems();
 		}

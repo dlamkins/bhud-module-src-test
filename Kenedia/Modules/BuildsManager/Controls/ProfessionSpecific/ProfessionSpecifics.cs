@@ -4,57 +4,37 @@ using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Kenedia.Modules.BuildsManager.Models;
 using Kenedia.Modules.Core.Models;
-using Kenedia.Modules.Core.Utility;
 
 namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 {
 	public abstract class ProfessionSpecifics : Panel
 	{
-		private TemplatePresenter? _templatePresenter;
-
 		protected virtual SkillIcon[] Skills { get; } = Array.Empty<SkillIcon>();
 
 
 		protected SkillTooltip SkillTooltip { get; }
 
-		public TemplatePresenter TemplatePresenter
-		{
-			get
-			{
-				return _templatePresenter;
-			}
-			set
-			{
-				Common.SetProperty<TemplatePresenter>(ref _templatePresenter, value, new ValueChangedEventHandler<TemplatePresenter>(SetTemplatePresenter));
-			}
-		}
+		public TemplatePresenter TemplatePresenter { get; }
 
-		public ProfessionSpecifics(TemplatePresenter template)
+		public ProfessionSpecifics(TemplatePresenter templatePresenter)
 		{
-			TemplatePresenter = template;
+			TemplatePresenter = templatePresenter;
 			base.ClipsBounds = false;
 			ZIndex = 1073741823;
 			base.Tooltip = (SkillTooltip = new SkillTooltip());
+			SetTemplatePresenter();
 			ApplyTemplate();
 		}
 
-		private void SetTemplatePresenter(object sender, ValueChangedEventArgs<TemplatePresenter> e)
+		private void SetTemplatePresenter()
 		{
-			if (e.OldValue != null)
+			if (TemplatePresenter != null)
 			{
-				e.OldValue!.LegendChanged -= new LegendChangedEventHandler(OnLegendChanged);
-				e.OldValue!.EliteSpecializationChanged -= new SpecializationChangedEventHandler(OnEliteSpecializationChanged);
-				e.OldValue!.TemplateChanged -= new ValueChangedEventHandler<Template>(OnTemplateChanged);
-				e.OldValue!.TraitChanged -= new TraitChangedEventHandler(OnTraitChanged);
-				e.OldValue!.SkillChanged -= new SkillChangedEventHandler(OnSkillChanged);
-			}
-			if (e.NewValue != null)
-			{
-				e.NewValue!.LegendChanged += new LegendChangedEventHandler(OnLegendChanged);
-				e.NewValue!.EliteSpecializationChanged += new SpecializationChangedEventHandler(OnEliteSpecializationChanged);
-				e.NewValue!.TemplateChanged += new ValueChangedEventHandler<Template>(OnTemplateChanged);
-				e.NewValue!.TraitChanged += new TraitChangedEventHandler(OnTraitChanged);
-				e.NewValue!.SkillChanged += new SkillChangedEventHandler(OnSkillChanged);
+				TemplatePresenter.LegendChanged += new LegendChangedEventHandler(OnLegendChanged);
+				TemplatePresenter.EliteSpecializationChanged += new SpecializationChangedEventHandler(OnEliteSpecializationChanged);
+				TemplatePresenter.TemplateChanged += new ValueChangedEventHandler<Template>(OnTemplateChanged);
+				TemplatePresenter.TraitChanged += new TraitChangedEventHandler(OnTraitChanged);
+				TemplatePresenter.SkillChanged += new SkillChangedEventHandler(OnSkillChanged);
 			}
 		}
 
@@ -102,7 +82,14 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 		protected override void DisposeControl()
 		{
 			base.DisposeControl();
-			TemplatePresenter = null;
+			if (TemplatePresenter != null)
+			{
+				TemplatePresenter.LegendChanged -= new LegendChangedEventHandler(OnLegendChanged);
+				TemplatePresenter.EliteSpecializationChanged -= new SpecializationChangedEventHandler(OnEliteSpecializationChanged);
+				TemplatePresenter.TemplateChanged -= new ValueChangedEventHandler<Template>(OnTemplateChanged);
+				TemplatePresenter.TraitChanged -= new TraitChangedEventHandler(OnTraitChanged);
+				TemplatePresenter.SkillChanged -= new SkillChangedEventHandler(OnSkillChanged);
+			}
 		}
 
 		protected void SetTooltipSkill()

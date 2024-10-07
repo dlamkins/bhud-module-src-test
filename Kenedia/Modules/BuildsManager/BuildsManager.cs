@@ -38,8 +38,6 @@ namespace Kenedia.Modules.BuildsManager
 
 		private bool _templatesLoaded;
 
-		public IServiceProvider ServiceProvider { get; private set; }
-
 		public static Data Data { get; set; }
 
 		public bool TemplatesLoaded
@@ -50,7 +48,7 @@ namespace Kenedia.Modules.BuildsManager
 			}
 			private set
 			{
-				Common.SetProperty(ref _templatesLoaded, value, new ValueChangedEventHandler<bool>(OnTemplatesLoaded), value);
+				Common.SetProperty(ref _templatesLoaded, value);
 			}
 		}
 
@@ -72,27 +70,18 @@ namespace Kenedia.Modules.BuildsManager
 
 		public NotificationBadge NotificationBadge { get; private set; }
 
-		public event ValueChangedEventHandler<bool> TemplatesLoadedDone;
-
 		[ImportingConstructor]
 		public BuildsManager([Import("ModuleParameters")] ModuleParameters moduleParameters)
 			: base(moduleParameters)
 		{
-			BaseModule<BuildsManager, MainWindow, Settings, Paths>.ModuleInstance = this;
 			HasGUI = true;
-			base.Services.GameStateDetectionService.Enabled = false;
-			ConfigureServices();
+			base.CoreServices.GameStateDetectionService.Enabled = false;
 		}
 
-		private void ConfigureServices()
+		protected override ServiceCollection DefineServices(ServiceCollection services)
 		{
-			Microsoft.Extensions.DependencyInjection.ServiceCollection services = new Microsoft.Extensions.DependencyInjection.ServiceCollection();
-			services.AddSingleton(base.Gw2ApiManager);
-			services.AddSingleton(base.ContentsManager);
-			((IServiceCollection)services).AddSingleton((Module)this);
+			base.DefineServices(services);
 			services.AddSingleton(this);
-			Paths implementationInstance = (base.Paths = new Paths(base.DirectoriesManager, base.Name));
-			services.AddSingleton(implementationInstance);
 			services.AddSingleton<TemplateCollection>();
 			services.AddSingleton<TemplatePresenter>();
 			services.AddSingleton<TemplateTags>();
@@ -113,19 +102,17 @@ namespace Kenedia.Modules.BuildsManager
 			services.AddSingleton<Func<CornerIconContainer>>(() => CornerContainer);
 			services.AddTransient<TemplateFactory>();
 			services.AddTransient<TemplateConverter>();
-			ServiceProvider = services.BuildServiceProvider();
-			Data = ServiceProviderServiceExtensions.GetRequiredService<Data>(ServiceProvider);
-			Templates = ServiceProviderServiceExtensions.GetRequiredService<TemplateCollection>(ServiceProvider);
-			TemplatePresenter = ServiceProviderServiceExtensions.GetRequiredService<TemplatePresenter>(ServiceProvider);
-			TemplateTags = ServiceProviderServiceExtensions.GetRequiredService<TemplateTags>(ServiceProvider);
-			GW2API = ServiceProviderServiceExtensions.GetRequiredService<GW2API>(ServiceProvider);
-			base.Settings = ServiceProviderServiceExtensions.GetRequiredService<Settings>(ServiceProvider);
-			CreateCornerIcons();
+			return services;
 		}
 
-		private void OnTemplatesLoaded(object sender, Kenedia.Modules.Core.Models.ValueChangedEventArgs<bool> e)
+		protected override void AssignServiceInstaces(IServiceProvider serviceProvider)
 		{
-			this.TemplatesLoadedDone?.Invoke(this, e);
+			base.AssignServiceInstaces(serviceProvider);
+			Data = ServiceProviderServiceExtensions.GetRequiredService<Data>(base.ServiceProvider);
+			Templates = ServiceProviderServiceExtensions.GetRequiredService<TemplateCollection>(base.ServiceProvider);
+			TemplatePresenter = ServiceProviderServiceExtensions.GetRequiredService<TemplatePresenter>(base.ServiceProvider);
+			TemplateTags = ServiceProviderServiceExtensions.GetRequiredService<TemplateTags>(base.ServiceProvider);
+			GW2API = ServiceProviderServiceExtensions.GetRequiredService<GW2API>(base.ServiceProvider);
 		}
 
 		protected override void DefineSettings(SettingCollection settings)
@@ -138,6 +125,7 @@ namespace Kenedia.Modules.BuildsManager
 		protected override void Initialize()
 		{
 			base.Initialize();
+			CreateCornerIcons();
 			BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Info("Starting " + base.Name + " v." + (object)base.Version.BaseVersion());
 			Data.Loaded += new EventHandler(Data_Loaded);
 		}
@@ -179,7 +167,7 @@ namespace Kenedia.Modules.BuildsManager
 		{
 			LoadingSpinner?.Show();
 			await base.LoadAsync();
-			await ServiceProviderServiceExtensions.GetService<TagGroups>(ServiceProvider)!.Load();
+			await ServiceProviderServiceExtensions.GetService<TagGroups>(base.ServiceProvider)!.Load();
 			await TemplateTags.Load();
 			await Data.Load();
 		}
@@ -223,7 +211,7 @@ namespace Kenedia.Modules.BuildsManager
 			{
 				base.LoadGUI();
 				BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Info("Building UI for " + base.Name);
-				IServiceScope scope = ServiceProviderServiceExtensions.CreateScope(ServiceProvider);
+				IServiceScope scope = ServiceProviderServiceExtensions.CreateScope(base.ServiceProvider);
 				base.MainWindow = ServiceProviderServiceExtensions.GetRequiredService<MainWindow>(scope.ServiceProvider);
 			}
 		}
@@ -265,7 +253,7 @@ namespace Kenedia.Modules.BuildsManager
 				string[] templateFiles = Directory.GetFiles(base.Paths.TemplatesPath);
 				Templates.Clear();
 				JsonSerializerSettings settings = new JsonSerializerSettings();
-				settings.get_Converters().Add((JsonConverter)(object)ServiceProviderServiceExtensions.GetService<TemplateConverter>(ServiceProvider));
+				settings.get_Converters().Add((JsonConverter)(object)ServiceProviderServiceExtensions.GetService<TemplateConverter>(base.ServiceProvider));
 				BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Info($"Loading {templateFiles.Length} Templates ...");
 				string[] array = templateFiles;
 				foreach (string file in array)
@@ -276,7 +264,7 @@ namespace Kenedia.Modules.BuildsManager
 				}
 				if (Templates.Count == 0)
 				{
-					Templates.Add(ServiceProviderServiceExtensions.GetService<TemplateFactory>(ServiceProvider)!.CreateTemplate());
+					Templates.Add(ServiceProviderServiceExtensions.GetService<TemplateFactory>(base.ServiceProvider)!.CreateTemplate());
 				}
 				time.Stop();
 				BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Info($"Time to load {templateFiles.Length} templates {time.ElapsedMilliseconds}ms. {Templates.Count} out of {templateFiles.Length} templates got loaded.");

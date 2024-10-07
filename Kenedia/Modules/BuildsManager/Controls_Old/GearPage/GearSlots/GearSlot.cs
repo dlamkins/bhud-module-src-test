@@ -309,7 +309,6 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 		protected override void DisposeControl()
 		{
 			base.DisposeControl();
-			TemplatePresenter = null;
 			ItemControl?.Dispose();
 		}
 	}
