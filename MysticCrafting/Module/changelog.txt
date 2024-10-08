@@ -1,4 +1,7 @@
-﻿#Items
+﻿#1.4.1 Categories hotfix
+Relics, rings and trinkets categories have been updated to display correctly.
+
+#1.4.0 Items
 You can now search and filter for almost any items that can be crafted, purchased from a vendor, or purchased from the TP.
       
 #API
