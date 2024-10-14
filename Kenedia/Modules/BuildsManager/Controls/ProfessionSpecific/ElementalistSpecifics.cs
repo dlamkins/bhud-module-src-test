@@ -6,6 +6,7 @@ using Gw2Sharp.Models;
 using Gw2Sharp.WebApi.V2.Models;
 using Kenedia.Modules.BuildsManager.DataModels.Professions;
 using Kenedia.Modules.BuildsManager.Models;
+using Kenedia.Modules.BuildsManager.Services;
 using Kenedia.Modules.Core.DataModels;
 using Kenedia.Modules.Core.Models;
 using Microsoft.Xna.Framework;
@@ -40,8 +41,8 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 		};
 
 
-		public ElementalistSpecifics(TemplatePresenter template)
-			: base(template)
+		public ElementalistSpecifics(TemplatePresenter template, Data data)
+			: base(template, data)
 		{
 			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
@@ -176,18 +177,18 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 
 		protected override void ApplyTemplate()
 		{
-			//IL_0389: Unknown result type (might be due to invalid IL or missing references)
-			//IL_039c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03af: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03d5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03da: Unknown result type (might be due to invalid IL or missing references)
-			if (base.TemplatePresenter?.Template == null)
+			//IL_0398: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03e9: Unknown result type (might be due to invalid IL or missing references)
+			if (base.TemplatePresenter?.Template == null || !base.Data.IsLoaded)
 			{
 				return;
 			}
 			base.ApplyTemplate();
-			Dictionary<int, Kenedia.Modules.BuildsManager.DataModels.Professions.Skill> skills = BuildsManager.Data?.Professions?[ProfessionType.Elementalist]?.Skills;
+			Dictionary<int, Kenedia.Modules.BuildsManager.DataModels.Professions.Skill> skills = base.Data?.Professions?[ProfessionType.Elementalist]?.Skills;
 			if (skills != null)
 			{
 				SkillIcon obj = Skills[0];

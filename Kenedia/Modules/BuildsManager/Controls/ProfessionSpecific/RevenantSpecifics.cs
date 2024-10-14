@@ -11,6 +11,7 @@ using Kenedia.Modules.BuildsManager.DataModels.Professions;
 using Kenedia.Modules.BuildsManager.Models;
 using Kenedia.Modules.BuildsManager.Models.Templates;
 using Kenedia.Modules.BuildsManager.Res;
+using Kenedia.Modules.BuildsManager.Services;
 using Kenedia.Modules.Core.Controls;
 using Kenedia.Modules.Core.Extensions;
 using Kenedia.Modules.Core.Models;
@@ -63,11 +64,11 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 
 		public ImageButton TerrestrialSwapButton { get; }
 
-		public RevenantSpecifics(TemplatePresenter template)
-			: base(template)
+		public RevenantSpecifics(TemplatePresenter template, Data data)
+			: base(template, data)
 		{
-			//IL_011f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0163: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0120: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0164: Unknown result type (might be due to invalid IL or missing references)
 			_legendSelector = new LegendSelector
 			{
 				Parent = Control.Graphics.SpriteScreen,
@@ -194,7 +195,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 
 		protected override void ApplyTemplate()
 		{
-			if (base.TemplatePresenter?.Template == null)
+			if (base.TemplatePresenter?.Template == null || !base.Data.IsLoaded)
 			{
 				return;
 			}
@@ -252,11 +253,14 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 
 		private void GetSelectableLegends(LegendSlotType legendSlot)
 		{
-			_selectedLegendSlot = legendSlot;
-			IEnumerable<Legend> legends = from e in BuildsManager.Data.Professions[ProfessionType.Revenant].Legends
-				where e.Value.Specialization == 0 || e.Value.Specialization == base.TemplatePresenter.Template.EliteSpecialization?.Id
-				select e.Value;
-			_legendSelector.SetItems(legends);
+			if (base.Data.IsLoaded)
+			{
+				_selectedLegendSlot = legendSlot;
+				IEnumerable<Legend> legends = from e in base.Data.Professions[ProfessionType.Revenant].Legends
+					where e.Value.Specialization == 0 || e.Value.Specialization == base.TemplatePresenter.Template.EliteSpecialization?.Id
+					select e.Value;
+				_legendSelector.SetItems(legends);
+			}
 		}
 	}
 }

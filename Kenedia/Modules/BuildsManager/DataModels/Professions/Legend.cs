@@ -74,15 +74,6 @@ namespace Kenedia.Modules.BuildsManager.DataModels.Professions
 
 		public AsyncTexture2D Icon => Swap?.Icon;
 
-		public Legend()
-		{
-		}
-
-		public Legend(Gw2Sharp.WebApi.V2.Models.Legend legend, Dictionary<int, Skill> skills)
-		{
-			Apply(legend, skills);
-		}
-
 		internal void ApplyLanguage(KeyValuePair<int, Legend> leg)
 		{
 			Heal.Name = leg.Value.Heal.Name;

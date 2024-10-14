@@ -26,11 +26,15 @@ namespace Kenedia.Modules.BuildsManager.Services
 
 		private CancellationTokenSource _tokenSource;
 
-		private List<TemplateTag> _tags;
+		private List<TemplateTag> _tags = new List<TemplateTag>();
 
 		private bool _saveRequested;
 
 		public TagGroups TagGroups { get; }
+
+		public bool IsLoaded { get; private set; }
+
+		public event EventHandler? Loaded;
 
 		public event PropertyChangedEventHandler TagChanged;
 
@@ -102,8 +106,8 @@ namespace Kenedia.Modules.BuildsManager.Services
 				{
 					if (File.Exists(_paths.ModulePath + "TemplateTags.json"))
 					{
-						string json2 = File.ReadAllText(_paths.ModulePath + "TemplateTags.json");
-						_tags = JsonConvert.DeserializeObject<List<TemplateTag>>(json2, SerializerSettings.Default);
+						string json = File.ReadAllText(_paths.ModulePath + "TemplateTags.json");
+						_tags = JsonConvert.DeserializeObject<List<TemplateTag>>(json, SerializerSettings.Default);
 					}
 				}
 				catch (Exception ex)
@@ -114,9 +118,9 @@ namespace Kenedia.Modules.BuildsManager.Services
 			}
 			else
 			{
-				string json = await new StreamReader(_contentsManager.GetFileStream("data\\TemplateTags.json")).ReadToEndAsync();
-				_tags = JsonConvert.DeserializeObject<List<TemplateTag>>(json, SerializerSettings.Default);
-				File.WriteAllText(_paths.ModulePath + "TemplateTags.json", json);
+				string json2 = await new StreamReader(_contentsManager.GetFileStream("data\\TemplateTags.json")).ReadToEndAsync();
+				_tags = JsonConvert.DeserializeObject<List<TemplateTag>>(json2, SerializerSettings.Default);
+				File.WriteAllText(_paths.ModulePath + "TemplateTags.json", json2);
 				BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Warn("Loaded default TemplateTags.json");
 			}
 			foreach (TemplateTag tag in _tags)
@@ -124,6 +128,8 @@ namespace Kenedia.Modules.BuildsManager.Services
 				tag.Icon = new DetailedTexture(tag.AssetId);
 				tag.PropertyChanged += new PropertyChangedEventHandler(Tag_PropertyChanged);
 			}
+			IsLoaded = true;
+			this.Loaded?.Invoke(this, EventArgs.Empty);
 		}
 
 		private void Tag_PropertyChanged(object sender, PropertyChangedEventArgs e)

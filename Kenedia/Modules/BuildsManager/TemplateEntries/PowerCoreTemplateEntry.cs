@@ -1,8 +1,7 @@
 using System;
-using System.Linq;
 using Kenedia.Modules.BuildsManager.DataModels.Items;
 using Kenedia.Modules.BuildsManager.Models.Templates;
-using Kenedia.Modules.BuildsManager.Utility;
+using Kenedia.Modules.BuildsManager.Services;
 using Kenedia.Modules.Core.Models;
 using Kenedia.Modules.Core.Utility;
 
@@ -26,8 +25,8 @@ namespace Kenedia.Modules.BuildsManager.TemplateEntries
 			}
 		}
 
-		public PowerCoreTemplateEntry(TemplateSlotType slot)
-			: base(slot)
+		public PowerCoreTemplateEntry(TemplateSlotType slot, Data data)
+			: base(slot, data)
 		{
 		}
 
@@ -44,26 +43,6 @@ namespace Kenedia.Modules.BuildsManager.TemplateEntries
 			{
 				PowerCore = powerCore;
 			}
-		}
-
-		public override byte[] AddToCodeArray(byte[] array)
-		{
-			return array.Concat(new byte[1] { PowerCore?.MappedId ?? 0 }).ToArray();
-		}
-
-		public override byte[] GetFromCodeArray(byte[] array)
-		{
-			byte[] array2 = array;
-			int newStartIndex = 1;
-			if (array2 != null && array2.Length != 0)
-			{
-				PowerCore = BuildsManager.Data.PowerCores.Values.Where((PowerCore e) => e.MappedId == array2[0]).FirstOrDefault();
-			}
-			if (array2 == null || array2.Length == 0)
-			{
-				return array2;
-			}
-			return GearTemplateCode.RemoveFromStart(array2, newStartIndex);
 		}
 
 		public void Dispose()

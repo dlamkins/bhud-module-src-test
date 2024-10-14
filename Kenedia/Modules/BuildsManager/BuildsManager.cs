@@ -1,7 +1,5 @@
 using System;
 using System.ComponentModel.Composition;
-using System.Diagnostics;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
@@ -25,7 +23,6 @@ using Kenedia.Modules.Core.Structs;
 using Kenedia.Modules.Core.Utility;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
-using Newtonsoft.Json;
 
 namespace Kenedia.Modules.BuildsManager
 {
@@ -75,6 +72,7 @@ namespace Kenedia.Modules.BuildsManager
 			: base(moduleParameters)
 		{
 			HasGUI = true;
+			AutoLoadGUI = false;
 			base.CoreServices.GameStateDetectionService.Enabled = false;
 		}
 
@@ -118,7 +116,6 @@ namespace Kenedia.Modules.BuildsManager
 		protected override void DefineSettings(SettingCollection settings)
 		{
 			base.DefineSettings(settings);
-			base.Settings.SettingCollection = settings;
 			base.Settings.ShowCornerIcon.SettingChanged += ShowCornerIcon_SettingChanged;
 		}
 
@@ -127,15 +124,7 @@ namespace Kenedia.Modules.BuildsManager
 			base.Initialize();
 			CreateCornerIcons();
 			BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Info("Starting " + base.Name + " v." + (object)base.Version.BaseVersion());
-			Data.Loaded += new EventHandler(Data_Loaded);
-		}
-
-		private async void Data_Loaded(object sender, EventArgs e)
-		{
-			if (!TemplatesLoaded)
-			{
-				await LoadTemplates();
-			}
+			LoadGUI();
 		}
 
 		public override IView GetSettingsView()
@@ -169,6 +158,7 @@ namespace Kenedia.Modules.BuildsManager
 			await base.LoadAsync();
 			await ServiceProviderServiceExtensions.GetService<TagGroups>(base.ServiceProvider)!.Load();
 			await TemplateTags.Load();
+			await Templates.Load();
 			await Data.Load();
 		}
 
@@ -207,13 +197,10 @@ namespace Kenedia.Modules.BuildsManager
 
 		protected override void LoadGUI()
 		{
-			if (Data.IsLoaded && TemplatesLoaded)
-			{
-				base.LoadGUI();
-				BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Info("Building UI for " + base.Name);
-				IServiceScope scope = ServiceProviderServiceExtensions.CreateScope(base.ServiceProvider);
-				base.MainWindow = ServiceProviderServiceExtensions.GetRequiredService<MainWindow>(scope.ServiceProvider);
-			}
+			base.LoadGUI();
+			BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Info("Building UI for " + base.Name);
+			IServiceScope scope = ServiceProviderServiceExtensions.CreateScope(base.ServiceProvider);
+			base.MainWindow = ServiceProviderServiceExtensions.GetRequiredService<MainWindow>(scope.ServiceProvider);
 		}
 
 		protected override void UnloadGUI()
@@ -244,37 +231,6 @@ namespace Kenedia.Modules.BuildsManager
 
 		private async Task LoadTemplates()
 		{
-			BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Info("LoadTemplates");
-			TemplatesLoaded = false;
-			Stopwatch time = new Stopwatch();
-			time.Start();
-			try
-			{
-				string[] templateFiles = Directory.GetFiles(base.Paths.TemplatesPath);
-				Templates.Clear();
-				JsonSerializerSettings settings = new JsonSerializerSettings();
-				settings.get_Converters().Add((JsonConverter)(object)ServiceProviderServiceExtensions.GetService<TemplateConverter>(base.ServiceProvider));
-				BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Info($"Loading {templateFiles.Length} Templates ...");
-				string[] array = templateFiles;
-				foreach (string file in array)
-				{
-					using StreamReader reader = new StreamReader(file);
-					Template template = JsonConvert.DeserializeObject<Template>(await reader.ReadToEndAsync(), settings);
-					Templates.Add(template);
-				}
-				if (Templates.Count == 0)
-				{
-					Templates.Add(ServiceProviderServiceExtensions.GetService<TemplateFactory>(base.ServiceProvider)!.CreateTemplate());
-				}
-				time.Stop();
-				BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Info($"Time to load {templateFiles.Length} templates {time.ElapsedMilliseconds}ms. {Templates.Count} out of {templateFiles.Length} templates got loaded.");
-			}
-			catch (Exception ex)
-			{
-				BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Warn(ex.Message);
-				BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Warn("Loading Templates failed!");
-			}
-			TemplatesLoaded = true;
 		}
 
 		private void CreateCornerIcons()

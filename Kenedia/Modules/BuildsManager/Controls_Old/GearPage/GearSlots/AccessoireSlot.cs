@@ -55,13 +55,18 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 			}
 		}
 
-		public AccessoireSlot(TemplateSlotType gearSlot, Container parent, TemplatePresenter templatePresenter, SelectionPanel selectionPanel)
-			: base(gearSlot, parent, templatePresenter, selectionPanel)
+		public AccessoireSlot(TemplateSlotType gearSlot, Container parent, TemplatePresenter templatePresenter, SelectionPanel selectionPanel, Data data)
+			: base(gearSlot, parent, templatePresenter, selectionPanel, data)
 		{
 			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
 			_infusionControl.Placeholder.Texture = (AsyncTexture2D)BaseModule<BuildsManager, MainWindow, Settings, Paths>.ModuleInstance.ContentsManager.GetTexture("textures\\infusionslot.png");
-			base.ItemControl.Item = BuildsManager.Data.Trinkets[81908];
 			_infusionControl.Parent = this;
+		}
+
+		protected override void OnDataLoaded()
+		{
+			base.OnDataLoaded();
+			base.ItemControl.Item = base.Data.Trinkets[81908];
 		}
 
 		public override void RecalculateLayout()

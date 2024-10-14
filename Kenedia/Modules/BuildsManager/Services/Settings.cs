@@ -5,15 +5,12 @@ using Kenedia.Modules.BuildsManager.Res;
 using Kenedia.Modules.BuildsManager.Views;
 using Kenedia.Modules.Core.Models;
 using Kenedia.Modules.Core.Res;
-using Kenedia.Modules.Core.Utility;
 using Microsoft.Xna.Framework.Input;
 
 namespace Kenedia.Modules.BuildsManager.Services
 {
 	public class Settings : BaseSettingsModel
 	{
-		private SettingCollection _settingCollection;
-
 		public SettingEntry<TemplateSortBehavior> SortBehavior { get; set; }
 
 		public SettingEntry<bool> ShowCornerIcon { get; set; }
@@ -32,23 +29,16 @@ namespace Kenedia.Modules.BuildsManager.Services
 
 		public SettingEntry<KeyBinding> ToggleWindowKey { get; set; }
 
-		public SettingCollection SettingCollection
-		{
-			get
-			{
-				return _settingCollection;
-			}
-			set
-			{
-				Common.SetProperty(ref _settingCollection, value, new ValueChangedEventHandler<SettingCollection>(OnSettingCollectionChanged));
-			}
-		}
-
 		public SettingEntry<bool> QuickFiltersPanelFade { get; private set; }
 
-		private void InitializeSettings(SettingCollection settings)
+		public Settings(SettingCollection settingCollection)
+			: base(settingCollection)
 		{
-			SettingCollection = settings;
+		}
+
+		protected override void InitializeSettings(SettingCollection settings)
+		{
+			base.InitializeSettings(settings);
 			SettingCollection internalSettings = settings.AddSubCollection("Internal", renderInUi: false, lazyLoaded: false);
 			SortBehavior = internalSettings.DefineSetting("SortBehavior", TemplateSortBehavior.ByProfession);
 			ShowQuickFilterPanelOnWindowOpen = internalSettings.DefineSetting("ShowQuickFilterPanelOnWindowOpen", defaultValue: false);
@@ -60,14 +50,6 @@ namespace Kenedia.Modules.BuildsManager.Services
 			AutoSetFilterProfession = internalSettings.DefineSetting("AutoSetFilterProfession", defaultValue: false, () => strings.AutoSetProfession_Name, () => strings.AutoSetProfession_Tooltip);
 			AutoSetFilterSpecialization = internalSettings.DefineSetting("AutoSetFilterSpecialization", defaultValue: false, () => strings.AutoSetFilterSpecialization_Name, () => strings.AutoSetFilterSpecialization_Tooltip);
 			ToggleWindowKey = internalSettings.DefineSetting("ToggleWindowKey", new KeyBinding(ModifierKeys.Shift, (Keys)66), () => string.Format(strings_common.ToggleItem, BaseModule<BuildsManager, MainWindow, Settings, Paths>.ModuleName), () => string.Format(strings_common.ToggleItem, BaseModule<BuildsManager, MainWindow, Settings, Paths>.ModuleName));
-		}
-
-		private void OnSettingCollectionChanged(object sender, ValueChangedEventArgs<SettingCollection> e)
-		{
-			if (e.NewValue != null)
-			{
-				InitializeSettings(e.NewValue);
-			}
 		}
 	}
 }

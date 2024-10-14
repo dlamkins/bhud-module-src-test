@@ -5,6 +5,7 @@ using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Gw2Sharp.Models;
 using Gw2Sharp.WebApi;
+using Kenedia.Modules.BuildsManager.Services;
 using Kenedia.Modules.Core.Controls;
 using Kenedia.Modules.Core.DataModels;
 using Kenedia.Modules.Core.Extensions;
@@ -55,15 +56,18 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 			}
 		}
 
-		public ProfessionRaceSelectable()
+		public Data Data { get; }
+
+		public ProfessionRaceSelectable(Data data)
 		{
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
+			Data = data;
 			HeightSizingMode = SizingMode.AutoSize;
 			base.BorderWidth = new RectangleDimensions(2);
 			base.BorderColor = Color.get_Black();
@@ -114,7 +118,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 			{
 			case ProfessionRaceSelection.SelectionType.Profession:
 			{
-				if (BuildsManager.Data.Professions.TryGetValue((ProfessionType)(object)Value, out var profession))
+				if (Data.Professions.TryGetValue((ProfessionType)(object)Value, out var profession))
 				{
 					_name.SetLocalizedText = () => profession?.Name;
 					_icon.Texture = profession.IconBig;
@@ -123,7 +127,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 			}
 			case ProfessionRaceSelection.SelectionType.Race:
 			{
-				if (BuildsManager.Data.Races.TryGetValue((Races)(object)Value, out var race))
+				if (Data.Races.TryGetValue((Races)(object)Value, out var race))
 				{
 					_name.SetLocalizedText = () => race?.Name;
 					_icon.Texture = race.Icon;

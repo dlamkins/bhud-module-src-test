@@ -7,6 +7,7 @@ using Kenedia.Modules.BuildsManager.DataModels.Items;
 using Kenedia.Modules.BuildsManager.Models;
 using Kenedia.Modules.BuildsManager.Models.Templates;
 using Kenedia.Modules.BuildsManager.Res;
+using Kenedia.Modules.BuildsManager.Services;
 using Kenedia.Modules.BuildsManager.TemplateEntries;
 using Kenedia.Modules.Core.Extensions;
 using Microsoft.Xna.Framework;
@@ -24,12 +25,12 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 
 		private string _powerCoreDescription;
 
-		public PowerCoreSlot(TemplateSlotType gearSlot, Container parent, TemplatePresenter templatePresenter, SelectionPanel selectionPanel)
-			: base(gearSlot, parent, templatePresenter, selectionPanel)
+		public PowerCoreSlot(TemplateSlotType gearSlot, Container parent, TemplatePresenter templatePresenter, SelectionPanel selectionPanel, Data data)
+			: base(gearSlot, parent, templatePresenter, selectionPanel, data)
 		{
-			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
 			base.ItemControl.Placeholder.Texture = AsyncTexture2D.FromAssetId(2630946);
 			base.ItemControl.Placeholder.TextureRegion = new Rectangle(38, 38, 52, 52);
 			ItemColor = Color.get_White();

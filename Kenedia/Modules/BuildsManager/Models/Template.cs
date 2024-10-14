@@ -218,80 +218,55 @@ namespace Kenedia.Modules.BuildsManager.Models
 			}
 		}
 
-		public ArmorTemplateEntry Head { get; } = new ArmorTemplateEntry(TemplateSlotType.Head);
+		public ArmorTemplateEntry Head { get; }
 
+		public ArmorTemplateEntry Shoulder { get; }
 
-		public ArmorTemplateEntry Shoulder { get; } = new ArmorTemplateEntry(TemplateSlotType.Shoulder);
+		public ArmorTemplateEntry Chest { get; }
 
+		public ArmorTemplateEntry Hand { get; }
 
-		public ArmorTemplateEntry Chest { get; } = new ArmorTemplateEntry(TemplateSlotType.Chest);
+		public ArmorTemplateEntry Leg { get; }
 
+		public ArmorTemplateEntry Foot { get; }
 
-		public ArmorTemplateEntry Hand { get; } = new ArmorTemplateEntry(TemplateSlotType.Hand);
+		public ArmorTemplateEntry AquaBreather { get; }
 
+		public WeaponTemplateEntry MainHand { get; }
 
-		public ArmorTemplateEntry Leg { get; } = new ArmorTemplateEntry(TemplateSlotType.Leg);
+		public WeaponTemplateEntry OffHand { get; }
 
+		public AquaticWeaponTemplateEntry Aquatic { get; }
 
-		public ArmorTemplateEntry Foot { get; } = new ArmorTemplateEntry(TemplateSlotType.Foot);
+		public WeaponTemplateEntry AltMainHand { get; }
 
+		public WeaponTemplateEntry AltOffHand { get; }
 
-		public ArmorTemplateEntry AquaBreather { get; } = new ArmorTemplateEntry(TemplateSlotType.AquaBreather);
+		public AquaticWeaponTemplateEntry AltAquatic { get; }
 
+		public BackTemplateEntry Back { get; }
 
-		public WeaponTemplateEntry MainHand { get; } = new WeaponTemplateEntry(TemplateSlotType.MainHand);
+		public AmuletTemplateEntry Amulet { get; }
 
+		public AccessoireTemplateEntry Accessory_1 { get; }
 
-		public WeaponTemplateEntry OffHand { get; } = new WeaponTemplateEntry(TemplateSlotType.OffHand);
+		public AccessoireTemplateEntry Accessory_2 { get; }
 
+		public RingTemplateEntry Ring_1 { get; }
 
-		public AquaticWeaponTemplateEntry Aquatic { get; } = new AquaticWeaponTemplateEntry(TemplateSlotType.Aquatic);
+		public RingTemplateEntry Ring_2 { get; }
 
+		public PvpAmuletTemplateEntry PvpAmulet { get; }
 
-		public WeaponTemplateEntry AltMainHand { get; } = new WeaponTemplateEntry(TemplateSlotType.AltMainHand);
+		public NourishmentTemplateEntry Nourishment { get; }
 
+		public EnhancementTemplateEntry Enhancement { get; }
 
-		public WeaponTemplateEntry AltOffHand { get; } = new WeaponTemplateEntry(TemplateSlotType.AltOffHand);
+		public PowerCoreTemplateEntry PowerCore { get; }
 
+		public PveRelicTemplateEntry PveRelic { get; }
 
-		public AquaticWeaponTemplateEntry AltAquatic { get; } = new AquaticWeaponTemplateEntry(TemplateSlotType.AltAquatic);
-
-
-		public BackTemplateEntry Back { get; } = new BackTemplateEntry(TemplateSlotType.Back);
-
-
-		public AmuletTemplateEntry Amulet { get; } = new AmuletTemplateEntry(TemplateSlotType.Amulet);
-
-
-		public AccessoireTemplateEntry Accessory_1 { get; } = new AccessoireTemplateEntry(TemplateSlotType.Accessory_1);
-
-
-		public AccessoireTemplateEntry Accessory_2 { get; } = new AccessoireTemplateEntry(TemplateSlotType.Accessory_2);
-
-
-		public RingTemplateEntry Ring_1 { get; } = new RingTemplateEntry(TemplateSlotType.Ring_1);
-
-
-		public RingTemplateEntry Ring_2 { get; } = new RingTemplateEntry(TemplateSlotType.Ring_2);
-
-
-		public PvpAmuletTemplateEntry PvpAmulet { get; } = new PvpAmuletTemplateEntry(TemplateSlotType.PvpAmulet);
-
-
-		public NourishmentTemplateEntry Nourishment { get; } = new NourishmentTemplateEntry(TemplateSlotType.Nourishment);
-
-
-		public EnhancementTemplateEntry Enhancement { get; } = new EnhancementTemplateEntry(TemplateSlotType.Enhancement);
-
-
-		public PowerCoreTemplateEntry PowerCore { get; } = new PowerCoreTemplateEntry(TemplateSlotType.PowerCore);
-
-
-		public PveRelicTemplateEntry PveRelic { get; } = new PveRelicTemplateEntry(TemplateSlotType.PveRelic);
-
-
-		public PvpRelicTemplateEntry PvpRelic { get; } = new PvpRelicTemplateEntry(TemplateSlotType.PvpRelic);
-
+		public PvpRelicTemplateEntry PvpRelic { get; }
 
 		public Dictionary<TemplateSlotType, TemplateEntry> Weapons { get; }
 
@@ -344,6 +319,31 @@ namespace Kenedia.Modules.BuildsManager.Models
 			Data = data;
 			_timer = new System.Timers.Timer(1000.0);
 			_timer.Elapsed += OnTimerElapsed;
+			Head = new ArmorTemplateEntry(TemplateSlotType.Head, Data);
+			Shoulder = new ArmorTemplateEntry(TemplateSlotType.Shoulder, Data);
+			Chest = new ArmorTemplateEntry(TemplateSlotType.Chest, Data);
+			Hand = new ArmorTemplateEntry(TemplateSlotType.Hand, Data);
+			Leg = new ArmorTemplateEntry(TemplateSlotType.Leg, Data);
+			Foot = new ArmorTemplateEntry(TemplateSlotType.Foot, Data);
+			AquaBreather = new ArmorTemplateEntry(TemplateSlotType.AquaBreather, Data);
+			MainHand = new WeaponTemplateEntry(TemplateSlotType.MainHand, Data);
+			OffHand = new WeaponTemplateEntry(TemplateSlotType.OffHand, Data);
+			Aquatic = new AquaticWeaponTemplateEntry(TemplateSlotType.Aquatic, Data);
+			AltMainHand = new WeaponTemplateEntry(TemplateSlotType.AltMainHand, Data);
+			AltOffHand = new WeaponTemplateEntry(TemplateSlotType.AltOffHand, Data);
+			AltAquatic = new AquaticWeaponTemplateEntry(TemplateSlotType.AltAquatic, Data);
+			Back = new BackTemplateEntry(TemplateSlotType.Back, Data);
+			Amulet = new AmuletTemplateEntry(TemplateSlotType.Amulet, Data);
+			Accessory_1 = new AccessoireTemplateEntry(TemplateSlotType.Accessory_1, Data);
+			Accessory_2 = new AccessoireTemplateEntry(TemplateSlotType.Accessory_2, Data);
+			Ring_1 = new RingTemplateEntry(TemplateSlotType.Ring_1, Data);
+			Ring_2 = new RingTemplateEntry(TemplateSlotType.Ring_2, Data);
+			PvpAmulet = new PvpAmuletTemplateEntry(TemplateSlotType.PvpAmulet, Data);
+			Nourishment = new NourishmentTemplateEntry(TemplateSlotType.Nourishment, Data);
+			Enhancement = new EnhancementTemplateEntry(TemplateSlotType.Enhancement, Data);
+			PowerCore = new PowerCoreTemplateEntry(TemplateSlotType.PowerCore, Data);
+			PveRelic = new PveRelicTemplateEntry(TemplateSlotType.PveRelic, Data);
+			PvpRelic = new PvpRelicTemplateEntry(TemplateSlotType.PvpRelic, Data);
 			Weapons = new Dictionary<TemplateSlotType, TemplateEntry>
 			{
 				{
@@ -682,16 +682,16 @@ namespace Kenedia.Modules.BuildsManager.Models
 				}
 				else
 				{
-					SetSkill(SkillSlotType.Active | SkillSlotType.Terrestrial | SkillSlotType.Heal, Kenedia.Modules.BuildsManager.DataModels.Professions.Skill.FromUShort(build.TerrestrialHealingSkillPaletteId, build.Profession));
-					SetSkill(SkillSlotType.Active | SkillSlotType.Terrestrial | SkillSlotType.Utility_1, Kenedia.Modules.BuildsManager.DataModels.Professions.Skill.FromUShort(build.TerrestrialUtility1SkillPaletteId, build.Profession));
-					SetSkill(SkillSlotType.Active | SkillSlotType.Terrestrial | SkillSlotType.Utility_2, Kenedia.Modules.BuildsManager.DataModels.Professions.Skill.FromUShort(build.TerrestrialUtility2SkillPaletteId, build.Profession));
-					SetSkill(SkillSlotType.Active | SkillSlotType.Terrestrial | SkillSlotType.Utility_3, Kenedia.Modules.BuildsManager.DataModels.Professions.Skill.FromUShort(build.TerrestrialUtility3SkillPaletteId, build.Profession));
-					SetSkill(SkillSlotType.Active | SkillSlotType.Terrestrial | SkillSlotType.Elite, Kenedia.Modules.BuildsManager.DataModels.Professions.Skill.FromUShort(build.TerrestrialEliteSkillPaletteId, build.Profession));
-					SetSkill(SkillSlotType.Active | SkillSlotType.Aquatic | SkillSlotType.Heal, Kenedia.Modules.BuildsManager.DataModels.Professions.Skill.FromUShort(build.AquaticHealingSkillPaletteId, build.Profession));
-					SetSkill(SkillSlotType.Active | SkillSlotType.Aquatic | SkillSlotType.Utility_1, Kenedia.Modules.BuildsManager.DataModels.Professions.Skill.FromUShort(build.AquaticUtility1SkillPaletteId, build.Profession));
-					SetSkill(SkillSlotType.Active | SkillSlotType.Aquatic | SkillSlotType.Utility_2, Kenedia.Modules.BuildsManager.DataModels.Professions.Skill.FromUShort(build.AquaticUtility2SkillPaletteId, build.Profession));
-					SetSkill(SkillSlotType.Active | SkillSlotType.Aquatic | SkillSlotType.Utility_3, Kenedia.Modules.BuildsManager.DataModels.Professions.Skill.FromUShort(build.AquaticUtility3SkillPaletteId, build.Profession));
-					SetSkill(SkillSlotType.Active | SkillSlotType.Aquatic | SkillSlotType.Elite, Kenedia.Modules.BuildsManager.DataModels.Professions.Skill.FromUShort(build.AquaticEliteSkillPaletteId, build.Profession));
+					SetSkill(SkillSlotType.Active | SkillSlotType.Terrestrial | SkillSlotType.Heal, Kenedia.Modules.BuildsManager.DataModels.Professions.Skill.FromUShort(build.TerrestrialHealingSkillPaletteId, build.Profession, Data));
+					SetSkill(SkillSlotType.Active | SkillSlotType.Terrestrial | SkillSlotType.Utility_1, Kenedia.Modules.BuildsManager.DataModels.Professions.Skill.FromUShort(build.TerrestrialUtility1SkillPaletteId, build.Profession, Data));
+					SetSkill(SkillSlotType.Active | SkillSlotType.Terrestrial | SkillSlotType.Utility_2, Kenedia.Modules.BuildsManager.DataModels.Professions.Skill.FromUShort(build.TerrestrialUtility2SkillPaletteId, build.Profession, Data));
+					SetSkill(SkillSlotType.Active | SkillSlotType.Terrestrial | SkillSlotType.Utility_3, Kenedia.Modules.BuildsManager.DataModels.Professions.Skill.FromUShort(build.TerrestrialUtility3SkillPaletteId, build.Profession, Data));
+					SetSkill(SkillSlotType.Active | SkillSlotType.Terrestrial | SkillSlotType.Elite, Kenedia.Modules.BuildsManager.DataModels.Professions.Skill.FromUShort(build.TerrestrialEliteSkillPaletteId, build.Profession, Data));
+					SetSkill(SkillSlotType.Active | SkillSlotType.Aquatic | SkillSlotType.Heal, Kenedia.Modules.BuildsManager.DataModels.Professions.Skill.FromUShort(build.AquaticHealingSkillPaletteId, build.Profession, Data));
+					SetSkill(SkillSlotType.Active | SkillSlotType.Aquatic | SkillSlotType.Utility_1, Kenedia.Modules.BuildsManager.DataModels.Professions.Skill.FromUShort(build.AquaticUtility1SkillPaletteId, build.Profession, Data));
+					SetSkill(SkillSlotType.Active | SkillSlotType.Aquatic | SkillSlotType.Utility_2, Kenedia.Modules.BuildsManager.DataModels.Professions.Skill.FromUShort(build.AquaticUtility2SkillPaletteId, build.Profession, Data));
+					SetSkill(SkillSlotType.Active | SkillSlotType.Aquatic | SkillSlotType.Utility_3, Kenedia.Modules.BuildsManager.DataModels.Professions.Skill.FromUShort(build.AquaticUtility3SkillPaletteId, build.Profession, Data));
+					SetSkill(SkillSlotType.Active | SkillSlotType.Aquatic | SkillSlotType.Elite, Kenedia.Modules.BuildsManager.DataModels.Professions.Skill.FromUShort(build.AquaticEliteSkillPaletteId, build.Profession, Data));
 				}
 				SetArmorItems();
 			}
@@ -703,7 +703,7 @@ namespace Kenedia.Modules.BuildsManager.Models
 
 		public void LoadGearFromCode(string? code, bool save = false)
 		{
-			GearChatCode.LoadTemplateFromChatCode(this, code);
+			GearChatCode.LoadTemplateFromChatCode(this, code, Data);
 			RemoveInvalidGearCombinations();
 			OnGearCodeChanged();
 			if (save)
@@ -879,7 +879,7 @@ namespace Kenedia.Modules.BuildsManager.Models
 			};
 			if (buildSpecialization != null)
 			{
-				SetSpecialization(slot, Kenedia.Modules.BuildsManager.DataModels.Professions.Specialization.FromByte(specId, profession));
+				SetSpecialization(slot, Kenedia.Modules.BuildsManager.DataModels.Professions.Specialization.FromByte(specId, profession, Data));
 				SetTrait(buildSpecialization, Kenedia.Modules.BuildsManager.DataModels.Professions.Trait.FromByte(adept, buildSpecialization.Specialization, TraitTierType.Adept), TraitTierType.Adept);
 				SetTrait(buildSpecialization, Kenedia.Modules.BuildsManager.DataModels.Professions.Trait.FromByte(master, buildSpecialization.Specialization, TraitTierType.Master), TraitTierType.Master);
 				SetTrait(buildSpecialization, Kenedia.Modules.BuildsManager.DataModels.Professions.Trait.FromByte(grandMaster, buildSpecialization.Specialization, TraitTierType.GrandMaster), TraitTierType.GrandMaster);
@@ -1543,9 +1543,9 @@ namespace Kenedia.Modules.BuildsManager.Models
 			Sigil sigil5 = ((obj != null) ? (templateSlot switch
 			{
 				TemplateSlotType.MainHand => (this[TemplateSlotType.MainHand] as ISingleSigilTemplateEntry).Sigil1, 
-				TemplateSlotType.OffHand => (this[TemplateSlotType.OffHand] as ISingleSigilTemplateEntry).Sigil1, 
+				TemplateSlotType.OffHand => (this[TemplateSlotType.MainHand] as ISingleSigilTemplateEntry).Sigil1, 
 				TemplateSlotType.AltMainHand => (this[TemplateSlotType.AltMainHand] as ISingleSigilTemplateEntry).Sigil1, 
-				TemplateSlotType.AltOffHand => (this[TemplateSlotType.AltOffHand] as ISingleSigilTemplateEntry).Sigil1, 
+				TemplateSlotType.AltOffHand => (this[TemplateSlotType.AltMainHand] as ISingleSigilTemplateEntry).Sigil1, 
 				TemplateSlotType.Aquatic => (this[TemplateSlotType.Aquatic] as IDoubleSigilTemplateEntry).Sigil1, 
 				TemplateSlotType.AltAquatic => (this[TemplateSlotType.AltAquatic] as IDoubleSigilTemplateEntry).Sigil1, 
 				_ => null, 

@@ -9,6 +9,7 @@ using Kenedia.Modules.BuildsManager.DataModels.Professions;
 using Kenedia.Modules.BuildsManager.Extensions;
 using Kenedia.Modules.BuildsManager.Models;
 using Kenedia.Modules.BuildsManager.Models.Templates;
+using Kenedia.Modules.BuildsManager.Services;
 using Kenedia.Modules.Core.DataModels;
 using Kenedia.Modules.Core.Extensions;
 using Kenedia.Modules.Core.Models;
@@ -73,6 +74,8 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 			}
 		}
 
+		public Data Data { get; }
+
 		public TemplateSlotType ActiveSlot
 		{
 			get
@@ -97,10 +100,11 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 			}
 		}
 
-		public GearSelection(TemplatePresenter templatePresenter)
+		public GearSelection(TemplatePresenter templatePresenter, Data data)
 		{
-			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
 			TemplatePresenter = templatePresenter;
+			Data = data;
 			Search.TextChangedAction = delegate(string txt)
 			{
 				_filterText = txt.Trim().ToLower();
@@ -109,52 +113,57 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 			SelectionContent.ControlPadding = new Vector2(2f);
 			SelectionContent.FlowDirection = ControlFlowDirection.SingleTopToBottom;
 			SelectionContent.SetLocation(Search.Left, Search.Bottom + 5);
-			_armors = AddItems<SelectionPanelSelectable, Armor>(from e in BuildsManager.Data.Armors.Values
+			Data.Loaded += new EventHandler(Data_Loaded);
+		}
+
+		private void Data_Loaded(object sender, EventArgs e)
+		{
+			_armors = AddItems<SelectionPanelSelectable, Armor>(from e in Data.Armors.Values
 				orderby e.Rarity descending, e.Id
 				select e);
-			_trinkets = AddItems<SelectionPanelSelectable, Trinket>(from e in BuildsManager.Data.Trinkets.Values
+			_trinkets = AddItems<SelectionPanelSelectable, Trinket>(from e in Data.Trinkets.Values
 				orderby e.Rarity descending, e.Id
 				select e);
-			_backs = AddItems<SelectionPanelSelectable, Trinket>(from e in BuildsManager.Data.Backs.Values
+			_backs = AddItems<SelectionPanelSelectable, Trinket>(from e in Data.Backs.Values
 				orderby e.Rarity descending, e.Id
 				select e);
-			_weapons = AddItems<SelectionPanelSelectable, Kenedia.Modules.BuildsManager.DataModels.Items.Weapon>(from e in BuildsManager.Data.Weapons.Values
+			_weapons = AddItems<SelectionPanelSelectable, Kenedia.Modules.BuildsManager.DataModels.Items.Weapon>(from e in Data.Weapons.Values
 				orderby e.WeaponType, e.Rarity descending, e.Id
 				select e);
-			_pvpAmulets = AddItems<SelectionPanelSelectable, PvpAmulet>(from e in BuildsManager.Data.PvpAmulets.Values
+			_pvpAmulets = AddItems<SelectionPanelSelectable, PvpAmulet>(from e in Data.PvpAmulets.Values
 				orderby e.Name, e.Id
 				select e);
-			_pveSigils = AddItems<SelectionPanelSelectable, Sigil>(from e in BuildsManager.Data.PveSigils.Values
+			_pveSigils = AddItems<SelectionPanelSelectable, Sigil>(from e in Data.PveSigils.Values
 				orderby e.Rarity descending, e.Name, e.Id
 				select e);
-			_pvpSigils = AddItems<SelectionPanelSelectable, Sigil>(from e in BuildsManager.Data.PvpSigils.Values
+			_pvpSigils = AddItems<SelectionPanelSelectable, Sigil>(from e in Data.PvpSigils.Values
 				orderby e.Rarity descending, e.Name, e.Id
 				select e);
-			_pveRunes = AddItems<SelectionPanelSelectable, Rune>(from e in BuildsManager.Data.PveRunes.Values
+			_pveRunes = AddItems<SelectionPanelSelectable, Rune>(from e in Data.PveRunes.Values
 				orderby e.Rarity descending, e.Name, e.Id
 				select e);
-			_pvpRunes = AddItems<SelectionPanelSelectable, Rune>(from e in BuildsManager.Data.PvpRunes.Values
+			_pvpRunes = AddItems<SelectionPanelSelectable, Rune>(from e in Data.PvpRunes.Values
 				orderby e.Rarity descending, e.Name, e.Id
 				select e);
-			_nourishment = AddItems<SelectionPanelSelectable, Nourishment>(from e in BuildsManager.Data.Nourishments.Values
+			_nourishment = AddItems<SelectionPanelSelectable, Nourishment>(from e in Data.Nourishments.Values
 				orderby e.Rarity descending, e.Name, e.Id
 				select e);
-			_utilites = AddItems<SelectionPanelSelectable, Enhancement>(from e in BuildsManager.Data.Enhancements.Values
+			_utilites = AddItems<SelectionPanelSelectable, Enhancement>(from e in Data.Enhancements.Values
 				orderby e.Name, e.Id
 				select e);
-			_enrichments = AddItems<SelectionPanelSelectable, Enrichment>(from e in BuildsManager.Data.Enrichments.Values
+			_enrichments = AddItems<SelectionPanelSelectable, Enrichment>(from e in Data.Enrichments.Values
 				orderby e.Rarity descending, e.Name, e.Id
 				select e);
-			_infusions = AddItems<SelectionPanelSelectable, Infusion>(from e in BuildsManager.Data.Infusions.Values
+			_infusions = AddItems<SelectionPanelSelectable, Infusion>(from e in Data.Infusions.Values
 				orderby e.Rarity descending, e.Name.Length, e.Name, e.Id
 				select e);
-			_powerCores = AddItems<SelectionPanelSelectable, PowerCore>(from e in BuildsManager.Data.PowerCores.Values
+			_powerCores = AddItems<SelectionPanelSelectable, PowerCore>(from e in Data.PowerCores.Values
 				orderby e.Rarity descending, e.Name.Length descending, e.Name descending, e.Id
 				select e);
-			_pveRelics = AddItems<SelectionPanelSelectable, Relic>(from e in BuildsManager.Data.PveRelics.Values
+			_pveRelics = AddItems<SelectionPanelSelectable, Relic>(from e in Data.PveRelics.Values
 				orderby e.Rarity descending, e.Name, e.Id
 				select e);
-			_pvpRelics = AddItems<SelectionPanelSelectable, Relic>(from e in BuildsManager.Data.PvpRelics.Values
+			_pvpRelics = AddItems<SelectionPanelSelectable, Relic>(from e in Data.PvpRelics.Values
 				orderby e.Rarity descending, e.Name, e.Id
 				select e);
 		}
@@ -402,7 +411,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 					foreach (SelectionPanelSelectable item3 in _weapons)
 					{
 						bool weaponMatch = true;
-						KeyValuePair<Kenedia.Modules.BuildsManager.DataModels.Professions.Weapon.WeaponType, Kenedia.Modules.BuildsManager.DataModels.Professions.Weapon> weapon = BuildsManager.Data.Professions[TemplatePresenter?.Template.Profession ?? ProfessionType.Guardian].Weapons.Where<KeyValuePair<Kenedia.Modules.BuildsManager.DataModels.Professions.Weapon.WeaponType, Kenedia.Modules.BuildsManager.DataModels.Professions.Weapon>>((KeyValuePair<Kenedia.Modules.BuildsManager.DataModels.Professions.Weapon.WeaponType, Kenedia.Modules.BuildsManager.DataModels.Professions.Weapon> e) => (item3.Item as Kenedia.Modules.BuildsManager.DataModels.Items.Weapon).WeaponType.IsWeaponType(e.Value.Type)).FirstOrDefault();
+						KeyValuePair<Kenedia.Modules.BuildsManager.DataModels.Professions.Weapon.WeaponType, Kenedia.Modules.BuildsManager.DataModels.Professions.Weapon> weapon = Data.Professions[TemplatePresenter?.Template.Profession ?? ProfessionType.Guardian].Weapons.Where<KeyValuePair<Kenedia.Modules.BuildsManager.DataModels.Professions.Weapon.WeaponType, Kenedia.Modules.BuildsManager.DataModels.Professions.Weapon>>((KeyValuePair<Kenedia.Modules.BuildsManager.DataModels.Professions.Weapon.WeaponType, Kenedia.Modules.BuildsManager.DataModels.Professions.Weapon> e) => (item3.Item as Kenedia.Modules.BuildsManager.DataModels.Items.Weapon).WeaponType.IsWeaponType(e.Value.Type)).FirstOrDefault();
 						if (weapon.Value != null)
 						{
 							activeSlot = ActiveSlot;

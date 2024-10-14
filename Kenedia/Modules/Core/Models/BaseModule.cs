@@ -99,6 +99,7 @@ namespace Kenedia.Modules.Core.Models
 			services.AddSingleton<ModuleWindow>();
 			services.AddSingleton<ModuleSettings>();
 			services.AddSingleton<ModulePaths>();
+			services.AddSingleton(ModuleParameters.SettingsManager.ModuleSettings);
 			services.AddSingleton(ModuleParameters.ContentsManager);
 			services.AddSingleton(ModuleParameters.SettingsManager);
 			services.AddSingleton(ModuleParameters.Gw2ApiManager);

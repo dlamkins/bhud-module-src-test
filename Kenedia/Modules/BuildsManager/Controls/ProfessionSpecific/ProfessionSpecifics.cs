@@ -3,6 +3,7 @@ using System.Linq;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Kenedia.Modules.BuildsManager.Models;
+using Kenedia.Modules.BuildsManager.Services;
 using Kenedia.Modules.Core.Models;
 
 namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
@@ -16,13 +17,26 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 
 		public TemplatePresenter TemplatePresenter { get; }
 
-		public ProfessionSpecifics(TemplatePresenter templatePresenter)
+		public Data Data { get; }
+
+		public ProfessionSpecifics(TemplatePresenter templatePresenter, Data data)
 		{
 			TemplatePresenter = templatePresenter;
+			Data = data;
 			base.ClipsBounds = false;
 			ZIndex = 1073741823;
 			base.Tooltip = (SkillTooltip = new SkillTooltip());
 			SetTemplatePresenter();
+			Data.Loaded += new EventHandler(Data_Loaded);
+		}
+
+		private void Data_Loaded(object sender, EventArgs e)
+		{
+			OnDataLoaded();
+		}
+
+		protected virtual void OnDataLoaded()
+		{
 			ApplyTemplate();
 		}
 

@@ -180,9 +180,9 @@ namespace Kenedia.Modules.BuildsManager.DataModels.Professions
 			}
 		}
 
-		public static Specialization FromByte(byte spezializationId, ProfessionType profession)
+		public static Specialization FromByte(byte spezializationId, ProfessionType profession, Data data)
 		{
-			ProfessionDataEntry professions = BuildsManager.Data.Professions;
+			ProfessionDataEntry professions = data.Professions;
 			Specialization specialization = default(Specialization);
 			if (professions == null || professions[profession]?.Specializations.TryGetValue(spezializationId, out specialization) != true)
 			{

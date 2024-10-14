@@ -6,6 +6,7 @@ using Gw2Sharp.WebApi.V2.Models;
 using Kenedia.Modules.BuildsManager.DataModels.Stats;
 using Kenedia.Modules.BuildsManager.Extensions;
 using Kenedia.Modules.BuildsManager.Models;
+using Kenedia.Modules.BuildsManager.Services;
 using Kenedia.Modules.Core.Extensions;
 using Kenedia.Modules.Core.Models;
 using Kenedia.Modules.Core.Utility;
@@ -26,6 +27,8 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 		private double _attributeAdjustments;
 
 		public TemplatePresenter TemplatePresenter { get; }
+
+		public Data Data { get; }
 
 		public IReadOnlyList<int> StatChoices
 		{
@@ -51,18 +54,38 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 			}
 		}
 
-		public StatSelection(TemplatePresenter templatePresenter)
+		public StatSelection(TemplatePresenter templatePresenter, Data data)
 		{
-			//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
 			TemplatePresenter = templatePresenter;
-			int i = 0;
+			Data = data;
+			Search.PerformFiltering = new Action<string>(FilterStats);
+			Search.SetLocation(Search.Left, Search.Top + 30);
+			SelectionContent.SetLocation(Search.Left, Search.Bottom + 5);
+			FilterStats();
+			_created = true;
+			Data.Loaded += new EventHandler(Data_Loaded);
+			CreateStatSelectables();
+		}
+
+		private void Data_Loaded(object sender, EventArgs e)
+		{
+			CreateStatSelectables();
+		}
+
+		private void CreateStatSelectables()
+		{
+			//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
+			if (_stats.Count > 0)
+			{
+				return;
+			}
 			int size = 25;
 			Point start = default(Point);
 			((Point)(ref start))._002Ector(0, 0);
-			foreach (AttributeType stat2 in new List<AttributeType>
+			List<AttributeType> obj = new List<AttributeType>
 			{
 				AttributeType.Power,
 				AttributeType.Toughness,
@@ -73,13 +96,15 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 				AttributeType.ConditionDamage,
 				AttributeType.ConditionDuration,
 				AttributeType.BoonDuration
-			})
+			};
+			int i = 0;
+			foreach (AttributeType stat2 in obj)
 			{
 				if (((uint)stat2 > 1u && stat2 != AttributeType.AgonyResistance) || 1 == 0)
 				{
 					int j = 0;
 					List<AttributeToggle> statIcons = _statIcons;
-					AttributeToggle obj = new AttributeToggle
+					AttributeToggle obj2 = new AttributeToggle
 					{
 						Parent = this,
 						Location = new Point(start.X + i * (size + 16), start.Y + j * size),
@@ -92,12 +117,12 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 						Checked = false,
 						BasicTooltipText = (stat2.GetDisplayName() ?? "")
 					};
-					AttributeToggle t = obj;
-					statIcons.Add(obj);
+					AttributeToggle t = obj2;
+					statIcons.Add(obj2);
 					i++;
 				}
 			}
-			foreach (KeyValuePair<int, Stat> stat in BuildsManager.Data.Stats.Items)
+			foreach (KeyValuePair<int, Stat> stat in Data.Stats.Items)
 			{
 				StatSelectable selectable;
 				_stats.Add(selectable = new StatSelectable
@@ -114,11 +139,6 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 					}
 				});
 			}
-			Search.PerformFiltering = new Action<string>(FilterStats);
-			Search.SetLocation(Search.Left, Search.Top + 30);
-			SelectionContent.SetLocation(Search.Left, Search.Bottom + 5);
-			FilterStats();
-			_created = true;
 		}
 
 		private void OnAttributeAdjustmentsChanged(object sender, ValueChangedEventArgs<double> e)

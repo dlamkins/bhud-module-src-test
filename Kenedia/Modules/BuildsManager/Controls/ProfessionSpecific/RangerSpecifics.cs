@@ -8,6 +8,7 @@ using Kenedia.Modules.BuildsManager.DataModels.Professions;
 using Kenedia.Modules.BuildsManager.Models;
 using Kenedia.Modules.BuildsManager.Models.Templates;
 using Kenedia.Modules.BuildsManager.Res;
+using Kenedia.Modules.BuildsManager.Services;
 using Kenedia.Modules.Core.DataModels;
 using Kenedia.Modules.Core.Extensions;
 using Microsoft.Xna.Framework;
@@ -64,8 +65,8 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 		};
 
 
-		public RangerSpecifics(TemplatePresenter template)
-			: base(template)
+		public RangerSpecifics(TemplatePresenter template, Data data)
+			: base(template, data)
 		{
 			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
@@ -175,7 +176,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 				PetSlotType petSlot = _selectorAnchor!.PetSlot;
 				bool flag2 = (((uint)(petSlot - 2) <= 1u) ? true : false);
 				Enviroment flag = (flag2 ? Enviroment.Terrestrial : Enviroment.Aquatic);
-				_petSelector.SetItems(from e in BuildsManager.Data.Pets.Values
+				_petSelector.SetItems(from e in base.Data.Pets.Values
 					where e.Enviroment.HasFlag(flag)
 					orderby e.Order
 					select e);

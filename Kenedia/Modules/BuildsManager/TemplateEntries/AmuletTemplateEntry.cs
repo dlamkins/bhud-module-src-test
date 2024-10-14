@@ -1,11 +1,9 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using Kenedia.Modules.BuildsManager.DataModels.Items;
 using Kenedia.Modules.BuildsManager.DataModels.Stats;
 using Kenedia.Modules.BuildsManager.Interfaces;
 using Kenedia.Modules.BuildsManager.Models.Templates;
-using Kenedia.Modules.BuildsManager.Utility;
+using Kenedia.Modules.BuildsManager.Services;
 using Kenedia.Modules.Core.Models;
 using Kenedia.Modules.Core.Utility;
 
@@ -49,11 +47,16 @@ namespace Kenedia.Modules.BuildsManager.TemplateEntries
 
 		public event EventHandler<ValueChangedEventArgs<Stat>> StatChanged;
 
-		public AmuletTemplateEntry(TemplateSlotType slot)
+		public AmuletTemplateEntry(TemplateSlotType slot, Data data)
+			: base(slot, data)
 		{
+		}
+
+		protected override void OnDataLoaded()
+		{
+			base.OnDataLoaded();
 			Trinket accessoire = default(Trinket);
-			Amulet = ((BuildsManager.Data?.Trinkets?.TryGetValue(92991, out accessoire) ?? false) ? accessoire : null);
-			base._002Ector(slot);
+			Amulet = ((base.Data?.Trinkets?.TryGetValue(92991, out accessoire) ?? false) ? accessoire : null);
 		}
 
 		protected override void OnItemChanged(object sender, ValueChangedEventArgs<BaseItem> e)
@@ -69,31 +72,6 @@ namespace Kenedia.Modules.BuildsManager.TemplateEntries
 			{
 				Amulet = trinket;
 			}
-		}
-
-		public override byte[] AddToCodeArray(byte[] array)
-		{
-			return array.Concat(new byte[2]
-			{
-				Stat?.MappedId ?? 0,
-				Enrichment?.MappedId ?? 0
-			}).ToArray();
-		}
-
-		public override byte[] GetFromCodeArray(byte[] array)
-		{
-			byte[] array2 = array;
-			int newStartIndex = 2;
-			if (array2 != null && array2.Length != 0)
-			{
-				Stat = BuildsManager.Data.Stats.Items.Where((KeyValuePair<int, Stat> e) => e.Value.MappedId == array2[0]).FirstOrDefault().Value;
-				Enrichment = BuildsManager.Data.Enrichments.Items.Where<KeyValuePair<int, Enrichment>>((KeyValuePair<int, Enrichment> e) => e.Value.MappedId == array2[1]).FirstOrDefault().Value;
-			}
-			if (array2 == null || array2.Length == 0)
-			{
-				return array2;
-			}
-			return GearTemplateCode.RemoveFromStart(array2, newStartIndex);
 		}
 
 		public void Dispose()

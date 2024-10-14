@@ -6,6 +6,7 @@ using Gw2Sharp.Models;
 using Gw2Sharp.WebApi.V2.Models;
 using Kenedia.Modules.BuildsManager.DataModels.Professions;
 using Kenedia.Modules.BuildsManager.Models;
+using Kenedia.Modules.BuildsManager.Services;
 using Kenedia.Modules.Core.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -41,8 +42,8 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 		};
 
 
-		public ThiefSpecifics(TemplatePresenter template)
-			: base(template)
+		public ThiefSpecifics(TemplatePresenter template, Data data)
+			: base(template, data)
 		{
 		}
 
@@ -111,12 +112,12 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 
 		protected override void ApplyTemplate()
 		{
-			if (base.TemplatePresenter?.Template == null)
+			if (base.TemplatePresenter?.Template == null || !base.Data.IsLoaded)
 			{
 				return;
 			}
 			base.ApplyTemplate();
-			Dictionary<int, Kenedia.Modules.BuildsManager.DataModels.Professions.Skill> skills = BuildsManager.Data?.Professions?[ProfessionType.Thief]?.Skills;
+			Dictionary<int, Kenedia.Modules.BuildsManager.DataModels.Professions.Skill> skills = base.Data?.Professions?[ProfessionType.Thief]?.Skills;
 			if (skills != null)
 			{
 				int? num = base.TemplatePresenter?.Template?.EliteSpecialization?.Id;

@@ -1,10 +1,8 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using Kenedia.Modules.BuildsManager.DataModels.Items;
 using Kenedia.Modules.BuildsManager.Interfaces;
 using Kenedia.Modules.BuildsManager.Models.Templates;
-using Kenedia.Modules.BuildsManager.Utility;
+using Kenedia.Modules.BuildsManager.Services;
 using Kenedia.Modules.Core.Models;
 using Kenedia.Modules.Core.Utility;
 
@@ -42,8 +40,8 @@ namespace Kenedia.Modules.BuildsManager.TemplateEntries
 			}
 		}
 
-		public PvpAmuletTemplateEntry(TemplateSlotType slot)
-			: base(slot)
+		public PvpAmuletTemplateEntry(TemplateSlotType slot, Data data)
+			: base(slot, data)
 		{
 		}
 
@@ -60,31 +58,6 @@ namespace Kenedia.Modules.BuildsManager.TemplateEntries
 			{
 				PvpAmulet = pvpAmulet;
 			}
-		}
-
-		public override byte[] AddToCodeArray(byte[] array)
-		{
-			return array.Concat(new byte[2]
-			{
-				PvpAmulet?.MappedId ?? 0,
-				Rune?.MappedId ?? 0
-			}).ToArray();
-		}
-
-		public override byte[] GetFromCodeArray(byte[] array)
-		{
-			byte[] array2 = array;
-			int newStartIndex = 2;
-			if (array2 != null && array2.Length != 0)
-			{
-				PvpAmulet = BuildsManager.Data.PvpAmulets.Items.Values.Where((PvpAmulet e) => e.MappedId == array2[0]).FirstOrDefault();
-				Rune = BuildsManager.Data.PvpRunes.Items.Where<KeyValuePair<int, Rune>>((KeyValuePair<int, Rune> e) => e.Value.MappedId == array2[1]).FirstOrDefault().Value;
-			}
-			if (array2 == null || array2.Length == 0)
-			{
-				return array2;
-			}
-			return GearTemplateCode.RemoveFromStart(array2, newStartIndex);
 		}
 
 		public void Dispose()

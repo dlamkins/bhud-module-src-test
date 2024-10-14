@@ -1,12 +1,9 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using Gw2Sharp.WebApi.V2.Models;
 using Kenedia.Modules.BuildsManager.DataModels.Items;
 using Kenedia.Modules.BuildsManager.DataModels.Stats;
 using Kenedia.Modules.BuildsManager.Interfaces;
 using Kenedia.Modules.BuildsManager.Models.Templates;
-using Kenedia.Modules.BuildsManager.Utility;
+using Kenedia.Modules.BuildsManager.Services;
 using Kenedia.Modules.Core.Models;
 using Kenedia.Modules.Core.Utility;
 
@@ -100,8 +97,8 @@ namespace Kenedia.Modules.BuildsManager.TemplateEntries
 			}
 		}
 
-		public WeaponTemplateEntry(TemplateSlotType slot)
-			: base(slot)
+		public WeaponTemplateEntry(TemplateSlotType slot, Data data)
+			: base(slot, data)
 		{
 		}
 
@@ -118,37 +115,6 @@ namespace Kenedia.Modules.BuildsManager.TemplateEntries
 			{
 				Weapon = weapon;
 			}
-		}
-
-		public override byte[] AddToCodeArray(byte[] array)
-		{
-			return array.Concat(new byte[5]
-			{
-				(byte)(Weapon?.WeaponType ?? ItemWeaponType.Unknown),
-				Stat?.MappedId ?? 0,
-				Sigil1?.MappedId ?? 0,
-				PvpSigil?.MappedId ?? 0,
-				Infusion1?.MappedId ?? 0
-			}).ToArray();
-		}
-
-		public override byte[] GetFromCodeArray(byte[] array)
-		{
-			byte[] array2 = array;
-			int newStartIndex = 5;
-			if (array2 != null && array2.Length != 0)
-			{
-				Weapon = (Enum.TryParse<ItemWeaponType>($"{array2[0]}", out var weaponType) ? BuildsManager.Data.Weapons.Values.Where((Weapon e) => e.WeaponType == weaponType).FirstOrDefault() : null);
-				Stat = BuildsManager.Data.Stats.Items.Where((KeyValuePair<int, Stat> e) => e.Value.MappedId == array2[1]).FirstOrDefault().Value;
-				Sigil1 = BuildsManager.Data.PveSigils.Items.Where<KeyValuePair<int, Sigil>>((KeyValuePair<int, Sigil> e) => e.Value.MappedId == array2[2]).FirstOrDefault().Value;
-				PvpSigil = BuildsManager.Data.PvpSigils.Items.Where<KeyValuePair<int, Sigil>>((KeyValuePair<int, Sigil> e) => e.Value.MappedId == array2[3]).FirstOrDefault().Value;
-				Infusion1 = BuildsManager.Data.Infusions.Items.Where<KeyValuePair<int, Infusion>>((KeyValuePair<int, Infusion> e) => e.Value.MappedId == array2[4]).FirstOrDefault().Value;
-			}
-			if (array2 == null || array2.Length == 0)
-			{
-				return array2;
-			}
-			return GearTemplateCode.RemoveFromStart(array2, newStartIndex);
 		}
 
 		public void Dispose()

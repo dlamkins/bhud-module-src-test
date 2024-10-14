@@ -53,19 +53,22 @@ namespace Kenedia.Modules.BuildsManager.Views
 
 		public Settings Settings { get; }
 
-		public QuickFiltersPanel(TemplateCollection templates, TemplateTags templateTags, TagGroups tagGroups, SelectionPanel selectionPanel, Settings settings)
+		public Data Data { get; }
+
+		public QuickFiltersPanel(TemplateCollection templates, TemplateTags templateTags, TagGroups tagGroups, SelectionPanel selectionPanel, Settings settings, Data data)
 		{
 			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0105: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0159: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0161: Unknown result type (might be due to invalid IL or missing references)
 			Templates = templates;
 			TemplateTags = templateTags;
 			TagGroups = tagGroups;
 			SelectionPanel = selectionPanel;
 			Settings = settings;
+			Data = data;
 			base.Parent = Control.Graphics.SpriteScreen;
 			base.Width = 205;
 			base.Height = 640;
@@ -103,7 +106,6 @@ namespace Kenedia.Modules.BuildsManager.Views
 				Parent = fp,
 				ClickAction = new Action(ResetAllToggles)
 			};
-			CreateTagControls();
 			base.FadeSteps = 150;
 			GameService.Gw2Mumble.PlayerCharacter.SpecializationChanged += PlayerCharacter_SpecializationChanged;
 			Settings.QuickFiltersPanelFade.SettingChanged += QuickFiltersPanelFade_SettingChanged;
@@ -124,6 +126,26 @@ namespace Kenedia.Modules.BuildsManager.Views
 				SortPanels();
 			});
 			SetHeightToTags();
+			TemplateTags.Loaded += new EventHandler(TemplateTags_Loaded);
+			if (TemplateTags.IsLoaded)
+			{
+				CreateTagControls();
+			}
+			Data.Loaded += new EventHandler(Data_Loaded);
+			if (Data.IsLoaded)
+			{
+				CreateSpecToggles();
+			}
+		}
+
+		private void Data_Loaded(object sender, EventArgs e)
+		{
+			CreateSpecToggles();
+		}
+
+		private void TemplateTags_Loaded(object sender, EventArgs e)
+		{
+			CreateTagControls();
 		}
 
 		private void ResetAllToggles()
@@ -192,7 +214,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 		private void SetAutoFilters(int e)
 		{
 			ProfessionType professionType = GameService.Gw2Mumble.PlayerCharacter.Profession;
-			if (!BuildsManager.Data.Professions.TryGetValue(professionType, out var profession))
+			if (!Data.Professions.TryGetValue(professionType, out var profession))
 			{
 				return;
 			}
@@ -507,8 +529,6 @@ namespace Kenedia.Modules.BuildsManager.Views
 
 		private void CreateTagControls()
 		{
-			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
 			List<TemplateTag> list = TemplateTags.ToList();
 			list.Sort(new TemplateTagComparer(TagGroups));
 			List<string> added = new List<string>();
@@ -518,6 +538,13 @@ namespace Kenedia.Modules.BuildsManager.Views
 				AddTemplateTag(tag);
 				added.Add(tag.Name);
 			}
+			SortPanels();
+		}
+
+		private void CreateSpecToggles()
+		{
+			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
 			_specPanel = new TagGroupPanel(new TagGroup(strings.Specializations), _tagPanel)
 			{
 				FlowDirection = ControlFlowDirection.LeftToRight,
@@ -528,7 +555,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 				ControlPadding = new Vector2(21f, 2f)
 			};
 			_specToggles.Clear();
-			foreach (Profession value in BuildsManager.Data.Professions.Values)
+			foreach (Profession value in Data.Professions.Values)
 			{
 				Profession p = value;
 				int prio = (int)p.Id * 100;

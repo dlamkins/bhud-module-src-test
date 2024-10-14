@@ -6,6 +6,7 @@ using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Gw2Sharp.Models;
+using Kenedia.Modules.BuildsManager.Services;
 using Kenedia.Modules.Core.DataModels;
 using Kenedia.Modules.Core.Structs;
 using Kenedia.Modules.Core.Utility;
@@ -40,10 +41,13 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 			}
 		}
 
-		public ProfessionRaceSelection()
+		public Data Data { get; }
+
+		public ProfessionRaceSelection(Data data)
 		{
-			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
+			Data = data;
 			Search.Dispose();
 			base.BackgroundImage = AsyncTexture2D.FromAssetId(155963);
 			SelectionContent.Location = Point.get_Zero();
@@ -59,7 +63,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 			foreach (Races race in Enum.GetValues(typeof(Races)))
 			{
 				ProfessionRaceSelectable ctrl;
-				_races.Add(ctrl = new ProfessionRaceSelectable
+				_races.Add(ctrl = new ProfessionRaceSelectable(data)
 				{
 					Parent = SelectionContent,
 					SelectionType = SelectionType.Race,
@@ -73,7 +77,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 			foreach (ProfessionType profession in Enum.GetValues(typeof(ProfessionType)))
 			{
 				ProfessionRaceSelectable ctrl;
-				_professions.Add(ctrl = new ProfessionRaceSelectable
+				_professions.Add(ctrl = new ProfessionRaceSelectable(data)
 				{
 					Parent = SelectionContent,
 					SelectionType = SelectionType.Profession,

@@ -171,7 +171,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 			{
 				Parent = _specializationsPanel
 			};
-			_professionRaceSelection = new ProfessionRaceSelection
+			_professionRaceSelection = new ProfessionRaceSelection(data)
 			{
 				Parent = this,
 				Visible = false,
@@ -336,31 +336,31 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 				switch (TemplatePresenter?.Template.Profession)
 				{
 				case ProfessionType.Guardian:
-					_professionSpecifics = new GuardianSpecifics(TemplatePresenter);
+					_professionSpecifics = new GuardianSpecifics(TemplatePresenter, Data);
 					break;
 				case ProfessionType.Warrior:
-					_professionSpecifics = new WarriorSpecifics(TemplatePresenter);
+					_professionSpecifics = new WarriorSpecifics(TemplatePresenter, Data);
 					break;
 				case ProfessionType.Engineer:
-					_professionSpecifics = new EngineerSpecifics(TemplatePresenter);
+					_professionSpecifics = new EngineerSpecifics(TemplatePresenter, Data);
 					break;
 				case ProfessionType.Ranger:
-					_professionSpecifics = new RangerSpecifics(TemplatePresenter);
+					_professionSpecifics = new RangerSpecifics(TemplatePresenter, Data);
 					break;
 				case ProfessionType.Thief:
-					_professionSpecifics = new ThiefSpecifics(TemplatePresenter);
+					_professionSpecifics = new ThiefSpecifics(TemplatePresenter, Data);
 					break;
 				case ProfessionType.Elementalist:
-					_professionSpecifics = new ElementalistSpecifics(TemplatePresenter);
+					_professionSpecifics = new ElementalistSpecifics(TemplatePresenter, Data);
 					break;
 				case ProfessionType.Mesmer:
-					_professionSpecifics = new MesmerSpecifics(TemplatePresenter);
+					_professionSpecifics = new MesmerSpecifics(TemplatePresenter, Data);
 					break;
 				case ProfessionType.Necromancer:
-					_professionSpecifics = new NecromancerSpecifics(TemplatePresenter);
+					_professionSpecifics = new NecromancerSpecifics(TemplatePresenter, Data);
 					break;
 				case ProfessionType.Revenant:
-					_professionSpecifics = new RevenantSpecifics(TemplatePresenter);
+					_professionSpecifics = new RevenantSpecifics(TemplatePresenter, Data);
 					break;
 				}
 				if (_professionSpecifics != null)

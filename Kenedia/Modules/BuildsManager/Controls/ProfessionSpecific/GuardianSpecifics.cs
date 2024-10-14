@@ -4,6 +4,7 @@ using Gw2Sharp.Models;
 using Gw2Sharp.WebApi.V2.Models;
 using Kenedia.Modules.BuildsManager.DataModels.Professions;
 using Kenedia.Modules.BuildsManager.Models;
+using Kenedia.Modules.BuildsManager.Services;
 using Kenedia.Modules.Core.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -92,8 +93,8 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 		};
 
 
-		public GuardianSpecifics(TemplatePresenter template)
-			: base(template)
+		public GuardianSpecifics(TemplatePresenter template, Data data)
+			: base(template, data)
 		{
 		}
 
@@ -144,10 +145,10 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 		protected override void ApplyTemplate()
 		{
 			Dictionary<int, Kenedia.Modules.BuildsManager.DataModels.Professions.Skill> skills;
-			if (base.TemplatePresenter?.Template != null)
+			if (base.TemplatePresenter?.Template != null && base.Data.IsLoaded)
 			{
 				base.ApplyTemplate();
-				skills = BuildsManager.Data?.Professions?[ProfessionType.Guardian]?.Skills;
+				skills = base.Data?.Professions?[ProfessionType.Guardian]?.Skills;
 				if (skills != null)
 				{
 					Skills[0].Skill = GetSkill(SkillSlot.Profession1);

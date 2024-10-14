@@ -98,27 +98,27 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 
 		public Pointer Pointer { get; set; }
 
-		public SelectionPanel(TemplatePresenter templatePresenter, TemplateCollection templates, TemplateTags templateTags, Data data, TemplateFactory templateFactory)
+		public SelectionPanel(TemplatePresenter templatePresenter, TemplateCollection templates, TemplateTags templateTags, Data data, TemplateFactory templateFactory, Settings settings)
 		{
 			TemplatePresenter = templatePresenter;
 			Pointer = new Pointer();
 			base.ClipsBounds = false;
 			HeightSizingMode = SizingMode.Fill;
 			base.Width = 375;
-			_gearSelection = new GearSelection(TemplatePresenter)
+			_gearSelection = new GearSelection(TemplatePresenter, data)
 			{
 				Parent = this,
 				Visible = false,
 				ZIndex = ZIndex
 			};
-			BuildSelection = new BuildSelection(templates, templateTags, data, templatePresenter, templateFactory)
+			BuildSelection = new BuildSelection(templates, templateTags, data, templatePresenter, templateFactory, settings)
 			{
 				Parent = this,
 				Visible = true,
 				SelectionPanel = this,
 				ZIndex = ZIndex
 			};
-			_statSelection = new StatSelection(TemplatePresenter)
+			_statSelection = new StatSelection(TemplatePresenter, data)
 			{
 				Parent = this,
 				Visible = false,

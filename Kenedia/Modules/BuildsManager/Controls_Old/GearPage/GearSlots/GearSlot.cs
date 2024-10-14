@@ -8,6 +8,7 @@ using Kenedia.Modules.BuildsManager.DataModels.Items;
 using Kenedia.Modules.BuildsManager.Extensions;
 using Kenedia.Modules.BuildsManager.Models;
 using Kenedia.Modules.BuildsManager.Models.Templates;
+using Kenedia.Modules.BuildsManager.Services;
 using Kenedia.Modules.Core.Controls;
 using Kenedia.Modules.Core.Models;
 using Kenedia.Modules.Core.Utility;
@@ -72,6 +73,8 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 
 		public SelectionPanel SelectionPanel { get; }
 
+		public Data Data { get; }
+
 		public List<GearSlot> SlotGroup { get; set; }
 
 		protected TemplatePresenter TemplatePresenter
@@ -86,7 +89,7 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 			}
 		}
 
-		public GearSlot(TemplateSlotType gearSlot, Container parent, TemplatePresenter templatePresenter, SelectionPanel selectionPanel)
+		public GearSlot(TemplateSlotType gearSlot, Container parent, TemplatePresenter templatePresenter, SelectionPanel selectionPanel, Data data)
 		{
 			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
@@ -96,9 +99,10 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
 			TemplatePresenter = templatePresenter;
 			SelectionPanel = selectionPanel;
+			Data = data;
 			Slot = gearSlot;
 			base.Parent = parent;
 			base.Size = new Point(380, 64);
@@ -107,6 +111,20 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 			CreateSubMenus();
 			ItemControl.Parent = this;
 			SetItemFromTemplate();
+			Data.Loaded += new EventHandler(Data_Loaded);
+			if (Data.IsLoaded)
+			{
+				OnDataLoaded();
+			}
+		}
+
+		private void Data_Loaded(object sender, EventArgs e)
+		{
+			OnDataLoaded();
+		}
+
+		protected virtual void OnDataLoaded()
+		{
 		}
 
 		protected virtual void OnTemplatePresenterChanged(object sender, ValueChangedEventArgs<TemplatePresenter> e)

@@ -45,7 +45,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 
 		private readonly bool _created;
 
-		private int tagSectionWidth;
+		private int _tagSectionWidth;
 
 		private bool _changeBuild = true;
 
@@ -87,21 +87,21 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 			_comparer = new TemplateTagComparer(TagGroups);
 			HeightSizingMode = SizingMode.Fill;
 			WidthSizingMode = SizingMode.Fill;
-			tagSectionWidth = 300;
+			_tagSectionWidth = 300;
 			_tagsLabel = new Kenedia.Modules.Core.Controls.Label
 			{
 				Parent = this,
 				SetLocalizedText = () => strings.Tags,
 				Font = Control.Content.DefaultFont32,
 				Height = 35,
-				Width = tagSectionWidth - 35 - 5,
+				Width = _tagSectionWidth - 35 - 5,
 				Location = new Point(0, 10)
 			};
 			_tagFilter = new FilterBox
 			{
 				Parent = this,
 				Location = new Point(0, _tagsLabel.Bottom + 10),
-				Width = tagSectionWidth - 30,
+				Width = _tagSectionWidth - 30,
 				SetLocalizedPlaceholder = () => strings_common.Search,
 				FilteringOnTextChange = true,
 				FilteringOnEnter = true,
@@ -155,7 +155,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 			{
 				Parent = this,
 				Location = new Point(0, _tagFilter.Bottom + 2),
-				Width = tagSectionWidth,
+				Width = _tagSectionWidth,
 				HeightSizingMode = SizingMode.Fill,
 				ShowBorder = false,
 				BorderColor = Color.get_Black(),
@@ -212,9 +212,18 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 			TemplateTags.TagChanged += new PropertyChangedEventHandler(TemplateTags_TagChanged);
 			_tagPanel.ChildAdded += TagPanel_ChildsChanged;
 			_tagPanel.ChildRemoved += TagPanel_ChildsChanged;
-			CreateTagControls();
+			TemplateTags.Loaded += new EventHandler(TemplateTags_Loaded);
+			if (TemplateTags.IsLoaded)
+			{
+				CreateTagControls();
+			}
 			ApplyTemplate();
 			_created = true;
+		}
+
+		private void TemplateTags_Loaded(object sender, EventArgs e)
+		{
+			CreateTagControls();
 		}
 
 		private void FilterTags(string txt)

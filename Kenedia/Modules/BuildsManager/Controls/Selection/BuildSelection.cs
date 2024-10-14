@@ -49,24 +49,27 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 
 		public TemplateFactory TemplateFactory { get; }
 
+		public Settings Settings { get; }
+
 		public List<KeyValuePair<string, List<Func<Template, bool>>>> FilterQueries { get; } = new List<KeyValuePair<string, List<Func<Template, bool>>>>();
 
 
 		public List<Func<Template, bool>> SpecializationFilterQueries { get; } = new List<Func<Template, bool>>();
 
 
-		public BuildSelection(TemplateCollection templates, TemplateTags templateTags, Data data, TemplatePresenter templatePresenter, TemplateFactory templateFactory)
+		public BuildSelection(TemplateCollection templates, TemplateTags templateTags, Data data, TemplatePresenter templatePresenter, TemplateFactory templateFactory, Settings settings)
 		{
-			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0104: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0126: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0167: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0108: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016b: Unknown result type (might be due to invalid IL or missing references)
 			Data = data;
 			Templates = templates;
 			TemplateTags = templateTags;
 			TemplateFactory = templateFactory;
+			Settings = settings;
 			TemplatePresenter = templatePresenter;
 			_sortBehavior = new Kenedia.Modules.Core.Controls.Dropdown
 			{
@@ -76,7 +79,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 				{
 					if (_sortBehavior != null)
 					{
-						BaseModule<BuildsManager, MainWindow, Settings, Paths>.ModuleInstance.Settings.SortBehavior.Value = GetSortBehaviorFromString(s);
+						Settings.SortBehavior.Value = GetSortBehaviorFromString(s);
 						FilterTemplates();
 					}
 				},
@@ -84,7 +87,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 				{
 					if (_sortBehavior != null)
 					{
-						_sortBehavior.SelectedItem = GetSortBehaviorString(BaseModule<BuildsManager, MainWindow, Settings, Paths>.ModuleInstance.Settings.SortBehavior.Value);
+						_sortBehavior.SelectedItem = GetSortBehaviorString(Settings.SortBehavior.Value);
 					}
 					return new List<string>(3)
 					{
@@ -93,7 +96,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 						GetSortBehaviorString(TemplateSortBehavior.ByModified)
 					};
 				},
-				SelectedItem = GetSortBehaviorString(BaseModule<BuildsManager, MainWindow, Settings, Paths>.ModuleInstance.Settings.SortBehavior.Value)
+				SelectedItem = GetSortBehaviorString(Settings.SortBehavior.Value)
 			};
 			Search.Location = new Point(2, _sortBehavior.Bottom + 5);
 			SelectionContent.Location = new Point(0, Search.Bottom + 5);
@@ -125,9 +128,21 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 			TemplateCollection templates2 = Templates;
 			templates2.CollectionChanged = (NotifyCollectionChangedEventHandler)Delegate.Combine(templates2.CollectionChanged, new NotifyCollectionChangedEventHandler(Templates_CollectionChanged));
 			Templates.TemplateChanged += new PropertyChangedEventHandler(Templates_TemplateChanged);
-			TemplateCollection templates3 = Templates;
-			List<Template> list = new List<Template>(templates3.Count);
-			list.AddRange(templates3);
+			Templates.Loaded += new EventHandler(Templates_Loaded);
+			if (Templates.IsLoaded)
+			{
+				TemplateCollection templates3 = Templates;
+				List<Template> list = new List<Template>(templates3.Count);
+				list.AddRange(templates3);
+				AddTemplateSelectable(firstLoad: true, list);
+			}
+		}
+
+		private void Templates_Loaded(object sender, EventArgs e)
+		{
+			TemplateCollection templates = Templates;
+			List<Template> list = new List<Template>(templates.Count);
+			list.AddRange(templates);
 			AddTemplateSelectable(firstLoad: true, list);
 		}
 
@@ -142,7 +157,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 					try
 					{
 						string code = await ClipboardUtil.WindowsClipboardService.GetTextAsync();
-						BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Debug("Load template from clipboard code: " + code);
+						BaseModule<BuildsManager, MainWindow, Kenedia.Modules.BuildsManager.Services.Settings, Paths>.Logger.Debug("Load template from clipboard code: " + code);
 						t.LoadFromCode(code);
 					}
 					catch (Exception)
@@ -222,7 +237,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 
 		private void SortTemplates()
 		{
-			switch (BaseModule<BuildsManager, MainWindow, Settings, Paths>.ModuleInstance.Settings.SortBehavior.Value)
+			switch (Settings.SortBehavior.Value)
 			{
 			case TemplateSortBehavior.ByProfession:
 				SelectionContent.SortChildren(delegate(TemplateSelectable a, TemplateSelectable b)

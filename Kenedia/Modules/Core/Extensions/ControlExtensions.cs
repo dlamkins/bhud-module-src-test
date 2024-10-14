@@ -6,25 +6,26 @@ namespace Kenedia.Modules.Core.Extensions
 {
 	public static class ControlExtensions
 	{
-		public static bool IsVisible(this Control control)
+		private static bool IsParentSetAndVisible(this Control ctrl)
 		{
-			return IsParentSetAndVisible(control);
-			static bool IsParentSetAndVisible(Control ctrl)
+			if (ctrl?.Parent?.Visible ?? false)
 			{
-				if (ctrl.Visible && ctrl.Parent != null)
+				if (ctrl.Parent != GameService.Graphics.SpriteScreen)
 				{
-					if (ctrl.Parent != GameService.Graphics.SpriteScreen || !ctrl.Parent.Visible)
-					{
-						if (ctrl.Parent.Visible)
-						{
-							return IsParentSetAndVisible(ctrl.Parent);
-						}
-						return false;
-					}
-					return true;
+					return ctrl.Parent.IsParentSetAndVisible();
 				}
-				return false;
+				return true;
 			}
+			return false;
+		}
+
+		public static bool IsVisible(this Control ctrl)
+		{
+			if (ctrl?.Visible ?? false)
+			{
+				return ctrl.IsParentSetAndVisible();
+			}
+			return false;
 		}
 
 		public static bool IsDrawn(this Control c)
