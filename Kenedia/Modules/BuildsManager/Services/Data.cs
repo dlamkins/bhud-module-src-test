@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Blish_HUD;
 using Blish_HUD.Modules.Managers;
 using Gw2Sharp.WebApi;
 using Kenedia.Modules.BuildsManager.DataModels.Items;
@@ -251,6 +252,7 @@ namespace Kenedia.Modules.BuildsManager.Services
 			{
 				return false;
 			}
+			await Task.Delay(5000);
 			LoadingSpinner spinner = Spinner;
 			LastLoadAttempt = Common.Now;
 			BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths>.Logger.Info("Loading data");
@@ -297,7 +299,10 @@ namespace Kenedia.Modules.BuildsManager.Services
 				if (!failed)
 				{
 					BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths>.Logger.Info("All data loaded!");
-					this.Loaded?.Invoke(this, EventArgs.Empty);
+					GameService.Graphics.QueueMainThreadRender(delegate
+					{
+						this.Loaded?.Invoke(this, EventArgs.Empty);
+					});
 				}
 				else
 				{

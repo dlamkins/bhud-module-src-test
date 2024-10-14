@@ -28,6 +28,10 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 			base.Tooltip = (SkillTooltip = new SkillTooltip());
 			SetTemplatePresenter();
 			Data.Loaded += new EventHandler(Data_Loaded);
+			if (Data.IsLoaded)
+			{
+				OnDataLoaded();
+			}
 		}
 
 		private void Data_Loaded(object sender, EventArgs e)

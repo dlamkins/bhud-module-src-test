@@ -43,6 +43,8 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 
 		public TemplatePresenter TemplatePresenter { get; private set; }
 
+		public Data Data { get; }
+
 		public MainWindow MainWindow
 		{
 			get
@@ -101,6 +103,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 		public SelectionPanel(TemplatePresenter templatePresenter, TemplateCollection templates, TemplateTags templateTags, Data data, TemplateFactory templateFactory, Settings settings)
 		{
 			TemplatePresenter = templatePresenter;
+			Data = data;
 			Pointer = new Pointer();
 			base.ClipsBounds = false;
 			HeightSizingMode = SizingMode.Fill;
@@ -159,6 +162,10 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 			{
 			case SelectionTypes.Items:
 			{
+				if (!Data.IsLoaded)
+				{
+					break;
+				}
 				if (((TemplateSlotType)(object)slot).GetGroupType() != _gearSelection.ActiveSlot.GetGroupType())
 				{
 					_gearSelection.Search.Text = string.Empty;
@@ -180,6 +187,10 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 				break;
 			}
 			case SelectionTypes.Stats:
+				if (!Data.IsLoaded)
+				{
+					break;
+				}
 				_statSelection.OnClickAction = delegate(object obj)
 				{
 					T val2 = obj as T;

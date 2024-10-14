@@ -30,37 +30,37 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 
 		private TemplatePresenter _templatePresenter;
 
-		private List<SelectionPanelSelectable> _armors;
+		private List<SelectionPanelSelectable> _armors = new List<SelectionPanelSelectable>();
 
-		private List<SelectionPanelSelectable> _trinkets;
+		private List<SelectionPanelSelectable> _trinkets = new List<SelectionPanelSelectable>();
 
-		private List<SelectionPanelSelectable> _backs;
+		private List<SelectionPanelSelectable> _backs = new List<SelectionPanelSelectable>();
 
-		private List<SelectionPanelSelectable> _weapons;
+		private List<SelectionPanelSelectable> _weapons = new List<SelectionPanelSelectable>();
 
-		private List<SelectionPanelSelectable> _pvpAmulets;
+		private List<SelectionPanelSelectable> _pvpAmulets = new List<SelectionPanelSelectable>();
 
-		private List<SelectionPanelSelectable> _pveSigils;
+		private List<SelectionPanelSelectable> _pveSigils = new List<SelectionPanelSelectable>();
 
-		private List<SelectionPanelSelectable> _pvpSigils;
+		private List<SelectionPanelSelectable> _pvpSigils = new List<SelectionPanelSelectable>();
 
-		private List<SelectionPanelSelectable> _pveRunes;
+		private List<SelectionPanelSelectable> _pveRunes = new List<SelectionPanelSelectable>();
 
-		private List<SelectionPanelSelectable> _pvpRunes;
+		private List<SelectionPanelSelectable> _pvpRunes = new List<SelectionPanelSelectable>();
 
-		private List<SelectionPanelSelectable> _nourishment;
+		private List<SelectionPanelSelectable> _nourishment = new List<SelectionPanelSelectable>();
 
-		private List<SelectionPanelSelectable> _utilites;
+		private List<SelectionPanelSelectable> _utilites = new List<SelectionPanelSelectable>();
 
-		private List<SelectionPanelSelectable> _enrichments;
+		private List<SelectionPanelSelectable> _enrichments = new List<SelectionPanelSelectable>();
 
-		private List<SelectionPanelSelectable> _infusions;
+		private List<SelectionPanelSelectable> _infusions = new List<SelectionPanelSelectable>();
 
-		private List<SelectionPanelSelectable> _powerCores;
+		private List<SelectionPanelSelectable> _powerCores = new List<SelectionPanelSelectable>();
 
-		private List<SelectionPanelSelectable> _pveRelics;
+		private List<SelectionPanelSelectable> _pveRelics = new List<SelectionPanelSelectable>();
 
-		private List<SelectionPanelSelectable> _pvpRelics;
+		private List<SelectionPanelSelectable> _pvpRelics = new List<SelectionPanelSelectable>();
 
 		public TemplatePresenter TemplatePresenter
 		{
@@ -102,7 +102,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 
 		public GearSelection(TemplatePresenter templatePresenter, Data data)
 		{
-			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
 			TemplatePresenter = templatePresenter;
 			Data = data;
 			Search.TextChangedAction = delegate(string txt)

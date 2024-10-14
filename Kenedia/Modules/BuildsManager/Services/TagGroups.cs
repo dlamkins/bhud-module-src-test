@@ -25,7 +25,7 @@ namespace Kenedia.Modules.BuildsManager.Services
 
 		private CancellationTokenSource _tokenSource;
 
-		private List<TagGroup> _groups;
+		private List<TagGroup> _groups = new List<TagGroup>();
 
 		private bool _saveRequested;
 

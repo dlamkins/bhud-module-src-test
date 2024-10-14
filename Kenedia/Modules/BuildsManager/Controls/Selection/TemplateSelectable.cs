@@ -250,6 +250,16 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 			LocalizingService.LocaleChanged += new EventHandler<Blish_HUD.ValueChangedEventArgs<Locale>>(LocalizingService_OnLocaleChanged);
 			templateTags.TagChanged += new PropertyChangedEventHandler(TemplateTags_TagChanged);
 			templateTags.TagRemoved += new EventHandler<TemplateTag>(TemplateTags_TagRemoved);
+			if (Data.IsLoaded)
+			{
+				ApplyTemplate();
+			}
+			Data.Loaded += new EventHandler(Data_Loaded);
+		}
+
+		private void Data_Loaded(object sender, EventArgs e)
+		{
+			ApplyTemplate();
 		}
 
 		private void TemplateTags_TagRemoved(object sender, TemplateTag e)

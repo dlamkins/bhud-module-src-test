@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
@@ -161,16 +162,16 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0111: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0116: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0121: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0126: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0179: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0183: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0193: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0154: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0159: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0169: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01db: Unknown result type (might be due to invalid IL or missing references)
 			base.OnClick(e);
 			Rectangle a = base.AbsoluteBounds;
 			if (base.ItemControl.MouseOver)
@@ -178,7 +179,7 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 				base.SelectionPanel?.SetAnchor(base.ItemControl, Blish_HUD.RectangleExtension.Add(new Rectangle(((Rectangle)(ref a)).get_Location(), Point.get_Zero()), base.ItemControl.LocalBounds), SelectionTypes.Stats, base.Slot, GearSubSlotType.None, delegate(Stat stat)
 				{
 					base.TemplatePresenter?.Template?.SetItem(base.Slot, TemplateSubSlotType.Stat, stat);
-				}, (base.TemplatePresenter?.Template[base.Slot] as ArmorTemplateEntry).Armor?.StatChoices, (base.TemplatePresenter?.Template[base.Slot] as ArmorTemplateEntry).Armor?.AttributeAdjustment);
+				}, (base.TemplatePresenter?.Template[base.Slot] as ArmorTemplateEntry).Armor?.StatChoices ?? base.Data.Armors?.Items?.Values?.FirstOrDefault()?.StatChoices ?? Array.Empty<int>(), (base.TemplatePresenter?.Template[base.Slot] as ArmorTemplateEntry).Armor?.AttributeAdjustment);
 			}
 			if (_runeControl.MouseOver)
 			{

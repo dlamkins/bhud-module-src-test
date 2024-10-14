@@ -46,7 +46,7 @@ namespace Kenedia.Modules.BuildsManager.Services
 			return t;
 		}
 
-		public Template CreateTemplate(string name, string buildCode, string gearCode, string description, UniqueObservableCollection<string> tags, Races? race, ProfessionType? profession, int? elitespecId, string? lastModified)
+		public Template CreateTemplate(string name, string buildCode, string gearCode, string description, UniqueObservableCollection<string> tags, Races? race, ProfessionType? profession, int elitespecId, string? lastModified)
 		{
 			return new Template(Data, name, buildCode, gearCode, description, tags, race, profession, elitespecId)
 			{

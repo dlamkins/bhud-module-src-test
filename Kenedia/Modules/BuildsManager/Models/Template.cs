@@ -68,8 +68,6 @@ namespace Kenedia.Modules.BuildsManager.Models
 
 		public Data Data { get; }
 
-		public Kenedia.Modules.BuildsManager.DataModels.Professions.Specialization? SavedEliteSpecialization { get; private set; }
-
 		public string FilePath => BaseModule<BuildsManager, MainWindow, Settings, Paths>.ModuleInstance.Paths.TemplatesPath + Common.MakeValidFileName(Name.Trim(), '_') + ".json";
 
 		[DataMember]
@@ -171,20 +169,17 @@ namespace Kenedia.Modules.BuildsManager.Models
 		}
 
 		[DataMember]
-		public int? EliteSpecializationId
+		public int EliteSpecializationId { get; set; }
+
+		public Kenedia.Modules.BuildsManager.DataModels.Professions.Specialization? EliteSpecialization
 		{
 			get
 			{
-				Kenedia.Modules.BuildsManager.DataModels.Professions.Specialization specialization = Specializations.Specialization3.Specialization;
-				if (specialization == null)
-				{
-					return SavedEliteSpecialization?.Id;
-				}
-				return specialization.Id;
+				Kenedia.Modules.BuildsManager.DataModels.Professions.Profession prof;
+				Kenedia.Modules.BuildsManager.DataModels.Professions.Specialization spec;
+				return ((Data.Professions.TryGetValue(Profession, out prof) && prof.Specializations.TryGetValue(EliteSpecializationId, out spec)) ? spec : null) ?? null;
 			}
 		}
-
-		public Kenedia.Modules.BuildsManager.DataModels.Professions.Specialization? EliteSpecialization => Specializations.Specialization3?.Specialization ?? SavedEliteSpecialization;
 
 		public RangerPets Pets { get; } = new RangerPets();
 
@@ -387,18 +382,30 @@ namespace Kenedia.Modules.BuildsManager.Models
 		}
 
 		[JsonConstructor]
-		public Template(Data data, string name, string buildCode, string gearCode, string description, UniqueObservableCollection<string> tags, Races? race, ProfessionType? profession, int? elitespecId)
+		public Template(Data data, string name, string buildCode, string gearCode, string description, UniqueObservableCollection<string> tags, Races? race, ProfessionType? profession, int elitespecId)
 			: this(data)
 		{
+			EliteSpecializationId = elitespecId;
 			_name = name;
 			_race = race.GetValueOrDefault(Races.None);
 			_profession = profession.GetValueOrDefault(ProfessionType.Guardian);
-			SavedEliteSpecialization = Data.Professions[Profession]?.Specializations.FirstOrDefault<KeyValuePair<int, Kenedia.Modules.BuildsManager.DataModels.Professions.Specialization>>((KeyValuePair<int, Kenedia.Modules.BuildsManager.DataModels.Professions.Specialization> e) => e.Value.Id == elitespecId).Value;
 			_description = description;
 			Tags = tags ?? _tags;
 			_savedBuildCode = buildCode;
 			_savedGearCode = gearCode;
 			SetArmorItems();
+			_ = Data.IsLoaded;
+			Data.Loaded += new EventHandler(Data_Loaded);
+		}
+
+		private void Data_Loaded(object sender, EventArgs e)
+		{
+			ApplyData();
+		}
+
+		private void ApplyData()
+		{
+			this.EliteSpecializationChanged?.Invoke(this, new SpecializationChangedEventArgs(SpecializationSlotType.Line_3, EliteSpecialization));
 		}
 
 		private void OnLastModifiedChanged(object sender, Kenedia.Modules.Core.Models.ValueChangedEventArgs<string> e)
@@ -571,7 +578,6 @@ namespace Kenedia.Modules.BuildsManager.Models
 			SetSpecialization(SpecializationSlotType.Line_3, null);
 			Pets.Wipe();
 			Legends.Wipe();
-			SavedEliteSpecialization = null;
 			RemoveInvalidSkillsBasedOnSpec();
 		}
 
@@ -641,7 +647,7 @@ namespace Kenedia.Modules.BuildsManager.Models
 
 		public void LoadBuildFromCode(string? code, bool save = false)
 		{
-			if (code != null && Gw2ChatLink.TryParse(code, out var chatlink))
+			if (code != null && Gw2ChatLink.TryParse(code, out var chatlink) && Data.IsLoaded)
 			{
 				BuildChatLink build = new BuildChatLink();
 				build.Parse(chatlink.ToArray());
@@ -703,12 +709,15 @@ namespace Kenedia.Modules.BuildsManager.Models
 
 		public void LoadGearFromCode(string? code, bool save = false)
 		{
-			GearChatCode.LoadTemplateFromChatCode(this, code, Data);
-			RemoveInvalidGearCombinations();
-			OnGearCodeChanged();
-			if (save)
+			if (Data.IsLoaded)
 			{
-				RequestSave("LoadGearFromCode");
+				GearChatCode.LoadTemplateFromChatCode(this, code, Data);
+				RemoveInvalidGearCombinations();
+				OnGearCodeChanged();
+				if (save)
+				{
+					RequestSave("LoadGearFromCode");
+				}
 			}
 		}
 
@@ -864,7 +873,7 @@ namespace Kenedia.Modules.BuildsManager.Models
 			{
 				GearCode = _savedGearCode;
 				BuildCode = _savedBuildCode;
-				Loaded = true;
+				Loaded = Data.IsLoaded;
 			}
 		}
 
@@ -952,7 +961,7 @@ namespace Kenedia.Modules.BuildsManager.Models
 				newSpecline.Specialization = specialization;
 				if (slot == SpecializationSlotType.Line_3)
 				{
-					SavedEliteSpecialization = specialization;
+					EliteSpecializationId = specialization?.Id ?? 0;
 				}
 				SetTrait(currentSpecline, null, TraitTierType.Adept);
 				SetTrait(currentSpecline, null, TraitTierType.Master);

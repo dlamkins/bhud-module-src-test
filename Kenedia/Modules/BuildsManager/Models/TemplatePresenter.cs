@@ -89,6 +89,8 @@ namespace Kenedia.Modules.BuildsManager.Models
 
 		public TemplateFactory TemplateFactory { get; }
 
+		public Data Data { get; }
+
 		public event EventHandler BuildCodeChanged;
 
 		public event EventHandler GearCodeChanged;
@@ -125,10 +127,17 @@ namespace Kenedia.Modules.BuildsManager.Models
 
 		public event SpecializationChangedEventHandler EliteSpecializationChanged;
 
-		public TemplatePresenter(TemplateFactory templateFactory)
+		public TemplatePresenter(TemplateFactory templateFactory, Data data)
 		{
 			TemplateFactory = templateFactory;
+			Data = data;
 			Template = TemplateFactory.CreateTemplate(string.Empty);
+			Data.Loaded += new EventHandler(Data_Loaded);
+		}
+
+		private void Data_Loaded(object sender, EventArgs e)
+		{
+			On_TemplateChanged(this, new ValueChangedEventArgs<Template>(Template, Template));
 		}
 
 		public void SetTemplate(Template? template)

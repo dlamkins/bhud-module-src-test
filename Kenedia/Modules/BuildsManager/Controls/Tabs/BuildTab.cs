@@ -192,9 +192,39 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 
 		public override void Draw(SpriteBatch spriteBatch, Rectangle drawBounds, Rectangle scissor)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-			base.Draw(spriteBatch, drawBounds, scissor);
+			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
+			if (Data.IsLoaded)
+			{
+				base.Draw(spriteBatch, drawBounds, scissor);
+				return;
+			}
+			Rectangle scissorRectangle = Rectangle.Intersect(scissor, base.AbsoluteBounds.WithPadding(_padding)).ScaleBy(Control.Graphics.UIScaleMultiplier);
+			((GraphicsResource)spriteBatch).get_GraphicsDevice().set_ScissorRectangle(scissorRectangle);
+			base.EffectBehind?.Draw(spriteBatch, drawBounds);
+			spriteBatch.Begin(base.SpriteBatchParameters);
+			Rectangle r = default(Rectangle);
+			((Rectangle)(ref r))._002Ector(((Rectangle)(ref drawBounds)).get_Center().X - 32, ((Rectangle)(ref drawBounds)).get_Center().Y, 64, 64);
+			Rectangle tR = default(Rectangle);
+			((Rectangle)(ref tR))._002Ector(drawBounds.X, ((Rectangle)(ref r)).get_Bottom() + 10, drawBounds.Width, Control.Content.DefaultFont16.get_LineHeight());
+			LoadingSpinnerUtil.DrawLoadingSpinner(this, spriteBatch, r);
+			spriteBatch.DrawStringOnCtrl(this, "Loading Data. Please wait.", Control.Content.DefaultFont16, tR, Color.get_White(), wrap: false, HorizontalAlignment.Center);
+			spriteBatch.End();
 		}
 
 		public override void RecalculateLayout()

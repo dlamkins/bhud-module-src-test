@@ -44,9 +44,9 @@ namespace Kenedia.Modules.BuildsManager.Utility
 			string description = (string)jo.get_Item("Description");
 			int? race = (int?)jo.get_Item("Race");
 			int? profession = (int?)jo.get_Item("Profession");
-			int? elitespecId = (int?)jo.get_Item("EliteSpecializationId");
+			int elitespecId = ((int?)jo.get_Item("EliteSpecializationId")).GetValueOrDefault();
 			string lastModified = (string)jo.get_Item("LastModified");
-			return TemplateFactory.CreateTemplate(name, buildCode, gearCode, description, tags, (Races)race.GetValueOrDefault(-1), (ProfessionType)profession.GetValueOrDefault(1), elitespecId.GetValueOrDefault(), lastModified);
+			return TemplateFactory.CreateTemplate(name, buildCode, gearCode, description, tags, (Races)race.GetValueOrDefault(-1), (ProfessionType)profession.GetValueOrDefault(1), elitespecId, lastModified);
 		}
 
 		public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)

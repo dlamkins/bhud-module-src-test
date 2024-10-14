@@ -51,7 +51,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0272: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0274: Unknown result type (might be due to invalid IL or missing references)
 			base.Build(buildPanel);
 			SelectionPanel.Parent = buildPanel;
 			SelectionPanel.Location = new Point(35, 0);
@@ -75,7 +75,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 			};
 			TabbedRegionTab tab = obj;
 			tabbedRegion.AddTab(obj);
-			_tabbedRegion.AddTab(new TabbedRegionTab(BuildTab)
+			_tabbedRegion.AddTab(tab = new TabbedRegionTab(BuildTab)
 			{
 				Header = () => strings.Build,
 				Icon = AsyncTexture2D.FromAssetId(156720)
