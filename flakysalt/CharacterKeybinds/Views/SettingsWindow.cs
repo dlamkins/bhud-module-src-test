@@ -1,18 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Input;
-using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
 using Blish_HUD.Settings.UI.Views;
 using Microsoft.Xna.Framework;
-using flakysalt.CharacterKeybinds.Data;
-using flakysalt.CharacterKeybinds.Util;
+using flakysalt.CharacterKeybinds.Model;
 
 namespace flakysalt.CharacterKeybinds.Views
 {
@@ -20,9 +16,9 @@ namespace flakysalt.CharacterKeybinds.Views
 	{
 		private CharacterKeybindsSettings model;
 
-		private CharacterKeybindWindow characterKeybindWindow;
+		private CharacterKeybindsTab characterKeybindWindow;
 
-		private TroubleshootWindow troubleshootWindow;
+		private Autoclicker troubleshootWindow;
 
 		private FlowPanel _settingFlowPanel;
 
@@ -38,18 +34,12 @@ namespace flakysalt.CharacterKeybinds.Views
 
 		private StandardButton faqButton;
 
-		private DirectoriesManager directoriesManager;
-
-		private Logger logger;
-
-		public SettingsWindow(CharacterKeybindsSettings model, CharacterKeybindWindow assignmentWindow, TroubleshootWindow autoclickView, DirectoriesManager directoriesManager, Logger logger)
+		public SettingsWindow(CharacterKeybindsSettings model, CharacterKeybindsTab assignmentWindow, Autoclicker autoclickView)
 			: this()
 		{
 			this.model = model;
 			characterKeybindWindow = assignmentWindow;
 			troubleshootWindow = autoclickView;
-			this.directoriesManager = directoriesManager;
-			this.logger = logger;
 		}
 
 		protected override void Build(Container buildPanel)
@@ -196,7 +186,6 @@ namespace flakysalt.CharacterKeybinds.Views
 			((Control)val9).set_Size(new Point(200, 30));
 			val9.set_Text("Troubleshoot");
 			openTroubleshootWindowButton = val9;
-			ImportLegacyKeybinds();
 			((Control)faqButton).add_Click((EventHandler<MouseEventArgs>)FaqButton_Click);
 			((Control)reportBugButton).add_Click((EventHandler<MouseEventArgs>)ReportBugButton_Click);
 			((Control)fairMacroUseButton).add_Click((EventHandler<MouseEventArgs>)FairMacroUseButton_Click);
@@ -211,36 +200,15 @@ namespace flakysalt.CharacterKeybinds.Views
 
 		private void OpenCharacterKeybindsSettingButton_Click(object sender, MouseEventArgs e)
 		{
-			CharacterKeybindWindow obj = characterKeybindWindow;
-			if (obj != null)
-			{
-				((Control)obj.WindowView).Show();
-			}
+			characterKeybindWindow?.Show();
 		}
 
 		private void OpenTroubleshootWindowButton_Click(object sender, MouseEventArgs e)
 		{
-			TroubleshootWindow obj = troubleshootWindow;
-			if (obj != null)
+			Autoclicker autoclicker = troubleshootWindow;
+			if (autoclicker != null)
 			{
-				((Control)obj.WindowView).Show();
-			}
-		}
-
-		private void ImportLegacyKeybinds()
-		{
-			if (File.Exists(Path.Combine(directoriesManager.GetFullDirectoryPath("keybind_storage"), "characterMap.json")))
-			{
-				try
-				{
-					List<CharacterKeybind> characterSpecializations = CharacterKeybindJsonUtil.DeserializeCharacterList(File.ReadAllText(Path.Combine(directoriesManager.GetFullDirectoryPath("keybind_storage"), "characterMap.json")));
-					model.characterKeybinds.set_Value(characterSpecializations);
-					File.Delete(Path.Combine(directoriesManager.GetFullDirectoryPath("keybind_storage"), "characterMap.json"));
-				}
-				catch (Exception e)
-				{
-					logger.Error($"Could not import legacy bindings. \n {e}");
-				}
+				((Control)autoclicker.WindowView).Show();
 			}
 		}
 

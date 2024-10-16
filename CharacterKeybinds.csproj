@@ -16,6 +16,6 @@
     <Reference Include="MonoGame.Framework" />
     <Reference Include="Gw2Sharp" />
     <Reference Include="System.Core" />
-    <Reference Include="Newtonsoft.Json" />
+    <Reference Include="MonoGame.Extended" />
   </ItemGroup>
 </Project>

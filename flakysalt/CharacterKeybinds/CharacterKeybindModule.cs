@@ -12,7 +12,8 @@ using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using flakysalt.CharacterKeybinds.Data;
+using flakysalt.CharacterKeybinds.Model;
+using flakysalt.CharacterKeybinds.Presenter;
 using flakysalt.CharacterKeybinds.Views;
 
 namespace flakysalt.CharacterKeybinds
@@ -22,29 +23,25 @@ namespace flakysalt.CharacterKeybinds
 	{
 		internal static CharacterKeybindModule moduleInstance;
 
-		private static readonly Logger Logger = Logger.GetLogger<CharacterKeybindModule>();
-
 		private Texture2D _cornerTexture;
 
 		private CornerIcon _cornerIcon;
 
 		public CharacterKeybindsSettings settingsModel;
 
-		private CharacterKeybindWindow moduleWindowView;
+		private CharacterKeybindsTab moduleWindowView;
 
-		public TroubleshootWindow autoclickerView;
+		private CharacterKeybindSettingsPresenter presenter;
 
-		internal SettingsManager SettingsManager => base.ModuleParameters.get_SettingsManager();
+		public Autoclicker autoclickerView;
 
 		internal ContentsManager ContentsManager => base.ModuleParameters.get_ContentsManager();
-
-		internal DirectoriesManager DirectoriesManager => base.ModuleParameters.get_DirectoriesManager();
 
 		internal Gw2ApiManager Gw2ApiManager => base.ModuleParameters.get_Gw2ApiManager();
 
 		public override IView GetSettingsView()
 		{
-			return (IView)(object)new SettingsWindow(settingsModel, moduleWindowView, autoclickerView, DirectoriesManager, Logger);
+			return (IView)(object)new SettingsWindow(settingsModel, moduleWindowView, autoclickerView);
 		}
 
 		[ImportingConstructor]
@@ -62,57 +59,72 @@ namespace flakysalt.CharacterKeybinds
 		protected override async Task LoadAsync()
 		{
 			_cornerTexture = ContentsManager.GetTexture("images/logo_small.png");
-			moduleWindowView = new CharacterKeybindWindow(Logger);
-			autoclickerView = new TroubleshootWindow();
+			autoclickerView = new Autoclicker();
 			autoclickerView.Init(settingsModel, ContentsManager);
-			await moduleWindowView.Init(ContentsManager, Gw2ApiManager, settingsModel, DirectoriesManager, autoclickerView);
+			LoadModuleWindow();
 			CreateCornerIconWithContextMenu();
+		}
+
+		private void LoadModuleWindow()
+		{
+			moduleWindowView = new CharacterKeybindsTab(ContentsManager);
+			CharacterKeybindModel model = new CharacterKeybindModel(settingsModel);
+			presenter = new CharacterKeybindSettingsPresenter(moduleWindowView, model, Gw2ApiManager, autoclickerView);
 		}
 
 		private void CreateCornerIconWithContextMenu()
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0065: Expected O, but got Unknown
-			CornerIcon val = new CornerIcon();
-			val.set_Icon(AsyncTexture2D.op_Implicit(_cornerTexture));
-			((Control)val).set_BasicTooltipText(((Module)this).get_Name() ?? "");
-			val.set_Priority(1);
-			((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			((Control)val).set_Visible(settingsModel.displayCornerIcon.get_Value());
-			val.set_DynamicHide(true);
-			_cornerIcon = val;
-			((Control)_cornerIcon).add_Click((EventHandler<MouseEventArgs>)delegate
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0061: Expected O, but got Unknown
+			if (settingsModel.displayCornerIcon.get_Value())
 			{
-				((WindowBase2)moduleWindowView.WindowView).ToggleWindow();
-			});
-			((SettingEntry)settingsModel.displayCornerIcon).add_PropertyChanged((PropertyChangedEventHandler)delegate
+				CornerIcon val = new CornerIcon();
+				val.set_Icon(AsyncTexture2D.op_Implicit(_cornerTexture));
+				((Control)val).set_BasicTooltipText(((Module)this).get_Name() ?? "");
+				val.set_Priority(1);
+				((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+				((Control)val).set_Visible(true);
+				_cornerIcon = val;
+				((Control)_cornerIcon).add_Click((EventHandler<MouseEventArgs>)delegate
+				{
+					moduleWindowView.ToggleWindow();
+				});
+			}
+			((SettingEntry)settingsModel.displayCornerIcon).add_PropertyChanged((PropertyChangedEventHandler)EnableOrCreateCornerIcon);
+		}
+
+		private void EnableOrCreateCornerIcon(object sender, PropertyChangedEventArgs e)
+		{
+			//IL_0009: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0050: Expected O, but got Unknown
+			if (_cornerIcon == null)
 			{
-				((Control)_cornerIcon).set_Visible(settingsModel.displayCornerIcon.get_Value());
-			});
+				CornerIcon val = new CornerIcon();
+				val.set_Icon(AsyncTexture2D.op_Implicit(_cornerTexture));
+				((Control)val).set_BasicTooltipText(((Module)this).get_Name() ?? "");
+				val.set_Priority(1);
+				((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+				_cornerIcon = val;
+			}
+			((Control)_cornerIcon).set_Visible(settingsModel.displayCornerIcon.get_Value());
 		}
 
 		protected override void Update(GameTime gameTime)
 		{
-			moduleWindowView.Update(gameTime);
+			presenter.Update(gameTime);
 		}
 
 		protected override void Unload()
 		{
-			CharacterKeybindWindow characterKeybindWindow = moduleWindowView;
-			if (characterKeybindWindow != null)
-			{
-				StandardWindow windowView = characterKeybindWindow.WindowView;
-				if (windowView != null)
-				{
-					((Control)windowView).Dispose();
-				}
-			}
 			moduleWindowView?.Dispose();
 			autoclickerView?.Dispose();
 			CornerIcon cornerIcon = _cornerIcon;
