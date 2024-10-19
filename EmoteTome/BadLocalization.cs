@@ -140,6 +140,8 @@ namespace EmoteTome
 
 		public static readonly List<string> PETALTHROW = new List<string> { "Petalthrow", "Petalthrow", "Blumenblätterwerfen", "Petalthrow" };
 
+		public static readonly List<string> BREAKDANCE = new List<string> { "Breakdance", "Breakdance", "Breakdance", "Breakdance" };
+
 		public static readonly List<string> BEAR = new List<string> { "Bear", "Ours", "Baer", "Osa" };
 
 		public static readonly List<string> DEER = new List<string> { "Deer", "Daim", "Hirsch", "Ciervo" };
