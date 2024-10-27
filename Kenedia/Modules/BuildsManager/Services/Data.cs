@@ -252,7 +252,6 @@ namespace Kenedia.Modules.BuildsManager.Services
 			{
 				return false;
 			}
-			await Task.Delay(5000);
 			LoadingSpinner spinner = Spinner;
 			LastLoadAttempt = Common.Now;
 			BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths>.Logger.Info("Loading data");

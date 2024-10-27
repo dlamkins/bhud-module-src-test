@@ -323,10 +323,10 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 			SetLastModifiedText(e.NewValue);
 		}
 
-		private void SetLastModifiedText(string date)
+		private void SetLastModifiedText(string? date)
 		{
 			string date2 = date;
-			_lastModified.SetLocalizedText = () => string.Format(strings.LastModified, date2);
+			_lastModified.SetLocalizedText = () => string.Format(strings.LastModified, date2 ?? string.Empty);
 		}
 
 		private void Tags_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -682,12 +682,12 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 
 		private void ApplyTemplate()
 		{
-			_name.Text = _template?.Name;
-			_raceTexture = (Data.Races.TryGetValue(_template?.Race ?? Races.None, out var race) ? race.Icon : null);
-			_specTexture = Template?.EliteSpecialization?.ProfessionIconBig ?? (Data.Professions.TryGetValue((Template?.Profession).Value, out var profession) ? profession.IconBig : null);
-			SetLastModifiedText(_template.LastModified);
+			_name.Text = Template?.Name;
+			_raceTexture = (Data.Races.TryGetValue(Template?.Race ?? Races.None, out var race) ? race.Icon : null);
+			_specTexture = ((Template == null) ? null : (Template?.EliteSpecialization?.ProfessionIconBig ?? (Data.Professions.TryGetValue((Template?.Profession).Value, out var profession) ? profession.IconBig : null)));
+			SetLastModifiedText(Template.LastModified);
 			SetTagTextures();
-			if (_template != null)
+			if (Template != null)
 			{
 				RecalculateLayout();
 			}
