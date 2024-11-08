@@ -7,7 +7,8 @@ namespace FarmingTracker
 {
 	public class FontService
 	{
-		public Dictionary<FontSize, BitmapFont> Fonts = new Dictionary<FontSize, BitmapFont>();
+		public Dictionary<FontSize, BitmapFont> Fonts { get; } = new Dictionary<FontSize, BitmapFont>();
+
 
 		public FontService()
 		{

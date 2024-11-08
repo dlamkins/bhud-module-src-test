@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Gw2Sharp.WebApi.V2.Models;
@@ -7,19 +6,14 @@ namespace FarmingTracker
 {
 	public class FilterService
 	{
-		public static bool IsUnknownFilterElement<T>(int currencyId)
-		{
-			return !Enum.IsDefined(typeof(T), currencyId);
-		}
-
 		public static (List<Stat> items, List<Stat> currencies) FilterStatsAndSetFunnelOpacity(List<Stat> items, List<Stat> currencies, List<CustomStatProfit> customStatProfits, StatsPanels statsPanels, SettingService settingService)
 		{
-			int currenciesCountBeforeFiltering = currencies.Count();
-			int itemsCountBeforeFiltering = items.Count();
+			int currenciesCountBeforeFiltering = currencies.Count;
+			int itemsCountBeforeFiltering = items.Count;
 			currencies = FilterCurrencies(currencies, customStatProfits, settingService);
 			items = FilterItems(items, customStatProfits, settingService);
-			bool noCurrenciesHiddenByFilter = currencies.Count() == currenciesCountBeforeFiltering;
-			bool noItemsHiddenByFilter = items.Count() == itemsCountBeforeFiltering;
+			bool noCurrenciesHiddenByFilter = currencies.Count == currenciesCountBeforeFiltering;
+			bool noItemsHiddenByFilter = items.Count == itemsCountBeforeFiltering;
 			statsPanels.CurrencyFilterIcon.SetOpacity(noCurrenciesHiddenByFilter);
 			statsPanels.ItemsFilterIcon.SetOpacity(noItemsHiddenByFilter);
 			return (items, currencies);
@@ -99,7 +93,7 @@ namespace FarmingTracker
 
 		private static bool IsShownByCurrencyFilter(Stat c, List<CurrencyFilter> currencyFilter)
 		{
-			if (IsUnknownFilterElement<CurrencyFilter>(c.ApiId))
+			if (Helper.IsUnknownEnumValue<CurrencyFilter>(c.ApiId))
 			{
 				return true;
 			}
@@ -155,11 +149,11 @@ namespace FarmingTracker
 
 		private static bool IsShownByCountSignFilter(Stat stat, List<CountFilter> countFilter)
 		{
-			if (countFilter.Contains(CountFilter.PositiveCount) && stat.Count > 0)
+			if (countFilter.Contains(CountFilter.PositiveCount) && stat.Signed_Count > 0)
 			{
 				return true;
 			}
-			if (countFilter.Contains(CountFilter.NegativeCount) && stat.Count < 0)
+			if (countFilter.Contains(CountFilter.NegativeCount) && stat.Signed_Count < 0)
 			{
 				return true;
 			}

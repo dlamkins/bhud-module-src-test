@@ -21,8 +21,8 @@ namespace FarmingTracker
 
 		public static (List<Stat> items, List<Stat> currencies) RemoveZeroCountStats(List<Stat> items, List<Stat> currencies)
 		{
-			items = items.Where((Stat s) => s.Count != 0).ToList();
-			currencies = currencies.Where((Stat s) => s.Count != 0).ToList();
+			items = items.Where((Stat s) => s.Signed_Count != 0).ToList();
+			currencies = currencies.Where((Stat s) => s.Signed_Count != 0).ToList();
 			return (items, currencies);
 		}
 
@@ -30,7 +30,7 @@ namespace FarmingTracker
 		{
 			foreach (Stat value in statById.Values)
 			{
-				value.Count = 0L;
+				value.Signed_Count = 0L;
 			}
 		}
 

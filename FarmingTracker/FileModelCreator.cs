@@ -14,8 +14,8 @@ namespace FarmingTracker
 				CustomStatProfits = model.CustomStatProfits.ToListSafe()
 			};
 			StatsSnapshot statsSnapshot = model.Stats.StatsSnapshot;
-			List<Stat> items = statsSnapshot.ItemById.Values.Where((Stat s) => s.Count != 0).ToList();
-			List<Stat> stats = statsSnapshot.CurrencyById.Values.Where((Stat s) => s.Count != 0).ToList();
+			List<Stat> items = statsSnapshot.ItemById.Values.Where((Stat s) => s.Signed_Count != 0).ToList();
+			List<Stat> stats = statsSnapshot.CurrencyById.Values.Where((Stat s) => s.Signed_Count != 0).ToList();
 			IEnumerable<FileStat> fileItems = CreateFileStats(items);
 			IEnumerable<FileStat> fileCurrencies = CreateFileStats(stats);
 			obj.FileItems.AddRange(fileItems);
@@ -30,7 +30,7 @@ namespace FarmingTracker
 				yield return new FileStat
 				{
 					ApiId = stat.ApiId,
-					Count = stat.Count
+					Count = stat.Signed_Count
 				};
 			}
 		}

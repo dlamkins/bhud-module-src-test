@@ -13,7 +13,6 @@ namespace FarmingTracker
 	{
 		public static async Task<Dictionary<int, CurrencyDetails>> CreateCacheWithAllApiCurrencies(Gw2ApiManager gw2ApiManager)
 		{
-			new List<Currency>();
 			IReadOnlyList<Currency> apiCurrencies;
 			try
 			{

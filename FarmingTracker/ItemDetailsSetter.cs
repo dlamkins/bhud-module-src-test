@@ -65,8 +65,8 @@ namespace FarmingTracker
 			foreach (CommercePrices apiPrice in apiPrices)
 			{
 				Stat stat = itemById[apiPrice.get_Id()];
-				stat.Details.SellsUnitPriceInCopper = apiPrice.get_Sells().get_UnitPrice();
-				stat.Details.BuysUnitPriceInCopper = apiPrice.get_Buys().get_UnitPrice();
+				stat.Details.Unsigned_SellsUnitPriceInCopper = apiPrice.get_Sells().get_UnitPrice();
+				stat.Details.Unsigned_BuysUnitPriceInCopper = apiPrice.get_Buys().get_UnitPrice();
 			}
 			if (apiItems.Any() && DebugMode.DebugLoggingRequired)
 			{
@@ -82,7 +82,7 @@ namespace FarmingTracker
 				stat2.Details.ItemFlags = apiItem.get_Flags();
 				stat2.Details.Type = ApiEnum<ItemType>.op_Implicit(apiItem.get_Type());
 				stat2.Details.WikiSearchTerm = apiItem.get_ChatLink();
-				stat2.Details.VendorValueInCopper = apiItem.get_VendorValue();
+				stat2.Details.Unsigned_VendorValueInCopper = apiItem.get_VendorValue();
 				stat2.Details.State = ApiStatDetailsState.SetByApi;
 			}
 			List<Stat> itemsUnknownByApi = itemById.Values.Where((Stat i) => i.Details.State == ApiStatDetailsState.MissingBecauseApiNotCalledYet).ToList();

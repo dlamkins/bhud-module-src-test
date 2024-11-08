@@ -55,13 +55,13 @@ namespace FarmingTracker
 			_copperPanel = new CoinPanel(textureService.SmallCopperCoinTexture, Color.get_SandyBrown(), tooltip, font, widthFixed: true, (Container)(object)coinsFlowPanel);
 		}
 
-		public void SetCoins(long coinsInCopper)
+		public void SetCoins(long signed_coinsInCopper)
 		{
-			Coin coin = new Coin(coinsInCopper);
+			Coin coin = new Coin(signed_coinsInCopper);
 			_signLabel.SetSign(coin.Sign);
-			_goldPanel.SetValue(coin.Gold, isZeroValueVisible: false);
-			_silverPanel.SetValue(coin.Silver, coin.Gold > 0);
-			_copperPanel.SetValue(coin.Copper, isZeroValueVisible: true);
+			_goldPanel.SetValue(coin.Unsigned_Gold, isZeroValueVisible: false);
+			_silverPanel.SetValue(coin.Unsigned_Silver, coin.Unsigned_Gold > 0);
+			_copperPanel.SetValue(coin.Unsigned_Copper, isZeroValueVisible: true);
 		}
 
 		protected override void DisposeControl()

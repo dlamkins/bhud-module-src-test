@@ -81,12 +81,12 @@ namespace FarmingTracker
 
 		public bool HasToSaveModel()
 		{
-			bool modelHasToBeSaved = _modelHasToBeSaved;
-			if (modelHasToBeSaved)
+			if (!_modelHasToBeSaved)
 			{
-				_modelHasToBeSaved = false;
+				return false;
 			}
-			return modelHasToBeSaved;
+			_modelHasToBeSaved = false;
+			return true;
 		}
 	}
 }

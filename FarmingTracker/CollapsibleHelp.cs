@@ -17,8 +17,6 @@ namespace FarmingTracker
 
 		private readonly Label _label;
 
-		private int _expandedHeight;
-
 		private readonly Panel _blackContainer;
 
 		private int _expandedWidth;
@@ -99,9 +97,9 @@ namespace FarmingTracker
 
 		private void UpdateHeight()
 		{
-			_expandedHeight = ((Control)_label).get_Height() + _collapsedHeight + 10;
-			((Control)this).set_Height(_isHelpExpanded ? _expandedHeight : _collapsedHeight);
-			((Control)_blackContainer).set_Height(_expandedHeight);
+			int expandedHeight = ((Control)_label).get_Height() + _collapsedHeight + 10;
+			((Control)this).set_Height(_isHelpExpanded ? expandedHeight : _collapsedHeight);
+			((Control)_blackContainer).set_Height(expandedHeight);
 		}
 
 		private void UpdateWidth(int expandedWith)

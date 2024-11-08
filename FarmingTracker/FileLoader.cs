@@ -23,7 +23,7 @@ namespace FarmingTracker
 		{
 			try
 			{
-				return ModelCreator.CreateModel(JsonConvert.DeserializeObject<FileModel>(await GetFileContentAndThrowIfFileEmpty(modelFilePath)) ?? throw new Exception("Deserializing the model.json file failed."));
+				return ModelCreator.CreateModel(JsonConvert.DeserializeObject<FileModel>(await GetFileContentAndThrowIfFileEmpty(modelFilePath)) ?? throw new InvalidOperationException("Deserializing the model.json file failed."));
 			}
 			catch (Exception e)
 			{
@@ -39,7 +39,7 @@ namespace FarmingTracker
 			string obj = await streamReader.ReadToEndAsync();
 			if (string.IsNullOrWhiteSpace(obj))
 			{
-				throw new Exception("file is empty!");
+				throw new InvalidOperationException("file is empty!");
 			}
 			return obj;
 		}

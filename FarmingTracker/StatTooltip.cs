@@ -8,7 +8,7 @@ namespace FarmingTracker
 {
 	public class StatTooltip : DisposableTooltip
 	{
-		public StatTooltip(Stat stat, long? customStatProfitInCopper, AsyncTexture2D statIconTexture, PanelType panelType, Services services)
+		public StatTooltip(Stat stat, long? unsigned_customStatProfitInCopper, AsyncTexture2D statIconTexture, PanelType panelType, Services services)
 		{
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
@@ -30,7 +30,7 @@ namespace FarmingTracker
 				AddDescription(stat, font, (Container)(object)rootFlowPanel);
 				if (panelType != PanelType.IgnoredItems)
 				{
-					StatTooltipService.AddProfitTable(stat, customStatProfitInCopper, font, services, (Container)(object)rootFlowPanel);
+					StatTooltipService.AddProfitTable(stat, unsigned_customStatProfitInCopper, font, services, (Container)(object)rootFlowPanel);
 					StatTooltipService.AddText("\nRight click for more options.", font, (Container)(object)rootFlowPanel);
 				}
 				else
@@ -41,7 +41,7 @@ namespace FarmingTracker
 			case ApiStatDetailsState.GoldCoinCustomStat:
 			case ApiStatDetailsState.SilveCoinCustomStat:
 			case ApiStatDetailsState.CopperCoinCustomStat:
-				StatTooltipService.AddText($"{stat.Count}\nChanges in 'raw gold'.\nIn other words coins spent or gained.", font, (Container)(object)rootFlowPanel);
+				StatTooltipService.AddText($"{stat.Signed_Count}\nChanges in 'raw gold'.\nIn other words coins spent or gained.", font, (Container)(object)rootFlowPanel);
 				break;
 			case ApiStatDetailsState.MissingBecauseUnknownByApi:
 				StatTooltipService.AddText($"Unknown item/currency (ID: {stat.ApiId})\n" + "GW2 API has no information about it.\nThis issue typically occurs for items related to renown hearts.", font, (Container)(object)rootFlowPanel);
@@ -103,7 +103,7 @@ namespace FarmingTracker
 			Image iconImage = val2;
 			Color rarityColor = ColorService.GetRarityTextColor(stat.Details.Rarity);
 			Label val3 = new Label();
-			val3.set_Text($"{stat.Count} {stat.Details.Name}");
+			val3.set_Text($"{stat.Signed_Count} {stat.Details.Name}");
 			val3.set_Font(GameService.Content.GetFont((FontFace)0, (FontSize)18, (FontStyle)2));
 			val3.set_TextColor(rarityColor);
 			val3.set_AutoSizeHeight(true);

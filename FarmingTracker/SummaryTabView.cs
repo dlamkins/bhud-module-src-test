@@ -106,8 +106,8 @@ namespace FarmingTracker
 				{
 					StatsSnapshot statsSnapshot = _model.Stats.StatsSnapshot;
 					_services.ProfitCalculator.CalculateProfits(statsSnapshot, _model.CustomStatProfits, _model.IgnoredItemApiIds, _services.FarmingDuration.Elapsed);
-					_controls.ProfitPanels.ShowProfits(_services.ProfitCalculator.ProfitInCopper, _services.ProfitCalculator.ProfitPerHourInCopper);
-					_profitWindow.ProfitPanels.ShowProfits(_services.ProfitCalculator.ProfitInCopper, _services.ProfitCalculator.ProfitPerHourInCopper);
+					_controls.ProfitPanels.ShowProfits(_services.ProfitCalculator.Signed_ProfitInCopper, _services.ProfitCalculator.Signed_ProfitPerHourInCopper);
+					_profitWindow.ProfitPanels.ShowProfits(_services.ProfitCalculator.Signed_ProfitInCopper, _services.ProfitCalculator.Signed_ProfitPerHourInCopper);
 					UiUpdater.UpdateStatPanels(_controls.StatsPanels, statsSnapshot, _model, _services);
 					_isUiUpdateTaskRunning = false;
 				});
@@ -157,8 +157,8 @@ namespace FarmingTracker
 			if (_profitPerHourUpdateInterval.HasEnded())
 			{
 				_services.ProfitCalculator.CalculateProfitPerHour(_services.FarmingDuration.Elapsed);
-				_controls.ProfitPanels.ShowProfits(_services.ProfitCalculator.ProfitInCopper, _services.ProfitCalculator.ProfitPerHourInCopper);
-				_profitWindow.ProfitPanels.ShowProfits(_services.ProfitCalculator.ProfitInCopper, _services.ProfitCalculator.ProfitPerHourInCopper);
+				_controls.ProfitPanels.ShowProfits(_services.ProfitCalculator.Signed_ProfitInCopper, _services.ProfitCalculator.Signed_ProfitPerHourInCopper);
+				_profitWindow.ProfitPanels.ShowProfits(_services.ProfitCalculator.Signed_ProfitInCopper, _services.ProfitCalculator.Signed_ProfitPerHourInCopper);
 			}
 			_controls.ElapsedFarmingTimeLabel.UpdateTimeEverySecond();
 			if (!_services.UpdateLoop.UpdateIntervalEnded())

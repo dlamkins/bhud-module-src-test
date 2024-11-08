@@ -101,10 +101,10 @@ namespace FarmingTracker
 			val4.set_AutoSizeWidth(true);
 			((Control)val4).set_Parent((Container)(object)statRowPanel);
 			Label statNameLabel = val4;
-			Coin coin = new Coin(customStatProfit2.CustomProfitInCopper);
+			Coin coin = new Coin(customStatProfit2.Unsigned_CustomProfitInCopper);
 			NumberTextBox numberTextBox = new NumberTextBox(6);
 			((Control)numberTextBox).set_Location(new Point(((Control)statImage).get_Right() + 10, ((Control)statNameLabel).get_Bottom() + 5));
-			((TextInputBase)numberTextBox).set_Text(coin.Gold.ToString());
+			((TextInputBase)numberTextBox).set_Text(coin.Unsigned_Gold.ToString());
 			((Control)numberTextBox).set_Width(60);
 			((Control)numberTextBox).set_Parent((Container)(object)statRowPanel);
 			NumberTextBox goldTextBox = numberTextBox;
@@ -115,7 +115,7 @@ namespace FarmingTracker
 			Image goldCoinImage = val5;
 			NumberTextBox numberTextBox2 = new NumberTextBox(2);
 			((Control)numberTextBox2).set_Location(new Point(((Control)goldCoinImage).get_Right() + 10, ((Control)statNameLabel).get_Bottom() + 5));
-			((TextInputBase)numberTextBox2).set_Text(coin.Silver.ToString());
+			((TextInputBase)numberTextBox2).set_Text(coin.Unsigned_Silver.ToString());
 			((Control)numberTextBox2).set_Width(35);
 			((Control)numberTextBox2).set_Parent((Container)(object)statRowPanel);
 			NumberTextBox silverTextBox = numberTextBox2;
@@ -126,7 +126,7 @@ namespace FarmingTracker
 			Image silverCoinImage = val6;
 			NumberTextBox numberTextBox3 = new NumberTextBox(2);
 			((Control)numberTextBox3).set_Location(new Point(((Control)silverCoinImage).get_Right() + 10, ((Control)statNameLabel).get_Bottom() + 5));
-			((TextInputBase)numberTextBox3).set_Text(coin.Copper.ToString());
+			((TextInputBase)numberTextBox3).set_Text(coin.Unsigned_Copper.ToString());
 			((Control)numberTextBox3).set_Width(35);
 			((Control)numberTextBox3).set_Parent((Container)(object)statRowPanel);
 			NumberTextBox copperTextBox = numberTextBox3;
@@ -172,7 +172,7 @@ namespace FarmingTracker
 			int gold = int.Parse(goldText);
 			int silver = int.Parse(silverText);
 			int copper = int.Parse(copperText);
-			customStatProfit.CustomProfitInCopper = 10000 * gold + 100 * silver + copper;
+			customStatProfit.Unsigned_CustomProfitInCopper = 10000 * gold + 100 * silver + copper;
 			services.UpdateLoop.TriggerUpdateUi();
 			services.UpdateLoop.TriggerSaveModel();
 		}

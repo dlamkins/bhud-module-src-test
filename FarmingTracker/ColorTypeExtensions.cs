@@ -1,11 +1,12 @@
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Microsoft.Xna.Framework;
 
 namespace FarmingTracker
 {
 	public static class ColorTypeExtensions
 	{
-		public static Dictionary<ColorType, Color> ColorByColorType = new Dictionary<ColorType, Color>
+		public static readonly ReadOnlyDictionary<ColorType, Color> ColorByColorType = new ReadOnlyDictionary<ColorType, Color>(new Dictionary<ColorType, Color>
 		{
 			[ColorType.White] = Color.get_White(),
 			[ColorType.Black] = Color.get_Black(),
@@ -30,7 +31,7 @@ namespace FarmingTracker
 			[ColorType.Magenta] = Color.get_Magenta(),
 			[ColorType.Violet] = Color.get_Violet(),
 			[ColorType.Purple] = Color.get_Purple()
-		};
+		});
 
 		public static Color GetColor(this ColorType colorType)
 		{

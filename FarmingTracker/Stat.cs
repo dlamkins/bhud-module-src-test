@@ -8,11 +8,11 @@ namespace FarmingTracker
 
 		public StatType StatType { get; set; }
 
-		public long Count { get; set; }
+		public long Signed_Count { get; set; }
 
-		public long CountSign => Math.Sign(Count);
+		public long CountSign => Math.Sign(Signed_Count);
 
-		public bool IsSingleItem => Math.Abs(Count) == 1;
+		public bool IsSingleItem => Math.Abs(Signed_Count) == 1;
 
 		public ApiStatDetails Details { get; set; } = new ApiStatDetails();
 

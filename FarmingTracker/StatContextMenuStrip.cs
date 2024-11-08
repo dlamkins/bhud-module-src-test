@@ -102,7 +102,7 @@ namespace FarmingTracker
 			CustomStatProfit matchingCustomStatProfit = customStatProfits.ToListSafe().SingleOrDefault((CustomStatProfit c) => c.BelongsToStat(stat2));
 			if (matchingCustomStatProfit != null)
 			{
-				matchingCustomStatProfit.CustomProfitInCopper = 0L;
+				matchingCustomStatProfit.Unsigned_CustomProfitInCopper = 0L;
 			}
 			else
 			{

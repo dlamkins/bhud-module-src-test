@@ -36,7 +36,7 @@ namespace FarmingTracker
 			}
 			catch (Exception e)
 			{
-				Module.Logger.Error(e, "Error: Failed to saving model to file. :(");
+				Module.Logger.Error(e, "Error: Failed to save model to file. :(");
 			}
 		}
 

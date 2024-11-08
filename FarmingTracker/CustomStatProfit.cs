@@ -6,7 +6,7 @@ namespace FarmingTracker
 
 		public StatType StatType { get; }
 
-		public long CustomProfitInCopper { get; set; }
+		public long Unsigned_CustomProfitInCopper { get; set; }
 
 		public CustomStatProfit(int apiId, StatType statType)
 		{

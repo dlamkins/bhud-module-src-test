@@ -110,13 +110,13 @@ namespace FarmingTracker
 			DrfMessage drfMessage = new DrfMessage();
 			drfMessage.Kind = "data";
 			drfMessage.Payload.Character = "1";
-			foreach (Stat item in items.Where((Stat s) => s.Count != 0))
+			foreach (Stat item in items.Where((Stat s) => s.Signed_Count != 0))
 			{
-				drfMessage.Payload.Drop.Items.Add(item.ApiId, item.Count);
+				drfMessage.Payload.Drop.Items.Add(item.ApiId, item.Signed_Count);
 			}
-			foreach (Stat currency in currencies.Where((Stat s) => s.Count != 0).Take(10))
+			foreach (Stat currency in currencies.Where((Stat s) => s.Signed_Count != 0).Take(10))
 			{
-				drfMessage.Payload.Drop.Currencies.Add(currency.ApiId, currency.Count);
+				drfMessage.Payload.Drop.Currencies.Add(currency.ApiId, currency.Signed_Count);
 			}
 			return drfMessage;
 		}

@@ -17,14 +17,14 @@ namespace FarmingTracker
 			{
 				if (statById.TryGetValue(statIdAndCount.Key, out var stat))
 				{
-					stat.Count += statIdAndCount.Value;
+					stat.Signed_Count += statIdAndCount.Value;
 					continue;
 				}
 				statById[statIdAndCount.Key] = new Stat
 				{
 					ApiId = statIdAndCount.Key,
 					StatType = statType,
-					Count = statIdAndCount.Value
+					Signed_Count = statIdAndCount.Value
 				};
 			}
 		}

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
@@ -178,12 +179,9 @@ namespace FarmingTracker
 
 		private static void RemoveUnknownEnumValues<T>(SettingEntry<List<T>> ListSetting) where T : Enum
 		{
-			foreach (T element in new List<T>(ListSetting.get_Value()))
+			foreach (T unknownValue in new List<T>(ListSetting.get_Value()).Where((T e) => Helper.IsUnknownEnumValue<T>((int)(object)e)))
 			{
-				if (FilterService.IsUnknownFilterElement<T>((int)(object)element))
-				{
-					ListSetting.get_Value().Remove(element);
-				}
+				ListSetting.get_Value().Remove(unknownValue);
 			}
 		}
 	}
