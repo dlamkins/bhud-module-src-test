@@ -54,7 +54,7 @@ namespace Kenedia.Modules.BuildsManager.Models
 
 		[JsonProperty("Tags")]
 		[DataMember]
-		private UniqueObservableCollection<string> _tags;
+		private UniqueObservableCollection<string> _tags = new UniqueObservableCollection<string>();
 
 		private CancellationTokenSource? _cancellationTokenSource;
 
@@ -65,6 +65,9 @@ namespace Kenedia.Modules.BuildsManager.Models
 		[JsonProperty("LastModified")]
 		[DataMember]
 		private string _lastModified = DateTime.Now.ToString("d");
+
+		public static Template Empty { get; } = new Template();
+
 
 		public Data Data { get; }
 
@@ -175,9 +178,10 @@ namespace Kenedia.Modules.BuildsManager.Models
 		{
 			get
 			{
-				Kenedia.Modules.BuildsManager.DataModels.Professions.Profession prof;
+				Kenedia.Modules.BuildsManager.DataModels.Professions.Profession prof = default(Kenedia.Modules.BuildsManager.DataModels.Professions.Profession);
+				bool? flag = Data?.Professions.TryGetValue(Profession, out prof);
 				Kenedia.Modules.BuildsManager.DataModels.Professions.Specialization spec;
-				return ((Data.Professions.TryGetValue(Profession, out prof) && prof.Specializations.TryGetValue(EliteSpecializationId, out spec)) ? spec : null) ?? null;
+				return ((flag.HasValue && flag.GetValueOrDefault() && prof.Specializations.TryGetValue(EliteSpecializationId, out spec)) ? spec : null) ?? null;
 			}
 		}
 
@@ -309,6 +313,12 @@ namespace Kenedia.Modules.BuildsManager.Models
 
 		public event TemplateSlotChangedEventHandler? TemplateSlotChanged;
 
+		private Template()
+		{
+			Name = string.Empty;
+			TriggerAutoSave = false;
+		}
+
 		public Template(Data data)
 		{
 			Data = data;
@@ -371,7 +381,6 @@ namespace Kenedia.Modules.BuildsManager.Models
 			AltMainHand.PairedWeapon = AltOffHand;
 			AltOffHand.PairedWeapon = AltMainHand;
 			Profession = GameService.Gw2Mumble.PlayerCharacter?.Profession ?? Profession;
-			Tags = new UniqueObservableCollection<string>();
 			Tags.CollectionChanged += Tags_CollectionChanged;
 		}
 
@@ -709,7 +718,7 @@ namespace Kenedia.Modules.BuildsManager.Models
 
 		public void LoadGearFromCode(string? code, bool save = false)
 		{
-			if (Data.IsLoaded)
+			if (Data?.IsLoaded ?? false)
 			{
 				GearChatCode.LoadTemplateFromChatCode(this, code, Data);
 				RemoveInvalidGearCombinations();
@@ -873,7 +882,7 @@ namespace Kenedia.Modules.BuildsManager.Models
 			{
 				GearCode = _savedGearCode;
 				BuildCode = _savedBuildCode;
-				Loaded = Data.IsLoaded;
+				Loaded = Data?.IsLoaded ?? false;
 			}
 		}
 
@@ -1505,6 +1514,23 @@ namespace Kenedia.Modules.BuildsManager.Models
 				if (templateSlot.IsAquatic())
 				{
 					TemplateSlotType[] array2 = slots;
+					foreach (TemplateSlotType slot13 in array2)
+					{
+						IWeaponTemplateEntry entry15 = this[slot13] as IWeaponTemplateEntry;
+						if (entry15 != null)
+						{
+							SetItem(slot13, TemplateSubSlotType.Item, overrideExisting ? weapon : (entry15?.Weapon ?? weapon));
+						}
+					}
+				}
+				else if (weapon?.WeaponType.IsTwoHanded() ?? false)
+				{
+					slots = new TemplateSlotType[2]
+					{
+						TemplateSlotType.MainHand,
+						TemplateSlotType.AltMainHand
+					};
+					TemplateSlotType[] array2 = slots;
 					foreach (TemplateSlotType slot12 in array2)
 					{
 						IWeaponTemplateEntry entry14 = this[slot12] as IWeaponTemplateEntry;
@@ -1514,7 +1540,7 @@ namespace Kenedia.Modules.BuildsManager.Models
 						}
 					}
 				}
-				else if (weapon?.WeaponType.IsTwoHanded() ?? false)
+				else if (weapon?.WeaponType.IsMainHand() ?? false)
 				{
 					slots = new TemplateSlotType[2]
 					{

@@ -28,10 +28,10 @@ namespace Kenedia.Modules.BuildsManager.Views
 			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
 			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02d8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02fc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_040a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04f4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0467: Unknown result type (might be due to invalid IL or missing references)
+			//IL_048b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0599: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0683: Unknown result type (might be due to invalid IL or missing references)
 			base.Build(buildPanel);
 			Kenedia.Modules.Core.Controls.FlowPanel p = new Kenedia.Modules.Core.Controls.FlowPanel
 			{
@@ -87,6 +87,47 @@ namespace Kenedia.Modules.BuildsManager.Views
 				},
 				SetLocalizedText = () => string.Format(strings_common.ShowCornerIcon, BaseModule<BuildsManager, MainWindow, Kenedia.Modules.BuildsManager.Services.Settings, Paths>.ModuleName),
 				SetLocalizedTooltip = () => strings_common.ShowCornerIcon_ttp
+			};
+			new Kenedia.Modules.Core.Controls.Checkbox
+			{
+				Parent = fp,
+				Checked = Settings.RequireVisibleTemplate.Value,
+				CheckedChangedAction = delegate(bool b)
+				{
+					Settings.RequireVisibleTemplate.Value = b;
+				},
+				SetLocalizedText = () => string.Format(strings.RequireVisibleTemplate, BaseModule<BuildsManager, MainWindow, Kenedia.Modules.BuildsManager.Services.Settings, Paths>.ModuleName),
+				SetLocalizedTooltip = () => strings.RequireVisibleTemplate_Tooltip
+			};
+			Kenedia.Modules.Core.Controls.Checkbox setFilterOnTemplateCreate = new Kenedia.Modules.Core.Controls.Checkbox
+			{
+				Parent = fp,
+				Checked = Settings.SetFilterOnTemplateCreate.Value,
+				SetLocalizedText = () => string.Format(strings.SetFilterOnTemplateCreate, BaseModule<BuildsManager, MainWindow, Kenedia.Modules.BuildsManager.Services.Settings, Paths>.ModuleName),
+				SetLocalizedTooltip = () => strings.SetFilterOnTemplateCreate_Tooltip
+			};
+			Kenedia.Modules.Core.Controls.Checkbox resetFilterOnTemplateCreate = new Kenedia.Modules.Core.Controls.Checkbox
+			{
+				Parent = fp,
+				Checked = Settings.ResetFilterOnTemplateCreate.Value,
+				SetLocalizedText = () => string.Format(strings.ResetFilterOnTemplateCreate, BaseModule<BuildsManager, MainWindow, Kenedia.Modules.BuildsManager.Services.Settings, Paths>.ModuleName),
+				SetLocalizedTooltip = () => strings.ResetFilterOnTemplateCreate_Tooltip
+			};
+			setFilterOnTemplateCreate.CheckedChangedAction = delegate(bool b)
+			{
+				Settings.SetFilterOnTemplateCreate.Value = b;
+				if (Settings.ResetFilterOnTemplateCreate.Value && b)
+				{
+					resetFilterOnTemplateCreate.Checked = false;
+				}
+			};
+			resetFilterOnTemplateCreate.CheckedChangedAction = delegate(bool b)
+			{
+				Settings.ResetFilterOnTemplateCreate.Value = b;
+				if (Settings.SetFilterOnTemplateCreate.Value && b)
+				{
+					setFilterOnTemplateCreate.Checked = false;
+				}
 			};
 			new Kenedia.Modules.Core.Controls.KeybindingAssigner
 			{

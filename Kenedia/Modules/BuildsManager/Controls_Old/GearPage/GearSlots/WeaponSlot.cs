@@ -4,7 +4,6 @@ using System.Linq;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
-using Blish_HUD.Input;
 using Kenedia.Modules.BuildsManager.Controls.Selection;
 using Kenedia.Modules.BuildsManager.DataModels.Items;
 using Kenedia.Modules.BuildsManager.DataModels.Stats;
@@ -313,38 +312,45 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 				Stat = weapon?.Stat;
 				AdjustForOtherSlot();
 			}
+			else
+			{
+				base.Item = null;
+				Infusion = null;
+				Sigil = null;
+				PvpSigil = null;
+				Stat = null;
+			}
 		}
 
-		protected override void OnClick(MouseEventArgs e)
+		protected override void SetAnchor()
 		{
-			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01dc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00df: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e7: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01ec: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01f1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0246: Unknown result type (might be due to invalid IL or missing references)
-			//IL_024b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0250: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01fc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0201: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0256: Unknown result type (might be due to invalid IL or missing references)
 			//IL_025b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0260: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ba: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_026b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0270: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02c5: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02ca: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0338: Unknown result type (might be due to invalid IL or missing references)
-			//IL_033d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0342: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02df: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0348: Unknown result type (might be due to invalid IL or missing references)
 			//IL_034d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0352: Unknown result type (might be due to invalid IL or missing references)
-			base.OnClick(e);
+			//IL_035d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0362: Unknown result type (might be due to invalid IL or missing references)
 			Rectangle a = base.AbsoluteBounds;
 			object obj;
 			if (!base.Slot.IsOffhand())
@@ -362,7 +368,7 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 				base.SelectionPanel?.SetAnchor(base.ItemControl, Blish_HUD.RectangleExtension.Add(new Rectangle(((Rectangle)(ref a)).get_Location(), Point.get_Zero()), base.ItemControl.LocalBounds), SelectionTypes.Stats, base.Slot, GearSubSlotType.None, delegate(Stat stat)
 				{
 					base.TemplatePresenter?.Template?.SetItem(base.Slot, TemplateSubSlotType.Stat, stat);
-				}, (base.TemplatePresenter?.Template[base.Slot] as WeaponTemplateEntry).Weapon?.StatChoices ?? base.Data.Weapons.Values.FirstOrDefault()?.StatChoices ?? Array.Empty<int>(), (base.TemplatePresenter?.Template[base.Slot] as WeaponTemplateEntry).Weapon?.AttributeAdjustment);
+				}, (base.TemplatePresenter?.Template[base.Slot] as WeaponTemplateEntry)?.Weapon?.StatChoices ?? base.Data.Weapons.Values.FirstOrDefault()?.StatChoices ?? Array.Empty<int>(), (base.TemplatePresenter?.Template[base.Slot] as WeaponTemplateEntry)?.Weapon?.AttributeAdjustment);
 			}
 			if (_pvpSigilControl.MouseOver)
 			{

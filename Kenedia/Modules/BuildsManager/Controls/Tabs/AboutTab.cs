@@ -47,6 +47,8 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 
 		private int _tagSectionWidth;
 
+		private Blocker _blocker;
+
 		private bool _changeBuild = true;
 
 		private Color _disabledColor = Color.get_Gray();
@@ -67,20 +69,22 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 		{
 			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0103: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_025f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0284: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02aa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_033b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_034c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0385: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0410: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0421: Unknown result type (might be due to invalid IL or missing references)
-			//IL_045e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0143: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0206: Unknown result type (might be due to invalid IL or missing references)
+			//IL_029f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02c4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_037b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_038c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0450: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0461: Unknown result type (might be due to invalid IL or missing references)
+			//IL_049e: Unknown result type (might be due to invalid IL or missing references)
 			TemplatePresenter = templatePresenter;
 			TemplateTags = templateTags;
 			TagGroups = tagGroups;
@@ -88,6 +92,14 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 			HeightSizingMode = SizingMode.Fill;
 			WidthSizingMode = SizingMode.Fill;
 			_tagSectionWidth = 300;
+			_blocker = new Blocker
+			{
+				Parent = this,
+				CoveredControl = this,
+				BackgroundColor = Color.get_Black() * 0.5f,
+				BorderWidth = 3,
+				Text = "Select a Template to view its details."
+			};
 			_tagsLabel = new Kenedia.Modules.Core.Controls.Label
 			{
 				Parent = this,
@@ -265,6 +277,12 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0003: Unknown result type (might be due to invalid IL or missing references)
 			base.Draw(spriteBatch, drawBounds, scissor);
+		}
+
+		public override void PaintAfterChildren(SpriteBatch spriteBatch, Rectangle bounds)
+		{
+			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+			base.PaintAfterChildren(spriteBatch, bounds);
 		}
 
 		private void TagPanel_ChildsChanged(object sender, ChildChangedEventArgs e)
@@ -519,13 +537,21 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 		private void ApplyTemplate()
 		{
 			_changeBuild = false;
+			_blocker.Visible = TemplatePresenter.Template == Template.Empty;
 			_modifiedField.Text = TemplatePresenter?.Template?.LastModified;
 			_noteField.Text = TemplatePresenter?.Template?.Description;
+			_modifiedField.Enabled = TemplatePresenter.Template != Template.Empty;
+			_noteField.Enabled = TemplatePresenter.Template != Template.Empty;
 			List<TagControl> list = new List<TagControl>(_tagPanel.GetChildrenOfType<TagControl>());
 			list.AddRange(_tagPanel.GetChildrenOfType<Kenedia.Modules.Core.Controls.FlowPanel>().SelectMany((Kenedia.Modules.Core.Controls.FlowPanel x) => x.GetChildrenOfType<TagControl>()));
 			foreach (TagControl tag in list)
 			{
 				tag.Selected = (TemplatePresenter?.Template?.Tags.Contains(tag.Tag.Name)).GetValueOrDefault();
+				tag.Enabled = TemplatePresenter.Template != Template.Empty;
+			}
+			foreach (Control child in base.Children)
+			{
+				child.Enabled = TemplatePresenter.Template != Template.Empty;
 			}
 			_changeBuild = true;
 		}

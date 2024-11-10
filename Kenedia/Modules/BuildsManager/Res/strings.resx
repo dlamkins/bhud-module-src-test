@@ -48,6 +48,7 @@
   <data name="PvpSigil"><value>PvP Sigil</value></data>
   <data name="Templates"><value>Templates</value></data>
   <data name="ItemId"><value>Item Id</value></data>
+  <data name="RequireVisibleTemplate_Tooltip"><value>Require Templates to be visible to be selected. Without beeing visible no template will be selected.</value></data>
   <data name="AddNewTemplateWithClipboard"><value>Add a new template
 
 If you have any valid build code in your clipboard the build will load from the code</value></data>
@@ -91,6 +92,7 @@ If you have any valid build code in your clipboard the build will load from the 
   <data name="Precision"><value>Precision</value></data>
   <data name="EmptyJewellerySlots"><value>of all empty jewellery slots</value></data>
   <data name="ShowQuickFilterPanelOnTabOpen_Tooltip"><value>Open the Quick Filter Panel whenever the template tab gets selected</value></data>
+  <data name="SetFilterOnTemplateCreate"><value>Set the filter text to the new template name</value></data>
   <data name="And"><value>and</value></data>
   <data name="All"><value>All</value></data>
   <data name="HealSkills"><value>Heal Skills</value></data>
@@ -115,7 +117,10 @@ If you have any valid build code in your clipboard the build will load from the 
   <data name="LastModified"><value>Last Modified: {0}</value></data>
   <data name="CreateTemplateToStart"><value>Create a template to start or paste a build code</value></data>
   <data name="CopyBuildTemplateCode"><value>CTRL + Left Click to copy the Build Template Code</value></data>
+  <data name="RequireVisibleTemplate"><value>Require Templates to be visible to be selected</value></data>
+  <data name="ResetFilterOnTemplateCreate"><value>Reset the filters on template creation</value></data>
   <data name="AutoSetProfession_Name"><value>Auto set Profession Filter</value></data>
+  <data name="ResetFilterOnTemplateCreate_Tooltip"><value>When creating a new template, reset the filters for templates</value></data>
   <data name="EmptyWeaponSlots"><value>of all empty weapon slots</value></data>
   <data name="WeaponSlots"><value>of all weapon slots</value></data>
   <data name="AgonyResistance"><value>Agony Resistance</value></data>
@@ -138,6 +143,7 @@ The purpose of this code is to share the modules Equipment Template easily with 
   <data name="Filters"><value>Filters</value></data>
   <data name="QuickFiltersPanelFadeDuration_Tooltip"><value>Duration of the fading of the Quick Filter Panel</value></data>
   <data name="SortByName"><value>Sort by name</value></data>
+  <data name="SetFilterOnTemplateCreate_Tooltip"><value>When creating a new template, set the filter text to the new template name</value></data>
   <data name="Specializations"><value>Specializations</value></data>
   <data name="AddGroup"><value>Add Group</value></data>
   <data name="Healing"><value>Healing Power</value></data>

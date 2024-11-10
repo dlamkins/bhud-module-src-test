@@ -5,6 +5,7 @@ using Kenedia.Modules.BuildsManager.Res;
 using Kenedia.Modules.BuildsManager.Views;
 using Kenedia.Modules.Core.Models;
 using Kenedia.Modules.Core.Res;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
 namespace Kenedia.Modules.BuildsManager.Services
@@ -13,7 +14,15 @@ namespace Kenedia.Modules.BuildsManager.Services
 	{
 		public SettingEntry<TemplateSortBehavior> SortBehavior { get; set; }
 
+		public SettingEntry<Point> MainWindowLocation { get; set; }
+
 		public SettingEntry<bool> ShowCornerIcon { get; set; }
+
+		public SettingEntry<bool> SetFilterOnTemplateCreate { get; set; }
+
+		public SettingEntry<bool> ResetFilterOnTemplateCreate { get; set; }
+
+		public SettingEntry<bool> RequireVisibleTemplate { get; set; }
 
 		public SettingEntry<bool> ShowQuickFilterPanelOnTabOpen { get; set; }
 
@@ -38,12 +47,17 @@ namespace Kenedia.Modules.BuildsManager.Services
 
 		protected override void InitializeSettings(SettingCollection settings)
 		{
+			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
 			base.InitializeSettings(settings);
 			SettingCollection internalSettings = settings.AddSubCollection("Internal", renderInUi: false, lazyLoaded: false);
+			MainWindowLocation = internalSettings.DefineSetting<Point>("MainWindowLocation", new Point(100, 100));
 			SortBehavior = internalSettings.DefineSetting("SortBehavior", TemplateSortBehavior.ByProfession);
 			ShowQuickFilterPanelOnWindowOpen = internalSettings.DefineSetting("ShowQuickFilterPanelOnWindowOpen", defaultValue: false);
 			ShowQuickFilterPanelOnTabOpen = internalSettings.DefineSetting("ShowQuickFilterPanelOnTabOpen", defaultValue: true);
 			ShowCornerIcon = internalSettings.DefineSetting("ShowCornerIcon", defaultValue: true);
+			RequireVisibleTemplate = internalSettings.DefineSetting("RequireVisibleTemplate", defaultValue: true);
+			SetFilterOnTemplateCreate = internalSettings.DefineSetting("SetFilterOnTemplateCreate", defaultValue: true);
+			ResetFilterOnTemplateCreate = internalSettings.DefineSetting("ResetFilterOnTemplateCreate", defaultValue: false);
 			QuickFiltersPanelFade = internalSettings.DefineSetting("QuickFiltersPanelFade", defaultValue: true);
 			QuickFiltersPanelFadeDuration = internalSettings.DefineSetting("QuickFiltersPanelFadeDuration", 1000.0);
 			QuickFiltersPanelFadeDelay = internalSettings.DefineSetting("QuickFiltersPanelFadeDelay", 5000.0);

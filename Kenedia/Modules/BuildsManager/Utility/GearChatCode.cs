@@ -97,86 +97,88 @@ namespace Kenedia.Modules.BuildsManager.Utility
 
 		public static string GetGearChatCode(Template template)
 		{
-			return "[&" + Convert.ToBase64String(new System.Span<byte>(new byte[77]
+			byte[] codeArray = new byte[77];
+			if (template != Template.Empty)
 			{
-				(byte)(template.MainHand.Weapon?.WeaponType ?? ItemWeaponType.Unknown),
-				template.MainHand.Stat?.MappedId ?? 0,
-				template.MainHand.Sigil1?.MappedId ?? 0,
-				template.MainHand.PvpSigil?.MappedId ?? 0,
-				template.MainHand.Infusion1?.MappedId ?? 0,
-				(byte)(template.OffHand.Weapon?.WeaponType ?? ItemWeaponType.Unknown),
-				template.OffHand.Stat?.MappedId ?? 0,
-				template.OffHand.Sigil1?.MappedId ?? 0,
-				template.OffHand.PvpSigil?.MappedId ?? 0,
-				template.OffHand.Infusion1?.MappedId ?? 0,
-				(byte)(template.AltMainHand.Weapon?.WeaponType ?? ItemWeaponType.Unknown),
-				template.AltMainHand.Stat?.MappedId ?? 0,
-				template.AltMainHand.Sigil1?.MappedId ?? 0,
-				template.AltMainHand.PvpSigil?.MappedId ?? 0,
-				template.AltMainHand.Infusion1?.MappedId ?? 0,
-				(byte)(template.AltOffHand.Weapon?.WeaponType ?? ItemWeaponType.Unknown),
-				template.AltOffHand.Stat?.MappedId ?? 0,
-				template.AltOffHand.Sigil1?.MappedId ?? 0,
-				template.AltOffHand.PvpSigil?.MappedId ?? 0,
-				template.AltOffHand.Infusion1?.MappedId ?? 0,
-				template.Head.Stat?.MappedId ?? 0,
-				template.Head.Rune?.MappedId ?? 0,
-				template.Head.Infusion1?.MappedId ?? 0,
-				template.Shoulder.Stat?.MappedId ?? 0,
-				template.Shoulder.Rune?.MappedId ?? 0,
-				template.Shoulder.Infusion1?.MappedId ?? 0,
-				template.Chest.Stat?.MappedId ?? 0,
-				template.Chest.Rune?.MappedId ?? 0,
-				template.Chest.Infusion1?.MappedId ?? 0,
-				template.Hand.Stat?.MappedId ?? 0,
-				template.Hand.Rune?.MappedId ?? 0,
-				template.Hand.Infusion1?.MappedId ?? 0,
-				template.Leg.Stat?.MappedId ?? 0,
-				template.Leg.Rune?.MappedId ?? 0,
-				template.Leg.Infusion1?.MappedId ?? 0,
-				template.Foot.Stat?.MappedId ?? 0,
-				template.Foot.Rune?.MappedId ?? 0,
-				template.Foot.Infusion1?.MappedId ?? 0,
-				template.Back.Stat?.MappedId ?? 0,
-				template.Back.Infusion1?.MappedId ?? 0,
-				template.Back.Infusion2?.MappedId ?? 0,
-				template.Amulet.Stat?.MappedId ?? 0,
-				template.Amulet.Enrichment?.MappedId ?? 0,
-				template.Accessory_1.Stat?.MappedId ?? 0,
-				template.Accessory_1.Infusion1?.MappedId ?? 0,
-				template.Accessory_2.Stat?.MappedId ?? 0,
-				template.Accessory_2.Infusion1?.MappedId ?? 0,
-				template.Ring_1.Stat?.MappedId ?? 0,
-				template.Ring_1.Infusion1?.MappedId ?? 0,
-				template.Ring_1.Infusion2?.MappedId ?? 0,
-				template.Ring_1.Infusion3?.MappedId ?? 0,
-				template.Ring_2.Stat?.MappedId ?? 0,
-				template.Ring_2.Infusion1?.MappedId ?? 0,
-				template.Ring_2.Infusion2?.MappedId ?? 0,
-				template.Ring_2.Infusion3?.MappedId ?? 0,
-				template.AquaBreather.Stat?.MappedId ?? 0,
-				template.AquaBreather.Rune?.MappedId ?? 0,
-				template.AquaBreather.Infusion1?.MappedId ?? 0,
-				(byte)(template.Aquatic.Weapon?.WeaponType ?? ItemWeaponType.Unknown),
-				template.Aquatic.Stat?.MappedId ?? 0,
-				template.Aquatic.Sigil1?.MappedId ?? 0,
-				template.Aquatic.Sigil2?.MappedId ?? 0,
-				template.Aquatic.Infusion1?.MappedId ?? 0,
-				template.Aquatic.Infusion2?.MappedId ?? 0,
-				(byte)(template.AltAquatic.Weapon?.WeaponType ?? ItemWeaponType.Unknown),
-				template.AltAquatic.Stat?.MappedId ?? 0,
-				template.AltAquatic.Sigil1?.MappedId ?? 0,
-				template.AltAquatic.Sigil2?.MappedId ?? 0,
-				template.AltAquatic.Infusion1?.MappedId ?? 0,
-				template.AltAquatic.Infusion2?.MappedId ?? 0,
-				template.PvpAmulet.PvpAmulet?.MappedId ?? 0,
-				template.PvpAmulet.Rune?.MappedId ?? 0,
-				template.Nourishment.Nourishment?.MappedId ?? 0,
-				template.Enhancement.Enhancement?.MappedId ?? 0,
-				template.PowerCore.PowerCore?.MappedId ?? 0,
-				template.PveRelic.Relic?.MappedId ?? 0,
-				template.PvpRelic.Relic?.MappedId ?? 0
-			}).ToArray()) + "]";
+				codeArray[0] = (byte)(template.MainHand.Weapon?.WeaponType ?? ItemWeaponType.Unknown);
+				codeArray[1] = template.MainHand.Stat?.MappedId ?? 0;
+				codeArray[2] = template.MainHand.Sigil1?.MappedId ?? 0;
+				codeArray[3] = template.MainHand.PvpSigil?.MappedId ?? 0;
+				codeArray[4] = template.MainHand.Infusion1?.MappedId ?? 0;
+				codeArray[5] = (byte)(template.OffHand.Weapon?.WeaponType ?? ItemWeaponType.Unknown);
+				codeArray[6] = template.OffHand.Stat?.MappedId ?? 0;
+				codeArray[7] = template.OffHand.Sigil1?.MappedId ?? 0;
+				codeArray[8] = template.OffHand.PvpSigil?.MappedId ?? 0;
+				codeArray[9] = template.OffHand.Infusion1?.MappedId ?? 0;
+				codeArray[10] = (byte)(template.AltMainHand.Weapon?.WeaponType ?? ItemWeaponType.Unknown);
+				codeArray[11] = template.AltMainHand.Stat?.MappedId ?? 0;
+				codeArray[12] = template.AltMainHand.Sigil1?.MappedId ?? 0;
+				codeArray[13] = template.AltMainHand.PvpSigil?.MappedId ?? 0;
+				codeArray[14] = template.AltMainHand.Infusion1?.MappedId ?? 0;
+				codeArray[15] = (byte)(template.AltOffHand.Weapon?.WeaponType ?? ItemWeaponType.Unknown);
+				codeArray[16] = template.AltOffHand.Stat?.MappedId ?? 0;
+				codeArray[17] = template.AltOffHand.Sigil1?.MappedId ?? 0;
+				codeArray[18] = template.AltOffHand.PvpSigil?.MappedId ?? 0;
+				codeArray[19] = template.AltOffHand.Infusion1?.MappedId ?? 0;
+				codeArray[20] = template.Head.Stat?.MappedId ?? 0;
+				codeArray[21] = template.Head.Rune?.MappedId ?? 0;
+				codeArray[22] = template.Head.Infusion1?.MappedId ?? 0;
+				codeArray[23] = template.Shoulder.Stat?.MappedId ?? 0;
+				codeArray[24] = template.Shoulder.Rune?.MappedId ?? 0;
+				codeArray[25] = template.Shoulder.Infusion1?.MappedId ?? 0;
+				codeArray[26] = template.Chest.Stat?.MappedId ?? 0;
+				codeArray[27] = template.Chest.Rune?.MappedId ?? 0;
+				codeArray[28] = template.Chest.Infusion1?.MappedId ?? 0;
+				codeArray[29] = template.Hand.Stat?.MappedId ?? 0;
+				codeArray[30] = template.Hand.Rune?.MappedId ?? 0;
+				codeArray[31] = template.Hand.Infusion1?.MappedId ?? 0;
+				codeArray[32] = template.Leg.Stat?.MappedId ?? 0;
+				codeArray[33] = template.Leg.Rune?.MappedId ?? 0;
+				codeArray[34] = template.Leg.Infusion1?.MappedId ?? 0;
+				codeArray[35] = template.Foot.Stat?.MappedId ?? 0;
+				codeArray[36] = template.Foot.Rune?.MappedId ?? 0;
+				codeArray[37] = template.Foot.Infusion1?.MappedId ?? 0;
+				codeArray[38] = template.Back.Stat?.MappedId ?? 0;
+				codeArray[39] = template.Back.Infusion1?.MappedId ?? 0;
+				codeArray[40] = template.Back.Infusion2?.MappedId ?? 0;
+				codeArray[41] = template.Amulet.Stat?.MappedId ?? 0;
+				codeArray[42] = template.Amulet.Enrichment?.MappedId ?? 0;
+				codeArray[43] = template.Accessory_1.Stat?.MappedId ?? 0;
+				codeArray[44] = template.Accessory_1.Infusion1?.MappedId ?? 0;
+				codeArray[45] = template.Accessory_2.Stat?.MappedId ?? 0;
+				codeArray[46] = template.Accessory_2.Infusion1?.MappedId ?? 0;
+				codeArray[47] = template.Ring_1.Stat?.MappedId ?? 0;
+				codeArray[48] = template.Ring_1.Infusion1?.MappedId ?? 0;
+				codeArray[49] = template.Ring_1.Infusion2?.MappedId ?? 0;
+				codeArray[50] = template.Ring_1.Infusion3?.MappedId ?? 0;
+				codeArray[51] = template.Ring_2.Stat?.MappedId ?? 0;
+				codeArray[52] = template.Ring_2.Infusion1?.MappedId ?? 0;
+				codeArray[53] = template.Ring_2.Infusion2?.MappedId ?? 0;
+				codeArray[54] = template.Ring_2.Infusion3?.MappedId ?? 0;
+				codeArray[55] = template.AquaBreather.Stat?.MappedId ?? 0;
+				codeArray[56] = template.AquaBreather.Rune?.MappedId ?? 0;
+				codeArray[57] = template.AquaBreather.Infusion1?.MappedId ?? 0;
+				codeArray[58] = (byte)(template.Aquatic.Weapon?.WeaponType ?? ItemWeaponType.Unknown);
+				codeArray[59] = template.Aquatic.Stat?.MappedId ?? 0;
+				codeArray[60] = template.Aquatic.Sigil1?.MappedId ?? 0;
+				codeArray[61] = template.Aquatic.Sigil2?.MappedId ?? 0;
+				codeArray[62] = template.Aquatic.Infusion1?.MappedId ?? 0;
+				codeArray[63] = template.Aquatic.Infusion2?.MappedId ?? 0;
+				codeArray[64] = (byte)(template.AltAquatic.Weapon?.WeaponType ?? ItemWeaponType.Unknown);
+				codeArray[65] = template.AltAquatic.Stat?.MappedId ?? 0;
+				codeArray[66] = template.AltAquatic.Sigil1?.MappedId ?? 0;
+				codeArray[67] = template.AltAquatic.Sigil2?.MappedId ?? 0;
+				codeArray[68] = template.AltAquatic.Infusion1?.MappedId ?? 0;
+				codeArray[69] = template.AltAquatic.Infusion2?.MappedId ?? 0;
+				codeArray[70] = template.PvpAmulet.PvpAmulet?.MappedId ?? 0;
+				codeArray[71] = template.PvpAmulet.Rune?.MappedId ?? 0;
+				codeArray[72] = template.Nourishment.Nourishment?.MappedId ?? 0;
+				codeArray[73] = template.Enhancement.Enhancement?.MappedId ?? 0;
+				codeArray[74] = template.PowerCore.PowerCore?.MappedId ?? 0;
+				codeArray[75] = template.PveRelic.Relic?.MappedId ?? 0;
+				codeArray[76] = template.PvpRelic.Relic?.MappedId ?? 0;
+			}
+			return "[&" + Convert.ToBase64String(new System.Span<byte>(codeArray).ToArray()) + "]";
 		}
 
 		public static void LoadTemplateFromChatCode(Template template, string? chatCode, Data data)

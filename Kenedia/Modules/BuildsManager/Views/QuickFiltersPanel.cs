@@ -163,7 +163,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 		private void Templates_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
 			NotifyCollectionChangedAction? notifyCollectionChangedAction = e?.Action;
-			if (notifyCollectionChangedAction.HasValue && notifyCollectionChangedAction.GetValueOrDefault() == NotifyCollectionChangedAction.Add)
+			if (notifyCollectionChangedAction.HasValue && notifyCollectionChangedAction.GetValueOrDefault() == NotifyCollectionChangedAction.Add && Settings.ResetFilterOnTemplateCreate.Value)
 			{
 				ResetAllToggles();
 			}

@@ -150,25 +150,28 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, bounds, base.MouseOver ? HoverColor : (Selected ? ActiveColor : DisabledColor));
+			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
+			if (base.Enabled)
+			{
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, bounds, base.MouseOver ? HoverColor : (Selected ? ActiveColor : DisabledColor));
+			}
 			AsyncTexture2D texture = Tag?.Icon?.Texture;
 			if (texture != null)
 			{
 				spriteBatch.DrawOnCtrl(this, texture, _iconBounds, Tag.Icon.TextureRegion, Color.get_White());
 			}
-			if (base.MouseOver)
+			if (base.MouseOver && base.Enabled)
 			{
 				spriteBatch.DrawOnCtrl(this, _editIcon, _editIconBounds, _editIconTextureRegion, Color.get_White());
 			}

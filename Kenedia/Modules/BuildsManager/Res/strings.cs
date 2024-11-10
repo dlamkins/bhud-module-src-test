@@ -212,11 +212,19 @@ namespace Kenedia.Modules.BuildsManager.Res
 
 		internal static string Rename => ResourceManager.GetString("Rename", resourceCulture);
 
+		internal static string RequireVisibleTemplate => ResourceManager.GetString("RequireVisibleTemplate", resourceCulture);
+
+		internal static string RequireVisibleTemplate_Tooltip => ResourceManager.GetString("RequireVisibleTemplate_Tooltip", resourceCulture);
+
 		internal static string Reset => ResourceManager.GetString("Reset", resourceCulture);
 
 		internal static string ResetAll => ResourceManager.GetString("ResetAll", resourceCulture);
 
 		internal static string ResetEntry => ResourceManager.GetString("ResetEntry", resourceCulture);
+
+		internal static string ResetFilterOnTemplateCreate => ResourceManager.GetString("ResetFilterOnTemplateCreate", resourceCulture);
+
+		internal static string ResetFilterOnTemplateCreate_Tooltip => ResourceManager.GetString("ResetFilterOnTemplateCreate_Tooltip", resourceCulture);
 
 		internal static string Ring => ResourceManager.GetString("Ring", resourceCulture);
 
@@ -227,6 +235,10 @@ namespace Kenedia.Modules.BuildsManager.Res
 		internal static string SelectGroupToEdit => ResourceManager.GetString("SelectGroupToEdit", resourceCulture);
 
 		internal static string SelectTagToEdit => ResourceManager.GetString("SelectTagToEdit", resourceCulture);
+
+		internal static string SetFilterOnTemplateCreate => ResourceManager.GetString("SetFilterOnTemplateCreate", resourceCulture);
+
+		internal static string SetFilterOnTemplateCreate_Tooltip => ResourceManager.GetString("SetFilterOnTemplateCreate_Tooltip", resourceCulture);
 
 		internal static string ShowQuickFilterPanelOnTabOpen_Name => ResourceManager.GetString("ShowQuickFilterPanelOnTabOpen_Name", resourceCulture);
 

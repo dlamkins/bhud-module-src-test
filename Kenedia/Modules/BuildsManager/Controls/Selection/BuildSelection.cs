@@ -51,6 +51,8 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 
 		public Settings Settings { get; }
 
+		public QuickFiltersPanel QuickFiltersPanel { get; }
+
 		public List<KeyValuePair<string, List<Func<Template, bool>>>> FilterQueries { get; } = new List<KeyValuePair<string, List<Func<Template, bool>>>>();
 
 
@@ -166,7 +168,14 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 					TemplateSelectable ts = null;
 					SelectionPanel?.SetTemplateAnchor(ts = TemplateSelectables.FirstOrDefault((TemplateSelectable e) => e.Template == t));
 					ts?.ToggleEditMode(enable: true);
-					Search.Text = t.Name;
+					if (Settings.SetFilterOnTemplateCreate.Value)
+					{
+						Search.Text = t.Name;
+					}
+					else if (Settings.ResetFilterOnTemplateCreate.Value)
+					{
+						Search.Text = null;
+					}
 				}
 			});
 		}
@@ -228,7 +237,8 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 				template.Visible = filterQueriesMatches && specMatches && (nameMatches || lastModifiedMatch);
 			}
 			SortTemplates();
-			if ((!(TemplateSelectables.FirstOrDefault((TemplateSelectable x) => x.Template == TemplatePresenter.Template)?.Visible)) ?? true)
+			TemplateSelectable current = TemplateSelectables.FirstOrDefault((TemplateSelectable x) => x.Template == TemplatePresenter.Template);
+			if ((((!(current?.Visible)) ?? true) && Settings.RequireVisibleTemplate.Value) || current?.Template == Template.Empty)
 			{
 				TemplateSelectable t = SelectionContent.OfType<TemplateSelectable>().FirstOrDefault((TemplateSelectable x) => x.Visible);
 				TemplatePresenter.SetTemplate(((t != null) ? t : null)?.Template);
@@ -331,6 +341,12 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 				}
 				TemplateSelectables.Add(t);
 			}
+			if (firstLoad)
+			{
+				FilterTemplates();
+				TemplateSelectable tt = GetFirstTemplateSelectable();
+				TemplatePresenter.SetTemplate(tt?.Template);
+			}
 		}
 
 		public override void PaintAfterChildren(SpriteBatch spriteBatch, Rectangle bounds)
@@ -377,7 +393,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 			FilterTemplates();
 		}
 
-		public TemplateSelectable GetFirstTemplateSelectable()
+		public TemplateSelectable? GetFirstTemplateSelectable()
 		{
 			FilterTemplates();
 			return SelectionContent.GetChildrenOfType<TemplateSelectable>().FirstOrDefault((TemplateSelectable e) => e.Visible);

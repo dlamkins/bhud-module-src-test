@@ -597,7 +597,11 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 		protected override async void OnClick(MouseEventArgs e)
 		{
 			base.OnClick(e);
-			if (Control.Input.Keyboard.KeysDown.Contains((Keys)162))
+			if (_name.MouseOver && e.IsDoubleClick)
+			{
+				ToggleEditMode(enable: true);
+			}
+			else if (Control.Input.Keyboard.KeysDown.Contains((Keys)162))
 			{
 				try
 				{
@@ -685,7 +689,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 			_name.Text = Template?.Name;
 			_raceTexture = (Data.Races.TryGetValue(Template?.Race ?? Races.None, out var race) ? race.Icon : null);
 			_specTexture = ((Template == null) ? null : (Template?.EliteSpecialization?.ProfessionIconBig ?? (Data.Professions.TryGetValue((Template?.Profession).Value, out var profession) ? profession.IconBig : null)));
-			SetLastModifiedText(Template.LastModified);
+			SetLastModifiedText(Template?.LastModified);
 			SetTagTextures();
 			if (Template != null)
 			{

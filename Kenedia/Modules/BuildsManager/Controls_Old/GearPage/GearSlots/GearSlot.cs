@@ -18,7 +18,7 @@ using MonoGame.Extended.BitmapFonts;
 
 namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 {
-	public class GearSlot : Container
+	public abstract class GearSlot : Container
 	{
 		private TemplateSlotType _slot = TemplateSlotType.None;
 
@@ -173,8 +173,14 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 
 		protected override void OnClick(MouseEventArgs e)
 		{
-			base.OnClick(e);
+			if (TemplatePresenter.Template != Template.Empty)
+			{
+				base.OnClick(e);
+				SetAnchor();
+			}
 		}
+
+		protected abstract void SetAnchor();
 
 		protected virtual void ApplySlot()
 		{

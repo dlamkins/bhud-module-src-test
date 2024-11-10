@@ -46,6 +46,8 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 
 		private readonly Kenedia.Modules.Core.Controls.TextBox _buildCodeBox;
 
+		private readonly Blocker _blocker;
+
 		private readonly ImageButton _copyButton;
 
 		private ProfessionSpecifics _professionSpecifics;
@@ -62,22 +64,32 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 
 		public BuildTab(TemplatePresenter templatePresenter, Data data)
 		{
-			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0106: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0181: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01dc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0208: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0245: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0267: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0272: Unknown result type (might be due to invalid IL or missing references)
-			//IL_027c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_028d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0108: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0146: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0248: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0285: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02bc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02cd: Unknown result type (might be due to invalid IL or missing references)
 			TemplatePresenter = templatePresenter;
 			Data = data;
 			base.ClipsBounds = false;
+			_blocker = new Blocker
+			{
+				Parent = this,
+				CoveredControl = this,
+				BackgroundColor = Color.get_Black() * 0.5f,
+				BorderWidth = 3,
+				Text = "Select a Template to view its details."
+			};
 			_copyButton = new ImageButton
 			{
 				Parent = this,
@@ -339,6 +351,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 			SetSelectionTextures();
 			SetProfessionSpecifics();
 			_buildCodeBox.Text = TemplatePresenter?.Template?.ParseBuildCode();
+			_blocker.Visible = TemplatePresenter.Template == Template.Empty;
 		}
 
 		private void TemplatePresenter_EliteSpecializationChanged(object sender, SpecializationChangedEventArgs e)
@@ -361,7 +374,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 		private void SetProfessionSpecifics()
 		{
 			_professionSpecifics?.Dispose();
-			if (TemplatePresenter?.Template != null)
+			if (TemplatePresenter?.Template != null && TemplatePresenter.Template != Template.Empty)
 			{
 				switch (TemplatePresenter?.Template.Profession)
 				{

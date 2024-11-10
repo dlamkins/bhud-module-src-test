@@ -11,7 +11,7 @@ namespace Kenedia.Modules.BuildsManager.Models
 {
 	public class TemplatePresenter
 	{
-		private Template _template;
+		private Template _template = Kenedia.Modules.BuildsManager.Models.Template.Empty;
 
 		private GameModeType _gameMode;
 
@@ -131,7 +131,6 @@ namespace Kenedia.Modules.BuildsManager.Models
 		{
 			TemplateFactory = templateFactory;
 			Data = data;
-			Template = TemplateFactory.CreateTemplate(string.Empty);
 			Data.Loaded += new EventHandler(Data_Loaded);
 		}
 
@@ -144,7 +143,7 @@ namespace Kenedia.Modules.BuildsManager.Models
 		{
 			if (template == null)
 			{
-				template = TemplateFactory.CreateTemplate();
+				template = Kenedia.Modules.BuildsManager.Models.Template.Empty;
 			}
 			Template = template;
 		}

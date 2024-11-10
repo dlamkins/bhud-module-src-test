@@ -32,6 +32,11 @@ namespace Kenedia.Modules.Core.Extensions
 			return false;
 		}
 
+		public static bool IsMainHand(this ItemWeaponType itemWeaponType)
+		{
+			return itemWeaponType == ItemWeaponType.Scepter;
+		}
+
 		public static SkillWeaponType ToSkillWeapon(this ItemWeaponType itemWeaponType)
 		{
 			Enum.TryParse<SkillWeaponType>((itemWeaponType == ItemWeaponType.Harpoon) ? "Spear" : itemWeaponType.ToString(), out var skillWeaponType);

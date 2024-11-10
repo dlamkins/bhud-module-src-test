@@ -45,6 +45,8 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 
 		public Data Data { get; }
 
+		public Settings Settings { get; }
+
 		public MainWindow MainWindow
 		{
 			get
@@ -104,6 +106,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 		{
 			TemplatePresenter = templatePresenter;
 			Data = data;
+			Settings = settings;
 			Pointer = new Pointer();
 			base.ClipsBounds = false;
 			HeightSizingMode = SizingMode.Fill;

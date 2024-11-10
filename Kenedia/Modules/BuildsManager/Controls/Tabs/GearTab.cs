@@ -43,6 +43,8 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 
 		private TemplatePresenter _templatePresenter;
 
+		private Blocker _blocker;
+
 		private readonly DetailedTexture _terrestrialSet = new DetailedTexture(156323);
 
 		private readonly DetailedTexture _alternateTerrestrialSet = new DetailedTexture(156324);
@@ -75,16 +77,26 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 
 		public GearTab(TemplatePresenter templatePresenter, SelectionPanel selectionPanel, Data data)
 		{
-			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0218: Unknown result type (might be due to invalid IL or missing references)
 			TemplatePresenter = templatePresenter;
 			SelectionPanel = selectionPanel;
 			Data = data;
 			WidthSizingMode = SizingMode.Fill;
 			HeightSizingMode = SizingMode.Fill;
+			_blocker = new Blocker
+			{
+				Parent = this,
+				CoveredControl = this,
+				BackgroundColor = Color.get_Black() * 0.5f,
+				BorderWidth = 3,
+				Text = "Select a Template to view its details."
+			};
 			string gearCodeDisclaimer = strings.EquipmentCodeDisclaimer;
 			_copyButton = new ImageButton
 			{
@@ -490,6 +502,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 
 		public void ApplyTemplate()
 		{
+			_blocker.Visible = TemplatePresenter.Template == Template.Empty;
 			_gearCodeBox.Text = TemplatePresenter?.Template?.ParseGearCode();
 			ProfessionType professionType = TemplatePresenter?.Template?.Profession ?? GameService.Gw2Mumble.PlayerCharacter?.Profession ?? ProfessionType.Guardian;
 			SetRaceIcon();
@@ -525,18 +538,18 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 				break;
 			}
 			Template t = TemplatePresenter.Template;
-			_templateSlots[TemplateSlotType.MainHand].Item = t?.MainHand.Weapon;
-			_templateSlots[TemplateSlotType.OffHand].Item = t?.OffHand.Weapon;
-			_templateSlots[TemplateSlotType.Aquatic].Item = t?.Aquatic.Weapon;
-			_templateSlots[TemplateSlotType.AltMainHand].Item = t?.AltMainHand.Weapon;
-			_templateSlots[TemplateSlotType.AltOffHand].Item = t?.AltOffHand.Weapon;
-			_templateSlots[TemplateSlotType.AltAquatic].Item = t?.AltAquatic.Weapon;
-			_templateSlots[TemplateSlotType.PvpAmulet].Item = t?.PvpAmulet.PvpAmulet;
-			_templateSlots[TemplateSlotType.Nourishment].Item = t?.Nourishment.Nourishment;
-			_templateSlots[TemplateSlotType.Enhancement].Item = t?.Enhancement.Enhancement;
-			_templateSlots[TemplateSlotType.PowerCore].Item = t?.PowerCore.PowerCore;
-			_templateSlots[TemplateSlotType.PveRelic].Item = t?.PveRelic.Relic;
-			_templateSlots[TemplateSlotType.PvpRelic].Item = t?.PvpRelic.Relic;
+			_templateSlots[TemplateSlotType.MainHand].Item = t?.MainHand?.Weapon;
+			_templateSlots[TemplateSlotType.OffHand].Item = t?.OffHand?.Weapon;
+			_templateSlots[TemplateSlotType.Aquatic].Item = t?.Aquatic?.Weapon;
+			_templateSlots[TemplateSlotType.AltMainHand].Item = t?.AltMainHand?.Weapon;
+			_templateSlots[TemplateSlotType.AltOffHand].Item = t?.AltOffHand?.Weapon;
+			_templateSlots[TemplateSlotType.AltAquatic].Item = t?.AltAquatic?.Weapon;
+			_templateSlots[TemplateSlotType.PvpAmulet].Item = t?.PvpAmulet?.PvpAmulet;
+			_templateSlots[TemplateSlotType.Nourishment].Item = t?.Nourishment?.Nourishment;
+			_templateSlots[TemplateSlotType.Enhancement].Item = t?.Enhancement?.Enhancement;
+			_templateSlots[TemplateSlotType.PowerCore].Item = t?.PowerCore?.PowerCore;
+			_templateSlots[TemplateSlotType.PveRelic].Item = t?.PveRelic?.Relic;
+			_templateSlots[TemplateSlotType.PvpRelic].Item = t?.PvpRelic?.Relic;
 			SetVisibility();
 		}
 
@@ -623,8 +636,8 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
 			if (Data.IsLoaded)
 			{
 				base.Draw(spriteBatch, drawBounds, scissor);
@@ -639,7 +652,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 			Rectangle tR = default(Rectangle);
 			((Rectangle)(ref tR))._002Ector(drawBounds.X, ((Rectangle)(ref r)).get_Bottom() + 10, drawBounds.Width, Control.Content.DefaultFont16.get_LineHeight());
 			LoadingSpinnerUtil.DrawLoadingSpinner(this, spriteBatch, r);
-			spriteBatch.DrawStringOnCtrl(this, "Loading Data. Please wait.", Control.Content.DefaultFont16, tR, Color.get_White(), wrap: false, HorizontalAlignment.Center);
+			spriteBatch.DrawStringOnCtrl(this, (!Data.IsLoaded) ? "Loading Data. Please wait." : "Select or create a template", Control.Content.DefaultFont16, tR, Color.get_White(), wrap: false, HorizontalAlignment.Center);
 			spriteBatch.End();
 		}
 

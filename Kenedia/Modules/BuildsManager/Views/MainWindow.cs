@@ -65,6 +65,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b0: Unknown result type (might be due to invalid IL or missing references)
 			SelectionPanel selectionPanel2 = selectionPanel;
 			AboutTab aboutTab2 = aboutTab;
 			BuildTab buildTab2 = buildTab;
@@ -77,7 +78,6 @@ namespace Kenedia.Modules.BuildsManager.Views
 			MainWindow mainWindow = this;
 			MainWindowPresenter = mainWindowPresenter;
 			TemplatePresenter = templatePresenter;
-			base.Parent = Control.Graphics.SpriteScreen;
 			AboutTab = aboutTab2;
 			BuildTab = buildTab2;
 			GearTab = gearTab2;
@@ -87,13 +87,16 @@ namespace Kenedia.Modules.BuildsManager.Views
 			AboutTab.MainWindow = (SelectionPanel.MainWindow = this);
 			base.Title = "❤";
 			base.Subtitle = "❤";
-			base.SavesPosition = true;
-			base.Id = module.Name + " MainWindow";
+			base.Id = "BuildsManager_MainWindow";
 			base.MainWindowEmblem = AsyncTexture2D.FromAssetId(156020);
 			base.Name = module.Name;
 			base.Version = module.Version;
+			base.SavesPosition = false;
+			base.SavesSize = false;
 			base.Width = 1250;
 			base.Height = 900;
+			base.Location = Settings.MainWindowLocation.Value;
+			base.Parent = Control.Graphics.SpriteScreen;
 			TemplatePresenter.TemplateChanged += new ValueChangedEventHandler<Template>(TemplatePresenter_TemplateChanged);
 			TemplatePresenter.NameChanged += new ValueChangedEventHandler<string>(TemplatePresenter_NameChanged);
 			base.Tabs.Add(TemplateViewTab = new Tab(AsyncTexture2D.FromAssetId(156720), () => mainWindow.TemplateView = new TemplateView(mainWindow, selectionPanel2, aboutTab2, buildTab2, gearTab2, quickFiltersPanel2, mainWindow.MainWindowPresenter), strings.Templates));
@@ -150,9 +153,21 @@ namespace Kenedia.Modules.BuildsManager.Views
 			base.SubName = e.NewValue;
 		}
 
+		protected override void OnMoved(MovedEventArgs e)
+		{
+			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+			base.OnMoved(e);
+			if (base.Visible && base.ViewState == ViewState.Loaded)
+			{
+				Settings.MainWindowLocation.Value = base.Location;
+			}
+		}
+
 		protected override void OnShown(EventArgs e)
 		{
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 			base.OnShown(e);
+			base.Location = Settings.MainWindowLocation.Value;
 			if (Settings.ShowQuickFilterPanelOnWindowOpen.Value)
 			{
 				QuickFiltersPanel.Show();
