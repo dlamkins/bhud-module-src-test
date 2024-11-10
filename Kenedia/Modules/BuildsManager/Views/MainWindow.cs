@@ -112,7 +112,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 		protected override void OnTabChanged(Blish_HUD.ValueChangedEventArgs<Tab> e)
 		{
 			base.OnTabChanged(e);
-			if (e.NewValue == TemplateViewTab && Settings.ShowQuickFilterPanelOnTabOpen.Value)
+			if (e.NewValue == TemplateViewTab && Settings.ShowQuickFilterPanelOnTabOpen.Value && base.Visible)
 			{
 				QuickFiltersPanel.Show();
 			}
@@ -120,7 +120,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 			Tab tab = e.NewValue;
 			if (tab == null)
 			{
-				goto IL_0084;
+				goto IL_008c;
 			}
 			Type selectedTabType;
 			if (tab == TemplateViewTab)
@@ -135,17 +135,18 @@ namespace Kenedia.Modules.BuildsManager.Views
 			{
 				if (tab != SettingsViewTab)
 				{
-					goto IL_0084;
+					goto IL_008c;
 				}
 				selectedTabType = typeof(SettingsView);
 			}
-			goto IL_0086;
-			IL_0084:
-			selectedTabType = null;
-			goto IL_0086;
-			IL_0086:
+			goto IL_008e;
+			IL_008e:
 			mainWindowPresenter.SelectedTabType = selectedTabType;
 			base.SubName = ((e.NewValue != TemplateViewTab) ? ((e.NewValue == SettingsViewTab) ? strings_common.Settings : ((e.NewValue == TagEditViewTab) ? strings.Tags : string.Empty)) : TemplatePresenter?.Template?.Name);
+			return;
+			IL_008c:
+			selectedTabType = null;
+			goto IL_008e;
 		}
 
 		private void TemplatePresenter_NameChanged(object sender, Kenedia.Modules.Core.Models.ValueChangedEventArgs<string> e)
@@ -168,7 +169,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 			base.OnShown(e);
 			base.Location = Settings.MainWindowLocation.Value;
-			if (Settings.ShowQuickFilterPanelOnWindowOpen.Value)
+			if (Settings.ShowQuickFilterPanelOnWindowOpen.Value && base.Visible)
 			{
 				QuickFiltersPanel.Show();
 			}
