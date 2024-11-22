@@ -76,6 +76,8 @@ namespace felix.BlishEmotes.Strings
 
 		internal static string paper => ResourceManager.GetString("paper", resourceCulture);
 
+		internal static string petalthrow => ResourceManager.GetString("petalthrow", resourceCulture);
+
 		internal static string playdead => ResourceManager.GetString("playdead", resourceCulture);
 
 		internal static string point => ResourceManager.GetString("point", resourceCulture);
@@ -125,6 +127,8 @@ namespace felix.BlishEmotes.Strings
 		internal static string thanks => ResourceManager.GetString("thanks", resourceCulture);
 
 		internal static string threaten => ResourceManager.GetString("threaten", resourceCulture);
+
+		internal static string unleash => ResourceManager.GetString("unleash", resourceCulture);
 
 		internal static string wave => ResourceManager.GetString("wave", resourceCulture);
 

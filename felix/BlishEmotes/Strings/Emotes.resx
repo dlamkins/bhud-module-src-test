@@ -36,6 +36,7 @@
   <data name="shuffle"><value>Shuffle</value></data>
   <data name="crossarms"><value>Crossarms</value></data>
   <data name="geargrind"><value>Geargrind</value></data>
+  <data name="unleash"><value>Unleash</value></data>
   <data name="threaten"><value>Threaten</value></data>
   <data name="possessed"><value>Possessed</value></data>
   <data name="no"><value>No</value></data>
@@ -56,6 +57,7 @@
   <data name="sleep"><value>Sleep</value></data>
   <data name="shrug"><value>Shrug</value></data>
   <data name="scissors"><value>Scissors</value></data>
+  <data name="petalthrow"><value>Petal throw</value></data>
   <data name="rockout"><value>Rockout</value></data>
   <data name="beckon"><value>Beckon</value></data>
   <data name="heroic"><value>Heroic</value></data>
