@@ -38,13 +38,16 @@
   <data name="soulless_horror"><value>Soulless Horror</value></data>
   <data name="conjured_amalgamate"><value>Conjured Amalgamate</value></data>
   <data name="adina"><value>Adina</value></data>
+  <data name="greer"><value>Greer</value></data>
   <data name="cairn"><value>Cairn</value></data>
   <data name="qadim"><value>Qadim</value></data>
+  <data name="ura"><value>Ura</value></data>
   <data name="sabir"><value>Sabir</value></data>
   <data name="vale_guardian"><value>Vale Guardian</value></data>
   <data name="twin_largos"><value>Twin Largos</value></data>
   <data name="keep_construct"><value>Keep Construct</value></data>
   <data name="voice_in_the_void"><value>Dhuum</value></data>
+  <data name="decima"><value>Decima</value></data>
   <data name="deimos"><value>Deimos</value></data>
   <data name="escort"><value>Escort</value></data>
   <data name="matthias"><value>Matthias</value></data>

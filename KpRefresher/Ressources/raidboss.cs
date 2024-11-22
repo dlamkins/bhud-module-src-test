@@ -50,6 +50,8 @@ namespace KpRefresher.Ressources
 
 		public static string conjured_amalgamate => ResourceManager.GetString("conjured_amalgamate", resourceCulture);
 
+		public static string decima => ResourceManager.GetString("decima", resourceCulture);
+
 		public static string deimos => ResourceManager.GetString("deimos", resourceCulture);
 
 		public static string escort => ResourceManager.GetString("escort", resourceCulture);
@@ -57,6 +59,8 @@ namespace KpRefresher.Ressources
 		public static string gate => ResourceManager.GetString("gate", resourceCulture);
 
 		public static string gorseval => ResourceManager.GetString("gorseval", resourceCulture);
+
+		public static string greer => ResourceManager.GetString("greer", resourceCulture);
 
 		public static string keep_construct => ResourceManager.GetString("keep_construct", resourceCulture);
 
@@ -87,6 +91,8 @@ namespace KpRefresher.Ressources
 		public static string twin_largos => ResourceManager.GetString("twin_largos", resourceCulture);
 
 		public static string twisted_castle => ResourceManager.GetString("twisted_castle", resourceCulture);
+
+		public static string ura => ResourceManager.GetString("ura", resourceCulture);
 
 		public static string vale_guardian => ResourceManager.GetString("vale_guardian", resourceCulture);
 

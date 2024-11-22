@@ -58,6 +58,8 @@ namespace KpRefresher.Ressources
 
 		public static string CosmicObservatoryCM => ResourceManager.GetString("CosmicObservatoryCM", resourceCulture);
 
+		public static string Decima => ResourceManager.GetString("Decima", resourceCulture);
+
 		public static string Deimos => ResourceManager.GetString("Deimos", resourceCulture);
 
 		public static string Desmina => ResourceManager.GetString("Desmina", resourceCulture);
@@ -67,6 +69,8 @@ namespace KpRefresher.Ressources
 		public static string Escort => ResourceManager.GetString("Escort", resourceCulture);
 
 		public static string Gorseval => ResourceManager.GetString("Gorseval", resourceCulture);
+
+		public static string Greer => ResourceManager.GetString("Greer", resourceCulture);
 
 		public static string HarvestTemple => ResourceManager.GetString("HarvestTemple", resourceCulture);
 
@@ -107,6 +111,8 @@ namespace KpRefresher.Ressources
 		public static string TempleOfFebeCM => ResourceManager.GetString("TempleOfFebeCM", resourceCulture);
 
 		public static string TwinLargos => ResourceManager.GetString("TwinLargos", resourceCulture);
+
+		public static string Ura => ResourceManager.GetString("Ura", resourceCulture);
 
 		public static string Vale => ResourceManager.GetString("Vale", resourceCulture);
 

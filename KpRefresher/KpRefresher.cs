@@ -109,7 +109,7 @@ namespace KpRefresher
 			GameService.Gw2Mumble.get_CurrentMap().add_MapChanged((EventHandler<ValueEventArgs<int>>)CurrentMap_MapChanged);
 			_emblemTexture = ContentsManager.GetTexture("emblem.png");
 			_windowBackgroundTexture = AsyncTexture2D.FromAssetId(155985);
-			KpRefresherWindow kpRefresherWindow = new KpRefresherWindow(_windowBackgroundTexture, new Rectangle(40, 26, 913, 691), new Rectangle(50, 26, 893, 681), AsyncTexture2D.op_Implicit(_emblemTexture), ModuleSettings, BusinessService);
+			KpRefresherWindow kpRefresherWindow = new KpRefresherWindow(_windowBackgroundTexture, new Rectangle(40, 26, 903, 681), new Rectangle(50, 26, 893, 681), AsyncTexture2D.op_Implicit(_emblemTexture), ModuleSettings, BusinessService);
 			((Control)kpRefresherWindow).set_Size(new Point(520, 700));
 			_mainWindow = kpRefresherWindow;
 			_mainWindow.BuildUi();

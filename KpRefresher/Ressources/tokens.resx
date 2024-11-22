@@ -29,6 +29,7 @@
   </xsd:schema>
 <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="Escort"><value>Turret Fragment</value></data>
   <data name="XunlaiJadeJunkyard"><value>Ankka's Coffer</value></data>
+  <data name="Decima"><value>Decima's Token</value></data>
   <data name="Deimos"><value>Fragment of Saul's Burden</value></data>
   <data name="TempleOfFebe"><value>Cerus's Magnificent Coffer</value></data>
   <data name="Sabetha"><value>Sabetha Flamethrower Fragment Piece</value></data>
@@ -42,8 +43,10 @@
   <data name="KeepConstruct"><value>Keep Construct Rubble</value></data>
   <data name="Gorseval"><value>Gorseval Tentacle Piece</value></data>
   <data name="Boneskinner"><value>Boneskinner Ritual Vial</value></data>
+  <data name="Ura"><value>Ura's Token</value></data>
   <data name="QTP"><value>Ether Djinn's Token</value></data>
   <data name="Adina"><value>Cardinal Adina's Token</value></data>
+  <data name="Greer"><value>Greer's Token</value></data>
   <data name="Dhuum"><value>Dhuum's Token</value></data>
   <data name="Cairn"><value>Cairn Fragment</value></data>
   <data name="Qadim"><value>Qadim's Token</value></data>

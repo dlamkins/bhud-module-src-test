@@ -21,7 +21,14 @@ namespace KpRefresher.Extensions
 
 		public static string GetDisplayName(this Enum enumValue)
 		{
-			return enumValue.GetType().GetMember(enumValue.ToString()).FirstOrDefault()?.GetCustomAttribute<DisplayAttribute>().GetDescription() ?? "unknown";
+			try
+			{
+				return enumValue.GetType().GetMember(enumValue.ToString()).FirstOrDefault()?.GetCustomAttribute<DisplayAttribute>().GetDescription() ?? "unknown";
+			}
+			catch (Exception)
+			{
+				return "unknown";
+			}
 		}
 	}
 }

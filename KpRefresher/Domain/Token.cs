@@ -72,50 +72,59 @@ namespace KpRefresher.Domain
 		[Display(Description = "QTP", ResourceType = typeof(tokens))]
 		[Order(22)]
 		QTP = 91175,
-		[Display(Description = "Boneskinner", ResourceType = typeof(tokens))]
+		[Display(Description = "Greer", ResourceType = typeof(tokens))]
 		[Order(23)]
+		Greer = 104047,
+		[Display(Description = "Decima", ResourceType = typeof(tokens))]
+		[Order(24)]
+		Decima = 103754,
+		[Display(Description = "Ura", ResourceType = typeof(tokens))]
+		[Order(25)]
+		Ura = 103996,
+		[Display(Description = "Boneskinner", ResourceType = typeof(tokens))]
+		[Order(26)]
 		Boneskinner = 93781,
 		[Display(Description = "AetherbladeHideout", ResourceType = typeof(tokens))]
-		[Order(24)]
+		[Order(27)]
 		AetherbladeHideout = 95638,
 		[Display(Description = "XunlaiJadeJunkyard", ResourceType = typeof(tokens))]
-		[Order(25)]
+		[Order(28)]
 		XunlaiJadeJunkyard = 95982,
 		[Display(Description = "KainengOverlook", ResourceType = typeof(tokens))]
-		[Order(26)]
+		[Order(29)]
 		KainengOverlook = 97451,
 		[Display(Description = "HarvestTemple", ResourceType = typeof(tokens))]
-		[Order(27)]
+		[Order(30)]
 		HarvestTemple = 97132,
 		[Display(Description = "OldLionsCourt", ResourceType = typeof(tokens))]
-		[Order(28)]
+		[Order(31)]
 		OldLionsCourt = 99165,
 		[Display(Description = "AetherbladeHideoutCM", ResourceType = typeof(tokens))]
-		[Order(29)]
+		[Order(32)]
 		AetherbladeHideoutCM = 97269,
 		[Display(Description = "XunlaiJadeJunkyardCM", ResourceType = typeof(tokens))]
-		[Order(30)]
+		[Order(33)]
 		XunlaiJadeJunkyardCM = 96638,
 		[Display(Description = "KainengOverlookCM", ResourceType = typeof(tokens))]
-		[Order(31)]
+		[Order(34)]
 		KainengOverlookCM = 96419,
 		[Display(Description = "HarvestTempleCM", ResourceType = typeof(tokens))]
-		[Order(32)]
+		[Order(35)]
 		HarvestTempleCM = 95986,
 		[Display(Description = "OldLionsCourtCM", ResourceType = typeof(tokens))]
-		[Order(33)]
+		[Order(36)]
 		OldLionsCourtCM = 99204,
 		[Display(Description = "CosmicObservatory", ResourceType = typeof(tokens))]
-		[Order(34)]
+		[Order(37)]
 		CosmicObservatory = 100068,
 		[Display(Description = "TempleOfFebe", ResourceType = typeof(tokens))]
-		[Order(35)]
+		[Order(38)]
 		TempleOfFebe = 100858,
 		[Display(Description = "CosmicObservatoryCM", ResourceType = typeof(tokens))]
-		[Order(36)]
+		[Order(39)]
 		CosmicObservatoryCM = 101172,
 		[Display(Description = "TempleOfFebeCM", ResourceType = typeof(tokens))]
-		[Order(37)]
+		[Order(40)]
 		TempleOfFebeCM = 101542
 	}
 }
