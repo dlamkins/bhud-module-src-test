@@ -80,12 +80,12 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		private void SetSkill(Skill skill)
 		{
-			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
 			Title = skill?.Name;
 			Id = $"{strings.SkillId}: {skill?.Id}";
 			Description = skill?.Description.InterpretItemDescription();
-			_image.Texture = skill?.Icon;
+			_image.Texture = TexturesService.GetAsyncTexture(skill?.IconAssetId);
 			Rectangle bounds = _image.Bounds;
 			base.Height = ((Rectangle)(ref bounds)).get_Bottom() + 10 + UI.GetTextHeight(Control.Content.DefaultFont14, Description, base.Width);
 			RecalculateLayout();

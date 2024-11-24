@@ -1,6 +1,7 @@
 using System;
 using Kenedia.Modules.BuildsManager.DataModels.Professions;
 using Kenedia.Modules.Core.Models;
+using Kenedia.Modules.Core.Services;
 using Kenedia.Modules.Core.Utility;
 using Microsoft.Xna.Framework;
 
@@ -26,12 +27,12 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		private void ApplyTrait()
 		{
-			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-			base.Texture = Trait?.Icon;
-			if (Trait != null && Trait.Icon != null)
+			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
+			base.Texture = TexturesService.GetAsyncTexture(Trait?.IconAssetId);
+			if (Trait != null && base.Texture != null)
 			{
-				int padding = Trait.Icon.Width / 16;
-				base.TextureRegion = new Rectangle(padding, padding, Trait.Icon.Width - padding * 2, Trait.Icon.Height - padding * 2);
+				int padding = base.Texture.Width / 16;
+				base.TextureRegion = new Rectangle(padding, padding, base.Texture.Width - padding * 2, base.Texture.Height - padding * 2);
 			}
 		}
 

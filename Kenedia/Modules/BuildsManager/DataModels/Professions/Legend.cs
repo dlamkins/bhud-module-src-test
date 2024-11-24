@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
-using Blish_HUD.Content;
 using Gw2Sharp.Models;
 using Gw2Sharp.WebApi.V2;
 using Gw2Sharp.WebApi.V2.Models;
@@ -71,8 +70,6 @@ namespace Kenedia.Modules.BuildsManager.DataModels.Professions
 				}
 			}
 		}
-
-		public AsyncTexture2D Icon => Swap?.Icon;
 
 		internal void ApplyLanguage(KeyValuePair<int, Legend> leg)
 		{

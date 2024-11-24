@@ -47,7 +47,9 @@ namespace Kenedia.Modules.BuildsManager.DataModels
 		public Dictionary<int, Kenedia.Modules.BuildsManager.DataModels.Professions.Skill> Skills { get; } = new Dictionary<int, Kenedia.Modules.BuildsManager.DataModels.Professions.Skill>();
 
 
-		public AsyncTexture2D Icon
+		public string IconPath => "textures\\races\\" + Id.ToString().ToLower() + ".png";
+
+		private AsyncTexture2D Icon
 		{
 			get
 			{

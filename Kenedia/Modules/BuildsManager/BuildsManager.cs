@@ -29,6 +29,8 @@ namespace Kenedia.Modules.BuildsManager
 	[Export(typeof(Module))]
 	public class BuildsManager : BaseModule<BuildsManager, MainWindow, Settings, Paths>
 	{
+		public static int MainThread = Thread.CurrentThread.ManagedThreadId;
+
 		private double _tick;
 
 		private CancellationTokenSource _cancellationTokenSource;

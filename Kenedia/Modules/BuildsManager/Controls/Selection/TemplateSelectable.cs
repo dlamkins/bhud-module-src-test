@@ -352,7 +352,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 
 		private void Template_RaceChanged(object sender, Kenedia.Modules.Core.Models.ValueChangedEventArgs<Races> e)
 		{
-			_raceTexture = (Data.Races.TryGetValue(_template?.Race ?? Races.None, out var race) ? race.Icon : null);
+			_raceTexture = (Data.Races.TryGetValue(_template?.Race ?? Races.None, out var race) ? TexturesService.GetTextureFromRef(race.IconPath) : null);
 		}
 
 		public void ToggleEditMode(bool enable)
@@ -687,8 +687,8 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 		private void ApplyTemplate()
 		{
 			_name.Text = Template?.Name;
-			_raceTexture = (Data.Races.TryGetValue(Template?.Race ?? Races.None, out var race) ? race.Icon : null);
-			_specTexture = ((Template == null) ? null : (Template?.EliteSpecialization?.ProfessionIconBig ?? (Data.Professions.TryGetValue((Template?.Profession).Value, out var profession) ? profession.IconBig : null)));
+			_raceTexture = (Data.Races.TryGetValue(Template?.Race ?? Races.None, out var race) ? TexturesService.GetTextureFromRef(race.IconPath) : null);
+			_specTexture = ((Template != null) ? TexturesService.GetAsyncTexture(Template?.EliteSpecialization?.ProfessionIconBigAssetId ?? (Data.Professions.TryGetValue((Template?.Profession).Value, out var profession) ? new int?(profession.IconBigAssetId) : null)) : null);
 			SetLastModifiedText(Template?.LastModified);
 			SetTagTextures();
 			if (Template != null)

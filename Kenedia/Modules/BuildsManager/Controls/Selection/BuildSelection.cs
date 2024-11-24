@@ -150,22 +150,26 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 		{
 			Task.Run(async delegate
 			{
-				string name = (string.IsNullOrEmpty(Search.Text) ? strings.NewTemplate : Search.Text);
-				Template t = CreateTemplate(Templates.GetNewName(name));
-				if (t != null)
+				string code = await ClipboardUtil.WindowsClipboardService.GetTextAsync();
+				code = code.Trim();
+				GameService.Graphics.QueueMainThreadRender(delegate
 				{
-					try
+					string name = (string.IsNullOrEmpty(Search.Text) ? strings.NewTemplate : Search.Text);
+					Template t = CreateTemplate(Templates.GetNewName(name));
+					if (!string.IsNullOrEmpty(code))
 					{
-						string code = await ClipboardUtil.WindowsClipboardService.GetTextAsync();
-						BaseModule<BuildsManager, MainWindow, Kenedia.Modules.BuildsManager.Services.Settings, Paths>.Logger.Debug("Load template from clipboard code: " + code);
-						t.LoadFromCode(code);
+						try
+						{
+							BaseModule<BuildsManager, MainWindow, Kenedia.Modules.BuildsManager.Services.Settings, Paths>.Logger.Debug("Load template from clipboard code: " + code);
+							t.LoadFromCode(code);
+						}
+						catch (Exception)
+						{
+						}
 					}
-					catch (Exception)
-					{
-					}
-					TemplateSelectable ts = null;
-					SelectionPanel?.SetTemplateAnchor(ts = TemplateSelectables.FirstOrDefault((TemplateSelectable e) => e.Template == t));
-					ts?.ToggleEditMode(enable: true);
+					TemplateSelectable templateSelectable = null;
+					SelectionPanel?.SetTemplateAnchor(templateSelectable = TemplateSelectables.FirstOrDefault((TemplateSelectable e) => e.Template == t));
+					templateSelectable?.ToggleEditMode(enable: true);
 					if (Settings.SetFilterOnTemplateCreate.Value)
 					{
 						Search.Text = t.Name;
@@ -174,7 +178,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 					{
 						Search.Text = null;
 					}
-				}
+				});
 			});
 		}
 

@@ -219,23 +219,22 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage
 
 		private void ApplyItem(object sender, Kenedia.Modules.Core.Models.ValueChangedEventArgs<BaseItem> e)
 		{
-			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0110: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0312: Unknown result type (might be due to invalid IL or missing references)
-			_image.Texture = Item?.Icon;
+			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0122: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0321: Unknown result type (might be due to invalid IL or missing references)
+			_image.Texture = TexturesService.GetAsyncTexture(Item?.AssetId);
 			_frameColor = Item?.Rarity.GetColor() ?? Color.get_Transparent();
 			_title.Text = Item?.Name;
 			_id.Text = $"{strings.ItemId}: {Item?.Id}";
 			_title.TextColor = Item?.Rarity.GetColor() ?? Color.get_White();
-			BaseItem item = Item;
-			if (item != null && item.Icon != null)
+			if (_image.Texture != null)
 			{
-				int padding = item.Icon.Width / 16;
-				_image.SourceRectangle = new Rectangle(padding, padding, Item!.Icon.Width - padding * 2, Item!.Icon.Height - padding * 2);
+				int padding = _image.Texture.Width / 16;
+				_image.SourceRectangle = new Rectangle(padding, padding, _image.Texture.Width - padding * 2, _image.Texture.Height - padding * 2);
 			}
 			ItemType? itemType = Item?.Type;
 			if (!itemType.HasValue)

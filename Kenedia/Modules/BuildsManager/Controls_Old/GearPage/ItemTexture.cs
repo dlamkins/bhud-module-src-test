@@ -4,6 +4,7 @@ using Blish_HUD.Controls;
 using Kenedia.Modules.BuildsManager.DataModels.Items;
 using Kenedia.Modules.Core.Extensions;
 using Kenedia.Modules.Core.Models;
+using Kenedia.Modules.Core.Services;
 using Kenedia.Modules.Core.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -47,7 +48,7 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage
 			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
 			_frameColor = ((Item != null) ? (Item?.Rarity.GetColor()).Value : (Color.get_White() * 0.5f));
-			base.Texture = Item?.Icon;
+			base.Texture = TexturesService.GetAsyncTexture(Item?.AssetId);
 		}
 
 		public void Draw(Control ctrl, SpriteBatch spriteBatch, Point? mousePos = null, Color? color = null)

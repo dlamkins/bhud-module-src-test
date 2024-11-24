@@ -556,7 +556,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 		private void SetSpecIcon(ProfessionType professionType)
 		{
 			Kenedia.Modules.BuildsManager.DataModels.Professions.Profession professionForIcon = default(Kenedia.Modules.BuildsManager.DataModels.Professions.Profession);
-			_framedSpecIcon.Texture = TemplatePresenter?.Template?.EliteSpecialization?.ProfessionIconBig ?? ((Data.Professions?.TryGetValue((TemplatePresenter?.Template?.Profession).GetValueOrDefault(ProfessionType.Guardian), out professionForIcon) ?? false) ? professionForIcon.IconBig : null);
+			_framedSpecIcon.Texture = TexturesService.GetAsyncTexture(TemplatePresenter?.Template?.EliteSpecialization?.ProfessionIconBigAssetId) ?? ((Data.Professions?.TryGetValue((TemplatePresenter?.Template?.Profession).GetValueOrDefault(ProfessionType.Guardian), out professionForIcon) ?? false) ? TexturesService.GetAsyncTexture(professionForIcon.IconBigAssetId) : null);
 			Kenedia.Modules.BuildsManager.DataModels.Professions.Profession professionForName = default(Kenedia.Modules.BuildsManager.DataModels.Professions.Profession);
 			_framedSpecIcon.BasicTooltipText = TemplatePresenter?.Template?.EliteSpecialization?.Name ?? ((Data.Professions?.TryGetValue((TemplatePresenter?.Template?.Profession).GetValueOrDefault(ProfessionType.Guardian), out professionForName) ?? false) ? professionForName.Name : null);
 		}
@@ -564,7 +564,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 		private void SetRaceIcon()
 		{
 			Kenedia.Modules.BuildsManager.DataModels.Race raceIcon = default(Kenedia.Modules.BuildsManager.DataModels.Race);
-			_raceIcon.Texture = ((Data.Races?.TryGetValue((TemplatePresenter?.Template?.Race).GetValueOrDefault(Races.None), out raceIcon) ?? false) ? raceIcon.Icon : null);
+			_raceIcon.Texture = ((Data.Races?.TryGetValue((TemplatePresenter?.Template?.Race).GetValueOrDefault(Races.None), out raceIcon) ?? false) ? TexturesService.GetTextureFromRef(raceIcon.IconPath) : null);
 			Kenedia.Modules.BuildsManager.DataModels.Race raceName = default(Kenedia.Modules.BuildsManager.DataModels.Race);
 			_raceIcon.BasicTooltipText = ((Data.Races?.TryGetValue((TemplatePresenter?.Template?.Race).GetValueOrDefault(Races.None), out raceName) ?? false) ? raceName.Name : null);
 		}
@@ -730,8 +730,6 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 		protected override void DisposeControl()
 		{
 			base.DisposeControl();
-			_templateSlots?.Values?.DisposeAll();
-			_templateSlots?.Clear();
 			_pve?.Dispose();
 			_pvp?.Dispose();
 		}

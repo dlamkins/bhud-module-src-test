@@ -93,16 +93,19 @@ namespace Kenedia.Modules.BuildsManager.Controls
 		private void ApplyTrait(object sender, Kenedia.Modules.Core.Models.ValueChangedEventArgs<Trait> e)
 		{
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010f: Unknown result type (might be due to invalid IL or missing references)
 			_title.TextColor = ContentService.Colors.Chardonnay;
 			_title.Text = Trait?.Name;
 			_id.Text = $"{strings.TraitId}: {Trait?.Id}";
 			_description.Text = Trait?.Description.InterpretItemDescription() ?? strings.MissingInfoFromAPI;
 			if (Trait != null)
 			{
-				_image.Texture = Trait.Icon;
-				int padding = (Trait.Icon?.Width ?? 0) / 16;
-				_image.TextureRegion = new Rectangle(padding, padding, Trait.Icon.Width - padding * 2, Trait.Icon.Height - padding * 2);
+				_image.Texture = TexturesService.GetAsyncTexture(Trait.IconAssetId);
+				if (_image.Texture != null)
+				{
+					int padding = _image.Texture.Width / 16;
+					_image.TextureRegion = new Rectangle(padding, padding, _image.Texture.Width - padding * 2, _image.Texture.Height - padding * 2);
+				}
 			}
 		}
 

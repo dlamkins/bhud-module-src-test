@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Threading;
 using Blish_HUD.Content;
 using Gw2Sharp;
 using Gw2Sharp.Models;
@@ -57,7 +58,7 @@ namespace Kenedia.Modules.BuildsManager.DataModels.Professions
 		[DataMember]
 		public int IconAssetId { get; set; }
 
-		public AsyncTexture2D Icon
+		private AsyncTexture2D Icon
 		{
 			get
 			{
@@ -65,7 +66,7 @@ namespace Kenedia.Modules.BuildsManager.DataModels.Professions
 				{
 					return _icon;
 				}
-				if (IconAssetId != 0)
+				if (IconAssetId != 0 && BuildsManager.MainThread == Thread.CurrentThread.ManagedThreadId)
 				{
 					_icon = AsyncTexture2D.FromAssetId(IconAssetId);
 				}

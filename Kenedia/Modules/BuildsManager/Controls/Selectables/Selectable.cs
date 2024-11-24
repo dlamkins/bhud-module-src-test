@@ -6,6 +6,7 @@ using Blish_HUD.Input;
 using Kenedia.Modules.BuildsManager.DataModels.Professions;
 using Kenedia.Modules.Core.Extensions;
 using Kenedia.Modules.Core.Models;
+using Kenedia.Modules.Core.Services;
 using Kenedia.Modules.Core.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -54,9 +55,9 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selectables
 
 		protected virtual void ApplyData(object sender, Kenedia.Modules.Core.Models.ValueChangedEventArgs<IBaseApiData> e)
 		{
-			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0123: Unknown result type (might be due to invalid IL or missing references)
 			if (Data == null)
 			{
 				return;
@@ -81,19 +82,21 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selectables
 				}
 				else
 				{
+					AsyncTexture2D skillIcon = TexturesService.GetAsyncTexture(skill.IconAssetId);
 					Type = SelectableType.Skill;
-					int sPadding = (int)((double)skill.Icon.Width * (7.0 / 64.0));
-					TextureRegion = new Rectangle(sPadding, sPadding, skill.Icon.Width - sPadding * 2, skill.Icon.Height - sPadding * 2);
-					Texture = skill.Icon;
+					int sPadding = (int)((double)skillIcon.Width * (7.0 / 64.0));
+					TextureRegion = new Rectangle(sPadding, sPadding, skillIcon.Width - sPadding * 2, skillIcon.Height - sPadding * 2);
+					Texture = skillIcon;
 					base.ClipsBounds = true;
 				}
 			}
 			else
 			{
+				AsyncTexture2D legendIcon = TexturesService.GetAsyncTexture(legend.Swap.IconAssetId);
 				Type = SelectableType.Legend;
-				int lPadding = (int)((double)legend.Icon.Width * (7.0 / 64.0));
-				TextureRegion = new Rectangle(lPadding, lPadding, legend.Icon.Width - lPadding * 2, legend.Icon.Height - lPadding * 2);
-				Texture = legend.Icon;
+				int lPadding = (int)((double)legendIcon.Width * (7.0 / 64.0));
+				TextureRegion = new Rectangle(lPadding, lPadding, legendIcon.Width - lPadding * 2, legendIcon.Height - lPadding * 2);
+				Texture = legendIcon;
 				base.ClipsBounds = true;
 			}
 		}

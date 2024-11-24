@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Blish_HUD;
+using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Kenedia.Modules.BuildsManager.DataModels.Items;
@@ -9,6 +10,7 @@ using Kenedia.Modules.BuildsManager.Res;
 using Kenedia.Modules.Core.DataModels;
 using Kenedia.Modules.Core.Extensions;
 using Kenedia.Modules.Core.Models;
+using Kenedia.Modules.Core.Services;
 using Kenedia.Modules.Core.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -112,7 +114,7 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage
 
 		private void ApplyStat(object sender, Kenedia.Modules.Core.Models.ValueChangedEventArgs<Stat> e)
 		{
-			_statTexture.Texture = Stat?.Icon;
+			_statTexture.Texture = TexturesService.GetTextureFromRef(Stat?.IconPath);
 			ItemTooltip itemTooltip = base.Tooltip as ItemTooltip;
 			if (itemTooltip != null)
 			{
@@ -126,14 +128,14 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage
 			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0099: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
 			_frameColor = Item?.Rarity.GetColor() ?? (Color.get_White() * 0.15f);
-			_texture.Texture = Item?.Icon;
-			BaseItem item = Item;
-			if (item != null && item.Icon != null)
+			_texture.Texture = TexturesService.GetAsyncTexture(Item?.AssetId);
+			AsyncTexture2D icon = TexturesService.GetAsyncTexture(Item?.AssetId);
+			if (icon != null)
 			{
-				int padding = item.Icon.Width / 16;
-				_texture.TextureRegion = new Rectangle(padding, padding, Item!.Icon.Width - padding * 2, Item!.Icon.Height - padding * 2);
+				int padding = icon.Width / 16;
+				_texture.TextureRegion = new Rectangle(padding, padding, icon.Width - padding * 2, icon.Height - padding * 2);
 			}
 			ItemTooltip itemTooltip = base.Tooltip as ItemTooltip;
 			if (itemTooltip == null)

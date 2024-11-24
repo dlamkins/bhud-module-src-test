@@ -6,6 +6,7 @@ using Blish_HUD.Input;
 using Kenedia.Modules.BuildsManager.DataModels.Stats;
 using Kenedia.Modules.Core.Controls;
 using Kenedia.Modules.Core.Extensions;
+using Kenedia.Modules.Core.Services;
 using Kenedia.Modules.Core.Structs;
 using Kenedia.Modules.Core.Utility;
 using Microsoft.Xna.Framework;
@@ -138,7 +139,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 		{
 			_name.SetLocalizedText = () => _stat?.Name;
 			_statSummary.SetLocalizedText = () => _stat?.Attributes.ToString(AttributeAdjustment);
-			_icon.Texture = _stat?.Icon;
+			_icon.Texture = TexturesService.GetTextureFromRef(_stat?.IconPath);
 		}
 
 		private void OnMultiplierChanged()

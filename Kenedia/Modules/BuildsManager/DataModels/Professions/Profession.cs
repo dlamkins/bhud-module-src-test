@@ -26,7 +26,7 @@ namespace Kenedia.Modules.BuildsManager.DataModels.Professions
 		[DataMember]
 		public ProfessionType Id { get; set; }
 
-		public AsyncTexture2D Icon
+		private AsyncTexture2D Icon
 		{
 			get
 			{
@@ -42,7 +42,7 @@ namespace Kenedia.Modules.BuildsManager.DataModels.Professions
 			}
 		}
 
-		public AsyncTexture2D IconBig
+		private AsyncTexture2D IconBig
 		{
 			get
 			{

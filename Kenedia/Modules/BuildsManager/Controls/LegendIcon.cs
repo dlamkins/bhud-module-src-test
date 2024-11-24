@@ -5,6 +5,7 @@ using Gw2Sharp;
 using Kenedia.Modules.BuildsManager.DataModels.Professions;
 using Kenedia.Modules.BuildsManager.Models.Templates;
 using Kenedia.Modules.Core.Models;
+using Kenedia.Modules.Core.Services;
 using Kenedia.Modules.Core.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -68,7 +69,7 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		private void ApplyLegend()
 		{
-			_texture.Texture = Legend?.Swap.Icon;
+			_texture.Texture = TexturesService.GetAsyncTexture(Legend?.Swap.IconAssetId);
 			SkillTooltip.Skill = Legend?.Swap;
 		}
 

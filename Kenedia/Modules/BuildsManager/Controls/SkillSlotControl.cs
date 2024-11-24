@@ -17,6 +17,7 @@ using Kenedia.Modules.BuildsManager.Res;
 using Kenedia.Modules.BuildsManager.Services;
 using Kenedia.Modules.Core.DataModels;
 using Kenedia.Modules.Core.Models;
+using Kenedia.Modules.Core.Services;
 using Kenedia.Modules.Core.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -30,7 +31,7 @@ namespace Kenedia.Modules.BuildsManager.Controls
 		public DetailedTexture Selector { get; } = new DetailedTexture(157138, 157140);
 
 
-		public AsyncTexture2D Texture => Skill?.Icon;
+		public AsyncTexture2D Texture => TexturesService.GetAsyncTexture(Skill?.IconAssetId);
 
 		public AsyncTexture2D HoveredFrameTexture { get; } = AsyncTexture2D.FromAssetId(157143);
 

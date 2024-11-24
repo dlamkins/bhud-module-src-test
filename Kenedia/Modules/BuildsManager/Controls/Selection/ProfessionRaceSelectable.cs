@@ -5,10 +5,14 @@ using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Gw2Sharp.Models;
 using Gw2Sharp.WebApi;
+using Kenedia.Modules.BuildsManager.Models;
 using Kenedia.Modules.BuildsManager.Services;
+using Kenedia.Modules.BuildsManager.Views;
 using Kenedia.Modules.Core.Controls;
 using Kenedia.Modules.Core.DataModels;
 using Kenedia.Modules.Core.Extensions;
+using Kenedia.Modules.Core.Models;
+using Kenedia.Modules.Core.Services;
 using Kenedia.Modules.Core.Structs;
 using Kenedia.Modules.Core.Utility;
 using Microsoft.Xna.Framework;
@@ -113,7 +117,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 			}
 		}
 
-		public override void UserLocale_SettingChanged(object sender, ValueChangedEventArgs<Locale> e)
+		public override void UserLocale_SettingChanged(object sender, Blish_HUD.ValueChangedEventArgs<Locale> e)
 		{
 			base.UserLocale_SettingChanged(sender, e);
 		}
@@ -133,7 +137,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 				if (Data.Professions.TryGetValue((ProfessionType)(object)Value, out var profession))
 				{
 					_name.SetLocalizedText = () => profession?.Name;
-					_icon.Texture = profession.IconBig;
+					_icon.Texture = TexturesService.GetAsyncTexture(profession?.IconBigAssetId);
 				}
 				break;
 			}
@@ -142,7 +146,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 				if (Data.Races.TryGetValue((Races)(object)Value, out var race))
 				{
 					_name.SetLocalizedText = () => race?.Name;
-					_icon.Texture = race.Icon;
+					_icon.Texture = BaseModule<BuildsManager, MainWindow, Settings, Paths>.ModuleInstance.ContentsManager.GetTexture(race?.IconPath);
 				}
 				break;
 			}

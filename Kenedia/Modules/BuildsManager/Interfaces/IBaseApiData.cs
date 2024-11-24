@@ -1,4 +1,3 @@
-using Blish_HUD.Content;
 using Kenedia.Modules.BuildsManager.DataModels.Items;
 
 namespace Kenedia.Modules.BuildsManager.Interfaces
@@ -10,7 +9,5 @@ namespace Kenedia.Modules.BuildsManager.Interfaces
 		string Description { get; set; }
 
 		int Id { get; set; }
-
-		AsyncTexture2D Icon { get; }
 	}
 }

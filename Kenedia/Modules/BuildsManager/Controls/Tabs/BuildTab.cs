@@ -424,7 +424,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 		private void SetRaceIcons()
 		{
 			Race raceIcon = default(Race);
-			_raceIcon.Texture = ((Data.Races?.TryGetValue((TemplatePresenter?.Template?.Race).GetValueOrDefault(Races.None), out raceIcon) ?? false) ? raceIcon.Icon : null);
+			_raceIcon.Texture = ((Data.Races?.TryGetValue((TemplatePresenter?.Template?.Race).GetValueOrDefault(Races.None), out raceIcon) ?? false) ? TexturesService.GetTextureFromRef(raceIcon.IconPath) : null);
 			Race raceName = default(Race);
 			_raceIcon.BasicTooltipText = ((Data.Races?.TryGetValue((TemplatePresenter?.Template?.Race).GetValueOrDefault(Races.None), out raceName) ?? false) ? raceName.Name : null);
 		}
@@ -432,7 +432,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 		private void SetSpecIcons()
 		{
 			Profession professionForIcon = default(Profession);
-			_specIcon.Texture = TemplatePresenter?.Template?.EliteSpecialization?.ProfessionIconBig ?? ((Data.Professions?.TryGetValue((TemplatePresenter?.Template?.Profession).GetValueOrDefault(ProfessionType.Guardian), out professionForIcon) ?? false) ? professionForIcon.IconBig : null);
+			_specIcon.Texture = TexturesService.GetAsyncTexture(TemplatePresenter?.Template?.EliteSpecialization?.ProfessionIconBigAssetId) ?? ((Data.Professions?.TryGetValue((TemplatePresenter?.Template?.Profession).GetValueOrDefault(ProfessionType.Guardian), out professionForIcon) ?? false) ? TexturesService.GetAsyncTexture(professionForIcon.IconBigAssetId) : null);
 			Profession professionForName = default(Profession);
 			_specIcon.BasicTooltipText = TemplatePresenter?.Template?.EliteSpecialization?.Name ?? ((Data.Professions?.TryGetValue((TemplatePresenter?.Template?.Profession).GetValueOrDefault(ProfessionType.Guardian), out professionForName) ?? false) ? professionForName.Name : null);
 		}

@@ -35,7 +35,7 @@ namespace Kenedia.Modules.BuildsManager.DataModels.Items
 		[DataMember]
 		public int AssetId { get; set; }
 
-		public AsyncTexture2D Icon
+		private AsyncTexture2D Icon
 		{
 			get
 			{

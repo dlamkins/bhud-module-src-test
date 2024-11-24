@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using Blish_HUD;
 using Blish_HUD.Controls;
+using Blish_HUD.Modules.Managers;
 using Kenedia.Modules.Core.Controls;
 using Kenedia.Modules.Core.Interfaces;
 using Microsoft.Xna.Framework;
@@ -12,6 +13,8 @@ namespace Kenedia.Modules.Core.Utility
 {
 	public static class UI
 	{
+		public static ContentsManager ContentsManager { get; set; }
+
 		public static void ScrollToChild(this Kenedia.Modules.Core.Controls.FlowPanel panel, Control child)
 		{
 			((Container)panel).ScrollToChild(child);

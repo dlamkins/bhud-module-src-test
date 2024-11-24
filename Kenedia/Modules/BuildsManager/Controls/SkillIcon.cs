@@ -6,6 +6,7 @@ using Gw2Sharp;
 using Kenedia.Modules.BuildsManager.DataModels.Professions;
 using Kenedia.Modules.BuildsManager.Models.Templates;
 using Kenedia.Modules.Core.Models;
+using Kenedia.Modules.Core.Services;
 using Kenedia.Modules.Core.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -66,7 +67,7 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		private void ApplySkill()
 		{
-			base.Texture = Skill?.Icon;
+			base.Texture = TexturesService.GetAsyncTexture(Skill?.IconAssetId);
 		}
 
 		public void Draw(Control ctrl, SpriteBatch spriteBatch, bool terrestrial = true, Point? mousePos = null, Color? color = null, Color? bgColor = null, bool? forceHover = null, float? rotation = null, Vector2? origin = null)

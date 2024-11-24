@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Blish_HUD;
+using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Gw2Sharp.Models;
@@ -13,6 +14,7 @@ using Kenedia.Modules.BuildsManager.Views;
 using Kenedia.Modules.Core.Controls;
 using Kenedia.Modules.Core.Extensions;
 using Kenedia.Modules.Core.Models;
+using Kenedia.Modules.Core.Services;
 using Kenedia.Modules.Core.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -124,7 +126,7 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		private Rectangle _specSelectorBounds;
 
-		private readonly List<(Specialization spec, Rectangle bounds)> _specBounds = new List<(Specialization, Rectangle)>();
+		private readonly List<(Specialization spec, Rectangle bounds, AsyncTexture2D texture)> _specBounds = new List<(Specialization, Rectangle, AsyncTexture2D)>();
 
 		public bool SelectorOpen
 		{
@@ -197,7 +199,7 @@ namespace Kenedia.Modules.BuildsManager.Controls
 			int offset = 40;
 			for (int i = 0; i < ((SpecializationSlot == SpecializationSlotType.Line_3) ? 8 : 5); i++)
 			{
-				_specBounds.Add(((Specialization)null, new Rectangle(offset, (base.Height - size) / 2, size, size)));
+				_specBounds.Add(((Specialization)null, new Rectangle(offset, (base.Height - size) / 2, size, size), (AsyncTexture2D)null));
 				offset += size + Scale(10);
 			}
 			TemplatePresenter.SpecializationChanged += new SpecializationChangedEventHandler(OnSpecializationChanged);
@@ -344,12 +346,12 @@ namespace Kenedia.Modules.BuildsManager.Controls
 			{
 				if (!s.Elite || SpecializationSlot == SpecializationSlotType.Line_3)
 				{
-					_specBounds[i] = (s, _specBounds[i].bounds);
+					_specBounds[i] = (s, _specBounds[i].bounds, TexturesService.GetAsyncTexture(s.IconAssetId));
 					i++;
 				}
 			}
-			_weaponTrait.Texture = BuildSpecialization?.Specialization?.WeaponTrait?.Icon;
-			_specializationBackground.Texture = BuildSpecialization?.Specialization?.Background;
+			_weaponTrait.Texture = TexturesService.GetAsyncTexture(BuildSpecialization?.Specialization?.WeaponTrait?.IconAssetId);
+			_specializationBackground.Texture = TexturesService.GetAsyncTexture(BuildSpecialization?.Specialization?.BackgroundAssetId);
 			UpdateTraitsForSpecialization();
 		}
 
@@ -569,19 +571,21 @@ namespace Kenedia.Modules.BuildsManager.Controls
 			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0105: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0116: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0147: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0157: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0162: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0176: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0180: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0106: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0148: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0151: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0166: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0170: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017a: Unknown result type (might be due to invalid IL or missing references)
 			string txt = null;
 			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, _specSelectorBounds, Rectangle.get_Empty(), Color.get_Black() * 0.8f, 0f, Vector2.get_Zero(), (SpriteEffects)0);
 			foreach (var spec in _specBounds)
@@ -593,14 +597,15 @@ namespace Kenedia.Modules.BuildsManager.Controls
 				bool hasSpec = templatePresenter != null && templatePresenter.Template?.HasSpecialization(spec.spec, out slot) == true;
 				if (spec.spec != null)
 				{
-					spriteBatch.DrawOnCtrl(this, spec.spec.Icon, spec.bounds, spec.spec.Icon.Bounds, hasSpec ? ContentService.Colors.Chardonnay : (hovered ? Color.get_White() : (Color.get_White() * 0.8f)), 0f, Vector2.get_Zero(), (SpriteEffects)0);
+					AsyncTexture2D specIcon = spec.texture;
+					spriteBatch.DrawOnCtrl(this, specIcon, spec.bounds, specIcon?.Bounds ?? Rectangle.get_Empty(), hasSpec ? ContentService.Colors.Chardonnay : (hovered ? Color.get_White() : (Color.get_White() * 0.8f)), 0f, Vector2.get_Zero(), (SpriteEffects)0);
 					if (hovered)
 					{
 						txt = spec.spec.Name;
 					}
 					if (hasSpec)
 					{
-						spriteBatch.DrawOnCtrl(this, spec.spec.Icon, spec.bounds, spec.spec.Icon.Bounds.Add(-4, -4, 8, 8), Color.get_Black() * 0.7f, 0f, Vector2.get_Zero(), (SpriteEffects)0);
+						spriteBatch.DrawOnCtrl(this, specIcon, spec.bounds, specIcon?.Bounds.Add(-4, -4, 8, 8) ?? Rectangle.get_Empty(), Color.get_Black() * 0.7f, 0f, Vector2.get_Zero(), (SpriteEffects)0);
 					}
 				}
 			}
