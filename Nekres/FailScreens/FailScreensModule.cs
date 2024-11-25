@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Linq;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Modules;
@@ -22,6 +24,8 @@ namespace Nekres.FailScreens
 		internal SettingEntry<DefeatedService.FailScreens> FailScreen;
 
 		internal SettingEntry<bool> Random;
+
+		internal Dictionary<DefeatedService.FailScreens, SettingEntry<bool>> ToggleScreens;
 
 		internal SettingEntry<float> Volume;
 
@@ -50,11 +54,17 @@ namespace Nekres.FailScreens
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
-			//IL_0250: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0255: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0324: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0329: Unknown result type (might be due to invalid IL or missing references)
 			SettingCollection visualsCol = settings.AddSubCollection("visuals", true, (Func<string>)(() => "Defeated Screen"));
 			FailScreen = visualsCol.DefineSetting<DefeatedService.FailScreens>("fail_screen", DefeatedService.FailScreens.DarkSouls, (Func<string>)(() => "Appearance"), (Func<string>)(() => "Visual to display upon defeat."));
 			Random = visualsCol.DefineSetting<bool>("random", true, (Func<string>)(() => "Randomize"), (Func<string>)(() => "Ignores selection if set."));
+			SettingCollection screensCol = visualsCol.AddSubCollection("screens", true, (Func<string>)(() => "Randomizer Toggles"));
+			ToggleScreens = new Dictionary<DefeatedService.FailScreens, SettingEntry<bool>>();
+			foreach (DefeatedService.FailScreens screen in Enum.GetValues(typeof(DefeatedService.FailScreens)).Cast<DefeatedService.FailScreens>())
+			{
+				ToggleScreens.Add(screen, screensCol.DefineSetting<bool>("enable_" + screen.ToString().ToLower(), true, (Func<string>)(() => "Enable " + screen.ToString().SplitCamelCase()), (Func<string>)(() => "Enable or disable the \"" + screen.ToString().SplitCamelCase() + "\" screen for randomization.")));
+			}
 			SettingCollection soundCol = settings.AddSubCollection("sound", true, (Func<string>)(() => "Sound Options"));
 			Volume = soundCol.DefineSetting<float>("volume", 0.05f, (Func<string>)(() => "Volume"), (Func<string>)(() => "Adjusts the audio volume."));
 			Muted = soundCol.DefineSetting<bool>("mute", false, (Func<string>)(() => "Mute"), (Func<string>)(() => "Mutes the audio."));

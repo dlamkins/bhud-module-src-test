@@ -6,6 +6,7 @@ using System.Threading;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
+using Blish_HUD.Settings;
 using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
@@ -108,7 +109,7 @@ namespace Nekres.FailScreens.Core.Services
 
 		private void OnStateChanged(object sender, ValueEventArgs<StateService.State> e)
 		{
-			//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
 			if (e.get_Value() != StateService.State.Defeated)
 			{
 				if (!_isSuperAdventureBox)
@@ -129,11 +130,10 @@ namespace Nekres.FailScreens.Core.Services
 			}
 			_failScreen = null;
 			FailScreens screen = FailScreensModule.Instance.FailScreen.get_Value();
-			if (FailScreensModule.Instance.Random.get_Value())
+			bool notAllDisabled = FailScreensModule.Instance.ToggleScreens.Values.Any((SettingEntry<bool> x) => x.get_Value());
+			if (FailScreensModule.Instance.Random.get_Value() && notAllDisabled)
 			{
-				int num = Enum.GetValues(typeof(FailScreens)).Cast<int>().Min();
-				int max = Enum.GetValues(typeof(FailScreens)).Cast<int>().Max();
-				screen = (FailScreens)RandomUtil.GetRandom(num, max);
+				screen = GetRandomScreenType();
 			}
 			Control buildScreen;
 			try
@@ -151,6 +151,18 @@ namespace Nekres.FailScreens.Core.Services
 				buildScreen.set_Size(((Control)GameService.Graphics.get_SpriteScreen()).get_Size());
 				_failScreen = buildScreen;
 			}
+		}
+
+		private FailScreens GetRandomScreenType()
+		{
+			int num = Enum.GetValues(typeof(FailScreens)).Cast<int>().Min();
+			int max = Enum.GetValues(typeof(FailScreens)).Cast<int>().Max();
+			FailScreens screen = (FailScreens)RandomUtil.GetRandom(num, max);
+			if (!FailScreensModule.Instance.ToggleScreens[screen].get_Value())
+			{
+				screen = GetRandomScreenType();
+			}
+			return screen;
 		}
 
 		private Control CreateFailScreen(FailScreens failScreen)
