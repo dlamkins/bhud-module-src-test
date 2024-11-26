@@ -105,6 +105,19 @@ namespace MysticCrafting.Module.Helpers
 			};
 		}
 
+		public static string TranslateWeightClass(WeightClass weightClass)
+		{
+			return weightClass switch
+			{
+				WeightClass.Heavy => MysticCrafting.Module.Strings.Discovery.WeightClassesPanelHeavy, 
+				WeightClass.Medium => MysticCrafting.Module.Strings.Discovery.WeightClassesPanelMedium, 
+				WeightClass.Light => MysticCrafting.Module.Strings.Discovery.WeightClassesPanelLight, 
+				WeightClass.Clothing => MysticCrafting.Module.Strings.Discovery.WeightClassesPanelClothing, 
+				WeightClass.Unknown => MysticCrafting.Module.Strings.Discovery.WeightClassesPanelUnknown, 
+				_ => string.Empty, 
+			};
+		}
+
 		public static string TranslateRarity(ItemRarity rarity)
 		{
 			return rarity switch

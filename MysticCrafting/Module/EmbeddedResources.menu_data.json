@@ -8,6 +8,13 @@
     "SelectedByDefault": true
   },
   {
+    "Name": "New Legendary",
+    "Icon": 523389,
+    "Filters": {
+      "Ids": [ 103815 ]
+    }
+  },
+  {
     "Name": "Weapons",
     "Filters": {
       "Type": 19
@@ -359,7 +366,7 @@
   {
     "Name": "Guild Decorations",
     "Filters": {
-      "Categories": [ 28, 29, 30, 31, 32, 34, 35, 36, 37]
+      "Categories": [ 28, 29, 30, 31, 32, 34, 35, 36, 37 ]
     },
     "Children": [
       {

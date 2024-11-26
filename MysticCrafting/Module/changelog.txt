@@ -1,23 +1,5 @@
-﻿#1.4.1 Categories hotfix
-Relics, rings and trinkets categories have been updated to display correctly.
-
-#1.4.0 Items
-You can now search and filter for almost any items that can be crafted, purchased from a vendor, or purchased from the TP.
-      
-#API
-- Data is now retrieved from the API only when you open the item details.
-- Item prices are retrieved only as needed, and uses a 5 minute refresh timer.
-- Item counts have been optimized to only load inventories when characters are actively used (initial load is for all characters).
-- You can now right-click on the GW2 API label in the bottom right to manually reload data.
-
-#Translations & UI
-- The module has been fully translated to French, thanks to Naru.
-- The german translations have been updated, thanks to Matthias.
-- New categories have been added to the menu.
-- New filters and updated UI.
-- Item details view has a bunch of UI changes.
-
-#Recipes & Bugs
-- You can now manually ignore items using an additional tab.
-- Fixed a bug that broke pricing when changing the crafting amount.
-- The max for Legendary Spear has been increased from 2 to 4.
+﻿#1.5.0 Legendary Spear update
+- New items have been added from the latest update (Legendary spear)
+- Legendary Weapon Starter Kit has been updated to #6
+- New filter has been added for armor weight classes
+- Bloodstone Shards and Funerary Incense have been fixed

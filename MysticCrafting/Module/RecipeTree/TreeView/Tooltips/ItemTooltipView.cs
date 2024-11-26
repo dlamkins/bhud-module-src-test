@@ -139,20 +139,19 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Tooltips
 			//IL_0283: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0284: Unknown result type (might be due to invalid IL or missing references)
 			//IL_028e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0295: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a1: Expected O, but got Unknown
-			//IL_02d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02d7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02e3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02f9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_029a: Expected O, but got Unknown
+			//IL_02cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02f2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02f7: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02fe: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0305: Unknown result type (might be due to invalid IL or missing references)
-			//IL_030f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_031f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0322: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0308: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0318: Unknown result type (might be due to invalid IL or missing references)
+			//IL_031b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0325: Unknown result type (might be due to invalid IL or missing references)
 			//IL_032c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0333: Unknown result type (might be due to invalid IL or missing references)
-			//IL_033a: Unknown result type (might be due to invalid IL or missing references)
 			CharacterCount = ServiceContainer.PlayerItemService.GetCharacterInventoryItemCount(Item.Id);
 			MaterialStorageCount = ServiceContainer.PlayerItemService.GetMaterialItemCount(Item.Id);
 			SharedInventoryCount = ServiceContainer.PlayerItemService.GetSharedInventoryCount(Item.Id);
@@ -209,8 +208,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Tooltips
 				val5.set_Text(string.Format(Recipe.MoreRequired, RequiredQuantity.ToString("N0")));
 				((Control)val5).set_Location(new Point(0, yPosition));
 				val5.set_Font(GameService.Content.get_DefaultFont16());
-				val5.set_TextColor(ColorHelper.BrightBlue);
-				val5.set_StrokeText(true);
+				val5.set_TextColor(ColorHelper.BrightGreen);
 				val5.set_AutoSizeWidth(true);
 				MoreRequiredLabel = val5;
 				yPosition += 25;
@@ -401,6 +399,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Tooltips
 				((Control)accountTitleLabel).Dispose();
 			}
 			BuildPanel = null;
+			Item = null;
 			((View<IPresenter>)this).Unload();
 		}
 	}

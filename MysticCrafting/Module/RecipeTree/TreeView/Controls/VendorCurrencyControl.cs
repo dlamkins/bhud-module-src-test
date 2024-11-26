@@ -74,5 +74,15 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Controls
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(0, 0, 1, ((Control)this).get_Height() - 1), lineColor);
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Control)this).get_Width() - 1, 0, 1, ((Control)this).get_Height() - 1), lineColor);
 		}
+
+		protected override void DisposeControl()
+		{
+			Tooltip tooltip = ((Control)this).get_Tooltip();
+			if (tooltip != null)
+			{
+				((Control)tooltip).Dispose();
+			}
+			((Control)this).DisposeControl();
+		}
 	}
 }

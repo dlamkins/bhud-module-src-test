@@ -256,6 +256,16 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Controls
 		protected override void DisposeControl()
 		{
 			DisposeCurrencyControls();
+			CoinsControl coinsControl = _coinsControl;
+			if (coinsControl != null)
+			{
+				((Control)coinsControl).Dispose();
+			}
+			Tooltip tooltip = ((Control)this).get_Tooltip();
+			if (tooltip != null)
+			{
+				((Control)tooltip).Dispose();
+			}
 			((FlowPanel)this).DisposeControl();
 		}
 	}

@@ -44,11 +44,17 @@ namespace MysticCrafting.Module.Strings
 
 		internal static string Account => ResourceManager.GetString("Account", resourceCulture);
 
+		internal static string AchievementUnlockedBy => ResourceManager.GetString("AchievementUnlockedBy", resourceCulture);
+
+		internal static string AchievingItemsLabel => ResourceManager.GetString("AchievingItemsLabel", resourceCulture);
+
 		internal static string AllRecipes => ResourceManager.GetString("AllRecipes", resourceCulture);
 
 		internal static string BuyingItemsLabel => ResourceManager.GetString("BuyingItemsLabel", resourceCulture);
 
 		internal static string ChoiceOfItem => ResourceManager.GetString("ChoiceOfItem", resourceCulture);
+
+		internal static string ContainedInItem => ResourceManager.GetString("ContainedInItem", resourceCulture);
 
 		internal static string ContextMenuBuyAll => ResourceManager.GetString("ContextMenuBuyAll", resourceCulture);
 

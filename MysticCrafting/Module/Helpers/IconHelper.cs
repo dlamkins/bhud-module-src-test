@@ -1,4 +1,5 @@
 using Atzie.MysticCrafting.Models.Crafting;
+using Atzie.MysticCrafting.Models.Items;
 using Blish_HUD.Content;
 
 namespace MysticCrafting.Module.Helpers
@@ -22,6 +23,12 @@ namespace MysticCrafting.Module.Helpers
 		public static readonly AsyncTexture2D Tailoring = AsyncTexture2D.FromAssetId(156621);
 
 		public static readonly AsyncTexture2D Scribing = AsyncTexture2D.FromAssetId(1228680);
+
+		public static readonly AsyncTexture2D Heavy = AsyncTexture2D.FromAssetId(156715);
+
+		public static readonly AsyncTexture2D Medium = AsyncTexture2D.FromAssetId(156620);
+
+		public static readonly AsyncTexture2D Light = AsyncTexture2D.FromAssetId(1293677);
 
 		private static readonly AsyncTexture2D ArmorSmithingColor = AsyncTexture2D.FromAssetId(102461);
 
@@ -129,6 +136,17 @@ namespace MysticCrafting.Module.Helpers
 			});
 		}
 
+		public static AsyncTexture2D GetIcon(WeightClass @class)
+		{
+			return (AsyncTexture2D)(@class switch
+			{
+				WeightClass.Heavy => Heavy, 
+				WeightClass.Medium => Medium, 
+				WeightClass.Light => Light, 
+				_ => null, 
+			});
+		}
+
 		public static AsyncTexture2D GetIconColor(string profession)
 		{
 			string text = profession.ToLower();
@@ -198,23 +216,6 @@ namespace MysticCrafting.Module.Helpers
 				}
 			}
 			return ArmorSmithingColor;
-		}
-
-		public static AsyncTexture2D GetIconColor(Discipline profession)
-		{
-			return (AsyncTexture2D)(profession switch
-			{
-				Discipline.Armorsmith => ArmorSmithingColor, 
-				Discipline.Weaponsmith => WeaponSmithingColor, 
-				Discipline.Jeweler => JeweleryColor, 
-				Discipline.Artificer => ArtificerColor, 
-				Discipline.Huntsman => HuntsmanColor, 
-				Discipline.Chef => CookingColor, 
-				Discipline.Leatherworker => LeatherworkingColor, 
-				Discipline.Tailor => TailoringColor, 
-				Discipline.Scribe => ScribingColor, 
-				_ => ArmorSmithingColor, 
-			});
 		}
 	}
 }

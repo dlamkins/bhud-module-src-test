@@ -109,5 +109,20 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 			val2.set_StrokeText(true);
 			_labelControl = val2;
 		}
+
+		protected override void DisposeControl()
+		{
+			Image iconControl = _iconControl;
+			if (iconControl != null)
+			{
+				((Control)iconControl).Dispose();
+			}
+			Label labelControl = _labelControl;
+			if (labelControl != null)
+			{
+				((Control)labelControl).Dispose();
+			}
+			base.DisposeControl();
+		}
 	}
 }

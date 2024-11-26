@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Atzie.MysticCrafting.Models.Account;
 using Atzie.MysticCrafting.Models.Crafting;
 using Atzie.MysticCrafting.Models.Currencies;
 using Atzie.MysticCrafting.Models.Items;
@@ -32,7 +33,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Presenters
 
 		private readonly IChoiceRepository _choiceRepository;
 
-		private readonly List<int> _excludedItems = new List<int> { 19675, 79410, 20797, 19925, 86093 };
+		private readonly List<int> _excludedItems = new List<int> { 19675, 79410, 19925 };
 
 		public IngredientNodePresenter(IRecipeDetailsViewPresenter recipeDetailsPresenter, IChoiceRepository choiceRepository)
 		{
@@ -131,6 +132,31 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Presenters
 			return unknownIngredientNode;
 		}
 
+		public AchievementNode BuildAchievementNode(Achievement achievement, Container parent, bool loadingChildren = false, bool expandable = false)
+		{
+			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+			AchievementNode achievementNode = new AchievementNode(achievement, parent, null, loadingChildren);
+			((Control)achievementNode).set_Width(((Control)parent).get_Width() - 25);
+			achievementNode.PanelHeight = 40;
+			((Control)achievementNode).set_Height(40);
+			achievementNode.PanelExtensionHeight = 0;
+			AchievementNode node = achievementNode;
+			node.Build(parent);
+			node.OnPanelClick += delegate
+			{
+				_recipeDetailsPresenter.SaveScrollDistance();
+			};
+			if (achievement.UnlockedByItemId != 0)
+			{
+				((Control)new LabelNode(MysticCrafting.Module.Strings.Recipe.AchievementUnlockedBy, (Container)(object)node)
+				{
+					TextColor = Color.get_White()
+				}).set_Width(((Control)parent).get_Width() - 25);
+				BuildItemNode(ServiceContainer.ItemRepository.GetItem(achievement.UnlockedByItemId), (Container)(object)node);
+			}
+			return node;
+		}
+
 		public ItemIngredientNode BuildItemNode(Ingredient ingredient, Container parent, bool loadingChildren = false, bool expandable = false)
 		{
 			if (ingredient.Item == null)
@@ -195,10 +221,12 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Presenters
 			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0103: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0144: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0329: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0379: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0141: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0186: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01cf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_036a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03e1: Unknown result type (might be due to invalid IL or missing references)
 			TreeNodeBase node = parent as TreeNodeBase;
 			if (node != null)
 			{
@@ -234,6 +262,15 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Presenters
 					TextColor = Color.get_White()
 				}).set_Width(((Control)parent).get_Width() - 25);
 				_tradingPostPresenter.Build(parent, tradingPostSource);
+			}
+			AchievementSource achievementSource = itemSource as AchievementSource;
+			if (achievementSource != null)
+			{
+				((Control)new LabelNode(MysticCrafting.Module.Strings.Recipe.AchievingItemsLabel, parent)
+				{
+					TextColor = Color.get_White()
+				}).set_Width(((Control)parent).get_Width() - 25);
+				BuildAchievementNode(achievementSource.Achievement, parent);
 			}
 			VendorSource vendorSource = itemSource as VendorSource;
 			if (vendorSource != null)
@@ -275,14 +312,20 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Presenters
 					if (containerSource.Container.ContainedChoiceItemIds != null && containerSource.Container.ContainedChoiceItemIds.Contains(parentNode.Item.Id))
 					{
 						LabelNode labelNode = new LabelNode(MysticCrafting.Module.Strings.Recipe.ChoiceOfItem, parent);
-						((Control)labelNode).set_Width(300);
-						labelNode.TextColor = Color.get_Red();
+						((Control)labelNode).set_Width(((Control)parent).get_Width() - 25);
+						labelNode.TextColor = Color.get_White();
 					}
-					if (containerSource.Container.ContainedChanceItemIds != null && containerSource.Container.ContainedChanceItemIds.Contains(parentNode.Item.Id))
+					else if (containerSource.Container.ContainedChanceItemIds != null && containerSource.Container.ContainedChanceItemIds.Contains(parentNode.Item.Id))
 					{
 						LabelNode labelNode2 = new LabelNode(MysticCrafting.Module.Strings.Recipe.RandomItemChance, parent);
-						((Control)labelNode2).set_Width(300);
-						labelNode2.TextColor = Color.get_Red();
+						((Control)labelNode2).set_Width(((Control)parent).get_Width() - 25);
+						labelNode2.TextColor = Color.get_White();
+					}
+					else
+					{
+						LabelNode labelNode3 = new LabelNode("Contained in", parent);
+						((Control)labelNode3).set_Width(300);
+						labelNode3.TextColor = Color.get_White();
 					}
 				}
 			}

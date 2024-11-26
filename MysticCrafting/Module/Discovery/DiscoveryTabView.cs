@@ -4,6 +4,7 @@ using System.Linq;
 using System.Timers;
 using Blish_HUD;
 using Blish_HUD.Controls;
+using Blish_HUD.GameServices;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Input;
 using Microsoft.Xna.Framework;
@@ -12,6 +13,7 @@ using MysticCrafting.Module.Discovery.ItemList.Controls;
 using MysticCrafting.Module.Discovery.Loading;
 using MysticCrafting.Module.Discovery.Menu;
 using MysticCrafting.Module.Discovery.Version;
+using MysticCrafting.Module.Extensions;
 using MysticCrafting.Module.Menu;
 using MysticCrafting.Module.RecipeTree;
 using MysticCrafting.Module.RecipeTree.TreeView;
@@ -35,15 +37,17 @@ namespace MysticCrafting.Module.Discovery
 
 		private readonly MysticCraftingModule _module;
 
-		private Container BuildPanel;
+		private Container _buildPanel;
 
-		private ViewContainer RecipeViewContainer;
+		private ViewContainer _recipeViewContainer;
 
-		private Panel DiscoveryOverviewContainer;
+		private Panel _discoveryOverviewContainer;
+
+		private RecipeDetailsView _recipeView;
 
 		private FlowPanel _leftSidePanel;
 
-		private readonly List<MenuPanel> _panels = new List<MenuPanel>();
+		private readonly List<MenuPanel> _menuPanels = new List<MenuPanel>();
 
 		private SkinsMenuPanel _skinsPanel;
 
@@ -51,7 +55,7 @@ namespace MysticCrafting.Module.Discovery
 
 		private RaritiesMenuPanel _raritiesPanel;
 
-		private RecipeDetailsView RecipeView;
+		private WeightClassesMenuPanel _weightClassesPanel;
 
 		private Timer _searchTimer;
 
@@ -126,33 +130,34 @@ namespace MysticCrafting.Module.Discovery
 			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00fc: Expected O, but got Unknown
-			BuildPanel = buildPanel;
+			_buildPanel = buildPanel;
 			ViewContainer val = new ViewContainer();
 			((Control)val).set_Parent(buildPanel);
 			((Control)val).set_Size(new Point(((Control)buildPanel).get_Width(), ((Control)buildPanel).get_Height() - 113));
 			((Control)val).set_Visible(false);
-			RecipeViewContainer = val;
+			_recipeViewContainer = val;
 			Panel val2 = new Panel();
 			((Control)val2).set_Parent(buildPanel);
 			((Control)val2).set_Size(new Point(((Control)buildPanel).get_Width() - 20, ((Control)buildPanel).get_Height() - 60));
 			val2.set_ShowBorder(false);
 			val2.set_ShowTint(false);
-			DiscoveryOverviewContainer = val2;
+			_discoveryOverviewContainer = val2;
 			try
 			{
-				BuildSearchBar((Container)(object)DiscoveryOverviewContainer);
-				BuildItemList((Container)(object)DiscoveryOverviewContainer);
+				BuildSearchBar((Container)(object)_discoveryOverviewContainer);
+				BuildItemList((Container)(object)_discoveryOverviewContainer);
 				FlowPanel val3 = new FlowPanel();
-				((Control)val3).set_Parent((Container)(object)DiscoveryOverviewContainer);
+				((Control)val3).set_Parent((Container)(object)_discoveryOverviewContainer);
 				((Control)val3).set_Size(new Point(((DesignStandard)(ref Panel.MenuStandard)).get_Size().X, ((DesignStandard)(ref Panel.MenuStandard)).get_Size().Y + 50 - ((Control)_searchBar).get_Height()));
 				((Control)val3).set_Location(new Point(0, ((Control)_searchBar).get_Height()));
 				val3.set_FlowDirection((ControlFlowDirection)6);
 				_leftSidePanel = val3;
 				BuildRaritiesPanel((Container)(object)_leftSidePanel);
 				BuildSourcesPanel((Container)(object)_leftSidePanel);
+				BuildWeightClassesPanel((Container)(object)_leftSidePanel);
 				BuildMenu((Container)(object)_leftSidePanel);
-				BuildLoadingStatusView(BuildPanel);
-				BuildVersionIndicatorView(BuildPanel);
+				BuildLoadingStatusView(_buildPanel);
+				BuildVersionIndicatorView(_buildPanel);
 			}
 			catch (Exception ex)
 			{
@@ -163,12 +168,12 @@ namespace MysticCrafting.Module.Discovery
 		public void ResizeMenu()
 		{
 			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
 			if (_menuPanel != null && Menu != null)
 			{
-				((Control)_menuPanel).set_Height(((DesignStandard)(ref Panel.MenuStandard)).get_Size().Y - ((Control)_sourcesPanel).get_Height() - ((Control)_raritiesPanel).get_Height());
+				((Control)_menuPanel).set_Height(((DesignStandard)(ref Panel.MenuStandard)).get_Size().Y - ((Control)_sourcesPanel).get_Height() - ((Control)_raritiesPanel).get_Height() - ((Control)_weightClassesPanel).get_Height());
 				CategoryMenu menu = Menu;
 				Rectangle contentRegion = ((Container)_menuPanel).get_ContentRegion();
 				((Control)menu).set_Size(((Rectangle)(ref contentRegion)).get_Size());
@@ -204,7 +209,12 @@ namespace MysticCrafting.Module.Discovery
 
 		private void ItemClicked(object sender, EventArgs e)
 		{
-			RecipeDetailsView recipeView = RecipeView;
+			ItemButton listItem = sender as ItemButton;
+			if (listItem == null)
+			{
+				return;
+			}
+			RecipeDetailsView recipeView = _recipeView;
 			if (recipeView != null)
 			{
 				TreeView treeView = recipeView.TreeView;
@@ -213,21 +223,21 @@ namespace MysticCrafting.Module.Discovery
 					((Control)treeView).Dispose();
 				}
 			}
-			ItemButton listItem = sender as ItemButton;
-			if (listItem != null)
+			IList<string> breadCrumbs = ((View<IItemListPresenter>)ItemList)?.get_Presenter()?.BuildBreadcrumbs();
+			_recipeView = new RecipeDetailsView(listItem.Item.Id, breadCrumbs ?? new List<string>());
+			RecipeDetailsView recipeView2 = _recipeView;
+			recipeView2.OnBackButtonClick = (EventHandler<MouseEventArgs>)Delegate.Combine(recipeView2.OnBackButtonClick, (EventHandler<MouseEventArgs>)delegate
 			{
-				IList<string> breadCrumbs = ((View<IItemListPresenter>)ItemList)?.get_Presenter()?.BuildBreadcrumbs();
-				RecipeView = new RecipeDetailsView(listItem.Item.Id, breadCrumbs ?? new List<string>());
-				RecipeDetailsView recipeView2 = RecipeView;
-				recipeView2.OnBackButtonClick = (EventHandler<MouseEventArgs>)Delegate.Combine(recipeView2.OnBackButtonClick, (EventHandler<MouseEventArgs>)delegate
-				{
-					((Control)RecipeViewContainer).Hide();
-					((Control)DiscoveryOverviewContainer).Show();
-				});
-				((Control)DiscoveryOverviewContainer).Hide();
-				((Control)RecipeViewContainer).Show();
-				RecipeViewContainer.Show((IView)(object)RecipeView);
-			}
+				_recipeViewContainer.Show((IView)null);
+				_recipeView = null;
+				((Control)_recipeViewContainer).Hide();
+				((Control)_discoveryOverviewContainer).Show();
+				DirectoryUtil.get_CachePath();
+				((ServiceModule<ContentService>)(object)GameService.Content.get_DatAssetCache()).Unload();
+			});
+			((Control)_discoveryOverviewContainer).Hide();
+			((Control)_recipeViewContainer).Show();
+			_recipeViewContainer.Show((IView)(object)_recipeView);
 		}
 
 		private void BuildMenu(Container parent)
@@ -290,7 +300,34 @@ namespace MysticCrafting.Module.Discovery
 				ResizeMenu();
 			});
 			((Control)_raritiesPanel).add_Click((EventHandler<MouseEventArgs>)PanelOnClick);
-			_panels.Add(_raritiesPanel);
+			_menuPanels.Add(_raritiesPanel);
+		}
+
+		private void BuildWeightClassesPanel(Container parent)
+		{
+			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+			WeightClassesMenuPanel weightClassesPanel = _weightClassesPanel;
+			if (weightClassesPanel != null)
+			{
+				((Control)weightClassesPanel).Dispose();
+			}
+			WeightClassesMenuPanel weightClassesMenuPanel = new WeightClassesMenuPanel(ItemListModel);
+			((Panel)weightClassesMenuPanel).set_Title(MysticCrafting.Module.Strings.Discovery.WeightClassesPanelHeading);
+			((Panel)weightClassesMenuPanel).set_ShowBorder(true);
+			((Control)weightClassesMenuPanel).set_Size(new Point(((DesignStandard)(ref Panel.MenuStandard)).get_Size().X, 235));
+			((Control)weightClassesMenuPanel).set_Parent(parent);
+			((Panel)weightClassesMenuPanel).set_CanCollapse(true);
+			((Panel)weightClassesMenuPanel).set_Collapsed(true);
+			((Panel)weightClassesMenuPanel).set_CanScroll(true);
+			((FlowPanel)weightClassesMenuPanel).set_FlowDirection((ControlFlowDirection)1);
+			_weightClassesPanel = weightClassesMenuPanel;
+			((Control)_weightClassesPanel).add_Resized((EventHandler<ResizedEventArgs>)delegate
+			{
+				ResizeMenu();
+			});
+			((Control)_weightClassesPanel).add_Click((EventHandler<MouseEventArgs>)PanelOnClick);
+			_menuPanels.Add(_weightClassesPanel);
 		}
 
 		private void BuildSourcesPanel(Container parent)
@@ -312,12 +349,12 @@ namespace MysticCrafting.Module.Discovery
 				ResizeMenu();
 			});
 			((Control)_sourcesPanel).add_Click((EventHandler<MouseEventArgs>)PanelOnClick);
-			_panels.Add(_sourcesPanel);
+			_menuPanels.Add(_sourcesPanel);
 		}
 
 		private void PanelOnClick(object sender, MouseEventArgs e)
 		{
-			foreach (MenuPanel item in _panels.Where((MenuPanel p) => p != sender))
+			foreach (MenuPanel item in _menuPanels.Where((MenuPanel p) => p != sender))
 			{
 				((Panel)item).Collapse();
 			}
@@ -425,6 +462,50 @@ namespace MysticCrafting.Module.Discovery
 		{
 			_searchTimer.Stop();
 			_searchTimer.Start();
+		}
+
+		protected override void Unload()
+		{
+			_searchTimer?.Dispose();
+			TextBox searchBar = _searchBar;
+			if (searchBar != null)
+			{
+				((Control)searchBar).Dispose();
+			}
+			Panel menuPanel = _menuPanel;
+			if (menuPanel != null)
+			{
+				((Control)menuPanel).Dispose();
+			}
+			CategoryMenu menu = Menu;
+			if (menu != null)
+			{
+				((Control)menu).Dispose();
+			}
+			((IEnumerable<Control>)_menuPanels).SafeDispose();
+			FlowPanel leftSidePanel = _leftSidePanel;
+			if (leftSidePanel != null)
+			{
+				((Control)leftSidePanel).Dispose();
+			}
+			ViewContainer itemListContainer = ItemListContainer;
+			if (itemListContainer != null)
+			{
+				((Control)itemListContainer).Dispose();
+			}
+			ViewContainer recipeViewContainer = _recipeViewContainer;
+			if (recipeViewContainer != null)
+			{
+				((Control)recipeViewContainer).Dispose();
+			}
+			Panel discoveryOverviewContainer = _discoveryOverviewContainer;
+			if (discoveryOverviewContainer != null)
+			{
+				((Control)discoveryOverviewContainer).Dispose();
+			}
+			((View<IPresenter>)(object)_versionIndicatorView)?.DoUnload();
+			((View<IPresenter>)(object)_loadingStatusView)?.DoUnload();
+			base.Unload();
 		}
 	}
 }

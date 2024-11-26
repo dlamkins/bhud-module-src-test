@@ -1,4 +1,4 @@
-using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Blish_HUD.Controls;
@@ -13,9 +13,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Controls
 	{
 		public IList<IItemSource> ItemSources { get; set; }
 
-		public IList<ItemTab> Tabs { get; private set; }
-
-		public event EventHandler<CheckChangedEvent> Selected;
+		public IList<ItemTab> Tabs => ((IEnumerable)((Container)this).get_Children()).OfType<ItemTab>().ToList();
 
 		public ItemTabsContainer(Container parent)
 			: this()
@@ -29,28 +27,23 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Controls
 
 		public void Build(IList<IItemSource> itemSources, TreeNodeBase node)
 		{
-			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
 			ItemSources = itemSources;
 			int paddingLeft = 0;
-			DisposeTabs();
-			List<ItemTab> tabs = new List<ItemTab>();
 			foreach (IItemSource itemSource in itemSources)
 			{
 				ItemTab itemTab = new ItemTab(itemSource);
 				((Control)itemTab).set_Parent((Container)(object)this);
 				((Control)itemTab).set_Size(new Point(32, 32));
-				ItemTab tab = itemTab;
-				tab.Activated += Tab_ActiveChanged;
-				tabs.Add(tab);
+				itemTab.Activated += Tab_ActiveChanged;
 				paddingLeft += 35;
 			}
 			IngredientNode ingredientNode = node as IngredientNode;
 			if (ingredientNode != null && !ingredientNode.IsTopIngredient)
 			{
-				tabs.Add(BuildIgnoreTab());
+				BuildIgnoreTab();
 				paddingLeft += 35;
 			}
-			Tabs = tabs;
 			((Control)this).set_Width(paddingLeft);
 		}
 
@@ -78,22 +71,18 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Controls
 			}
 		}
 
-		public void Dispose()
+		protected override void DisposeControl()
 		{
-			DisposeTabs();
-			((Control)this).Dispose();
-		}
-
-		public void DisposeTabs()
-		{
-			if (Tabs == null)
+			Tooltip tooltip = ((Control)this).get_Tooltip();
+			if (tooltip != null)
 			{
-				return;
+				((Control)tooltip).Dispose();
 			}
 			foreach (ItemTab tab in Tabs)
 			{
-				((Control)tab).Dispose();
+				tab.Activated -= Tab_ActiveChanged;
 			}
+			((FlowPanel)this).DisposeControl();
 		}
 	}
 }

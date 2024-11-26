@@ -4,7 +4,6 @@ using Blish_HUD.Common.UI.Views;
 using Blish_HUD.Controls;
 using MysticCrafting.Module.Extensions;
 using MysticCrafting.Module.RecipeTree.TreeView.Controls;
-using MysticCrafting.Module.RecipeTree.TreeView.Presenters;
 using MysticCrafting.Module.RecipeTree.TreeView.Tooltips;
 using MysticCrafting.Module.Services;
 
@@ -95,8 +94,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 
 		protected override void BuildMenuStrip()
 		{
-			ContextMenuPresenter menuStripPresenter = new ContextMenuPresenter();
-			MenuStrip = menuStripPresenter.BuildMenuStrip(Item, this);
+			((Control)this).set_Menu(ServiceContainer.ContextMenuPresenter.BuildMenuStrip(Item, this));
 		}
 
 		public override bool UpdatePlayerUnitCount()
@@ -121,6 +119,12 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 			}
 			base.PlayerUnitCount = newPlayerCount;
 			return true;
+		}
+
+		protected override void DisposeControl()
+		{
+			Item = null;
+			base.DisposeControl();
 		}
 	}
 }

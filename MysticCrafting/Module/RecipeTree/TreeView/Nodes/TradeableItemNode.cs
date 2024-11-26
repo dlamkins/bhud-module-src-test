@@ -396,12 +396,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 			{
 				((Control)coinsControl).Dispose();
 			}
-			ContextMenuStrip menuStrip = MenuStrip;
-			if (menuStrip != null)
-			{
-				((Control)menuStrip).Dispose();
-			}
-			((Container)this).DisposeControl();
+			base.DisposeControl();
 		}
 	}
 }

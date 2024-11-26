@@ -38,7 +38,16 @@ namespace MysticCrafting.Module.Repositories
 
 		public void Dispose()
 		{
-			Connection.Dispose();
+			Dispose(disposing: true);
+			GC.SuppressFinalize(this);
+		}
+
+		protected virtual void Dispose(bool disposing)
+		{
+			if (disposing)
+			{
+				Connection?.Dispose();
+			}
 		}
 	}
 }

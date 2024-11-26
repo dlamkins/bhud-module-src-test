@@ -45,6 +45,10 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Extensions
 
 		public static void UpdatePrices(this TreeView treeView, IList<Item> items)
 		{
+			if (items == null || items.Count == 0)
+			{
+				return;
+			}
 			foreach (ItemIngredientNode node in from n in treeView.IngredientNodes.OfType<ItemIngredientNode>()
 				where items.Contains(n.Item)
 				select n)

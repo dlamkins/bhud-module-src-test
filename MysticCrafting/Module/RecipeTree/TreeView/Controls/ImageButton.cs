@@ -51,6 +51,16 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Controls
 			}
 		}
 
+		protected override void DisposeControl()
+		{
+			Tooltip tooltip = ((Control)this).get_Tooltip();
+			if (tooltip != null)
+			{
+				((Control)tooltip).Dispose();
+			}
+			((Control)this).DisposeControl();
+		}
+
 		public ImageButton()
 			: this()
 		{

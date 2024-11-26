@@ -12,8 +12,6 @@ namespace MysticCrafting.Module.Services
 {
 	public class TextureRepository : ITextureRepository, IDisposable
 	{
-		private readonly ConcurrentDictionary<string, AsyncTexture2D> _textures;
-
 		private readonly ConcurrentDictionary<string, AsyncTexture2D> _refTextures;
 
 		private readonly ContentsManager _contentsManager;
@@ -25,14 +23,8 @@ namespace MysticCrafting.Module.Services
 
 		public TextureRepository(ContentsManager contentsManager)
 		{
-			_textures = new ConcurrentDictionary<string, AsyncTexture2D>();
 			_refTextures = new ConcurrentDictionary<string, AsyncTexture2D>();
 			_contentsManager = contentsManager;
-		}
-
-		public void ClearTextures()
-		{
-			_textures.Clear();
 		}
 
 		public AsyncTexture2D GetTexture(string url)
@@ -41,17 +33,17 @@ namespace MysticCrafting.Module.Services
 			{
 				url = "https://render.guildwars2.com/file" + url;
 			}
-			AsyncTexture2D texture = _textures.FirstOrDefault((KeyValuePair<string, AsyncTexture2D> t) => t.Key.Equals(url)).Value;
-			if (texture != null)
+			return GameService.Content.GetRenderServiceTexture(url);
+		}
+
+		public AsyncTexture2D GetTexture(int id)
+		{
+			AsyncTexture2D texture = default(AsyncTexture2D);
+			if (GameService.Content.get_DatAssetCache().TryGetTextureFromAssetId(id, ref texture))
 			{
 				return texture;
 			}
-			texture = GameService.Content.GetRenderServiceTexture(url);
-			if (texture != null)
-			{
-				_textures.AddOrUpdate(url, texture, (string key, AsyncTexture2D value) => value = texture);
-			}
-			return texture;
+			return null;
 		}
 
 		public AsyncTexture2D GetRefTexture(string fileName)
@@ -118,15 +110,10 @@ namespace MysticCrafting.Module.Services
 
 		public void Dispose()
 		{
-			foreach (KeyValuePair<string, AsyncTexture2D> texture in _textures)
-			{
-				texture.Value.Dispose();
-			}
 			foreach (KeyValuePair<string, AsyncTexture2D> refTexture in _refTextures)
 			{
 				refTexture.Value.Dispose();
 			}
-			_textures.Clear();
 			_refTextures.Clear();
 		}
 	}

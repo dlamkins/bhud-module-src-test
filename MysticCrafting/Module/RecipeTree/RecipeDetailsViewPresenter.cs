@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
@@ -46,7 +47,7 @@ namespace MysticCrafting.Module.RecipeTree
 			if (base.get_View().Scrollbar != null && !float.IsNaN(TargetScrollDistance))
 			{
 				float distance = TargetScrollDistance / (float)(((Control)base.get_View().TreeView).get_Height() + 96 - ((Control)base.get_View().Scrollbar).get_Size().Y);
-				base.get_View().Scrollbar.set_ScrollDistance(distance);
+				base.get_View().Scrollbar.set_ScrollDistance(Math.Min(distance, 1f));
 			}
 		}
 	}

@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Blish_HUD.Modules.Managers;
+using MysticCrafting.Module.RecipeTree.TreeView.Presenters;
 using MysticCrafting.Module.Repositories;
 using MysticCrafting.Module.Repositories.Logging;
 using MysticCrafting.Module.Services.API;
@@ -28,6 +29,8 @@ namespace MysticCrafting.Module.Services
 
 		internal static IWizardsVaultRepository WizardsVaultRepository { get; set; }
 
+		internal static IAchievementRepository AchievementRepository { get; set; }
+
 		internal static ITextureRepository TextureRepository { get; set; }
 
 		internal static ITradingPostService TradingPostService { get; set; }
@@ -46,6 +49,8 @@ namespace MysticCrafting.Module.Services
 
 		internal static IApiServiceManager ApiServiceManager { get; set; }
 
+		internal static ContextMenuPresenter ContextMenuPresenter { get; set; }
+
 		internal static void Register(Gw2ApiManager apiManager, DirectoriesManager directoriesManager, ContentsManager contentsManager)
 		{
 			DataService = new DataService(directoriesManager);
@@ -57,6 +62,7 @@ namespace MysticCrafting.Module.Services
 			VendorRepository = new VendorRepository();
 			CurrencyRepository = new CurrencyRepository();
 			WizardsVaultRepository = new WizardsVaultRepository();
+			AchievementRepository = new AchievementRepository(ItemRepository);
 			FavoritesRepository = new LoggingFavoritesRepository(new FavoritesRepository(DataService));
 			DataService.RegisterRepository(FavoritesRepository);
 			ChoiceRepository = new LoggingChoiceRepository(new ChoiceRepository(DataService));
@@ -66,13 +72,14 @@ namespace MysticCrafting.Module.Services
 			PlayerItemService = new PlayerItemService(apiManager);
 			PlayerUnlocksService = new PlayerUnlocksService(apiManager);
 			PlayerAchievementsService = new PlayerAchievementsService(apiManager);
-			ItemSourceService = new ItemSourceService(TradingPostService, RecipeRepository, VendorRepository, ChoiceRepository, ItemRepository, WizardsVaultRepository);
+			ItemSourceService = new ItemSourceService(TradingPostService, RecipeRepository, VendorRepository, ChoiceRepository, ItemRepository, WizardsVaultRepository, AchievementRepository);
 			WalletService = new WalletService(apiManager, CurrencyRepository, PlayerItemService);
 			AudioService = new AudioService(contentsManager);
 			ApiServiceManager = new ApiServiceManager();
 			ApiServiceManager.RegisterService(PlayerItemService);
 			ApiServiceManager.RegisterService(PlayerUnlocksService);
 			ApiServiceManager.RegisterService(WalletService);
+			ContextMenuPresenter = new ContextMenuPresenter();
 		}
 
 		internal static async Task LoadAsync()
@@ -134,6 +141,7 @@ namespace MysticCrafting.Module.Services
 			PlayerUnlocksService = null;
 			ItemSourceService = null;
 			WalletService = null;
+			TextureRepository.Dispose();
 			AudioService = null;
 		}
 	}

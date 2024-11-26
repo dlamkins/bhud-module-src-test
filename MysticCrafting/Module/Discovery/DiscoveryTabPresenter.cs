@@ -35,6 +35,7 @@ namespace MysticCrafting.Module.Discovery
 					base.get_View().ItemListModel.Filter.DetailsType = menuItem.ItemFilter.DetailsType;
 					base.get_View().ItemListModel.Filter.Categories = menuItem.ItemFilter.Categories;
 					base.get_View().ItemListModel.Filter.IsFavorite = menuItem.ItemFilter.IsFavorite;
+					base.get_View().ItemListModel.Filter.Ids = menuItem.ItemFilter.Ids;
 					base.get_View().ItemListModel.Breadcrumbs = GetBreadcrumbs(menuItem);
 					base.get_View().ItemListModel.InvokeFilterChanged();
 				}

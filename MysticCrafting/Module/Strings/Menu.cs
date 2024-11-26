@@ -108,6 +108,8 @@ namespace MysticCrafting.Module.Strings
 
 		internal static string Monuments => ResourceManager.GetString("Monuments", resourceCulture);
 
+		internal static string New_Legendary => ResourceManager.GetString("New Legendary", resourceCulture);
+
 		internal static string Obstacles => ResourceManager.GetString("Obstacles", resourceCulture);
 
 		internal static string Other => ResourceManager.GetString("Other", resourceCulture);

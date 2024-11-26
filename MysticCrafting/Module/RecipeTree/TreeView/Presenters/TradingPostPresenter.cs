@@ -14,8 +14,6 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Presenters
 	{
 		private readonly IChoiceRepository _choiceRepository;
 
-		private TradingPostSource Source;
-
 		public event EventHandler<CheckChangedEvent> SelectChanged;
 
 		public TradingPostPresenter(IChoiceRepository choiceRepository)
@@ -25,7 +23,6 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Presenters
 
 		public void Build(Container parent, TradingPostSource source)
 		{
-			Source = source;
 			TradingPostNode obj = new TradingPostNode(source.Item.TradingPostBuy.GetValueOrDefault(), Recipe.TradingPostBuy, TradingPostOptions.Buy, parent)
 			{
 				PanelHeight = 40,

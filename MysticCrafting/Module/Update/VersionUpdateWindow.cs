@@ -141,7 +141,7 @@ namespace MysticCrafting.Module.Update
 			((Control)val2).set_Width(((Container)this).get_ContentRegion().Width);
 			((Control)val2).set_Height(82);
 			val2.set_TextColor(Colors.Chardonnay);
-			val2.set_Text("Items Update");
+			val2.set_Text("Legendary Spear");
 			val2.set_Font(GameService.Content.GetFont((FontFace)0, (FontSize)24, (FontStyle)0));
 			val2.set_StrokeText(true);
 			val2.set_VerticalAlignment((VerticalAlignment)1);

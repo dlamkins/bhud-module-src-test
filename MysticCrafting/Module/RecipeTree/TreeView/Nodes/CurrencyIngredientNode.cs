@@ -2,10 +2,10 @@ using System.Collections.Generic;
 using Atzie.MysticCrafting.Models.Currencies;
 using Blish_HUD.Common.UI.Views;
 using Blish_HUD.Controls;
+using Blish_HUD.Graphics.UI;
 using Microsoft.Xna.Framework;
 using MysticCrafting.Module.Extensions;
 using MysticCrafting.Module.RecipeTree.TreeView.Controls;
-using MysticCrafting.Module.RecipeTree.TreeView.Presenters;
 using MysticCrafting.Module.RecipeTree.TreeView.Tooltips;
 using MysticCrafting.Module.Services;
 
@@ -15,7 +15,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 	{
 		public CurrencyQuantity CurrencyQuantity { get; set; }
 
-		public new CoinsControl CoinsControl { get; set; }
+		public CoinsControl CurrencyCoinsControl { get; set; }
 
 		public CurrencyIngredientNode(CurrencyQuantity currencyQuantity, Container parent, int? index = null, bool loadingChildren = false)
 			: base(currencyQuantity.Currency.Id, (int)currencyQuantity.Count, parent, index, showUnitCount: true, loadingChildren)
@@ -50,7 +50,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 					UnitPrice = TotalUnitCount
 				};
 				((Control)obj).set_Location(new Point(70, 10));
-				CoinsControl = obj;
+				CurrencyCoinsControl = obj;
 			}
 			BuildItemTooltip();
 		}
@@ -82,8 +82,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 
 		protected override void BuildMenuStrip()
 		{
-			ContextMenuPresenter menuStripPresenter = new ContextMenuPresenter();
-			MenuStrip = menuStripPresenter.BuildMenuStrip(CurrencyQuantity.Currency, this);
+			((Control)this).set_Menu(ServiceContainer.ContextMenuPresenter.BuildMenuStrip(CurrencyQuantity.Currency, this));
 		}
 
 		public override bool UpdatePlayerUnitCount()
@@ -104,6 +103,26 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 		public bool IsCoin()
 		{
 			return CurrencyQuantity.Currency.Id == 1;
+		}
+
+		protected override void DisposeControl()
+		{
+			CoinsControl currencyCoinsControl = CurrencyCoinsControl;
+			if (currencyCoinsControl != null)
+			{
+				((Control)currencyCoinsControl).Dispose();
+			}
+			Tooltip playerCountTooltip = base.PlayerCountTooltip;
+			if (playerCountTooltip != null)
+			{
+				((Control)playerCountTooltip).Dispose();
+			}
+			ICountTooltipView playerCountTooltipView = base.PlayerCountTooltipView;
+			if (playerCountTooltipView != null)
+			{
+				((IView)playerCountTooltipView).DoUnload();
+			}
+			base.DisposeControl();
 		}
 	}
 }

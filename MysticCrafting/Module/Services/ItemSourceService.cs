@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Atzie.MysticCrafting.Models.Account;
 using Atzie.MysticCrafting.Models.Crafting;
 using Atzie.MysticCrafting.Models.Items;
 using Atzie.MysticCrafting.Models.Vendor;
@@ -19,19 +20,15 @@ namespace MysticCrafting.Module.Services
 
 		private readonly IVendorRepository _vendorRepository;
 
+		private readonly IAchievementRepository _achievementRepository;
+
 		private readonly IChoiceRepository _choiceRepository;
 
 		private readonly IItemRepository _itemRepository;
 
 		private readonly IWizardsVaultRepository _wizardsVaultRepository;
 
-		private Dictionary<int, List<int>> SwappableItems = new Dictionary<int, List<int>> { 
-		{
-			79410,
-			new List<int> { 24282, 19684, 19684, 19684, 19684 }
-		} };
-
-		public ItemSourceService(ITradingPostService tradingPostService, IRecipeRepository recipeRepository, IVendorRepository vendorRepository, IChoiceRepository choiceRepository, IItemRepository itemRepository, IWizardsVaultRepository wizardsVaultRepository)
+		public ItemSourceService(ITradingPostService tradingPostService, IRecipeRepository recipeRepository, IVendorRepository vendorRepository, IChoiceRepository choiceRepository, IItemRepository itemRepository, IWizardsVaultRepository wizardsVaultRepository, IAchievementRepository achievementRepository)
 		{
 			_tradingPostService = tradingPostService;
 			_recipeRepository = recipeRepository;
@@ -39,6 +36,7 @@ namespace MysticCrafting.Module.Services
 			_choiceRepository = choiceRepository;
 			_itemRepository = itemRepository;
 			_wizardsVaultRepository = wizardsVaultRepository;
+			_achievementRepository = achievementRepository;
 		}
 
 		public IEnumerable<IItemSource> GetItemSources(Item item)
@@ -61,6 +59,11 @@ namespace MysticCrafting.Module.Services
 					sources.Add(prices);
 				}
 			}
+			AchievementSource achievementSource = GetAchievementSource(item);
+			if (achievementSource != null)
+			{
+				sources.Add(achievementSource);
+			}
 			VendorSource vendorPrices = GetVendorSource(item);
 			if (vendorPrices != null)
 			{
@@ -72,30 +75,6 @@ namespace MysticCrafting.Module.Services
 				sources.AddRange(itemContainerSource);
 			}
 			return sources;
-		}
-
-		public IEnumerable<IItemSource> ConvertSourcesToSwap(IEnumerable<RecipeSource> sources, int itemId, int parentItemId)
-		{
-			if (itemId == 0 || parentItemId == 0 || !SwappableItems.Select((KeyValuePair<int, List<int>> s) => s.Key).Contains(parentItemId))
-			{
-				return sources;
-			}
-			List<Recipe> recipes = (from s in sources
-				where s != null
-				select s into r
-				select r.Recipe).ToList();
-			if (recipes == null || recipes.Count() <= 1)
-			{
-				return sources;
-			}
-			List<int> swapIds = SwappableItems[parentItemId];
-			new SwapItemSource($"swap_{itemId}")
-			{
-				DisplayName = "Swap",
-				Recipes = recipes,
-				SwappableItemIds = swapIds
-			};
-			return null;
 		}
 
 		private IEnumerable<RecipeSource> GetRecipeSources(Item item)
@@ -119,6 +98,25 @@ namespace MysticCrafting.Module.Services
 			{
 				Item = item,
 				DisplayName = "Trading Post"
+			};
+		}
+
+		private AchievementSource GetAchievementSource(Item item)
+		{
+			if (item == null)
+			{
+				return null;
+			}
+			Achievement achievement = _achievementRepository.GetAchievement(item.Id);
+			if (achievement == null)
+			{
+				return null;
+			}
+			return new AchievementSource("achievement_" + item.Id)
+			{
+				Item = item,
+				Achievement = achievement,
+				DisplayName = achievement.Name
 			};
 		}
 

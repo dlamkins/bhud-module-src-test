@@ -265,21 +265,23 @@ namespace MysticCrafting.Module
 		{
 			BuildCornerIcon();
 			Gw2ApiManager.add_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)Gw2ApiManager_SubtokenUpdated);
-			GameService.Overlay.add_UserLocaleChanged((EventHandler<ValueEventArgs<CultureInfo>>)async delegate
-			{
-				bool visible = ((Control)_mainWindow).get_Visible();
-				StandardWindow mainWindow = _mainWindow;
-				if (mainWindow != null)
-				{
-					((Control)mainWindow).Dispose();
-				}
-				_mainWindow = BuildWindow();
-				if (visible)
-				{
-					ToggleWindow();
-				}
-			});
+			GameService.Overlay.add_UserLocaleChanged((EventHandler<ValueEventArgs<CultureInfo>>)OverlayOnUserLocaleChanged);
 			((Module)this).OnModuleLoaded(e);
+		}
+
+		private void OverlayOnUserLocaleChanged(object sender, ValueEventArgs<CultureInfo> e)
+		{
+			bool visible = ((Control)_mainWindow).get_Visible();
+			StandardWindow mainWindow = _mainWindow;
+			if (mainWindow != null)
+			{
+				((Control)mainWindow).Dispose();
+			}
+			_mainWindow = BuildWindow();
+			if (visible)
+			{
+				ToggleWindow();
+			}
 		}
 
 		protected override void Update(GameTime gameTime)
@@ -301,6 +303,8 @@ namespace MysticCrafting.Module
 				((Control)mainWindow).Dispose();
 			}
 			ServiceContainer.Dispose();
+			Gw2ApiManager.remove_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)Gw2ApiManager_SubtokenUpdated);
+			GameService.Overlay.remove_UserLocaleChanged((EventHandler<ValueEventArgs<CultureInfo>>)OverlayOnUserLocaleChanged);
 			ServiceCollection = null;
 		}
 	}

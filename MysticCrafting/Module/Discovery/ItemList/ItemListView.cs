@@ -36,13 +36,9 @@ namespace MysticCrafting.Module.Discovery.ItemList
 
 		public ViewContainer Container { get; set; }
 
-		public ViewContainer ParentContainer { get; set; }
-
 		public FlowPanel ResultsPanel { get; set; }
 
 		public ItemListModel Model { get; set; }
-
-		public ContextMenuStrip SettingsMenu { get; set; }
 
 		public bool NoResults
 		{

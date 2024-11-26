@@ -118,6 +118,8 @@ namespace MysticCrafting.Module.Models
 
 		public AsyncTexture2D TitleBanner = AsyncTexture2D.FromAssetId(2468319);
 
+		public AsyncTexture2D Achievement = AsyncTexture2D.FromAssetId(156709);
+
 		public AsyncTexture2D HiddenAchievement = AsyncTexture2D.FromAssetId(1999808);
 	}
 }

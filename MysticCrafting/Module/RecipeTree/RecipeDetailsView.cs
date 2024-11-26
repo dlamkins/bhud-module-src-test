@@ -27,7 +27,7 @@ namespace MysticCrafting.Module.RecipeTree
 	{
 		public EventHandler<MouseEventArgs> OnBackButtonClick;
 
-		public Scrollbar _scrollBar;
+		private Scrollbar _scrollBar;
 
 		private IIngredientNodePresenter _ingredientNodePresenter;
 
@@ -41,7 +41,7 @@ namespace MysticCrafting.Module.RecipeTree
 
 		public Item Item { get; set; }
 
-		public FlowPanel FlowPanel { get; set; }
+		public FlowPanel TreeViewFlowPanel { get; set; }
 
 		public Container BuildPanel { get; set; }
 
@@ -50,8 +50,6 @@ namespace MysticCrafting.Module.RecipeTree
 		public bool RecipeDetailsLoaded { get; set; }
 
 		public Panel RecipeDetailsPanel { get; set; }
-
-		public ViewContainer LoadingViewContainer { get; set; }
 
 		public MysticCrafting.Module.RecipeTree.TreeView.TreeView TreeView { get; set; }
 
@@ -125,7 +123,14 @@ namespace MysticCrafting.Module.RecipeTree
 				{
 					((Control)obj).Dispose();
 				}
-				BuildRecipeDetails();
+				if (Item != null)
+				{
+					BuildRecipeDetails();
+				}
+				else
+				{
+					Logger.Error($"Could not retrieve item with ID: {ItemId}");
+				}
 			});
 		}
 
@@ -183,10 +188,10 @@ namespace MysticCrafting.Module.RecipeTree
 			((Control)val).set_Size(new Point(767, 745));
 			((Control)val).set_Location(new Point(150, 50));
 			((Control)val).set_Opacity(0.15f);
-			FlowPanel flowPanel = FlowPanel;
-			if (flowPanel != null)
+			FlowPanel treeViewFlowPanel = TreeViewFlowPanel;
+			if (treeViewFlowPanel != null)
 			{
-				((Control)flowPanel).Dispose();
+				((Control)treeViewFlowPanel).Dispose();
 			}
 			FlowPanel val2 = new FlowPanel();
 			((Control)val2).set_Parent(parent);
@@ -196,7 +201,7 @@ namespace MysticCrafting.Module.RecipeTree
 			((Control)val2).set_Location(new Point(0, 0));
 			((Panel)val2).set_CanScroll(true);
 			((Panel)val2).set_ShowBorder(true);
-			FlowPanel = val2;
+			TreeViewFlowPanel = val2;
 			Container container = BuildItemDetails();
 			Panel headerPanel = BuildHeaderPanel(((Control)container).get_Width());
 			MysticCrafting.Module.RecipeTree.TreeView.TreeView treeView = TreeView;
@@ -205,7 +210,7 @@ namespace MysticCrafting.Module.RecipeTree
 				((Control)treeView).Dispose();
 			}
 			MysticCrafting.Module.RecipeTree.TreeView.TreeView treeView2 = new MysticCrafting.Module.RecipeTree.TreeView.TreeView();
-			((Control)treeView2).set_Parent((Container)(object)FlowPanel);
+			((Control)treeView2).set_Parent((Container)(object)TreeViewFlowPanel);
 			((Container)treeView2).set_HeightSizingMode((SizingMode)1);
 			((Control)treeView2).set_Size(new Point(BuildPanel.get_ContentRegion().Width, 640 - ((Control)headerPanel).get_Height()));
 			TreeView = treeView2;
@@ -251,46 +256,46 @@ namespace MysticCrafting.Module.RecipeTree
 			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fe: Expected O, but got Unknown
-			//IL_0174: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0179: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0180: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0190: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0191: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00df: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0105: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0110: Expected O, but got Unknown
+			//IL_0186: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0192: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ed: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01fe: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0205: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0216: Unknown result type (might be due to invalid IL or missing references)
-			//IL_021e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01cd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0209: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0210: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0217: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0228: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0230: Unknown result type (might be due to invalid IL or missing references)
 			Panel val = new Panel();
-			((Control)val).set_Parent((Container)(object)FlowPanel);
+			((Control)val).set_Parent((Container)(object)TreeViewFlowPanel);
 			val.set_ShowBorder(false);
 			val.set_ShowTint(false);
 			((Control)val).set_Size(new Point(1241, 80));
@@ -299,10 +304,13 @@ namespace MysticCrafting.Module.RecipeTree
 			((Control)val2).set_Size(new Point(1241, 154));
 			((Control)val2).set_Location(new Point(0, -25));
 			((Control)val2).set_Parent((Container)(object)container);
-			Image val3 = new Image(AsyncTexture2D.FromAssetId(Item.IconId));
-			((Control)val3).set_Parent((Container)(object)container);
-			((Control)val3).set_Size(new Point(80, 80));
-			((Control)val3).set_Location(new Point(35, 0));
+			if (AsyncTexture2D.FromAssetId(Item.IconId) != null)
+			{
+				Image val3 = new Image(AsyncTexture2D.FromAssetId(Item.IconId));
+				((Control)val3).set_Parent((Container)(object)container);
+				((Control)val3).set_Size(new Point(80, 80));
+				((Control)val3).set_Location(new Point(35, 0));
+			}
 			Label val4 = new Label();
 			((Control)val4).set_Parent((Container)(object)container);
 			val4.set_Font(GameService.Content.get_DefaultFont32());
@@ -376,7 +384,7 @@ namespace MysticCrafting.Module.RecipeTree
 			//IL_010f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_011d: Unknown result type (might be due to invalid IL or missing references)
 			Panel val = new Panel();
-			((Control)val).set_Parent((Container)(object)FlowPanel);
+			((Control)val).set_Parent((Container)(object)TreeViewFlowPanel);
 			val.set_ShowBorder(false);
 			val.set_ShowTint(false);
 			val.set_BackgroundTexture(AsyncTexture2D.FromAssetId(1032325));
@@ -408,7 +416,33 @@ namespace MysticCrafting.Module.RecipeTree
 		protected override void Unload()
 		{
 			_pricingUpdateTimer?.Dispose();
-			((Control)TreeView).Dispose();
+			MysticCrafting.Module.RecipeTree.TreeView.TreeView treeView = TreeView;
+			if (treeView != null)
+			{
+				((Control)treeView).Dispose();
+			}
+			FlowPanel treeViewFlowPanel = TreeViewFlowPanel;
+			if (treeViewFlowPanel != null)
+			{
+				((Control)treeViewFlowPanel).Dispose();
+			}
+			Panel recipeDetailsPanel = RecipeDetailsPanel;
+			if (recipeDetailsPanel != null)
+			{
+				((Control)recipeDetailsPanel).Dispose();
+			}
+			PanelHeaderButton headerButton = HeaderButton;
+			if (headerButton != null)
+			{
+				((Control)headerButton).Dispose();
+			}
+			Scrollbar scrollBar = _scrollBar;
+			if (scrollBar != null)
+			{
+				((Control)scrollBar).Dispose();
+			}
+			OnBackButtonClick = null;
+			Item = null;
 			base.Unload();
 		}
 	}

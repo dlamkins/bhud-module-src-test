@@ -131,5 +131,16 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(0, 0, lineSize, base.PanelRectangle.Height + lineSize * 4), lineColor);
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(base.PanelRectangle.Width - lineSize, 0, lineSize, base.PanelCollapsedHeight), lineColor);
 		}
+
+		protected override void DisposeControl()
+		{
+			Checkbox checkbox = Checkbox;
+			if (checkbox != null)
+			{
+				((Control)checkbox).Dispose();
+			}
+			this.OnSelected = null;
+			base.DisposeControl();
+		}
 	}
 }

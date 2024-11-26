@@ -95,6 +95,8 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Controls
 			{
 				((Control)tooltip).Dispose();
 			}
+			MaxValueChanged = null;
+			this.AfterTextChanged = null;
 			((TextInputBase)this).DisposeControl();
 		}
 	}

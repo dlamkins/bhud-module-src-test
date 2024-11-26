@@ -47,5 +47,15 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 			((Control)val).set_Height(20);
 			Checkbox = val;
 		}
+
+		protected override void DisposeControl()
+		{
+			Checkbox checkbox = Checkbox;
+			if (checkbox != null)
+			{
+				((Control)checkbox).Dispose();
+			}
+			base.DisposeControl();
+		}
 	}
 }

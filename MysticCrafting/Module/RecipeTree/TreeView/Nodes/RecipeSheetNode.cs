@@ -122,6 +122,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 			{
 				((Control)recipeLockedIcon).Dispose();
 			}
+			Recipe = null;
 			base.DisposeControl();
 		}
 	}

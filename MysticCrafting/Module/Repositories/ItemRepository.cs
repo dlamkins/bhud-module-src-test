@@ -15,14 +15,18 @@ namespace MysticCrafting.Module.Repositories
 	{
 		private SQLiteConnection Connection { get; set; }
 
+		private ISqliteDbService Service { get; set; }
+
 		public void Initialize(ISqliteDbService service)
 		{
+			Service = service;
 			Connection = new SQLiteConnection(service.DatabaseFilePath);
 		}
 
 		public Item GetItem(int itemId)
 		{
-			return ReadOperations.FindWithChildren<Item>(Connection, (object)itemId, true);
+			using SQLiteConnection connection = new SQLiteConnection(Service.DatabaseFilePath);
+			return ReadOperations.FindWithChildren<Item>(connection, (object)itemId, true);
 		}
 
 		public IList<int> GetItemIds()
@@ -41,7 +45,15 @@ namespace MysticCrafting.Module.Repositories
 			{
 				IList<int> favoriteIds = ServiceContainer.FavoritesRepository.GetAll();
 				query = query + "Item.Id IN (" + string.Join(",", favoriteIds.Select((int id) => "?")) + ") AND ";
-				foreach (int id2 in favoriteIds)
+				foreach (int id3 in favoriteIds)
+				{
+					parameters.Add(id3);
+				}
+			}
+			if (filter.Ids != null && filter.Ids.Any())
+			{
+				query = query + "Item.Id IN (" + string.Join(",", filter.Ids.Select((int id) => "?")) + ") AND ";
+				foreach (int id2 in filter.Ids)
 				{
 					parameters.Add(id2);
 				}
@@ -80,10 +92,13 @@ namespace MysticCrafting.Module.Repositories
 					parameters.Add((int)rarity);
 				}
 			}
-			if (filter.Weight != 0 && !filter.WeightFilterDisabled)
+			if (filter.WeightClasses != null && filter.WeightClasses.Any())
 			{
-				query += "ArmorWeight = ? AND ";
-				parameters.Add((int)filter.Weight);
+				query = query + "ArmorWeight IN (" + string.Join(",", filter.WeightClasses.Select((WeightClass id) => " ? ")) + ") AND ";
+				foreach (WeightClass weightClass in filter.WeightClasses)
+				{
+					parameters.Add((int)weightClass);
+				}
 			}
 			if ((filter.Disciplines != null && filter.Disciplines.Any()) || filter.IsTradeable || filter.SoldByVendor || filter.HasMysticForgeRecipe)
 			{
@@ -119,12 +134,22 @@ namespace MysticCrafting.Module.Repositories
 			query = query.Remove(query.LastIndexOf("AND "));
 			query += "GROUP BY Item.Id ";
 			query += "limit 300";
-			return Connection.Query<Item>(query, parameters.ToArray());
+			using SQLiteConnection connection = new SQLiteConnection(Service.DatabaseFilePath);
+			return connection.Query<Item>(query, parameters.ToArray());
 		}
 
 		public void Dispose()
 		{
-			Connection?.Dispose();
+			Dispose(disposing: true);
+			GC.SuppressFinalize(this);
+		}
+
+		protected virtual void Dispose(bool disposing)
+		{
+			if (disposing)
+			{
+				Connection?.Dispose();
+			}
 		}
 	}
 }

@@ -38,7 +38,9 @@
   <data name="ItemCountBoxTooltipText"><value>Limited by item type</value></data>
   <data name="TableHeaderName"><value>Name</value></data>
   <data name="RecipeSourceOther"><value>Other</value></data>
+  <data name="AchievingItemsLabel"><value>Rewarded by</value></data>
   <data name="RecipeSourceRecipeSheet"><value>Recipe sheet</value></data>
+  <data name="ContainedInItem"><value>Contained in</value></data>
   <data name="Vendor"><value>Vendor</value></data>
   <data name="TradingPost"><value>Trading Post</value></data>
   <data name="ItemSourceWarning"><value>The module does not currently support the methods to acquire this item. Right click on this item to easily open the wiki.</value></data>
@@ -54,6 +56,7 @@
   <data name="RecipeRequiredLevel"><value>Required Level</value></data>
   <data name="ContextMenuUpdateTradingPost"><value>Update Trading Post options</value></data>
   <data name="VendorsMore"><value>{0} more</value></data>
+  <data name="AchievementUnlockedBy"><value>Unlocked by</value></data>
   <data name="BuyingItemsLabel"><value>Bought for</value></data>
   <data name="Account"><value>Account</value></data>
   <data name="OpenFrenchWiki"><value>Open French Wiki</value></data>
@@ -63,7 +66,7 @@
   <data name="WalletQuantityReserved"><value>{0} reserved for other purchases</value></data>
   <data name="SellerItemCostsLabel"><value>Sold for</value></data>
   <data name="WalletQuantityReservedShort"><value>{0} reserved</value></data>
-  <data name="RandomItemChance"><value>Random chance to get item from container</value></data>
+  <data name="RandomItemChance"><value>Random chance from</value></data>
   <data name="TableHeaderCount"><value>Count</value></data>
   <data name="TableHeaderPrice"><value>Price</value></data>
   <data name="CopyName"><value>Copy Name</value></data>
@@ -71,7 +74,7 @@
   <data name="CopyChatLink"><value>Copy Chat Link</value></data>
   <data name="ContextMenuBuyAll"><value>Buy all</value></data>
   <data name="Requirement"><value>Requirement</value></data>
-  <data name="ChoiceOfItem"><value>Item is one of the choices from container</value></data>
+  <data name="ChoiceOfItem"><value>Chosen from</value></data>
   <data name="RecipeSheetLabel"><value>Learned from</value></data>
   <data name="TradingPostBuy"><value>Buy</value></data>
   <data name="RecipeSource"><value>Source</value></data>

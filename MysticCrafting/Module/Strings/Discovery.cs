@@ -80,6 +80,20 @@ namespace MysticCrafting.Module.Strings
 
 		internal static string TableHeaderWeight => ResourceManager.GetString("TableHeaderWeight", resourceCulture);
 
+		internal static string WeightClassesPanelAllOptions => ResourceManager.GetString("WeightClassesPanelAllOptions", resourceCulture);
+
+		internal static string WeightClassesPanelClothing => ResourceManager.GetString("WeightClassesPanelClothing", resourceCulture);
+
+		internal static string WeightClassesPanelHeading => ResourceManager.GetString("WeightClassesPanelHeading", resourceCulture);
+
+		internal static string WeightClassesPanelHeavy => ResourceManager.GetString("WeightClassesPanelHeavy", resourceCulture);
+
+		internal static string WeightClassesPanelLight => ResourceManager.GetString("WeightClassesPanelLight", resourceCulture);
+
+		internal static string WeightClassesPanelMedium => ResourceManager.GetString("WeightClassesPanelMedium", resourceCulture);
+
+		internal static string WeightClassesPanelUnknown => ResourceManager.GetString("WeightClassesPanelUnknown", resourceCulture);
+
 		internal Discovery()
 		{
 		}

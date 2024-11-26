@@ -149,7 +149,9 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Tooltips
 		{
 			_controls?.SafeDispose();
 			_controls?.Clear();
+			_controls = null;
 			BuildPanel = null;
+			Group = null;
 			((View<IPresenter>)this).Unload();
 		}
 	}

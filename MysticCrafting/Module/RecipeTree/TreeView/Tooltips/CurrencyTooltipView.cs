@@ -254,10 +254,6 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Tooltips
 
 		protected override void Unload()
 		{
-			foreach (Control control in _controls)
-			{
-				control.Dispose();
-			}
 			_controls?.Clear();
 			Quantity = null;
 			((View<IPresenter>)this).Unload();

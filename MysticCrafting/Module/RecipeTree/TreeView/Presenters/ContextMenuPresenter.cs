@@ -80,9 +80,12 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Presenters
 			{
 				menuStrip.AddMenuItem(wikiItem);
 			}
-			menuStrip.AddMenuItem(BuildGw2Bltc(item.Id));
-			menuStrip.AddMenuItem(BuildCopyText(item.LocalizedName(), Recipe.CopyName));
-			menuStrip.AddMenuItem(BuildCopyText(item.ChatLink, Recipe.CopyChatLink));
+			int itemId = item.Id;
+			string itemLocalizedName = item.LocalizedName();
+			string itemChatLink = item.ChatLink;
+			menuStrip.AddMenuItem(BuildGw2Bltc(itemId));
+			menuStrip.AddMenuItem(BuildCopyText(itemLocalizedName, Recipe.CopyName));
+			menuStrip.AddMenuItem(BuildCopyText(itemChatLink, Recipe.CopyChatLink));
 			menuStrip.AddMenuItem(BuildTradingPostItem(node));
 			return menuStrip;
 		}
@@ -127,31 +130,55 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Presenters
 
 		public ContextMenuStripItem BuildTradingPostItem(IngredientNode node)
 		{
-			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0013: Expected O, but got Unknown
-			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001e: Expected O, but got Unknown
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0043: Expected O, but got Unknown
-			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006f: Expected O, but got Unknown
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Expected O, but got Unknown
+			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0011: Expected O, but got Unknown
+			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0036: Expected O, but got Unknown
+			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0062: Expected O, but got Unknown
 			ContextMenuStrip Submenu = new ContextMenuStrip();
 			ContextMenuStripItem buyAll = new ContextMenuStripItem(Recipe.ContextMenuBuyAll);
-			((Control)buyAll).add_Click((EventHandler<MouseEventArgs>)delegate
-			{
-				node.UpdateTradingPostOptions(TradingPostOptions.Buy);
-			});
+			((Control)buyAll).add_Click((EventHandler<MouseEventArgs>)BuyAllOnClick);
 			Submenu.AddMenuItem(buyAll);
 			ContextMenuStripItem sellAll = new ContextMenuStripItem(Recipe.ContextMenuSellAll);
-			((Control)sellAll).add_Click((EventHandler<MouseEventArgs>)delegate
-			{
-				node.UpdateTradingPostOptions(TradingPostOptions.Sell);
-			});
+			((Control)sellAll).add_Click((EventHandler<MouseEventArgs>)SellAllOnClick);
 			Submenu.AddMenuItem(sellAll);
 			ContextMenuStripItem val = new ContextMenuStripItem(Recipe.ContextMenuUpdateTradingPost);
 			val.set_Submenu(Submenu);
 			return val;
+		}
+
+		private void BuyAllOnClick(object sender, MouseEventArgs e)
+		{
+			ContextMenuStripItem item = (ContextMenuStripItem)((sender is ContextMenuStripItem) ? sender : null);
+			if (item != null)
+			{
+				GetNodeFromStrip(item)?.UpdateTradingPostOptions(TradingPostOptions.Buy);
+			}
+		}
+
+		private void SellAllOnClick(object sender, MouseEventArgs e)
+		{
+			ContextMenuStripItem item = (ContextMenuStripItem)((sender is ContextMenuStripItem) ? sender : null);
+			if (item != null)
+			{
+				GetNodeFromStrip(item)?.UpdateTradingPostOptions(TradingPostOptions.Sell);
+			}
+		}
+
+		private IngredientNode GetNodeFromStrip(ContextMenuStripItem item)
+		{
+			IngredientNode node = null;
+			Container parent = ((Control)item).get_Parent();
+			ContextMenuStrip strip = (ContextMenuStrip)(object)((parent is ContextMenuStrip) ? parent : null);
+			if (strip != null)
+			{
+				node = TreeViewContextHelper.Context.CurrentTreeView.IngredientNodes.FirstOrDefault((IngredientNode n) => ((Control)n).get_Menu() == strip) ?? TreeViewContextHelper.Context.CurrentTreeView.IngredientNodes.FirstOrDefault((IngredientNode n) => ((Container)((Control)n).get_Menu()).GetChildrenOfType<ContextMenuStripItem>().Any((ContextMenuStripItem i) => i.get_Submenu() == strip));
+			}
+			return node;
 		}
 
 		public ContextMenuStripItem BuildSearchWikiItem(string name, Locale locale = 0)

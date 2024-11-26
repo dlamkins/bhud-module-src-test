@@ -22,8 +22,8 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Controls
 
 		protected override void DisposeControl()
 		{
-			RemoveFromCollection();
 			((Tooltip)this).DisposeControl();
+			RemoveFromCollection();
 		}
 	}
 }

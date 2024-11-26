@@ -12,7 +12,6 @@ using MysticCrafting.Models.Vendor;
 using MysticCrafting.Module.Extensions;
 using MysticCrafting.Module.RecipeTree.TreeView.Controls;
 using MysticCrafting.Module.RecipeTree.TreeView.Extensions;
-using MysticCrafting.Module.RecipeTree.TreeView.Presenters;
 using MysticCrafting.Module.RecipeTree.TreeView.Tooltips;
 using MysticCrafting.Module.Services;
 using MysticCrafting.Module.Strings;
@@ -21,15 +20,17 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 {
 	public class VendorNode : SelectableTradeableItemNode
 	{
-		private Image Icon;
-
-		private Label NameLabel;
-
-		public VendorSellsItemGroup VendorGroup { get; }
+		public VendorSellsItemGroup VendorGroup { get; set; }
 
 		public VendorPriceContainer PriceContainer { get; set; }
 
 		private Label QuantityLabel { get; set; }
+
+		private Image Icon { get; set; }
+
+		private Label NameLabel { get; set; }
+
+		private DisposableTooltip GeneralTooltip { get; set; }
 
 		public override string PathName => VendorGroup.VendorSellsItems.FirstOrDefault().FullName;
 
@@ -82,24 +83,24 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
 			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ab: Expected O, but got Unknown
-			//IL_014e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0153: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0161: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0172: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0193: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0194: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a3: Expected O, but got Unknown
-			//IL_01ba: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0200: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0205: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0162: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0169: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0170: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0181: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b2: Expected O, but got Unknown
+			//IL_01c9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ea: Unknown result type (might be due to invalid IL or missing references)
 			//IL_020f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0214: Unknown result type (might be due to invalid IL or missing references)
 			//IL_021e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022d: Unknown result type (might be due to invalid IL or missing references)
 			AsyncTexture2D iconTexture = ServiceContainer.TextureRepository.GetVendorIconTexture(VendorGroup.VendorItem.Vendor.IconFile);
 			if (iconTexture != null)
 			{
@@ -118,9 +119,9 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 			val2.set_StrokeText(true);
 			val2.set_AutoSizeWidth(true);
 			NameLabel = val2;
-			DisposableTooltip tooltip = new DisposableTooltip((ITooltipView)(object)new VendorGroupTooltipView(VendorGroup));
-			((Control)Icon).set_Tooltip((Tooltip)(object)tooltip);
-			((Control)NameLabel).set_Tooltip((Tooltip)(object)tooltip);
+			GeneralTooltip = new DisposableTooltip((ITooltipView)(object)new VendorGroupTooltipView(VendorGroup));
+			((Control)Icon).set_Tooltip((Tooltip)(object)GeneralTooltip);
+			((Control)NameLabel).set_Tooltip((Tooltip)(object)GeneralTooltip);
 			PriceContainer = new VendorPriceContainer((Container)(object)this)
 			{
 				Costs = VendorGroup.ItemCosts
@@ -160,8 +161,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 
 		private void BuildMenuStrip()
 		{
-			ContextMenuPresenter menuStripPresenter = new ContextMenuPresenter();
-			MenuStrip = menuStripPresenter.BuildMenuStrip(VendorGroup);
+			((Control)this).set_Menu(ServiceContainer.ContextMenuPresenter.BuildMenuStrip(VendorGroup));
 		}
 
 		private string GetVendorTitle(int truncate = 0)
@@ -196,10 +196,13 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 
 		protected override void OnChildRemoved(ChildChangedEventArgs e)
 		{
-			IngredientNode node = e.get_ChangedChild() as IngredientNode;
-			if (node != null)
+			if (base.TreeView != null)
 			{
-				base.TreeView.RemoveNode(node);
+				IngredientNode node = e.get_ChangedChild() as IngredientNode;
+				if (node != null)
+				{
+					base.TreeView.RemoveNode(node);
+				}
 			}
 			((Container)this).OnChildRemoved(e);
 			e.get_ChangedChild().Dispose();
@@ -215,6 +218,37 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 				((Control)PriceContainer).set_Location(new Point(((Control)this).get_Width() - ((Control)PriceContainer).get_Width() - ((Control)QuantityLabel).get_Width() - 15, 10));
 				((Control)QuantityLabel).set_Location(new Point(((Control)PriceContainer).get_Right() + 8, 8));
 			}
+		}
+
+		protected override void DisposeControl()
+		{
+			VendorPriceContainer priceContainer = PriceContainer;
+			if (priceContainer != null)
+			{
+				((Control)priceContainer).Dispose();
+			}
+			Label quantityLabel = QuantityLabel;
+			if (quantityLabel != null)
+			{
+				((Control)quantityLabel).Dispose();
+			}
+			Image icon = Icon;
+			if (icon != null)
+			{
+				((Control)icon).Dispose();
+			}
+			Label nameLabel = NameLabel;
+			if (nameLabel != null)
+			{
+				((Control)nameLabel).Dispose();
+			}
+			DisposableTooltip generalTooltip = GeneralTooltip;
+			if (generalTooltip != null)
+			{
+				((Control)generalTooltip).Dispose();
+			}
+			VendorGroup = null;
+			base.DisposeControl();
 		}
 	}
 }

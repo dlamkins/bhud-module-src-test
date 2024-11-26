@@ -151,7 +151,8 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Controls
 			{
 				((Control)tooltip).Dispose();
 			}
-			((Control)this).DisposeControl();
+			this.Activated = null;
+			base.DisposeControl();
 		}
 	}
 }

@@ -27,8 +27,6 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 
 		private string _fullPath;
 
-		internal ContextMenuStrip MenuStrip;
-
 		public TreeView TreeView { get; protected set; }
 
 		public int NodeIndex { get; set; }
@@ -285,19 +283,6 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 			}
 		}
 
-		protected override void OnRightMouseButtonReleased(MouseEventArgs e)
-		{
-			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-			if (MouseOverItemDetails)
-			{
-				ContextMenuStrip menuStrip = MenuStrip;
-				if (menuStrip != null)
-				{
-					menuStrip.Show(e.get_MousePosition());
-				}
-			}
-		}
-
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
 			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
@@ -363,6 +348,24 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(PanelRectangle.X, PanelCollapsedHeight - lineSize, PanelRectangle.Width, lineSize), lineColor);
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(0, 0, lineSize, PanelRectangle.Height + lineSize * 2), lineColor);
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(PanelRectangle.Width - lineSize, 0, lineSize, PanelCollapsedHeight), lineColor);
+		}
+
+		protected override void DisposeControl()
+		{
+			SlideAnimation = null;
+			TreeView = null;
+			this.OnPanelClick = null;
+			Tooltip tooltip = ((Control)this).get_Tooltip();
+			if (tooltip != null)
+			{
+				((Control)tooltip).Dispose();
+			}
+			ContextMenuStrip menu = ((Control)this).get_Menu();
+			if (menu != null)
+			{
+				((Control)menu).Dispose();
+			}
+			((Container)this).DisposeControl();
 		}
 	}
 }

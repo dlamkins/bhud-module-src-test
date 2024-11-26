@@ -792,10 +792,13 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 
 		protected override void OnChildRemoved(ChildChangedEventArgs e)
 		{
-			IngredientNode node = e.get_ChangedChild() as IngredientNode;
-			if (node != null)
+			if (base.TreeView != null)
 			{
-				base.TreeView.RemoveNode(node);
+				IngredientNode node = e.get_ChangedChild() as IngredientNode;
+				if (node != null)
+				{
+					base.TreeView.RemoveNode(node);
+				}
 			}
 			((Container)this).OnChildRemoved(e);
 			e.get_ChangedChild().Dispose();
@@ -828,6 +831,11 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 			{
 				((Control)icon).Dispose();
 			}
+			Image iconBackground = IconBackground;
+			if (iconBackground != null)
+			{
+				((Control)iconBackground).Dispose();
+			}
 			Image iconChain = IconChain;
 			if (iconChain != null)
 			{
@@ -848,16 +856,17 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 			{
 				((Control)loadingSpinner).Dispose();
 			}
+			NumberBox unitCountNumberBox = UnitCountNumberBox;
+			if (unitCountNumberBox != null)
+			{
+				((Control)unitCountNumberBox).Dispose();
+			}
 			Label unitCountLabel = UnitCountLabel;
 			if (unitCountLabel != null)
 			{
 				((Control)unitCountLabel).Dispose();
 			}
-			ContextMenuStrip menuStrip = MenuStrip;
-			if (menuStrip != null)
-			{
-				((Control)menuStrip).Dispose();
-			}
+			UnitCountNumberTooltipView = null;
 			CraftingDisciplinesControl requirementsControl = RequirementsControl;
 			if (requirementsControl != null)
 			{
@@ -868,11 +877,13 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 			{
 				((IView)playerCountTooltipView).DoUnload();
 			}
+			PlayerCountTooltipView = null;
 			Tooltip playerCountTooltip = PlayerCountTooltip;
 			if (playerCountTooltip != null)
 			{
 				((Control)playerCountTooltip).Dispose();
 			}
+			((Control)this).set_EffectBehind((ControlEffect)null);
 			base.DisposeControl();
 		}
 	}

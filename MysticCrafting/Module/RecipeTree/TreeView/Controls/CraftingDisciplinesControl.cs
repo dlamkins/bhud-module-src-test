@@ -51,5 +51,15 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Controls
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(Icon), new Rectangle(textWidth, 0, IconSize.X, IconSize.Y), Color.get_LightYellow());
 			}
 		}
+
+		protected override void DisposeControl()
+		{
+			Tooltip tooltip = ((Control)this).get_Tooltip();
+			if (tooltip != null)
+			{
+				((Control)tooltip).Dispose();
+			}
+			((Control)this).DisposeControl();
+		}
 	}
 }

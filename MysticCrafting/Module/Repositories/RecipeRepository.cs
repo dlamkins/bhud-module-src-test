@@ -28,7 +28,6 @@ namespace MysticCrafting.Module.Repositories
 
 		public void Dispose()
 		{
-			Connection.Dispose();
 		}
 	}
 }
