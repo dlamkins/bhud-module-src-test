@@ -10,5 +10,7 @@ namespace MysticCrafting.Module.RecipeTree
 		void SaveScrollDistance();
 
 		void UpdateScrollDistance();
+
+		void InitializeScrollbar();
 	}
 }

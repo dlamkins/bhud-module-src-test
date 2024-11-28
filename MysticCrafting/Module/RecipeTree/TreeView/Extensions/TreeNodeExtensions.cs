@@ -26,6 +26,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Extensions
 			foreach (TreeNodeBase node in nodes)
 			{
 				node.NodeIndex = index;
+				(node as IngredientNode)?.UpdateRelatedNodes();
 				index++;
 				(from t in ((IEnumerable)((Container)node).get_Children()).OfType<TreeNodeBase>()
 					where ((Control)t).get_Visible()
@@ -74,7 +75,10 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Extensions
 							throw new ArgumentOutOfRangeException();
 						}
 						node.Item.TradingPostLastUpdated = ServiceContainer.TradingPostService.LastLoaded;
-						node.TradingPostPrice = tpNode.UnitPrice;
+						if (tpNode.Selected)
+						{
+							node.TradingPostPrice = tpNode.UnitPrice;
+						}
 					}
 				}
 			}

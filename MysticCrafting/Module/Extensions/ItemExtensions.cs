@@ -37,7 +37,7 @@ namespace MysticCrafting.Module.Extensions
 			}
 			if (item.Type == ItemType.Weapon)
 			{
-				if (item.Id == 30691)
+				if (item.Id == 30691 || item.Id == 103815)
 				{
 					return 4;
 				}

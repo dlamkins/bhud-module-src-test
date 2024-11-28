@@ -7,6 +7,8 @@ namespace MysticCrafting.Module.Models
 	{
 		public MysticVaultContainer Container { get; set; }
 
+		public MysticItemContainer ItemContainer { get; set; }
+
 		public Item ContainerItem { get; set; }
 
 		public ItemContainerSource(string uniqueId)

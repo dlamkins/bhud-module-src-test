@@ -9,6 +9,15 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Extensions
 {
 	public static class IngredientNodeExtensions
 	{
+		public class ReservationGroup
+		{
+			public int NodeIndex { get; set; }
+
+			public int Count { get; set; }
+
+			public int Group { get; set; }
+		}
+
 		public static IEnumerable<IngredientNode> GetParents(this IngredientNode node)
 		{
 			List<IngredientNode> parents = new List<IngredientNode>();
@@ -57,6 +66,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Extensions
 			List<IngredientNode> relatedNodes = node.TreeView.IngredientNodes.GetByItemId(node.Id).ToList();
 			int nodeCount = relatedNodes.Count;
 			int reservedQuantity = 0;
+			List<ReservationGroup> reservations = new List<ReservationGroup>();
 			foreach (IngredientNode relatedNode in relatedNodes)
 			{
 				if (nodeCount == 1)
@@ -64,15 +74,26 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Extensions
 					relatedNode.Unlink();
 					continue;
 				}
-				relatedNode.Link(reservedQuantity);
+				int groupedReservedQuantity = 0;
+				int groupId = relatedNode.ReservedGroup.GetValueOrDefault();
+				groupedReservedQuantity = reservations.Where((ReservationGroup r) => r.Group == 0 || r.Group != groupId).Sum((ReservationGroup r) => r.Count);
+				relatedNode.Link(groupedReservedQuantity);
+				int reservationCount = 0;
 				if (!relatedNode.IsSharedItem && relatedNode.Active)
 				{
-					ITradeableItemNode tradeableNode = relatedNode.ParentNode as ITradeableItemNode;
-					if (tradeableNode != null)
+					ITradeableItemNode parentNode = relatedNode.ParentNode as ITradeableItemNode;
+					if (parentNode != null)
 					{
-						reservedQuantity += relatedNode.UnitCount * tradeableNode.OrderUnitCount;
+						reservationCount = relatedNode.UnitCount * parentNode.OrderUnitCount;
 					}
 				}
+				reservations.Add(new ReservationGroup
+				{
+					Count = reservationCount,
+					NodeIndex = relatedNode.NodeIndex,
+					Group = groupId
+				});
+				reservedQuantity += reservationCount;
 			}
 			foreach (IngredientNode item in relatedNodes)
 			{

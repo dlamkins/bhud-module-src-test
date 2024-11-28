@@ -1,15 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Atzie.MysticCrafting.Models.Items;
 using MysticCrafting.Module.Services;
 
 namespace MysticCrafting.Module.Repositories
 {
-	public class ItemContainerRepository : IItemContainerRepository, IRepository
+	public class ItemContainerRepository : IItemContainerRepository
 	{
-		private readonly IDataService _dataService;
-
 		private IList<MysticItemContainer> ItemContainers { get; set; }
 
 		public bool LocalOnly => false;
@@ -20,19 +17,26 @@ namespace MysticCrafting.Module.Repositories
 
 		public ItemContainerRepository(IDataService dataService)
 		{
-			_dataService = dataService;
-		}
-
-		public async Task<string> LoadAsync()
-		{
-			ItemContainers = (await _dataService.LoadFromFileAsync<List<MysticItemContainer>>(FileName)) ?? new List<MysticItemContainer>();
-			Loaded = true;
-			return $"{ItemContainers.Count} item containers loaded";
+			ItemContainers = new List<MysticItemContainer>
+			{
+				new MysticItemContainer
+				{
+					ItemId = 123456699,
+					ContainedItemId = 102929,
+					Name = "Map completion of Lowland Shore"
+				},
+				new MysticItemContainer
+				{
+					ItemId = 123456698,
+					ContainedItemId = 102958,
+					Name = "Map completion of Janthir Syntri"
+				}
+			};
 		}
 
 		public IList<MysticItemContainer> GetItemContainers(int itemId)
 		{
-			return ItemContainers.Where((MysticItemContainer v) => v.ContainedItemId == itemId).ToList();
+			return ItemContainers?.Where((MysticItemContainer v) => v.ContainedItemId == itemId)?.ToList();
 		}
 	}
 }

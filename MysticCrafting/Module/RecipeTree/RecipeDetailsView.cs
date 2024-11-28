@@ -219,6 +219,7 @@ namespace MysticCrafting.Module.RecipeTree
 			{
 				base.get_Presenter().UpdateScrollDistance();
 			};
+			base.get_Presenter().InitializeScrollbar();
 			try
 			{
 				_ingredientNodePresenter.BuildItemNode(Item, (Container)(object)TreeView, expandable: false, isPrimaryNode: true);

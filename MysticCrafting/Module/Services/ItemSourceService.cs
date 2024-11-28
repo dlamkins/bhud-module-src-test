@@ -8,19 +8,14 @@ using MysticCrafting.Models.Vendor;
 using MysticCrafting.Module.Extensions;
 using MysticCrafting.Module.Models;
 using MysticCrafting.Module.Repositories;
-using MysticCrafting.Module.Services.API;
 
 namespace MysticCrafting.Module.Services
 {
 	public class ItemSourceService : IItemSourceService
 	{
-		private readonly ITradingPostService _tradingPostService;
-
-		private readonly IRecipeRepository _recipeRepository;
-
-		private readonly IVendorRepository _vendorRepository;
-
 		private readonly IAchievementRepository _achievementRepository;
+
+		private readonly IItemContainerRepository _itemContainerRepository;
 
 		private readonly IChoiceRepository _choiceRepository;
 
@@ -28,15 +23,13 @@ namespace MysticCrafting.Module.Services
 
 		private readonly IWizardsVaultRepository _wizardsVaultRepository;
 
-		public ItemSourceService(ITradingPostService tradingPostService, IRecipeRepository recipeRepository, IVendorRepository vendorRepository, IChoiceRepository choiceRepository, IItemRepository itemRepository, IWizardsVaultRepository wizardsVaultRepository, IAchievementRepository achievementRepository)
+		public ItemSourceService(IChoiceRepository choiceRepository, IItemRepository itemRepository, IWizardsVaultRepository wizardsVaultRepository, IAchievementRepository achievementRepository, IItemContainerRepository itemContainerRepository)
 		{
-			_tradingPostService = tradingPostService;
-			_recipeRepository = recipeRepository;
-			_vendorRepository = vendorRepository;
 			_choiceRepository = choiceRepository;
 			_itemRepository = itemRepository;
 			_wizardsVaultRepository = wizardsVaultRepository;
 			_achievementRepository = achievementRepository;
+			_itemContainerRepository = itemContainerRepository;
 		}
 
 		public IEnumerable<IItemSource> GetItemSources(Item item)
@@ -128,11 +121,19 @@ namespace MysticCrafting.Module.Services
 				return null;
 			}
 			List<ItemContainerSource> sources = new List<ItemContainerSource>();
-			foreach (MysticVaultContainer container in containers)
+			foreach (MysticVaultContainer container2 in containers)
+			{
+				sources.Add(new ItemContainerSource($"item_container_{container2.ItemId}")
+				{
+					Container = container2,
+					ContainerItem = _itemRepository.GetItem(container2.ItemId)
+				});
+			}
+			foreach (MysticItemContainer container in _itemContainerRepository.GetItemContainers(itemId))
 			{
 				sources.Add(new ItemContainerSource($"item_container_{container.ItemId}")
 				{
-					Container = container,
+					ItemContainer = container,
 					ContainerItem = _itemRepository.GetItem(container.ItemId)
 				});
 			}

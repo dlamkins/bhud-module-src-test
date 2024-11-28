@@ -186,7 +186,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 			if (node != null)
 			{
 				node.Active = Active;
-				if (base.TreeView.IngredientNodes != null && node.Active && node.Id != 1)
+				if (base.TreeView.IngredientNodes != null && node.Id != 1)
 				{
 					base.TreeView.IngredientNodes.Add(node);
 					node.UpdateRelatedNodes();

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using MysticCrafting.Module.Services;
@@ -30,6 +31,27 @@ namespace MysticCrafting.Module.RecipeTree
 				ServiceContainer.WalletService
 			};
 			base.get_View().LoadRecipeDetails();
+		}
+
+		public void InitializeScrollbar()
+		{
+			if (base.get_View().Scrollbar == null)
+			{
+				return;
+			}
+			((Control)base.get_View().Scrollbar).add_PropertyChanged((PropertyChangedEventHandler)delegate(object sender, PropertyChangedEventArgs args)
+			{
+				//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+				if (args.PropertyName == "ScrollDistance")
+				{
+					float num = TargetScrollDistance / (float)(((Control)base.get_View().TreeView).get_Height() + 96 - ((Control)base.get_View().Scrollbar).get_Size().Y);
+					if (base.get_View().Scrollbar.get_ScrollDistance() == 0f && num > 0.99f)
+					{
+						base.get_View().Scrollbar.set_ScrollDistance(0.99f);
+						SaveScrollDistance();
+					}
+				}
+			});
 		}
 
 		public void SaveScrollDistance()

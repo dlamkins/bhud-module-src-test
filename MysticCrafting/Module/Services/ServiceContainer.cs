@@ -31,6 +31,8 @@ namespace MysticCrafting.Module.Services
 
 		internal static IAchievementRepository AchievementRepository { get; set; }
 
+		internal static IItemContainerRepository ItemContainerRepository { get; set; }
+
 		internal static ITextureRepository TextureRepository { get; set; }
 
 		internal static ITradingPostService TradingPostService { get; set; }
@@ -63,6 +65,7 @@ namespace MysticCrafting.Module.Services
 			CurrencyRepository = new CurrencyRepository();
 			WizardsVaultRepository = new WizardsVaultRepository();
 			AchievementRepository = new AchievementRepository(ItemRepository);
+			ItemContainerRepository = new ItemContainerRepository(DataService);
 			FavoritesRepository = new LoggingFavoritesRepository(new FavoritesRepository(DataService));
 			DataService.RegisterRepository(FavoritesRepository);
 			ChoiceRepository = new LoggingChoiceRepository(new ChoiceRepository(DataService));
@@ -72,7 +75,7 @@ namespace MysticCrafting.Module.Services
 			PlayerItemService = new PlayerItemService(apiManager);
 			PlayerUnlocksService = new PlayerUnlocksService(apiManager);
 			PlayerAchievementsService = new PlayerAchievementsService(apiManager);
-			ItemSourceService = new ItemSourceService(TradingPostService, RecipeRepository, VendorRepository, ChoiceRepository, ItemRepository, WizardsVaultRepository, AchievementRepository);
+			ItemSourceService = new ItemSourceService(ChoiceRepository, ItemRepository, WizardsVaultRepository, AchievementRepository, ItemContainerRepository);
 			WalletService = new WalletService(apiManager, CurrencyRepository, PlayerItemService);
 			AudioService = new AudioService(contentsManager);
 			ApiServiceManager = new ApiServiceManager();

@@ -157,6 +157,26 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Presenters
 			return node;
 		}
 
+		public ItemContainerNode BuildItemContainerNode(MysticItemContainer container, Container parent, bool loadingChildren = false, bool expandable = false)
+		{
+			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+			((Control)new LabelNode(MysticCrafting.Module.Strings.Recipe.AchievingItemsLabel, parent)
+			{
+				TextColor = Color.get_White()
+			}).set_Width(((Control)parent).get_Width() - 25);
+			ItemContainerNode itemContainerNode = new ItemContainerNode(container, parent, null, loadingChildren);
+			((Control)itemContainerNode).set_Width(((Control)parent).get_Width() - 25);
+			itemContainerNode.PanelHeight = 40;
+			((Control)itemContainerNode).set_Height(40);
+			itemContainerNode.PanelExtensionHeight = 0;
+			itemContainerNode.Build(parent);
+			itemContainerNode.OnPanelClick += delegate
+			{
+				_recipeDetailsPresenter.SaveScrollDistance();
+			};
+			return itemContainerNode;
+		}
+
 		public ItemIngredientNode BuildItemNode(Ingredient ingredient, Container parent, bool loadingChildren = false, bool expandable = false)
 		{
 			if (ingredient.Item == null)
@@ -327,11 +347,15 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Presenters
 						((Control)labelNode3).set_Width(300);
 						labelNode3.TextColor = Color.get_White();
 					}
+					if (containerSource.ContainerItem != null)
+					{
+						BuildItemNode(containerSource.ContainerItem, parent, expandable: true);
+					}
 				}
 			}
-			if (containerSource.ContainerItem != null)
+			if (containerSource.ItemContainer != null)
 			{
-				BuildItemNode(containerSource.ContainerItem, parent, expandable: true);
+				BuildItemContainerNode(containerSource.ItemContainer, parent);
 			}
 		}
 

@@ -1,4 +1,12 @@
-﻿#1.5.0 Legendary Spear update
+﻿#1.5.1 Bug fixes
+- New legendary spear limit changed from 2 to 4
+- Gift of Consensed Might recipe has been fixed
+- Icons for new vendors have been added
+- Fixed issue with scroll jumping back to the top
+- Add map completion options for new legendary gifts
+- Fixed issue with price calculation with vendor selection
+
+#1.5.0 Legendary Spear update
 - New items have been added from the latest update (Legendary spear)
 - Legendary Weapon Starter Kit has been updated to #6
 - New filter has been added for armor weight classes

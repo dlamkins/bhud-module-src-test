@@ -261,6 +261,23 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 			}
 		}
 
+		public int? ReservedGroup
+		{
+			get
+			{
+				VendorNode vendorNode = ((Control)this).get_Parent() as VendorNode;
+				if (vendorNode != null)
+				{
+					TreeNodeBase node = ((Control)vendorNode).get_Parent() as TreeNodeBase;
+					if (node != null)
+					{
+						return node.NodeIndex;
+					}
+				}
+				return (((Control)this).get_Parent() as IngredientNode)?.ReservedGroup;
+			}
+		}
+
 		public int PlayerUnitCount
 		{
 			get
@@ -783,7 +800,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 		{
 			base.OnChildAdded(e);
 			IngredientNode node = e.get_ChangedChild() as IngredientNode;
-			if (node != null && base.TreeView.IngredientNodes != null)
+			if (node != null && base.TreeView.IngredientNodes != null && node.Id != 1)
 			{
 				base.TreeView.IngredientNodes.Add(node);
 				node.UpdateRelatedNodes();
@@ -798,6 +815,17 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Nodes
 				if (node != null)
 				{
 					base.TreeView.RemoveNode(node);
+				}
+			}
+			if (base.TreeView != null)
+			{
+				VendorNode vendorNode = e.get_ChangedChild() as VendorNode;
+				if (vendorNode != null)
+				{
+					foreach (IngredientNode child in vendorNode.ChildNodes.OfType<IngredientNode>())
+					{
+						base.TreeView.RemoveNode(child);
+					}
 				}
 			}
 			((Container)this).OnChildRemoved(e);
