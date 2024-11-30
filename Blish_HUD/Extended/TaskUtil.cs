@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Gw2Sharp.WebApi.Exceptions;
+using Newtonsoft.Json;
 
 namespace Blish_HUD.Extended
 {
@@ -30,26 +31,40 @@ namespace Blish_HUD.Extended
 				return result;
 			}
 			Exception e = (Exception)obj;
-			if (e is NotFoundException || e is BadRequestException || e is AuthorizationRequiredException)
+			if ((e is NotFoundException || e is BadRequestException || e is AuthorizationRequiredException || e is ServiceUnavailableException) ? true : false)
 			{
 				logger.Trace(e, e.Message);
 				return default(T);
 			}
 			if (retries > 0)
 			{
-				logger.Warn(e, $"Failed to request data. Retrying in {delayMs / 1000} second(s) (remaining retries: {retries}).");
+				logger.Info(e, $"Failed to request data. Retrying in {delayMs / 1000} second(s) (remaining retries: {retries}).");
 				await Task.Delay(delayMs);
 				return await RetryAsync(func, retries - 1, delayMs, logger);
 			}
 			if (!(e is TooManyRequestsException))
 			{
-				if (e is RequestException || e is RequestException<string>)
+				if (!(e is RequestException) && !(e is RequestException<string>))
 				{
-					logger.Trace(e, e.Message);
+					if (!(e is JsonReaderException))
+					{
+						if (e is JsonException)
+						{
+							logger.Trace(e, e.Message);
+						}
+						else
+						{
+							logger.Error(e, e.Message);
+						}
+					}
+					else
+					{
+						logger.Trace(e, e.Message);
+					}
 				}
 				else
 				{
-					logger.Error(e, e.Message);
+					logger.Trace(e, e.Message);
 				}
 			}
 			else

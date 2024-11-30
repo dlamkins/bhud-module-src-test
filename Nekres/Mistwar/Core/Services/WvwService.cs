@@ -1,12 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Extended;
+using Blish_HUD.Gw2WebApi;
 using Blish_HUD.Modules;
+using Flurl;
+using Flurl.Http;
 using Gw2Sharp.WebApi.V2;
 using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
@@ -77,15 +82,15 @@ namespace Nekres.Mistwar.Core.Services
 			_prevApiRequestTime = DateTime.UtcNow;
 			RefreshMessage = "Refreshing";
 			CurrentGuild = await GetRepresentedGuild();
-			int worldId = await GetWorldId();
-			if (worldId >= 0)
+			int teamId = await GetTeamId();
+			if (teamId >= 0)
 			{
 				int[] wvWMapIds = GetWvWMapIds();
 				List<Task> taskList = new List<Task>();
 				int[] array = wvWMapIds;
 				foreach (int id in array)
 				{
-					Task<Task> t = new Task<Task>(() => UpdateObjectives(worldId, id));
+					Task<Task> t = new Task<Task>(() => UpdateObjectives(teamId, id));
 					taskList.Add(t);
 					t.Start();
 				}
@@ -104,11 +109,7 @@ namespace Nekres.Mistwar.Core.Services
 
 		public async Task<Guid> GetRepresentedGuild()
 		{
-			if (!MistwarModule.ModuleInstance.Gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)(object)new TokenPermission[2]
-			{
-				(TokenPermission)1,
-				(TokenPermission)3
-			}))
+			if (!MistwarModule.ModuleInstance.Gw2ApiManager.IsAuthorized(false, (TokenPermission)3))
 			{
 				return Guid.Empty;
 			}
@@ -143,12 +144,44 @@ namespace Nekres.Mistwar.Core.Services
 
 		public async Task<int> GetWorldId()
 		{
-			if (!MistwarModule.ModuleInstance.Gw2ApiManager.HasPermission((TokenPermission)1))
+			if (!MistwarModule.ModuleInstance.Gw2ApiManager.IsAuthorized(false))
 			{
 				return -1;
 			}
+			((IEndpointClient)MistwarModule.ModuleInstance.Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()).get_BaseUrl();
 			Account obj = await TaskUtil.TryAsync(() => ((IBlobClient<Account>)(object)MistwarModule.ModuleInstance.Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()).GetAsync(default(CancellationToken)));
 			return (obj != null) ? obj.get_World() : (-1);
+		}
+
+		public async Task<int> GetTeamId()
+		{
+			if (!MistwarModule.ModuleInstance.Gw2ApiManager.IsAuthorized(false))
+			{
+				return -1;
+			}
+			Url requestUrl = StringExtensions.SetQueryParams("https://api.guildwars2.com/v2/account", (object)new
+			{
+				v = "2024-07-20T01:00:00.000Z",
+				access_token = GetSubToken()
+			}, (NullValueHandling)1);
+			string json = await TaskUtil.TryAsync(() => GeneratedExtensions.GetStringAsync(requestUrl, default(CancellationToken), (HttpCompletionOption)0));
+			try
+			{
+				JsonElement val = JsonDocument.Parse(json, default(JsonDocumentOptions)).get_RootElement();
+				val = ((JsonElement)(ref val)).GetProperty("wvw");
+				val = ((JsonElement)(ref val)).GetProperty("team_id");
+				return ((JsonElement)(ref val)).GetInt32();
+			}
+			catch (Exception)
+			{
+				return -1;
+			}
+		}
+
+		public string GetSubToken()
+		{
+			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+			return ((ManagedConnection)MistwarModule.ModuleInstance.Gw2ApiManager.GetPrivateField("_connection").GetValue(MistwarModule.ModuleInstance.Gw2ApiManager)).get_Connection().get_AccessToken();
 		}
 
 		public int[] GetWvWMapIds()
@@ -161,18 +194,18 @@ namespace Nekres.Mistwar.Core.Services
 			return await _wvwObjectiveCache.GetItem(mapId);
 		}
 
-		private async Task UpdateObjectives(int worldId, int mapId)
+		private async Task UpdateObjectives(int teamId, int mapId)
 		{
 			List<WvwObjectiveEntity> objEntities = await GetObjectives(mapId);
 			WvwMatch match = await TaskUtil.TryAsync(() => ((IBlobClient<WvwMatch>)(object)MistwarModule.ModuleInstance.Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Wvw()
 				.get_Matches()
-				.World(worldId)).GetAsync(default(CancellationToken)));
+				.World(teamId)).GetAsync(default(CancellationToken)));
 			if (match == null)
 			{
 				return;
 			}
 			_teams = match.get_AllWorlds();
-			CurrentTeam = (WvwOwner)(_teams.get_Blue().Contains(worldId) ? 3 : (_teams.get_Red().Contains(worldId) ? 2 : (_teams.get_Green().Contains(worldId) ? 4 : 0)));
+			CurrentTeam = (WvwOwner)(_teams.get_Blue().Contains(teamId) ? 3 : (_teams.get_Red().Contains(teamId) ? 2 : (_teams.get_Green().Contains(teamId) ? 4 : 0)));
 			WvwMatchMap obj2 = match.get_Maps().FirstOrDefault((WvwMatchMap x) => x.get_Id() == mapId);
 			IReadOnlyList<WvwMatchMapObjective> objectives = ((obj2 != null) ? obj2.get_Objectives() : null);
 			if (objectives.IsNullOrEmpty())

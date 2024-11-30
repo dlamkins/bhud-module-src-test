@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Threading;
 using Blish_HUD.Extended.WinApi;
 
 namespace Blish_HUD.Extended
@@ -53,6 +54,8 @@ namespace Blish_HUD.Extended
 
 		private const uint WM_CHAR = 258u;
 
+		private const uint WM_PASTE = 770u;
+
 		private const uint MAPVK_VK_TO_VSC = 0u;
 
 		private const uint MAPVK_VSC_TO_VK = 1u;
@@ -77,7 +80,7 @@ namespace Blish_HUD.Extended
 
 		private const uint VK_SHIFT = 16u;
 
-		private static List<int> ExtendedKeys = new List<int>
+		private static List<int> _extendedKeys = new List<int>
 		{
 			45, 36, 34, 46, 35, 33, 165, 161, 163, 38,
 			40, 37, 39, 144, 42
@@ -89,170 +92,175 @@ namespace Blish_HUD.Extended
 		[DllImport("user32.dll")]
 		private static extern uint MapVirtualKey(uint uCode, uint uMapType);
 
-		[DllImport("user32.dll")]
+		[DllImport("user32.dll", SetLastError = true)]
 		private static extern uint SendInput(uint nInputs, [In][MarshalAs(UnmanagedType.LPArray)] Input[] pInputs, int cbSize);
 
-		[DllImport("user32.dll", CharSet = CharSet.Auto)]
+		[DllImport("kernel32.dll")]
+		private static extern uint GetLastError();
+
+		[DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+		private static extern bool SendMessage(IntPtr hWnd, uint msg, uint wParam, int lParam);
+
+		[DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
 		private static extern bool PostMessage(IntPtr hWnd, uint msg, uint wParam, int lParam);
 
-		public static void Press(int keyCode, bool sendToSystem = false)
+		public static bool Press(int keyCode, bool sendToSystem = true)
 		{
-			if (!GameService.GameIntegration.get_Gw2Instance().get_Gw2IsRunning() || sendToSystem)
+			return EmulateInput(keyCode, pressed: true, sendToSystem);
+		}
+
+		public static bool Release(int keyCode, bool sendToSystem = true)
+		{
+			return EmulateInput(keyCode, pressed: false, sendToSystem);
+		}
+
+		private static bool EmulateInput(int keyCode, bool pressed, bool sendToSystem = false)
+		{
+			DateTime waitTil = DateTime.UtcNow.AddMilliseconds(500.0);
+			while (DateTime.UtcNow < waitTil)
 			{
-				Input input;
-				InputUnion u;
-				KeybdInput ki;
-				Input[] nInputs;
-				if (ExtendedKeys.Contains(keyCode))
+				if (sendToSystem)
 				{
-					Input[] array = new Input[2];
-					input = new Input
+					if (SendInput(keyCode, pressed))
 					{
-						type = InputType.KEYBOARD
-					};
-					u = default(InputUnion);
-					ki = new KeybdInput
-					{
-						wScan = 224,
-						wVk = 0,
-						dwFlags = (KeyEventF)0u
-					};
-					u.ki = ki;
-					input.U = u;
-					array[0] = input;
-					input = new Input
-					{
-						type = InputType.KEYBOARD
-					};
-					u = default(InputUnion);
-					ki = new KeybdInput
-					{
-						wScan = (short)MapVirtualKey((uint)keyCode, 0u),
-						wVk = (short)keyCode,
-						dwFlags = KeyEventF.EXTENDEDKEY
-					};
-					u.ki = ki;
-					input.U = u;
-					array[1] = input;
-					nInputs = array;
+						return true;
+					}
 				}
-				else
+				else if (PostMessage(keyCode, pressed))
 				{
-					Input[] array2 = new Input[1];
-					input = new Input
-					{
-						type = InputType.KEYBOARD
-					};
-					u = default(InputUnion);
-					ki = new KeybdInput
-					{
-						wScan = (short)MapVirtualKey((uint)keyCode, 0u),
-						wVk = (short)keyCode
-					};
-					u.ki = ki;
-					input.U = u;
-					array2[0] = input;
-					nInputs = array2;
+					return true;
 				}
-				SendInput((uint)nInputs.Length, nInputs, Input.Size);
+			}
+			return false;
+		}
+
+		private static bool PostMessage(int keyCode, bool pressed)
+		{
+			ExtraKeyInfo lParam = new ExtraKeyInfo
+			{
+				scanCode = (char)MapVirtualKey((uint)keyCode, 0u)
+			};
+			if (_extendedKeys.Contains(keyCode))
+			{
+				lParam.extendedKey = 1;
+			}
+			uint msg = 256u;
+			if (!pressed)
+			{
+				msg = 257u;
+				lParam.repeatCount = 1;
+				lParam.prevKeyState = 1;
+				lParam.transitionState = 1;
+			}
+			return PostMessage(GameService.GameIntegration.get_Gw2Instance().get_Gw2WindowHandle(), msg, (uint)keyCode, lParam.GetInt());
+		}
+
+		private static bool SendInput(int keyCode, bool pressed)
+		{
+			KeyEventF dwFlags = ((!pressed) ? KeyEventF.KEYUP : ((KeyEventF)0u));
+			Input input;
+			InputUnion u;
+			KeybdInput ki;
+			Input[] nInputs;
+			if (_extendedKeys.Contains(keyCode))
+			{
+				Input[] array = new Input[2];
+				input = new Input
+				{
+					type = InputType.KEYBOARD
+				};
+				u = default(InputUnion);
+				ki = new KeybdInput
+				{
+					wScan = 224,
+					wVk = 0,
+					dwFlags = (KeyEventF)0u
+				};
+				u.ki = ki;
+				input.U = u;
+				array[0] = input;
+				input = new Input
+				{
+					type = InputType.KEYBOARD
+				};
+				u = default(InputUnion);
+				ki = new KeybdInput
+				{
+					wScan = (short)MapVirtualKey((uint)keyCode, 0u),
+					wVk = (short)keyCode,
+					dwFlags = (KeyEventF.EXTENDEDKEY | dwFlags)
+				};
+				u.ki = ki;
+				input.U = u;
+				array[1] = input;
+				nInputs = array;
 			}
 			else
 			{
-				ExtraKeyInfo lParam = new ExtraKeyInfo
+				Input[] array2 = new Input[1];
+				input = new Input
 				{
-					scanCode = (char)MapVirtualKey((uint)keyCode, 0u)
+					type = InputType.KEYBOARD
 				};
-				if (ExtendedKeys.Contains(keyCode))
+				u = default(InputUnion);
+				ki = new KeybdInput
 				{
-					lParam.extendedKey = 1;
-				}
-				PostMessage(GameService.GameIntegration.get_Gw2Instance().get_Gw2WindowHandle(), 256u, (uint)keyCode, lParam.GetInt());
+					wScan = (short)MapVirtualKey((uint)keyCode, 0u),
+					wVk = (short)keyCode,
+					dwFlags = dwFlags
+				};
+				u.ki = ki;
+				input.U = u;
+				array2[0] = input;
+				nInputs = array2;
 			}
+			return SendInput((uint)nInputs.Length, nInputs, Input.Size) != 0;
 		}
 
-		public static void Release(int keyCode, bool sendToSystem = false)
+		public static bool Paste(bool sendToSystem = true)
 		{
-			if (!GameService.GameIntegration.get_Gw2Instance().get_Gw2IsRunning() || sendToSystem)
+			if (!Press(162, sendToSystem))
 			{
-				Input input;
-				InputUnion u;
-				KeybdInput ki;
-				Input[] nInputs;
-				if (ExtendedKeys.Contains(keyCode))
-				{
-					Input[] array = new Input[2];
-					input = new Input
-					{
-						type = InputType.KEYBOARD
-					};
-					u = default(InputUnion);
-					ki = new KeybdInput
-					{
-						wScan = 224,
-						wVk = 0,
-						dwFlags = (KeyEventF)0u
-					};
-					u.ki = ki;
-					input.U = u;
-					array[0] = input;
-					input = new Input
-					{
-						type = InputType.KEYBOARD
-					};
-					u = default(InputUnion);
-					ki = new KeybdInput
-					{
-						wScan = (short)MapVirtualKey((uint)keyCode, 0u),
-						wVk = (short)keyCode,
-						dwFlags = (KeyEventF.EXTENDEDKEY | KeyEventF.KEYUP)
-					};
-					u.ki = ki;
-					input.U = u;
-					array[1] = input;
-					nInputs = array;
-				}
-				else
-				{
-					Input[] array2 = new Input[1];
-					input = new Input
-					{
-						type = InputType.KEYBOARD
-					};
-					u = default(InputUnion);
-					ki = new KeybdInput
-					{
-						wScan = (short)MapVirtualKey((uint)keyCode, 0u),
-						wVk = (short)keyCode,
-						dwFlags = KeyEventF.KEYUP
-					};
-					u.ki = ki;
-					input.U = u;
-					array2[0] = input;
-					nInputs = array2;
-				}
-				SendInput((uint)nInputs.Length, nInputs, Input.Size);
+				return false;
 			}
-			else
+			if (!Stroke(86, sendToSystem))
 			{
-				ExtraKeyInfo lParam = new ExtraKeyInfo
-				{
-					scanCode = (char)MapVirtualKey((uint)keyCode, 0u),
-					repeatCount = 1,
-					prevKeyState = 1,
-					transitionState = 1
-				};
-				if (ExtendedKeys.Contains(keyCode))
-				{
-					lParam.extendedKey = 1;
-				}
-				PostMessage(GameService.GameIntegration.get_Gw2Instance().get_Gw2WindowHandle(), 257u, (uint)keyCode, lParam.GetInt());
+				return false;
 			}
+			Thread.Sleep(50);
+			return Release(162, sendToSystem);
 		}
 
-		public static void Stroke(int keyCode, bool sendToSystem = false)
+		public static bool Clear(bool sendToSystem = true)
 		{
-			Press(keyCode, sendToSystem);
-			Release(keyCode, sendToSystem);
+			if (!SelectAll(sendToSystem))
+			{
+				return false;
+			}
+			return Stroke(46, sendToSystem);
+		}
+
+		public static bool SelectAll(bool sendToSystem = true)
+		{
+			if (!Press(162, sendToSystem))
+			{
+				return false;
+			}
+			if (!Stroke(65, sendToSystem))
+			{
+				return false;
+			}
+			Thread.Sleep(50);
+			return Release(162, sendToSystem);
+		}
+
+		public static bool Stroke(int keyCode, bool sendToSystem = true)
+		{
+			if (Press(keyCode, sendToSystem))
+			{
+				return Release(keyCode, sendToSystem);
+			}
+			return false;
 		}
 
 		public static bool IsPressed(uint keyCode)

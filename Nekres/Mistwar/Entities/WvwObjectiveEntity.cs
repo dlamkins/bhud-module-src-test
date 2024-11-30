@@ -211,7 +211,11 @@ namespace Nekres.Mistwar.Entities
 			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000d: Invalid comparison between Unknown and I4
 			WvwOwner owner = Owner;
-			return (int)owner == 2 || (int)owner == 4;
+			if ((int)owner == 2 || (int)owner == 4)
+			{
+				return true;
+			}
+			return false;
 		}
 
 		public bool IsClaimed()
@@ -240,22 +244,24 @@ namespace Nekres.Mistwar.Entities
 
 		public bool HasRegularWaypoint()
 		{
-			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001a: Invalid comparison between Unknown and I4
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001e: Invalid comparison between Unknown and I4
-			if (!IsSpawn())
+			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0022: Invalid comparison between Unknown and I4
+			bool flag = IsSpawn();
+			if (!flag)
 			{
-				if (GetTier() == WvwObjectiveTier.Fortified)
+				bool flag2 = GetTier() == WvwObjectiveTier.Fortified;
+				if (flag2)
 				{
 					WvwObjectiveType type = Type;
-					return (int)type == 3 || (int)type == 2;
+					bool flag3 = ((type - 2 <= 1) ? true : false);
+					flag2 = flag3;
 				}
-				return false;
+				flag = flag2;
 			}
-			return true;
+			return flag;
 		}
 
 		public bool IsSpawn()
