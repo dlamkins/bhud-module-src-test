@@ -48,6 +48,8 @@ namespace KpRefresher.Ressources
 
 		public static string cairn => ResourceManager.GetString("cairn", resourceCulture);
 
+		public static string camp => ResourceManager.GetString("camp", resourceCulture);
+
 		public static string conjured_amalgamate => ResourceManager.GetString("conjured_amalgamate", resourceCulture);
 
 		public static string decima => ResourceManager.GetString("decima", resourceCulture);
