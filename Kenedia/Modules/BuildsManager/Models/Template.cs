@@ -697,11 +697,12 @@ namespace Kenedia.Modules.BuildsManager.Models
 				}
 				else
 				{
+					ushort eliteSkillId = (ushort)((build.TerrestrialEliteSkillPaletteId == 4857) ? 408 : build.TerrestrialEliteSkillPaletteId);
 					SetSkill(SkillSlotType.Active | SkillSlotType.Terrestrial | SkillSlotType.Heal, Kenedia.Modules.BuildsManager.DataModels.Professions.Skill.FromUShort(build.TerrestrialHealingSkillPaletteId, build.Profession, Data));
 					SetSkill(SkillSlotType.Active | SkillSlotType.Terrestrial | SkillSlotType.Utility_1, Kenedia.Modules.BuildsManager.DataModels.Professions.Skill.FromUShort(build.TerrestrialUtility1SkillPaletteId, build.Profession, Data));
 					SetSkill(SkillSlotType.Active | SkillSlotType.Terrestrial | SkillSlotType.Utility_2, Kenedia.Modules.BuildsManager.DataModels.Professions.Skill.FromUShort(build.TerrestrialUtility2SkillPaletteId, build.Profession, Data));
 					SetSkill(SkillSlotType.Active | SkillSlotType.Terrestrial | SkillSlotType.Utility_3, Kenedia.Modules.BuildsManager.DataModels.Professions.Skill.FromUShort(build.TerrestrialUtility3SkillPaletteId, build.Profession, Data));
-					SetSkill(SkillSlotType.Active | SkillSlotType.Terrestrial | SkillSlotType.Elite, Kenedia.Modules.BuildsManager.DataModels.Professions.Skill.FromUShort(build.TerrestrialEliteSkillPaletteId, build.Profession, Data));
+					SetSkill(SkillSlotType.Active | SkillSlotType.Terrestrial | SkillSlotType.Elite, Kenedia.Modules.BuildsManager.DataModels.Professions.Skill.FromUShort(eliteSkillId, build.Profession, Data));
 					SetSkill(SkillSlotType.Active | SkillSlotType.Aquatic | SkillSlotType.Heal, Kenedia.Modules.BuildsManager.DataModels.Professions.Skill.FromUShort(build.AquaticHealingSkillPaletteId, build.Profession, Data));
 					SetSkill(SkillSlotType.Active | SkillSlotType.Aquatic | SkillSlotType.Utility_1, Kenedia.Modules.BuildsManager.DataModels.Professions.Skill.FromUShort(build.AquaticUtility1SkillPaletteId, build.Profession, Data));
 					SetSkill(SkillSlotType.Active | SkillSlotType.Aquatic | SkillSlotType.Utility_2, Kenedia.Modules.BuildsManager.DataModels.Professions.Skill.FromUShort(build.AquaticUtility2SkillPaletteId, build.Profession, Data));
@@ -735,10 +736,10 @@ namespace Kenedia.Modules.BuildsManager.Models
 			BuildChatLink build = new BuildChatLink
 			{
 				Profession = Profession,
-				RangerAquaticPet1Id = Pets.GetPetByte(PetSlotType.Aquatic_1),
-				RangerAquaticPet2Id = Pets.GetPetByte(PetSlotType.Aquatic_2),
-				RangerTerrestrialPet1Id = Pets.GetPetByte(PetSlotType.Terrestrial_1),
-				RangerTerrestrialPet2Id = Pets.GetPetByte(PetSlotType.Terrestrial_2),
+				RangerAquaticPet1Id = (byte)((Profession == ProfessionType.Ranger) ? Pets.GetPetByte(PetSlotType.Aquatic_1) : 0),
+				RangerAquaticPet2Id = (byte)((Profession == ProfessionType.Ranger) ? Pets.GetPetByte(PetSlotType.Aquatic_2) : 0),
+				RangerTerrestrialPet1Id = (byte)((Profession == ProfessionType.Ranger) ? Pets.GetPetByte(PetSlotType.Terrestrial_1) : 0),
+				RangerTerrestrialPet2Id = (byte)((Profession == ProfessionType.Ranger) ? Pets.GetPetByte(PetSlotType.Terrestrial_2) : 0),
 				Specialization1Id = Specializations.Specialization1.GetSpecializationByte(),
 				Specialization1Trait1Index = Specializations.Specialization1.GetTraitByte(TraitTierType.Adept),
 				Specialization1Trait2Index = Specializations.Specialization1.GetTraitByte(TraitTierType.Master),
@@ -765,11 +766,13 @@ namespace Kenedia.Modules.BuildsManager.Models
 				build.RevenantInactiveAquaticUtility2SkillPaletteId = Skills.GetPaletteId(SkillSlotType.Inactive | SkillSlotType.Aquatic | SkillSlotType.Utility_2);
 				build.RevenantInactiveAquaticUtility3SkillPaletteId = Skills.GetPaletteId(SkillSlotType.Inactive | SkillSlotType.Aquatic | SkillSlotType.Utility_3);
 			}
+			ushort skillid = Skills.GetPaletteId(SkillSlotType.Active | SkillSlotType.Terrestrial | SkillSlotType.Elite);
+			ushort eliteSkillId = (ushort)((skillid == 408) ? 4857 : skillid);
 			build.TerrestrialHealingSkillPaletteId = Skills.GetPaletteId(SkillSlotType.Active | SkillSlotType.Terrestrial | SkillSlotType.Heal);
 			build.TerrestrialUtility1SkillPaletteId = Skills.GetPaletteId(SkillSlotType.Active | SkillSlotType.Terrestrial | SkillSlotType.Utility_1);
 			build.TerrestrialUtility2SkillPaletteId = Skills.GetPaletteId(SkillSlotType.Active | SkillSlotType.Terrestrial | SkillSlotType.Utility_2);
 			build.TerrestrialUtility3SkillPaletteId = Skills.GetPaletteId(SkillSlotType.Active | SkillSlotType.Terrestrial | SkillSlotType.Utility_3);
-			build.TerrestrialEliteSkillPaletteId = Skills.GetPaletteId(SkillSlotType.Active | SkillSlotType.Terrestrial | SkillSlotType.Elite);
+			build.TerrestrialEliteSkillPaletteId = eliteSkillId;
 			build.AquaticHealingSkillPaletteId = Skills.GetPaletteId(SkillSlotType.Active | SkillSlotType.Aquatic | SkillSlotType.Heal);
 			build.AquaticUtility1SkillPaletteId = Skills.GetPaletteId(SkillSlotType.Active | SkillSlotType.Aquatic | SkillSlotType.Utility_1);
 			build.AquaticUtility2SkillPaletteId = Skills.GetPaletteId(SkillSlotType.Active | SkillSlotType.Aquatic | SkillSlotType.Utility_2);
@@ -777,7 +780,8 @@ namespace Kenedia.Modules.BuildsManager.Models
 			build.AquaticEliteSkillPaletteId = Skills.GetPaletteId(SkillSlotType.Active | SkillSlotType.Aquatic | SkillSlotType.Elite);
 			byte[] bytes = build.ToArray();
 			build.Parse(bytes.Concat(new byte[2]).ToArray());
-			return build.ToString();
+			string text = build.ToString();
+			return text.Insert(text.Length - 2, "AAA=");
 		}
 
 		public string? ParseGearCode()

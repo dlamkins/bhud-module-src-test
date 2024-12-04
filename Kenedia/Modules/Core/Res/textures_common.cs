@@ -54,6 +54,12 @@ namespace Kenedia.Modules.Core.Res
 
 		internal static Bitmap Tag_Hovered => (Bitmap)ResourceManager.GetObject("Tag_Hovered", resourceCulture);
 
+		internal static Bitmap ToggleAreaLeft => (Bitmap)ResourceManager.GetObject("ToggleAreaLeft", resourceCulture);
+
+		internal static Bitmap ToggleAreaMid => (Bitmap)ResourceManager.GetObject("ToggleAreaMid", resourceCulture);
+
+		internal static Bitmap ToggleAreaRight => (Bitmap)ResourceManager.GetObject("ToggleAreaRight", resourceCulture);
+
 		internal textures_common()
 		{
 		}
