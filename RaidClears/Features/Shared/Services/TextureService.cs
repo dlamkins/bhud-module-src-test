@@ -9,6 +9,8 @@ namespace RaidClears.Features.Shared.Services
 	{
 		protected DownloadTextureService _downloadTextures { get; set; }
 
+		public Texture2D JWLogo { get; }
+
 		public Texture2D PoFLogo { get; }
 
 		public Texture2D HoTLogo { get; }
@@ -45,6 +47,7 @@ namespace RaidClears.Features.Shared.Services
 			SettingTabGeneral = contentsManager.GetTexture("controls/tab_icons/cog.png");
 			SettingTabStrikes = contentsManager.GetTexture("controls/tab_icons/strikes.png");
 			SettingTabFractals = contentsManager.GetTexture("controls/tab_icons/fotm.png");
+			JWLogo = AsyncTexture2D.op_Implicit(GetDynamicTexture("texture_raids_jw.png"));
 			PoFLogo = AsyncTexture2D.op_Implicit(GetDynamicTexture("texture_raids_pof.png"));
 			HoTLogo = AsyncTexture2D.op_Implicit(GetDynamicTexture("texture_raids_hot.png"));
 			BaseLogo = AsyncTexture2D.op_Implicit(GetDynamicTexture("texture_base_logo.png"));
@@ -66,6 +69,7 @@ namespace RaidClears.Features.Shared.Services
 			((GraphicsResource)SettingTabGeneral).Dispose();
 			((GraphicsResource)SettingTabStrikes).Dispose();
 			((GraphicsResource)SettingTabFractals).Dispose();
+			((GraphicsResource)JWLogo).Dispose();
 			((GraphicsResource)PoFLogo).Dispose();
 			((GraphicsResource)HoTLogo).Dispose();
 			((GraphicsResource)BaseLogo).Dispose();

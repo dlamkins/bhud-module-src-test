@@ -56,6 +56,7 @@
   <data name="StrikeGroup_Icebrood_abbr"><value>IBS</value></data>
   <data name="Setting_Strike_CW_Label"><value>Cold War</value></data>
   <data name="Raid_Wing_2_3_Short"><value>M</value></data>
+  <data name="Raid_Wing_8_2_Short"><value>D</value></data>
   <data name="Setting_Fractals_Visible_Tooltip"><value /></data>
   <data name="Setting_Strike_OLC_Label"><value>Old Lion's Court</value></data>
   <data name="Setting_Strike_Drag_Label"><value>Unlock Strike overlay position</value></data>
@@ -80,6 +81,7 @@
   <data name="Raid_Wing_1_1_Name"><value>Vale Guardian</value></data>
   <data name="PatchNotes_Tooltip"><value>Show patch notes in your default web browser</value></data>
   <data name="Setting_Fractals_Tooltips_Tooltip"><value>Hovering the mouse over an encounter will display the full name and tomorrow's encounter</value></data>
+  <data name="Setting_Raid_W8_Tooltip"><value>Enable Mount Balrior on the raid overlay</value></data>
   <data name="SettingsPanel_Strikes_Heading_Selection"><value>Strikes Selection</value></data>
   <data name="Setting_Raid_Tooltips_Label"><value>Enable mouse hover tooltips on overlay</value></data>
   <data name="Raid_Wing_6_1_Name"><value>Conjured Amalgamate</value></data>
@@ -103,6 +105,7 @@
   <data name="Setting_Strike_ColText_Label"><value>Label and Grid text color</value></data>
   <data name="Fractals_DailyTierN"><value>Daily Tier (1,2,3,4)</value></data>
   <data name="Setting_Fractals_LabelDisplay_Label"><value>Label style</value></data>
+  <data name="Raid_Wing_8"><value>Mount Balrior</value></data>
   <data name="Raid_Wing_4"><value>Bastion of the Penitent</value></data>
   <data name="Raid_Wing_5"><value>Hall of Chains</value></data>
   <data name="Raid_Wing_6"><value>Mythwright Gambit</value></data>
@@ -138,6 +141,7 @@
   <data name="Raid_Wing_2_1_Short"><value>S</value></data>
   <data name="Setting_Strike_PanelOpacity_Label"><value>Grid background opacity</value></data>
   <data name="Settings_Keybind_tooltip"><value>Show/Hide this window with a keybind</value></data>
+  <data name="Raid_Wing_8_1_Short"><value>C</value></data>
   <data name="Raid_Wing_5_3_Short"><value>S</value></data>
   <data name="Setting_Fractals_ColClear_Tooltip"><value>Hex color code (#rrggbb) for Encounters that have been cleared this reset</value></data>
   <data name="Setting_Fractals_Icon_Tooltip"><value>Fractals overlay hides/shows when clicking the icon next to Blish in the top-left of the screen</value></data>
@@ -170,6 +174,7 @@
   <data name="Setting_Strike_HT_Label"><value>Harvest Temple</value></data>
   <data name="Strike_Confirm_Btn_Yes"><value>Completed</value></data>
   <data name="Setting_cornerIconHelpText"><value>Which overlays should Hide/Show when you left click the menu icon?</value></data>
+  <data name="Raid_Wing_8_Short"><value>MtBal</value></data>
   <data name="Setting_Dun_Enabled"><value>Enable dungeons feature</value></data>
   <data name="Strike_Short_Fraenir"><value>FoJ</value></data>
   <data name="Raid_Wing_2_2_Name"><value>Bandit Trio</value></data>
@@ -210,8 +215,10 @@
   <data name="Raid_Wing_7_2_Short"><value>A</value></data>
   <data name="Raid_Wing_4_Short"><value>BotP</value></data>
   <data name="Setting_Dun_Tooltips_Tooltip"><value>Hovering the mouse over an path will display the full name</value></data>
+  <data name="Raid_Wing_8_4_Short"><value>U</value></data>
   <data name="Setting_Strike_AH_Label"><value>Aetherblade Hideout</value></data>
   <data name="Setting_Strike_LabelOpacity_Tooltip"><value>Hidden &lt;---&gt; Fully Visible</value></data>
+  <data name="Raid_Wing_8_3_Short"><value>G</value></data>
   <data name="SettingsPanel_Tab_Dunegons"><value>Dungeons</value></data>
   <data name="VisibleHide"><value>Hide</value></data>
   <data name="VisibleShow"><value>Show</value></data>
@@ -236,6 +243,7 @@
   <data name="Setting_Dun_ColFreqText_Label"><value>Frequenter text color</value></data>
   <data name="Setting_Raid_W2_Label"><value>W2 / Salvation Pass</value></data>
   <data name="Setting_Strike_Font_Tooptip"><value>Change the size of the grid</value></data>
+  <data name="Raid_Wing_8_3_Name"><value>Greer</value></data>
   <data name="Setting_Raid_W7_Tooltip"><value>Enable The Key of Ahdashim on the raid overlay</value></data>
   <data name="Setting_Raid_Keybind_Label"><value>Show/Hide keybind</value></data>
   <data name="SettingsPanel_Tab_General"><value>General</value></data>
@@ -245,13 +253,17 @@
   <data name="Setting_Dun_Visible_Tooltip"><value>Show the dungeons overlay on screen</value></data>
   <data name="Setting_Strike_Layout_Label"><value>Grid layout</value></data>
   <data name="Setting_Fractals_PanelOpacity_Tooltip"><value>Hidden &lt;---&gt; Fully Visible</value></data>
+  <data name="Settings_Raid_JW_Heading"><value>Enable Janthir Wilds raid wing</value></data>
   <data name="Setting_Strike_Eod"><value>Enable End of Dragons</value></data>
   <data name="Setting_Strike_IBS"><value>Enable Icebrood Saga</value></data>
   <data name="Setting_Strike_Drag_Tooltip"><value>Click and drag to reposition the overlay window</value></data>
   <data name="Raid_Wing_7_4_Short"><value>Q2</value></data>
   <data name="Setting_Dun_Visible_Label"><value>Show dungeons overlay</value></data>
+  <data name="Raid_Wing_8_2_Name"><value>Decima</value></data>
   <data name="Setting_Raid_Icon_Label"><value>Raids hide/show on menubar icon click</value></data>
+  <data name="Raid_Wing_8_1_Name"><value>Camp</value></data>
   <data name="Setting_Strike_Keybind_Label"><value>Show/Hide keybind</value></data>
+  <data name="Raid_Wing_8_4_Name"><value>Ura</value></data>
   <data name="Raid_Wing_5_1_Short"><value>SH</value></data>
   <data name="Setting_Strike_BS_Label"><value>Boneskinner</value></data>
   <data name="Setting_Strike_FoJ_Label"><value>Fraenir of Jormag</value></data>
@@ -270,6 +282,7 @@
   <data name="Setting_Raid_W6_Label"><value>W6 / Mythwright Gambit</value></data>
   <data name="Raid_Wing_6_1_Short"><value>CA</value></data>
   <data name="Setting_Strike_Layout_Tooltip"><value /></data>
+  <data name="Setting_Raid_W8_Label"><value>W8 / Mount Balrior</value></data>
   <data name="ModuleSettings_OpenSettings"><value>Open Settings</value></data>
   <data name="Raid_Wing_5_2_Name"><value>River of Souls</value></data>
   <data name="Setting_Raid_ColClear_Label"><value>Cleared encounter color</value></data>

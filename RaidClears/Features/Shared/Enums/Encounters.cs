@@ -29,7 +29,11 @@ namespace RaidClears.Features.Shared.Enums
 			Gate,
 			Adina,
 			Sabir,
-			QadimThePeerless
+			QadimThePeerless,
+			Camp,
+			Decima,
+			Greer,
+			Ura
 		}
 
 		public enum Dungeons

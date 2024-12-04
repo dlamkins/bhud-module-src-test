@@ -142,7 +142,7 @@ namespace RaidClears.Settings.Models
 					new Setting<bool>("RCw5", DefaultValue: true, () => Strings.Setting_Raid_W5_Label, () => Strings.Setting_Raid_W5_Tooltip),
 					new Setting<bool>("RCw6", DefaultValue: true, () => Strings.Setting_Raid_W6_Label, () => Strings.Setting_Raid_W6_Tooltip),
 					new Setting<bool>("RCw7", DefaultValue: true, () => Strings.Setting_Raid_W7_Label, () => Strings.Setting_Raid_W7_Tooltip),
-					new Setting<bool>("RCw8", DefaultValue: true, () => "Wing 8", () => "Happy April 1st")
+					new Setting<bool>("RCw8", DefaultValue: true, () => Strings.Setting_Raid_W8_Label, () => Strings.Setting_Raid_W8_Tooltip)
 				};
 			}
 		}

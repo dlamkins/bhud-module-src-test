@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Blish_HUD.Controls;
@@ -19,16 +18,6 @@ namespace RaidClears.Features.Raids.Models
 		{
 			RaidSettings settings = Service.Settings.RaidSettings;
 			List<Wing> wings = GetWingMetaData();
-			if (DateTime.Now.Month == 4 && DateTime.Now.Day == 1)
-			{
-				wings.Add(new Wing("The Wait for Wing 8", 7, "W8", new BoxModel[4]
-				{
-					new BoxModel("w8-1", "Not", "N"),
-					new BoxModel("w8-2", "Our", "O"),
-					new BoxModel("w8-3", "Priority", "P"),
-					new BoxModel("w8-4", "Ever", "E")
-				}));
-			}
 			foreach (Wing wing in wings)
 			{
 				GridGroup group = new GridGroup((Container)(object)panel, settings.Style.Layout);
@@ -56,7 +45,7 @@ namespace RaidClears.Features.Raids.Models
 			{
 				box.ConditionalTextColorSetting(settings.RaidPanelHighlightEmbolden, settings.RaidPanelColorEmbolden, settings.Style.Color.Text);
 			}
-			else if (index == weekly.CallOfTheMist)
+			else if (index == weekly.CallOfTheMist || index == weekly.LatestRelease)
 			{
 				box.ConditionalTextColorSetting(settings.RaidPanelHighlightCotM, settings.RaidPanelColorCotm, settings.Style.Color.Text);
 			}
@@ -120,6 +109,13 @@ namespace RaidClears.Features.Raids.Models
 				new Encounter(Encounters.RaidBosses.Adina),
 				new Encounter(Encounters.RaidBosses.Sabir),
 				new Encounter(Encounters.RaidBosses.QadimThePeerless)
+			}));
+			list.Add(new Wing(Strings.Raid_Wing_8, 7, Strings.Raid_Wing_8_Short, new BoxModel[4]
+			{
+				new Encounter(Encounters.RaidBosses.Camp),
+				new Encounter(Encounters.RaidBosses.Decima),
+				new Encounter(Encounters.RaidBosses.Greer),
+				new Encounter(Encounters.RaidBosses.Ura)
 			}));
 			return list;
 		}

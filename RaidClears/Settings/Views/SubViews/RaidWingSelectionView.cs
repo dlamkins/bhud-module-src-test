@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Blish_HUD.Content;
@@ -48,16 +47,17 @@ namespace RaidClears.Settings.Views.SubViews
 			//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0111: Expected O, but got Unknown
-			//IL_0170: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0152: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0159: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0164: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0175: Unknown result type (might be due to invalid IL or missing references)
 			//IL_017c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0187: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0191: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0198: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c6: Expected O, but got Unknown
+			//IL_0183: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0199: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b3: Expected O, but got Unknown
 			((View<IPresenter>)this).Build(buildPanel);
 			FlowPanel panel = FlowPanelExtensions.BeginFlow(new FlowPanel(), buildPanel);
 			FlowPanel val = new FlowPanel();
@@ -85,18 +85,21 @@ namespace RaidClears.Settings.Views.SubViews
 				.AddSpace()
 				.AddSpace()
 				.AddSpace());
-			if (DateTime.Now.Month == 4 && DateTime.Now.Day == 1)
-			{
-				FlowPanel val3 = new FlowPanel();
-				val3.set_FlowDirection((ControlFlowDirection)3);
-				val3.set_OuterControlPadding(new Vector2(20f, 5f));
-				((Control)val3).set_Parent((Container)(object)panel);
-				((Panel)val3).set_ShowTint(false);
-				((Panel)val3).set_ShowBorder(false);
-				((Container)val3).set_HeightSizingMode((SizingMode)1);
-				((Control)val3).set_Width(((Control)panel).get_Width() - 40);
-				panel.AddChildPanel((Panel)(object)FlowPanelExtensions.AddString(val3, "April Fools Joke").AddSetting((IEnumerable<SettingEntry>?)_settings.RaidWings.Skip(7).Take(1)));
-			}
+			FlowPanel val3 = new FlowPanel();
+			val3.set_FlowDirection((ControlFlowDirection)3);
+			val3.set_OuterControlPadding(new Vector2(20f, 5f));
+			((Control)val3).set_Parent((Container)(object)panel);
+			((Panel)val3).set_ShowTint(false);
+			((Panel)val3).set_ShowBorder(false);
+			((Container)val3).set_HeightSizingMode((SizingMode)1);
+			((Control)val3).set_Width(((Control)panel).get_Width() - 40);
+			((Panel)val3).set_BackgroundTexture(AsyncTexture2D.op_Implicit(Service.Textures!.JWLogo));
+			panel.AddChildPanel((Panel)(object)FlowPanelExtensions.AddSpace(val3).AddString(Strings.Settings_Raid_JW_Heading).AddSetting((IEnumerable<SettingEntry>?)_settings.RaidWings.Skip(7).Take(1))
+				.AddSpace()
+				.AddSpace()
+				.AddSpace()
+				.AddSpace()
+				.AddSpace());
 		}
 	}
 }

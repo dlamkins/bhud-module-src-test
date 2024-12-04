@@ -6,10 +6,13 @@ namespace RaidClears.Features.Raids.Services
 
 		public int CallOfTheMist { get; }
 
-		public WeeklyWings(int emboldened, int callOfTheMist)
+		public int LatestRelease { get; }
+
+		public WeeklyWings(int emboldened, int callOfTheMist, int latestReleaes)
 		{
 			Emboldened = emboldened;
 			CallOfTheMist = callOfTheMist;
+			LatestRelease = latestReleaes;
 		}
 	}
 }

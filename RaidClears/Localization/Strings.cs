@@ -196,6 +196,26 @@ namespace RaidClears.Localization
 
 		internal static string Raid_Wing_7_Short => ResourceManager.GetString("Raid_Wing_7_Short", resourceCulture);
 
+		internal static string Raid_Wing_8 => ResourceManager.GetString("Raid_Wing_8", resourceCulture);
+
+		internal static string Raid_Wing_8_1_Name => ResourceManager.GetString("Raid_Wing_8_1_Name", resourceCulture);
+
+		internal static string Raid_Wing_8_1_Short => ResourceManager.GetString("Raid_Wing_8_1_Short", resourceCulture);
+
+		internal static string Raid_Wing_8_2_Name => ResourceManager.GetString("Raid_Wing_8_2_Name", resourceCulture);
+
+		internal static string Raid_Wing_8_2_Short => ResourceManager.GetString("Raid_Wing_8_2_Short", resourceCulture);
+
+		internal static string Raid_Wing_8_3_Name => ResourceManager.GetString("Raid_Wing_8_3_Name", resourceCulture);
+
+		internal static string Raid_Wing_8_3_Short => ResourceManager.GetString("Raid_Wing_8_3_Short", resourceCulture);
+
+		internal static string Raid_Wing_8_4_Name => ResourceManager.GetString("Raid_Wing_8_4_Name", resourceCulture);
+
+		internal static string Raid_Wing_8_4_Short => ResourceManager.GetString("Raid_Wing_8_4_Short", resourceCulture);
+
+		internal static string Raid_Wing_8_Short => ResourceManager.GetString("Raid_Wing_8_Short", resourceCulture);
+
 		internal static string Setting_APIPoll_Label => ResourceManager.GetString("Setting_APIPoll_Label", resourceCulture);
 
 		internal static string Setting_APIPoll_Tooltip => ResourceManager.GetString("Setting_APIPoll_Tooltip", resourceCulture);
@@ -400,6 +420,10 @@ namespace RaidClears.Localization
 
 		internal static string Setting_Raid_W7_Tooltip => ResourceManager.GetString("Setting_Raid_W7_Tooltip", resourceCulture);
 
+		internal static string Setting_Raid_W8_Label => ResourceManager.GetString("Setting_Raid_W8_Label", resourceCulture);
+
+		internal static string Setting_Raid_W8_Tooltip => ResourceManager.GetString("Setting_Raid_W8_Tooltip", resourceCulture);
+
 		internal static string Setting_Stike_Priority => ResourceManager.GetString("Setting_Stike_Priority", resourceCulture);
 
 		internal static string Setting_Strike_AH_Label => ResourceManager.GetString("Setting_Strike_AH_Label", resourceCulture);
@@ -499,6 +523,8 @@ namespace RaidClears.Localization
 		internal static string Settings_Keybind_tooltip => ResourceManager.GetString("Settings_Keybind_tooltip", resourceCulture);
 
 		internal static string Settings_Raid_Hot_Heading => ResourceManager.GetString("Settings_Raid_Hot_Heading", resourceCulture);
+
+		internal static string Settings_Raid_JW_Heading => ResourceManager.GetString("Settings_Raid_JW_Heading", resourceCulture);
 
 		internal static string Settings_Raid_PoF_Heading => ResourceManager.GetString("Settings_Raid_PoF_Heading", resourceCulture);
 

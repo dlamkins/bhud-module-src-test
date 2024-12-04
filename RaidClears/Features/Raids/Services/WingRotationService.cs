@@ -13,7 +13,7 @@ namespace RaidClears.Features.Raids.Services
 		public static WeeklyWings GetWeeklyWings()
 		{
 			int num = (int)Math.Floor((decimal)(((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds() - 1656315000) / 604800m) % 7;
-			return new WeeklyWings(num, (num + 1) % 7);
+			return new WeeklyWings(num, (num + 1) % 7, 7);
 		}
 	}
 }
