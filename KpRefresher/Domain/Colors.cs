@@ -9,5 +9,7 @@ namespace KpRefresher.Domain
 		public static Color KpRefreshedColor => Color.FromNonPremultiplied(130, 177, 161, 175);
 
 		public static Color OnlyGw2 => Color.FromNonPremultiplied(161, 130, 177, 255);
+
+		public static Color Error => Color.get_Red();
 	}
 }

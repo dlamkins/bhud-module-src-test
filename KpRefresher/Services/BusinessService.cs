@@ -290,9 +290,24 @@ namespace KpRefresher.Services
 				ShowNotification(strings.Notification_DataNotAvailable, (NotificationType)1);
 				return null;
 			}
+			bool isError = false;
 			List<RaidBoss> baseClears = await _kpMeService.GetClearData(KpId);
 			List<RaidBoss> clears = await _gw2ApiService.GetClears();
 			List<(string, Color?)> res = new List<(string, Color?)>();
+			if (baseClears == null)
+			{
+				isError = true;
+				res.Add(("Error while fetching Kp.Me API\n", Colors.Error));
+			}
+			if (clears == null)
+			{
+				isError = true;
+				res.Add(("Error while fetching GW2 API\n", Colors.Error));
+			}
+			if (isError)
+			{
+				return res;
+			}
 			List<RaidBoss> encounters = _raidBossNames.OrderBy((RaidBoss x) => (int)x).ToList();
 			foreach (int wingNumber in encounters.Select((RaidBoss ob) => ob.GetAttribute<WingAttribute>().WingNumber).Distinct())
 			{
