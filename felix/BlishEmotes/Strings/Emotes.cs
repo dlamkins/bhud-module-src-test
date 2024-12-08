@@ -48,6 +48,8 @@ namespace felix.BlishEmotes.Strings
 
 		internal static string bow => ResourceManager.GetString("bow", resourceCulture);
 
+		internal static string breakdance => ResourceManager.GetString("breakdance", resourceCulture);
+
 		internal static string cheer => ResourceManager.GetString("cheer", resourceCulture);
 
 		internal static string cower => ResourceManager.GetString("cower", resourceCulture);
