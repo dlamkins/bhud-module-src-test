@@ -24,13 +24,13 @@ namespace RaidClears.Settings.Views.SubViews
 		{
 			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0012: Expected O, but got Unknown
-			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
 			((View<IPresenter>)this).Build(buildPanel);
 			FlowPanelExtensions.BeginFlow(new FlowPanel(), buildPanel).AddString(Strings.Settings_Dungeon_Heading).AddSetting((IEnumerable<SettingEntry>?)_settings.DungeonPaths)
 				.AddSpace()

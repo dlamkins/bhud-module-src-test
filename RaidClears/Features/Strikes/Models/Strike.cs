@@ -1,21 +1,19 @@
 using System.Collections.Generic;
-using RaidClears.Features.Raids.Models;
 using RaidClears.Features.Shared.Models;
-using RaidClears.Features.Strikes.Services;
 
 namespace RaidClears.Features.Strikes.Models
 {
-	public class Strike : Wing
+	public class Strike : GroupModel
 	{
 		public ExpansionStrikes Expansion;
 
-		public Strike(string name, int index, string shortName, IEnumerable<BoxModel> boxes)
-			: base(name, index, shortName, boxes)
+		public Strike(string name, string id, int index, string shortName, IEnumerable<BoxModel> boxes)
+			: base(name, shortName, index, shortName, boxes)
 		{
 		}
 
 		public Strike(ExpansionStrikes expansion)
-			: base(expansion.Name, 0, expansion.Abbriviation, expansion.GetEncounters())
+			: base(expansion.Name, expansion.Id, 0, Service.StrikeSettings.GetEncounterLabel(expansion.Id), expansion.GetEncounters())
 		{
 			Expansion = expansion;
 		}

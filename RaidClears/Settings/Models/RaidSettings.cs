@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Blish_HUD.Settings;
+using RaidClears.Features.Raids.Models;
+using RaidClears.Features.Raids.Services;
 
 namespace RaidClears.Settings.Models
 {
@@ -57,6 +59,53 @@ namespace RaidClears.Settings.Models
 			SettingComplianceExtensions.SetRange(Style.BgOpacity, 0f, 1f);
 			RaidPanelColorEmbolden = settings.DefineSetting(Settings.Raids.Style.Color.embolden);
 			RaidPanelColorCotm = settings.DefineSetting(Settings.Raids.Style.Color.cotm);
+		}
+
+		public void ConvertToJsonFile(RaidSettingsPersistance json, RaidData raidData)
+		{
+			foreach (ExpansionRaid expansion in raidData.Expansions)
+			{
+				SetExpansionValue(json, expansion.Id, value: true);
+				foreach (RaidWing wing in expansion.Wings)
+				{
+					if (RaidWings.Count() >= wing.Number)
+					{
+						SetWingValue(json, wing.Id, RaidWings.ToArray()[wing.Number - 1].get_Value());
+					}
+					else
+					{
+						SetWingValue(json, wing.Id, value: true);
+					}
+					foreach (RaidEncounter encounter in wing.Encounters)
+					{
+						SetEncounterValue(json, encounter.ApiId, value: true);
+					}
+				}
+			}
+		}
+
+		private void SetExpansionValue(RaidSettingsPersistance json, string id, bool value)
+		{
+			if (json.Expansions.ContainsKey(id))
+			{
+				json.Expansions[id] = value;
+			}
+		}
+
+		private void SetWingValue(RaidSettingsPersistance json, string id, bool value)
+		{
+			if (json.Wings.ContainsKey(id))
+			{
+				json.Wings[id] = value;
+			}
+		}
+
+		private void SetEncounterValue(RaidSettingsPersistance json, string id, bool value)
+		{
+			if (json.Encounters.ContainsKey(id))
+			{
+				json.Encounters[id] = value;
+			}
 		}
 	}
 }

@@ -16,29 +16,26 @@ namespace RaidClears.Features.Fractals.Services
 				select new BoxModel(e.Encounter.id ?? "", e.Encounter.name + "\n\n" + Strings.Strike_Tooltip_tomorrow + "\n" + e.TomorrowEncounter.Label, e.Encounter.shortName);
 		}
 
-		public static IEnumerable<BoxModel> GetCMFractals()
+		public static IEnumerable<(BoxModel box, FractalMap fractalMap, int scale)> GetCMFractals()
 		{
-			int today = DayOfYearIndexService.DayOfYearIndex();
-			List<(FractalMap, int)> CMs = new List<(FractalMap, int)>();
-			int[] challengeMotes = Service.FractalMapData.ChallengeMotes;
-			foreach (int scale in challengeMotes)
+			return BuildToolTipData(Service.FractalMapData.ChallengeMotes.Select(Service.FractalMapData.GetFractalForScale));
+		}
+
+		public static IEnumerable<(BoxModel box, FractalMap fractalMap, int scale)> GetTomorrowTierNForTooltip()
+		{
+			return BuildToolTipData(GetTomorrowTierNFractals());
+		}
+
+		public static IEnumerable<(BoxModel box, FractalMap fractalMap, int scale)> BuildToolTipData(IEnumerable<FractalMap> fractals)
+		{
+			DayOfYearIndexService.DayOfYearIndex();
+			List<(BoxModel, FractalMap, int)> CMs = new List<(BoxModel, FractalMap, int)>();
+			foreach (FractalMap map in fractals)
 			{
-				CMs.Add((Service.FractalMapData.GetFractalForScale(scale), scale));
+				List<int> scales = map.Scales;
+				CMs.Add((new BoxModel(map.ApiLabel, "", Service.FractalPersistance.GetEncounterLabel(map.ApiLabel)), map, scales.Last()));
 			}
-			return CMs.Select<(FractalMap, int), BoxModel>(((FractalMap fractal, int scale) e) => new BoxModel(e.fractal.ApiLabel, GetCMTooltip(e.fractal, e.scale, today), e.fractal.ShortLabel));
-		}
-
-		private static string GetCMTooltip(FractalMap fractal, int scale, int today)
-		{
-			string instab = string.Join("\n\t", Service.InstabilitiesData.GetInstabsForLevelOnDay(scale, today).ToArray());
-			string tomInstab = string.Join("\n\t", Service.InstabilitiesData.GetInstabsForLevelOnDay(scale, (today + 1) % 366).ToArray());
-			return fractal.Label + "\n\nInstabilities\n\t" + instab + "\n\nTomorrow's Instabilities\n\t" + tomInstab;
-		}
-
-		public static IEnumerable<BoxModel> GetTomorrowTierN()
-		{
-			return from e in GetTomorrowTierNFractals()
-				select new BoxModel(e.ApiLabel ?? "", e.Label ?? "", e.ShortLabel);
+			return CMs;
 		}
 
 		public static IEnumerable<FractalInfo> GetDailyTierNFractals()

@@ -64,10 +64,14 @@ namespace RaidClears.Utils
 			});
 		}
 
-		public static void VisiblityChanged(this GridBox panel, SettingEntry<bool> setting)
+		public static void VisiblityChanged(this GridBox panel, SettingEntry<bool>? setting)
 		{
 			GridBox panel2 = panel;
-			setting.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)delegate(object _, ValueChangedEventArgs<bool> e)
+			if (setting == null)
+			{
+				return;
+			}
+			setting!.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)delegate(object _, ValueChangedEventArgs<bool> e)
 			{
 				((Control)panel2).set_Visible(e.get_NewValue());
 				Container parent2 = ((Control)panel2).get_Parent();
@@ -76,7 +80,7 @@ namespace RaidClears.Utils
 					((Control)parent2).Invalidate();
 				}
 			});
-			((Control)panel2).set_Visible(setting.get_Value());
+			((Control)panel2).set_Visible(setting!.get_Value());
 			Container parent = ((Control)panel2).get_Parent();
 			if (parent != null)
 			{

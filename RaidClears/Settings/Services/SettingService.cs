@@ -22,6 +22,8 @@ namespace RaidClears.Settings.Services
 
 		public SettingEntry<bool> ScreenClamp { get; }
 
+		public SettingEntry<bool> OrganicGridBoxBackgrounds { get; }
+
 		public SettingEntry<int> CornerIconPriority { get; }
 
 		public RaidSettings RaidSettings { get; }
@@ -43,6 +45,7 @@ namespace RaidClears.Settings.Services
 			SettingsPanelKeyBind.get_Value().set_Enabled(true);
 			GlobalCornerIconEnabled = settings.DefineSetting<bool>("RCGlobalCornerIcon", true, (Func<string>)(() => Strings.Setting_CornerIconEnable), (Func<string>)(() => Strings.Setting_CornerIconEnableTooltip));
 			ScreenClamp = settings.DefineSetting<bool>("RCScreenClamp", true, (Func<string>)(() => "Keep overlay windows on screen"), (Func<string>)(() => "When turned on, this will make sure that all overlay windows stay within the visible area of your screen, so they don't go off the edges"));
+			OrganicGridBoxBackgrounds = settings.DefineSetting<bool>("RCStylize", true, (Func<string>)(() => "'GW2 Style' background boxes"), (Func<string>)(() => "On: Backgrounds will appear with fuzzy edges more akin to GW2's style,\nOff: Background will be rectangles"));
 			RaidSettings = new RaidSettings(settings);
 			DungeonSettings = new DungeonSettings(settings);
 			StrikeSettings = new StrikeSettings(settings);

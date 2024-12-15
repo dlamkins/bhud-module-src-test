@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
+using RaidClears.Features.Strikes.Models;
 
 namespace RaidClears.Features.Strikes.Services
 {

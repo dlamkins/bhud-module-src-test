@@ -1,7 +1,9 @@
 using System;
 using Blish_HUD;
 using Blish_HUD.Controls;
+using Blish_HUD.Controls.Effects;
 using Blish_HUD.Settings;
+using Microsoft.Xna.Framework;
 using MonoGame.Extended.BitmapFonts;
 using RaidClears.Settings.Enums;
 
@@ -9,6 +11,22 @@ namespace RaidClears.Features.Shared.Controls
 {
 	public class GridBox : Label
 	{
+		protected MyEffect bgtexture { get; set; }
+
+		public Color BackgroundColor
+		{
+			get
+			{
+				//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+				return bgtexture.Tint;
+			}
+			set
+			{
+				//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+				bgtexture.Tint = value;
+			}
+		}
+
 		public GridBox(Container parent, string title, string tooltip, SettingEntry<float> opacity, SettingEntry<FontSize> fontSize)
 			: this()
 		{
@@ -19,6 +37,8 @@ namespace RaidClears.Features.Shared.Controls
 			((Label)this).set_AutoSizeHeight(true);
 			OpacityChange(opacity);
 			FontSizeChange(fontSize);
+			bgtexture = new MyEffect((Control)(object)this);
+			((Control)this).set_EffectBehind((ControlEffect)(object)bgtexture);
 		}
 
 		private void OpacityChange(SettingEntry<float> opacity)

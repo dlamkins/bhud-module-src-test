@@ -4,11 +4,13 @@ using System.IO;
 using Blish_HUD;
 using Blish_HUD.Settings;
 using Newtonsoft.Json;
+using RaidClears.Features.Raids.Services;
+using RaidClears.Features.Strikes.Models;
 
 namespace RaidClears.Features.Strikes.Services
 {
 	[Serializable]
-	public class StrikeSettingsPersistance
+	public class StrikeSettingsPersistance : Labelable
 	{
 		[JsonIgnore]
 		public static string FILENAME = "strike_settings.json";
@@ -34,6 +36,11 @@ namespace RaidClears.Features.Strikes.Services
 
 		public event EventHandler<bool>? StrikeSettingsChanged;
 
+		public StrikeSettingsPersistance()
+		{
+			_isStrike = true;
+		}
+
 		public void DefineEmpty()
 		{
 			foreach (ExpansionStrikes expac in Service.StrikeData.Expansions)
@@ -44,6 +51,23 @@ namespace RaidClears.Features.Strikes.Services
 					Missions.Add(miss.Id, value: true);
 				}
 			}
+		}
+
+		public override void SetEncounterLabel(string encounterApiId, string label)
+		{
+			if (base.EncounterLabels.ContainsKey(encounterApiId))
+			{
+				base.EncounterLabels.Remove(encounterApiId);
+			}
+			if (base.EncounterLabels.ContainsKey("priority_" + encounterApiId))
+			{
+				base.EncounterLabels.Remove("priority_" + encounterApiId);
+			}
+			base.EncounterLabels.Add(encounterApiId, label);
+			base.EncounterLabels.Add("priority_" + encounterApiId, label);
+			Service.StrikesWindow.UpdateEncounterLabel(encounterApiId, label);
+			Service.StrikesWindow.UpdateEncounterLabel("priority_" + encounterApiId, label);
+			Save();
 		}
 
 		public SettingEntry<bool> GetPriorityVisible(ExpansionStrikes priority)
@@ -119,7 +143,7 @@ namespace RaidClears.Features.Strikes.Services
 			return setting;
 		}
 
-		public void Save()
+		public override void Save()
 		{
 			FileInfo configFileInfo = GetConfigFileInfo();
 			string serializedContents = JsonConvert.SerializeObject(this, Formatting.Indented);

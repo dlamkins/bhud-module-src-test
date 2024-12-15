@@ -15,8 +15,8 @@ namespace RaidClears.Features.Strikes.Models
 
 		private static StrikeSettings Settings => Service.Settings.StrikeSettings;
 
-		public PriorityStrikes(string name, int index, string shortName, IEnumerable<BoxModel> boxes, Container panel)
-			: base(name, index, shortName, boxes)
+		public PriorityStrikes(string name, string id, int index, string shortName, IEnumerable<BoxModel> boxes, Container panel)
+			: base(name, id, index, shortName, boxes)
 		{
 			Service.ResetWatcher.DailyReset += new EventHandler<DateTime>(ResetWatcher_DailyReset);
 			InitGroup(panel);

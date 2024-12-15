@@ -3,7 +3,7 @@ using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Microsoft.Xna.Framework;
 using RaidClears.Features.Fractals.Services;
-using RaidClears.Features.Strikes.Services;
+using RaidClears.Features.Strikes.Models;
 
 namespace RaidClears.Settings.Controls
 {

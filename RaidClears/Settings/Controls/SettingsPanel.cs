@@ -84,20 +84,20 @@ namespace RaidClears.Settings.Controls
 
 		private void BuildTabs()
 		{
-			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0053: Expected O, but got Unknown
-			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a6: Expected O, but got Unknown
-			//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f9: Expected O, but got Unknown
-			//IL_0142: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014c: Expected O, but got Unknown
-			//IL_0195: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019f: Expected O, but got Unknown
-			((TabbedWindow2)this).get_Tabs().Add(new Tab(AsyncTexture2D.op_Implicit(Service.Textures?.SettingTabRaid), (Func<IView>)(() => (IView)(object)new CustomSettingMenuView((ISettingsMenuRegistrar)(object)new RaidsSettingTab())), Strings.SettingsPanel_Tab_Raids, (int?)null));
-			((TabbedWindow2)this).get_Tabs().Add(new Tab(AsyncTexture2D.op_Implicit(Service.Textures?.SettingTabStrikes), (Func<IView>)(() => (IView)(object)new CustomSettingMenuView((ISettingsMenuRegistrar)(object)new StrikesSettingTab())), Strings.SettingsPanel_Tab_Strikes, (int?)null));
-			((TabbedWindow2)this).get_Tabs().Add(new Tab(AsyncTexture2D.op_Implicit(Service.Textures?.SettingTabFractals), (Func<IView>)(() => (IView)(object)new CustomSettingMenuView((ISettingsMenuRegistrar)(object)new FractalSettingTab())), Strings.SettingsPanel_Tab_Fractals, (int?)null));
-			((TabbedWindow2)this).get_Tabs().Add(new Tab(AsyncTexture2D.op_Implicit(Service.Textures?.SettingTabDungeon), (Func<IView>)(() => (IView)(object)new CustomSettingMenuView((ISettingsMenuRegistrar)(object)new DungeonSettingTab())), Strings.SettingsPanel_Tab_Dunegons, (int?)null));
+			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004e: Expected O, but got Unknown
+			//IL_0092: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009c: Expected O, but got Unknown
+			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ea: Expected O, but got Unknown
+			//IL_012e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0138: Expected O, but got Unknown
+			//IL_0181: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018b: Expected O, but got Unknown
+			((TabbedWindow2)this).get_Tabs().Add(new Tab(Service.Textures?.SettingTabRaid, (Func<IView>)(() => (IView)(object)new CustomSettingMenuView((ISettingsMenuRegistrar)(object)new RaidsSettingTab())), Strings.SettingsPanel_Tab_Raids, (int?)null));
+			((TabbedWindow2)this).get_Tabs().Add(new Tab(Service.Textures?.SettingTabStrikes, (Func<IView>)(() => (IView)(object)new CustomSettingMenuView((ISettingsMenuRegistrar)(object)new StrikesSettingTab())), Strings.SettingsPanel_Tab_Strikes, (int?)null));
+			((TabbedWindow2)this).get_Tabs().Add(new Tab(Service.Textures?.SettingTabFractals, (Func<IView>)(() => (IView)(object)new CustomSettingMenuView((ISettingsMenuRegistrar)(object)new FractalSettingTab())), Strings.SettingsPanel_Tab_Fractals, (int?)null));
+			((TabbedWindow2)this).get_Tabs().Add(new Tab(Service.Textures?.SettingTabDungeon, (Func<IView>)(() => (IView)(object)new CustomSettingMenuView((ISettingsMenuRegistrar)(object)new DungeonSettingTab())), Strings.SettingsPanel_Tab_Dunegons, (int?)null));
 			((TabbedWindow2)this).get_Tabs().Add(new Tab(AsyncTexture2D.op_Implicit(Service.Textures?.SettingTabGeneral), (Func<IView>)(() => (IView)(object)new MainSettingsView()), Strings.SettingsPanel_Tab_General, (int?)null));
 		}
 	}

@@ -1,9 +1,10 @@
-using System.Collections.Generic;
+using System;
 using Newtonsoft.Json;
 
-namespace RaidClears.Features.Strikes.Services
+namespace RaidClears.Features.Shared.Models
 {
-	public class StrikeMission
+	[Serializable]
+	public class EncounterInterface
 	{
 		[JsonProperty("id")]
 		public string Id = "undefined";
@@ -14,7 +15,7 @@ namespace RaidClears.Features.Strikes.Services
 		[JsonProperty("abbriviation")]
 		public string Abbriviation = "undefined";
 
-		[JsonProperty("mapIds")]
-		public List<int> MapIds = new List<int>();
+		[JsonProperty("assetId")]
+		public int AssetId;
 	}
 }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using Blish_HUD.Settings;
 using Newtonsoft.Json;
+using RaidClears.Features.Strikes.Models;
 
 namespace RaidClears.Features.Strikes.Services
 {
@@ -50,7 +51,10 @@ namespace RaidClears.Features.Strikes.Services
 					return expansion;
 				}
 			}
-			return new ExpansionStrikes();
+			return new ExpansionStrikes
+			{
+				Name = name
+			};
 		}
 
 		public StrikeMission? GetStrikeMisisonByMapId(int id)
@@ -72,6 +76,10 @@ namespace RaidClears.Features.Strikes.Services
 		{
 			foreach (ExpansionStrikes expansion in Expansions)
 			{
+				if (expansion.Id == name)
+				{
+					return expansion.ToStrikeMission();
+				}
 				foreach (StrikeMission mission in expansion.Missions)
 				{
 					if (mission.Id == name)
@@ -80,13 +88,17 @@ namespace RaidClears.Features.Strikes.Services
 					}
 				}
 			}
-			return new StrikeMission();
+			return new StrikeMission
+			{
+				Id = name
+			};
 		}
 
 		public StrikeMission GetStrikeMissionByName(string name)
 		{
 			foreach (ExpansionStrikes expansion in Expansions)
 			{
+				_ = expansion.Id == name;
 				foreach (StrikeMission mission in expansion.Missions)
 				{
 					if (mission.Name == name)
@@ -95,7 +107,10 @@ namespace RaidClears.Features.Strikes.Services
 					}
 				}
 			}
-			return new StrikeMission();
+			return new StrikeMission
+			{
+				Name = name
+			};
 		}
 
 		public string GetStrikeMissionResetById(string name)

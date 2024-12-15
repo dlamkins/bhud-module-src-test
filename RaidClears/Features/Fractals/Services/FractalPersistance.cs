@@ -2,11 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
+using RaidClears.Features.Raids.Services;
 
 namespace RaidClears.Features.Fractals.Services
 {
 	[Serializable]
-	public class FractalPersistance
+	public class FractalPersistance : Labelable
 	{
 		[JsonIgnore]
 		public static string FILENAME = "fractal_clears.json";
@@ -19,6 +20,11 @@ namespace RaidClears.Features.Fractals.Services
 		public Dictionary<string, Dictionary<string, DateTime>> AccountClears { get; set; } = new Dictionary<string, Dictionary<string, DateTime>>();
 
 
+		public FractalPersistance()
+		{
+			_isFractal = true;
+		}
+
 		public Dictionary<string, DateTime> GetEmpty()
 		{
 			Dictionary<string, DateTime> empty = new Dictionary<string, DateTime>();
@@ -27,6 +33,17 @@ namespace RaidClears.Features.Fractals.Services
 				empty.Add(map.Value.ApiLabel, default(DateTime));
 			}
 			return empty;
+		}
+
+		public override void SetEncounterLabel(string encounterApiId, string label)
+		{
+			if (base.EncounterLabels.ContainsKey(encounterApiId))
+			{
+				base.EncounterLabels.Remove(encounterApiId);
+			}
+			base.EncounterLabels.Add(encounterApiId, label);
+			Service.FractalWindow.UpdateEncounterLabel(encounterApiId, label);
+			Save();
 		}
 
 		public void SaveClear(string account, FractalMap mission)
@@ -61,7 +78,7 @@ namespace RaidClears.Features.Fractals.Services
 			Save();
 		}
 
-		public void Save()
+		public override void Save()
 		{
 			FileInfo configFileInfo = GetConfigFileInfo();
 			string serializedContents = JsonConvert.SerializeObject(this, Formatting.Indented);

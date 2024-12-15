@@ -25,6 +25,8 @@ namespace RaidClears.Settings.Views.Tabs
 			//IL_007e: Expected O, but got Unknown
 			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00b7: Expected O, but got Unknown
+			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f0: Expected O, but got Unknown
 			_registeredMenuItems.Add(new MenuViewItem(new MenuItem(Strings.SettingsPanel_Raids_Heading_General), (MenuItem _) => (IView)(object)new GenericGeneralView(Service.Settings.RaidSettings.Generic, new List<SettingEntry>
 			{
 				(SettingEntry)(object)Service.Settings.RaidSettings.RaidPanelHighlightEmbolden,
@@ -35,7 +37,8 @@ namespace RaidClears.Settings.Views.Tabs
 				Service.Settings.RaidSettings.RaidPanelColorEmbolden,
 				Service.Settings.RaidSettings.RaidPanelColorCotm
 			})));
-			_registeredMenuItems.Add(new MenuViewItem(new MenuItem(Strings.SettingsPanel_Raids_Heading_WingSelection), (MenuItem _) => (IView)(object)new RaidWingSelectionView(Service.Settings.RaidSettings)));
+			_registeredMenuItems.Add(new MenuViewItem(new MenuItem(Strings.SettingsPanel_Raids_Heading_WingSelection), (MenuItem _) => (IView)(object)new DynamicRaidSelectionView()));
+			_registeredMenuItems.Add(new MenuViewItem(new MenuItem("Customize Labels"), (MenuItem _) => (IView)(object)new RaidLabelCustomizationView()));
 		}
 
 		public IEnumerable<MenuItem> GetSettingMenus()

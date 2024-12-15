@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using RaidClears.Features.Shared.Models;
 
 namespace RaidClears.Features.Fractals.Services
 {
@@ -19,5 +20,15 @@ namespace RaidClears.Features.Fractals.Services
 
 		[JsonProperty("id")]
 		public int MapId;
+
+		public EncounterInterface ToEncounterInterface()
+		{
+			return new EncounterInterface
+			{
+				Id = ApiLabel,
+				Name = Label,
+				Abbriviation = ShortLabel
+			};
+		}
 	}
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Blish_HUD;
 using Blish_HUD.Controls;
+using RaidClears.Features.Strikes.Models;
 using RaidClears.Localization;
 using RaidClears.Settings.Enums;
 using RaidClears.Shared.Controls;

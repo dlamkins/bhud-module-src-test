@@ -30,10 +30,10 @@ namespace RaidClears.Settings.Views.SubViews.Generics
 		{
 			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
 			//IL_006d: Expected O, but got Unknown
-			//IL_0144: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0149: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0154: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016a: Expected O, but got Unknown
+			//IL_015f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0164: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0185: Expected O, but got Unknown
 			((View<IPresenter>)this).Build(buildPanel);
 			SettingComplianceExtensions.SetRange(_settings.BgOpacity, 0f, 1f);
 			SettingComplianceExtensions.SetRange(_settings.LabelOpacity, 0.1f, 1f);

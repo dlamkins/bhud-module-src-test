@@ -2,7 +2,7 @@ namespace RaidClears.Utils
 {
 	public static class Colors
 	{
-		public const string SoftRed = "#781414";
+		public const string LightGray = "#4f4f4f";
 
 		public const string Green = "#147814";
 
@@ -12,6 +12,6 @@ namespace RaidClears.Utils
 
 		public const string Black = "#000000";
 
-		public const string Blue = "#5050FF";
+		public const string Blue = "#202090";
 	}
 }

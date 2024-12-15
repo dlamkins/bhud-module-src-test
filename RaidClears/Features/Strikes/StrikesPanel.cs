@@ -65,5 +65,24 @@ namespace RaidClears.Features.Strikes
 				strike.Dispose();
 			}
 		}
+
+		public void UpdateEncounterLabel(string encounterApiId, string newLabel)
+		{
+			foreach (Strike expansion in _strikes)
+			{
+				if (expansion.id == encounterApiId)
+				{
+					((Label)expansion.GroupLabel).set_Text(newLabel);
+					break;
+				}
+				foreach (BoxModel encounter in expansion.boxes)
+				{
+					if (encounter.id == encounterApiId)
+					{
+						encounter.SetLabel(newLabel);
+					}
+				}
+			}
+		}
 	}
 }

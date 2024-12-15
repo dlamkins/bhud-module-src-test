@@ -5,6 +5,7 @@ using Blish_HUD.Graphics.UI;
 using Blish_HUD.Input;
 using Blish_HUD.Settings;
 using Microsoft.Xna.Framework;
+using RaidClears.Features.Shared.Controls;
 using RaidClears.Localization;
 using RaidClears.Utils;
 
@@ -15,28 +16,33 @@ namespace RaidClears.Settings.Views.SubViews
 		protected override void Build(Container buildPanel)
 		{
 			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0027: Expected O, but got Unknown
-			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0049: Expected O, but got Unknown
-			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0091: Expected O, but got Unknown
-			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0111: Expected O, but got Unknown
+			//IL_0013: Expected O, but got Unknown
+			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004b: Expected O, but got Unknown
+			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a7: Expected O, but got Unknown
+			//IL_016c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0178: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0180: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0185: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0190: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0195: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01cd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e6: Expected O, but got Unknown
 			((View<IPresenter>)this).Build(buildPanel);
-			FlowPanel panel2 = FlowPanelExtensions.BeginFlow(new FlowPanel(), buildPanel, new Point(-95, 0), new Point(0, 5));
+			FlowPanel panel = new FlowPanel();
+			FlowPanel panel2 = panel.BeginFlow(buildPanel, new Point(-95, 0), new Point(0, 5));
 			StandardButton val = new StandardButton();
 			val.set_Text(Strings.PatchNotes);
 			((Control)val).set_BasicTooltipText(Strings.PatchNotes_Tooltip);
@@ -47,10 +53,12 @@ namespace RaidClears.Settings.Views.SubViews
 				.AddSpace();
 			StandardButton val2 = new StandardButton();
 			val2.set_Text(Strings.Settings_RefreshNow);
-			Control refreshButton;
-			FlowPanel panel = panel3.AddFlowControl((Control)val2, out refreshButton).AddSpace().AddSetting((SettingEntry)(object)Service.Settings.ScreenClamp)
-				.AddSpace()
+			((Container)(object)panel3.AddFlowControl((Control)val2, out var refreshButton).AddSpace().AddSetting((SettingEntry)(object)Service.Settings.OrganicGridBoxBackgrounds)).AddControl((Control)(object)new GridBox((Container)(object)panel, "Demo", "Example encounter box", Service.Settings.RaidSettings.Style.GridOpacity, Service.Settings.RaidSettings.Style.FontSize), out var grid);
+			panel.AddSpace().AddSetting((SettingEntry)(object)Service.Settings.ScreenClamp).AddSpace()
 				.AddSetting((SettingEntry)(object)Service.Settings.GlobalCornerIconEnabled);
+			(grid as GridBox).BackgroundColor = Service.Settings.RaidSettings.Style.Color.Cleared.get_Value().ToString().HexToXnaColor();
+			Control obj = grid;
+			obj.set_Location(obj.get_Location() + new Point(20, 0));
 			FlowPanel val3 = new FlowPanel();
 			val3.set_FlowDirection((ControlFlowDirection)3);
 			val3.set_OuterControlPadding(new Vector2(20f, 5f));

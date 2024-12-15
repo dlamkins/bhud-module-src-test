@@ -5,8 +5,8 @@ namespace RaidClears.Features.Raids.Models
 {
 	public class Wing : GroupModel
 	{
-		public Wing(string name, int index, string shortName, IEnumerable<BoxModel> boxes)
-			: base(name, index, shortName, boxes)
+		public Wing(string name, string id, int index, string shortName, IEnumerable<BoxModel> boxes)
+			: base(name, id, index, Service.RaidSettings.GetEncounterLabel(id), boxes)
 		{
 		}
 	}

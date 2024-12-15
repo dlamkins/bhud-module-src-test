@@ -27,6 +27,8 @@ namespace RaidClears.Settings.Views.Tabs
 			//IL_00b7: Expected O, but got Unknown
 			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00f0: Expected O, but got Unknown
+			//IL_0100: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0129: Expected O, but got Unknown
 			_registeredMenuItems.Add(new MenuViewItem(new MenuItem(Strings.SettingsPanel_Raids_Heading_General), (MenuItem _) => (IView)(object)new GenericGeneralView(Service.Settings.StrikeSettings.Generic, new List<SettingEntry>
 			{
 				(SettingEntry)(object)Service.Settings.StrikeSettings.StrikeCompletion,
@@ -34,6 +36,7 @@ namespace RaidClears.Settings.Views.Tabs
 			})));
 			_registeredMenuItems.Add(new MenuViewItem(new MenuItem(Strings.SettingsPanel_Raids_Heading_Layout), (MenuItem _) => (IView)(object)new GenericStyleView(Service.Settings.StrikeSettings.Style, null, showCopyRaids: true)));
 			_registeredMenuItems.Add(new MenuViewItem(new MenuItem(Strings.SettingsPanel_Strikes_Heading_Selection), (MenuItem _) => (IView)(object)new DynamicStrikeSelectionView()));
+			_registeredMenuItems.Add(new MenuViewItem(new MenuItem("Customize Labels"), (MenuItem _) => (IView)(object)new StrikeLabelCustomizationView()));
 			_registeredMenuItems.Add(new MenuViewItem(new MenuItem("Manage Clears"), (MenuItem _) => (IView)(object)new StrikeClearCorrectionView()));
 		}
 

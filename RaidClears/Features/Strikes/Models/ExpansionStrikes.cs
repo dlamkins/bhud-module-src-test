@@ -1,21 +1,14 @@
+using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using RaidClears.Features.Raids.Models;
 using RaidClears.Features.Shared.Models;
 
-namespace RaidClears.Features.Strikes.Services
+namespace RaidClears.Features.Strikes.Models
 {
-	public class ExpansionStrikes
+	[Serializable]
+	public class ExpansionStrikes : EncounterInterface
 	{
-		[JsonProperty("id")]
-		public string Id = "undefined";
-
-		[JsonProperty("name")]
-		public string Name = "undefined";
-
-		[JsonProperty("abbriviation")]
-		public string Abbriviation = "undefined";
-
 		[JsonProperty("asset")]
 		public string asset = "missing.png";
 
@@ -39,6 +32,16 @@ namespace RaidClears.Features.Strikes.Services
 				missionslist.Add(new Encounter(mission));
 			}
 			return missionslist;
+		}
+
+		public StrikeMission ToStrikeMission()
+		{
+			return new StrikeMission
+			{
+				Name = Name,
+				Id = Id,
+				Abbriviation = Abbriviation
+			};
 		}
 	}
 }

@@ -1,8 +1,10 @@
+using System;
 using Blish_HUD.Modules.Managers;
 using RaidClears.Features.Dungeons;
 using RaidClears.Features.Fractals;
 using RaidClears.Features.Fractals.Services;
 using RaidClears.Features.Raids;
+using RaidClears.Features.Raids.Services;
 using RaidClears.Features.Shared.Services;
 using RaidClears.Features.Strikes;
 using RaidClears.Features.Strikes.Services;
@@ -13,6 +15,9 @@ namespace RaidClears
 {
 	public static class Service
 	{
+		public static Random Random { get; set; } = new Random();
+
+
 		public static string CurrentAccountName { get; set; } = AccountNameService.DEFAULT_ACCOUNT_NAME;
 
 
@@ -41,6 +46,9 @@ namespace RaidClears
 		public static StrikeData StrikeData { get; set; } = null;
 
 
+		public static RaidSettingsPersistance RaidSettings { get; set; } = null;
+
+
 		public static StrikeSettingsPersistance StrikeSettings { get; set; } = null;
 
 
@@ -54,6 +62,9 @@ namespace RaidClears
 
 
 		public static FractalMapData FractalMapData { get; set; } = null;
+
+
+		public static RaidData RaidData { get; set; } = null;
 
 
 		public static RaidPanel RaidWindow { get; set; } = null;

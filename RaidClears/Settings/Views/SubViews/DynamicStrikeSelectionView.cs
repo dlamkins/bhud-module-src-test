@@ -3,6 +3,7 @@ using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Settings;
 using Microsoft.Xna.Framework;
+using RaidClears.Features.Strikes.Models;
 using RaidClears.Features.Strikes.Services;
 using RaidClears.Utils;
 
@@ -60,19 +61,19 @@ namespace RaidClears.Settings.Views.SubViews
 
 		private void BuildExpansionPanel(FlowPanel panel, ExpansionStrikes expac)
 		{
-			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d5: Expected O, but got Unknown
-			//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fd: Expected O, but got Unknown
+			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0092: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0099: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00df: Expected O, but got Unknown
+			//IL_0107: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0111: Expected O, but got Unknown
 			List<SettingEntry<bool>> expansionMissions = new List<SettingEntry<bool>>();
 			foreach (StrikeMission mission in expac.Missions)
 			{

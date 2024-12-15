@@ -67,5 +67,25 @@ namespace RaidClears.Features.Fractals
 				fractal.Dispose();
 			}
 		}
+
+		public void UpdateEncounterLabel(string encounterApiId, string newLabel)
+		{
+			foreach (Fractal fractalGroup in _fractals)
+			{
+				if (fractalGroup.id == encounterApiId)
+				{
+					((Label)fractalGroup.GroupLabel).set_Text(newLabel);
+					break;
+				}
+				foreach (BoxModel fractal in fractalGroup.boxes)
+				{
+					if (fractal.id == encounterApiId)
+					{
+						fractal.SetLabel(newLabel);
+						return;
+					}
+				}
+			}
+		}
 	}
 }

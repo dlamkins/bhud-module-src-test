@@ -34,7 +34,7 @@ namespace RaidClears.Settings.Models
 			{
 				public static class Color
 				{
-					public static Setting<string> uncleared = new Setting<string>("DunColNotCleared", "#781414", () => Strings.Setting_Raid_ColNotClear_Label, () => Strings.Setting_Raid_ColNotClear_Tooltip);
+					public static Setting<string> uncleared = new Setting<string>("DunColNotCleared", "#4f4f4f", () => Strings.Setting_Raid_ColNotClear_Label, () => Strings.Setting_Raid_ColNotClear_Tooltip);
 
 					public static Setting<string> cleared = new Setting<string>("DunColCleared", "#147814", () => Strings.Setting_Raid_ColClear_Label, () => Strings.Setting_Raid_ColClear_Tooltip);
 
@@ -101,7 +101,7 @@ namespace RaidClears.Settings.Models
 			{
 				public static class Color
 				{
-					public static Setting<string> uncleared = new Setting<string>("colNotCleared", "#781414", () => Strings.Setting_Raid_ColNotClear_Label, () => Strings.Setting_Raid_ColNotClear_Tooltip);
+					public static Setting<string> uncleared = new Setting<string>("colNotCleared", "#4f4f4f", () => Strings.Setting_Raid_ColNotClear_Label, () => Strings.Setting_Raid_ColNotClear_Tooltip);
 
 					public static Setting<string> cleared = new Setting<string>("colCleared", "#147814", () => Strings.Setting_Raid_ColClear_Label, () => Strings.Setting_Raid_ColClear_Tooltip);
 
@@ -109,7 +109,7 @@ namespace RaidClears.Settings.Models
 
 					public static Setting<string> cotm = new Setting<string>("colCotm", "#F3F527", () => Strings.Setting_Raid_ColCotm_Label, () => Strings.Setting_Raid_ColCotm_Tooltip);
 
-					public static Setting<string> embolden = new Setting<string>("colEmbolden", "#5050FF", () => Strings.Setting_Raid_ColEmbolden_Label, () => Strings.Setting_Raid_ColEmbolden_Tooltip);
+					public static Setting<string> embolden = new Setting<string>("colEmbolden", "#202090", () => Strings.Setting_Raid_ColEmbolden_Label, () => Strings.Setting_Raid_ColEmbolden_Tooltip);
 
 					public static Setting<string> background = new Setting<string>("colRaidBG", "#000000", () => Strings.Setting_Raid_ColBG_Label, () => Strings.Setting_Raid_ColBG_Tooltip);
 				}
@@ -153,7 +153,7 @@ namespace RaidClears.Settings.Models
 			{
 				public static class Color
 				{
-					public static Setting<string> uncleared = new Setting<string>("StkcolNotCleared", "#781414", () => Strings.Setting_Strike_ColNotClear_Label, () => Strings.Setting_Strike_ColNotClear_Tooltip);
+					public static Setting<string> uncleared = new Setting<string>("StkcolNotCleared", "#4f4f4f", () => Strings.Setting_Strike_ColNotClear_Label, () => Strings.Setting_Strike_ColNotClear_Tooltip);
 
 					public static Setting<string> cleared = new Setting<string>("StkColCleared", "#147814", () => Strings.Setting_Strike_ColClear_Label, () => Strings.Setting_Strike_ColClear_Tooltip);
 
@@ -240,7 +240,7 @@ namespace RaidClears.Settings.Models
 			{
 				public static class Color
 				{
-					public static Setting<string> uncleared = new Setting<string>("FraccolNotCleared", "#781414", () => Strings.Setting_Fractals_ColNotClear_Label, () => Strings.Setting_Fractals_ColNotClear_Tooltip);
+					public static Setting<string> uncleared = new Setting<string>("FraccolNotCleared", "#4f4f4f", () => Strings.Setting_Fractals_ColNotClear_Label, () => Strings.Setting_Fractals_ColNotClear_Tooltip);
 
 					public static Setting<string> cleared = new Setting<string>("FracColCleared", "#147814", () => Strings.Setting_Fractals_ColClear_Label, () => Strings.Setting_Fractals_ColClear_Tooltip);
 

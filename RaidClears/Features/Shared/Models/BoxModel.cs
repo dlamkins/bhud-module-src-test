@@ -1,5 +1,6 @@
 using Blish_HUD.Controls;
 using Microsoft.Xna.Framework;
+using RaidClears.Features.Raids;
 using RaidClears.Features.Shared.Controls;
 
 namespace RaidClears.Features.Shared.Models
@@ -13,6 +14,8 @@ namespace RaidClears.Features.Shared.Models
 		public string shortName;
 
 		private bool _isCleared;
+
+		protected RaidTooltipView _tooltip;
 
 		private readonly Color _colorUnknown = new Color(64, 64, 64);
 
@@ -45,23 +48,34 @@ namespace RaidClears.Features.Shared.Models
 			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
 			_colorCleared = cleared;
 			_colorNotCleared = notCleared;
-			((Control)Box).set_BackgroundColor(_isCleared ? _colorCleared : _colorNotCleared);
+			Box.BackgroundColor = (_isCleared ? _colorCleared : _colorNotCleared);
 			((Control)Box).Invalidate();
 		}
 
-		public void SetGridBoxReference(GridBox box)
+		public virtual void SetGridBoxReference(GridBox box)
 		{
 			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 			Box = box;
-			((Control)Box).set_BackgroundColor(_colorUnknown);
+			Box.BackgroundColor = _colorUnknown;
+			if (_tooltip != null)
+			{
+				((Control)Box).set_Tooltip((Tooltip)(object)_tooltip);
+			}
 		}
 
 		public void SetCleared(bool cleared)
 		{
 			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-			((Control)Box).set_BackgroundColor(cleared ? _colorCleared : _colorNotCleared);
+			Box.BackgroundColor = (cleared ? _colorCleared : _colorNotCleared);
 			_isCleared = cleared;
+		}
+
+		public void SetLabel(string label)
+		{
+			shortName = label;
+			((Label)Box).set_Text(label);
+			((Control)Box).Invalidate();
 		}
 	}
 }

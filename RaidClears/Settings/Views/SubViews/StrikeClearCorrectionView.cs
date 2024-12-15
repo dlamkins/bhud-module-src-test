@@ -4,7 +4,7 @@ using System.Linq;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Microsoft.Xna.Framework;
-using RaidClears.Features.Strikes.Services;
+using RaidClears.Features.Strikes.Models;
 using RaidClears.Utils;
 
 namespace RaidClears.Settings.Views.SubViews

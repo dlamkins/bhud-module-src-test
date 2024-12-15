@@ -27,9 +27,12 @@ namespace RaidClears.Settings.Views.Tabs
 			//IL_00b7: Expected O, but got Unknown
 			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00f0: Expected O, but got Unknown
+			//IL_0100: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0129: Expected O, but got Unknown
 			_registeredMenuItems.Add(new MenuViewItem(new MenuItem(Strings.SettingsPanel_Raids_Heading_General), (MenuItem _) => (IView)(object)new GenericGeneralView(Service.Settings.FractalSettings.Generic, new List<SettingEntry> { (SettingEntry)(object)Service.Settings.FractalSettings.CompletionMethod })));
 			_registeredMenuItems.Add(new MenuViewItem(new MenuItem(Strings.SettingsPanel_Raids_Heading_Layout), (MenuItem _) => (IView)(object)new GenericStyleView(Service.Settings.FractalSettings.Style, null, showCopyRaids: true)));
 			_registeredMenuItems.Add(new MenuViewItem(new MenuItem(Strings.SettingsPanel_Fractals_Heading_Selection), (MenuItem _) => (IView)(object)new FractalSelectionView(Service.Settings.FractalSettings)));
+			_registeredMenuItems.Add(new MenuViewItem(new MenuItem("Customize Labels"), (MenuItem _) => (IView)(object)new FractalLabelCustomizationView()));
 			_registeredMenuItems.Add(new MenuViewItem(new MenuItem("Manage Clears"), (MenuItem _) => (IView)(object)new FractalClearCorrectionView()));
 		}
 

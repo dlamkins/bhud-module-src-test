@@ -4,6 +4,7 @@ using System.IO;
 using System.Net;
 using Newtonsoft.Json;
 using RaidClears.Features.Fractals.Services;
+using RaidClears.Features.Raids.Services;
 using RaidClears.Features.Shared.Services;
 using RaidClears.Features.Strikes.Services;
 
@@ -27,8 +28,15 @@ namespace RaidClears.Shared.Services
 		[JsonProperty("strike_data")]
 		public string StrikeDataVersion { get; set; }
 
+		[JsonProperty("raid_data")]
+		public string RaidDataVersion { get; set; }
+
 		[JsonProperty("assets")]
 		public List<string> Assets { get; set; } = new List<string>();
+
+
+		[JsonProperty("gridbox_masks")]
+		public List<string> GridBoxMasks { get; set; } = new List<string>();
 
 
 		private static FileInfo GetConfigFileInfo()
@@ -76,16 +84,30 @@ namespace RaidClears.Shared.Services
 			{
 				Module.ModuleLogger.Info("JSON File: Strike Data is current on version " + webFile.StrikeDataVersion);
 			}
+			if (webFile.RaidDataVersion != localFile.RaidDataVersion)
+			{
+				RaidData.DownloadFile();
+				Module.ModuleLogger.Info("JSON File: Raid Data UPDATED to version " + webFile.RaidDataVersion);
+			}
+			else
+			{
+				Module.ModuleLogger.Info("JSON File: Raid Data is current on version " + webFile.RaidDataVersion);
+			}
 			webFile.Save();
-			webFile.ValidateAssetCache(webFile.Assets);
+			webFile.ValidateAssetCache(webFile.Assets, webFile.GridBoxMasks);
 		}
 
-		public void ValidateAssetCache(List<string> assets)
+		public void ValidateAssetCache(List<string> assets, List<string> gridboxMasks)
 		{
 			DownloadTextureService _textures = new DownloadTextureService();
-			foreach (string asset in assets)
+			foreach (string asset2 in assets)
+			{
+				_textures.ValidateTextureCache(asset2);
+			}
+			foreach (string asset in gridboxMasks)
 			{
 				_textures.ValidateTextureCache(asset);
+				Service.Textures!.AddGridBoxMask(asset);
 			}
 		}
 

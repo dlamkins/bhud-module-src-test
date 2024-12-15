@@ -7,7 +7,7 @@ using Blish_HUD.Settings;
 using Blish_HUD.Settings.UI.Views;
 using Microsoft.Xna.Framework;
 using RaidClears.Features.Fractals.Services;
-using RaidClears.Features.Strikes.Services;
+using RaidClears.Features.Strikes.Models;
 using RaidClears.Settings.Controls;
 using RaidClears.Settings.Enums;
 using RaidClears.Settings.Views;
@@ -162,7 +162,7 @@ namespace RaidClears.Utils
 			return panel.BeginFlow(parent, new Point(0), new Point(0));
 		}
 
-		public static FlowPanel AddSetting(this FlowPanel panel, SettingEntry setting)
+		public static FlowPanel AddSetting(this FlowPanel panel, SettingEntry setting, int? width = null)
 		{
 			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
@@ -172,16 +172,16 @@ namespace RaidClears.Utils
 			ViewContainer viewContainer = val;
 			if (setting.get_SettingType() == typeof(bool))
 			{
-				viewContainer.Show(FixedWidthBoolSettingView.FromSetting((SettingEntry<bool>)(object)setting, ((Control)panel).get_Width()));
+				viewContainer.Show(FixedWidthBoolSettingView.FromSetting((SettingEntry<bool>)(object)setting, width ?? ((Control)panel).get_Width()));
 			}
 			else
 			{
-				viewContainer.Show(SettingView.FromType(setting, ((Control)panel).get_Width()));
+				viewContainer.Show(SettingView.FromType(setting, width ?? ((Control)panel).get_Width()));
 			}
 			return panel;
 		}
 
-		public static FlowPanel AddSetting(this FlowPanel panel, IEnumerable<SettingEntry>? settings)
+		public static FlowPanel AddSetting(this FlowPanel panel, IEnumerable<SettingEntry>? settings, int? width = null)
 		{
 			if (settings == null)
 			{
@@ -189,7 +189,7 @@ namespace RaidClears.Utils
 			}
 			foreach (SettingEntry setting in settings!)
 			{
-				panel.AddSetting(setting);
+				panel.AddSetting(setting, width);
 			}
 			return panel;
 		}
@@ -244,6 +244,17 @@ namespace RaidClears.Utils
 			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
 			((Control)new ViewContainer()).set_Parent((Container)(object)panel);
+			return panel;
+		}
+
+		public static FlowPanel AddHorizontalSpace(this FlowPanel panel, int width)
+		{
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			ViewContainer val = new ViewContainer();
+			((Control)val).set_Parent((Container)(object)panel);
+			((Control)val).set_Width(width);
 			return panel;
 		}
 

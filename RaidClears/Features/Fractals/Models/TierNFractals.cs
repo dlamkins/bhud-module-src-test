@@ -15,8 +15,8 @@ namespace RaidClears.Features.Fractals.Models
 
 		private static FractalSettings Settings => Service.Settings.FractalSettings;
 
-		public TierNFractals(string name, int index, string shortName, IEnumerable<BoxModel> boxes, Container panel)
-			: base(name, index, shortName, boxes)
+		public TierNFractals(Container panel)
+			: base(Fractal.TierNLabel, 0, Fractal.TierNId, new List<BoxModel>())
 		{
 			Service.ResetWatcher.DailyReset += new EventHandler<DateTime>(ResetWatcher_DailyReset);
 			InitGroup(panel);

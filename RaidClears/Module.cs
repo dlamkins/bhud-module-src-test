@@ -16,6 +16,7 @@ using RaidClears.Features.Dungeons;
 using RaidClears.Features.Fractals;
 using RaidClears.Features.Fractals.Services;
 using RaidClears.Features.Raids;
+using RaidClears.Features.Raids.Services;
 using RaidClears.Features.Shared.Models;
 using RaidClears.Features.Shared.Services;
 using RaidClears.Features.Strikes;
@@ -65,17 +66,19 @@ namespace RaidClears
 
 		protected override Task LoadAsync()
 		{
-			//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bf: Expected O, but got Unknown
+			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d3: Expected O, but got Unknown
+			Service.Textures = new TextureService(Service.ContentsManager);
 			ModuleMetaDataService.CheckVersions();
+			Service.RaidData = RaidData.Load();
 			Service.StrikeData = StrikeData.Load();
+			Service.RaidSettings = RaidSettingsPersistance.Load();
 			Service.StrikeSettings = StrikeSettingsPersistance.Load();
 			Service.FractalMapData = FractalMapData.Load();
 			Service.InstabilitiesData = InstabilitiesData.Load();
 			Service.StrikePersistance = StrikePersistance.Load();
 			Service.FractalPersistance = FractalPersistance.Load();
 			Service.ApiPollingService = new ApiPollService(Service.Settings.ApiPollingPeriod);
-			Service.Textures = new TextureService(Service.ContentsManager);
 			Service.ResetWatcher = new ResetsWatcherService();
 			Service.MapWatcher = new MapWatcherService();
 			Service.FractalMapWatcher = new FractalMapWatcherService();
