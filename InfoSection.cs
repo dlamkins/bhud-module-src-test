@@ -1,6 +1,5 @@
 using System;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
@@ -20,8 +19,42 @@ public class InfoSection
 
 	private static Label _infoText;
 
-	public static async Task InitializeInfoPanel()
+	public static void InitializeInfoPanel()
 	{
+		//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+		//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+		//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+		//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+		//IL_007e: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0088: Unknown result type (might be due to invalid IL or missing references)
+		//IL_008f: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0096: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00a6: Expected O, but got Unknown
+		//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00da: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0102: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0106: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0110: Unknown result type (might be due to invalid IL or missing references)
+		//IL_0125: Expected O, but got Unknown
+		//IL_0125: Unknown result type (might be due to invalid IL or missing references)
 		Image val = new Image();
 		((Control)val).set_Parent((Container)(object)_decorWindow);
 		((Control)val).set_Location(new Point(((Control)_decorWindow).get_Width() - 120, 5));
@@ -49,45 +82,34 @@ public class InfoSection
 		val3.set_ShadowColor(new Color(0, 0, 0));
 		val3.set_Font(GameService.Content.get_DefaultFont16());
 		_infoText = val3;
-		((Control)val).add_MouseEntered((EventHandler<MouseEventArgs>)delegate
+		((Control)val).add_MouseEntered((EventHandler<MouseEventArgs>)async delegate
 		{
-			AnimatePanel(_infoTextPanel, fadeIn: true);
+			await AnimatePanel(_infoTextPanel, fadeIn: true);
 		});
-		((Control)val).add_MouseLeft((EventHandler<MouseEventArgs>)delegate
+		((Control)val).add_MouseLeft((EventHandler<MouseEventArgs>)async delegate
 		{
-			AnimatePanel(_infoTextPanel, fadeIn: false);
+			await AnimatePanel(_infoTextPanel, fadeIn: false);
 		});
 	}
 
 	private static async Task AnimatePanel(Panel panel, bool fadeIn)
 	{
-		_ = fadeIn;
+		float targetOpacity = (fadeIn ? 1f : 0f);
+		float step = (fadeIn ? 0.1f : (-0.1f));
 		if (fadeIn)
 		{
 			((Control)panel).set_Visible(true);
 		}
-		Timer timer = new Timer
+		while ((fadeIn && ((Control)panel).get_Opacity() < targetOpacity) || (!fadeIn && ((Control)panel).get_Opacity() > targetOpacity))
 		{
-			Interval = 1
-		};
-		timer.Tick += delegate
+			((Control)panel).set_Opacity(MathHelper.Clamp(((Control)panel).get_Opacity() + step, 0f, 1f));
+			await Task.Delay(16);
+		}
+		((Control)panel).set_Opacity(targetOpacity);
+		if (!fadeIn)
 		{
-			Panel obj = panel;
-			((Control)obj).set_Opacity(((Control)obj).get_Opacity() + (fadeIn ? 0.1f : (-0.1f)));
-			((Control)panel).set_Opacity(MathHelper.Clamp(((Control)panel).get_Opacity(), 0f, 1f));
-			if (fadeIn && ((Control)panel).get_Opacity() >= 1f)
-			{
-				((Control)panel).set_Opacity(1f);
-				timer.Stop();
-			}
-			else if (!fadeIn && ((Control)panel).get_Opacity() <= 0f)
-			{
-				((Control)panel).set_Opacity(0f);
-				((Control)panel).set_Visible(false);
-				timer.Stop();
-			}
-		};
-		timer.Start();
+			((Control)panel).set_Visible(false);
+		}
 	}
 
 	public static void UpdateInfoText(string newText)

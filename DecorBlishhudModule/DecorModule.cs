@@ -114,7 +114,7 @@ namespace DecorBlishhudModule
 			((Control)_loadingSpinner).set_Visible(true);
 			AsyncTexture2D windowBackgroundTexture = AsyncTexture2D.FromAssetId(155997);
 			await CreateGw2StyleWindowThatDisplaysAllDecorations(windowBackgroundTexture);
-			await InfoSection.InitializeInfoPanel();
+			InfoSection.InitializeInfoPanel();
 			await RightSideSection.UpdateDecorationImageAsync(new Decoration
 			{
 				Name = "Welcome to Decor. Enjoy your stay!",
@@ -377,7 +377,7 @@ namespace DecorBlishhudModule
 			customTab2.Enabled = false;
 			customTab4.Enabled = false;
 			await LeftSideSection.PopulateHomesteadIconsInFlowPanel(_homesteadDecorationsFlowPanel, _isIconView: true);
-			Task guildHallTask = Task.Run(async delegate
+			Task task = Task.Run(async delegate
 			{
 				await LeftSideSection.PopulateGuildHallIconsInFlowPanel(guildHallDecorationsFlowPanel, _isIconView: true);
 				customTab2.Enabled = true;
@@ -396,8 +396,20 @@ namespace DecorBlishhudModule
 					_loaded = true;
 				}
 			});
-			Task.WhenAll(guildHallTask);
-			Task.WhenAll(imagePreviewTask);
+			task.ContinueWith(delegate(Task t)
+			{
+				if (t.IsFaulted)
+				{
+					Logger.Warn((Exception)t.Exception, "Guild Hall task failed.");
+				}
+			});
+			imagePreviewTask.ContinueWith(delegate(Task t)
+			{
+				if (t.IsFaulted)
+				{
+					Logger.Warn((Exception)t.Exception, "Image Preview task failed.");
+				}
+			});
 			((TextInputBase)searchTextBox).add_TextChanged((EventHandler<EventArgs>)async delegate
 			{
 				string searchText = ((TextInputBase)searchTextBox).get_Text().ToLower();

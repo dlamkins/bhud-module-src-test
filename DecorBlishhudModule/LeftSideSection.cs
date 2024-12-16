@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Content;
@@ -29,8 +30,6 @@ namespace DecorBlishhudModule
 		private static Dictionary<string, List<Decoration>> _guildHallDecorationsCache;
 
 		private static Panel lastClickedIconPanel = null;
-
-		private CancellationTokenSource _cancellationTokenSource;
 
 		private static bool isOperationRunning = false;
 
@@ -503,15 +502,29 @@ namespace DecorBlishhudModule
 
 		private static Texture2D CreateIconTexture(byte[] iconResponse)
 		{
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
 			try
 			{
 				using MemoryStream memoryStream = new MemoryStream(iconResponse);
+				using Image originalImage = Image.FromStream(memoryStream);
+				int maxDimension = 600;
+				int newWidth = originalImage.Width;
+				int newHeight = originalImage.Height;
+				if (originalImage.Width > maxDimension || originalImage.Height > maxDimension)
+				{
+					float scale = Math.Min((float)maxDimension / (float)originalImage.Width, (float)maxDimension / (float)originalImage.Height);
+					newWidth = (int)((float)originalImage.Width * scale);
+					newHeight = (int)((float)originalImage.Height * scale);
+				}
+				using Bitmap resizedImage = new Bitmap(originalImage, newWidth, newHeight);
+				using MemoryStream resizedStream = new MemoryStream();
 				GraphicsDeviceContext graphicsContext = GameService.Graphics.LendGraphicsDeviceContext();
 				try
 				{
-					return Texture2D.FromStream(((GraphicsDeviceContext)(ref graphicsContext)).get_GraphicsDevice(), (Stream)memoryStream);
+					resizedImage.Save(resizedStream, ImageFormat.Png);
+					resizedStream.Seek(0L, SeekOrigin.Begin);
+					return Texture2D.FromStream(((GraphicsDeviceContext)(ref graphicsContext)).get_GraphicsDevice(), (Stream)resizedStream);
 				}
 				finally
 				{
