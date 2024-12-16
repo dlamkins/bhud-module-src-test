@@ -47,8 +47,6 @@ namespace DecorBlishhudModule
 
 		private Texture2D _copy;
 
-		private LoadingSpinner _loadingSpinner;
-
 		private CustomTabbedWindow2 _decorWindow;
 
 		private Image _decorationIcon;
@@ -110,8 +108,15 @@ namespace DecorBlishhudModule
 			_info = ContentsManager.GetTexture("test/info.png");
 			_x = ContentsManager.GetTexture("test/x.png");
 			_copy = ContentsManager.GetTexture("test/copy.png");
-			_cornerIcon = CornerIconHelper.CreateLoadingIcon(_homesteadIconUnactive, _homesteadIconHover, _decorWindow, out _loadingSpinner);
-			((Control)_loadingSpinner).set_Visible(true);
+			DecorModule decorModule = this;
+			CornerIcon val = new CornerIcon();
+			val.set_Icon(AsyncTexture2D.op_Implicit(_homesteadIconUnactive));
+			val.set_HoverIcon(AsyncTexture2D.op_Implicit(_homesteadIconHover));
+			val.set_IconName("Decor");
+			val.set_Priority(1645843523);
+			val.set_LoadingMessage("Decor is fetching data...");
+			((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+			decorModule._cornerIcon = val;
 			AsyncTexture2D windowBackgroundTexture = AsyncTexture2D.FromAssetId(155997);
 			await CreateGw2StyleWindowThatDisplaysAllDecorations(windowBackgroundTexture);
 			InfoSection.InitializeInfoPanel();
@@ -135,7 +140,6 @@ namespace DecorBlishhudModule
 					}
 				}
 			});
-			((Control)_loadingSpinner).set_Visible(false);
 			_signatureLabelManager = new SignatureSection((Container)(object)_decorWindow);
 			_wikiLicenseManager = new WikiLicenseSection((Container)(object)_decorWindow);
 		}
@@ -161,11 +165,6 @@ namespace DecorBlishhudModule
 			if (homesteadIconUnactive != null)
 			{
 				((GraphicsResource)homesteadIconUnactive).Dispose();
-			}
-			LoadingSpinner loadingSpinner = _loadingSpinner;
-			if (loadingSpinner != null)
-			{
-				((Control)loadingSpinner).Dispose();
 			}
 			CustomTabbedWindow2 decorWindow = _decorWindow;
 			if (decorWindow != null)
@@ -377,6 +376,7 @@ namespace DecorBlishhudModule
 			customTab2.Enabled = false;
 			customTab4.Enabled = false;
 			await LeftSideSection.PopulateHomesteadIconsInFlowPanel(_homesteadDecorationsFlowPanel, _isIconView: true);
+			_cornerIcon.set_LoadingMessage((string)null);
 			Task task = Task.Run(async delegate
 			{
 				await LeftSideSection.PopulateGuildHallIconsInFlowPanel(guildHallDecorationsFlowPanel, _isIconView: true);
