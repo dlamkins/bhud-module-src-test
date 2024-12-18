@@ -60,7 +60,7 @@ namespace DecorBlishhudModule.Sections
 
 		public void UpdateWidthBasedOnFlowPanel(bool isBigView)
 		{
-			((Control)_licenseLabel).set_Width(isBigView ? 1110 : 600);
+			((Control)_licenseLabel).set_Width(isBigView ? 1120 : 600);
 			PositionLicenseLabel();
 		}
 	}

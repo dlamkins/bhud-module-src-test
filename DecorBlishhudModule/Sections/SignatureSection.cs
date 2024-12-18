@@ -41,7 +41,7 @@ namespace DecorBlishhudModule.Sections
 			val.set_ShowShadow(true);
 			val.set_ShadowColor(new Color(0, 0, 0));
 			((Control)val).set_Height(185);
-			((Control)val).set_Width(220);
+			((Control)val).set_Width(235);
 			_signatureLabel = val;
 			((Control)_parentWindow).add_Resized((EventHandler<ResizedEventArgs>)delegate
 			{

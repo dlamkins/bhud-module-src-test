@@ -25,6 +25,8 @@ namespace DecorBlishhudModule
 	{
 		private static readonly Logger Logger = Logger.GetLogger<DecorModule>();
 
+		private static readonly Dictionary<string, Texture2D> _sharedTextureCache = new Dictionary<string, Texture2D>();
+
 		private static Dictionary<string, List<Decoration>> _homesteadDecorationsCache;
 
 		private static Dictionary<string, List<Decoration>> _guildHallDecorationsCache;
@@ -179,7 +181,12 @@ namespace DecorBlishhudModule
 		{
 			try
 			{
-				Texture2D iconTexture = CreateIconTexture(await DecorModule.DecorModuleInstance.Client.GetByteArrayAsync(decoration.IconUrl));
+				Texture2D iconTexture = await GetOrCreateTextureAsync(decoration.Name, decoration.IconUrl);
+				if (iconTexture == null)
+				{
+					Logger.Warn("Icon texture for '" + decoration.Name + "' could not be loaded.");
+					return;
+				}
 				if (_isIconView)
 				{
 					if (iconTexture == null)
@@ -282,8 +289,8 @@ namespace DecorBlishhudModule
 					});
 					return;
 				}
-				Texture2D imageTexture = CreateIconTexture(await DecorModule.DecorModuleInstance.Client.GetByteArrayAsync(decoration.ImageUrl));
-				if (imageTexture == null || iconTexture == null)
+				Texture2D imageTexture = await GetOrCreateTextureAsync(decoration.Name + "_Image", decoration.ImageUrl);
+				if (imageTexture == null)
 				{
 					return;
 				}
@@ -500,6 +507,28 @@ namespace DecorBlishhudModule
 			}
 		}
 
+		private static async Task<Texture2D> GetOrCreateTextureAsync(string key, string iconUrl)
+		{
+			if (_sharedTextureCache.TryGetValue(key, out var existingTexture))
+			{
+				return existingTexture;
+			}
+			try
+			{
+				Texture2D newTexture = CreateIconTexture(await DecorModule.DecorModuleInstance.Client.GetByteArrayAsync(iconUrl));
+				if (newTexture != null)
+				{
+					_sharedTextureCache[key] = newTexture;
+				}
+				return newTexture;
+			}
+			catch (Exception ex)
+			{
+				Logger.Warn("Failed to load texture for '" + key + "'. Error: " + ex.Message);
+				return null;
+			}
+		}
+
 		private static Texture2D CreateIconTexture(byte[] iconResponse)
 		{
 			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
@@ -536,6 +565,22 @@ namespace DecorBlishhudModule
 				Logger.Warn("Failed to create icon texture. Error: " + ex.Message);
 				return null;
 			}
+		}
+
+		private static void CleanupSharedTextureCache()
+		{
+			foreach (Texture2D value in _sharedTextureCache.Values)
+			{
+				((GraphicsResource)value).Dispose();
+			}
+			_sharedTextureCache.Clear();
+			Logger.Info("Shared texture cache cleaned up.");
+		}
+
+		protected void Unload()
+		{
+			CleanupSharedTextureCache();
+			Unload();
 		}
 	}
 }

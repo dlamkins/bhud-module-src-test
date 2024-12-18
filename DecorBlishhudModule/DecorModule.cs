@@ -33,6 +33,10 @@ namespace DecorBlishhudModule
 
 		private Texture2D _homesteadIconUnactive;
 
+		private Texture2D _homesteadScreen;
+
+		private Texture2D _guildhallScreen;
+
 		private Texture2D _handiworkTab;
 
 		private Texture2D _scribeTab;
@@ -101,6 +105,8 @@ namespace DecorBlishhudModule
 			_homesteadIconUnactive = ContentsManager.GetTexture("test/homesteadIconUnactive.png");
 			_homesteadIconHover = ContentsManager.GetTexture("test/homesteadIconHover.png");
 			_homesteadIconMenu = ContentsManager.GetTexture("test/homesteadIconMenu.png");
+			_homesteadScreen = ContentsManager.GetTexture("test/homestead_screen.png");
+			_guildhallScreen = ContentsManager.GetTexture("test/guildhall_screen.png");
 			_handiworkTab = ContentsManager.GetTexture("test/handiwork.png");
 			_scribeTab = ContentsManager.GetTexture("test/scribe.png");
 			_iconsTab = ContentsManager.GetTexture("test/icons.png");
@@ -165,6 +171,16 @@ namespace DecorBlishhudModule
 			if (homesteadIconUnactive != null)
 			{
 				((GraphicsResource)homesteadIconUnactive).Dispose();
+			}
+			Texture2D homesteadScreen = _homesteadScreen;
+			if (homesteadScreen != null)
+			{
+				((GraphicsResource)homesteadScreen).Dispose();
+			}
+			Texture2D guildhallScreen = _guildhallScreen;
+			if (guildhallScreen != null)
+			{
+				((GraphicsResource)guildhallScreen).Dispose();
 			}
 			CustomTabbedWindow2 decorWindow = _decorWindow;
 			if (decorWindow != null)
@@ -231,30 +247,29 @@ namespace DecorBlishhudModule
 			((WindowBase2)customTabbedWindow).set_SavesPosition(true);
 			((WindowBase2)customTabbedWindow).set_Id("DecorModule_Decoration_Window");
 			decorModule._decorWindow = customTabbedWindow;
-			TextBox val = new TextBox();
+			Image val = new Image();
 			((Control)val).set_Parent((Container)(object)_decorWindow);
-			((Control)val).set_Location(new Point(20, 0));
-			((Control)val).set_Width(240);
-			((TextInputBase)val).set_PlaceholderText("Search Decorations...");
-			TextBox searchTextBox = val;
-			Panel val2 = new Panel();
+			((Control)val).set_Size(new Point(((Control)_decorWindow).get_Size().X - 55, ((Control)_decorWindow).get_Size().Y - 75));
+			((Control)val).set_Location(new Point(0, 0));
+			((Control)val).set_Opacity(0.3f);
+			((Control)val).set_BackgroundColor(new Color(0, 0, 0, 10));
+			val.set_Texture(AsyncTexture2D.op_Implicit(_homesteadScreen));
+			((Control)val).set_Visible(true);
+			Image backgroundImage = val;
+			TextBox val2 = new TextBox();
 			((Control)val2).set_Parent((Container)(object)_decorWindow);
-			((Control)val2).set_Location(new Point(((Control)searchTextBox).get_Right() - 22, ((Control)searchTextBox).get_Top() + 5));
-			((Control)val2).set_Size(new Point(16, 16));
-			((Control)val2).set_Visible(false);
-			val2.set_BackgroundTexture(AsyncTexture2D.op_Implicit(_x));
-			Panel clearButton = val2;
-			DecorModule decorModule2 = this;
-			FlowPanel val3 = new FlowPanel();
+			((Control)val2).set_Location(new Point(20, 0));
+			((Control)val2).set_Width(240);
+			((TextInputBase)val2).set_PlaceholderText("Search Decorations...");
+			TextBox searchTextBox = val2;
+			Panel val3 = new Panel();
 			((Control)val3).set_Parent((Container)(object)_decorWindow);
-			val3.set_FlowDirection((ControlFlowDirection)3);
-			((Panel)val3).set_ShowBorder(true);
-			((Control)val3).set_Width(500);
-			((Control)val3).set_Height(660);
-			((Panel)val3).set_CanScroll(true);
-			((Control)val3).set_Location(new Point(10, ((Control)searchTextBox).get_Bottom() + 10));
-			((Control)val3).set_Visible(true);
-			decorModule2._homesteadDecorationsFlowPanel = val3;
+			((Control)val3).set_Location(new Point(((Control)searchTextBox).get_Right() - 22, ((Control)searchTextBox).get_Top() + 5));
+			((Control)val3).set_Size(new Point(16, 16));
+			((Control)val3).set_Visible(false);
+			val3.set_BackgroundTexture(AsyncTexture2D.op_Implicit(_x));
+			Panel clearButton = val3;
+			DecorModule decorModule2 = this;
 			FlowPanel val4 = new FlowPanel();
 			((Control)val4).set_Parent((Container)(object)_decorWindow);
 			val4.set_FlowDirection((ControlFlowDirection)3);
@@ -263,18 +278,18 @@ namespace DecorBlishhudModule
 			((Control)val4).set_Height(660);
 			((Panel)val4).set_CanScroll(true);
 			((Control)val4).set_Location(new Point(10, ((Control)searchTextBox).get_Bottom() + 10));
-			((Control)val4).set_Visible(false);
-			FlowPanel guildHallDecorationsFlowPanel = val4;
+			((Control)val4).set_Visible(true);
+			decorModule2._homesteadDecorationsFlowPanel = val4;
 			FlowPanel val5 = new FlowPanel();
 			((Control)val5).set_Parent((Container)(object)_decorWindow);
 			val5.set_FlowDirection((ControlFlowDirection)3);
 			((Panel)val5).set_ShowBorder(true);
-			((Control)val5).set_Width(1050);
-			((Control)val5).set_Height(640);
+			((Control)val5).set_Width(500);
+			((Control)val5).set_Height(660);
 			((Panel)val5).set_CanScroll(true);
 			((Control)val5).set_Location(new Point(10, ((Control)searchTextBox).get_Bottom() + 10));
 			((Control)val5).set_Visible(false);
-			FlowPanel homesteadDecorationsBigFlowPanel = val5;
+			FlowPanel guildHallDecorationsFlowPanel = val5;
 			FlowPanel val6 = new FlowPanel();
 			((Control)val6).set_Parent((Container)(object)_decorWindow);
 			val6.set_FlowDirection((ControlFlowDirection)3);
@@ -284,30 +299,40 @@ namespace DecorBlishhudModule
 			((Panel)val6).set_CanScroll(true);
 			((Control)val6).set_Location(new Point(10, ((Control)searchTextBox).get_Bottom() + 10));
 			((Control)val6).set_Visible(false);
-			FlowPanel guildHallDecorationsBigFlowPanel = val6;
-			DecorModule decorModule3 = this;
-			Label val7 = new Label();
+			FlowPanel homesteadDecorationsBigFlowPanel = val6;
+			FlowPanel val7 = new FlowPanel();
 			((Control)val7).set_Parent((Container)(object)_decorWindow);
-			((Control)val7).set_Width(500);
-			((Control)val7).set_Height(120);
-			val7.set_WrapText(true);
-			val7.set_StrokeText(true);
-			val7.set_ShowShadow(true);
-			val7.set_ShadowColor(new Color(0, 0, 0));
-			val7.set_Font(GameService.Content.get_DefaultFont18());
-			decorModule3._decorationRightText = val7;
-			DecorModule decorModule4 = this;
-			Image val8 = new Image();
+			val7.set_FlowDirection((ControlFlowDirection)3);
+			((Panel)val7).set_ShowBorder(true);
+			((Control)val7).set_Width(1050);
+			((Control)val7).set_Height(640);
+			((Panel)val7).set_CanScroll(true);
+			((Control)val7).set_Location(new Point(10, ((Control)searchTextBox).get_Bottom() + 10));
+			((Control)val7).set_Visible(false);
+			FlowPanel guildHallDecorationsBigFlowPanel = val7;
+			DecorModule decorModule3 = this;
+			Label val8 = new Label();
 			((Control)val8).set_Parent((Container)(object)_decorWindow);
-			((Control)val8).set_Size(new Point(40, 40));
-			((Control)val8).set_Location(new Point(((Control)_decorationRightText).get_Left(), ((Control)_decorationRightText).get_Bottom() + 5));
-			decorModule4._decorationIcon = val8;
-			DecorModule decorModule5 = this;
+			((Control)val8).set_Width(500);
+			((Control)val8).set_Height(120);
+			val8.set_WrapText(true);
+			val8.set_StrokeText(true);
+			val8.set_ShowShadow(true);
+			val8.set_ShadowColor(new Color(0, 0, 0));
+			val8.set_Font(GameService.Content.get_DefaultFont18());
+			decorModule3._decorationRightText = val8;
+			DecorModule decorModule4 = this;
 			Image val9 = new Image();
 			((Control)val9).set_Parent((Container)(object)_decorWindow);
-			((Control)val9).set_Size(new Point(400, 400));
-			((Control)val9).set_Location(new Point(((Control)_decorationRightText).get_Left(), ((Control)_decorationIcon).get_Bottom() + 5));
-			decorModule5._decorationImage = val9;
+			((Control)val9).set_Size(new Point(40, 40));
+			((Control)val9).set_Location(new Point(((Control)_decorationRightText).get_Left(), ((Control)_decorationRightText).get_Bottom() + 5));
+			decorModule4._decorationIcon = val9;
+			DecorModule decorModule5 = this;
+			Image val10 = new Image();
+			((Control)val10).set_Parent((Container)(object)_decorWindow);
+			((Control)val10).set_Size(new Point(400, 400));
+			((Control)val10).set_Location(new Point(((Control)_decorationRightText).get_Left(), ((Control)_decorationIcon).get_Bottom() + 5));
+			decorModule5._decorationImage = val10;
 			CustomTab customTab1 = new CustomTab(AsyncTexture2D.op_Implicit(_handiworkTab), "Homestead Handiwork", 4);
 			CustomTab customTab2 = new CustomTab(AsyncTexture2D.op_Implicit(_scribeTab), "Guild Hall Scribe", 3);
 			CustomTab customTab3 = new CustomTab(AsyncTexture2D.op_Implicit(_iconsTab), "Icons Preview", 2);
@@ -327,6 +352,8 @@ namespace DecorBlishhudModule
 				if (selectedTabGroup == customTab1 && selectedTabGroup2 == customTab3)
 				{
 					((WindowBase2)_decorWindow).set_Subtitle("Homestead Decorations");
+					backgroundImage.set_Texture(AsyncTexture2D.op_Implicit(_homesteadScreen));
+					((Control)backgroundImage).set_Visible(true);
 					((Control)_decorationRightText).set_Visible(true);
 					((Control)_decorationImage).set_Visible(true);
 					((Control)_homesteadDecorationsFlowPanel).set_Visible(true);
@@ -339,6 +366,8 @@ namespace DecorBlishhudModule
 				else if (selectedTabGroup == customTab2 && selectedTabGroup2 == customTab3)
 				{
 					((WindowBase2)_decorWindow).set_Subtitle("Guild Hall Decorations");
+					backgroundImage.set_Texture(AsyncTexture2D.op_Implicit(_guildhallScreen));
+					((Control)backgroundImage).set_Visible(true);
 					((Control)_decorationRightText).set_Visible(true);
 					((Control)_decorationImage).set_Visible(true);
 					((Control)_homesteadDecorationsFlowPanel).set_Visible(false);
@@ -351,6 +380,8 @@ namespace DecorBlishhudModule
 				else if (selectedTabGroup == customTab1 && selectedTabGroup2 == customTab4)
 				{
 					((WindowBase2)_decorWindow).set_Subtitle("Homestead Decorations");
+					backgroundImage.set_Texture(AsyncTexture2D.op_Implicit(_homesteadScreen));
+					((Control)backgroundImage).set_Visible(true);
 					((Control)_decorationRightText).set_Visible(false);
 					((Control)_decorationImage).set_Visible(false);
 					((Control)_homesteadDecorationsFlowPanel).set_Visible(false);
@@ -363,6 +394,8 @@ namespace DecorBlishhudModule
 				else if (selectedTabGroup == customTab2 && selectedTabGroup2 == customTab4)
 				{
 					((WindowBase2)_decorWindow).set_Subtitle("Guild Hall Decorations");
+					backgroundImage.set_Texture(AsyncTexture2D.op_Implicit(_guildhallScreen));
+					((Control)backgroundImage).set_Visible(true);
 					((Control)_decorationRightText).set_Visible(false);
 					((Control)_decorationImage).set_Visible(false);
 					((Control)_homesteadDecorationsFlowPanel).set_Visible(false);
