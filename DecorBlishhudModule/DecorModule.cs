@@ -49,6 +49,8 @@ namespace DecorBlishhudModule
 
 		private Texture2D _x;
 
+		private Texture2D _x2;
+
 		private Texture2D _copy;
 
 		private CustomTabbedWindow2 _decorWindow;
@@ -76,6 +78,8 @@ namespace DecorBlishhudModule
 		public Image DecorationImage => _decorationImage;
 
 		public Texture2D X => _x;
+
+		public Texture2D X2 => _x2;
 
 		public Texture2D Info => _info;
 
@@ -113,6 +117,7 @@ namespace DecorBlishhudModule
 			_imagesTab = ContentsManager.GetTexture("test/images.png");
 			_info = ContentsManager.GetTexture("test/info.png");
 			_x = ContentsManager.GetTexture("test/x.png");
+			_x2 = ContentsManager.GetTexture("test/x2.png");
 			_copy = ContentsManager.GetTexture("test/copy.png");
 			DecorModule decorModule = this;
 			CornerIcon val = new CornerIcon();
@@ -216,6 +221,11 @@ namespace DecorBlishhudModule
 			if (x != null)
 			{
 				((GraphicsResource)x).Dispose();
+			}
+			Texture2D x2 = _x2;
+			if (x2 != null)
+			{
+				((GraphicsResource)x2).Dispose();
 			}
 			Texture2D copy = _copy;
 			if (copy != null)

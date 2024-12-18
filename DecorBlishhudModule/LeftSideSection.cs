@@ -237,30 +237,30 @@ namespace DecorBlishhudModule
 							((Control)borderPanel).set_BackgroundColor(new Color(254, 254, 176));
 							((Control)decorationIconImage).set_Opacity(1f);
 							lastClickedIconPanel = borderPanel;
-							LoadingSpinner val14 = new LoadingSpinner();
-							((Control)val14).set_Parent((Container)(object)decorWindow2);
-							((Control)val14).set_Size(new Point(32, 32));
-							((Control)val14).set_Location(new Point(727, 320));
-							LoadingSpinner loaderSpinner = val14;
-							Label val15 = new Label();
-							((Control)val15).set_Parent((Container)(object)decorWindow2);
-							val15.set_Text("Loading...");
-							val15.set_Font(GameService.Content.get_DefaultFont16());
-							((Control)val15).set_Location(new Point(762, 325));
-							val15.set_HorizontalAlignment((HorizontalAlignment)1);
-							val15.set_AutoSizeWidth(true);
-							Label loadingLabel = val15;
+							LoadingSpinner val12 = new LoadingSpinner();
+							((Control)val12).set_Parent((Container)(object)decorWindow2);
+							((Control)val12).set_Size(new Point(32, 32));
+							((Control)val12).set_Location(new Point(727, 320));
+							LoadingSpinner loaderSpinner = val12;
+							Label val13 = new Label();
+							((Control)val13).set_Parent((Container)(object)decorWindow2);
+							val13.set_Text("Loading...");
+							val13.set_Font(GameService.Content.get_DefaultFont16());
+							((Control)val13).set_Location(new Point(762, 325));
+							val13.set_HorizontalAlignment((HorizontalAlignment)1);
+							val13.set_AutoSizeWidth(true);
+							Label loadingLabel = val13;
 							Label loadingLabel2 = new Label();
 							if (!loaded)
 							{
-								Label val16 = new Label();
-								((Control)val16).set_Parent((Container)(object)decorWindow2);
-								val16.set_Text("The image may take longer as the full data is fetched.");
-								val16.set_Font(GameService.Content.get_DefaultFont16());
-								((Control)val16).set_Location(new Point(620, 350));
-								val16.set_HorizontalAlignment((HorizontalAlignment)1);
-								val16.set_AutoSizeWidth(true);
-								loadingLabel2 = val16;
+								Label val14 = new Label();
+								((Control)val14).set_Parent((Container)(object)decorWindow2);
+								val14.set_Text("The image may take longer as the full data is fetched.");
+								val14.set_Font(GameService.Content.get_DefaultFont16());
+								((Control)val14).set_Location(new Point(620, 350));
+								val14.set_HorizontalAlignment((HorizontalAlignment)1);
+								val14.set_AutoSizeWidth(true);
+								loadingLabel2 = val14;
 							}
 							isOperationRunning = true;
 							try
@@ -340,6 +340,7 @@ namespace DecorBlishhudModule
 				((Control)val6).set_Location(new Point(xOffset, centeredYOffset));
 				((Control)val6).set_Size(new Point(width - 3, height));
 				((Control)val6).set_BasicTooltipText(decoration.Name);
+				Image decorationImage = val6;
 				((Control)mainContainer).add_MouseEntered((EventHandler<MouseEventArgs>)delegate
 				{
 					//IL_001b: Unknown result type (might be due to invalid IL or missing references)
@@ -358,137 +359,45 @@ namespace DecorBlishhudModule
 				});
 				CustomTabbedWindow2 decorWindow = DecorModule.DecorModuleInstance.DecorWindow;
 				Texture2D borderedTexture = BorderCreator.CreateBorderedTexture(imageTexture);
+				((Control)decorationImage).add_Click((EventHandler<MouseEventArgs>)async delegate
+				{
+					decorWindow = DecorModule.DecorModuleInstance.DecorWindow;
+					Image val11 = new Image(AsyncTexture2D.op_Implicit(borderedTexture));
+					((Control)val11).set_Parent((Container)(object)decorWindow);
+					decorationImage = val11;
+					await BigImageSection.UpdateDecorationImageAsync(decoration, (Container)(object)decorWindow, decorationImage);
+				});
 				Panel val7 = new Panel();
-				((Control)val7).set_Parent((Container)(object)decorWindow);
-				((Control)val7).set_Size(new Point(1045, 632));
-				((Control)val7).set_Location(new Point(10, 40));
-				((Control)val7).set_BackgroundColor(Color.get_Black());
-				((Control)val7).set_Opacity(0.5f);
-				((Control)val7).set_Visible(false);
-				((Control)val7).set_ZIndex(100);
-				Panel bigImagePanel = val7;
-				Image val8 = new Image(AsyncTexture2D.op_Implicit(borderedTexture));
-				((Control)val8).set_Parent((Container)(object)decorWindow);
-				((Control)val8).set_Visible(false);
-				((Control)val8).set_ZIndex(101);
-				Image bigImage = val8;
-				bool bigImageIsVisible = false;
-				float aspectRatioBig = (float)imageTexture.get_Width() / (float)imageTexture.get_Height();
-				int maxWidth = ((Control)decorWindow).get_Size().X - 400;
-				int maxHeight = ((Control)decorWindow).get_Size().Y - 300;
-				int targetWidth;
-				int targetHeight;
-				if (aspectRatioBig > 1f)
-				{
-					targetWidth = maxWidth;
-					targetHeight = (int)((float)maxWidth / aspectRatioBig);
-					if (targetHeight > maxHeight)
-					{
-						targetHeight = maxHeight;
-						targetWidth = (int)((float)maxHeight * aspectRatioBig);
-					}
-				}
-				else
-				{
-					targetHeight = maxHeight;
-					targetWidth = (int)((float)maxHeight * aspectRatioBig);
-					if (targetWidth > maxWidth)
-					{
-						targetWidth = maxWidth;
-						targetHeight = (int)((float)maxWidth / aspectRatioBig);
-					}
-				}
-				((Control)bigImage).set_Size(new Point(targetWidth, targetHeight));
-				((Control)bigImage).set_Location(new Point((((Control)decorWindow).get_Size().X - ((Control)bigImage).get_Size().X - 90) / 2, (((Control)decorWindow).get_Size().Y - ((Control)bigImage).get_Size().Y - 80) / 2));
-				Texture2D textureX = DecorModule.DecorModuleInstance.X;
-				int textureWidth = 30;
-				int textureHeight = 30;
-				float aspectRatioX = (float)textureX.get_Width() / (float)textureX.get_Height();
-				if (aspectRatioX > 1f)
-				{
-					textureWidth = Math.Min(textureWidth, ((Control)bigImage).get_Size().X / 5);
-					textureHeight = (int)((float)textureWidth / aspectRatioX);
-				}
-				else
-				{
-					textureHeight = Math.Min(textureHeight, ((Control)bigImage).get_Size().Y / 5);
-					textureWidth = (int)((float)textureHeight * aspectRatioX);
-				}
-				Image val9 = new Image(AsyncTexture2D.op_Implicit(textureX));
-				((Control)val9).set_Parent((Container)(object)decorWindow);
-				((Control)val9).set_Size(new Point(textureWidth, textureHeight));
-				((Control)val9).set_Location(new Point(((Control)bigImage).get_Location().X + ((Control)bigImage).get_Size().X - textureWidth - 10, ((Control)bigImage).get_Location().Y + 10));
-				((Control)val9).set_ZIndex(102);
+				((Control)val7).set_Parent((Container)(object)mainContainer);
+				((Control)val7).set_Size(new Point(24, 24));
+				((Control)val7).set_Location(new Point(((Control)mainContainer).get_Size().X - 24, -2));
+				Panel copyPanelContainer = val7;
+				Image val8 = new Image(AsyncTexture2D.op_Implicit(DecorModule.DecorModuleInstance?.CopyIcon));
+				((Control)val8).set_Parent((Container)(object)copyPanelContainer);
+				((Control)val8).set_Size(((Control)copyPanelContainer).get_Size());
+				((Control)val8).set_BasicTooltipText("Copy Name");
+				Panel val9 = new Panel();
+				((Control)val9).set_Parent((Container)(object)mainContainer);
+				((Control)val9).set_Location(new Point(90, 150));
+				val9.set_Title("Copied !");
+				((Control)val9).set_Width(80);
+				((Control)val9).set_Height(45);
+				val9.set_ShowBorder(true);
+				((Control)val9).set_Opacity(0f);
 				((Control)val9).set_Visible(false);
-				Image textureXImage = val9;
-				((Control)val6).add_Click((EventHandler<MouseEventArgs>)delegate
-				{
-					if (!bigImageIsVisible)
-					{
-						((Control)bigImage).set_Visible(true);
-						((Control)bigImagePanel).set_Visible(true);
-						bigImageIsVisible = true;
-						((Control)textureXImage).set_Visible(true);
-					}
-					else
-					{
-						((Control)bigImage).set_Visible(false);
-						((Control)bigImagePanel).set_Visible(false);
-						bigImageIsVisible = false;
-						((Control)textureXImage).set_Visible(false);
-					}
-				});
-				((Control)bigImage).add_Click((EventHandler<MouseEventArgs>)delegate
-				{
-					if (bigImageIsVisible)
-					{
-						((Control)bigImage).set_Visible(false);
-						((Control)bigImagePanel).set_Visible(false);
-						bigImageIsVisible = false;
-						((Control)textureXImage).set_Visible(false);
-					}
-				});
-				((Control)decorWindow).add_Click((EventHandler<MouseEventArgs>)delegate
-				{
-					if (((Control)bigImage).get_Visible())
-					{
-						((Control)bigImage).set_Visible(false);
-						((Control)bigImagePanel).set_Visible(false);
-						bigImageIsVisible = false;
-						((Control)textureXImage).set_Visible(false);
-					}
-				});
+				Panel savePanel = val9;
 				Panel val10 = new Panel();
-				((Control)val10).set_Parent((Container)(object)mainContainer);
-				((Control)val10).set_Size(new Point(24, 24));
-				((Control)val10).set_Location(new Point(((Control)mainContainer).get_Size().X - 24, -2));
-				Panel copyPanelContainer = val10;
-				Image val11 = new Image(AsyncTexture2D.op_Implicit(DecorModule.DecorModuleInstance?.CopyIcon));
-				((Control)val11).set_Parent((Container)(object)copyPanelContainer);
-				((Control)val11).set_Size(((Control)copyPanelContainer).get_Size());
-				((Control)val11).set_BasicTooltipText("Copy Name");
-				Panel val12 = new Panel();
-				((Control)val12).set_Parent((Container)(object)mainContainer);
-				((Control)val12).set_Location(new Point(90, 150));
-				val12.set_Title("Copied !");
-				((Control)val12).set_Width(80);
-				((Control)val12).set_Height(45);
-				val12.set_ShowBorder(true);
-				((Control)val12).set_Opacity(0f);
-				((Control)val12).set_Visible(false);
-				Panel savePanel = val12;
-				Panel val13 = new Panel();
-				((Control)val13).set_Parent((Container)(object)copyPanelContainer);
-				((Control)val13).set_Size(((Control)copyPanelContainer).get_Size());
-				((Control)val13).set_Location(Point.get_Zero());
-				((Control)val13).set_BackgroundColor(Color.get_White() * 0.3f);
-				((Control)val13).set_Visible(false);
-				Panel copyBrightnessOverlay = val13;
-				((Control)val11).add_MouseEntered((EventHandler<MouseEventArgs>)delegate
+				((Control)val10).set_Parent((Container)(object)copyPanelContainer);
+				((Control)val10).set_Size(((Control)copyPanelContainer).get_Size());
+				((Control)val10).set_Location(Point.get_Zero());
+				((Control)val10).set_BackgroundColor(Color.get_White() * 0.3f);
+				((Control)val10).set_Visible(false);
+				Panel copyBrightnessOverlay = val10;
+				((Control)val8).add_MouseEntered((EventHandler<MouseEventArgs>)delegate
 				{
 					((Control)copyBrightnessOverlay).set_Visible(true);
 				});
-				((Control)val11).add_MouseLeft((EventHandler<MouseEventArgs>)delegate
+				((Control)val8).add_MouseLeft((EventHandler<MouseEventArgs>)delegate
 				{
 					((Control)copyBrightnessOverlay).set_Visible(false);
 				});
@@ -537,7 +446,7 @@ namespace DecorBlishhudModule
 			{
 				using MemoryStream memoryStream = new MemoryStream(iconResponse);
 				using Image originalImage = Image.FromStream(memoryStream);
-				int maxDimension = 600;
+				int maxDimension = 200;
 				int newWidth = originalImage.Width;
 				int newHeight = originalImage.Height;
 				if (originalImage.Width > maxDimension || originalImage.Height > maxDimension)
@@ -574,6 +483,8 @@ namespace DecorBlishhudModule
 				((GraphicsResource)value).Dispose();
 			}
 			_sharedTextureCache.Clear();
+			_homesteadDecorationsCache.Clear();
+			_guildHallDecorationsCache.Clear();
 			Logger.Info("Shared texture cache cleaned up.");
 		}
 
