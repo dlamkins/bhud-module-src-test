@@ -82,6 +82,10 @@ namespace EmoteTome
 
 		private SettingEntry<bool> _halloweenMode;
 
+		private SettingEntry<bool> _checkForKeyPress;
+
+		private SettingEntry<bool> _checkForMovement;
+
 		private SettingEntry<string> _coreEmoteSeparator;
 
 		private SettingEntry<bool> _showBeckon;
@@ -180,6 +184,8 @@ namespace EmoteTome
 
 		private SettingEntry<bool> _showBreakdance;
 
+		private SettingEntry<bool> _showBoogie;
+
 		private List<Tuple<SettingEntry<bool>, Emote>> unlockEmoteSettingMap = new List<Tuple<SettingEntry<bool>, Emote>>();
 
 		private SettingEntry<string> _rankEmoteSeparator;
@@ -238,6 +244,8 @@ namespace EmoteTome
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
+			_checkForKeyPress = settings.DefineSetting<bool>("Check for Key Press", true, (Func<string>)(() => BadLocalization.CHECKKEY[language]), (Func<string>)(() => BadLocalization.CHECKKEYTEXT[language]));
+			_checkForMovement = settings.DefineSetting<bool>("Check for Movement", true, (Func<string>)(() => BadLocalization.CHECKMOVE[language]), (Func<string>)(() => BadLocalization.CHECKMOVETEXT[language]));
 			_showEmoteNames = settings.DefineSetting<bool>("Show Names", false, (Func<string>)(() => BadLocalization.SHOWNAMES[language]), (Func<string>)(() => BadLocalization.SHOWNAMESTEXT[language]));
 			_adjustLabelLength = settings.DefineSetting<bool>("Larger Name Labels", false, (Func<string>)(() => BadLocalization.LARGERNAMELABELS[language]), (Func<string>)(() => BadLocalization.LARGERNAMELABELSTEXT[language]));
 			_halloweenMode = settings.DefineSetting<bool>("Halloween Mode", false, (Func<string>)(() => BadLocalization.HALLOWEENMODE[language]), (Func<string>)(() => BadLocalization.HALLOWEENMODETEXT[language]));
@@ -289,6 +297,7 @@ namespace EmoteTome
 			_showUnleash = settings.DefineSetting<bool>("Show Unleash", true, (Func<string>)(() => BadLocalization.UNLEASH[language]), (Func<string>)(() => BadLocalization.EMOTETEXT[language]));
 			_showPetalthrow = settings.DefineSetting<bool>("Show Petalthrow", true, (Func<string>)(() => BadLocalization.PETALTHROW[language]), (Func<string>)(() => BadLocalization.EMOTETEXT[language]));
 			_showBreakdance = settings.DefineSetting<bool>("Show Breakdance", true, (Func<string>)(() => BadLocalization.BREAKDANCE[language]), (Func<string>)(() => BadLocalization.EMOTETEXT[language]));
+			_showBoogie = settings.DefineSetting<bool>("Show Boogie", true, (Func<string>)(() => BadLocalization.BOOGIE[language]), (Func<string>)(() => BadLocalization.EMOTETEXT[language]));
 			_rankEmoteSeparator = settings.DefineSetting<string>("Rank Separator", "", (Func<string>)(() => BadLocalization.RANKPANELTITLE[language]), (Func<string>)(() => ""));
 			_showYourRank = settings.DefineSetting<bool>("Show Your Rank", true, (Func<string>)(() => BadLocalization.YOURRANK[language]), (Func<string>)(() => BadLocalization.EMOTETEXT[language]));
 			_showRankRabbit = settings.DefineSetting<bool>("Show Rank Rabbit", true, (Func<string>)(() => BadLocalization.RABBIT[language]), (Func<string>)(() => BadLocalization.EMOTETEXT[language]));
@@ -637,6 +646,7 @@ namespace EmoteTome
 			unlockSettingList.Add(_showUnleash);
 			unlockSettingList.Add(_showPetalthrow);
 			unlockSettingList.Add(_showBreakdance);
+			unlockSettingList.Add(_showBoogie);
 			try
 			{
 				for (int j = 0; j < unlockEmoteList.Count; j++)
@@ -1117,29 +1127,37 @@ namespace EmoteTome
 
 		private bool isPlayerMoving()
 		{
-			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			if (((Vector3)(ref currentPositionA)).Equals(currentPositionB) && ((Vector3)(ref currentPositionA)).Equals(currentPositionC))
+			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+			if (_checkForMovement.get_Value())
 			{
-				return false;
+				if (((Vector3)(ref currentPositionA)).Equals(currentPositionB) && ((Vector3)(ref currentPositionA)).Equals(currentPositionC))
+				{
+					return false;
+				}
+				return true;
 			}
-			return true;
+			return false;
 		}
 
 		public bool IsAnyKeyDown()
 		{
-			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-			foreach (object v in Enum.GetValues(typeof(Key)))
+			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+			if (_checkForKeyPress.get_Value())
 			{
-				if ((Key)v != 0)
+				foreach (object v in Enum.GetValues(typeof(Key)))
 				{
-					KeyboardState state = Keyboard.GetState();
-					if (((KeyboardState)(ref state)).IsKeyDown((Keys)(Key)v))
+					if ((Key)v != 0)
 					{
-						return true;
+						KeyboardState state = Keyboard.GetState();
+						if (((KeyboardState)(ref state)).IsKeyDown((Keys)(Key)v))
+						{
+							return true;
+						}
 					}
 				}
+				return false;
 			}
 			return false;
 		}
@@ -1209,7 +1227,7 @@ namespace EmoteTome
 					unlockedEmotes = unlockedEmotes.ConvertAll((string d) => d.ToLower());
 					foreach (Emote emote6 in unlockEmoteList)
 					{
-						if (emote6.getChatCode().Equals("hiss") || emote6.getChatCode().Equals("magicjuggle") || emote6.getChatCode().Equals("possessed") || emote6.getChatCode().Equals("readbook") || emote6.getChatCode().Equals("serve") || emote6.getChatCode().Equals("sipcoffee") || emote6.getChatCode().Equals("unleash") || emote6.getChatCode().Equals("petalthrow") || emote6.getChatCode().Equals("breakdance"))
+						if (emote6.getChatCode().Equals("hiss") || emote6.getChatCode().Equals("magicjuggle") || emote6.getChatCode().Equals("possessed") || emote6.getChatCode().Equals("readbook") || emote6.getChatCode().Equals("serve") || emote6.getChatCode().Equals("sipcoffee") || emote6.getChatCode().Equals("unleash") || emote6.getChatCode().Equals("petalthrow") || emote6.getChatCode().Equals("breakdance") || emote6.getChatCode().Equals("boogie"))
 						{
 							((Control)emote6.getContainer()).set_Enabled(true);
 							emote6.getContainer().getImage().set_Tint(activatedColor);

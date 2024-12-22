@@ -50,6 +50,14 @@ namespace EmoteTome
 
 		public static readonly List<string> EMOTETEXT = new List<string> { "Shows/Hides this emote", "Affiche/Masque cet emote", "Zeigt/versteckt dieses Emote", "Muestra/Oculta este emote" };
 
+		public static readonly List<string> CHECKKEY = new List<string> { "Check keystrokes for emotes", "vérifier les touches enfoncées pour les émotes", "Prüfe Tastendruck bei Emotes", "Verifique las pulsaciones de teclas para ver emoticones" };
+
+		public static readonly List<string> CHECKKEYTEXT = new List<string> { "Does not allow emotes when a key is pressed.\nIt's not recommended to disable this setting.", "N'autorise pas les émoticônes lorsqu'une touche est enfoncée.\nIl n'est pas recommandé de désactiver ce paramètre.", "Erlaubt keine Emotes, während eine Taste gedrückt wird.\nEs wird nicht empfohlen, diese Einstellung zu deaktivieren.", "No permite gestos cuando se presiona una tecla.\nNo se recomienda deshabilitar esta configuración." };
+
+		public static readonly List<string> CHECKMOVE = new List<string> { "Check movement for emotes", "Vérifiez le mouvement pour les émoticônes", "Prüfe Bewegung bei Emotes", "Comprueba el movimiento de los emoticones" };
+
+		public static readonly List<string> CHECKMOVETEXT = new List<string> { "Does not allow emotes when player is moving.\nIt's not recommended to disable this setting.", "N'autorise pas les émoticônes lorsque le joueur se déplace.\nIl n'est pas recommandé de désactiver ce paramètre.", "Erlaubt keine Emotes, während sich der Spieler bewegt.\nEs wird nicht empfohlen, diese Einstellung zu deaktivieren.", "No permite gestos cuando el jugador está en movimiento.\nNo se recomienda deshabilitar esta configuración." };
+
 		public static readonly List<string> BECKON = new List<string> { "Beckon", "Approcher", "Herbeiwinken", "Señas" };
 
 		public static readonly List<string> BOW = new List<string> { "Bow", "Reverence", "Verbeugen", "Inclinarse" };
@@ -138,9 +146,11 @@ namespace EmoteTome
 
 		public static readonly List<string> UNLEASH = new List<string> { "Unleash", "Libere", "Entfesseln", "Desatar" };
 
-		public static readonly List<string> PETALTHROW = new List<string> { "Petalthrow", "Petalthrow", "Blumenblätterwerfen", "Petalthrow" };
+		public static readonly List<string> PETALTHROW = new List<string> { "Petalthrow", "Lancerpetale", "Bluetenblaetterwerfen", "Lanzarpetalos" };
 
 		public static readonly List<string> BREAKDANCE = new List<string> { "Breakdance", "Breakdance", "Breakdance", "Breakdance" };
+
+		public static readonly List<string> BOOGIE = new List<string> { "Boogie", "Boogie", "Boogie", "Boogie" };
 
 		public static readonly List<string> BEAR = new List<string> { "Bear", "Ours", "Baer", "Osa" };
 
