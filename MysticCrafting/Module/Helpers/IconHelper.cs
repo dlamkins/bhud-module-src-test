@@ -147,75 +147,21 @@ namespace MysticCrafting.Module.Helpers
 			});
 		}
 
-		public static AsyncTexture2D GetIconColor(string profession)
+		public static AsyncTexture2D GetIconColor(Discipline profession)
 		{
-			string text = profession.ToLower();
-			if (text != null)
+			return (AsyncTexture2D)(profession switch
 			{
-				switch (text.Length)
-				{
-				case 6:
-					switch (text[0])
-					{
-					case 't':
-						if (!(text == "tailor"))
-						{
-							break;
-						}
-						return TailoringColor;
-					case 's':
-						if (!(text == "scribe"))
-						{
-							break;
-						}
-						return ScribingColor;
-					}
-					break;
-				case 10:
-					if (!(text == "armorsmith"))
-					{
-						break;
-					}
-					return ArmorSmithingColor;
-				case 11:
-					if (!(text == "weaponsmith"))
-					{
-						break;
-					}
-					return WeaponSmithingColor;
-				case 7:
-					if (!(text == "jeweler"))
-					{
-						break;
-					}
-					return JeweleryColor;
-				case 9:
-					if (!(text == "artificer"))
-					{
-						break;
-					}
-					return ArtificerColor;
-				case 8:
-					if (!(text == "huntsman"))
-					{
-						break;
-					}
-					return HuntsmanColor;
-				case 4:
-					if (!(text == "chef"))
-					{
-						break;
-					}
-					return CookingColor;
-				case 13:
-					if (!(text == "leatherworker"))
-					{
-						break;
-					}
-					return LeatherworkingColor;
-				}
-			}
-			return ArmorSmithingColor;
+				Discipline.Armorsmith => ArmorSmithingColor, 
+				Discipline.Weaponsmith => WeaponSmithingColor, 
+				Discipline.Jeweler => JeweleryColor, 
+				Discipline.Artificer => ArtificerColor, 
+				Discipline.Huntsman => HuntsmanColor, 
+				Discipline.Chef => CookingColor, 
+				Discipline.Leatherworker => LeatherworkingColor, 
+				Discipline.Tailor => TailoringColor, 
+				Discipline.Scribe => ScribingColor, 
+				_ => ArmorSmithingColor, 
+			});
 		}
 	}
 }

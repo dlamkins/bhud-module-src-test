@@ -44,6 +44,10 @@ namespace MysticCrafting.Module.Strings
 
 		internal static string Accessories => ResourceManager.GetString("Accessories", resourceCulture);
 
+		internal static string Alcohol => ResourceManager.GetString("Alcohol", resourceCulture);
+
+		internal static string All_Items => ResourceManager.GetString("All Items", resourceCulture);
+
 		internal static string Amulets => ResourceManager.GetString("Amulets", resourceCulture);
 
 		internal static string Architecture => ResourceManager.GetString("Architecture", resourceCulture);
@@ -52,9 +56,19 @@ namespace MysticCrafting.Module.Strings
 
 		internal static string Armor_Runes => ResourceManager.GetString("Armor Runes", resourceCulture);
 
+		internal static string Ascended_Crafting => ResourceManager.GetString("Ascended Crafting", resourceCulture);
+
 		internal static string Axes => ResourceManager.GetString("Axes", resourceCulture);
 
 		internal static string Backpieces => ResourceManager.GetString("Backpieces", resourceCulture);
+
+		internal static string Bags => ResourceManager.GetString("Bags", resourceCulture);
+
+		internal static string Basic => ResourceManager.GetString("Basic", resourceCulture);
+
+		internal static string Basic_Crafting => ResourceManager.GetString("Basic Crafting", resourceCulture);
+
+		internal static string Blueprints => ResourceManager.GetString("Blueprints", resourceCulture);
 
 		internal static string Boots => ResourceManager.GetString("Boots", resourceCulture);
 
@@ -64,13 +78,27 @@ namespace MysticCrafting.Module.Strings
 
 		internal static string Crafting_Materials => ResourceManager.GetString("Crafting Materials", resourceCulture);
 
+		internal static string Craftsman => ResourceManager.GetString("Craftsman", resourceCulture);
+
 		internal static string Daggers => ResourceManager.GetString("Daggers", resourceCulture);
 
 		internal static string Decorations => ResourceManager.GetString("Decorations", resourceCulture);
 
+		internal static string Desserts => ResourceManager.GetString("Desserts", resourceCulture);
+
+		internal static string Dyes => ResourceManager.GetString("Dyes", resourceCulture);
+
+		internal static string Enrichments => ResourceManager.GetString("Enrichments", resourceCulture);
+
+		internal static string Equipment => ResourceManager.GetString("Equipment", resourceCulture);
+
 		internal static string Favorites => ResourceManager.GetString("Favorites", resourceCulture);
 
+		internal static string Feasts => ResourceManager.GetString("Feasts", resourceCulture);
+
 		internal static string Festivals => ResourceManager.GetString("Festivals", resourceCulture);
+
+		internal static string Fine_Crafting => ResourceManager.GetString("Fine Crafting", resourceCulture);
 
 		internal static string Foci => ResourceManager.GetString("Foci", resourceCulture);
 
@@ -82,7 +110,11 @@ namespace MysticCrafting.Module.Strings
 
 		internal static string Gloves => ResourceManager.GetString("Gloves", resourceCulture);
 
+		internal static string Glyphs => ResourceManager.GetString("Glyphs", resourceCulture);
+
 		internal static string Greatswords => ResourceManager.GetString("Greatswords", resourceCulture);
+
+		internal static string Guild_Decorations => ResourceManager.GetString("Guild Decorations", resourceCulture);
 
 		internal static string Hammers => ResourceManager.GetString("Hammers", resourceCulture);
 
@@ -92,7 +124,21 @@ namespace MysticCrafting.Module.Strings
 
 		internal static string Home => ResourceManager.GetString("Home", resourceCulture);
 
+		internal static string Infusions => ResourceManager.GetString("Infusions", resourceCulture);
+
+		internal static string Ingredients => ResourceManager.GetString("Ingredients", resourceCulture);
+
+		internal static string Inscriptions => ResourceManager.GetString("Inscriptions", resourceCulture);
+
+		internal static string Insignia => ResourceManager.GetString("Insignia", resourceCulture);
+
+		internal static string Invisible => ResourceManager.GetString("Invisible", resourceCulture);
+
 		internal static string Jade_Bot_Components => ResourceManager.GetString("Jade Bot Components", resourceCulture);
+
+		internal static string Jade_Tech => ResourceManager.GetString("Jade Tech", resourceCulture);
+
+		internal static string Jewels => ResourceManager.GetString("Jewels", resourceCulture);
 
 		internal static string Leggings => ResourceManager.GetString("Leggings", resourceCulture);
 
@@ -104,13 +150,23 @@ namespace MysticCrafting.Module.Strings
 
 		internal static string Materials => ResourceManager.GetString("Materials", resourceCulture);
 
+		internal static string Meals => ResourceManager.GetString("Meals", resourceCulture);
+
+		internal static string Miniatures => ResourceManager.GetString("Miniatures", resourceCulture);
+
 		internal static string Minis => ResourceManager.GetString("Minis", resourceCulture);
 
+		internal static string Modules => ResourceManager.GetString("Modules", resourceCulture);
+
 		internal static string Monuments => ResourceManager.GetString("Monuments", resourceCulture);
+
+		internal static string Mystic_Items => ResourceManager.GetString("Mystic Items", resourceCulture);
 
 		internal static string New_Legendary => ResourceManager.GetString("New Legendary", resourceCulture);
 
 		internal static string Obstacles => ResourceManager.GetString("Obstacles", resourceCulture);
+
+		internal static string Oiled => ResourceManager.GetString("Oiled", resourceCulture);
 
 		internal static string Other => ResourceManager.GetString("Other", resourceCulture);
 
@@ -118,7 +174,13 @@ namespace MysticCrafting.Module.Strings
 
 		internal static string Plants => ResourceManager.GetString("Plants", resourceCulture);
 
+		internal static string Power_Cores => ResourceManager.GetString("Power Cores", resourceCulture);
+
+		internal static string Rare_Crafting => ResourceManager.GetString("Rare Crafting", resourceCulture);
+
 		internal static string Recipes => ResourceManager.GetString("Recipes", resourceCulture);
+
+		internal static string Relic => ResourceManager.GetString("Relic", resourceCulture);
 
 		internal static string Relics => ResourceManager.GetString("Relics", resourceCulture);
 
@@ -126,13 +188,21 @@ namespace MysticCrafting.Module.Strings
 
 		internal static string Rings => ResourceManager.GetString("Rings", resourceCulture);
 
+		internal static string Runes_of_Holding => ResourceManager.GetString("Runes of Holding", resourceCulture);
+
 		internal static string Scepters => ResourceManager.GetString("Scepters", resourceCulture);
+
+		internal static string Schematics => ResourceManager.GetString("Schematics", resourceCulture);
 
 		internal static string Shields => ResourceManager.GetString("Shields", resourceCulture);
 
 		internal static string Short_Bows => ResourceManager.GetString("Short Bows", resourceCulture);
 
 		internal static string Shoulders => ResourceManager.GetString("Shoulders", resourceCulture);
+
+		internal static string Snacks => ResourceManager.GetString("Snacks", resourceCulture);
+
+		internal static string Soups => ResourceManager.GetString("Soups", resourceCulture);
 
 		internal static string Spears => ResourceManager.GetString("Spears", resourceCulture);
 
@@ -141,6 +211,8 @@ namespace MysticCrafting.Module.Strings
 		internal static string Statuary => ResourceManager.GetString("Statuary", resourceCulture);
 
 		internal static string Swords => ResourceManager.GetString("Swords", resourceCulture);
+
+		internal static string Tonics => ResourceManager.GetString("Tonics", resourceCulture);
 
 		internal static string Torches => ResourceManager.GetString("Torches", resourceCulture);
 

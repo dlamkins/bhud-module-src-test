@@ -8,11 +8,8 @@
     "SelectedByDefault": true
   },
   {
-    "Name": "New Legendary",
-    "Icon": 523389,
-    "Filters": {
-      "Ids": [ 103815 ]
-    }
+    "Name": "All Items",
+    "Icon": 605018
   },
   {
     "Name": "Weapons",
@@ -205,7 +202,7 @@
         }
       },
       {
-        "Name": "Relic",
+        "Name": "Relics",
         "Filters": {
           "Categories": [ 25 ]
         }
@@ -526,5 +523,11 @@
         }
       }
     ]
+  },
+  {
+    "Name": "Miniatures",
+    "Filters": {
+      "Type": 11
+    }
   }
 ]

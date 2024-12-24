@@ -44,6 +44,7 @@
   <data name="Vendor"><value>Vendor</value></data>
   <data name="TradingPost"><value>Trading Post</value></data>
   <data name="ItemSourceWarning"><value>The module does not currently support the methods to acquire this item. Right click on this item to easily open the wiki.</value></data>
+  <data name="SpecialItemWarning"><value>Please be aware that there may be cheaper ways to acquire this item. </value></data>
   <data name="MysticForge"><value>Mystic forge</value></data>
   <data name="CountInInventoryCharacter"><value>{0} in Inventory {1}</value></data>
   <data name="CurrentRecipe"><value>current</value></data>

@@ -61,11 +61,11 @@ namespace MysticCrafting.Module.Services.API
 			}
 			Task<IApiV2ObjectList<AccountMaterial>> apiMaterialsTask = ((IBlobClient<IApiV2ObjectList<AccountMaterial>>)(object)_gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
 				.get_Materials()).GetAsync(default(CancellationToken));
-			Task<IApiV2ObjectList<AccountItem>> backItemsTask = ((IBlobClient<IApiV2ObjectList<AccountItem>>)(object)_gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
+			Task<IApiV2ObjectList<AccountItem>> bankItemsTask = ((IBlobClient<IApiV2ObjectList<AccountItem>>)(object)_gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
 				.get_Bank()).GetAsync(default(CancellationToken));
 			Task<IApiV2ObjectList<AccountItem>> sharedInventoryItemsTask = ((IBlobClient<IApiV2ObjectList<AccountItem>>)(object)_gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
 				.get_Inventory()).GetAsync(default(CancellationToken));
-			List<Task> tasks = new List<Task> { apiMaterialsTask, backItemsTask, sharedInventoryItemsTask };
+			List<Task> tasks = new List<Task> { apiMaterialsTask, bankItemsTask, sharedInventoryItemsTask };
 			if (!_allCharacterNames.Any())
 			{
 				tasks.Add(LoadAllCharacterInventoriesAsync());
@@ -77,7 +77,7 @@ namespace MysticCrafting.Module.Services.API
 			await Task.WhenAll(tasks);
 			Convert((IEnumerable<AccountMaterial>)(await apiMaterialsTask), ItemStorageType.MaterialStorage).ToList();
 			Materials = ((IEnumerable<AccountMaterial>)(await apiMaterialsTask)).Select(ItemAmount.From).ToList();
-			BankItems = ((IEnumerable<AccountItem>)(await backItemsTask)).Select(ItemAmount.From)?.ToList();
+			BankItems = ((IEnumerable<AccountItem>)(await bankItemsTask)).Select(ItemAmount.From)?.ToList();
 			SharedInventoryItems = ((IEnumerable<AccountItem>)(await sharedInventoryItemsTask)).Select(ItemAmount.From).ToList();
 			return $"{Materials.Count()} materials, {BankItems.Count()} bank items, {SharedInventoryItems.Count()} shared inventory items";
 		}

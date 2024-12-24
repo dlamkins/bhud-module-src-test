@@ -20,6 +20,10 @@ namespace MysticCrafting.Module.Menu
 
 		public bool IsSelectAllOption;
 
+		public int IconWidth = 32;
+
+		public int IconHeight = 32;
+
 		[JsonIgnore]
 		public float ArrowRotation { get; set; } = -(float)Math.PI / 2f;
 
@@ -93,11 +97,11 @@ namespace MysticCrafting.Module.Menu
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0133: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0139: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0141: Unknown result type (might be due to invalid IL or missing references)
 			int leftSidePadding = LeftSidePadding;
 			if (!((Container)this)._children.get_IsEmpty())
 			{
@@ -113,7 +117,7 @@ namespace MysticCrafting.Module.Menu
 			}
 			if (((MenuItem)this).get_Icon() != null && ((Container)this)._children.get_IsEmpty())
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(((MenuItem)this).get_Icon()), new Rectangle(leftSidePadding + 190, ((MenuItem)this).get_MenuItemHeight() / 2 - 16, 32, 32));
+				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(((MenuItem)this).get_Icon()), new Rectangle(leftSidePadding + 190, ((MenuItem)this).get_MenuItemHeight() / 2 - 16, IconWidth, IconHeight));
 			}
 			if (texture != null)
 			{

@@ -66,7 +66,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Tooltips
 			//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00e5: Expected O, but got Unknown
-			AsyncTexture2D icon = IconHelper.GetIconColor(requirement.DisciplineName);
+			AsyncTexture2D icon = IconHelper.GetIcon(requirement.DisciplineName);
 			int paddingLeft = 0;
 			if (icon != null)
 			{

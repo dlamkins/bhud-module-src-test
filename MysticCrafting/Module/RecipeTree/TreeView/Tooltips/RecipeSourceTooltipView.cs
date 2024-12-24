@@ -116,7 +116,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Tooltips
 			int xPos = 0;
 			foreach (Discipline item in RecipeSource.Recipe.Disciplines ?? new List<Discipline>())
 			{
-				AsyncTexture2D icon = IconHelper.GetIcon(item);
+				AsyncTexture2D icon = IconHelper.GetIconColor(item);
 				List<Control> controls = _controls;
 				Image val = new Image(icon);
 				((Control)val).set_Parent(BuildPanel);

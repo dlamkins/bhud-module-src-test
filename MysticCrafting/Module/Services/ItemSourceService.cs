@@ -39,10 +39,13 @@ namespace MysticCrafting.Module.Services
 				return new List<IItemSource> { GetTradingPostSource(item) };
 			}
 			List<IItemSource> sources = new List<IItemSource>();
-			IEnumerable<RecipeSource> recipes = GetRecipeSources(item);
-			if (recipes != null)
+			if (item.Id != 19675)
 			{
-				sources.AddRange(recipes);
+				IEnumerable<RecipeSource> recipes = GetRecipeSources(item);
+				if (recipes != null)
+				{
+					sources.AddRange(recipes);
+				}
 			}
 			if (item.CanBeTraded)
 			{

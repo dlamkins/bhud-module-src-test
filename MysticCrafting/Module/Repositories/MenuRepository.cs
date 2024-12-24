@@ -41,7 +41,7 @@ namespace MysticCrafting.Module.Repositories
 
 		public IList<MysticMenuItem> GetMenuItems()
 		{
-			return MenuItems;
+			return MenuItems ?? new List<MysticMenuItem>();
 		}
 	}
 }

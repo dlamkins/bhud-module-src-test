@@ -1,4 +1,10 @@
-﻿#1.5.1 Bug fixes
+﻿#1.5.2 Bug fixes and minor changes
+- Mystic Clovers and Obsidian Shards have been enabled
+- Add new categories for Miniatures and All items (removed New Legendary category)
+- Add leatherworking to filters (oops)
+- Updates to discipline icons
+
+#1.5.1 Bug fixes
 - New legendary spear limit changed from 2 to 4
 - Gift of Consensed Might recipe has been fixed
 - Icons for new vendors have been added

@@ -29,8 +29,8 @@ namespace MysticCrafting.Module.Discovery.Menu
 			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0059: Expected O, but got Unknown
 			_itemsListModel = model ?? throw new ArgumentNullException("model");
-			MaxSelected = 11;
-			CurrentSelected = 11;
+			MaxSelected = 12;
+			CurrentSelected = 12;
 			Menu val = new Menu();
 			((Control)val).set_Parent((Container)(object)this);
 			Rectangle contentRegion = ((Container)this).get_ContentRegion();
@@ -43,13 +43,13 @@ namespace MysticCrafting.Module.Discovery.Menu
 			((MenuItem)filterMenuItem).set_Checked(true);
 			filterMenuItem.IsSelectAllOption = true;
 			((MenuItem)filterMenuItem).add_CheckedChanged((EventHandler<CheckChangedEvent>)AllSourcesMenuItemOnCheckedChanged);
-			((MenuItem)_sourcesMenu.AddCustomMenuItem(MysticCrafting.Module.Strings.Recipe.TradingPost, ServiceContainer.TextureRepository.Textures.TradingPostIcon)).add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate(object sender, CheckChangedEvent e)
+			((MenuItem)_sourcesMenu.AddCustomMenuItem(MysticCrafting.Module.Strings.Recipe.TradingPost, ServiceContainer.TextureRepository.GetRefTexture("102496_cropped.png"))).add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate(object sender, CheckChangedEvent e)
 			{
 				_itemsListModel.Filter.IsTradeable = e.get_Checked();
 				SourceMenuItemOnCheckChanged(sender, e);
 			});
 			_itemsListModel.Filter.IsTradeable = true;
-			((MenuItem)_sourcesMenu.AddCustomMenuItem(MysticCrafting.Module.Strings.Recipe.Vendor, ServiceContainer.TextureRepository.Textures.VendorIcon)).add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate(object sender, CheckChangedEvent e)
+			((MenuItem)_sourcesMenu.AddCustomMenuItem(MysticCrafting.Module.Strings.Recipe.Vendor, ServiceContainer.TextureRepository.GetRefTexture("merchant.png"))).add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate(object sender, CheckChangedEvent e)
 			{
 				_itemsListModel.Filter.SoldByVendor = e.get_Checked();
 				SourceMenuItemOnCheckChanged(sender, e);
@@ -66,6 +66,7 @@ namespace MysticCrafting.Module.Discovery.Menu
 			((MenuItem)_sourcesMenu.AddDiscipline(Discipline.Chef)).add_CheckedChanged((EventHandler<CheckChangedEvent>)DisciplineMenuItemOnCheckChanged);
 			((MenuItem)_sourcesMenu.AddDiscipline(Discipline.Huntsman)).add_CheckedChanged((EventHandler<CheckChangedEvent>)DisciplineMenuItemOnCheckChanged);
 			((MenuItem)_sourcesMenu.AddDiscipline(Discipline.Jeweler)).add_CheckedChanged((EventHandler<CheckChangedEvent>)DisciplineMenuItemOnCheckChanged);
+			((MenuItem)_sourcesMenu.AddDiscipline(Discipline.Leatherworker)).add_CheckedChanged((EventHandler<CheckChangedEvent>)DisciplineMenuItemOnCheckChanged);
 			((MenuItem)_sourcesMenu.AddDiscipline(Discipline.Scribe)).add_CheckedChanged((EventHandler<CheckChangedEvent>)DisciplineMenuItemOnCheckChanged);
 			((MenuItem)_sourcesMenu.AddDiscipline(Discipline.Tailor)).add_CheckedChanged((EventHandler<CheckChangedEvent>)DisciplineMenuItemOnCheckChanged);
 			((MenuItem)_sourcesMenu.AddDiscipline(Discipline.Weaponsmith)).add_CheckedChanged((EventHandler<CheckChangedEvent>)DisciplineMenuItemOnCheckChanged);

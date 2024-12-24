@@ -34,7 +34,7 @@ namespace MysticCrafting.Module.Extensions
 			EnumFilterMenuItem<Discipline> enumFilterMenuItem = new EnumFilterMenuItem<Discipline>(discipline, LocalizationHelper.TranslateDiscipline(discipline));
 			((Control)enumFilterMenuItem).set_Parent((Container)(object)menu);
 			((MenuItem)enumFilterMenuItem).set_CanCheck(true);
-			((MenuItem)enumFilterMenuItem).set_Icon(IconHelper.GetIcon(discipline));
+			((MenuItem)enumFilterMenuItem).set_Icon(IconHelper.GetIconColor(discipline));
 			((MenuItem)enumFilterMenuItem).set_Checked(true);
 			return enumFilterMenuItem;
 		}

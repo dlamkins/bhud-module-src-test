@@ -33,7 +33,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Presenters
 
 		private readonly IChoiceRepository _choiceRepository;
 
-		private readonly List<int> _excludedItems = new List<int> { 19675, 79410, 19925 };
+		private readonly List<int> _excludedItems = new List<int> { 79410 };
 
 		public IngredientNodePresenter(IRecipeDetailsViewPresenter recipeDetailsPresenter, IChoiceRepository choiceRepository)
 		{
@@ -238,15 +238,16 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Presenters
 
 		public void BuildChildren(IItemSource itemSource, Container parent)
 		{
-			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0103: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0141: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0186: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_036a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03e1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0110: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_040a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_042d: Unknown result type (might be due to invalid IL or missing references)
 			TreeNodeBase node = parent as TreeNodeBase;
 			if (node != null)
 			{
@@ -257,6 +258,14 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Presenters
 				}
 			}
 			(parent as IIngredientContainer)?.ClearChildIngredientNodes();
+			IngredientNode parentIngredient = parent as IngredientNode;
+			if (parentIngredient != null && (parentIngredient.Id == 19675 || parentIngredient.Id == 19925))
+			{
+				((Control)new LabelNode(MysticCrafting.Module.Strings.Recipe.SpecialItemWarning, parent)
+				{
+					TextColor = Color.get_Red()
+				}).set_Width(((Control)parent).get_Width() - 25);
+			}
 			RecipeSource recipeSource = itemSource as RecipeSource;
 			if (recipeSource != null && recipeSource.Recipe != null)
 			{

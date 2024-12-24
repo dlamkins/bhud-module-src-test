@@ -126,6 +126,8 @@ namespace MysticCrafting.Module.Strings
 
 		internal static string SoldByVendors => ResourceManager.GetString("SoldByVendors", resourceCulture);
 
+		internal static string SpecialItemWarning => ResourceManager.GetString("SpecialItemWarning", resourceCulture);
+
 		internal static string TableHeaderCount => ResourceManager.GetString("TableHeaderCount", resourceCulture);
 
 		internal static string TableHeaderName => ResourceManager.GetString("TableHeaderName", resourceCulture);
