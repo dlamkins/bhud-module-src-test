@@ -29,6 +29,10 @@ namespace DecorBlishhudModule
 
 		private Texture2D _homesteadIconMenu;
 
+		private Texture2D _homesteadIconMenuWintersday;
+
+		private Texture2D _currentEmblem;
+
 		private Texture2D _homesteadIconHover;
 
 		private Texture2D _homesteadIconUnactive;
@@ -47,9 +51,13 @@ namespace DecorBlishhudModule
 
 		private Texture2D _info;
 
+		private Texture2D _blackTexture;
+
 		private Texture2D _x;
 
 		private Texture2D _x2;
+
+		private Texture2D _x2Active;
 
 		private Texture2D _copy;
 
@@ -77,9 +85,13 @@ namespace DecorBlishhudModule
 
 		public Image DecorationImage => _decorationImage;
 
+		public Texture2D BlackTexture => _blackTexture;
+
 		public Texture2D X => _x;
 
 		public Texture2D X2 => _x2;
+
+		public Texture2D X2Active => _x2Active;
 
 		public Texture2D Info => _info;
 
@@ -109,6 +121,7 @@ namespace DecorBlishhudModule
 			_homesteadIconUnactive = ContentsManager.GetTexture("test/homesteadIconUnactive.png");
 			_homesteadIconHover = ContentsManager.GetTexture("test/homesteadIconHover.png");
 			_homesteadIconMenu = ContentsManager.GetTexture("test/homesteadIconMenu.png");
+			_homesteadIconMenuWintersday = ContentsManager.GetTexture("test/homesteadIconMenuWinterstay.png");
 			_homesteadScreen = ContentsManager.GetTexture("test/homestead_screen.png");
 			_guildhallScreen = ContentsManager.GetTexture("test/guildhall_screen.png");
 			_handiworkTab = ContentsManager.GetTexture("test/handiwork.png");
@@ -116,8 +129,10 @@ namespace DecorBlishhudModule
 			_iconsTab = ContentsManager.GetTexture("test/icons.png");
 			_imagesTab = ContentsManager.GetTexture("test/images.png");
 			_info = ContentsManager.GetTexture("test/info.png");
+			_blackTexture = ContentsManager.GetTexture("test/black_texture.png");
 			_x = ContentsManager.GetTexture("test/x.png");
 			_x2 = ContentsManager.GetTexture("test/x2.png");
+			_x2Active = ContentsManager.GetTexture("test/x2_active.png");
 			_copy = ContentsManager.GetTexture("test/copy.png");
 			DecorModule decorModule = this;
 			CornerIcon val = new CornerIcon();
@@ -128,6 +143,7 @@ namespace DecorBlishhudModule
 			val.set_LoadingMessage("Decor is fetching data...");
 			((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			decorModule._cornerIcon = val;
+			_currentEmblem = await MainIconTheme.GetThemeIconAsync(_homesteadIconMenu, _homesteadIconMenuWintersday);
 			AsyncTexture2D windowBackgroundTexture = AsyncTexture2D.FromAssetId(155997);
 			await CreateGw2StyleWindowThatDisplaysAllDecorations(windowBackgroundTexture);
 			InfoSection.InitializeInfoPanel();
@@ -166,6 +182,11 @@ namespace DecorBlishhudModule
 			if (homesteadIconMenu != null)
 			{
 				((GraphicsResource)homesteadIconMenu).Dispose();
+			}
+			Texture2D homesteadIconMenuWintersday = _homesteadIconMenuWintersday;
+			if (homesteadIconMenuWintersday != null)
+			{
+				((GraphicsResource)homesteadIconMenuWintersday).Dispose();
 			}
 			Texture2D homesteadIconHover = _homesteadIconHover;
 			if (homesteadIconHover != null)
@@ -217,6 +238,11 @@ namespace DecorBlishhudModule
 			{
 				((GraphicsResource)info).Dispose();
 			}
+			Texture2D blackTexture = _blackTexture;
+			if (blackTexture != null)
+			{
+				((GraphicsResource)blackTexture).Dispose();
+			}
 			Texture2D x = _x;
 			if (x != null)
 			{
@@ -226,6 +252,11 @@ namespace DecorBlishhudModule
 			if (x2 != null)
 			{
 				((GraphicsResource)x2).Dispose();
+			}
+			Texture2D x2Active = _x2Active;
+			if (x2Active != null)
+			{
+				((GraphicsResource)x2Active).Dispose();
 			}
 			Texture2D copy = _copy;
 			if (copy != null)
@@ -251,7 +282,7 @@ namespace DecorBlishhudModule
 			CustomTabbedWindow2 customTabbedWindow = new CustomTabbedWindow2(windowBackgroundTexture, new Rectangle(20, 26, 560, 640), new Rectangle(70, 40, 550, 640), new Point(1150, 800));
 			((Control)customTabbedWindow).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			((WindowBase2)customTabbedWindow).set_Title("Decor");
-			((WindowBase2)customTabbedWindow).set_Emblem(_homesteadIconMenu);
+			((WindowBase2)customTabbedWindow).set_Emblem(_currentEmblem);
 			((WindowBase2)customTabbedWindow).set_Subtitle("Homestead Decorations");
 			((Control)customTabbedWindow).set_Location(new Point(300, 300));
 			((WindowBase2)customTabbedWindow).set_SavesPosition(true);

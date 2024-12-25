@@ -22,9 +22,10 @@ namespace DecorBlishhudModule.Sections
 		{
 			((Control)_decorationImage).set_ZIndex(101);
 			Texture2D textureX = DecorModule.DecorModuleInstance.X2;
+			Texture2D textureXActive = DecorModule.DecorModuleInstance.X2Active;
 			Image val = new Image(AsyncTexture2D.op_Implicit(textureX));
 			((Control)val).set_Parent(_decorWindow);
-			((Control)val).set_Size(new Point(25, 25));
+			((Control)val).set_Size(new Point(30, 30));
 			((Control)val).set_ZIndex(102);
 			((Control)val).set_Visible(false);
 			Image textureXImage = val;
@@ -33,7 +34,7 @@ namespace DecorBlishhudModule.Sections
 				Panel val2 = new Panel();
 				((Control)val2).set_Parent(_decorWindow);
 				((Control)val2).set_Size(new Point(1045, 632));
-				((Control)val2).set_Location(new Point(10, 40));
+				((Control)val2).set_Location(new Point(11, 43));
 				((Control)val2).set_BackgroundColor(Color.get_Black());
 				((Control)val2).set_Opacity(0.5f);
 				((Control)val2).set_Visible(false);
@@ -64,6 +65,14 @@ namespace DecorBlishhudModule.Sections
 				{
 					Logger.Warn("Failed to load decoration image for '" + decoration.Name + "'. Error: " + ex.ToString());
 				}
+				((Control)textureXImage).add_MouseEntered((EventHandler<MouseEventArgs>)delegate
+				{
+					textureXImage.set_Texture(AsyncTexture2D.op_Implicit(textureXActive));
+				});
+				((Control)textureXImage).add_MouseLeft((EventHandler<MouseEventArgs>)delegate
+				{
+					textureXImage.set_Texture(AsyncTexture2D.op_Implicit(textureX));
+				});
 				((Control)_decorationImage).add_Click((EventHandler<MouseEventArgs>)async delegate
 				{
 					await Task.Delay(100);
@@ -201,12 +210,12 @@ namespace DecorBlishhudModule.Sections
 
 		private static void PositionXIconAtTopLeft(Image xIcon, Image decorationImage)
 		{
-			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
 			int offsetX = 35;
-			int offsetY = 10;
+			int offsetY = 5;
 			((Control)xIcon).set_Location(new Point(((Control)decorationImage).get_Location().X + ((Control)decorationImage).get_Size().X - offsetX, ((Control)decorationImage).get_Location().Y + offsetY));
 		}
 	}

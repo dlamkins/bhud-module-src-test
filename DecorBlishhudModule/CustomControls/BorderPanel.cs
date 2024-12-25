@@ -20,8 +20,8 @@ namespace DecorBlishhudModule.CustomControls
 		{
 			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-			ResizeHandleBoundsRight = new Rectangle(((Control)this).get_Width() - _textureWindowCorner.get_Width() + 3, ((Control)this).get_Height() - _textureWindowCorner.get_Height() + 3, _textureWindowCorner.get_Width(), _textureWindowCorner.get_Height());
-			ResizeHandleBoundsLeft = new Rectangle(-3, ((Control)this).get_Height() - _textureWindowCorner.get_Height() + 3, _textureWindowCorner.get_Width(), _textureWindowCorner.get_Height());
+			ResizeHandleBoundsRight = new Rectangle(((Control)this).get_Width() - _textureWindowCorner.get_Width() + 2, ((Control)this).get_Height() - _textureWindowCorner.get_Height() + 3, _textureWindowCorner.get_Width(), _textureWindowCorner.get_Height());
+			ResizeHandleBoundsLeft = new Rectangle(-2, ((Control)this).get_Height() - _textureWindowCorner.get_Height() + 3, _textureWindowCorner.get_Width(), _textureWindowCorner.get_Height());
 		}
 
 		public override void PaintAfterChildren(SpriteBatch spriteBatch, Rectangle bounds)

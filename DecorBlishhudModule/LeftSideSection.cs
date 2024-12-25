@@ -303,9 +303,9 @@ namespace DecorBlishhudModule
 				Panel val3 = new Panel();
 				((Control)val3).set_Parent((Container)(object)mainContainer);
 				((Control)val3).set_Location(new Point(0, 0));
-				((Control)val3).set_Size(new Point(254, 50));
-				((Control)val3).set_BackgroundColor(Color.get_Black());
+				((Control)val3).set_Size(new Point(256, 50));
 				((Control)val3).set_BasicTooltipText(decoration.Name);
+				val3.set_BackgroundTexture(AsyncTexture2D.op_Implicit(DecorModule.DecorModuleInstance.BlackTexture));
 				Panel iconTextContainer = val3;
 				Image val4 = new Image(AsyncTexture2D.op_Implicit(iconTexture));
 				((Control)val4).set_Parent((Container)(object)iconTextContainer);
@@ -337,7 +337,7 @@ namespace DecorBlishhudModule
 				int centeredYOffset = (((Control)mainContainer).get_Size().Y - ((Control)iconTextContainer).get_Size().Y - height) / 2 + yOffset;
 				Image val6 = new Image(AsyncTexture2D.op_Implicit(imageTexture));
 				((Control)val6).set_Parent((Container)(object)mainContainer);
-				((Control)val6).set_Location(new Point(xOffset, centeredYOffset));
+				((Control)val6).set_Location(new Point(xOffset + 2, centeredYOffset - 1));
 				((Control)val6).set_Size(new Point(width - 3, height));
 				((Control)val6).set_BasicTooltipText(decoration.Name);
 				Image decorationImage = val6;
@@ -370,7 +370,7 @@ namespace DecorBlishhudModule
 				Panel val7 = new Panel();
 				((Control)val7).set_Parent((Container)(object)mainContainer);
 				((Control)val7).set_Size(new Point(24, 24));
-				((Control)val7).set_Location(new Point(((Control)mainContainer).get_Size().X - 24, -2));
+				((Control)val7).set_Location(new Point(((Control)mainContainer).get_Size().X - 24, 0));
 				Panel copyPanelContainer = val7;
 				Image val8 = new Image(AsyncTexture2D.op_Implicit(DecorModule.DecorModuleInstance?.CopyIcon));
 				((Control)val8).set_Parent((Container)(object)copyPanelContainer);
