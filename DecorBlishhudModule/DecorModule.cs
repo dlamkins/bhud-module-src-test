@@ -29,6 +29,16 @@ namespace DecorBlishhudModule
 
 		private Texture2D _homesteadIconMenu;
 
+		private Texture2D _homesteadIconMenuLunar;
+
+		private Texture2D _homesteadIconMenuSAB;
+
+		private Texture2D _homesteadIconMenuDragonBash;
+
+		private Texture2D _homesteadIconMenuFOTFW;
+
+		private Texture2D _homesteadIconMenuHalloween;
+
 		private Texture2D _homesteadIconMenuWintersday;
 
 		private Texture2D _currentEmblem;
@@ -121,6 +131,11 @@ namespace DecorBlishhudModule
 			_homesteadIconUnactive = ContentsManager.GetTexture("test/homesteadIconUnactive.png");
 			_homesteadIconHover = ContentsManager.GetTexture("test/homesteadIconHover.png");
 			_homesteadIconMenu = ContentsManager.GetTexture("test/homesteadIconMenu.png");
+			_homesteadIconMenuLunar = ContentsManager.GetTexture("test/homesteadIconMenuLunar.png");
+			_homesteadIconMenuSAB = ContentsManager.GetTexture("test/homesteadIconMenuSAB.png");
+			_homesteadIconMenuDragonBash = ContentsManager.GetTexture("test/homesteadIconMenuDragonBash.png");
+			_homesteadIconMenuFOTFW = ContentsManager.GetTexture("test/homesteadIconMenuFOTFW.png");
+			_homesteadIconMenuHalloween = ContentsManager.GetTexture("test/homesteadIconMenuHalloween.png");
 			_homesteadIconMenuWintersday = ContentsManager.GetTexture("test/homesteadIconMenuWinterstay.png");
 			_homesteadScreen = ContentsManager.GetTexture("test/homestead_screen.png");
 			_guildhallScreen = ContentsManager.GetTexture("test/guildhall_screen.png");
@@ -143,7 +158,7 @@ namespace DecorBlishhudModule
 			val.set_LoadingMessage("Decor is fetching data...");
 			((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			decorModule._cornerIcon = val;
-			_currentEmblem = await MainIconTheme.GetThemeIconAsync(_homesteadIconMenu, _homesteadIconMenuWintersday);
+			_currentEmblem = await MainIconTheme.GetThemeIconAsync(_homesteadIconMenu, _homesteadIconMenuLunar, _homesteadIconMenuSAB, _homesteadIconMenuDragonBash, _homesteadIconMenuFOTFW, _homesteadIconMenuHalloween, _homesteadIconMenuWintersday);
 			AsyncTexture2D windowBackgroundTexture = AsyncTexture2D.FromAssetId(155997);
 			await CreateGw2StyleWindowThatDisplaysAllDecorations(windowBackgroundTexture);
 			InfoSection.InitializeInfoPanel();
@@ -183,6 +198,23 @@ namespace DecorBlishhudModule
 			{
 				((GraphicsResource)homesteadIconMenu).Dispose();
 			}
+			Texture2D homesteadIconMenuLunar = _homesteadIconMenuLunar;
+			if (homesteadIconMenuLunar != null)
+			{
+				((GraphicsResource)homesteadIconMenuLunar).Dispose();
+			}
+			Texture2D homesteadIconMenuSAB = _homesteadIconMenuSAB;
+			if (homesteadIconMenuSAB != null)
+			{
+				((GraphicsResource)homesteadIconMenuSAB).Dispose();
+			}
+			Texture2D homesteadIconMenuDragonBash = _homesteadIconMenuDragonBash;
+			if (homesteadIconMenuDragonBash != null)
+			{
+				((GraphicsResource)homesteadIconMenuDragonBash).Dispose();
+			}
+			((GraphicsResource)_homesteadIconMenuFOTFW).Dispose();
+			((GraphicsResource)_homesteadIconMenuHalloween).Dispose();
 			Texture2D homesteadIconMenuWintersday = _homesteadIconMenuWintersday;
 			if (homesteadIconMenuWintersday != null)
 			{
