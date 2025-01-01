@@ -129,7 +129,7 @@ namespace MysticCrafting.Module.Services
 				sources.Add(new ItemContainerSource($"item_container_{container2.ItemId}")
 				{
 					Container = container2,
-					ContainerItem = _itemRepository.GetItem(container2.ItemId)
+					ContainerItem = container2.Item
 				});
 			}
 			foreach (MysticItemContainer container in _itemContainerRepository.GetItemContainers(itemId))
@@ -137,7 +137,7 @@ namespace MysticCrafting.Module.Services
 				sources.Add(new ItemContainerSource($"item_container_{container.ItemId}")
 				{
 					ItemContainer = container,
-					ContainerItem = _itemRepository.GetItem(container.ItemId)
+					ContainerItem = container.ContainedItem
 				});
 			}
 			return sources;

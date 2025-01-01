@@ -118,6 +118,11 @@ namespace MysticCrafting.Module.RecipeTree
 			Task.Run(delegate
 			{
 				Item = ServiceContainer.ItemRepository.GetItem(ItemId);
+				if (ItemId == 103815)
+				{
+					ServiceContainer.AchievementRepository.LoadAchievementsAsync();
+				}
+				ServiceContainer.WizardsVaultRepository.LoadContainersAsync();
 				LoadingSpinner obj = _loadingSpinner;
 				if (obj != null)
 				{

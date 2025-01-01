@@ -19,15 +19,12 @@ namespace MysticCrafting.Module.Repositories
 
 		public IList<Recipe> GetRecipes(int itemId)
 		{
-			if (ReadOperations.GetWithChildren<Item>(Connection, (object)itemId, true)?.Recipes == null)
-			{
-				new List<Recipe>();
-			}
 			return ReadOperations.GetWithChildren<Item>(Connection, (object)itemId, true)?.Recipes ?? new List<Recipe>();
 		}
 
 		public void Dispose()
 		{
+			Connection?.Dispose();
 		}
 	}
 }

@@ -33,7 +33,19 @@ namespace MysticCrafting.Module.Services
 			{
 				url = "https://render.guildwars2.com/file" + url;
 			}
-			return GameService.Content.GetRenderServiceTexture(url);
+			return GetRenderServiceTexture(url);
+		}
+
+		public AsyncTexture2D GetRenderServiceTexture(string uriOrSignatureFileIdPair)
+		{
+			int separatorIndex = uriOrSignatureFileIdPair.LastIndexOf('/');
+			if (separatorIndex == -1 || separatorIndex + 1 >= uriOrSignatureFileIdPair.Length)
+			{
+				throw new ArgumentException("Could not find signature / file id pair in provided '" + uriOrSignatureFileIdPair + "'.", "uriOrSignatureFileIdPair");
+			}
+			string signature = uriOrSignatureFileIdPair.Substring(0, separatorIndex);
+			string fileId = uriOrSignatureFileIdPair.Substring(separatorIndex + 1, uriOrSignatureFileIdPair.Length - separatorIndex - 5);
+			return GameService.Content.GetRenderServiceTexture(signature, fileId);
 		}
 
 		public AsyncTexture2D GetTexture(int id)

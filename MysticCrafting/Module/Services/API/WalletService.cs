@@ -71,7 +71,7 @@ namespace MysticCrafting.Module.Services.API
 			{
 				return new List<CurrencyQuantity>();
 			}
-			return _currencyRepository.GetCurrencies().Select(GetItemCurrency);
+			return _currencyRepository.Currencies.Select(GetItemCurrency);
 		}
 
 		private CurrencyQuantity GetItemCurrency(int itemCurrencyId)

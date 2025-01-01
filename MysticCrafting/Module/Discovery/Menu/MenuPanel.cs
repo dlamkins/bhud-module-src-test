@@ -34,19 +34,16 @@ namespace MysticCrafting.Module.Discovery.Menu
 
 		public override void RecalculateLayout()
 		{
+			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
 			int num1 = ((!string.IsNullOrEmpty(((Panel)this)._title)) ? 36 : 0);
-			int num2 = 0;
-			int num3 = 0;
-			int x = 0;
-			((Container)this).set_ContentRegion(new Rectangle(x, num1, ((Control)this)._size.X - x - num2, ((Control)this)._size.Y - num1 - num3));
+			((Container)this).set_ContentRegion(new Rectangle(0, num1, ((Control)this)._size.X, ((Control)this)._size.Y - num1));
 			Rectangle contentRegion = ((Container)this).get_ContentRegion();
 			_layoutHeaderBounds = new Rectangle(((Rectangle)(ref contentRegion)).get_Left(), 0, ((Container)this).get_ContentRegion().Width, 36);
 			_layoutHeaderStatusTextBounds = new Rectangle(((Rectangle)(ref _layoutHeaderBounds)).get_Right() - 60, 0, _layoutHeaderBounds.Width - 10, 36);
@@ -55,6 +52,13 @@ namespace MysticCrafting.Module.Discovery.Menu
 
 		protected override void OnResized(ResizedEventArgs e)
 		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+			if (e.get_CurrentSize().Y == 0)
+			{
+				((Control)this).set_Size(new Point(e.get_CurrentSize().X, 36));
+			}
 			((Container)this).OnResized(e);
 			if (AssociatedScrollbar != null)
 			{

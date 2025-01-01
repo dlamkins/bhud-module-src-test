@@ -141,7 +141,7 @@ namespace MysticCrafting.Module.Update
 			((Control)val2).set_Width(((Container)this).get_ContentRegion().Width);
 			((Control)val2).set_Height(82);
 			val2.set_TextColor(Colors.Chardonnay);
-			val2.set_Text("Legendary Spear");
+			val2.set_Text("Changelog");
 			val2.set_Font(GameService.Content.GetFont((FontFace)0, (FontSize)24, (FontStyle)0));
 			val2.set_StrokeText(true);
 			val2.set_VerticalAlignment((VerticalAlignment)1);
@@ -153,8 +153,8 @@ namespace MysticCrafting.Module.Update
 			((Control)val3).set_Height(290);
 			((Control)val3).set_Width(474);
 			((Control)val3).set_Left(((Container)this).get_ContentRegion().Width / 2 - 237);
-			val3.set_ControlPadding(new Vector2(10f, 5f));
-			((Control)val3).set_Padding(new Thickness(10f));
+			val3.set_ControlPadding(new Vector2(10f, 2f));
+			((Control)val3).set_Padding(new Thickness(3f));
 			((Control)val3).set_Parent((Container)(object)this);
 			((Panel)val3).set_ShowBorder(true);
 			((Panel)val3).set_CanScroll(true);
@@ -187,7 +187,7 @@ namespace MysticCrafting.Module.Update
 						((Control)val8).set_Width(((Control)_changePanel).get_Width() - 30);
 						val8.set_WrapText(true);
 						val8.set_Text($"\n{text}");
-						val8.set_Font(GameService.Content.GetFont((FontFace)0, (FontSize)16, (FontStyle)0));
+						val8.set_Font(GameService.Content.get_DefaultFont16());
 						((Control)val8).set_Parent((Container)(object)_changePanel);
 						text.Clear();
 					}
@@ -200,13 +200,13 @@ namespace MysticCrafting.Module.Update
 					//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 					//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 					//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-					//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+					//IL_002e: Unknown result type (might be due to invalid IL or missing references)
 					Label val7 = new Label();
 					val7.set_AutoSizeHeight(true);
 					val7.set_AutoSizeWidth(true);
 					val7.set_TextColor(Colors.Chardonnay);
-					val7.set_Text("\n" + text);
-					val7.set_Font(GameService.Content.GetFont((FontFace)0, (FontSize)18, (FontStyle)0));
+					val7.set_Text(text ?? "");
+					val7.set_Font(GameService.Content.get_DefaultFont18());
 					((Control)val7).set_Parent((Container)(object)_changePanel);
 				}
 			}

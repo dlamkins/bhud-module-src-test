@@ -1,9 +1,13 @@
-﻿#1.5.2 Bug fixes and minor changes
+﻿#1.5.3 Bug fixes and performance improvements
+- Fixed issue with pricing when ignoring items
+- Fixed fatal error when re-enabling the module after disabling it
+- Fixed issue that caused filters to not display intermittently
+- Performance improvements when loading crafting tree
+#1.5.2 Bug fixes and minor changes
 - Mystic Clovers and Obsidian Shards have been enabled
 - Add new categories for Miniatures and All items (removed New Legendary category)
 - Add leatherworking to filters (oops)
 - Updates to discipline icons
-
 #1.5.1 Bug fixes
 - New legendary spear limit changed from 2 to 4
 - Gift of Consensed Might recipe has been fixed
@@ -11,7 +15,6 @@
 - Fixed issue with scroll jumping back to the top
 - Add map completion options for new legendary gifts
 - Fixed issue with price calculation with vendor selection
-
 #1.5.0 Legendary Spear update
 - New items have been added from the latest update (Legendary spear)
 - Legendary Weapon Starter Kit has been updated to #6

@@ -134,7 +134,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Presenters
 
 		public AchievementNode BuildAchievementNode(Achievement achievement, Container parent, bool loadingChildren = false, bool expandable = false)
 		{
-			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
 			AchievementNode achievementNode = new AchievementNode(achievement, parent, null, loadingChildren);
 			((Control)achievementNode).set_Width(((Control)parent).get_Width() - 25);
 			achievementNode.PanelHeight = 40;
@@ -146,13 +146,13 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Presenters
 			{
 				_recipeDetailsPresenter.SaveScrollDistance();
 			};
-			if (achievement.UnlockedByItemId != 0)
+			if (achievement.UnlockedByItemId != 0 && achievement.UnlockedByItem != null)
 			{
 				((Control)new LabelNode(MysticCrafting.Module.Strings.Recipe.AchievementUnlockedBy, (Container)(object)node)
 				{
 					TextColor = Color.get_White()
 				}).set_Width(((Control)parent).get_Width() - 25);
-				BuildItemNode(ServiceContainer.ItemRepository.GetItem(achievement.UnlockedByItemId), (Container)(object)node);
+				BuildItemNode(achievement.UnlockedByItem, (Container)(object)node);
 			}
 			return node;
 		}
@@ -394,8 +394,15 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Presenters
 				return;
 			}
 			Container parent = ((Control)((Control)tab).get_Parent()).get_Parent();
+			if (tab.ItemSource.UniqueId == "ignore")
+			{
+				(parent as TreeNodeBase)?.ClearChildNodes();
+			}
+			else
+			{
+				BuildChildren(tab.ItemSource, parent);
+			}
 			(parent as ITradeableItemNode)?.ResetPrices();
-			BuildChildren(tab.ItemSource, parent);
 			IngredientNode node = parent as IngredientNode;
 			if (node != null)
 			{

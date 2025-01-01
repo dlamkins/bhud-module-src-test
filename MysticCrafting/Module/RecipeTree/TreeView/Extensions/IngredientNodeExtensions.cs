@@ -114,7 +114,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Extensions
 			}
 			return (from n in node.TreeView.IngredientNodes.GetByItemId(reservedId)
 				where n.NodeIndex < nodeIndex
-				select n).ToList().Sum((IngredientNode n) => n.TotalUnitCount);
+				select n).Sum((IngredientNode n) => n.TotalUnitCount);
 		}
 
 		public static void UpdateTradingPostOptions(this IngredientNode node, TradingPostOptions option)
