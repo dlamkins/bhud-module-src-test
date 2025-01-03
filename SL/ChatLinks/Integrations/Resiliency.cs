@@ -42,7 +42,7 @@ namespace SL.ChatLinks.Integrations
 								HttpResponseMessage result5 = outcome2.Result;
 								if (result5 != null)
 								{
-									switch (result5.get_StatusCode())
+									switch (result5.StatusCode)
 									{
 									case HttpStatusCode.RequestTimeout:
 										goto IL_0134;
@@ -57,15 +57,15 @@ namespace SL.ChatLinks.Integrations
 									case HttpStatusCode.GatewayTimeout:
 										goto IL_01c8;
 									}
-									if (!result5.get_IsSuccessStatusCode())
+									if (!result5.IsSuccessStatusCode)
 									{
-										HttpContent content3 = result5.get_Content();
+										HttpContent content3 = result5.Content;
 										if (content3 != null)
 										{
-											HttpContentHeaders headers3 = content3.get_Headers();
+											HttpContentHeaders headers3 = content3.Headers;
 											if (headers3 != null)
 											{
-												long? contentLength3 = headers3.get_ContentLength();
+												long? contentLength3 = headers3.ContentLength;
 												if (contentLength3.HasValue && contentLength3.GetValueOrDefault() == 0L)
 												{
 													result6 = true;
@@ -151,7 +151,7 @@ namespace SL.ChatLinks.Integrations
 							HttpResponseMessage result3 = outcome.Result;
 							if (result3 != null)
 							{
-								switch (result3.get_StatusCode())
+								switch (result3.StatusCode)
 								{
 								case HttpStatusCode.RequestTimeout:
 									goto IL_0121;
@@ -166,15 +166,15 @@ namespace SL.ChatLinks.Integrations
 								case HttpStatusCode.GatewayTimeout:
 									goto IL_01b5;
 								}
-								if (!result3.get_IsSuccessStatusCode())
+								if (!result3.IsSuccessStatusCode)
 								{
-									HttpContent content2 = result3.get_Content();
+									HttpContent content2 = result3.Content;
 									if (content2 != null)
 									{
-										HttpContentHeaders headers2 = content2.get_Headers();
+										HttpContentHeaders headers2 = content2.Headers;
 										if (headers2 != null)
 										{
-											long? contentLength2 = headers2.get_ContentLength();
+											long? contentLength2 = headers2.ContentLength;
 											if (contentLength2.HasValue && contentLength2.GetValueOrDefault() == 0L)
 											{
 												result4 = true;
@@ -248,7 +248,7 @@ namespace SL.ChatLinks.Integrations
 				bool result2;
 				if (result != null)
 				{
-					switch (result.get_StatusCode())
+					switch (result.StatusCode)
 					{
 					case HttpStatusCode.RequestTimeout:
 						goto IL_009f;
@@ -259,15 +259,15 @@ namespace SL.ChatLinks.Integrations
 					case HttpStatusCode.GatewayTimeout:
 						goto IL_00b4;
 					}
-					if (!result.get_IsSuccessStatusCode())
+					if (!result.IsSuccessStatusCode)
 					{
-						HttpContent content = result.get_Content();
+						HttpContent content = result.Content;
 						if (content != null)
 						{
-							HttpContentHeaders headers = content.get_Headers();
+							HttpContentHeaders headers = content.Headers;
 							if (headers != null)
 							{
-								long? contentLength = headers.get_ContentLength();
+								long? contentLength = headers.ContentLength;
 								if (contentLength.HasValue && contentLength.GetValueOrDefault() == 0L)
 								{
 									result2 = true;
@@ -322,13 +322,12 @@ namespace SL.ChatLinks.Integrations
 			{
 				return null;
 			}
-			MediaTypeHeaderValue contentType = attempt.Result!.get_Content().get_Headers().get_ContentType();
-			if (((contentType != null) ? contentType.get_MediaType() : null) != "application/json")
+			if (attempt.Result!.Content.Headers.ContentType?.MediaType != "application/json")
 			{
 				return null;
 			}
-			await attempt.Result!.get_Content().LoadIntoBufferAsync();
-			Stream content = await attempt.Result!.get_Content().ReadAsStreamAsync();
+			await attempt.Result!.Content.LoadIntoBufferAsync();
+			Stream content = await attempt.Result!.Content.ReadAsStreamAsync();
 			try
 			{
 				using JsonDocument json = await JsonDocument.ParseAsync(content);

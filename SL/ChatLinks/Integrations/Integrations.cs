@@ -1,4 +1,3 @@
-using System;
 using System.Net.Http;
 using System.Threading;
 using GuildWars2;
@@ -13,18 +12,13 @@ namespace SL.ChatLinks.Integrations
 		{
 			IHttpClientBuilder builder = services.AddHttpClient<Gw2Client>(delegate(HttpClient httpClient)
 			{
-				httpClient.set_Timeout(Timeout.InfiniteTimeSpan);
+				httpClient.Timeout = Timeout.InfiniteTimeSpan;
 			});
-			builder.ConfigurePrimaryHttpMessageHandler((Func<HttpMessageHandler>)delegate
+			builder.ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
 			{
-				//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0011: Expected O, but got Unknown
-				HttpClientHandler val = new HttpClientHandler();
-				val.set_MaxConnectionsPerServer(int.MaxValue);
-				return (HttpMessageHandler)val;
+				MaxConnectionsPerServer = int.MaxValue
 			});
-			builder.AddHttpMessageHandler(() => (DelegatingHandler)(object)new ResilienceHandler(new ResiliencePipelineBuilder<HttpResponseMessage>().AddTimeout(Resiliency.TotalTimeoutStrategy).AddRetry(Resiliency.RetryStrategy).AddCircuitBreaker(Resiliency.CircuitBreakerStrategy)
+			builder.AddHttpMessageHandler(() => new ResilienceHandler(new ResiliencePipelineBuilder<HttpResponseMessage>().AddTimeout(Resiliency.TotalTimeoutStrategy).AddRetry(Resiliency.RetryStrategy).AddCircuitBreaker(Resiliency.CircuitBreakerStrategy)
 				.AddHedging(Resiliency.HedgingStrategy)
 				.AddTimeout(Resiliency.AttemptTimeoutStrategy)
 				.Build()));

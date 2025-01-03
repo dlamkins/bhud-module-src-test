@@ -77,7 +77,8 @@ namespace SL.ChatLinks
 				}
 			});
 			ServiceProvider serviceProvider = (_serviceProvider = (ServiceProvider?)(ServiceLocator.ServiceProvider = serviceCollection.BuildServiceProvider()));
-			Batteries_V2.Init();
+			SQLite3Provider_dynamic_cdecl.Setup("sliekens.e_sqlite3", new ModuleGetFunctionPointer("sliekens.e_sqlite3"));
+			raw.SetProvider(new SQLite3Provider_dynamic_cdecl());
 		}
 
 		protected override async Task LoadAsync()
@@ -128,22 +129,15 @@ namespace SL.ChatLinks
 				return;
 			}
 			using Stream seed = base.ModuleParameters.get_ContentsManager().GetFileStream("data.zip");
-			ZipArchive unzip = new ZipArchive(seed, (ZipArchiveMode)0);
-			try
+			using ZipArchive unzip = new ZipArchive(seed, ZipArchiveMode.Read);
+			ZipArchiveEntry data = unzip.GetEntry("data.db");
+			if (data == null)
 			{
-				ZipArchiveEntry data = unzip.GetEntry("data.db");
-				if (data == null)
-				{
-					return;
-				}
-				using Stream dataStream = data.Open();
-				using FileStream fileStream = File.Create(databaseLocation);
-				await dataStream.CopyToAsync(fileStream);
+				return;
 			}
-			finally
-			{
-				((IDisposable)unzip)?.Dispose();
-			}
+			using Stream dataStream = data.Open();
+			using FileStream fileStream = File.Create(databaseLocation);
+			await dataStream.CopyToAsync(fileStream);
 		}
 
 		private T Resolve<T>() where T : notnull

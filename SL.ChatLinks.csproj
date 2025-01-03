@@ -8,9 +8,21 @@
     <LangVersion>Preview</LangVersion>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
-  <PropertyGroup />
-  <ItemGroup />
+  <PropertyGroup>
+    <RootNamespace />
+  </PropertyGroup>
   <ItemGroup>
+    <None Remove="costura_win_x86.sliekens.e_sqlite3.dll" />
+    <None Remove="costura_win_x64.sliekens.e_sqlite3.dll" />
+    <None Remove="costura\metadata" />
+    <EmbeddedResource Include="costura_win_x86.sliekens.e_sqlite3.dll" />
+    <EmbeddedResource Include="costura_win_x64.sliekens.e_sqlite3.dll" />
+    <EmbeddedResource Include="costura\metadata" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System.Memory">
+      <HintPath>..\..\working\System.Memory.dll</HintPath>
+    </Reference>
     <Reference Include="Blish HUD" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="Microsoft.Extensions.DependencyInjection">
@@ -31,6 +43,9 @@
     </Reference>
     <Reference Include="Microsoft.Extensions.Logging.Abstractions">
       <HintPath>..\..\working\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.core">
+      <HintPath>..\..\working\SQLitePCLRaw.core.dll</HintPath>
     </Reference>
     <Reference Include="GW2SDK">
       <HintPath>..\..\working\GW2SDK.dll</HintPath>
@@ -62,8 +77,8 @@
     <Reference Include="Microsoft.Extensions.Http">
       <HintPath>..\..\working\Microsoft.Extensions.Http.dll</HintPath>
     </Reference>
-    <Reference Include="SQLitePCLRaw.batteries_v2">
-      <HintPath>..\..\working\SQLitePCLRaw.batteries_v2.dll</HintPath>
+    <Reference Include="SQLitePCLRaw.provider.dynamic_cdecl">
+      <HintPath>..\..\working\SQLitePCLRaw.provider.dynamic_cdecl.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.EntityFrameworkCore.Sqlite">
       <HintPath>..\..\working\Microsoft.EntityFrameworkCore.Sqlite.dll</HintPath>
