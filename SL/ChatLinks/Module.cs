@@ -77,8 +77,7 @@ namespace SL.ChatLinks
 				}
 			});
 			ServiceProvider serviceProvider = (_serviceProvider = (ServiceProvider?)(ServiceLocator.ServiceProvider = serviceCollection.BuildServiceProvider()));
-			SQLite3Provider_dynamic_cdecl.Setup("sliekens.e_sqlite3", new ModuleGetFunctionPointer("sliekens.e_sqlite3"));
-			raw.SetProvider(new SQLite3Provider_dynamic_cdecl());
+			SetupSQLite3();
 		}
 
 		protected override async Task LoadAsync()
@@ -118,6 +117,12 @@ namespace SL.ChatLinks
 			((Control)_cornerIcon).set_Menu(new ContextMenuStrip());
 			_syncButton = ((Control)_cornerIcon).get_Menu().AddMenuItem("Sync database");
 			((Control)_syncButton).add_Click((EventHandler<MouseEventArgs>)SyncClicked);
+		}
+
+		private void SetupSQLite3()
+		{
+			SQLite3Provider_dynamic_cdecl.Setup("e_sqlite3", new ModuleGetFunctionPointer("sliekens.e_sqlite3"));
+			raw.SetProvider(new SQLite3Provider_dynamic_cdecl());
 		}
 
 		private async Task FirstTimeSetup()
