@@ -156,7 +156,7 @@ namespace Events_Module
 					e.NextTime = DateTime.Today + nextTime;
 				}
 				double timeUntil = (e.NextTime - DateTime.Now).TotalMinutes;
-				if (timeUntil < (double)(e.Reminder ?? (-1)) && e.IsWatched)
+				if (timeUntil < (double)e.Reminder.GetValueOrDefault(-1) && e.IsWatched)
 				{
 					if (!e.HasAlerted && EventsModule.ModuleInstance.NotificationsEnabled)
 					{
