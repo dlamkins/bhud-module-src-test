@@ -40,7 +40,7 @@ namespace DecorBlishhudModule.Sections
 			val.set_StrokeText(true);
 			val.set_ShowShadow(true);
 			val.set_ShadowColor(new Color(0, 0, 0));
-			((Control)val).set_Height(195);
+			((Control)val).set_Height(205);
 			((Control)val).set_Width(600);
 			_licenseLabel = val;
 			((Control)_parentWindow).add_Resized((EventHandler<ResizedEventArgs>)delegate
@@ -58,9 +58,10 @@ namespace DecorBlishhudModule.Sections
 			((Control)_licenseLabel).Invalidate();
 		}
 
-		public void UpdateWidthBasedOnFlowPanel(bool isBigView)
+		public void UpdateFlowPanelPosition(bool isBigView)
 		{
 			((Control)_licenseLabel).set_Width(isBigView ? 1120 : 600);
+			((Control)_licenseLabel).set_Height(isBigView ? 145 : 205);
 			PositionLicenseLabel();
 		}
 	}

@@ -89,7 +89,7 @@ namespace DecorBlishhudModule
 				((Control)val).set_Height(calculatedHeight);
 				((Panel)val).set_CanCollapse(false);
 				val.set_ControlPadding(new Vector2(4f, 4f));
-				val.set_OuterControlPadding(new Vector2(0f, 4f));
+				val.set_OuterControlPadding(new Vector2(6f, 4f));
 				FlowPanel categoryFlowPanel = val;
 				await Task.WhenAll(decorations.Select((Decoration decoration) => CreateDecorationIconsImagesAsync(decoration, categoryFlowPanel, _isIconView)));
 			}));
@@ -114,7 +114,7 @@ namespace DecorBlishhudModule
 				((Control)val).set_Height(calculatedHeight);
 				((Panel)val).set_CanCollapse(false);
 				val.set_ControlPadding(new Vector2(4f, 4f));
-				val.set_OuterControlPadding(new Vector2(0f, 4f));
+				val.set_OuterControlPadding(new Vector2(6f, 4f));
 				FlowPanel categoryFlowPanel = val;
 				await Task.WhenAll(value.Select((Decoration decoration) => CreateDecorationIconsImagesAsync(decoration, categoryFlowPanel, _isIconView)));
 			}).ToList());
@@ -144,8 +144,8 @@ namespace DecorBlishhudModule
 				((Control)val).set_Width(((Control)homesteadDecorationsFlowPanel).get_Width() - 20);
 				((Control)val).set_Height(calculatedHeight);
 				((Panel)val).set_CanCollapse(true);
-				val.set_ControlPadding(new Vector2(4f, 10f));
-				val.set_OuterControlPadding(new Vector2(0f, 10f));
+				val.set_ControlPadding(new Vector2(8f, 10f));
+				val.set_OuterControlPadding(new Vector2(10f, 10f));
 				FlowPanel categoryFlowPanel = val;
 				await Task.WhenAll(decorations.Select((Decoration decoration) => CreateDecorationIconsImagesAsync(decoration, categoryFlowPanel, _isIconView)));
 			}));
@@ -169,8 +169,8 @@ namespace DecorBlishhudModule
 				((Control)val).set_Width(((Control)decorationsFlowPanel).get_Width() - 20);
 				((Control)val).set_Height(calculatedHeight);
 				((Panel)val).set_CanCollapse(true);
-				val.set_ControlPadding(new Vector2(4f, 10f));
-				val.set_OuterControlPadding(new Vector2(0f, 10f));
+				val.set_ControlPadding(new Vector2(8f, 10f));
+				val.set_OuterControlPadding(new Vector2(10f, 10f));
 				FlowPanel categoryFlowPanel = val;
 				await Task.WhenAll(value.Select((Decoration decoration) => CreateDecorationIconsImagesAsync(decoration, categoryFlowPanel, _isIconView)));
 			}).ToList());

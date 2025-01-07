@@ -14,7 +14,7 @@ namespace DecorBlishhudModule.CustomControls.CustomTab
 
 		private const int TAB_HEIGHT = 50;
 
-		private const int TAB_WIDTH = 100;
+		private const int TAB_WIDTH = 80;
 
 		private const int TAB_GAP = 40;
 
@@ -205,35 +205,35 @@ namespace DecorBlishhudModule.CustomControls.CustomTab
 			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
 			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0104: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0144: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0149: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0190: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0195: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0107: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0147: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0193: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0198: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01ca: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ed: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ff: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0206: Unknown result type (might be due to invalid IL or missing references)
-			//IL_021c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0226: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0233: Unknown result type (might be due to invalid IL or missing references)
-			//IL_023f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01cd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ee: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01fe: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0205: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0222: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0239: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0245: Unknown result type (might be due to invalid IL or missing references)
 			((WindowBase2)this).PaintAfterChildren(spriteBatch, bounds);
 			int tabIndex = 0;
 			Rectangle val;
@@ -248,11 +248,11 @@ namespace DecorBlishhudModule.CustomControls.CustomTab
 				if (isSelected2)
 				{
 					val = ((WindowBase2)this).get_SidebarActiveBounds();
-					((Rectangle)(ref destinationRectangle))._002Ector(((Rectangle)(ref val)).get_Left() - (100 - ((WindowBase2)this).get_SidebarActiveBounds().Width) + 2, y2, 100, 50);
+					((Rectangle)(ref destinationRectangle))._002Ector(((Rectangle)(ref val)).get_Left() - (80 - ((WindowBase2)this).get_SidebarActiveBounds().Width) + 2, y2, 80, 50);
 					Texture2D obj = AsyncTexture2D.op_Implicit(((WindowBase2)this).get_WindowBackground());
 					Rectangle val2 = destinationRectangle;
 					val = ((WindowBase2)this).get_WindowRegion();
-					int num = ((Rectangle)(ref val)).get_Left() + destinationRectangle.X;
+					int num = ((Rectangle)(ref val)).get_Left() + destinationRectangle.X + 20;
 					int y3 = destinationRectangle.Y;
 					padding = ((Control)this).get_Padding();
 					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, obj, val2, (Rectangle?)new Rectangle(num, y3 - (int)((Thickness)(ref padding)).get_Top(), destinationRectangle.Width, destinationRectangle.Height));
@@ -271,11 +271,11 @@ namespace DecorBlishhudModule.CustomControls.CustomTab
 				if (isSelected)
 				{
 					val = ((WindowBase2)this).get_SidebarActiveBounds();
-					((Rectangle)(ref destinationRectangle2))._002Ector(((Rectangle)(ref val)).get_Left() - (100 - ((WindowBase2)this).get_SidebarActiveBounds().Width) + 2, y, 100, 50);
+					((Rectangle)(ref destinationRectangle2))._002Ector(((Rectangle)(ref val)).get_Left() - (80 - ((WindowBase2)this).get_SidebarActiveBounds().Width) + 2, y, 80, 50);
 					Texture2D obj2 = AsyncTexture2D.op_Implicit(((WindowBase2)this).get_WindowBackground());
 					Rectangle val3 = destinationRectangle2;
 					val = ((WindowBase2)this).get_WindowRegion();
-					int num2 = ((Rectangle)(ref val)).get_Left() + destinationRectangle2.X;
+					int num2 = ((Rectangle)(ref val)).get_Left() + destinationRectangle2.X + 20;
 					int y4 = destinationRectangle2.Y;
 					padding = ((Control)this).get_Padding();
 					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, obj2, val3, (Rectangle?)new Rectangle(num2, y4 - (int)((Thickness)(ref padding)).get_Top(), destinationRectangle2.Width, destinationRectangle2.Height));

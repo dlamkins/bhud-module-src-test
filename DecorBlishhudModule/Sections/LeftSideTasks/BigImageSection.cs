@@ -10,7 +10,7 @@ using DecorBlishhudModule.Model;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace DecorBlishhudModule.Sections
+namespace DecorBlishhudModule.Sections.LeftSideTasks
 {
 	public class BigImageSection
 	{
@@ -33,8 +33,8 @@ namespace DecorBlishhudModule.Sections
 			{
 				Panel val2 = new Panel();
 				((Control)val2).set_Parent(_decorWindow);
-				((Control)val2).set_Size(new Point(1045, 632));
-				((Control)val2).set_Location(new Point(11, 43));
+				((Control)val2).set_Size(new Point(1075, 652));
+				((Control)val2).set_Location(new Point(11, 42));
 				((Control)val2).set_BackgroundColor(Color.get_Black());
 				((Control)val2).set_Opacity(0.5f);
 				((Control)val2).set_Visible(false);
@@ -182,7 +182,7 @@ namespace DecorBlishhudModule.Sections
 			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
 			int centerX = (parent.get_Width() - ((Control)image).get_Size().X) / 2;
 			int centerY = (parent.get_Height() - ((Control)image).get_Size().Y) / 2;
-			((Control)image).set_Location(new Point(centerX - 48, centerY - 40));
+			((Control)image).set_Location(new Point(centerX - 48, centerY - 30));
 		}
 
 		public static void AdjustImageSize(Texture2D loadedTexture, Image decorationImage)

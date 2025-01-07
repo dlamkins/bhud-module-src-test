@@ -4,7 +4,7 @@ using Blish_HUD.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace DecorBlishhudModule
+namespace DecorBlishhudModule.Sections.LeftSideTasks
 {
 	public class BorderCreator
 	{

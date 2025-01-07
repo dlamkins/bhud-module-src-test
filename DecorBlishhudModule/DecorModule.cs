@@ -71,6 +71,8 @@ namespace DecorBlishhudModule
 
 		private Texture2D _copy;
 
+		private Texture2D _heart;
+
 		private CustomTabbedWindow2 _decorWindow;
 
 		private Image _decorationIcon;
@@ -108,6 +110,8 @@ namespace DecorBlishhudModule
 		public bool Loaded => _loaded;
 
 		public Texture2D CopyIcon => _copy;
+
+		public Texture2D Heart => _heart;
 
 		public HttpClient Client => client;
 
@@ -149,6 +153,7 @@ namespace DecorBlishhudModule
 			_x2 = ContentsManager.GetTexture("test/x2.png");
 			_x2Active = ContentsManager.GetTexture("test/x2_active.png");
 			_copy = ContentsManager.GetTexture("test/copy.png");
+			_heart = ContentsManager.GetTexture("test/heart.png");
 			DecorModule decorModule = this;
 			CornerIcon val = new CornerIcon();
 			val.set_Icon(AsyncTexture2D.op_Implicit(_homesteadIconUnactive));
@@ -295,6 +300,11 @@ namespace DecorBlishhudModule
 			{
 				((GraphicsResource)copy).Dispose();
 			}
+			Texture2D heart = _heart;
+			if (heart != null)
+			{
+				((GraphicsResource)heart).Dispose();
+			}
 			Image decorationIcon = _decorationIcon;
 			if (decorationIcon != null)
 			{
@@ -311,7 +321,7 @@ namespace DecorBlishhudModule
 		private async Task CreateGw2StyleWindowThatDisplaysAllDecorations(AsyncTexture2D windowBackgroundTexture)
 		{
 			DecorModule decorModule = this;
-			CustomTabbedWindow2 customTabbedWindow = new CustomTabbedWindow2(windowBackgroundTexture, new Rectangle(20, 26, 560, 640), new Rectangle(70, 40, 550, 640), new Point(1150, 800));
+			CustomTabbedWindow2 customTabbedWindow = new CustomTabbedWindow2(windowBackgroundTexture, new Rectangle(0, 26, 590, 640), new Rectangle(50, 40, 550, 640), new Point(1150, 800));
 			((Control)customTabbedWindow).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			((WindowBase2)customTabbedWindow).set_Title("Decor");
 			((WindowBase2)customTabbedWindow).set_Emblem(_currentEmblem);
@@ -322,7 +332,7 @@ namespace DecorBlishhudModule
 			decorModule._decorWindow = customTabbedWindow;
 			Image val = new Image();
 			((Control)val).set_Parent((Container)(object)_decorWindow);
-			((Control)val).set_Size(new Point(((Control)_decorWindow).get_Size().X - 55, ((Control)_decorWindow).get_Size().Y - 75));
+			((Control)val).set_Size(new Point(((Control)_decorWindow).get_Size().X - 75, ((Control)_decorWindow).get_Size().Y - 75));
 			((Control)val).set_Location(new Point(0, 0));
 			((Control)val).set_Opacity(0.3f);
 			((Control)val).set_BackgroundColor(new Color(0, 0, 0, 10));
@@ -332,13 +342,14 @@ namespace DecorBlishhudModule
 			TextBox val2 = new TextBox();
 			((Control)val2).set_Parent((Container)(object)_decorWindow);
 			((Control)val2).set_Location(new Point(20, 0));
-			((Control)val2).set_Width(240);
+			((Control)val2).set_Size(new Point(280, 30));
+			((TextInputBase)val2).set_Font(GameService.Content.get_DefaultFont16());
 			((TextInputBase)val2).set_PlaceholderText("Search Decorations...");
 			TextBox searchTextBox = val2;
 			Panel val3 = new Panel();
 			((Control)val3).set_Parent((Container)(object)_decorWindow);
-			((Control)val3).set_Location(new Point(((Control)searchTextBox).get_Right() - 22, ((Control)searchTextBox).get_Top() + 5));
-			((Control)val3).set_Size(new Point(16, 16));
+			((Control)val3).set_Location(new Point(((Control)searchTextBox).get_Right() - 23, ((Control)searchTextBox).get_Top() + 5));
+			((Control)val3).set_Size(new Point(18, 18));
 			((Control)val3).set_Visible(false);
 			val3.set_BackgroundTexture(AsyncTexture2D.op_Implicit(_x));
 			Panel clearButton = val3;
@@ -367,8 +378,8 @@ namespace DecorBlishhudModule
 			((Control)val6).set_Parent((Container)(object)_decorWindow);
 			val6.set_FlowDirection((ControlFlowDirection)3);
 			((Panel)val6).set_ShowBorder(true);
-			((Control)val6).set_Width(1050);
-			((Control)val6).set_Height(640);
+			((Control)val6).set_Width(1080);
+			((Control)val6).set_Height(660);
 			((Panel)val6).set_CanScroll(true);
 			((Control)val6).set_Location(new Point(10, ((Control)searchTextBox).get_Bottom() + 10));
 			((Control)val6).set_Visible(false);
@@ -377,8 +388,8 @@ namespace DecorBlishhudModule
 			((Control)val7).set_Parent((Container)(object)_decorWindow);
 			val7.set_FlowDirection((ControlFlowDirection)3);
 			((Panel)val7).set_ShowBorder(true);
-			((Control)val7).set_Width(1050);
-			((Control)val7).set_Height(640);
+			((Control)val7).set_Width(1080);
+			((Control)val7).set_Height(660);
 			((Panel)val7).set_CanScroll(true);
 			((Control)val7).set_Location(new Point(10, ((Control)searchTextBox).get_Bottom() + 10));
 			((Control)val7).set_Visible(false);
@@ -433,7 +444,8 @@ namespace DecorBlishhudModule
 					((Control)guildHallDecorationsFlowPanel).set_Visible(false);
 					((Control)homesteadDecorationsBigFlowPanel).set_Visible(false);
 					((Control)guildHallDecorationsBigFlowPanel).set_Visible(false);
-					_wikiLicenseManager.UpdateWidthBasedOnFlowPanel(isBigView: false);
+					_wikiLicenseManager.UpdateFlowPanelPosition(isBigView: false);
+					_signatureLabelManager.UpdateFlowPanelPosition(isBigView: false);
 					InfoSection.UpdateInfoText("    Click on the name or the image\n            to copy its name.");
 				}
 				else if (selectedTabGroup == customTab2 && selectedTabGroup2 == customTab3)
@@ -447,7 +459,8 @@ namespace DecorBlishhudModule
 					((Control)guildHallDecorationsFlowPanel).set_Visible(true);
 					((Control)homesteadDecorationsBigFlowPanel).set_Visible(false);
 					((Control)guildHallDecorationsBigFlowPanel).set_Visible(false);
-					_wikiLicenseManager.UpdateWidthBasedOnFlowPanel(isBigView: false);
+					_wikiLicenseManager.UpdateFlowPanelPosition(isBigView: false);
+					_signatureLabelManager.UpdateFlowPanelPosition(isBigView: false);
 					InfoSection.UpdateInfoText("    Click on the name or the image\n            to copy its name.");
 				}
 				else if (selectedTabGroup == customTab1 && selectedTabGroup2 == customTab4)
@@ -461,7 +474,8 @@ namespace DecorBlishhudModule
 					((Control)guildHallDecorationsFlowPanel).set_Visible(false);
 					((Control)homesteadDecorationsBigFlowPanel).set_Visible(true);
 					((Control)guildHallDecorationsBigFlowPanel).set_Visible(false);
-					_wikiLicenseManager.UpdateWidthBasedOnFlowPanel(isBigView: true);
+					_wikiLicenseManager.UpdateFlowPanelPosition(isBigView: true);
+					_signatureLabelManager.UpdateFlowPanelPosition(isBigView: true);
 					InfoSection.UpdateInfoText("    Click on the image to zoom in.\nCopy icon copies the decoration name.");
 				}
 				else if (selectedTabGroup == customTab2 && selectedTabGroup2 == customTab4)
@@ -475,7 +489,8 @@ namespace DecorBlishhudModule
 					((Control)guildHallDecorationsFlowPanel).set_Visible(false);
 					((Control)homesteadDecorationsBigFlowPanel).set_Visible(false);
 					((Control)guildHallDecorationsBigFlowPanel).set_Visible(true);
-					_wikiLicenseManager.UpdateWidthBasedOnFlowPanel(isBigView: true);
+					_wikiLicenseManager.UpdateFlowPanelPosition(isBigView: true);
+					_signatureLabelManager.UpdateFlowPanelPosition(isBigView: true);
 					InfoSection.UpdateInfoText("    Click on the image to zoom in.\nCopy icon copies the decoration name.");
 				}
 			};
