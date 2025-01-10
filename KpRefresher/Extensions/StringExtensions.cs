@@ -12,11 +12,11 @@ namespace KpRefresher.Extensions
 			foreach (FieldInfo field in fields)
 			{
 				DisplayAttribute attribute = Attribute.GetCustomAttribute(field, typeof(DisplayAttribute)) as DisplayAttribute;
-				if (attribute != null && attribute.Name == name)
+				if (attribute != null && string.Equals(attribute.Name, name, StringComparison.InvariantCultureIgnoreCase))
 				{
 					return (T)field.GetValue(null);
 				}
-				if (field.Name == name)
+				if (string.Equals(field.Name, name, StringComparison.InvariantCultureIgnoreCase))
 				{
 					return (T)field.GetValue(null);
 				}
