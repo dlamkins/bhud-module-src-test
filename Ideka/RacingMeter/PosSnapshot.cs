@@ -1,6 +1,7 @@
 using System;
 using Blish_HUD;
 using Gw2Sharp.Models;
+using Ideka.RacingMeter.Lib;
 using Microsoft.Xna.Framework;
 
 namespace Ideka.RacingMeter
@@ -45,6 +46,21 @@ namespace Ideka.RacingMeter
 			Mount = source.Mount;
 			Time = source.Time;
 			LastUpdate = source.LastUpdate;
+		}
+
+		public PosSnapshot(GhostSnapshot snapshot)
+		{
+			//IL_0009: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+			Meters = snapshot.Position;
+			Front = snapshot.Front;
+			CameraMeters = snapshot.CameraPosition;
+			CameraFront = snapshot.CameraFront;
+			Mount = snapshot.Mount;
+			Time = (LastUpdate = snapshot.Time);
 		}
 
 		public PosSnapshot(TimeSpan time)

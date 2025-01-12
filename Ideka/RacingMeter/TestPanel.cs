@@ -20,7 +20,7 @@ namespace Ideka.RacingMeter
 
 		public string Caption => Strings.TestingRace;
 
-		public TestPanel(PanelStack panelStack, MeasurerRealtime measurer, FullRace fullRace, int testCheckpoint)
+		public TestPanel(PanelStack panelStack, IMeasurer measurer, FullRace fullRace, int testCheckpoint)
 		{
 			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0048: Unknown result type (might be due to invalid IL or missing references)

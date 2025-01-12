@@ -8,14 +8,6 @@ namespace Ideka.RacingMeter
 	{
 		private const int TeleportThreshold = 100000;
 
-		private const float DoubleP = 0.1f;
-
-		private readonly DropOutStack<PosSnapshot> PosStack = new DropOutStack<PosSnapshot>(2);
-
-		private readonly DropOutStack<SpeedTime> SpeedStack = new DropOutStack<SpeedTime>(2);
-
-		private readonly DropOutStack<AccelTime> AccelStack = new DropOutStack<AccelTime>(2);
-
 		public readonly DropOutStack<bool> DoublingStack = new DropOutStack<bool>(50);
 
 		private PosSnapshot? _pos;
@@ -54,9 +46,6 @@ namespace Ideka.RacingMeter
 		public void Reset()
 		{
 			_clearing = true;
-			PosStack.Clear();
-			SpeedStack.Clear();
-			AccelStack.Clear();
 			_pos = null;
 			_speed = null;
 			_accel = null;
@@ -78,25 +67,18 @@ namespace Ideka.RacingMeter
 			}
 			PosSnapshot prevPos = _pos;
 			PosSnapshot newPos = (_pos = new PosSnapshot(time));
-			PosStack.Push(newPos);
 			if (prevPos != null)
 			{
 				SpeedTime prevSpeed = _speed;
 				SpeedTime newSpeed = (_speed = new SpeedTime(prevPos, newPos, deltaTime));
-				SpeedStack.Push(newSpeed);
 				bool doubled = false;
-				if (prevSpeed != null && !prevSpeed.IsDouble)
+				if (prevSpeed != null)
 				{
-					float? num = prevSpeed?.Speed3D;
-					if (num.HasValue)
+					DoubledDiff = SpeedTime.GetDoubledDiff(prevSpeed, newSpeed);
+					if (SpeedTime.IsDoubling(prevSpeed, newSpeed))
 					{
-						float ps3 = num.GetValueOrDefault();
-						DoubledDiff = Math.Abs(newSpeed.Speed3D - ps3 * 2f) / (ps3 * 2f);
-						if (DoubledDiff < 0.1f)
-						{
-							newSpeed = (_speed = new SpeedTime(prevPos, newPos, deltaTime, isDouble: true));
-							doubled = true;
-						}
+						newSpeed = (_speed = new SpeedTime(prevPos, newPos, deltaTime.Multiply(2.0)));
+						doubled = true;
 					}
 				}
 				DoublingStack.Push(doubled);
@@ -104,7 +86,6 @@ namespace Ideka.RacingMeter
 				{
 					AccelTime prevAccel = _accel;
 					AccelTime newAccel = (_accel = new AccelTime(prevSpeed, newSpeed, deltaTime));
-					AccelStack.Push(newAccel);
 					if (prevAccel != null && prevAccel.Accel3D > 100000f && newAccel.Accel3D < (0f - prevAccel.Accel3D) / 2f)
 					{
 						this.Teleported?.Invoke();

@@ -19,7 +19,7 @@ namespace Ideka.RacingMeter
 
 		private readonly DisposableCollection _dc = new DisposableCollection();
 
-		private readonly MeasurerRealtime _measurer;
+		private readonly IMeasurer _measurer;
 
 		private readonly AnchoredRect _meterContainer;
 
@@ -42,7 +42,7 @@ namespace Ideka.RacingMeter
 
 		public bool Debug { get; set; }
 
-		public Speedometer(MeasurerRealtime measurer)
+		public Speedometer(IMeasurer measurer)
 			: this()
 		{
 			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
@@ -154,9 +154,13 @@ namespace Ideka.RacingMeter
 			BitmapFont font = Control.get_Content().get_DefaultFont16();
 			ShapeExtensions.DrawRectangle(spriteBatch2, rect, Color.get_Black(), 1f, 0f);
 			string toDraw = "";
-			add<int>("misses", _measurer.MissedTicks);
-			add<float>("ddiff", _measurer.DoubledDiff, shown: true, "G");
-			add<int>("doublings", _measurer.Doublings);
+			MeasurerRealtime measurer = _measurer as MeasurerRealtime;
+			if (measurer != null)
+			{
+				add<int>("misses", measurer.MissedTicks);
+				add<float>("ddiff", measurer.DoubledDiff, shown: true, "G");
+				add<int>("doublings", measurer.Doublings);
+			}
 			add<float>("slope", _measurer.Speed.SlopeAngle, shown: false);
 			add<float>("camera", _measurer.Speed.CamMovementYaw, shown: false);
 			add<float>("drift", _measurer.Speed.FwdMovementYaw, shown: false);

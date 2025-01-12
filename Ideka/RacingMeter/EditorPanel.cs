@@ -56,7 +56,7 @@ namespace Ideka.RacingMeter
 
 		public string Caption => Strings.RaceEditor;
 
-		public EditorPanel(PanelStack panelStack, MeasurerRealtime measurer, FullRace? fullRace)
+		public EditorPanel(PanelStack panelStack, IMeasurer measurer, FullRace? fullRace)
 			: this()
 		{
 			//IL_0046: Unknown result type (might be due to invalid IL or missing references)

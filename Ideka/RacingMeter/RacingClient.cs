@@ -179,7 +179,7 @@ namespace Ideka.RacingMeter
 
 		private readonly DropOutStack<TimeSpan> _latencies = new DropOutStack<TimeSpan>(5);
 
-		private readonly MeasurerRealtime _measurer;
+		private readonly IMeasurer _measurer;
 
 		private CancellationTokenSource? _cts;
 
@@ -289,7 +289,7 @@ namespace Ideka.RacingMeter
 
 		public event Action<User>? CheckpointReached;
 
-		public RacingClient(MeasurerRealtime measurer)
+		public RacingClient(IMeasurer measurer)
 		{
 			_measurer = measurer;
 			Server = new RacingServer(() => Conn);

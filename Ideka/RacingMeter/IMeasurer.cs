@@ -1,3 +1,5 @@
+using System;
+
 namespace Ideka.RacingMeter
 {
 	public interface IMeasurer
@@ -7,5 +9,9 @@ namespace Ideka.RacingMeter
 		SpeedTime Speed { get; }
 
 		AccelTime Accel { get; }
+
+		event Action<PosSnapshot>? NewPosition;
+
+		event Action? Teleported;
 	}
 }

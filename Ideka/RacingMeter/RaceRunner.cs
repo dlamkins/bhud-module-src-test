@@ -29,7 +29,7 @@ namespace Ideka.RacingMeter
 
 		private readonly DisposableCollection _dc = new DisposableCollection();
 
-		private readonly MeasurerRealtime _measurer;
+		private readonly IMeasurer _measurer;
 
 		private RaceRunFx? _runFx;
 
@@ -112,7 +112,7 @@ namespace Ideka.RacingMeter
 
 		public event Action<Race, Ghost>? RaceFinished;
 
-		public RaceRunner(MeasurerRealtime measurer, int testCheckpoint = -1)
+		public RaceRunner(IMeasurer measurer, int testCheckpoint = -1)
 		{
 			_measurer = measurer;
 			TestCheckpoint = testCheckpoint;
@@ -385,8 +385,8 @@ namespace Ideka.RacingMeter
 			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
 			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0154: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0153: Unknown result type (might be due to invalid IL or missing references)
 			RaceRunFx runFx = _runFx;
 			if (runFx == null)
 			{

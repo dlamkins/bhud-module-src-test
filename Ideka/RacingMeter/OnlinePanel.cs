@@ -25,7 +25,7 @@ namespace Ideka.RacingMeter
 
 		public string Caption => Strings.OnlineRacing;
 
-		public OnlinePanel(PanelStack panelStack, MeasurerRealtime measurer)
+		public OnlinePanel(PanelStack panelStack, IMeasurer measurer)
 			: this()
 		{
 			Client = new RacingClient(measurer);

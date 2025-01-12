@@ -3,7 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using Blish_HUD;
 using Blish_HUD.Controls;
+using Blish_HUD.Input;
+using Ideka.BHUDCommon;
+using Ideka.BHUDCommon.AnchoredRect;
 using Ideka.RacingMeter.Lib;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Ideka.RacingMeter
 {
@@ -15,7 +20,15 @@ namespace Ideka.RacingMeter
 
 		private readonly Label _timeLabel;
 
+		private readonly StandardButton _playButton;
+
 		private readonly TrackBar _progressBar;
+
+		private readonly MeasurerGhost _ghostMeasurer;
+
+		private readonly AnchoredRect _meterContainer;
+
+		private bool _isPlaying;
 
 		public FullRace? FullRace
 		{
@@ -39,7 +52,16 @@ namespace Ideka.RacingMeter
 			set
 			{
 				_view.FullGhost = ((value?.Ghost?.RaceId == FullRace?.Meta.Id) ? value : null);
-				((Control)_progressBar).set_Enabled(_view.Ghost != null);
+				_isPlaying = false;
+				TrackBar progressBar = _progressBar;
+				bool enabled;
+				((Control)_playButton).set_Enabled(enabled = _view.Ghost != null);
+				((Control)progressBar).set_Enabled(enabled);
+				Ghost ghost2 = _view.Ghost;
+				if (ghost2 != null)
+				{
+					_progressBar.set_MaxValue((float)ghost2.Time.TotalSeconds);
+				}
 				Race race = _view.Race;
 				object ghostCheckpoints;
 				if (race != null)
@@ -48,12 +70,12 @@ namespace Ideka.RacingMeter
 					if (ghost != null)
 					{
 						ghostCheckpoints = ghost.Checkpoints(race);
-						goto IL_0087;
+						goto IL_00c8;
 					}
 				}
 				ghostCheckpoints = null;
-				goto IL_0087;
-				IL_0087:
+				goto IL_00c8;
+				IL_00c8:
 				GhostCheckpoints = (IReadOnlyList<GhostSnapshot>?)ghostCheckpoints;
 				UpdateLabels();
 			}
@@ -72,11 +94,16 @@ namespace Ideka.RacingMeter
 			//IL_005a: Expected O, but got Unknown
 			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006c: Expected O, but got Unknown
+			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0094: Expected O, but got Unknown
+			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a6: Expected O, but got Unknown
+			//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
 			((Panel)this).set_Title(Strings.RacePreview);
 			((Panel)this).set_ShowTint(true);
 			RacePreviewView racePreviewView = new RacePreviewView();
@@ -88,17 +115,31 @@ namespace Ideka.RacingMeter
 			val.set_AutoSizeHeight(true);
 			val.set_AutoSizeWidth(true);
 			_timeLabel = val;
-			TrackBar val2 = new TrackBar();
+			StandardButton val2 = new StandardButton();
 			((Control)val2).set_Parent((Container)(object)this);
-			val2.set_SmallStep(true);
-			val2.set_MinValue(0f);
-			val2.set_MaxValue(1f);
-			val2.set_Value(0f);
-			_progressBar = val2;
+			_playButton = val2;
+			TrackBar val3 = new TrackBar();
+			((Control)val3).set_Parent((Container)(object)this);
+			val3.set_SmallStep(true);
+			val3.set_MinValue(0f);
+			val3.set_MaxValue(1f);
+			val3.set_Value(0f);
+			_progressBar = val3;
+			_meterContainer = new AnchoredRect
+			{
+				SizeDelta = new Vector2(400f, 100f),
+				Anchor = new Vector2(0.5f, 0.5f)
+			};
+			_ghostMeasurer = new MeasurerGhost();
+			_meterContainer.AddChild(BeetleMeter.Construct(_ghostMeasurer, () => null));
 			UpdateLayout();
+			((Control)_playButton).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				_isPlaying = !_isPlaying;
+			});
 			_progressBar.add_ValueChanged((EventHandler<ValueEventArgs<float>>)delegate
 			{
-				_view.GhostProgress = _progressBar.get_Value();
+				_view.GhostProgress = TimeSpan.FromSeconds(_progressBar.get_Value());
 				UpdateLabels();
 			});
 			RacingModule.Server.RemoteRacesChanged += new Action<RemoteRaces>(RemoteRacesChanged);
@@ -126,7 +167,36 @@ namespace Ideka.RacingMeter
 
 		private void UpdateLabels()
 		{
-			_timeLabel.set_Text((FullGhost?.Ghost.SnapshotAt(_progressBar.get_Value()).Time ?? TimeSpan.Zero).Formatted());
+			_timeLabel.set_Text(TimeSpan.FromSeconds(_progressBar.get_Value()).Formatted());
+		}
+
+		public override void UpdateContainer(GameTime gameTime)
+		{
+			((Container)this).UpdateContainer(gameTime);
+			_meterContainer.Update(gameTime);
+			if (_isPlaying)
+			{
+				TrackBar progressBar = _progressBar;
+				progressBar.set_Value(progressBar.get_Value() + (float)gameTime.get_ElapsedGameTime().TotalSeconds);
+			}
+		}
+
+		public override void Draw(SpriteBatch spriteBatch, Rectangle drawBounds, Rectangle scissor)
+		{
+			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0003: Unknown result type (might be due to invalid IL or missing references)
+			((Control)this).Draw(spriteBatch, drawBounds, scissor);
+			FullGhost fg = FullGhost;
+			if (fg != null)
+			{
+				Ghost ghost = fg.Ghost;
+				if (ghost != null)
+				{
+					SpriteBatchExtensions.Begin(spriteBatch, ((Control)this).get_SpriteBatchParameters());
+					_ghostMeasurer.Update(ghost, TimeSpan.FromSeconds(_progressBar.get_Value()));
+					spriteBatch.End();
+				}
+			}
 		}
 
 		protected override void OnResized(ResizedEventArgs e)
@@ -138,13 +208,15 @@ namespace Ideka.RacingMeter
 		private void UpdateLayout()
 		{
 			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
 			if (_view != null)
 			{
-				((Control)_progressBar).set_Left(10);
-				((Control)_progressBar).set_Bottom(((Container)this).get_ContentRegion().Height - 10);
-				((Control)_progressBar).set_Width(((Container)this).get_ContentRegion().Width - 20);
+				((Control)_playButton).set_Left(10);
+				((Control)_playButton).set_Bottom(((Container)this).get_ContentRegion().Height - 10);
+				((Control)_playButton).set_Width(((Control)_playButton).get_Height());
+				((Control)(object)_playButton).ArrangeLeftRight(10, (Control)_progressBar);
+				((Control)(object)_progressBar).MiddleWith((Control)(object)_playButton);
+				((Control)(object)_progressBar).WidthFillRight(10);
 				((Control)_timeLabel).set_Left(10);
 				((Control)_timeLabel).set_Bottom(((Control)_progressBar).get_Top() - 10);
 				((Control)_view).set_Left(0);

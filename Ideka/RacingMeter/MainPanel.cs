@@ -55,9 +55,9 @@ namespace Ideka.RacingMeter
 
 		public string Caption => Strings.RacingMeter;
 
-		public MainPanel(PanelStack panelStack, MeasurerRealtime measurer)
+		public MainPanel(PanelStack panelStack, IMeasurer measurer)
 		{
-			MeasurerRealtime measurer2 = measurer;
+			IMeasurer measurer2 = measurer;
 			((Panel)this)._002Ector();
 			MainPanel mainPanel = this;
 			_panelStack = panelStack;

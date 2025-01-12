@@ -54,7 +54,7 @@ namespace Ideka.RacingMeter
 
 		public override Race Race => FullRace.Race;
 
-		public MeasurerRealtime Measurer { get; }
+		public IMeasurer Measurer { get; }
 
 		public bool Draw300InGuide { get; set; }
 
@@ -176,7 +176,7 @@ namespace Ideka.RacingMeter
 
 		public event Action<int>? TestRequested;
 
-		public RaceEditor(MeasurerRealtime measurer, FullRace? fullRace)
+		public RaceEditor(IMeasurer measurer, FullRace? fullRace)
 		{
 			Measurer = measurer;
 			_state = new EditState(fullRace);

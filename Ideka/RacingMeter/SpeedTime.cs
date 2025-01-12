@@ -22,15 +22,15 @@ namespace Ideka.RacingMeter
 
 		public float SlopeAngle { get; }
 
-		public SpeedTime(PosSnapshot first, PosSnapshot second, TimeSpan deltaTime, bool isDouble = false)
-			: base(first, second, deltaTime, isDouble)
+		public SpeedTime(PosSnapshot first, PosSnapshot second, TimeSpan deltaTime)
+			: base(first, second, deltaTime)
 		{
-			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
 			float t = ValueTime.TimeMagnitude(base.DeltaTime);
 			float distance2D = Vector2.Distance(base.First.Inches.ToVector2(), base.Second.Inches.ToVector2());
 			Speed2D = distance2D / t;
@@ -43,6 +43,16 @@ namespace Ideka.RacingMeter
 				SlopeAngle = (float)(Math.Atan(height / distance2D) * (1.0 / Math.PI));
 			}
 			Update();
+		}
+
+		public static float GetDoubledDiff(SpeedTime a, SpeedTime b)
+		{
+			return Math.Abs(b.Speed3D - a.Speed3D * 2f) / (a.Speed3D * 2f);
+		}
+
+		public static bool IsDoubling(SpeedTime a, SpeedTime b)
+		{
+			return GetDoubledDiff(a, b) < 0.1f;
 		}
 
 		public void Update()

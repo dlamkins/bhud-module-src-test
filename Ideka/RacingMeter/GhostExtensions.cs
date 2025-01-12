@@ -63,20 +63,17 @@ namespace Ideka.RacingMeter
 			ghost.Snapshots.Add(snapshot);
 		}
 
-		public static GhostSnapshot SnapshotAt(this Ghost ghost, float p)
+		public static (GhostSnapshot a, GhostSnapshot b, GhostSnapshot c) TripleSnapshot(this Ghost ghost, TimeSpan time)
 		{
-			return ghost.SnapshotAt(ghost.Time.Multiply(p));
+			time += ghost.Start;
+			return ghost.Snapshots.By3().FirstOrDefault(((GhostSnapshot, GhostSnapshot, GhostSnapshot) x) => time >= x.Item2.Time && time <= x.Item3.Time);
 		}
 
-		public static GhostSnapshot SnapshotAt(this Ghost ghost, TimeSpan time, bool clamped = true)
+		public static GhostSnapshot SnapshotAt(this Ghost ghost, TimeSpan time)
 		{
 			if (!ghost.Snapshots.Any())
 			{
 				return default(GhostSnapshot);
-			}
-			if (clamped && time > ghost.Time)
-			{
-				time = ghost.Time;
 			}
 			time += ghost.Start;
 			if (time <= ghost.Snapshots.First().Time)
@@ -91,9 +88,7 @@ namespace Ideka.RacingMeter
 			{
 				if (!(time < a.Time) && !(time > b.Time))
 				{
-					GhostSnapshot result = Lerp(a, b, MathUtils.InverseLerp(a.Time.Ticks, b.Time.Ticks, time.Ticks, clamp: true));
-					result.Time -= ghost.Start;
-					return result;
+					return Lerp(a, b, MathUtils.InverseLerp(a.Time.Ticks, b.Time.Ticks, time.Ticks, clamp: true));
 				}
 			}
 			return default(GhostSnapshot);
@@ -110,14 +105,18 @@ namespace Ideka.RacingMeter
 			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
 			GhostSnapshot result = default(GhostSnapshot);
 			result.Position = Vector3.Lerp(a.Position, b.Position, (float)p);
 			result.Front = Vector3.Lerp(a.Front, b.Front, (float)p);
+			result.CameraPosition = Vector3.Lerp(a.CameraPosition, b.CameraPosition, (float)p);
 			result.CameraFront = Vector3.Lerp(a.CameraFront, b.CameraFront, (float)p);
 			result.Mount = ((p < 0.5) ? a.Mount : b.Mount);
-			result.Time = TimeSpan.FromTicks((long)MathUtils.Lerp(a.Time.Ticks, b.Time.Ticks, p));
+			result.Time = TimeSpan.FromSeconds(MathUtils.Lerp(a.Time.Seconds, b.Time.Seconds, p));
 			return result;
 		}
 	}

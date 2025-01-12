@@ -15,7 +15,7 @@ namespace Ideka.RacingMeter
 		public float DownAccel { get; }
 
 		public AccelTime(SpeedTime first, SpeedTime second, TimeSpan dt)
-			: base(first, second, dt, isDouble: false)
+			: base(first, second, dt)
 		{
 			float t = ValueTime.TimeMagnitude(base.DeltaTime);
 			Accel2D = (base.Second.Speed2D - base.First.Speed2D) / t;

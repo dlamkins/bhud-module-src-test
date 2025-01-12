@@ -10,7 +10,7 @@ namespace Ideka.RacingMeter
 {
 	public class MumbleEngine : IDisposable
 	{
-		private static readonly TimeSpan PosUpdateRate = TimeSpan.FromMilliseconds(40.0);
+		public static readonly TimeSpan PosUpdateRate = TimeSpan.FromMilliseconds(40.0);
 
 		private static readonly TimeSpan MinStopTime = PosUpdateRate.Multiply(2.5);
 

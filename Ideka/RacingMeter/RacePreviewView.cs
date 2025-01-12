@@ -270,7 +270,8 @@ namespace Ideka.RacingMeter
 			}
 		}
 
-		public float GhostProgress { get; set; }
+		public TimeSpan GhostProgress { get; set; } = TimeSpan.Zero;
+
 
 		private static float EaseOut(float x)
 		{
