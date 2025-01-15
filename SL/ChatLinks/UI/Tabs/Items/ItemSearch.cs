@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -10,7 +9,7 @@ using GuildWars2.Items;
 using Microsoft.EntityFrameworkCore;
 using SL.ChatLinks.Storage;
 
-namespace SL.ChatLinks.UI.Tabs.Items.Services
+namespace SL.ChatLinks.UI.Tabs.Items
 {
 	public sealed class ItemSearch
 	{
@@ -31,11 +30,6 @@ namespace SL.ChatLinks.UI.Tabs.Items.Services
 		public IAsyncEnumerable<Item> NewItems(int limit)
 		{
 			return _items.OrderByDescending((Item item) => item.Id).Take(limit).AsAsyncEnumerable();
-		}
-
-		public IAsyncEnumerable<T> OfType<T>() where T : Item
-		{
-			return _items.OfType<T>().AsAsyncEnumerable();
 		}
 
 		public async IAsyncEnumerable<Item> Search(string query, int limit, [EnumeratorCancellation] CancellationToken cancellationToken)
@@ -171,40 +165,6 @@ namespace SL.ChatLinks.UI.Tabs.Items.Services
 			{
 				yield return item2;
 			}
-		}
-
-		private static int LevenshteinDistance(string a, string b)
-		{
-			if (string.IsNullOrEmpty(a))
-			{
-				if (!string.IsNullOrEmpty(b))
-				{
-					return b.Length;
-				}
-				return 0;
-			}
-			if (string.IsNullOrEmpty(b))
-			{
-				return a.Length;
-			}
-			int[,] costs = new int[a.Length + 1, b.Length + 1];
-			for (int j = 0; j <= a.Length; j++)
-			{
-				costs[j, 0] = j;
-			}
-			for (int l = 0; l <= b.Length; l++)
-			{
-				costs[0, l] = l;
-			}
-			for (int i = 1; i <= a.Length; i++)
-			{
-				for (int k = 1; k <= b.Length; k++)
-				{
-					int cost = ((b[k - 1] != a[i - 1]) ? 1 : 0);
-					costs[i, k] = Math.Min(Math.Min(costs[i - 1, k] + 1, costs[i, k - 1] + 1), costs[i - 1, k - 1] + cost);
-				}
-			}
-			return costs[a.Length, b.Length];
 		}
 	}
 }

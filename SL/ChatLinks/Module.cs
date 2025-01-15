@@ -8,18 +8,22 @@ using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Blish_HUD.Modules;
+using Blish_HUD.Settings;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.Xna.Framework.Graphics;
 using SL.ChatLinks.Integrations;
 using SL.ChatLinks.Logging;
 using SL.ChatLinks.Storage;
 using SL.ChatLinks.UI;
-using SL.ChatLinks.UI.Tabs.Items.Services;
+using SL.ChatLinks.UI.Tabs.Items;
+using SL.ChatLinks.UI.Tabs.Items.Collections;
+using SL.ChatLinks.UI.Tabs.Items.Tooltips;
+using SL.ChatLinks.UI.Tabs.Items.Upgrades;
 using SL.Common;
-using SL.Common.Controls.Items.Services;
 using SQLitePCL;
 
 namespace SL.ChatLinks
@@ -35,31 +39,60 @@ namespace SL.ChatLinks
 
 		private ContextMenuStripItem? _syncButton;
 
+		private SettingEntry<bool>? _raiseStackSize;
+
+		private SettingEntry<bool>? _bananaMode;
+
 		[ImportingConstructor]
 		public Module([Import("ModuleParameters")] ModuleParameters parameters)
 			: this(parameters)
 		{
 		}
 
+		protected override void DefineSettings(SettingCollection settings)
+		{
+			_raiseStackSize = settings.DefineSetting<bool>("RaiseStackSize", false, (Func<string>)(() => "Raise the maximum item stack size from 250 to 255"), (Func<string>)(() => "When enabled, you can generate chat links with stacks of 255 items."));
+			_bananaMode = settings.DefineSetting<bool>("BananaMode", false, (Func<string>)(() => "Banana of Imagination-mode"), (Func<string>)(() => "When enabled, you can add an upgrade component to any item."));
+		}
+
 		protected override void Initialize()
 		{
-			ServiceCollection serviceCollection = new ServiceCollection();
-			serviceCollection.AddSingleton<ModuleParameters>(base.ModuleParameters);
-			serviceCollection.AddSingleton<IViewsFactory, ViewsFactory>();
-			serviceCollection.AddGw2Client();
-			serviceCollection.AddDbContext<ChatLinksContext>(delegate(DbContextOptionsBuilder optionsBuilder)
+			ServiceCollection services = new ServiceCollection();
+			services.AddSingleton<SettingCollection>(base.ModuleParameters.get_SettingsManager().get_ModuleSettings());
+			services.Configure(delegate(ChatLinkOptions options)
+			{
+				options.RaiseStackSize = _raiseStackSize!.get_Value();
+				options.BananaMode = _bananaMode!.get_Value();
+			});
+			services.AddSingleton<IOptionsChangeTokenSource<ChatLinkOptions>, ChatLinkOptionsAdapter>();
+			services.AddGw2Client();
+			services.AddDbContext<ChatLinksContext>(delegate(DbContextOptionsBuilder optionsBuilder)
 			{
 				string text = DatabaseLocation();
 				SqliteConnection connection = new SqliteConnection("Data Source=" + text);
 				Levenshtein.RegisterLevenshteinFunction(connection);
 				optionsBuilder.UseSqlite(connection);
 			}, ServiceLifetime.Transient, ServiceLifetime.Transient);
-			serviceCollection.AddTransient<ItemSeeder>();
-			serviceCollection.AddTransient<MainIcon>();
-			serviceCollection.AddTransient<MainWindow>();
-			serviceCollection.AddTransient<ItemSearch>();
-			serviceCollection.AddHttpClient<ItemIcons>();
-			serviceCollection.AddLogging(delegate(ILoggingBuilder builder)
+			services.AddTransient<ItemSeeder>();
+			services.AddSingleton<IEventAggregator, DefaultEventAggregator>();
+			services.AddTransient<MainIcon>();
+			services.AddTransient<MainIconViewModel>();
+			services.AddTransient<MainWindow>();
+			services.AddTransient<MainWindowViewModel>();
+			services.AddTransient<ItemsTabView>();
+			services.AddTransient<ItemsTabViewFactory>();
+			services.AddTransient<ItemsTabViewModel>();
+			services.AddTransient<ItemsTabViewModelFactory>();
+			services.AddTransient<ItemsListViewModelFactory>();
+			services.AddTransient<ItemTooltipViewModelFactory>();
+			services.AddTransient<ChatLinkEditorViewModelFactory>();
+			services.AddTransient<UpgradeEditorViewModelFactory>();
+			services.AddTransient<UpgradeSelectorViewModelFactory>();
+			services.AddTransient<ItemSearch>();
+			services.AddSingleton<Customizer>();
+			services.AddHttpClient<ItemIcons>();
+			services.AddTransient<IClipBoard, WpfClipboard>();
+			services.AddLogging(delegate(ILoggingBuilder builder)
 			{
 				builder.Services.AddSingleton<ILoggerProvider, LoggingAdapterProvider<Module>>();
 				if (ApplicationSettings.get_Instance().get_DebugEnabled() || GameService.Debug.get_EnableDebugLogging().get_Value())
@@ -76,8 +109,8 @@ namespace SL.ChatLinks
 					builder.AddFilter("Microsoft.EntityFrameworkCore.Query", LogLevel.Critical);
 				}
 			});
-			ServiceProvider serviceProvider = (_serviceProvider = (ServiceProvider?)(ServiceLocator.ServiceProvider = serviceCollection.BuildServiceProvider()));
-			SetupSQLite3();
+			_serviceProvider = services.BuildServiceProvider();
+			SetupSqlite3();
 		}
 
 		protected override async Task LoadAsync()
@@ -119,7 +152,7 @@ namespace SL.ChatLinks
 			((Control)_syncButton).add_Click((EventHandler<MouseEventArgs>)SyncClicked);
 		}
 
-		private void SetupSQLite3()
+		private static void SetupSqlite3()
 		{
 			SQLite3Provider_dynamic_cdecl.Setup("e_sqlite3", new ModuleGetFunctionPointer("sliekens.e_sqlite3"));
 			raw.SetProvider(new SQLite3Provider_dynamic_cdecl());
@@ -214,7 +247,6 @@ namespace SL.ChatLinks
 				((Control)mainWindow).Dispose();
 			}
 			_serviceProvider?.Dispose();
-			ServiceLocator.ServiceProvider = null;
 		}
 	}
 }

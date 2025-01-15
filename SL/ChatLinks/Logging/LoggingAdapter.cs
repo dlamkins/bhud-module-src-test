@@ -14,13 +14,13 @@ namespace SL.ChatLinks.Logging
 		[CompilerGenerated]
 		private IOptionsMonitor<LoggerFilterOptions> _003Coptions_003EP;
 
-		private readonly Logger Sink;
+		private readonly Logger _sink;
 
 		public LoggingAdapter(string categoryName, IOptionsMonitor<LoggerFilterOptions> options)
 		{
 			_003CcategoryName_003EP = categoryName;
 			_003Coptions_003EP = options;
-			Sink = Logger.GetLogger<T>();
+			_sink = Logger.GetLogger<T>();
 			base._002Ector();
 		}
 
@@ -41,22 +41,22 @@ namespace SL.ChatLinks.Logging
 				switch (logLevel)
 				{
 				case LogLevel.Trace:
-					Sink.Trace(exception2, text);
+					_sink.Trace(exception2, text);
 					break;
 				case LogLevel.Debug:
-					Sink.Debug(exception2, text);
+					_sink.Debug(exception2, text);
 					break;
 				case LogLevel.Information:
-					Sink.Info(exception2, text);
+					_sink.Info(exception2, text);
 					break;
 				case LogLevel.Warning:
-					Sink.Warn(exception2, text);
+					_sink.Warn(exception2, text);
 					break;
 				case LogLevel.Error:
-					Sink.Error(exception2, text);
+					_sink.Error(exception2, text);
 					break;
 				case LogLevel.Critical:
-					Sink.Fatal(exception2, text);
+					_sink.Fatal(exception2, text);
 					break;
 				}
 			});

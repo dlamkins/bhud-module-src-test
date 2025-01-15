@@ -2,7 +2,6 @@ using System;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Microsoft.Xna.Framework;
-using SL.Common;
 
 namespace SL.ChatLinks.UI
 {
@@ -10,13 +9,8 @@ namespace SL.ChatLinks.UI
 	{
 		private readonly AsyncEmblem _emblem;
 
-		public MainWindow()
-			: this(Objects.Create<MainWindowViewModel>())
-		{
-		}
-
-		private MainWindow(MainWindowViewModel vm)
-			: this(vm.BackgroundTexture, new Rectangle(0, 26, 953, 691), new Rectangle(70, 71, 839, 605))
+		public MainWindow(MainWindowViewModel vm)
+			: this(vm.BackgroundTexture, new Rectangle(0, 26, 953, 691), new Rectangle(70, 35, 880, 650))
 		{
 			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0027: Unknown result type (might be due to invalid IL or missing references)

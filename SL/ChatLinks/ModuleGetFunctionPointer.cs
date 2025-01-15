@@ -11,23 +11,10 @@ namespace SL.ChatLinks
 {
 	public class ModuleGetFunctionPointer : IGetFunctionPointer
 	{
-		private readonly ProcessModule _module;
+		private readonly ProcessModule _module = module ?? throw new ArgumentNullException("module");
 
-		public static ProcessModule GetModule(string moduleName)
+		public ModuleGetFunctionPointer(ProcessModule module)
 		{
-			string moduleName2 = moduleName;
-			List<ProcessModule> list = (from ProcessModule e in Process.GetCurrentProcess().Modules
-				where Path.GetFileNameWithoutExtension(e.ModuleName) == moduleName2
-				select e).ToList();
-			if (list.Count == 0)
-			{
-				throw new ArgumentException("Found no modules named '" + moduleName2 + "' in the current process.", "moduleName");
-			}
-			if (list.Count > 1)
-			{
-				throw new ArgumentException("Found several modules named '" + moduleName2 + "' in the current process.", "moduleName");
-			}
-			return list[0];
 		}
 
 		public ModuleGetFunctionPointer(string moduleName)
@@ -35,9 +22,23 @@ namespace SL.ChatLinks
 		{
 		}
 
-		public ModuleGetFunctionPointer(ProcessModule module)
+		public static ProcessModule GetModule(string moduleName)
 		{
-			_module = module ?? throw new ArgumentNullException("module");
+			string moduleName2 = moduleName;
+			List<ProcessModule> modules = (from ProcessModule e in Process.GetCurrentProcess().Modules
+				where Path.GetFileNameWithoutExtension(e.ModuleName) == moduleName2
+				select e).ToList();
+			if (modules != null)
+			{
+				switch (modules.Count)
+				{
+				case 1:
+					return modules[0];
+				case 0:
+					throw new ArgumentException("Found no modules named '" + moduleName2 + "' in the current process.", "moduleName");
+				}
+			}
+			throw new ArgumentException("Found several modules named '" + moduleName2 + "' in the current process.");
 		}
 
 		public IntPtr GetFunctionPointer(string name)
