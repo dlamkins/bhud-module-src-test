@@ -19,8 +19,11 @@
     <Reference Include="HtmlAgilityPack">
       <HintPath>..\..\working\HtmlAgilityPack.dll</HintPath>
     </Reference>
-    <Reference Include="MonoGame.Extended" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Text.Json">
+      <HintPath>..\..\working\System.Text.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoGame.Extended" />
     <Reference Include="Newtonsoft.Json" />
   </ItemGroup>
 </Project>

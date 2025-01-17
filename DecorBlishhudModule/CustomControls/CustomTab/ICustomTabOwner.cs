@@ -6,8 +6,12 @@ namespace DecorBlishhudModule.CustomControls.CustomTab
 
 		CustomTabCollection TabsGroup2 { get; }
 
+		CustomTabCollection TabsGroup3 { get; }
+
 		CustomTab SelectedTabGroup1 { get; set; }
 
 		CustomTab SelectedTabGroup2 { get; set; }
+
+		CustomTab SelectedTabGroup3 { get; set; }
 	}
 }

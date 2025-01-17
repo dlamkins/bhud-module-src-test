@@ -35,6 +35,12 @@ namespace DecorBlishhudModule
 
 		private static bool isOperationRunning = false;
 
+		private static LoadingSpinner _loaderSpinner = null;
+
+		private static Label _loadingLabel = null;
+
+		private static Label _loadingLabel2 = null;
+
 		private static Task<Dictionary<string, List<Decoration>>> FetchHomesteadDecorationsAsync()
 		{
 			if (_homesteadDecorationsCache == null)
@@ -222,12 +228,47 @@ namespace DecorBlishhudModule
 							((Control)decorationIconImage).set_Opacity(1f);
 						}
 					});
+					CustomTabbedWindow2 decorWindow2 = DecorModule.DecorModuleInstance.DecorWindow;
+					CustomTab lastSelectedTab = null;
+					decorWindow2.TabChanged += delegate
+					{
+						if (decorWindow2.SelectedTabGroup3 != null)
+						{
+							if (_loaderSpinner != null)
+							{
+								((Control)_loaderSpinner).set_Visible(false);
+							}
+							if (_loadingLabel != null)
+							{
+								((Control)_loadingLabel).set_Visible(false);
+							}
+							if (_loadingLabel2 != null)
+							{
+								((Control)_loadingLabel2).set_Visible(false);
+							}
+						}
+						if (decorWindow2.SelectedTabGroup2 != null && decorWindow2.SelectedTabGroup2 != lastSelectedTab && _loaderSpinner != null && _loadingLabel != null && _loadingLabel2 != null)
+						{
+							if (decorWindow2.SelectedTabGroup2.Name == "Icons Preview")
+							{
+								((Control)_loaderSpinner).set_Visible(true);
+								((Control)_loadingLabel).set_Visible(true);
+								((Control)_loadingLabel2).set_Visible(true);
+							}
+							else
+							{
+								((Control)_loaderSpinner).set_Visible(false);
+								((Control)_loadingLabel).set_Visible(false);
+								((Control)_loadingLabel2).set_Visible(false);
+							}
+						}
+						lastSelectedTab = decorWindow2.SelectedTabGroup2;
+					};
 					DecorModule decorModule;
 					((Control)decorationIconImage).add_Click((EventHandler<MouseEventArgs>)async delegate
 					{
 						if (!isOperationRunning)
 						{
-							CustomTabbedWindow2 decorWindow2 = DecorModule.DecorModuleInstance.DecorWindow;
 							bool loaded = DecorModule.DecorModuleInstance.Loaded;
 							if (lastClickedIconPanel != null && ((Control)lastClickedIconPanel).get_BackgroundColor() == new Color(254, 254, 176))
 							{
@@ -241,7 +282,7 @@ namespace DecorBlishhudModule
 							((Control)val12).set_Parent((Container)(object)decorWindow2);
 							((Control)val12).set_Size(new Point(32, 32));
 							((Control)val12).set_Location(new Point(727, 320));
-							LoadingSpinner loaderSpinner = val12;
+							_loaderSpinner = val12;
 							Label val13 = new Label();
 							((Control)val13).set_Parent((Container)(object)decorWindow2);
 							val13.set_Text("Loading...");
@@ -249,8 +290,8 @@ namespace DecorBlishhudModule
 							((Control)val13).set_Location(new Point(762, 325));
 							val13.set_HorizontalAlignment((HorizontalAlignment)1);
 							val13.set_AutoSizeWidth(true);
-							Label loadingLabel = val13;
-							Label loadingLabel2 = new Label();
+							_loadingLabel = val13;
+							_loadingLabel2 = new Label();
 							if (!loaded)
 							{
 								Label val14 = new Label();
@@ -260,7 +301,7 @@ namespace DecorBlishhudModule
 								((Control)val14).set_Location(new Point(620, 350));
 								val14.set_HorizontalAlignment((HorizontalAlignment)1);
 								val14.set_AutoSizeWidth(true);
-								loadingLabel2 = val14;
+								_loadingLabel2 = val14;
 							}
 							isOperationRunning = true;
 							try
@@ -281,9 +322,9 @@ namespace DecorBlishhudModule
 							finally
 							{
 								isOperationRunning = false;
-								((Control)loaderSpinner).Dispose();
-								((Control)loadingLabel).Dispose();
-								((Control)loadingLabel2).Dispose();
+								((Control)_loaderSpinner).Dispose();
+								((Control)_loadingLabel).Dispose();
+								((Control)_loadingLabel2).Dispose();
 							}
 						}
 					});
@@ -416,7 +457,7 @@ namespace DecorBlishhudModule
 			}
 		}
 
-		private static async Task<Texture2D> GetOrCreateTextureAsync(string key, string iconUrl)
+		public static async Task<Texture2D> GetOrCreateTextureAsync(string key, string iconUrl)
 		{
 			if (_sharedTextureCache.TryGetValue(key, out var existingTexture))
 			{
@@ -438,7 +479,7 @@ namespace DecorBlishhudModule
 			}
 		}
 
-		private static Texture2D CreateIconTexture(byte[] iconResponse)
+		public static Texture2D CreateIconTexture(byte[] iconResponse)
 		{
 			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0085: Unknown result type (might be due to invalid IL or missing references)

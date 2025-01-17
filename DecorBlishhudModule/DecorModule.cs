@@ -11,6 +11,7 @@ using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
 using DecorBlishhudModule.CustomControls.CustomTab;
 using DecorBlishhudModule.Model;
+using DecorBlishhudModule.Refinement;
 using DecorBlishhudModule.Sections;
 using DecorBlishhudModule.Sections.LeftSideTasks;
 using Microsoft.Xna.Framework;
@@ -21,7 +22,7 @@ namespace DecorBlishhudModule
 	[Export(typeof(Module))]
 	public class DecorModule : Module
 	{
-		private static readonly Logger Logger = Logger.GetLogger<DecorModule>();
+		public readonly Logger Logger = Logger.GetLogger<DecorModule>();
 
 		private static readonly HttpClient client = new HttpClient();
 
@@ -51,6 +52,12 @@ namespace DecorBlishhudModule
 
 		private Texture2D _guildhallScreen;
 
+		private Texture2D _farmScreen;
+
+		private Texture2D _lumberScreen;
+
+		private Texture2D _metalScreen;
+
 		private Texture2D _handiworkTab;
 
 		private Texture2D _scribeTab;
@@ -58,6 +65,12 @@ namespace DecorBlishhudModule
 		private Texture2D _iconsTab;
 
 		private Texture2D _imagesTab;
+
+		private Texture2D _farmTab;
+
+		private Texture2D _lumberTab;
+
+		private Texture2D _metalTab;
 
 		private Texture2D _info;
 
@@ -73,6 +86,18 @@ namespace DecorBlishhudModule
 
 		private Texture2D _heart;
 
+		private Texture2D _copperCoin;
+
+		private Texture2D _silverCoin;
+
+		private Texture2D _arrowUp;
+
+		private Texture2D _arrowDown;
+
+		private Texture2D _arrowNeutral;
+
+		private Texture2D _efficiancy;
+
 		private CustomTabbedWindow2 _decorWindow;
 
 		private Image _decorationIcon;
@@ -86,6 +111,12 @@ namespace DecorBlishhudModule
 		private WikiLicenseSection _wikiLicenseManager;
 
 		private FlowPanel _homesteadDecorationsFlowPanel;
+
+		private FlowPanel _farmPanel;
+
+		private FlowPanel _lumberPanel;
+
+		private FlowPanel _metalPanel;
 
 		private bool _loaded;
 
@@ -113,11 +144,23 @@ namespace DecorBlishhudModule
 
 		public Texture2D Heart => _heart;
 
+		public Texture2D CopperCoin => _copperCoin;
+
+		public Texture2D SilverCoin => _silverCoin;
+
+		public Texture2D ArrowUp => _arrowUp;
+
+		public Texture2D ArrowDown => _arrowDown;
+
+		public Texture2D ArrowNeutral => _arrowNeutral;
+
+		public Texture2D Efficiency => _efficiancy;
+
 		public HttpClient Client => client;
 
 		internal SettingsManager SettingsManager => base.ModuleParameters.get_SettingsManager();
 
-		internal ContentsManager ContentsManager => base.ModuleParameters.get_ContentsManager();
+		public ContentsManager ContentsManager => base.ModuleParameters.get_ContentsManager();
 
 		internal DirectoriesManager DirectoriesManager => base.ModuleParameters.get_DirectoriesManager();
 
@@ -143,10 +186,16 @@ namespace DecorBlishhudModule
 			_homesteadIconMenuWintersday = ContentsManager.GetTexture("test/homesteadIconMenuWinterstay.png");
 			_homesteadScreen = ContentsManager.GetTexture("test/homestead_screen.png");
 			_guildhallScreen = ContentsManager.GetTexture("test/guildhall_screen.png");
+			_farmScreen = ContentsManager.GetTexture("test/farm_screen.png");
+			_lumberScreen = ContentsManager.GetTexture("test/lumber_screen.png");
+			_metalScreen = ContentsManager.GetTexture("test/metal_screen.png");
 			_handiworkTab = ContentsManager.GetTexture("test/handiwork.png");
 			_scribeTab = ContentsManager.GetTexture("test/scribe.png");
 			_iconsTab = ContentsManager.GetTexture("test/icons.png");
 			_imagesTab = ContentsManager.GetTexture("test/images.png");
+			_farmTab = ContentsManager.GetTexture("test/farm.png");
+			_lumberTab = ContentsManager.GetTexture("test/lumber.png");
+			_metalTab = ContentsManager.GetTexture("test/metal.png");
 			_info = ContentsManager.GetTexture("test/info.png");
 			_blackTexture = ContentsManager.GetTexture("test/black_texture.png");
 			_x = ContentsManager.GetTexture("test/x.png");
@@ -154,6 +203,12 @@ namespace DecorBlishhudModule
 			_x2Active = ContentsManager.GetTexture("test/x2_active.png");
 			_copy = ContentsManager.GetTexture("test/copy.png");
 			_heart = ContentsManager.GetTexture("test/heart.png");
+			_copperCoin = ContentsManager.GetTexture("test/coin_copper.png");
+			_silverCoin = ContentsManager.GetTexture("test/coin_silver.png");
+			_arrowUp = ContentsManager.GetTexture("test/arrow_up.png");
+			_arrowDown = ContentsManager.GetTexture("test/arrow_down.png");
+			_arrowNeutral = ContentsManager.GetTexture("test/arrow_neutral.png");
+			_efficiancy = ContentsManager.GetTexture("test/efficiency.png");
 			DecorModule decorModule = this;
 			CornerIcon val = new CornerIcon();
 			val.set_Icon(AsyncTexture2D.op_Implicit(_homesteadIconUnactive));
@@ -245,6 +300,21 @@ namespace DecorBlishhudModule
 			{
 				((GraphicsResource)guildhallScreen).Dispose();
 			}
+			Texture2D farmScreen = _farmScreen;
+			if (farmScreen != null)
+			{
+				((GraphicsResource)farmScreen).Dispose();
+			}
+			Texture2D lumberScreen = _lumberScreen;
+			if (lumberScreen != null)
+			{
+				((GraphicsResource)lumberScreen).Dispose();
+			}
+			Texture2D metalScreen = _metalScreen;
+			if (metalScreen != null)
+			{
+				((GraphicsResource)metalScreen).Dispose();
+			}
 			CustomTabbedWindow2 decorWindow = _decorWindow;
 			if (decorWindow != null)
 			{
@@ -269,6 +339,21 @@ namespace DecorBlishhudModule
 			if (imagesTab != null)
 			{
 				((GraphicsResource)imagesTab).Dispose();
+			}
+			Texture2D farmTab = _farmTab;
+			if (farmTab != null)
+			{
+				((GraphicsResource)farmTab).Dispose();
+			}
+			Texture2D lumberTab = _lumberTab;
+			if (lumberTab != null)
+			{
+				((GraphicsResource)lumberTab).Dispose();
+			}
+			Texture2D metalTab = _metalTab;
+			if (metalTab != null)
+			{
+				((GraphicsResource)metalTab).Dispose();
 			}
 			Texture2D info = _info;
 			if (info != null)
@@ -304,6 +389,36 @@ namespace DecorBlishhudModule
 			if (heart != null)
 			{
 				((GraphicsResource)heart).Dispose();
+			}
+			Texture2D copperCoin = _copperCoin;
+			if (copperCoin != null)
+			{
+				((GraphicsResource)copperCoin).Dispose();
+			}
+			Texture2D silverCoin = _silverCoin;
+			if (silverCoin != null)
+			{
+				((GraphicsResource)silverCoin).Dispose();
+			}
+			Texture2D arrowUp = _arrowUp;
+			if (arrowUp != null)
+			{
+				((GraphicsResource)arrowUp).Dispose();
+			}
+			Texture2D arrowDown = _arrowDown;
+			if (arrowDown != null)
+			{
+				((GraphicsResource)arrowDown).Dispose();
+			}
+			Texture2D arrowNeutral = _arrowNeutral;
+			if (arrowNeutral != null)
+			{
+				((GraphicsResource)arrowNeutral).Dispose();
+			}
+			Texture2D efficiancy = _efficiancy;
+			if (efficiancy != null)
+			{
+				((GraphicsResource)efficiancy).Dispose();
 			}
 			Image decorationIcon = _decorationIcon;
 			if (decorationIcon != null)
@@ -395,44 +510,79 @@ namespace DecorBlishhudModule
 			((Control)val7).set_Visible(false);
 			FlowPanel guildHallDecorationsBigFlowPanel = val7;
 			DecorModule decorModule3 = this;
-			Label val8 = new Label();
+			FlowPanel val8 = new FlowPanel();
 			((Control)val8).set_Parent((Container)(object)_decorWindow);
-			((Control)val8).set_Width(500);
-			((Control)val8).set_Height(120);
-			val8.set_WrapText(true);
-			val8.set_StrokeText(true);
-			val8.set_ShowShadow(true);
-			val8.set_ShadowColor(new Color(0, 0, 0));
-			val8.set_Font(GameService.Content.get_DefaultFont18());
-			decorModule3._decorationRightText = val8;
+			val8.set_FlowDirection((ControlFlowDirection)2);
+			((Control)val8).set_Width(1080);
+			((Control)val8).set_Height(700);
+			((Panel)val8).set_CanScroll(true);
+			((Control)val8).set_Visible(false);
+			decorModule3._farmPanel = val8;
 			DecorModule decorModule4 = this;
-			Image val9 = new Image();
+			FlowPanel val9 = new FlowPanel();
 			((Control)val9).set_Parent((Container)(object)_decorWindow);
-			((Control)val9).set_Size(new Point(40, 40));
-			((Control)val9).set_Location(new Point(((Control)_decorationRightText).get_Left(), ((Control)_decorationRightText).get_Bottom() + 5));
-			decorModule4._decorationIcon = val9;
+			val9.set_FlowDirection((ControlFlowDirection)2);
+			((Control)val9).set_Width(1080);
+			((Control)val9).set_Height(700);
+			((Panel)val9).set_CanScroll(true);
+			((Control)val9).set_Visible(false);
+			decorModule4._lumberPanel = val9;
 			DecorModule decorModule5 = this;
-			Image val10 = new Image();
+			FlowPanel val10 = new FlowPanel();
 			((Control)val10).set_Parent((Container)(object)_decorWindow);
-			((Control)val10).set_Size(new Point(400, 400));
-			((Control)val10).set_Location(new Point(((Control)_decorationRightText).get_Left(), ((Control)_decorationIcon).get_Bottom() + 5));
-			decorModule5._decorationImage = val10;
-			CustomTab customTab1 = new CustomTab(AsyncTexture2D.op_Implicit(_handiworkTab), "Homestead Handiwork", 4);
-			CustomTab customTab2 = new CustomTab(AsyncTexture2D.op_Implicit(_scribeTab), "Guild Hall Scribe", 3);
-			CustomTab customTab3 = new CustomTab(AsyncTexture2D.op_Implicit(_iconsTab), "Icons Preview", 2);
-			CustomTab customTab4 = new CustomTab(AsyncTexture2D.op_Implicit(_imagesTab), "Images Preview", 1);
+			val10.set_FlowDirection((ControlFlowDirection)2);
+			((Control)val10).set_Width(1080);
+			((Control)val10).set_Height(700);
+			((Panel)val10).set_CanScroll(true);
+			((Control)val10).set_Visible(false);
+			decorModule5._metalPanel = val10;
+			DecorModule decorModule6 = this;
+			Label val11 = new Label();
+			((Control)val11).set_Parent((Container)(object)_decorWindow);
+			((Control)val11).set_Width(500);
+			((Control)val11).set_Height(120);
+			val11.set_WrapText(true);
+			val11.set_StrokeText(true);
+			val11.set_ShowShadow(true);
+			val11.set_ShadowColor(new Color(0, 0, 0));
+			val11.set_Font(GameService.Content.get_DefaultFont18());
+			decorModule6._decorationRightText = val11;
+			DecorModule decorModule7 = this;
+			Image val12 = new Image();
+			((Control)val12).set_Parent((Container)(object)_decorWindow);
+			((Control)val12).set_Size(new Point(40, 40));
+			((Control)val12).set_Location(new Point(((Control)_decorationRightText).get_Left(), ((Control)_decorationRightText).get_Bottom() + 5));
+			decorModule7._decorationIcon = val12;
+			DecorModule decorModule8 = this;
+			Image val13 = new Image();
+			((Control)val13).set_Parent((Container)(object)_decorWindow);
+			((Control)val13).set_Size(new Point(400, 400));
+			((Control)val13).set_Location(new Point(((Control)_decorationRightText).get_Left(), ((Control)_decorationIcon).get_Bottom() + 5));
+			decorModule8._decorationImage = val13;
+			CustomTab customTab1 = new CustomTab(AsyncTexture2D.op_Implicit(_handiworkTab), "Homestead Handiwork", 7);
+			CustomTab customTab2 = new CustomTab(AsyncTexture2D.op_Implicit(_scribeTab), "Guild Hall Scribe", 6);
+			CustomTab customTab3 = new CustomTab(AsyncTexture2D.op_Implicit(_iconsTab), "Icons Preview", 5);
+			CustomTab customTab4 = new CustomTab(AsyncTexture2D.op_Implicit(_imagesTab), "Images Preview", 4);
+			CustomTab customTab5 = new CustomTab(AsyncTexture2D.op_Implicit(_farmTab), "Refinement - Farm", 3);
+			CustomTab customTab6 = new CustomTab(AsyncTexture2D.op_Implicit(_lumberTab), "Refinement - Lumber Mill", 2);
+			CustomTab customTab7 = new CustomTab(AsyncTexture2D.op_Implicit(_metalTab), "Refinement - Metal Forge", 1);
 			_decorWindow.TabsGroup1.Add(customTab1);
 			_decorWindow.TabsGroup1.Add(customTab2);
 			_decorWindow.TabsGroup2.Add(customTab3);
 			_decorWindow.TabsGroup2.Add(customTab4);
+			_decorWindow.TabsGroup3.Add(customTab5);
+			_decorWindow.TabsGroup3.Add(customTab6);
+			_decorWindow.TabsGroup3.Add(customTab7);
 			_decorWindow.SelectedTabGroup1 = _decorWindow.TabsGroup1.FirstOrDefault();
 			_decorWindow.SelectedTabGroup2 = _decorWindow.TabsGroup2.FirstOrDefault();
 			_ = _decorWindow.SelectedTabGroup1;
 			_ = _decorWindow.SelectedTabGroup2;
+			_ = _decorWindow.SelectedTabGroup3;
 			_decorWindow.TabChanged += delegate
 			{
 				CustomTab selectedTabGroup = _decorWindow.SelectedTabGroup1;
 				CustomTab selectedTabGroup2 = _decorWindow.SelectedTabGroup2;
+				CustomTab selectedTabGroup3 = _decorWindow.SelectedTabGroup3;
 				if (selectedTabGroup == customTab1 && selectedTabGroup2 == customTab3)
 				{
 					((WindowBase2)_decorWindow).set_Subtitle("Homestead Decorations");
@@ -444,8 +594,13 @@ namespace DecorBlishhudModule
 					((Control)guildHallDecorationsFlowPanel).set_Visible(false);
 					((Control)homesteadDecorationsBigFlowPanel).set_Visible(false);
 					((Control)guildHallDecorationsBigFlowPanel).set_Visible(false);
+					((Control)searchTextBox).set_Visible(true);
+					((Control)_farmPanel).set_Visible(false);
+					((Control)_lumberPanel).set_Visible(false);
+					((Control)_metalPanel).set_Visible(false);
 					_wikiLicenseManager.UpdateFlowPanelPosition(isBigView: false);
 					_signatureLabelManager.UpdateFlowPanelPosition(isBigView: false);
+					InfoSection.UpdateInfoVisible(visible: true);
 					InfoSection.UpdateInfoText("    Click on the name or the image\n            to copy its name.");
 				}
 				else if (selectedTabGroup == customTab2 && selectedTabGroup2 == customTab3)
@@ -459,8 +614,13 @@ namespace DecorBlishhudModule
 					((Control)guildHallDecorationsFlowPanel).set_Visible(true);
 					((Control)homesteadDecorationsBigFlowPanel).set_Visible(false);
 					((Control)guildHallDecorationsBigFlowPanel).set_Visible(false);
+					((Control)searchTextBox).set_Visible(true);
+					((Control)_farmPanel).set_Visible(false);
+					((Control)_lumberPanel).set_Visible(false);
+					((Control)_metalPanel).set_Visible(false);
 					_wikiLicenseManager.UpdateFlowPanelPosition(isBigView: false);
 					_signatureLabelManager.UpdateFlowPanelPosition(isBigView: false);
+					InfoSection.UpdateInfoVisible(visible: true);
 					InfoSection.UpdateInfoText("    Click on the name or the image\n            to copy its name.");
 				}
 				else if (selectedTabGroup == customTab1 && selectedTabGroup2 == customTab4)
@@ -474,8 +634,13 @@ namespace DecorBlishhudModule
 					((Control)guildHallDecorationsFlowPanel).set_Visible(false);
 					((Control)homesteadDecorationsBigFlowPanel).set_Visible(true);
 					((Control)guildHallDecorationsBigFlowPanel).set_Visible(false);
+					((Control)searchTextBox).set_Visible(true);
+					((Control)_farmPanel).set_Visible(false);
+					((Control)_lumberPanel).set_Visible(false);
+					((Control)_metalPanel).set_Visible(false);
 					_wikiLicenseManager.UpdateFlowPanelPosition(isBigView: true);
 					_signatureLabelManager.UpdateFlowPanelPosition(isBigView: true);
+					InfoSection.UpdateInfoVisible(visible: true);
 					InfoSection.UpdateInfoText("    Click on the image to zoom in.\nCopy icon copies the decoration name.");
 				}
 				else if (selectedTabGroup == customTab2 && selectedTabGroup2 == customTab4)
@@ -489,16 +654,78 @@ namespace DecorBlishhudModule
 					((Control)guildHallDecorationsFlowPanel).set_Visible(false);
 					((Control)homesteadDecorationsBigFlowPanel).set_Visible(false);
 					((Control)guildHallDecorationsBigFlowPanel).set_Visible(true);
+					((Control)searchTextBox).set_Visible(true);
+					((Control)_farmPanel).set_Visible(false);
+					((Control)_lumberPanel).set_Visible(false);
+					((Control)_metalPanel).set_Visible(false);
 					_wikiLicenseManager.UpdateFlowPanelPosition(isBigView: true);
 					_signatureLabelManager.UpdateFlowPanelPosition(isBigView: true);
+					InfoSection.UpdateInfoVisible(visible: true);
 					InfoSection.UpdateInfoText("    Click on the image to zoom in.\nCopy icon copies the decoration name.");
+				}
+				else if (selectedTabGroup3 == customTab5)
+				{
+					((WindowBase2)_decorWindow).set_Subtitle("Refinement - Farm");
+					backgroundImage.set_Texture(AsyncTexture2D.op_Implicit(_farmScreen));
+					((Control)_decorationRightText).set_Visible(false);
+					((Control)_decorationImage).set_Visible(false);
+					((Control)_homesteadDecorationsFlowPanel).set_Visible(false);
+					((Control)guildHallDecorationsFlowPanel).set_Visible(false);
+					((Control)homesteadDecorationsBigFlowPanel).set_Visible(false);
+					((Control)guildHallDecorationsBigFlowPanel).set_Visible(false);
+					((Control)searchTextBox).set_Visible(false);
+					((Control)_farmPanel).set_Visible(true);
+					((Control)_lumberPanel).set_Visible(false);
+					((Control)_metalPanel).set_Visible(false);
+					_wikiLicenseManager.UpdateFlowPanelPosition(isBigView: true);
+					_signatureLabelManager.UpdateFlowPanelPosition(isBigView: true);
+					InfoSection.UpdateInfoVisible(visible: false);
+				}
+				else if (selectedTabGroup3 == customTab6)
+				{
+					((WindowBase2)_decorWindow).set_Subtitle("Refinement - Lumber Mill");
+					backgroundImage.set_Texture(AsyncTexture2D.op_Implicit(_lumberScreen));
+					((Control)_decorationRightText).set_Visible(false);
+					((Control)_decorationImage).set_Visible(false);
+					((Control)_homesteadDecorationsFlowPanel).set_Visible(false);
+					((Control)guildHallDecorationsFlowPanel).set_Visible(false);
+					((Control)homesteadDecorationsBigFlowPanel).set_Visible(false);
+					((Control)guildHallDecorationsBigFlowPanel).set_Visible(false);
+					((Control)searchTextBox).set_Visible(false);
+					((Control)_farmPanel).set_Visible(false);
+					((Control)_lumberPanel).set_Visible(true);
+					((Control)_metalPanel).set_Visible(false);
+					_wikiLicenseManager.UpdateFlowPanelPosition(isBigView: true);
+					_signatureLabelManager.UpdateFlowPanelPosition(isBigView: true);
+					InfoSection.UpdateInfoVisible(visible: false);
+				}
+				else if (selectedTabGroup3 == customTab7)
+				{
+					((WindowBase2)_decorWindow).set_Subtitle("Refinement - Metal Forge");
+					backgroundImage.set_Texture(AsyncTexture2D.op_Implicit(_metalScreen));
+					((Control)_decorationRightText).set_Visible(false);
+					((Control)_decorationImage).set_Visible(false);
+					((Control)_homesteadDecorationsFlowPanel).set_Visible(false);
+					((Control)guildHallDecorationsFlowPanel).set_Visible(false);
+					((Control)homesteadDecorationsBigFlowPanel).set_Visible(false);
+					((Control)guildHallDecorationsBigFlowPanel).set_Visible(false);
+					((Control)searchTextBox).set_Visible(false);
+					((Control)_farmPanel).set_Visible(false);
+					((Control)_lumberPanel).set_Visible(false);
+					((Control)_metalPanel).set_Visible(true);
+					_wikiLicenseManager.UpdateFlowPanelPosition(isBigView: true);
+					_signatureLabelManager.UpdateFlowPanelPosition(isBigView: true);
+					InfoSection.UpdateInfoVisible(visible: false);
 				}
 			};
 			customTab2.Enabled = false;
 			customTab4.Enabled = false;
 			await LeftSideSection.PopulateHomesteadIconsInFlowPanel(_homesteadDecorationsFlowPanel, _isIconView: true);
+			await CustomTableFarm.Initialize(_farmPanel, "farm");
+			await CustomTableLumber.Initialize(_lumberPanel, "lumber");
+			await CustomTableMetal.Initialize(_metalPanel, "metal");
 			_cornerIcon.set_LoadingMessage((string)null);
-			Task task = Task.Run(async delegate
+			Task.Run(async delegate
 			{
 				await LeftSideSection.PopulateGuildHallIconsInFlowPanel(guildHallDecorationsFlowPanel, _isIconView: true);
 				customTab2.Enabled = true;
@@ -506,8 +733,14 @@ namespace DecorBlishhudModule
 				{
 					_loaded = true;
 				}
+			}).ContinueWith(delegate(Task t)
+			{
+				if (t.IsFaulted)
+				{
+					Logger.Warn((Exception)t.Exception, "Guild Hall task failed.");
+				}
 			});
-			Task imagePreviewTask = Task.Run(async delegate
+			Task.Run(async delegate
 			{
 				await LeftSideSection.PopulateHomesteadBigIconsInFlowPanel(homesteadDecorationsBigFlowPanel, _isIconView: false);
 				await LeftSideSection.PopulateGuildHallBigIconsInFlowPanel(guildHallDecorationsBigFlowPanel, _isIconView: false);
@@ -516,15 +749,7 @@ namespace DecorBlishhudModule
 				{
 					_loaded = true;
 				}
-			});
-			task.ContinueWith(delegate(Task t)
-			{
-				if (t.IsFaulted)
-				{
-					Logger.Warn((Exception)t.Exception, "Guild Hall task failed.");
-				}
-			});
-			imagePreviewTask.ContinueWith(delegate(Task t)
+			}).ContinueWith(delegate(Task t)
 			{
 				if (t.IsFaulted)
 				{
