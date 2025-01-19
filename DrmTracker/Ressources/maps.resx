@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="CaledonTooltip"><value>Caledon Forest</value></data>
+  <data name="FireheartLabel"><value>Fireheart</value></data>
+  <data name="CaledonLabel"><value>Caledon</value></data>
+  <data name="MetricaTooltip"><value>Metrica Province</value></data>
+  <data name="GendarranTooltip"><value>Gendarran Fields</value></data>
+  <data name="SnowdenTooltip"><value>Snowden Drifts</value></data>
+  <data name="RuinsLabel"><value>Ruins</value></data>
+  <data name="BloodtideTooltip"><value>Bloodtide Coast</value></data>
+  <data name="DoricTooltip"><value>Lake Doric</value></data>
+  <data name="FireheartTooltip"><value>Fireheart Rise</value></data>
+  <data name="GendarranLabel"><value>Gendarran</value></data>
+  <data name="RuinsTooltip"><value>Fields of Ruin</value></data>
+  <data name="BrisbanTooltip"><value>Brisban Wildlands</value></data>
+  <data name="BrisbanLabel"><value>Brisban</value></data>
+  <data name="DoricLabel"><value>Doric</value></data>
+  <data name="ThunderheadLabel"><value>Thunderhead</value></data>
+  <data name="ThunderheadTooltip"><value>Thunderhead Peaks</value></data>
+  <data name="SnowdenLabel"><value>Snowden</value></data>
+  <data name="MetricaLabel"><value>Metrica</value></data>
+  <data name="BloodtideLabel"><value>Bloodtide</value></data>
+  </root>

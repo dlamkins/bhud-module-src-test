@@ -1,0 +1,174 @@
+{
+  "Maps": [
+    {
+      "Id": 1,
+      "Key": "Metrica"
+    },
+    {
+      "Id": 2,
+      "Key": "Brisban"
+    },
+    {
+      "Id": 3,
+      "Key": "Gendarran"
+    },
+    {
+      "Id": 4,
+      "Key": "Ruins"
+    },
+    {
+      "Id": 5,
+      "Key": "Thunderhead"
+    },
+    {
+      "Id": 6,
+      "Key": "Doric"
+    },
+    {
+      "Id": 7,
+      "Key": "Snowden"
+    },
+    {
+      "Id": 8,
+      "Key": "Caledon"
+    },
+    {
+      "Id": 9,
+      "Key": "Bloodtide"
+    },
+    {
+      "Id": 10,
+      "Key": "Fireheart"
+    }
+  ],
+  "Factions": [
+    {
+      "Id": 0,
+      "Key": "Crystal"
+    },
+    {
+      "Id": 1,
+      "Key": "Ebon"
+    },
+    {
+      "Id": 2,
+      "Key": "Deldrimor"
+    },
+    {
+      "Id": 3,
+      "Key": "Exalted"
+    },
+    {
+      "Id": 4,
+      "Key": "Tengu"
+    },
+    {
+      "Id": 5,
+      "Key": "Kodan"
+    },
+    {
+      "Id": 6,
+      "Key": "Skritt"
+    },
+    {
+      "Id": 7,
+      "Key": "Olmakhan"
+    },
+    {
+      "Id": 8,
+      "Key": "Legion"
+    }
+  ],
+  "Drms": [
+    {
+      "Map": 1,
+      "ApiIds": {
+        "Clear": 5534,
+        "FullCM": 5511,
+        "Factions": 5709
+      },
+      "FactionsIds": [ 0, 2, 4, 6, 7 ]
+    },
+    {
+      "Map": 2,
+      "ApiIds": {
+        "Clear": 5490,
+        "FullCM": 5475,
+        "Factions": 5698
+      },
+      "FactionsIds": [ 0, 3, 4, 6 ]
+    },
+    {
+      "Map": 3,
+      "ApiIds": {
+        "Clear": 5510,
+        "FullCM": 5496,
+        "Factions": 5700
+      },
+      "FactionsIds": [ 1, 2, 5, 8 ]
+    },
+    {
+      "Map": 4,
+      "ApiIds": {
+        "Clear": 5581,
+        "FullCM": 5589,
+        "Factions": 5693
+      },
+      "FactionsIds": [ 0, 1, 2, 6, 7, 8 ]
+    },
+    {
+      "Map": 5,
+      "ApiIds": {
+        "Clear": 5579,
+        "FullCM": 5569,
+        "Factions": 5703
+      },
+      "FactionsIds": [ 0, 1, 2, 3, 4, 5, 7 ]
+    },
+    {
+      "Map": 6,
+      "ApiIds": {
+        "Clear": 5590,
+        "FullCM": 5555,
+        "Factions": 5697
+      },
+      "FactionsIds": [ 0, 1, 3, 5, 6 ]
+    },
+    {
+      "Map": 7,
+      "ApiIds": {
+        "Clear": 5578,
+        "FullCM": 5593,
+        "Factions": 5708
+      },
+      "FactionsIds": [ 0, 1, 2, 5, 8 ]
+    },
+    {
+      "Map": 8,
+      "ApiIds": {
+        "Clear": 5650,
+        "FullCM": 5644,
+        "Factions": 5691
+      },
+      "FactionsIds": [ 3, 4, 6, 7 ]
+    },
+    {
+      "Map": 9,
+      "ApiIds": {
+        "Clear": 5642,
+        "FullCM": 5622,
+        "Factions": 5688
+      },
+      "FactionsIds": [ 3, 4, 6, 7, 8 ]
+    },
+    {
+      "Map": 10,
+      "ApiIds": {
+        "Clear": 5640,
+        "FullCM": 5663,
+        "Factions": 5704
+      },
+      "FactionsIds": [ 1, 2, 5, 8 ]
+    }
+  ]
+}
