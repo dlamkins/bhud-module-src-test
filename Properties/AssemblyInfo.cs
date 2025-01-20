@@ -6,7 +6,7 @@ using System.Runtime.Versioning;
 [assembly: AssemblyCompany("DrmTracker")]
 [assembly: AssemblyConfiguration("Release")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
-[assembly: AssemblyInformationalVersion("1.0.0+d93791f097d5412f4bc4f26c5c28b24a8bea40a1")]
+[assembly: AssemblyInformationalVersion("1.0.0+f85ffb80ba0dc50b932872ba78109c1d00af060b")]
 [assembly: AssemblyProduct("DrmTracker")]
 [assembly: AssemblyTitle("DrmTracker")]
 [assembly: AssemblyVersion("1.0.0.0")]

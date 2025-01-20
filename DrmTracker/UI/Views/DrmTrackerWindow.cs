@@ -70,16 +70,16 @@ namespace DrmTracker.UI.Views
 			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
 			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0104: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0172: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0177: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0183: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0199: Expected O, but got Unknown
-			//IL_01be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0105: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0173: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0178: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0184: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019a: Expected O, but got Unknown
+			//IL_01bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01cf: Unknown result type (might be due to invalid IL or missing references)
 			FlowPanel flowPanel = new FlowPanel();
 			((Control)flowPanel).set_Parent((Container)(object)this);
 			((Container)flowPanel).set_WidthSizingMode((SizingMode)2);
@@ -105,7 +105,7 @@ namespace DrmTracker.UI.Views
 			FlowPanel flowPanel3 = new FlowPanel();
 			((Control)flowPanel3).set_Parent((Container)(object)mainContainer);
 			((Container)flowPanel3).set_WidthSizingMode((SizingMode)2);
-			((Container)flowPanel3).set_HeightSizingMode((SizingMode)1);
+			((Control)flowPanel3).set_Height(35);
 			((FlowPanel)flowPanel3).set_OuterControlPadding(new Vector2(5f));
 			((FlowPanel)flowPanel3).set_ControlPadding(new Vector2(5f));
 			FlowPanel actionContainer = flowPanel3;
@@ -186,10 +186,10 @@ namespace DrmTracker.UI.Views
 
 		private void DrawLines()
 		{
-			//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0151: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02fd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0159: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_030f: Unknown result type (might be due to invalid IL or missing references)
 			foreach (Map map in _maps)
 			{
 				DrmAchievements drmProgression = _accountDrms?.FirstOrDefault((DrmProgression a) => a.Map == map.Id)?.AccountAchievement;
@@ -201,12 +201,12 @@ namespace DrmTracker.UI.Views
 				List<(Panel, Label)> tablePanels = _tablePanels;
 				(FlowPanel, Label) tuple = lineLabel;
 				tablePanels.Add(((Panel)(object)tuple.Item1, (Label)(object)tuple.Item2));
-				(FlowPanel, Label) label = UiUtils.CreateLabel(() => "", () => "", _tableContainer, 12, (HorizontalAlignment)1);
+				(FlowPanel, Label) label = UiUtils.CreateLabel(() => "", () => _mapsResx.GetString(map.Key + "Tooltip") + " - Clear", _tableContainer, 12, (HorizontalAlignment)1);
 				((Control)label.Item1).set_BackgroundColor(GetBackgroundColor(drmProgression?.Clear, "Clear"));
 				List<(Panel, Label)> tablePanels2 = _tablePanels;
 				tuple = label;
 				tablePanels2.Add(((Panel)(object)tuple.Item1, (Label)(object)tuple.Item2));
-				label = UiUtils.CreateLabel(() => "", () => "", _tableContainer, 12, (HorizontalAlignment)1);
+				label = UiUtils.CreateLabel(() => "", () => _mapsResx.GetString(map.Key + "Tooltip") + " - CM", _tableContainer, 12, (HorizontalAlignment)1);
 				((Control)label.Item1).set_BackgroundColor(GetBackgroundColor(drmProgression?.FullCM, "CM"));
 				if (drmProgression?.FullCM == null || (drmProgression?.FullCM != null && !drmProgression.FullCM.get_Done()))
 				{
@@ -223,7 +223,7 @@ namespace DrmTracker.UI.Views
 				tablePanels3.Add(((Panel)(object)tuple.Item1, (Label)(object)tuple.Item2));
 				foreach (Faction faction in _factions)
 				{
-					label = UiUtils.CreateLabel(() => "", () => "", _tableContainer, 12, (HorizontalAlignment)1);
+					label = UiUtils.CreateLabel(() => "", () => _mapsResx.GetString(map.Key + "Tooltip") + " - " + _factionsResx.GetString(faction.Key + "Tooltip"), _tableContainer, 12, (HorizontalAlignment)1);
 					((Control)label.Item1).set_BackgroundColor(GetBackgroundColorFaction(drmProgression?.Factions, map.Id, faction.Id));
 					List<(Panel, Label)> tablePanels4 = _tablePanels;
 					tuple = label;
@@ -234,13 +234,13 @@ namespace DrmTracker.UI.Views
 
 		private void DrawLegend(FlowPanel container)
 		{
-			//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013c: Unknown result type (might be due to invalid IL or missing references)
-			UiUtils.CreateLabel(() => strings.Legend_Title, () => "", container, 6, (HorizontalAlignment)1);
-			((Control)UiUtils.CreateLabel(() => strings.Legend_None, () => "", container, 6, (HorizontalAlignment)1).panel).set_BackgroundColor(Colors.None);
-			((Control)UiUtils.CreateLabel(() => strings.Legend_Todo, () => "", container, 6, (HorizontalAlignment)1).panel).set_BackgroundColor(Colors.Todo);
-			((Control)UiUtils.CreateLabel(() => strings.Legend_Done, () => "", container, 6, (HorizontalAlignment)1).panel).set_BackgroundColor(Colors.Done);
+			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0140: Unknown result type (might be due to invalid IL or missing references)
+			UiUtils.CreateLabel(() => strings.Legend_Title, () => "", container, 12, (HorizontalAlignment)1);
+			((Control)UiUtils.CreateLabel(() => strings.Legend_None, () => "", container, 11, (HorizontalAlignment)1).panel).set_BackgroundColor(Colors.None);
+			((Control)UiUtils.CreateLabel(() => strings.Legend_Todo, () => "", container, 11, (HorizontalAlignment)1).panel).set_BackgroundColor(Colors.Todo);
+			((Control)UiUtils.CreateLabel(() => strings.Legend_Done, () => "", container, 11, (HorizontalAlignment)1).panel).set_BackgroundColor(Colors.Done);
 		}
 
 		private async Task RefreshData()
@@ -320,15 +320,15 @@ namespace DrmTracker.UI.Views
 
 		private void ActionContainer_ContentResized(object sender, RegionChangedEventArgs e)
 		{
-			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0092: Unknown result type (might be due to invalid IL or missing references)
 			List<StandardButton> buttons = _buttons;
 			if (buttons == null || buttons.Count < 0)
 			{
 				return;
 			}
-			int columns = 4;
+			int columns = 9;
 			StandardButton obj = _buttons.FirstOrDefault();
 			FlowPanel obj2 = ((obj != null) ? ((Control)obj).get_Parent() : null) as FlowPanel;
 			int width = ((((obj2 != null) ? new int?(((Container)obj2).get_ContentRegion().Width) : null) - (int)((FlowPanel)obj2).get_OuterControlPadding().X - (int)((FlowPanel)obj2).get_ControlPadding().X * (columns - 1)) / columns).GetValueOrDefault(100);
