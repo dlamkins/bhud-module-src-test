@@ -453,7 +453,7 @@ namespace DecorBlishhudModule.Refinement
 			val2.set_ShowShadow(true);
 			val2.set_ShadowColor(new Color(0, 0, 0, 255));
 			Label updateTimerLabel = val2;
-			int secondsCounter = 30;
+			int secondsCounter = 60;
 			Timer timer = new Timer(1000.0);
 			timer.Elapsed += delegate
 			{
@@ -465,10 +465,10 @@ namespace DecorBlishhudModule.Refinement
 			};
 			timer.AutoReset = true;
 			timer.Enabled = true;
-			Timer timer2 = new Timer(31000.0);
+			Timer timer2 = new Timer(61000.0);
 			timer2.Elapsed += async delegate
 			{
-				secondsCounter = 30;
+				secondsCounter = 60;
 				await RefreshPrices(type);
 				updateTimerLabel.set_Text($"      Prices will update in {secondsCounter} s");
 			};
