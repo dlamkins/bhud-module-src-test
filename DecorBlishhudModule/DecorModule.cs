@@ -244,6 +244,10 @@ namespace DecorBlishhudModule
 			});
 			_signatureLabelManager = new SignatureSection((Container)(object)_decorWindow);
 			_wikiLicenseManager = new WikiLicenseSection((Container)(object)_decorWindow);
+			while (!_loaded)
+			{
+				await Task.Delay(100);
+			}
 		}
 
 		protected override void Unload()
@@ -354,71 +358,6 @@ namespace DecorBlishhudModule
 			if (metalTab != null)
 			{
 				((GraphicsResource)metalTab).Dispose();
-			}
-			Texture2D info = _info;
-			if (info != null)
-			{
-				((GraphicsResource)info).Dispose();
-			}
-			Texture2D blackTexture = _blackTexture;
-			if (blackTexture != null)
-			{
-				((GraphicsResource)blackTexture).Dispose();
-			}
-			Texture2D x = _x;
-			if (x != null)
-			{
-				((GraphicsResource)x).Dispose();
-			}
-			Texture2D x2 = _x2;
-			if (x2 != null)
-			{
-				((GraphicsResource)x2).Dispose();
-			}
-			Texture2D x2Active = _x2Active;
-			if (x2Active != null)
-			{
-				((GraphicsResource)x2Active).Dispose();
-			}
-			Texture2D copy = _copy;
-			if (copy != null)
-			{
-				((GraphicsResource)copy).Dispose();
-			}
-			Texture2D heart = _heart;
-			if (heart != null)
-			{
-				((GraphicsResource)heart).Dispose();
-			}
-			Texture2D copperCoin = _copperCoin;
-			if (copperCoin != null)
-			{
-				((GraphicsResource)copperCoin).Dispose();
-			}
-			Texture2D silverCoin = _silverCoin;
-			if (silverCoin != null)
-			{
-				((GraphicsResource)silverCoin).Dispose();
-			}
-			Texture2D arrowUp = _arrowUp;
-			if (arrowUp != null)
-			{
-				((GraphicsResource)arrowUp).Dispose();
-			}
-			Texture2D arrowDown = _arrowDown;
-			if (arrowDown != null)
-			{
-				((GraphicsResource)arrowDown).Dispose();
-			}
-			Texture2D arrowNeutral = _arrowNeutral;
-			if (arrowNeutral != null)
-			{
-				((GraphicsResource)arrowNeutral).Dispose();
-			}
-			Texture2D efficiancy = _efficiancy;
-			if (efficiancy != null)
-			{
-				((GraphicsResource)efficiancy).Dispose();
 			}
 			Image decorationIcon = _decorationIcon;
 			if (decorationIcon != null)

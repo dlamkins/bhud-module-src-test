@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Graphics;
@@ -9,31 +10,60 @@ namespace DecorBlishhudModule
 	{
 		public static async Task<Texture2D> GetThemeIconAsync(Texture2D defaultIcon, Texture2D _homesteadIconMenuLunar, Texture2D _homesteadIconMenuSAB, Texture2D _homesteadIconMenuDragonBash, Texture2D _homesteadIconMenuFOTFW, Texture2D _homesteadIconMenuHalloween, Texture2D wintersdayIcon)
 		{
-			Dictionary<Texture2D, string[]> iconMapping = new Dictionary<Texture2D, string[]>
+			int currentYear = DateTime.Now.Year;
+			Dictionary<Texture2D, List<string>> iconMapping = new Dictionary<Texture2D, List<string>>
 			{
 				{
 					_homesteadIconMenuLunar,
-					new string[1] { "id=\"Current_release:_“Lunar_New_Year”" }
+					new List<string>
+					{
+						"id=\"Current_release:_“Lunar_New_Year”",
+						$"id=\"Current_release:_“Lunar_New_Year_{currentYear}”"
+					}
 				},
 				{
 					_homesteadIconMenuSAB,
-					new string[1] { "id=\"Current_release:_“Super_Adventure_Festival”" }
+					new List<string>
+					{
+						"id=\"Current_release:_“Super_Adventure_Festival”",
+						$"id=\"Current_release:_“Super_Adventure_Festival_{currentYear}”"
+					}
 				},
 				{
 					_homesteadIconMenuDragonBash,
-					new string[1] { "id=\"Current_release:_“Dragon_Bash”" }
+					new List<string>
+					{
+						"id=\"Current_release:_“Dragon_Bash”",
+						$"id=\"Current_release:_“Dragon_Bash_{currentYear}”"
+					}
 				},
 				{
 					_homesteadIconMenuFOTFW,
-					new string[1] { "id=\"Current_release:_“Festival_of_the_Four_Winds”" }
+					new List<string>
+					{
+						"id=\"Current_release:_“Festival_of_the_Four_Winds”",
+						$"id=\"Current_release:_“Festival_of_the_Four_Winds_{currentYear}”"
+					}
 				},
 				{
 					_homesteadIconMenuHalloween,
-					new string[2] { "id=\"Current_release:_“Halloween”", "id=\"Current_release:_“Shadow_of_the_Mad_King”" }
+					new List<string>
+					{
+						"id=\"Current_release:_“Halloween”",
+						"id=\"Current_release:_“Shadow_of_the_Mad_King”",
+						$"id=\"Current_release:_“Halloween_{currentYear}”",
+						$"id=\"Current_release:_“Shadow_of_the_Mad_King_{currentYear}”"
+					}
 				},
 				{
 					wintersdayIcon,
-					new string[2] { "id=\"Current_release:_“Wintersday”", "id=\"Current_release:_“A_Very_Merry_Wintersday”" }
+					new List<string>
+					{
+						"id=\"Current_release:_“Wintersday”",
+						"id=\"Current_release:_“A_Very_Merry_Wintersday”",
+						$"id=\"Current_release:_“Wintersday_{currentYear}”",
+						$"id=\"Current_release:_“A_Very_Merry_Wintersday_{currentYear}”"
+					}
 				}
 			};
 			try
@@ -55,10 +85,9 @@ namespace DecorBlishhudModule
 					obj2 = string.Empty;
 				}
 				string parsedText = (string)obj2;
-				foreach (KeyValuePair<Texture2D, string[]> entry in iconMapping)
+				foreach (KeyValuePair<Texture2D, List<string>> entry in iconMapping)
 				{
-					string[] value = entry.Value;
-					foreach (string keyword in value)
+					foreach (string keyword in entry.Value)
 					{
 						if (parsedText.Contains(keyword))
 						{

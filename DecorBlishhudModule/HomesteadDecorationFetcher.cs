@@ -12,6 +12,8 @@ namespace DecorBlishhudModule
 {
 	public class HomesteadDecorationFetcher
 	{
+		private static readonly Dictionary<string, string> IngredientIconCache = new Dictionary<string, string>();
+
 		public static async Task<Dictionary<string, List<Decoration>>> FetchDecorationsAsync()
 		{
 			DecorModule.DecorModuleInstance.Client.get_DefaultRequestHeaders().get_UserAgent().ParseAdd("Mozilla/5.0");
@@ -32,28 +34,22 @@ namespace DecorBlishhudModule
 		private static async Task<List<Decoration>> FetchDecorationsForCategoryAsync(string baseUrl)
 		{
 			List<Decoration> decorations = new List<Decoration>();
-			string[] sections = new string[2] { "1", "2" };
 			string combinedHtmlContent = string.Empty;
-			string[] array = sections;
-			foreach (string section in array)
+			JToken obj = JObject.Parse(await DecorModule.DecorModuleInstance.Client.GetStringAsync(baseUrl)).get_Item("parse");
+			object obj2;
+			if (obj == null)
 			{
-				string url = baseUrl + "&section=" + section;
-				JToken obj = JObject.Parse(await DecorModule.DecorModuleInstance.Client.GetStringAsync(url)).get_Item("parse");
-				object obj2;
-				if (obj == null)
-				{
-					obj2 = null;
-				}
-				else
-				{
-					JToken obj3 = obj.get_Item((object)"text");
-					obj2 = ((obj3 == null) ? null : ((object)obj3.get_Item((object)"*"))?.ToString());
-				}
-				string htmlContent = (string)obj2;
-				if (!string.IsNullOrEmpty(htmlContent))
-				{
-					combinedHtmlContent += htmlContent;
-				}
+				obj2 = null;
+			}
+			else
+			{
+				JToken obj3 = obj.get_Item((object)"text");
+				obj2 = ((obj3 == null) ? null : ((object)obj3.get_Item((object)"*"))?.ToString());
+			}
+			string htmlContent = (string)obj2;
+			if (!string.IsNullOrEmpty(htmlContent))
+			{
+				combinedHtmlContent += htmlContent;
 			}
 			HtmlDocument doc = new HtmlDocument();
 			doc.LoadHtml(combinedHtmlContent);
@@ -99,15 +95,87 @@ namespace DecorBlishhudModule
 						imageUrl = imageUrl.Replace("/images/thumb/", "/images/");
 						imageUrl = Regex.Replace(imageUrl, "/\\d+px-[^/]+$", "");
 					}
-					Decoration matchedDecoration = decorations.FirstOrDefault((Decoration d) => d.Name.Trim().Equals(galleryName?.Trim(), StringComparison.OrdinalIgnoreCase));
-					if (matchedDecoration != null && imageUrl != null)
+					Decoration matchedDecoration2 = decorations.FirstOrDefault((Decoration d) => d.Name.Trim().Equals(galleryName?.Trim(), StringComparison.OrdinalIgnoreCase));
+					if (matchedDecoration2 != null && imageUrl != null)
 					{
-						matchedDecoration.ImageUrl = imageUrl;
+						matchedDecoration2.ImageUrl = imageUrl;
+					}
+				}
+			}
+			HtmlNodeCollection recipesNode = doc.DocumentNode.SelectNodes("//table[@class='recipe sortable table']//tr[position()>1]");
+			if (recipesNode != null)
+			{
+				foreach (HtmlNode item3 in (IEnumerable<HtmlNode>)recipesNode)
+				{
+					HtmlNodeCollection cells = item3.SelectNodes("td");
+					if (cells != null && cells.Count >= 5)
+					{
+						string recipeName = cells[0].InnerText.Trim().Split(new string[1] { "  " }, StringSplitOptions.None)[0];
+						Decoration matchedDecoration = decorations.FirstOrDefault((Decoration d) => d.Name.Trim().Equals(recipeName, StringComparison.OrdinalIgnoreCase));
+						if (matchedDecoration != null)
+						{
+							matchedDecoration.Book = ((cells[0].InnerText.Trim().Split(new string[1] { "  " }, StringSplitOptions.None).Length <= 1) ? null : cells[0].InnerText.Trim().Split(new string[1] { "  " }, StringSplitOptions.None).ElementAtOrDefault(1)?.Replace("(Learned from: ", "").Replace(")", "").Trim());
+							matchedDecoration.CraftingRating = cells[3]?.InnerText.Trim();
+							HtmlNode ingredientsNode = cells[4].SelectSingleNode(".//dl");
+							if (ingredientsNode != null)
+							{
+								ParseIngredients(ingredientsNode, matchedDecoration);
+							}
+						}
 					}
 				}
 				return decorations;
 			}
 			return decorations;
+		}
+
+		private static void ParseIngredients(HtmlNode ingredientsNode, Decoration decoration)
+		{
+			HtmlNodeCollection dtNodes = ingredientsNode.SelectNodes(".//dt");
+			HtmlNodeCollection ddNodes = ingredientsNode.SelectNodes(".//dd");
+			if (dtNodes == null || ddNodes == null || dtNodes.Count != ddNodes.Count)
+			{
+				return;
+			}
+			for (int i = 0; i < dtNodes.Count; i++)
+			{
+				string ingredientQuantity = dtNodes[i]?.InnerText.Trim();
+				string ingredientName = ddNodes[i]?.InnerText.Trim();
+				HtmlNode ingredientIconNode = ddNodes[i]?.SelectSingleNode(".//img");
+				string ingredientIconUrl = null;
+				if (ingredientIconNode != null)
+				{
+					string rawIconUrl = "https://wiki.guildwars2.com" + ingredientIconNode.GetAttributeValue("src", "").Trim();
+					if (!IngredientIconCache.TryGetValue(ingredientName, out ingredientIconUrl))
+					{
+						ingredientIconUrl = rawIconUrl;
+						IngredientIconCache[ingredientName] = ingredientIconUrl;
+					}
+				}
+				switch (i + 1)
+				{
+				case 1:
+					decoration.CraftingIngredientName1 = ingredientName;
+					decoration.CraftingIngredientIcon1 = ingredientIconUrl;
+					decoration.CraftingIngredientQty1 = ingredientQuantity;
+					break;
+				case 2:
+					decoration.CraftingIngredientName2 = ingredientName;
+					decoration.CraftingIngredientIcon2 = ingredientIconUrl;
+					decoration.CraftingIngredientQty2 = ingredientQuantity;
+					break;
+				case 3:
+					decoration.CraftingIngredientName3 = ingredientName;
+					decoration.CraftingIngredientIcon3 = ingredientIconUrl;
+					decoration.CraftingIngredientQty3 = ingredientQuantity;
+					break;
+				case 4:
+					decoration.CraftingIngredientName4 = ingredientName;
+					decoration.CraftingIngredientIcon4 = ingredientIconUrl;
+					decoration.CraftingIngredientQty4 = ingredientQuantity;
+					break;
+				}
+			}
 		}
 	}
 }

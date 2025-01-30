@@ -19,9 +19,10 @@ namespace DecorBlishhudModule.Sections.LeftSideTasks
 				foreach (Panel decorationIconPanel in ((IEnumerable)((Container)categoryFlowPanel).get_Children()).OfType<Panel>())
 				{
 					Image decorationIcon = ((IEnumerable)((Container)decorationIconPanel).get_Children()).OfType<Image>().FirstOrDefault();
-					if (decorationIcon != null)
+					if (decorationIcon != null && ((Control)decorationIcon).get_Tooltip() != null)
 					{
-						bool matchesSearch = ((Control)decorationIcon).get_BasicTooltipText()?.ToLower().Contains(searchText) ?? false;
+						Label tooltipLabel = ((IEnumerable)((Container)((Control)decorationIcon).get_Tooltip()).get_Children()).OfType<Label>().FirstOrDefault();
+						bool matchesSearch = tooltipLabel != null && tooltipLabel.get_Text().ToLower().Contains(searchText);
 						((Control)decorationIconPanel).set_Visible(matchesSearch);
 						if (matchesSearch)
 						{
@@ -35,7 +36,13 @@ namespace DecorBlishhudModule.Sections.LeftSideTasks
 				{
 					continue;
 				}
-				visibleDecorations.Sort((Panel a, Panel b) => string.Compare(((Control)((IEnumerable)((Container)a).get_Children()).OfType<Image>().FirstOrDefault()).get_BasicTooltipText(), ((Control)((IEnumerable)((Container)b).get_Children()).OfType<Image>().FirstOrDefault()).get_BasicTooltipText(), StringComparison.OrdinalIgnoreCase));
+				visibleDecorations.Sort(delegate(Panel a, Panel b)
+				{
+					Label obj = ((IEnumerable)((Container)((Control)((IEnumerable)((Container)a).get_Children()).OfType<Image>().FirstOrDefault()).get_Tooltip()).get_Children()).OfType<Label>().FirstOrDefault();
+					string strA = ((obj != null) ? obj.get_Text() : null);
+					Label obj2 = ((IEnumerable)((Container)((Control)((IEnumerable)((Container)b).get_Children()).OfType<Image>().FirstOrDefault()).get_Tooltip()).get_Children()).OfType<Label>().FirstOrDefault();
+					return string.Compare(strA, (obj2 != null) ? obj2.get_Text() : null, StringComparison.OrdinalIgnoreCase);
+				});
 				foreach (Panel visibleDecoration2 in visibleDecorations)
 				{
 					((Container)categoryFlowPanel).get_Children().Remove((Control)(object)visibleDecoration2);

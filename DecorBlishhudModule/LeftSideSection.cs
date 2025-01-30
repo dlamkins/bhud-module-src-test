@@ -193,6 +193,7 @@ namespace DecorBlishhudModule
 					Logger.Warn("Icon texture for '" + decoration.Name + "' could not be loaded.");
 					return;
 				}
+				Tooltip tooltip = await DecorationCustomTooltip.CreateTooltipWithIconsAsync(decoration, iconTexture);
 				if (_isIconView)
 				{
 					if (iconTexture == null)
@@ -209,6 +210,7 @@ namespace DecorBlishhudModule
 					((Control)val2).set_Size(new Point(45));
 					((Control)val2).set_Location(new Point(2, 2));
 					((Control)val2).set_BasicTooltipText(decoration.Name);
+					((Control)val2).set_Tooltip(tooltip);
 					Image decorationIconImage = val2;
 					((Control)borderPanel).add_MouseEntered((EventHandler<MouseEventArgs>)delegate
 					{
@@ -307,6 +309,7 @@ namespace DecorBlishhudModule
 							try
 							{
 								decorModule = DecorModule.DecorModuleInstance;
+								((Control)decorModule.DecorationImage).set_Tooltip(tooltip);
 								await Task.Run(async delegate
 								{
 									try
@@ -339,13 +342,13 @@ namespace DecorBlishhudModule
 				((Control)borderPanel2).set_Parent((Container)(object)categoryFlowPanel);
 				((Control)borderPanel2).set_Size(new Point(254, 300));
 				((Control)borderPanel2).set_BackgroundColor(new Color(0, 0, 0, 36));
-				((Control)borderPanel2).set_BasicTooltipText(decoration.Name);
+				((Control)borderPanel2).set_Tooltip(tooltip);
 				BorderPanel mainContainer = borderPanel2;
 				Panel val3 = new Panel();
 				((Control)val3).set_Parent((Container)(object)mainContainer);
 				((Control)val3).set_Location(new Point(0, 0));
 				((Control)val3).set_Size(new Point(256, 50));
-				((Control)val3).set_BasicTooltipText(decoration.Name);
+				((Control)val3).set_Tooltip(tooltip);
 				val3.set_BackgroundTexture(AsyncTexture2D.op_Implicit(DecorModule.DecorModuleInstance.BlackTexture));
 				Panel iconTextContainer = val3;
 				Image val4 = new Image(AsyncTexture2D.op_Implicit(iconTexture));
@@ -353,6 +356,7 @@ namespace DecorBlishhudModule
 				((Control)val4).set_Location(new Point(3, 3));
 				((Control)val4).set_Size(new Point(44, 44));
 				((Control)val4).set_BasicTooltipText(decoration.Name);
+				((Control)val4).set_Tooltip(tooltip);
 				Image iconImage = val4;
 				Label val5 = new Label();
 				((Control)val5).set_Parent((Container)(object)iconTextContainer);
@@ -362,7 +366,7 @@ namespace DecorBlishhudModule
 				val5.set_Font((decoration.Name.ToString().Length > 30) ? GameService.Content.get_DefaultFont12() : GameService.Content.get_DefaultFont14());
 				val5.set_HorizontalAlignment((HorizontalAlignment)0);
 				val5.set_VerticalAlignment((VerticalAlignment)1);
-				((Control)val5).set_BasicTooltipText(decoration.Name);
+				((Control)val5).set_Tooltip(tooltip);
 				int width2 = imageTexture.get_Width();
 				int imageHeight = imageTexture.get_Height();
 				float aspectRatio = (float)width2 / (float)imageHeight;
@@ -380,7 +384,7 @@ namespace DecorBlishhudModule
 				((Control)val6).set_Parent((Container)(object)mainContainer);
 				((Control)val6).set_Location(new Point(xOffset + 2, centeredYOffset - 1));
 				((Control)val6).set_Size(new Point(width - 3, height));
-				((Control)val6).set_BasicTooltipText(decoration.Name);
+				((Control)val6).set_Tooltip(tooltip);
 				Image decorationImage = val6;
 				((Control)mainContainer).add_MouseEntered((EventHandler<MouseEventArgs>)delegate
 				{
