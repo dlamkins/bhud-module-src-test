@@ -409,6 +409,7 @@ namespace DecorBlishhudModule
 					decorWindow = DecorModule.DecorModuleInstance.DecorWindow;
 					Image val11 = new Image(AsyncTexture2D.op_Implicit(borderedTexture));
 					((Control)val11).set_Parent((Container)(object)decorWindow);
+					((Control)val11).set_Tooltip(tooltip);
 					decorationImage = val11;
 					await BigImageSection.UpdateDecorationImageAsync(decoration, (Container)(object)decorWindow, decorationImage);
 				});

@@ -407,14 +407,37 @@ namespace DecorBlishhudModule.Refinement
 
 		private static async Task RefreshPrices(string type)
 		{
+			if (!_currentItemsByType.ContainsKey(type) || _currentItemsByType[type] == null)
+			{
+				Console.WriteLine("Error: _currentItemsByType does not contain key: " + type + " or is null");
+				return;
+			}
 			List<Item> items = _currentItemsByType[type];
-			items = await ItemFetcher.UpdateItemPrices(items);
-			_currentItemsByType[type] = items;
+			if (items == null || items.Count == 0)
+			{
+				Console.WriteLine("Error: No items found to update prices.");
+				return;
+			}
+			try
+			{
+				items = await ItemFetcher.UpdateItemPrices(items);
+				_currentItemsByType[type] = items;
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine("Error updating item prices: " + ex.Message);
+				return;
+			}
 			await UpdatePriceColumns(type);
 		}
 
 		private static async Task UpdatePriceColumns(string type)
 		{
+			if (!_currentItemsByType.ContainsKey(type) || _currentItemsByType[type] == null)
+			{
+				Console.WriteLine("Error: Cannot update price columns. _currentItemsByType[" + type + "] is null.");
+				return;
+			}
 			((Container)_defBuy).get_Children().Clear();
 			((Container)_defSell).get_Children().Clear();
 			((Container)_eff1Buy).get_Children().Clear();
@@ -424,12 +447,19 @@ namespace DecorBlishhudModule.Refinement
 			foreach (Item item in _currentItemsByType[type])
 			{
 				Color rowBackgroundColor = ((_currentItemsByType[type].IndexOf(item) % 2 != 0) ? new Color(0, 0, 0, 175) : new Color(0, 0, 0, 75));
-				await CreateCurrencyDisplay(_defBuy, item, item.DefaultBuy, rowBackgroundColor);
-				await CreateCurrencyDisplay(_defSell, item, item.DefaultSell, rowBackgroundColor);
-				await CreateCurrencyDisplay(_eff1Buy, item, item.TradeEfficiency1Buy, rowBackgroundColor);
-				await CreateCurrencyDisplay(_eff1Sell, item, item.TradeEfficiency1Sell, rowBackgroundColor);
-				await CreateCurrencyDisplay(_eff2Buy, item, item.TradeEfficiency2Buy, rowBackgroundColor);
-				await CreateCurrencyDisplay(_eff2Sell, item, item.TradeEfficiency2Sell, rowBackgroundColor);
+				try
+				{
+					await CreateCurrencyDisplay(_defBuy, item, item.DefaultBuy, rowBackgroundColor);
+					await CreateCurrencyDisplay(_defSell, item, item.DefaultSell, rowBackgroundColor);
+					await CreateCurrencyDisplay(_eff1Buy, item, item.TradeEfficiency1Buy, rowBackgroundColor);
+					await CreateCurrencyDisplay(_eff1Sell, item, item.TradeEfficiency1Sell, rowBackgroundColor);
+					await CreateCurrencyDisplay(_eff2Buy, item, item.TradeEfficiency2Buy, rowBackgroundColor);
+					await CreateCurrencyDisplay(_eff2Sell, item, item.TradeEfficiency2Sell, rowBackgroundColor);
+				}
+				catch (Exception ex)
+				{
+					Console.WriteLine("Error creating currency display for item " + item?.Name + ": " + ex.Message);
+				}
 			}
 		}
 
@@ -464,9 +494,16 @@ namespace DecorBlishhudModule.Refinement
 			Timer timer2 = new Timer(61000.0);
 			timer2.Elapsed += async delegate
 			{
-				secondsCounter = 60;
-				await RefreshPrices(type);
-				updateTimerLabel.set_Text($"      Prices will update in {secondsCounter} s");
+				try
+				{
+					secondsCounter = 60;
+					await RefreshPrices(type);
+					updateTimerLabel.set_Text($"      Prices will update in {secondsCounter} s");
+				}
+				catch (Exception ex)
+				{
+					Console.WriteLine("Error in price update timer: " + ex.Message);
+				}
 			};
 			timer2.AutoReset = true;
 			timer2.Enabled = true;

@@ -57,7 +57,7 @@ namespace DecorBlishhudModule.Sections.LeftSideTasks
 			val3.set_Text(decoration.Name);
 			val3.set_TextColor(Color.get_White());
 			val3.set_Font(GameService.Content.get_DefaultFont16());
-			((Control)val3).set_Location(new Point(50, 5));
+			((Control)val3).set_Location(new Point(50, (decoration.Book != null) ? 5 : 10));
 			val3.set_AutoSizeWidth(true);
 			Label val4 = new Label();
 			((Control)val4).set_Parent((Container)(object)customTooltip);
