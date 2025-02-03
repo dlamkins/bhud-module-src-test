@@ -7,7 +7,7 @@ using Kenedia.Modules.Core.Services;
 
 namespace Kenedia.Modules.Core.Controls
 {
-	public class TrackBar : TrackBar, ILocalizable
+	public class TrackBar : Blish_HUD.Controls.TrackBar, ILocalizable
 	{
 		private Func<string> _setLocalizedTooltip;
 
@@ -20,17 +20,16 @@ namespace Kenedia.Modules.Core.Controls
 			set
 			{
 				_setLocalizedTooltip = value;
-				((Control)this).set_BasicTooltipText(value?.Invoke());
+				base.BasicTooltipText = value?.Invoke();
 			}
 		}
 
 		public Action<int> ValueChangedAction { get; set; }
 
 		public TrackBar()
-			: this()
 		{
-			LocalizingService.LocaleChanged += UserLocale_SettingChanged;
-			((TrackBar)this).add_ValueChanged((EventHandler<ValueEventArgs<float>>)TrackBar_ValueChanged);
+			LocalizingService.LocaleChanged += new EventHandler<ValueChangedEventArgs<Locale>>(UserLocale_SettingChanged);
+			base.ValueChanged += TrackBar_ValueChanged;
 			UserLocale_SettingChanged(null, null);
 		}
 
@@ -38,19 +37,19 @@ namespace Kenedia.Modules.Core.Controls
 		{
 			if (SetLocalizedTooltip != null)
 			{
-				((Control)this).set_BasicTooltipText(SetLocalizedTooltip?.Invoke());
+				base.BasicTooltipText = SetLocalizedTooltip?.Invoke();
 			}
 		}
 
 		protected override void DisposeControl()
 		{
-			((TrackBar)this).DisposeControl();
-			GameService.Overlay.get_UserLocale().remove_SettingChanged((EventHandler<ValueChangedEventArgs<Locale>>)UserLocale_SettingChanged);
+			base.DisposeControl();
+			GameService.Overlay.UserLocale.SettingChanged -= UserLocale_SettingChanged;
 		}
 
 		private void TrackBar_ValueChanged(object sender, ValueEventArgs<float> e)
 		{
-			ValueChangedAction?.Invoke((int)((TrackBar)this).get_Value());
+			ValueChangedAction?.Invoke((int)base.Value);
 		}
 	}
 }

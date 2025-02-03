@@ -8,7 +8,7 @@ using Kenedia.Modules.Core.Services;
 
 namespace Kenedia.Modules.Core.Controls
 {
-	public class TextBox : TextBox, ILocalizable
+	public class TextBox : Blish_HUD.Controls.TextBox, ILocalizable
 	{
 		private Func<string> _setLocalizedText;
 
@@ -25,7 +25,7 @@ namespace Kenedia.Modules.Core.Controls
 			set
 			{
 				_setLocalizedText = value;
-				((TextInputBase)this).set_Text(value?.Invoke());
+				base.Text = value?.Invoke();
 			}
 		}
 
@@ -38,7 +38,7 @@ namespace Kenedia.Modules.Core.Controls
 			set
 			{
 				_setLocalizedTooltip = value;
-				((Control)this).set_BasicTooltipText(value?.Invoke());
+				base.BasicTooltipText = value?.Invoke();
 			}
 		}
 
@@ -51,7 +51,7 @@ namespace Kenedia.Modules.Core.Controls
 			set
 			{
 				_setLocalizedPlaceholder = value;
-				((TextInputBase)this).set_PlaceholderText(value?.Invoke());
+				base.PlaceholderText = value?.Invoke();
 			}
 		}
 
@@ -62,68 +62,66 @@ namespace Kenedia.Modules.Core.Controls
 		public Action<string> TextChangedAction { get; set; }
 
 		public TextBox()
-			: this()
 		{
-			LocalizingService.LocaleChanged += UserLocale_SettingChanged;
-			((TextInputBase)this).add_TextChanged((EventHandler<EventArgs>)OnTextChanged);
+			LocalizingService.LocaleChanged += new EventHandler<ValueChangedEventArgs<Locale>>(UserLocale_SettingChanged);
+			base.TextChanged += OnTextChanged;
 			UserLocale_SettingChanged(null, null);
 		}
 
 		public void ResetText()
 		{
-			((TextInputBase)this).set_Text((string)null);
+			base.Text = null;
 		}
 
 		protected override void OnEnterPressed(EventArgs e)
 		{
-			((TextBox)this).OnEnterPressed(e);
-			EnterPressedAction?.Invoke(((TextInputBase)this).get_Text());
+			base.OnEnterPressed(e);
+			EnterPressedAction?.Invoke(base.Text);
 		}
 
 		public void UserLocale_SettingChanged(object sender, ValueChangedEventArgs<Locale> e)
 		{
 			if (SetLocalizedText != null)
 			{
-				((TextInputBase)this).set_Text(SetLocalizedText?.Invoke());
+				base.Text = SetLocalizedText?.Invoke();
 			}
 			if (SetLocalizedTooltip != null)
 			{
-				((Control)this).set_BasicTooltipText(SetLocalizedTooltip?.Invoke());
+				base.BasicTooltipText = SetLocalizedTooltip?.Invoke();
 			}
 			if (SetLocalizedPlaceholder != null)
 			{
-				((TextInputBase)this).set_PlaceholderText(SetLocalizedPlaceholder?.Invoke());
+				base.PlaceholderText = SetLocalizedPlaceholder?.Invoke();
 			}
 		}
 
 		protected override void DisposeControl()
 		{
-			((TextInputBase)this).DisposeControl();
-			((TextInputBase)this).remove_TextChanged((EventHandler<EventArgs>)OnTextChanged);
-			GameService.Overlay.get_UserLocale().remove_SettingChanged((EventHandler<ValueChangedEventArgs<Locale>>)UserLocale_SettingChanged);
+			base.DisposeControl();
+			base.TextChanged -= OnTextChanged;
+			GameService.Overlay.UserLocale.SettingChanged -= UserLocale_SettingChanged;
 		}
 
 		private void OnTextChanged(object sender, EventArgs e)
 		{
-			TextChangedAction?.Invoke(((TextInputBase)this).get_Text());
+			TextChangedAction?.Invoke(base.Text);
 		}
 
 		protected override void OnClick(MouseEventArgs e)
 		{
-			if (((Control)this).get_Enabled())
+			if (base.Enabled)
 			{
-				((TextInputBase)this).OnClick(e);
+				base.OnClick(e);
 			}
 		}
 
 		protected override CaptureType CapturesInput()
 		{
-			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-			if (!((Control)this).get_Enabled())
+			if (!base.Enabled)
 			{
-				return (CaptureType)0;
+				return CaptureType.None;
 			}
-			return ((Control)this).CapturesInput();
+			return base.CapturesInput();
 		}
 	}
 }

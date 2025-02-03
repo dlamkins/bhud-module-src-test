@@ -1,6 +1,5 @@
 using System;
 using Blish_HUD;
-using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Kenedia.Modules.Core.Models;
 using Kenedia.Modules.Core.Structs;
@@ -22,7 +21,7 @@ namespace Kenedia.Modules.Core.Controls
 
 		public bool AutoSize;
 
-		private BitmapFont _font = GameService.Content.get_DefaultFont14();
+		private BitmapFont _font = GameService.Content.DefaultFont14;
 
 		private string _text = string.Empty;
 
@@ -42,7 +41,7 @@ namespace Kenedia.Modules.Core.Controls
 			}
 			set
 			{
-				Common.SetProperty(ref _text, value, ((Control)this).RecalculateLayout);
+				Common.SetProperty(ref _text, value, new Action(RecalculateLayout));
 			}
 		}
 
@@ -54,7 +53,7 @@ namespace Kenedia.Modules.Core.Controls
 			}
 			set
 			{
-				Common.SetProperty(ref _texture, value, ((Control)this).RecalculateLayout);
+				Common.SetProperty(ref _texture, value, new Action(RecalculateLayout));
 			}
 		}
 
@@ -66,7 +65,7 @@ namespace Kenedia.Modules.Core.Controls
 			}
 			set
 			{
-				Common.SetProperty(ref _outerPadding, value, ((Control)this).RecalculateLayout);
+				Common.SetProperty(ref _outerPadding, value, new Action(RecalculateLayout));
 			}
 		}
 
@@ -78,7 +77,7 @@ namespace Kenedia.Modules.Core.Controls
 			}
 			set
 			{
-				Common.SetProperty(ref _innerPadding, value, ((Control)this).RecalculateLayout);
+				Common.SetProperty(ref _innerPadding, value, new Action(RecalculateLayout));
 			}
 		}
 
@@ -90,7 +89,7 @@ namespace Kenedia.Modules.Core.Controls
 			}
 			set
 			{
-				Common.SetProperty(ref _font, value, ((Control)this).RecalculateLayout);
+				Common.SetProperty(ref _font, value, new Action(RecalculateLayout));
 			}
 		}
 
@@ -110,7 +109,7 @@ namespace Kenedia.Modules.Core.Controls
 			}
 			set
 			{
-				Common.SetProperty(ref _showIcon, value, ((Control)this).RecalculateLayout);
+				Common.SetProperty(ref _showIcon, value, new Action(RecalculateLayout));
 			}
 		}
 
@@ -137,7 +136,7 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_016d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0172: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0177: Unknown result type (might be due to invalid IL or missing references)
-			((Control)this).RecalculateLayout();
+			base.RecalculateLayout();
 			RectangleDimensions p = OuterPadding;
 			RectangleF size = Font.GetStringRectangle(Text);
 			int imagePadding = ((Texture != null) ? ((Math.Max(Texture.Bounds.Height, (int)size.Height) - p.Vertical - Texture.Bounds.Height) / 2) : 0);
@@ -147,20 +146,20 @@ namespace Kenedia.Modules.Core.Controls
 			_totalBounds = new Rectangle(Point.get_Zero(), new Point(_iconBounds.Width + _textBounds.Width + InnerPadding + p.Right, Math.Max(_iconBounds.Height, _textBounds.Height) + p.Bottom));
 			if (AutoSize)
 			{
-				if (((Control)this).get_Width() != _totalBounds.Width)
+				if (base.Width != _totalBounds.Width)
 				{
-					((Control)this).set_Width(_totalBounds.Width);
+					base.Width = _totalBounds.Width;
 				}
-				if (((Control)this).get_Height() != _totalBounds.Height)
+				if (base.Height != _totalBounds.Height)
 				{
-					((Control)this).set_Height(_totalBounds.Height);
+					base.Height = _totalBounds.Height;
 				}
 			}
 		}
 
 		public override void DoUpdate(GameTime gameTime)
 		{
-			((Control)this).DoUpdate(gameTime);
+			base.DoUpdate(gameTime);
 		}
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
@@ -175,38 +174,29 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
 			if (Texture != null)
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(Texture.Texture), _iconBounds, (Rectangle?)Texture.TextureRegion, (Color)(((_003F?)Texture.DrawColor) ?? Color.get_White()), 0f, default(Vector2), (SpriteEffects)0);
+				spriteBatch.DrawOnCtrl(this, Texture.Texture, _iconBounds, Texture.TextureRegion, (Color)(((_003F?)Texture.DrawColor) ?? Color.get_White()), 0f, default(Vector2), (SpriteEffects)0);
 			}
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, Text, Font, _textBounds, FontColor, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+			spriteBatch.DrawStringOnCtrl(this, Text, Font, _textBounds, FontColor, wrap: false, stroke: true);
 		}
 
 		protected override CaptureType CapturesInput()
 		{
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
 			CaptureType? capture = Capture;
 			if (!capture.HasValue)
 			{
 				if (!CaptureInput)
 				{
-					return (CaptureType)0;
+					return CaptureType.None;
 				}
-				return ((Control)this).CapturesInput();
+				return base.CapturesInput();
 			}
 			return capture.GetValueOrDefault();
 		}
 
 		protected override void DisposeControl()
 		{
-			((Control)this).DisposeControl();
+			base.DisposeControl();
 			Texture = null;
 		}
-
-		public IconLabel()
-			: this()
-		{
-		}//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-		//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-
 	}
 }

@@ -18,35 +18,33 @@ namespace Kenedia.Modules.Characters.Controls
 
 
 		public NotificationPanel(ObservableCollection<Character_Model> characters)
-			: this()
 		{
 			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			((Control)this).set_Height(100);
-			((Control)this).set_Width(400);
-			((FlowPanel)this).set_FlowDirection((ControlFlowDirection)3);
-			((Panel)this).set_CanScroll(true);
+			base.Height = 100;
+			base.Width = 400;
+			base.FlowDirection = ControlFlowDirection.SingleTopToBottom;
+			base.CanScroll = true;
 			_characters = characters;
 			UpdateCharacters();
 		}
 
 		public void UpdateCharacters()
 		{
-			List<Character_Model> addedCharacters = _markedCharacters.Select(((Character_Model character, CharacterDeletedNotification control) e) => e.character).ToList();
+			List<Character_Model> addedCharacters = _markedCharacters.Select<(Character_Model, CharacterDeletedNotification), Character_Model>(((Character_Model character, CharacterDeletedNotification control) e) => e.character).ToList();
 			foreach (Character_Model character in _characters)
 			{
 				if (character.MarkedAsDeleted && addedCharacters.Find((Character_Model e) => e == character) == null)
 				{
-					List<(Character_Model character, CharacterDeletedNotification control)> markedCharacters = _markedCharacters;
-					Character_Model item = character;
-					CharacterDeletedNotification characterDeletedNotification = new CharacterDeletedNotification();
-					((Control)characterDeletedNotification).set_Parent((Container)(object)this);
-					((Control)characterDeletedNotification).set_Height(25);
-					characterDeletedNotification.MarkedCharacter = character;
-					markedCharacters.Add((item, characterDeletedNotification));
+					_markedCharacters.Add((character, new CharacterDeletedNotification
+					{
+						Parent = this,
+						Height = 25,
+						MarkedCharacter = character
+					}));
 				}
 			}
-			((Control)this).RecalculateLayout();
+			RecalculateLayout();
 		}
 
 		public override void RecalculateLayout()
@@ -54,60 +52,52 @@ namespace Kenedia.Modules.Characters.Controls
 			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
-			((FlowPanel)this).RecalculateLayout();
-			((FlowPanel)this).SortChildren<BaseNotification>((Comparison<BaseNotification>)delegate(BaseNotification a, BaseNotification b)
+			base.RecalculateLayout();
+			SortChildren(delegate(BaseNotification a, BaseNotification b)
 			{
 				int num = a.NotificationType.CompareTo(b.NotificationType);
 				int num2 = a.Id.CompareTo(b.Id);
 				return (num != 0) ? num : (num + num2);
 			});
-			foreach (Control child in ((Container)this).get_Children())
+			foreach (Control child in base.Children)
 			{
-				child.set_Width(((Container)this).get_ContentRegion().Width);
+				child.Width = base.ContentRegion.Width;
 			}
-			((Control)this).set_Height((MaxSize.Y > -1) ? Math.Min(MaxSize.Y, (((Container)this).get_Children().get_Count() > 0) ? ((IEnumerable<Control>)((Container)this).get_Children()).Max((Control e) => e.get_Bottom()) : 0) : ((((Container)this).get_Children().get_Count() > 0) ? ((IEnumerable<Control>)((Container)this).get_Children()).Max((Control e) => e.get_Bottom()) : 0));
-			if (((Container)this).get_Children() != null && ((Container)this).get_Children().get_Count() != 0)
+			base.Height = ((MaxSize.Y > -1) ? Math.Min(MaxSize.Y, (base.Children.Count > 0) ? base.Children.Max((Control e) => e.Bottom) : 0) : ((base.Children.Count > 0) ? base.Children.Max((Control e) => e.Bottom) : 0));
+			if (base.Children != null && base.Children.Count != 0)
 			{
-				ControlCollection<Control> children = ((Container)this).get_Children();
-				if (children == null || !(((IEnumerable<Control>)children).Where((Control e) => e.get_Visible())?.Count() <= 0))
+				ControlCollection<Control> children = base.Children;
+				if (children == null || !(children.Where((Control e) => e.Visible)?.Count() <= 0))
 				{
-					((Control)this).Show();
+					Show();
 					return;
 				}
 			}
-			((Control)this).Hide();
+			Hide();
 		}
 
 		protected override void OnChildRemoved(ChildChangedEventArgs e)
 		{
-			((FlowPanel)this).OnChildRemoved(e);
-			((Control)this).Invalidate();
-			Container parent = ((Control)this).get_Parent();
-			if (parent != null)
+			base.OnChildRemoved(e);
+			Invalidate();
+			base.Parent?.Invalidate();
+			if (base.Children != null && base.Children.Count != 0)
 			{
-				((Control)parent).Invalidate();
-			}
-			if (((Container)this).get_Children() != null && ((Container)this).get_Children().get_Count() != 0)
-			{
-				ControlCollection<Control> children = ((Container)this).get_Children();
-				if (children == null || !(((IEnumerable<Control>)children).Where((Control e) => e.get_Visible())?.Count() <= 0))
+				ControlCollection<Control> children = base.Children;
+				if (children == null || !(children.Where((Control e) => e.Visible)?.Count() <= 0))
 				{
 					return;
 				}
 			}
-			((Control)this).Hide();
+			Hide();
 		}
 
 		protected override void OnChildAdded(ChildChangedEventArgs e)
 		{
-			((FlowPanel)this).OnChildAdded(e);
-			((Control)this).Show();
-			((Control)this).Invalidate();
-			Container parent = ((Control)this).get_Parent();
-			if (parent != null)
-			{
-				((Control)parent).Invalidate();
-			}
+			base.OnChildAdded(e);
+			Show();
+			Invalidate();
+			base.Parent?.Invalidate();
 		}
 	}
 }

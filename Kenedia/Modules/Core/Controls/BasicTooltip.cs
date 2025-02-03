@@ -11,7 +11,7 @@ namespace Kenedia.Modules.Core.Controls
 {
 	public class BasicTooltip : Control
 	{
-		private BitmapFont _font = GameService.Content.get_DefaultFont14();
+		private BitmapFont _font = GameService.Content.DefaultFont14;
 
 		private string _text;
 
@@ -45,7 +45,7 @@ namespace Kenedia.Modules.Core.Controls
 				_text = value;
 				if (value == null)
 				{
-					((Control)this).Hide();
+					Hide();
 				}
 				UpdateLayout();
 			}
@@ -56,10 +56,8 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-			((Control)this).DoUpdate(gameTime);
-			((Control)this).set_Location(new Point(Control.get_Input().get_Mouse().get_Position()
-				.X, Control.get_Input().get_Mouse().get_Position()
-				.Y + 25));
+			base.DoUpdate(gameTime);
+			base.Location = new Point(Control.Input.Mouse.Position.X, Control.Input.Mouse.Position.Y + 25);
 		}
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
@@ -120,17 +118,17 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_026a: Unknown result type (might be due to invalid IL or missing references)
 			if (Font != null && Text != null)
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(Background), bounds, (Rectangle?)((TextureRectangle != Rectangle.get_Empty()) ? TextureRectangle : Background.get_Bounds()), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
-				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, Text, Font, RectangleExtension.Add(bounds, new Rectangle(5, 5, -10, -10)), Color.get_White(), false, (HorizontalAlignment)1, (VerticalAlignment)0);
+				spriteBatch.DrawOnCtrl(this, Background, bounds, (TextureRectangle != Rectangle.get_Empty()) ? TextureRectangle : Background.Bounds, Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
+				spriteBatch.DrawStringOnCtrl(this, Text, Font, bounds.Add(new Rectangle(5, 5, -10, -10)), Color.get_White(), wrap: false, HorizontalAlignment.Center, VerticalAlignment.Top);
 				Color color = Color.get_Black();
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), bounds.Width, 2), (Rectangle?)Rectangle.get_Empty(), color * 0.5f);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), bounds.Width, 1), (Rectangle?)Rectangle.get_Empty(), color * 0.6f);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Bottom() - 2, bounds.Width, 2), (Rectangle?)Rectangle.get_Empty(), color * 0.5f);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Bottom() - 1, bounds.Width, 1), (Rectangle?)Rectangle.get_Empty(), color * 0.6f);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), 2, bounds.Height), (Rectangle?)Rectangle.get_Empty(), color * 0.5f);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), 1, bounds.Height), (Rectangle?)Rectangle.get_Empty(), color * 0.6f);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Right() - 2, ((Rectangle)(ref bounds)).get_Top(), 2, bounds.Height), (Rectangle?)Rectangle.get_Empty(), color * 0.5f);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Right() - 1, ((Rectangle)(ref bounds)).get_Top(), 1, bounds.Height), (Rectangle?)Rectangle.get_Empty(), color * 0.6f);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), bounds.Width, 2), Rectangle.get_Empty(), color * 0.5f);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), bounds.Width, 1), Rectangle.get_Empty(), color * 0.6f);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Bottom() - 2, bounds.Width, 2), Rectangle.get_Empty(), color * 0.5f);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Bottom() - 1, bounds.Width, 1), Rectangle.get_Empty(), color * 0.6f);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), 2, bounds.Height), Rectangle.get_Empty(), color * 0.5f);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), 1, bounds.Height), Rectangle.get_Empty(), color * 0.6f);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref bounds)).get_Right() - 2, ((Rectangle)(ref bounds)).get_Top(), 2, bounds.Height), Rectangle.get_Empty(), color * 0.5f);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref bounds)).get_Right() - 1, ((Rectangle)(ref bounds)).get_Top(), 1, bounds.Height), Rectangle.get_Empty(), color * 0.6f);
 			}
 		}
 
@@ -139,10 +137,8 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-			((Control)this).OnShown(e);
-			((Control)this).set_Location(new Point(Control.get_Input().get_Mouse().get_Position()
-				.X, Control.get_Input().get_Mouse().get_Position()
-				.Y + 25));
+			base.OnShown(e);
+			base.Location = new Point(Control.Input.Mouse.Position.X, Control.Input.Mouse.Position.Y + 25);
 		}
 
 		private void UpdateLayout()
@@ -155,21 +151,14 @@ namespace Kenedia.Modules.Core.Controls
 			if (Font != null && Text != null)
 			{
 				Size2 sSize = Font.MeasureString(Text);
-				((Control)this).set_Size(new Point(10 + (int)sSize.Width, 10 + (int)sSize.Height));
+				base.Size = new Point(10 + (int)sSize.Width, 10 + (int)sSize.Height);
 			}
 		}
 
 		protected override void DisposeControl()
 		{
-			((Control)this).DisposeControl();
+			base.DisposeControl();
 			Background = null;
 		}
-
-		public BasicTooltip()
-			: this()
-		{
-		}//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-
 	}
 }

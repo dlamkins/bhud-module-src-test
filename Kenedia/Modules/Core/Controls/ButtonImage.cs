@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using Blish_HUD;
 using Blish_HUD.Content;
-using Blish_HUD.Controls;
 using Kenedia.Modules.Core.Extensions;
 using Kenedia.Modules.Core.Res;
 using Kenedia.Modules.Core.Services;
@@ -32,14 +31,14 @@ namespace Kenedia.Modules.Core.Controls
 			}
 			set
 			{
-				Common.SetProperty(ref _textureSize, value, ((Control)this).RecalculateLayout);
+				Common.SetProperty(ref _textureSize, value, new Action(RecalculateLayout));
 			}
 		}
 
 		public ButtonImage()
 		{
-			_buttonImage = AsyncTexture2D.op_Implicit(TexturesService.GetTextureFromRef(textures_common.ImageButtonBackground, "ImageButtonBackground"));
-			_hoveredButton = AsyncTexture2D.op_Implicit(TexturesService.GetTextureFromRef(textures_common.ImageButtonBackground_Hovered, "ImageButtonBackground_Hovered"));
+			_buttonImage = (AsyncTexture2D)TexturesService.GetTextureFromRef(textures_common.ImageButtonBackground, "ImageButtonBackground");
+			_hoveredButton = (AsyncTexture2D)TexturesService.GetTextureFromRef(textures_common.ImageButtonBackground_Hovered, "ImageButtonBackground_Hovered");
 		}
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
@@ -55,15 +54,15 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
 			if (_buttonImage != null)
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit((((Control)this).get_MouseOver() && ((Control)this).get_Enabled()) ? _hoveredButton : _buttonImage), bounds, (Rectangle?)_buttonImage.get_Bounds(), Color.get_White());
+				spriteBatch.DrawOnCtrl(this, (base.MouseOver && base.Enabled) ? _hoveredButton : _buttonImage, bounds, _buttonImage.Bounds, Color.get_White());
 			}
-			if (((Control)this).get_MouseOver() && ((Control)this).get_Enabled())
+			if (base.MouseOver && base.Enabled)
 			{
 				for (int i = 0; i < _frameBounds.Count; i++)
 				{
 					Rectangle b = _frameBounds[i].bounds;
 					float alpha = _frameBounds[i].alpha;
-					spriteBatch.DrawFrame((Control)(object)this, b, Colors.ColonialWhite * alpha);
+					spriteBatch.DrawFrame(this, b, ContentService.Colors.ColonialWhite * alpha);
 				}
 			}
 			base.Paint(spriteBatch, _textureBounds);
@@ -84,18 +83,18 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
-			Point size = (Point)(((_003F?)TextureSize) ?? ((Control)this).get_Size());
+			Point size = (Point)(((_003F?)TextureSize) ?? base.Size);
 			Point padding = default(Point);
-			((Point)(ref padding))._002Ector((((Control)this).get_Width() - size.X) / 2, (((Control)this).get_Height() - size.Y) / 2);
-			int xOffset = (int)((double)((Control)this).get_Width() * 0.15);
-			int yOffset = (int)((double)((Control)this).get_Height() * 0.15);
+			((Point)(ref padding))._002Ector((base.Width - size.X) / 2, (base.Height - size.Y) / 2);
+			int xOffset = (int)((double)base.Width * 0.15);
+			int yOffset = (int)((double)base.Height * 0.15);
 			_textureBounds = new Rectangle(xOffset / 2 + padding.X, yOffset / 2 + padding.Y, size.X - xOffset, size.Y - yOffset);
 			_frameBounds.Clear();
-			int frameWidth = Math.Max(2, (int)((double)((Control)this).get_Width() * 0.05));
+			int frameWidth = Math.Max(2, (int)((double)base.Width * 0.05));
 			float stepSize = 0.75f / (float)(frameWidth - 1);
 			for (int i = 0; i < frameWidth; i++)
 			{
-				_frameBounds.Add((new Rectangle(i, i, ((Control)this).get_Width() - i * 2, ((Control)this).get_Height() - i * 2), (float)i * stepSize));
+				_frameBounds.Add((new Rectangle(i, i, base.Width - i * 2, base.Height - i * 2), (float)i * stepSize));
 			}
 		}
 

@@ -21,7 +21,7 @@ using MonoGame.Extended.BitmapFonts;
 
 namespace Kenedia.Modules.Characters.Controls
 {
-	public class CharacterCard : Panel
+	public class CharacterCard : Kenedia.Modules.Core.Controls.Panel
 	{
 		private readonly AsyncTexture2D _iconFrame = AsyncTexture2D.FromAssetId(1414041);
 
@@ -41,7 +41,7 @@ namespace Kenedia.Modules.Characters.Controls
 
 		private readonly CharacterTooltip _characterTooltip;
 
-		private readonly FlowPanel _contentPanel;
+		private readonly Kenedia.Modules.Core.Controls.FlowPanel _contentPanel;
 
 		private readonly CharacterLabels _infoLabels;
 
@@ -84,10 +84,10 @@ namespace Kenedia.Modules.Characters.Controls
 		public List<CharacterCard> AttachedCards { get; set; } = new List<CharacterCard>();
 
 
-		public BitmapFont NameFont { get; set; } = GameService.Content.get_DefaultFont14();
+		public BitmapFont NameFont { get; set; } = GameService.Content.DefaultFont14;
 
 
-		public BitmapFont Font { get; set; } = GameService.Content.get_DefaultFont14();
+		public BitmapFont Font { get; set; } = GameService.Content.DefaultFont14;
 
 
 		public int Index
@@ -122,13 +122,13 @@ namespace Kenedia.Modules.Characters.Controls
 				{
 					if (temp != null)
 					{
-						temp.Deleted -= CharacterDeleted;
-						temp.Updated -= ApplyCharacter;
+						temp.Deleted -= new EventHandler(CharacterDeleted);
+						temp.Updated -= new EventHandler(ApplyCharacter);
 					}
 					if (_character != null)
 					{
-						_character.Deleted += CharacterDeleted;
-						_character.Updated += ApplyCharacter;
+						_character.Deleted += new EventHandler(CharacterDeleted);
+						_character.Updated += new EventHandler(ApplyCharacter);
 					}
 				}
 				if (_characterTooltip != null)
@@ -170,26 +170,29 @@ namespace Kenedia.Modules.Characters.Controls
 			//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0116: Unknown result type (might be due to invalid IL or missing references)
 			//IL_015f: Unknown result type (might be due to invalid IL or missing references)
-			((Container)this).set_HeightSizingMode((SizingMode)1);
+			HeightSizingMode = SizingMode.AutoSize;
 			base.BackgroundColor = Color.get_Black() * 0.5f;
-			((Container)this).set_AutoSizePadding(new Point(0, 2));
-			FlowPanel flowPanel = new FlowPanel();
-			((Control)flowPanel).set_Parent((Container)(object)this);
-			((FlowPanel)flowPanel).set_FlowDirection((ControlFlowDirection)3);
-			((FlowPanel)flowPanel).set_OuterControlPadding(new Vector2(5f, 5f));
-			_contentPanel = flowPanel;
-			Dummy dummy = new Dummy();
-			((Control)dummy).set_Parent((Container)(object)this);
-			((Control)dummy).set_Size(Point.get_Zero());
-			_iconDummy = dummy;
+			base.AutoSizePadding = new Point(0, 2);
+			_contentPanel = new Kenedia.Modules.Core.Controls.FlowPanel
+			{
+				Parent = this,
+				FlowDirection = ControlFlowDirection.SingleTopToBottom,
+				OuterControlPadding = new Vector2(5f, 5f)
+			};
+			_iconDummy = new Dummy
+			{
+				Parent = this,
+				Size = Point.get_Zero()
+			};
 			_infoLabels = new CharacterLabels(_contentPanel);
-			BasicTooltip basicTooltip = new BasicTooltip();
-			((Control)basicTooltip).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			((Control)basicTooltip).set_ZIndex(1000);
-			((Control)basicTooltip).set_Size(new Point(300, 50));
-			((Control)basicTooltip).set_Visible(false);
-			_textTooltip = basicTooltip;
-			((Control)_textTooltip).add_Shown((EventHandler<EventArgs>)TextTooltip_Shown);
+			_textTooltip = new BasicTooltip
+			{
+				Parent = GameService.Graphics.SpriteScreen,
+				ZIndex = 1000,
+				Size = new Point(300, 50),
+				Visible = false
+			};
+			_textTooltip.Shown += TextTooltip_Shown;
 			_created = true;
 			_updateCharacter = true;
 		}
@@ -202,12 +205,12 @@ namespace Kenedia.Modules.Characters.Controls
 			_data = card._data;
 			_mainWindow = card._mainWindow;
 			_settings = card._settings;
-			((Control)this).set_Size(((Control)card).get_Size());
+			base.Size = card.Size;
 			Character = card._character;
 			_infoLabels.TextureManager = _textureManager;
 			_infoLabels.Data = _data;
 			_infoLabels.Settings = _settings;
-			_settings.AppearanceSettingChanged += Settings_AppearanceSettingChanged;
+			_settings.AppearanceSettingChanged += new EventHandler(Settings_AppearanceSettingChanged);
 			Settings_AppearanceSettingChanged(this, null);
 		}
 
@@ -236,20 +239,21 @@ namespace Kenedia.Modules.Characters.Controls
 			_data = data;
 			_mainWindow = mainWindow;
 			_settings = settings;
-			((Container)this).set_HeightSizingMode((SizingMode)1);
+			HeightSizingMode = SizingMode.AutoSize;
 			base.BackgroundColor = new Color(0, 0, 0, 75);
-			((Container)this).set_AutoSizePadding(new Point(0, 2));
+			base.AutoSizePadding = new Point(0, 2);
 			_infoLabels.TextureManager = _textureManager;
 			_infoLabels.Data = _data;
 			_infoLabels.Settings = _settings;
 			_infoLabels.CurrentCharacter = currentCharacter;
-			_settings.AppearanceSettingChanged += Settings_AppearanceSettingChanged;
-			CharacterTooltip characterTooltip = new CharacterTooltip(currentCharacter, textureManager, data, _settings);
-			((Control)characterTooltip).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			((Control)characterTooltip).set_ZIndex(1001);
-			((Control)characterTooltip).set_Size(new Point(300, 50));
-			((Control)characterTooltip).set_Visible(false);
-			_characterTooltip = characterTooltip;
+			_settings.AppearanceSettingChanged += new EventHandler(Settings_AppearanceSettingChanged);
+			_characterTooltip = new CharacterTooltip(currentCharacter, textureManager, data, _settings)
+			{
+				Parent = GameService.Graphics.SpriteScreen,
+				ZIndex = 1001,
+				Size = new Point(300, 50),
+				Visible = false
+			};
 		}
 
 		private void ApplyCharacter(object sender, EventArgs e)
@@ -321,37 +325,37 @@ namespace Kenedia.Modules.Characters.Controls
 			//IL_03e7: Unknown result type (might be due to invalid IL or missing references)
 			//IL_03ec: Unknown result type (might be due to invalid IL or missing references)
 			//IL_03f2: Unknown result type (might be due to invalid IL or missing references)
-			if (_created && ((Control)this).get_Visible())
+			if (_created && base.Visible)
 			{
 				_infoLabels.RecalculateBounds();
-				((Control)_contentPanel).set_Visible(_settings.PanelLayout.get_Value() != Settings.CharacterPanelLayout.OnlyIcons);
-				IEnumerable<Control> controls = _infoLabels.DataControls.Where((Control e) => e.get_Visible());
-				Control firstControl = ((controls.Count() <= 0) ? null : _infoLabels.DataControls.Where((Control e) => e.get_Visible() && e is IFontControl)?.FirstOrDefault());
-				bool anyVisible = ((Control)_contentPanel).get_Visible() && controls.Count() > 0;
-				int width = (anyVisible ? (controls.Max((Control e) => e.get_Width()) + (int)(((FlowPanel)_contentPanel).get_OuterControlPadding().X * 2f)) : 0);
-				int height = (anyVisible ? controls.Aggregate((int)(((FlowPanel)_contentPanel).get_OuterControlPadding().Y * 2f), (int result, Control e) => result + e.get_Height() + (int)((FlowPanel)_contentPanel).get_ControlPadding().Y) : 0);
-				Settings.PanelSizes pSize = _settings.PanelSize.get_Value();
-				_iconSize = ((_settings.PanelLayout.get_Value() != Settings.CharacterPanelLayout.OnlyText) ? (pSize switch
+				_contentPanel.Visible = _settings.PanelLayout.Value != Settings.CharacterPanelLayout.OnlyIcons;
+				IEnumerable<Control> controls = _infoLabels.DataControls.Where((Control e) => e.Visible);
+				Control firstControl = ((controls.Count() <= 0) ? null : _infoLabels.DataControls.Where((Control e) => e.Visible && e is IFontControl)?.FirstOrDefault());
+				bool anyVisible = _contentPanel.Visible && controls.Count() > 0;
+				int width = (anyVisible ? (controls.Max((Control e) => e.Width) + (int)(_contentPanel.OuterControlPadding.X * 2f)) : 0);
+				int height = (anyVisible ? controls.Aggregate((int)(_contentPanel.OuterControlPadding.Y * 2f), (int result, Control e) => result + e.Height + (int)_contentPanel.ControlPadding.Y) : 0);
+				Settings.PanelSizes pSize = _settings.PanelSize.Value;
+				_iconSize = ((_settings.PanelLayout.Value != Settings.CharacterPanelLayout.OnlyText) ? (pSize switch
 				{
 					Settings.PanelSizes.Large => 112, 
 					Settings.PanelSizes.Normal => 80, 
 					Settings.PanelSizes.Small => 64, 
-					_ => _settings.CustomCharacterIconSize.get_Value(), 
+					_ => _settings.CustomCharacterIconSize.Value, 
 				}) : 0);
-				if (_settings.CharacterPanelFixedWidth.get_Value())
+				if (_settings.CharacterPanelFixedWidth.Value)
 				{
-					width = _settings.CharacterPanelWidth.get_Value() - _iconSize;
+					width = _settings.CharacterPanelWidth.Value - _iconSize;
 				}
 				_iconRectangle = new Rectangle(0, 0, _iconSize, _iconSize);
 				_cogSize = Math.Max(20, ((firstControl != null) ? ((IFontControl)firstControl).Font.get_LineHeight() : Font.get_LineHeight()) - 4);
 				_cogSize = ((!anyVisible) ? (_iconSize / 5) : _cogSize);
-				if (firstControl != null && width < firstControl.get_Width() + 5 + _cogSize)
+				if (firstControl != null && width < firstControl.Width + 5 + _cogSize)
 				{
 					width += (anyVisible ? (5 + _cogSize) : 0);
 				}
 				_textBounds = new Rectangle(((Rectangle)(ref _iconRectangle)).get_Right() + ((anyVisible && _iconSize > 0) ? 5 : 0), 0, width, height);
-				((Control)_contentPanel).set_Location(((Rectangle)(ref _textBounds)).get_Location());
-				((Control)_contentPanel).set_Size(((Rectangle)(ref _textBounds)).get_Size());
+				_contentPanel.Location = ((Rectangle)(ref _textBounds)).get_Location();
+				_contentPanel.Size = ((Rectangle)(ref _textBounds)).get_Size();
 				_controlBounds = new Rectangle(((Rectangle)(ref _iconRectangle)).get_Left(), ((Rectangle)(ref _iconRectangle)).get_Top(), ((Rectangle)(ref _textBounds)).get_Right() - ((Rectangle)(ref _iconRectangle)).get_Left(), Math.Max(_textBounds.Height, _iconRectangle.Height));
 				_cogRect = new Rectangle(_controlBounds.Width - _cogSize - 4, 4, _cogSize, _cogSize);
 				int size = ((_iconSize > 0) ? Math.Min(56, _iconRectangle.Width - 8) : Math.Min(56, Math.Min(_textBounds.Width, _textBounds.Height) - 8));
@@ -400,29 +404,29 @@ namespace Kenedia.Modules.Characters.Controls
 			//IL_0215: Unknown result type (might be due to invalid IL or missing references)
 			//IL_021b: Unknown result type (might be due to invalid IL or missing references)
 			base.PaintBeforeChildren(spriteBatch, bounds);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), _iconRectangle, (Rectangle?)Rectangle.get_Empty(), Color.get_Transparent(), 0f, default(Vector2), (SpriteEffects)0);
+			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, _iconRectangle, Rectangle.get_Empty(), Color.get_Transparent(), 0f, default(Vector2), (SpriteEffects)0);
 			if (Character == null)
 			{
 				return;
 			}
-			if (_settings.PanelLayout.get_Value() != Settings.CharacterPanelLayout.OnlyText)
+			if (_settings.PanelLayout.Value != Settings.CharacterPanelLayout.OnlyText)
 			{
 				if (!Character.HasDefaultIcon && Character.Icon != null)
 				{
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(Character.Icon), _iconRectangle, (Rectangle?)Character.Icon.get_Bounds(), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
+					spriteBatch.DrawOnCtrl(this, Character.Icon, _iconRectangle, Character.Icon.Bounds, Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
 					return;
 				}
 				AsyncTexture2D texture = Character.SpecializationIcon;
 				if (texture != null)
 				{
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_iconFrame), new Rectangle(_iconRectangle.X, _iconRectangle.Y, _iconRectangle.Width, _iconRectangle.Height), (Rectangle?)_iconFrame.get_Bounds(), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_iconFrame), new Rectangle(_iconRectangle.Width, _iconRectangle.Height, _iconRectangle.Width, _iconRectangle.Height), (Rectangle?)_iconFrame.get_Bounds(), Color.get_White(), 3.14f, default(Vector2), (SpriteEffects)0);
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(texture), new Rectangle(8, 8, _iconRectangle.Width - 16, _iconRectangle.Height - 16), (Rectangle?)texture.get_Bounds(), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
+					spriteBatch.DrawOnCtrl(this, _iconFrame, new Rectangle(_iconRectangle.X, _iconRectangle.Y, _iconRectangle.Width, _iconRectangle.Height), _iconFrame.Bounds, Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
+					spriteBatch.DrawOnCtrl(this, _iconFrame, new Rectangle(_iconRectangle.Width, _iconRectangle.Height, _iconRectangle.Width, _iconRectangle.Height), _iconFrame.Bounds, Color.get_White(), 3.14f, default(Vector2), (SpriteEffects)0);
+					spriteBatch.DrawOnCtrl(this, texture, new Rectangle(8, 8, _iconRectangle.Width - 16, _iconRectangle.Height - 16), texture.Bounds, Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
 				}
 			}
-			else if (((Control)this).get_MouseOver())
+			else if (base.MouseOver)
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), _iconRectangle, (Rectangle?)Rectangle.get_Empty(), Color.get_Transparent(), 0f, default(Vector2), (SpriteEffects)0);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, _iconRectangle, Rectangle.get_Empty(), Color.get_Transparent(), 0f, default(Vector2), (SpriteEffects)0);
 			}
 		}
 
@@ -541,20 +545,20 @@ namespace Kenedia.Modules.Characters.Controls
 			//IL_07b3: Unknown result type (might be due to invalid IL or missing references)
 			//IL_07bd: Unknown result type (might be due to invalid IL or missing references)
 			//IL_07c3: Unknown result type (might be due to invalid IL or missing references)
-			((Container)this).PaintAfterChildren(spriteBatch, bounds);
-			if (((Control)this).get_MouseOver())
+			base.PaintAfterChildren(spriteBatch, bounds);
+			if (base.MouseOver)
 			{
-				((Control)_textTooltip).set_Visible(false);
-				bool loginHovered = !IsDraggingTarget && ((Rectangle)(ref _loginRect)).Contains(((Control)this).get_RelativeMousePosition());
-				if (_settings.PanelLayout.get_Value() != Settings.CharacterPanelLayout.OnlyText)
+				_textTooltip.Visible = false;
+				bool loginHovered = !IsDraggingTarget && ((Rectangle)(ref _loginRect)).Contains(base.RelativeMousePosition);
+				if (_settings.PanelLayout.Value != Settings.CharacterPanelLayout.OnlyText)
 				{
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), _iconRectangle, (Rectangle?)Rectangle.get_Empty(), IsDraggingTarget ? Color.get_Transparent() : (Color.get_Black() * 0.5f), 0f, default(Vector2), (SpriteEffects)0);
+					spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, _iconRectangle, Rectangle.get_Empty(), IsDraggingTarget ? Color.get_Transparent() : (Color.get_Black() * 0.5f), 0f, default(Vector2), (SpriteEffects)0);
 					if (!IsDraggingTarget)
 					{
 						int num;
-						if (((Control)_contentPanel).get_Visible())
+						if (_contentPanel.Visible)
 						{
-							IEnumerable<Control> enumerable = _infoLabels.DataControls.Where((Control e) => e.get_Visible());
+							IEnumerable<Control> enumerable = _infoLabels.DataControls.Where((Control e) => e.Visible);
 							num = ((enumerable != null && enumerable.Count() > 0) ? 1 : 0);
 						}
 						else
@@ -563,70 +567,70 @@ namespace Kenedia.Modules.Characters.Controls
 						}
 						bool anyVisible = (byte)num != 0;
 						_textTooltip.Text = (Character.HasBirthdayPresent ? string.Format(strings.Birthday_Text, Character.Name, Character.Age) : string.Format(strings.LoginWith, Character.Name));
-						((Control)_textTooltip).set_Visible(loginHovered && anyVisible);
-						SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit((!Character.HasBirthdayPresent) ? (loginHovered ? _loginTextureHovered : _loginTexture) : (loginHovered ? _presentTextureOpen : _presentTexture)), Character.HasBirthdayPresent ? RectangleExtension.Add(_loginRect, 8, 8, -16, -16) : _loginRect, (Rectangle?)((!Character.HasBirthdayPresent) ? (loginHovered ? _loginTextureHovered.get_Bounds() : _loginTexture.get_Bounds()) : (loginHovered ? _presentTextureOpen.get_Bounds() : _presentTexture.get_Bounds())), (Color)(loginHovered ? Color.get_White() : new Color(215, 215, 215)), 0f, default(Vector2), (SpriteEffects)0);
+						_textTooltip.Visible = loginHovered && anyVisible;
+						spriteBatch.DrawOnCtrl(this, (!Character.HasBirthdayPresent) ? (loginHovered ? _loginTextureHovered : _loginTexture) : (loginHovered ? _presentTextureOpen : _presentTexture), Character.HasBirthdayPresent ? _loginRect.Add(8, 8, -16, -16) : _loginRect, (!Character.HasBirthdayPresent) ? (loginHovered ? _loginTextureHovered.Bounds : _loginTexture.Bounds) : (loginHovered ? _presentTextureOpen.Bounds : _presentTexture.Bounds), (Color)(loginHovered ? Color.get_White() : new Color(215, 215, 215)), 0f, default(Vector2), (SpriteEffects)0);
 					}
 				}
 				else
 				{
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), bounds, (Rectangle?)Rectangle.get_Empty(), Color.get_Black() * 0.5f, 0f, default(Vector2), (SpriteEffects)0);
+					spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, bounds, Rectangle.get_Empty(), Color.get_Black() * 0.5f, 0f, default(Vector2), (SpriteEffects)0);
 					_textTooltip.Text = (Character.HasBirthdayPresent ? string.Format(strings.Birthday_Text, Character.Name, Character.Age) : string.Empty);
-					((Control)_textTooltip).set_Visible(!string.IsNullOrEmpty(_textTooltip.Text));
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit((!Character.HasBirthdayPresent) ? (loginHovered ? _loginTextureHovered : _loginTexture) : (loginHovered ? _presentTextureOpen : _presentTexture)), Character.HasBirthdayPresent ? RectangleExtension.Add(_loginRect, 8, 8, -16, -16) : _loginRect, (Rectangle?)((!Character.HasBirthdayPresent) ? (loginHovered ? _loginTextureHovered.get_Bounds() : _loginTexture.get_Bounds()) : (loginHovered ? _presentTextureOpen.get_Bounds() : _presentTexture.get_Bounds())), (Color)(loginHovered ? Color.get_White() : new Color(200, 200, 200)), 0f, default(Vector2), (SpriteEffects)0);
+					_textTooltip.Visible = !string.IsNullOrEmpty(_textTooltip.Text);
+					spriteBatch.DrawOnCtrl(this, (!Character.HasBirthdayPresent) ? (loginHovered ? _loginTextureHovered : _loginTexture) : (loginHovered ? _presentTextureOpen : _presentTexture), Character.HasBirthdayPresent ? _loginRect.Add(8, 8, -16, -16) : _loginRect, (!Character.HasBirthdayPresent) ? (loginHovered ? _loginTextureHovered.Bounds : _loginTexture.Bounds) : (loginHovered ? _presentTextureOpen.Bounds : _presentTexture.Bounds), (Color)(loginHovered ? Color.get_White() : new Color(200, 200, 200)), 0f, default(Vector2), (SpriteEffects)0);
 				}
 				if (!IsDraggingTarget)
 				{
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(((Rectangle)(ref _cogRect)).Contains(((Control)this).get_RelativeMousePosition()) ? _cogTextureHovered : _cogTexture), _cogRect, (Rectangle?)new Rectangle(5, 5, 22, 22), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
-					if (((Rectangle)(ref _cogRect)).Contains(((Control)this).get_RelativeMousePosition()))
+					spriteBatch.DrawOnCtrl((Control)this, (Texture2D)(((Rectangle)(ref _cogRect)).Contains(base.RelativeMousePosition) ? _cogTextureHovered : _cogTexture), _cogRect, (Rectangle?)new Rectangle(5, 5, 22, 22), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
+					if (((Rectangle)(ref _cogRect)).Contains(base.RelativeMousePosition))
 					{
 						_textTooltip.Text = string.Format(strings.AdjustSettings, Character.Name);
-						((Control)_textTooltip).set_Visible(true);
+						_textTooltip.Visible = true;
 					}
 				}
 			}
-			if (!((Control)this).get_MouseOver() && Character != null && Character.HasBirthdayPresent)
+			if (!base.MouseOver && Character != null && Character.HasBirthdayPresent)
 			{
-				if (_settings.PanelLayout.get_Value() != Settings.CharacterPanelLayout.OnlyText)
+				if (_settings.PanelLayout.Value != Settings.CharacterPanelLayout.OnlyText)
 				{
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), _iconRectangle, (Rectangle?)Rectangle.get_Empty(), Color.get_Black() * 0.5f, 0f, default(Vector2), (SpriteEffects)0);
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_presentTexture), Character.HasBirthdayPresent ? RectangleExtension.Add(_loginRect, 8, 8, -16, -16) : _loginRect, (Rectangle?)_presentTexture.get_Bounds(), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
+					spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, _iconRectangle, Rectangle.get_Empty(), Color.get_Black() * 0.5f, 0f, default(Vector2), (SpriteEffects)0);
+					spriteBatch.DrawOnCtrl(this, _presentTexture, Character.HasBirthdayPresent ? _loginRect.Add(8, 8, -16, -16) : _loginRect, _presentTexture.Bounds, Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
 				}
 				else
 				{
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), bounds, (Rectangle?)Rectangle.get_Empty(), Color.get_Black() * 0.5f, 0f, default(Vector2), (SpriteEffects)0);
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_presentTexture), Character.HasBirthdayPresent ? RectangleExtension.Add(_loginRect, 8, 8, -16, -16) : _loginRect, (Rectangle?)_presentTexture.get_Bounds(), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
+					spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, bounds, Rectangle.get_Empty(), Color.get_Black() * 0.5f, 0f, default(Vector2), (SpriteEffects)0);
+					spriteBatch.DrawOnCtrl(this, _presentTexture, Character.HasBirthdayPresent ? _loginRect.Add(8, 8, -16, -16) : _loginRect, _presentTexture.Bounds, Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
 				}
 			}
-			if (IsDraggingTarget || (_mainWindow != null && ((Rectangle)(ref bounds)).Contains(((Control)this).get_RelativeMousePosition()) && _mainWindow.IsActive) || ((Control)this).get_MouseOver())
+			if (IsDraggingTarget || (_mainWindow != null && ((Rectangle)(ref bounds)).Contains(base.RelativeMousePosition) && _mainWindow.IsActive) || base.MouseOver)
 			{
-				Color color = Colors.ColonialWhite;
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), bounds.Width, 2), (Rectangle?)Rectangle.get_Empty(), color * 0.5f);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), bounds.Width, 1), (Rectangle?)Rectangle.get_Empty(), color * 0.6f);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Bottom() - 2, bounds.Width, 2), (Rectangle?)Rectangle.get_Empty(), color * 0.5f);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Bottom() - 1, bounds.Width, 1), (Rectangle?)Rectangle.get_Empty(), color * 0.6f);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), 2, bounds.Height), (Rectangle?)Rectangle.get_Empty(), color * 0.5f);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), 1, bounds.Height), (Rectangle?)Rectangle.get_Empty(), color * 0.6f);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Right() - 2, ((Rectangle)(ref bounds)).get_Top(), 2, bounds.Height), (Rectangle?)Rectangle.get_Empty(), color * 0.5f);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Right() - 1, ((Rectangle)(ref bounds)).get_Top(), 1, bounds.Height), (Rectangle?)Rectangle.get_Empty(), color * 0.6f);
+				Color color = ContentService.Colors.ColonialWhite;
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), bounds.Width, 2), Rectangle.get_Empty(), color * 0.5f);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), bounds.Width, 1), Rectangle.get_Empty(), color * 0.6f);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Bottom() - 2, bounds.Width, 2), Rectangle.get_Empty(), color * 0.5f);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Bottom() - 1, bounds.Width, 1), Rectangle.get_Empty(), color * 0.6f);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), 2, bounds.Height), Rectangle.get_Empty(), color * 0.5f);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), 1, bounds.Height), Rectangle.get_Empty(), color * 0.6f);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref bounds)).get_Right() - 2, ((Rectangle)(ref bounds)).get_Top(), 2, bounds.Height), Rectangle.get_Empty(), color * 0.5f);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref bounds)).get_Right() - 1, ((Rectangle)(ref bounds)).get_Top(), 1, bounds.Height), Rectangle.get_Empty(), color * 0.6f);
 			}
 		}
 
 		public override void UpdateContainer(GameTime gameTime)
 		{
-			((Container)this).UpdateContainer(gameTime);
+			base.UpdateContainer(gameTime);
 			if (!IsDraggingTarget)
 			{
-				if (!((Control)this).get_MouseOver() && ((Control)_textTooltip).get_Visible())
+				if (!base.MouseOver && _textTooltip.Visible)
 				{
-					((Control)_textTooltip).set_Visible(((Control)this).get_MouseOver());
+					_textTooltip.Visible = base.MouseOver;
 				}
-				if (!((Control)this).get_MouseOver() && ((Control)_characterTooltip).get_Visible())
+				if (!base.MouseOver && _characterTooltip.Visible)
 				{
-					((Control)_characterTooltip).set_Visible(((Control)this).get_MouseOver());
+					_characterTooltip.Visible = base.MouseOver;
 				}
 			}
 			_infoLabels.Update();
-			if (_updateCharacter && _created && ((Control)this).get_Visible())
+			if (_updateCharacter && _created && base.Visible)
 			{
 				Settings_AppearanceSettingChanged(this, null);
 				_updateCharacter = false;
@@ -635,10 +639,10 @@ namespace Kenedia.Modules.Characters.Controls
 
 		protected override void OnRightMouseButtonPressed(MouseEventArgs e)
 		{
-			((Control)this).OnRightMouseButtonPressed(e);
+			base.OnRightMouseButtonPressed(e);
 			if (!IsDraggingTarget)
 			{
-				_mainWindow.ShowAttached((_mainWindow.CharacterEdit.Character != Character || !((Control)_mainWindow.CharacterEdit).get_Visible()) ? _mainWindow.CharacterEdit : null);
+				_mainWindow.ShowAttached((_mainWindow.CharacterEdit.Character != Character || !_mainWindow.CharacterEdit.Visible) ? _mainWindow.CharacterEdit : null);
 				_mainWindow.CharacterEdit.Character = Character;
 			}
 		}
@@ -650,17 +654,17 @@ namespace Kenedia.Modules.Characters.Controls
 				return;
 			}
 			base.OnClick(e);
-			if (e.get_IsDoubleClick() && _settings.DoubleClickToEnter.get_Value())
+			if (e.IsDoubleClick && _settings.DoubleClickToEnter.Value)
 			{
 				Character.Swap();
 				return;
 			}
-			if (((Rectangle)(ref _loginRect)).Contains(((Control)this).get_RelativeMousePosition()))
+			if (((Rectangle)(ref _loginRect)).Contains(base.RelativeMousePosition))
 			{
-				PlayerCharacter player = GameService.Gw2Mumble.get_PlayerCharacter();
-				if (player != null && player.get_Name() == Character.Name && Character.HasBirthdayPresent)
+				PlayerCharacter player = GameService.Gw2Mumble.PlayerCharacter;
+				if (player != null && player.Name == Character.Name && Character.HasBirthdayPresent)
 				{
-					await _settings.MailKey.get_Value().PerformPress(50, triggerSystem: false);
+					await _settings.MailKey.Value.PerformPress(50, triggerSystem: false);
 					_mainWindow.CharacterEdit.Character = Character;
 					_mainWindow.ShowAttached(_mainWindow.CharacterEdit);
 				}
@@ -670,9 +674,9 @@ namespace Kenedia.Modules.Characters.Controls
 					_mainWindow.ShowAttached();
 				}
 			}
-			if (((Rectangle)(ref _cogRect)).Contains(((Control)this).get_RelativeMousePosition()))
+			if (((Rectangle)(ref _cogRect)).Contains(base.RelativeMousePosition))
 			{
-				((Control)_mainWindow.CharacterEdit).set_Visible(!((Control)_mainWindow.CharacterEdit).get_Visible() || _mainWindow.CharacterEdit.Character != Character);
+				_mainWindow.CharacterEdit.Visible = !_mainWindow.CharacterEdit.Visible || _mainWindow.CharacterEdit.Character != Character;
 				_mainWindow.CharacterEdit.Character = Character;
 			}
 		}
@@ -681,32 +685,23 @@ namespace Kenedia.Modules.Characters.Controls
 		{
 			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-			((Control)this).OnLeftMouseButtonPressed(e);
-			if (IsDraggingTarget)
+			base.OnLeftMouseButtonPressed(e);
+			if (!IsDraggingTarget)
 			{
-				return;
-			}
-			KeyboardState state = Keyboard.GetState();
-			if (((KeyboardState)(ref state)).IsKeyDown((Keys)162) && _settings.SortType.get_Value() == Settings.SortBy.Custom)
-			{
-				_mainWindow.DraggingControl.StartDragging(this);
-				_dragging = true;
-				CharacterTooltip characterTooltip = _characterTooltip;
-				if (characterTooltip != null)
+				KeyboardState state = Keyboard.GetState();
+				if (((KeyboardState)(ref state)).IsKeyDown((Keys)162) && _settings.SortType.Value == Settings.SortBy.Custom)
 				{
-					((Control)characterTooltip).Hide();
-				}
-				BasicTooltip textTooltip = _textTooltip;
-				if (textTooltip != null)
-				{
-					((Control)textTooltip).Hide();
+					_mainWindow.DraggingControl.StartDragging(this);
+					_dragging = true;
+					_characterTooltip?.Hide();
+					_textTooltip?.Hide();
 				}
 			}
 		}
 
 		protected override void OnLeftMouseButtonReleased(MouseEventArgs e)
 		{
-			((Control)this).OnLeftMouseButtonReleased(e);
+			base.OnLeftMouseButtonReleased(e);
 			if (!IsDraggingTarget && _dragging)
 			{
 				_mainWindow.DraggingControl.EndDragging();
@@ -716,91 +711,59 @@ namespace Kenedia.Modules.Characters.Controls
 
 		protected override void OnMouseMoved(MouseEventArgs e)
 		{
-			((Control)this).OnMouseMoved(e);
-			if (!IsDraggingTarget && !_mainWindow.DraggingControl.IsActive && (_textTooltip == null || (!((Control)_textTooltip).get_Visible() && _settings.ShowDetailedTooltip.get_Value())))
+			base.OnMouseMoved(e);
+			if (!IsDraggingTarget && !_mainWindow.DraggingControl.IsActive && (_textTooltip == null || (!_textTooltip.Visible && _settings.ShowDetailedTooltip.Value)))
 			{
-				CharacterTooltip characterTooltip = _characterTooltip;
-				if (characterTooltip != null)
-				{
-					((Control)characterTooltip).Show();
-				}
+				_characterTooltip?.Show();
 			}
 		}
 
 		protected override void OnMouseEntered(MouseEventArgs e)
 		{
-			((Control)this).OnMouseEntered(e);
-			if (!IsDraggingTarget && !_mainWindow.DraggingControl.IsActive && (_textTooltip == null || (!((Control)_textTooltip).get_Visible() && _settings.ShowDetailedTooltip.get_Value())))
+			base.OnMouseEntered(e);
+			if (!IsDraggingTarget && !_mainWindow.DraggingControl.IsActive && (_textTooltip == null || (!_textTooltip.Visible && _settings.ShowDetailedTooltip.Value)))
 			{
-				CharacterTooltip characterTooltip = _characterTooltip;
-				if (characterTooltip != null)
-				{
-					((Control)characterTooltip).Show();
-				}
+				_characterTooltip?.Show();
 			}
 		}
 
 		protected override void OnHidden(EventArgs e)
 		{
-			((Control)this).OnHidden(e);
-			BasicTooltip textTooltip = _textTooltip;
-			if (textTooltip != null)
-			{
-				((Control)textTooltip).Hide();
-			}
-			CharacterTooltip characterTooltip = _characterTooltip;
-			if (characterTooltip != null)
-			{
-				((Control)characterTooltip).Hide();
-			}
+			base.OnHidden(e);
+			_textTooltip?.Hide();
+			_characterTooltip?.Hide();
 		}
 
 		protected override void DisposeControl()
 		{
 			base.DisposeControl();
-			((Control)_textTooltip).remove_Shown((EventHandler<EventArgs>)TextTooltip_Shown);
+			_textTooltip.Shown -= TextTooltip_Shown;
 			if (_character != null)
 			{
-				_character.Deleted -= CharacterDeleted;
+				_character.Deleted -= new EventHandler(CharacterDeleted);
 			}
 			_infoLabels?.Dispose();
-			FlowPanel contentPanel = _contentPanel;
-			if (contentPanel != null)
-			{
-				((Control)contentPanel).Dispose();
-			}
-			BasicTooltip textTooltip = _textTooltip;
-			if (textTooltip != null)
-			{
-				((Control)textTooltip).Dispose();
-			}
-			CharacterTooltip characterTooltip = _characterTooltip;
-			if (characterTooltip != null)
-			{
-				((Control)characterTooltip).Dispose();
-			}
-			((IEnumerable<IDisposable>)((Container)this).get_Children()).DisposeAll();
+			_contentPanel?.Dispose();
+			_textTooltip?.Dispose();
+			_characterTooltip?.Dispose();
+			base.Children.DisposeAll();
 			_mainWindow.CharacterCards.Remove(this);
 		}
 
 		private void TextTooltip_Shown(object sender, EventArgs e)
 		{
-			CharacterTooltip characterTooltip = _characterTooltip;
-			if (characterTooltip != null)
-			{
-				((Control)characterTooltip).Hide();
-			}
+			_characterTooltip?.Hide();
 		}
 
 		private void CharacterDeleted(object sender, EventArgs e)
 		{
-			((Control)this).Dispose();
+			Dispose();
 		}
 
 		public void HideTooltips()
 		{
-			((Control)_textTooltip).Hide();
-			((Control)_characterTooltip).Hide();
+			_textTooltip.Hide();
+			_characterTooltip.Hide();
 		}
 
 		private void AdaptNewBounds()
@@ -814,18 +777,18 @@ namespace Kenedia.Modules.Characters.Controls
 			//IL_0178: Unknown result type (might be due to invalid IL or missing references)
 			//IL_019f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01a4: Unknown result type (might be due to invalid IL or missing references)
-			if (((Control)this).get_Width() != _controlBounds.Width + ((Container)this).get_AutoSizePadding().X)
+			if (base.Width != _controlBounds.Width + base.AutoSizePadding.X)
 			{
-				((Control)this).set_Width(_controlBounds.Width + ((Container)this).get_AutoSizePadding().X);
+				base.Width = _controlBounds.Width + base.AutoSizePadding.X;
 			}
-			if (((Control)this).get_Height() != _controlBounds.Height + ((Container)this).get_AutoSizePadding().Y)
+			if (base.Height != _controlBounds.Height + base.AutoSizePadding.Y)
 			{
-				((Control)_iconDummy).set_Height(_controlBounds.Height);
+				_iconDummy.Height = _controlBounds.Height;
 			}
 			int num;
-			if (((Control)_contentPanel).get_Visible())
+			if (_contentPanel.Visible)
 			{
-				IEnumerable<Control> enumerable = _infoLabels.DataControls.Where((Control e) => e.get_Visible());
+				IEnumerable<Control> enumerable = _infoLabels.DataControls.Where((Control e) => e.Visible);
 				num = ((enumerable != null && enumerable.Count() > 0) ? 1 : 0);
 			}
 			else

@@ -28,12 +28,12 @@ namespace Kenedia.Modules.Core.Controls
 				//IL_0031: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0034: Unknown result type (might be due to invalid IL or missing references)
 				//IL_003a: Invalid comparison between Unknown and I4
-				if (((Control)this).get_MouseOver())
+				if (base.MouseOver)
 				{
-					MouseState state = Control.get_Input().get_Mouse().get_State();
+					MouseState state = Control.Input.Mouse.State;
 					if ((int)((MouseState)(ref state)).get_LeftButton() != 1)
 					{
-						state = Control.get_Input().get_Mouse().get_State();
+						state = Control.Input.Mouse.State;
 						return (int)((MouseState)(ref state)).get_RightButton() == 1;
 					}
 					return true;
@@ -78,15 +78,14 @@ namespace Kenedia.Modules.Core.Controls
 			set
 			{
 				_setLocalizedTooltip = value;
-				((Control)this).set_BasicTooltipText(value?.Invoke());
+				base.BasicTooltipText = value?.Invoke();
 			}
 		}
 
 		public ImageButton()
-			: this()
 		{
 			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			LocalizingService.LocaleChanged += UserLocale_SettingChanged;
+			LocalizingService.LocaleChanged += new EventHandler<ValueChangedEventArgs<Locale>>(UserLocale_SettingChanged);
 			UserLocale_SettingChanged(null, null);
 		}
 
@@ -94,27 +93,27 @@ namespace Kenedia.Modules.Core.Controls
 		{
 			if (SetLocalizedTooltip != null)
 			{
-				((Control)this).set_BasicTooltipText(SetLocalizedTooltip?.Invoke());
+				base.BasicTooltipText = SetLocalizedTooltip?.Invoke();
 			}
 		}
 
 		protected override void DisposeControl()
 		{
-			((Control)this).DisposeControl();
+			base.DisposeControl();
 			Texture = null;
 			DisabledTexture = null;
 			HoveredTexture = null;
 			ClickedTexture = null;
-			GameService.Overlay.get_UserLocale().remove_SettingChanged((EventHandler<ValueChangedEventArgs<Locale>>)UserLocale_SettingChanged);
+			GameService.Overlay.UserLocale.SettingChanged -= UserLocale_SettingChanged;
 		}
 
 		private AsyncTexture2D GetTexture()
 		{
-			if (((Control)this).get_Enabled() || DisabledTexture == null)
+			if (base.Enabled || DisabledTexture == null)
 			{
 				if (!Clicked || ClickedTexture == null)
 				{
-					if (!((Control)this).get_MouseOver() || HoveredTexture == null)
+					if (!base.MouseOver || HoveredTexture == null)
 					{
 						return Texture;
 					}
@@ -135,25 +134,25 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
 			AsyncTexture2D texture = GetTexture();
-			Color? color = ((ColorHovered.HasValue && ((Control)this).get_MouseOver()) ? ColorHovered : ((ColorClicked.HasValue && Clicked) ? ColorClicked : ImageColor));
+			Color? color = ((ColorHovered.HasValue && base.MouseOver) ? ColorHovered : ((ColorClicked.HasValue && Clicked) ? ColorClicked : ImageColor));
 			if (texture != null && color.HasValue)
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(texture), SizeRectangle.GetValueOrDefault(bounds), (Rectangle?)(Rectangle)(((_003F?)TextureRectangle) ?? texture.get_Bounds()), color.Value, TextureRotation.GetValueOrDefault(), default(Vector2), (SpriteEffects)0);
+				spriteBatch.DrawOnCtrl(this, texture, SizeRectangle.GetValueOrDefault(bounds), (Rectangle)(((_003F?)TextureRectangle) ?? texture.Bounds), color.Value, TextureRotation.GetValueOrDefault(), default(Vector2), (SpriteEffects)0);
 			}
 		}
 
 		protected override void OnClick(MouseEventArgs e)
 		{
-			if (((Control)this).get_Enabled())
+			if (base.Enabled)
 			{
-				((Control)this).OnClick(e);
+				base.OnClick(e);
 				ClickAction?.Invoke(e);
 			}
 		}
 
 		public override void RecalculateLayout()
 		{
-			((Control)this).RecalculateLayout();
+			base.RecalculateLayout();
 		}
 	}
 }

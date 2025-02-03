@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using Blish_HUD.Controls;
 using Kenedia.Modules.Core.Interfaces;
@@ -32,7 +30,7 @@ namespace Kenedia.Modules.Characters.Controls
 		{
 			get
 			{
-				return ((IFontControl)((IEnumerable<Control>)((Container)this).get_Children()).FirstOrDefault((Control e) => e is IFontControl))?.Text;
+				return ((IFontControl)base.Children.FirstOrDefault((Control e) => e is IFontControl))?.Text;
 			}
 			set
 			{
@@ -41,7 +39,7 @@ namespace Kenedia.Modules.Characters.Controls
 
 		protected virtual void OnFontChanged(object sender = null, EventArgs e = null)
 		{
-			foreach (IFontControl item in ((IEnumerable)((Container)this).get_Children()).Cast<IFontControl>())
+			foreach (IFontControl item in base.Children.Cast<IFontControl>())
 			{
 				item.Font = Font;
 			}
@@ -49,21 +47,16 @@ namespace Kenedia.Modules.Characters.Controls
 
 		protected override void DisposeControl()
 		{
-			((FlowPanel)this).DisposeControl();
+			base.DisposeControl();
 		}
 
 		protected override void OnChildAdded(ChildChangedEventArgs e)
 		{
-			((FlowPanel)this).OnChildAdded(e);
-			if (Font != null && ((object)e.get_ChangedChild()).GetType() == typeof(IFontControl))
+			base.OnChildAdded(e);
+			if (Font != null && e.ChangedChild.GetType() == typeof(IFontControl))
 			{
-				(e.get_ChangedChild() as IFontControl).Font = Font;
+				(e.ChangedChild as IFontControl).Font = Font;
 			}
-		}
-
-		public FontFlowPanel()
-			: this()
-		{
 		}
 	}
 }

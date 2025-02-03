@@ -10,7 +10,7 @@ namespace Kenedia.Modules.Core.Extensions
 			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0003: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0005: Invalid comparison between Unknown and I4
-			if (itemWeaponType - 11 <= 5)
+			if (itemWeaponType - 11 <= 8)
 			{
 				return true;
 			}
@@ -39,6 +39,13 @@ namespace Kenedia.Modules.Core.Extensions
 				return true;
 			}
 			return false;
+		}
+
+		public static bool IsMainHand(this ItemWeaponType itemWeaponType)
+		{
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0002: Invalid comparison between Unknown and I4
+			return (int)itemWeaponType == 5;
 		}
 
 		public static SkillWeaponType ToSkillWeapon(this ItemWeaponType itemWeaponType)

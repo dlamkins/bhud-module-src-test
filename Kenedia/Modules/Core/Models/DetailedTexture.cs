@@ -131,25 +131,25 @@ namespace Kenedia.Modules.Core.Models
 			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0135: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0141: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0150: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0170: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0185: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0197: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0151: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0187: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0199: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b3: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01fe: Unknown result type (might be due to invalid IL or missing references)
 			if (!_isDisposed && (FallBackTexture != null || Texture != null))
 			{
 				Vector2 valueOrDefault = origin.GetValueOrDefault();
@@ -178,20 +178,20 @@ namespace Kenedia.Modules.Core.Models
 				Color valueOrDefault3 = color.GetValueOrDefault();
 				if (!color.HasValue)
 				{
-					valueOrDefault3 = (Color)(((_003F?)((Hovered && HoverDrawColor.HasValue) ? HoverDrawColor : DrawColor)) ?? Color.get_White());
+					valueOrDefault3 = (Color)(((_003F?)(((forceHover == true || Hovered) && HoverDrawColor.HasValue) ? HoverDrawColor : DrawColor)) ?? Color.get_White());
 					color = valueOrDefault3;
 				}
 				if (Texture != null)
 				{
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, ctrl, AsyncTexture2D.op_Implicit(((forceHover == true || Hovered) && HoveredTexture != null) ? HoveredTexture : (Texture ?? FallBackTexture)), Bounds, (Rectangle?)TextureRegion, color.Value, rotation.Value, origin.Value, (SpriteEffects)0);
+					spriteBatch.DrawOnCtrl(ctrl, ((forceHover == true || Hovered) && HoveredTexture != null) ? HoveredTexture : (Texture ?? FallBackTexture), Bounds, TextureRegion, color.Value, rotation.Value, origin.Value, (SpriteEffects)0);
 				}
 				else
 				{
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, ctrl, AsyncTexture2D.op_Implicit(FallBackTexture), (FallbackBounds == Rectangle.get_Empty()) ? Bounds : FallbackBounds, (Rectangle?)FallbackRegion, color.Value, rotation.Value, origin.Value, (SpriteEffects)0);
+					spriteBatch.DrawOnCtrl(ctrl, FallBackTexture, (FallbackBounds == Rectangle.get_Empty()) ? Bounds : FallbackBounds, FallbackRegion, color.Value, rotation.Value, origin.Value, (SpriteEffects)0);
 				}
 				if (bgColor.HasValue)
 				{
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, ctrl, Textures.get_Pixel(), Bounds, (Rectangle?)Rectangle.get_Empty(), bgColor.Value, rotation.Value, origin.Value, (SpriteEffects)0);
+					spriteBatch.DrawOnCtrl(ctrl, ContentService.Textures.Pixel, Bounds, Rectangle.get_Empty(), bgColor.Value, rotation.Value, origin.Value, (SpriteEffects)0);
 				}
 			}
 		}
@@ -273,15 +273,15 @@ namespace Kenedia.Modules.Core.Models
 				}
 				if (Texture != null)
 				{
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, ctrl, AsyncTexture2D.op_Implicit(((forceHover == true || Hovered) && HoveredTexture != null) ? HoveredTexture : (Texture ?? FallBackTexture)), Bounds, (Rectangle?)TextureRegion, color.Value, rotation.Value, origin.Value, effect.Value);
+					spriteBatch.DrawOnCtrl(ctrl, ((forceHover == true || Hovered) && HoveredTexture != null) ? HoveredTexture : (Texture ?? FallBackTexture), Bounds, TextureRegion, color.Value, rotation.Value, origin.Value, effect.Value);
 				}
 				else
 				{
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, ctrl, AsyncTexture2D.op_Implicit(FallBackTexture), (FallbackBounds == Rectangle.get_Empty()) ? Bounds : FallbackBounds, (Rectangle?)FallbackRegion, color.Value, rotation.Value, origin.Value, effect.Value);
+					spriteBatch.DrawOnCtrl(ctrl, FallBackTexture, (FallbackBounds == Rectangle.get_Empty()) ? Bounds : FallbackBounds, FallbackRegion, color.Value, rotation.Value, origin.Value, effect.Value);
 				}
 				if (bgColor.HasValue)
 				{
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, ctrl, Textures.get_Pixel(), Bounds, (Rectangle?)Rectangle.get_Empty(), bgColor.Value, rotation.Value, origin.Value, effect.Value);
+					spriteBatch.DrawOnCtrl(ctrl, ContentService.Textures.Pixel, Bounds, Rectangle.get_Empty(), bgColor.Value, rotation.Value, origin.Value, effect.Value);
 				}
 			}
 		}
@@ -299,15 +299,15 @@ namespace Kenedia.Modules.Core.Models
 			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
 			if (TextureRegion == Rectangle.get_Empty() || force)
 			{
-				TextureRegion = (Texture ?? FallBackTexture).get_Bounds();
+				TextureRegion = (Texture ?? FallBackTexture).Bounds;
 			}
 			if (FallbackRegion == Rectangle.get_Empty() || force)
 			{
-				FallbackRegion = (Texture ?? FallBackTexture).get_Bounds();
+				FallbackRegion = (Texture ?? FallBackTexture).Bounds;
 			}
 			if (Bounds == Rectangle.get_Empty() || force)
 			{
-				Bounds = (Texture ?? FallBackTexture).get_Bounds();
+				Bounds = (Texture ?? FallBackTexture).Bounds;
 			}
 		}
 

@@ -5,7 +5,6 @@ using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Blish_HUD.Settings;
-using Gw2Sharp.WebApi;
 using Kenedia.Modules.Characters.Extensions;
 using Kenedia.Modules.Characters.Res;
 using Kenedia.Modules.Characters.Services;
@@ -19,15 +18,15 @@ namespace Kenedia.Modules.Characters.Views
 {
 	public class SettingsWindow : BaseSettingsWindow
 	{
-		private Label _customFontSizeLabel;
+		private Kenedia.Modules.Core.Controls.Label _customFontSizeLabel;
 
-		private Dropdown _customFontSize;
+		private Kenedia.Modules.Core.Controls.Dropdown _customFontSize;
 
-		private Label _customNameFontSizeLabel;
+		private Kenedia.Modules.Core.Controls.Label _customNameFontSizeLabel;
 
-		private Dropdown _customNameFontSize;
+		private Kenedia.Modules.Core.Controls.Dropdown _customNameFontSize;
 
-		private readonly FlowPanel _contentPanel;
+		private readonly Kenedia.Modules.Core.Controls.FlowPanel _contentPanel;
 
 		private readonly SharedSettingsView _sharedSettingsView;
 
@@ -48,13 +47,14 @@ namespace Kenedia.Modules.Characters.Views
 			_sharedSettingsView = sharedSettingsView;
 			_ocr = ocr;
 			_settings = settings;
-			FlowPanel flowPanel = new FlowPanel();
-			((Control)flowPanel).set_Parent((Container)(object)this);
-			((Control)flowPanel).set_Width(((Container)this).get_ContentRegion().Width);
-			((Control)flowPanel).set_Height(((Container)this).get_ContentRegion().Height);
-			((FlowPanel)flowPanel).set_ControlPadding(new Vector2(0f, 10f));
-			((Panel)flowPanel).set_CanScroll(true);
-			_contentPanel = flowPanel;
+			_contentPanel = new Kenedia.Modules.Core.Controls.FlowPanel
+			{
+				Parent = this,
+				Width = base.ContentRegion.Width,
+				Height = base.ContentRegion.Height,
+				ControlPadding = new Vector2(0f, 10f),
+				CanScroll = true
+			};
 			base.SubWindowEmblem = AsyncTexture2D.FromAssetId(156027);
 			base.MainWindowEmblem = AsyncTexture2D.FromAssetId(156015);
 			base.Name = string.Format(strings.ItemSettings, BaseModule<Characters, MainWindow, Settings, PathCollection>.ModuleName ?? "");
@@ -65,7 +65,7 @@ namespace Kenedia.Modules.Characters.Views
 			CreateDelays();
 			CreateGeneral();
 			CreateKeybinds();
-			GameService.Overlay.get_UserLocale().add_SettingChanged((EventHandler<ValueChangedEventArgs<Locale>>)OnLanguageChanged);
+			GameService.Overlay.UserLocale.SettingChanged += OnLanguageChanged;
 			OnLanguageChanged();
 		}
 
@@ -110,221 +110,262 @@ namespace Kenedia.Modules.Characters.Views
 			//IL_08bd: Unknown result type (might be due to invalid IL or missing references)
 			//IL_08d3: Unknown result type (might be due to invalid IL or missing references)
 			//IL_08e4: Unknown result type (might be due to invalid IL or missing references)
-			Panel panel = new Panel();
-			((Control)panel).set_Parent((Container)(object)_contentPanel);
-			((Control)panel).set_Width(((Container)this).get_ContentRegion().Width - 20);
-			((Container)panel).set_HeightSizingMode((SizingMode)1);
-			((Panel)panel).set_ShowBorder(true);
-			((Panel)panel).set_CanCollapse(true);
-			panel.TitleIcon = AsyncTexture2D.FromAssetId(157122);
-			panel.SetLocalizedTitle = () => strings.RadialMenuSettings;
-			panel.SetLocalizedTitleTooltip = () => strings.RadialMenuSettings_Tooltip;
-			Panel headerPanel = panel;
-			FlowPanel flowPanel = new FlowPanel();
-			((Control)flowPanel).set_Parent((Container)(object)headerPanel);
-			((Container)flowPanel).set_HeightSizingMode((SizingMode)1);
-			((Container)flowPanel).set_WidthSizingMode((SizingMode)2);
-			((FlowPanel)flowPanel).set_FlowDirection((ControlFlowDirection)3);
-			((FlowPanel)flowPanel).set_ControlPadding(new Vector2(10f));
-			FlowPanel contentFlowPanel = flowPanel;
-			FlowPanel flowPanel2 = new FlowPanel();
-			((Control)flowPanel2).set_Parent((Container)(object)contentFlowPanel);
-			((Container)flowPanel2).set_HeightSizingMode((SizingMode)1);
-			((Control)flowPanel2).set_Width(((Container)this).get_ContentRegion().Width - 20);
-			((FlowPanel)flowPanel2).set_FlowDirection((ControlFlowDirection)3);
-			((FlowPanel)flowPanel2).set_ControlPadding(new Vector2(3f, 3f));
-			((FlowPanel)flowPanel2).set_OuterControlPadding(new Vector2(5f));
-			FlowPanel settingsFlowPanel = flowPanel2;
-			Checkbox checkbox = new Checkbox();
-			((Control)checkbox).set_Parent((Container)(object)settingsFlowPanel);
-			((Checkbox)checkbox).set_Checked(_settings.EnableRadialMenu.get_Value());
-			checkbox.SetLocalizedText = () => strings.EnableRadialMenu;
-			checkbox.SetLocalizedTooltip = () => strings.EnableRadialMenu_Tooltip;
-			checkbox.CheckedChangedAction = delegate(bool b)
+			Kenedia.Modules.Core.Controls.Panel headerPanel = new Kenedia.Modules.Core.Controls.Panel
 			{
-				_settings.EnableRadialMenu.set_Value(b);
+				Parent = _contentPanel,
+				Width = base.ContentRegion.Width - 20,
+				HeightSizingMode = SizingMode.AutoSize,
+				ShowBorder = true,
+				CanCollapse = true,
+				TitleIcon = AsyncTexture2D.FromAssetId(157122),
+				SetLocalizedTitle = () => strings.RadialMenuSettings,
+				SetLocalizedTitleTooltip = () => strings.RadialMenuSettings_Tooltip
 			};
-			Checkbox checkbox2 = new Checkbox();
-			((Control)checkbox2).set_Parent((Container)(object)settingsFlowPanel);
-			checkbox2.SetLocalizedText = () => strings.Radial_ShowAdvancedTooltip;
-			checkbox2.SetLocalizedTooltip = () => strings.Radial_ShowAdvancedTooltip_Tooltip;
-			((Checkbox)checkbox2).set_Checked(_settings.Radial_ShowAdvancedTooltip.get_Value());
-			checkbox2.CheckedChangedAction = delegate(bool b)
+			Kenedia.Modules.Core.Controls.FlowPanel contentFlowPanel = new Kenedia.Modules.Core.Controls.FlowPanel
 			{
-				_settings.Radial_ShowAdvancedTooltip.set_Value(b);
+				Parent = headerPanel,
+				HeightSizingMode = SizingMode.AutoSize,
+				WidthSizingMode = SizingMode.Fill,
+				FlowDirection = ControlFlowDirection.SingleTopToBottom,
+				ControlPadding = new Vector2(10f)
 			};
-			Checkbox checkbox3 = new Checkbox();
-			((Control)checkbox3).set_Parent((Container)(object)settingsFlowPanel);
-			checkbox3.SetLocalizedText = () => strings.Radial_UseProfessionColor;
-			checkbox3.SetLocalizedTooltip = () => strings.Radial_UseProfessionColor_Tooltip;
-			((Checkbox)checkbox3).set_Checked(_settings.Radial_UseProfessionColor.get_Value());
-			checkbox3.CheckedChangedAction = delegate(bool b)
+			Kenedia.Modules.Core.Controls.FlowPanel settingsFlowPanel = new Kenedia.Modules.Core.Controls.FlowPanel
 			{
-				_settings.Radial_UseProfessionColor.set_Value(b);
+				Parent = contentFlowPanel,
+				HeightSizingMode = SizingMode.AutoSize,
+				Width = base.ContentRegion.Width - 20,
+				FlowDirection = ControlFlowDirection.SingleTopToBottom,
+				ControlPadding = new Vector2(3f, 3f),
+				OuterControlPadding = new Vector2(5f)
 			};
-			Checkbox checkbox4 = new Checkbox();
-			((Control)checkbox4).set_Parent((Container)(object)settingsFlowPanel);
-			checkbox4.SetLocalizedText = () => strings.Radial_UseProfessionIcons;
-			checkbox4.SetLocalizedTooltip = () => strings.Radial_UseProfessionIcons_Tooltip;
-			((Checkbox)checkbox4).set_Checked(_settings.Radial_UseProfessionIcons.get_Value());
-			checkbox4.CheckedChangedAction = delegate(bool b)
+			new Kenedia.Modules.Core.Controls.Checkbox
 			{
-				_settings.Radial_UseProfessionIcons.set_Value(b);
-			};
-			Checkbox checkbox5 = new Checkbox();
-			((Control)checkbox5).set_Parent((Container)(object)settingsFlowPanel);
-			checkbox5.SetLocalizedText = () => strings.Radial_UseProfessionIconsColor;
-			checkbox5.SetLocalizedTooltip = () => strings.Radial_UseProfessionIconsColor_Tooltip;
-			((Checkbox)checkbox5).set_Checked(_settings.Radial_UseProfessionIconsColor.get_Value());
-			checkbox5.CheckedChangedAction = delegate(bool b)
-			{
-				_settings.Radial_UseProfessionIconsColor.set_Value(b);
-			};
-			Panel panel2 = new Panel();
-			((Control)panel2).set_Parent((Container)(object)settingsFlowPanel);
-			((Control)panel2).set_Width(((Container)this).get_ContentRegion().Width - 20);
-			((Container)panel2).set_HeightSizingMode((SizingMode)1);
-			Panel subP = panel2;
-			Label label = new Label();
-			((Control)label).set_Parent((Container)(object)subP);
-			((Label)label).set_AutoSizeWidth(true);
-			label.SetLocalizedText = () => string.Format(strings.Radial_Scale + " {0}%", _settings.Radial_Scale.get_Value() * 100f);
-			label.SetLocalizedTooltip = () => strings.Radial_Scale_Tooltip;
-			Label scaleLabel = label;
-			TrackBar trackBar = new TrackBar();
-			((Control)trackBar).set_Parent((Container)(object)subP);
-			trackBar.SetLocalizedTooltip = () => strings.Radial_Scale_Tooltip;
-			((TrackBar)trackBar).set_Value(_settings.Radial_Scale.get_Value() * 100f);
-			trackBar.ValueChangedAction = delegate(int v)
-			{
-				_settings.Radial_Scale.set_Value((float)v / 100f);
-				scaleLabel.UserLocale_SettingChanged(_settings.Radial_Scale.get_Value(), null);
-			};
-			((TrackBar)trackBar).set_MinValue(0f);
-			((TrackBar)trackBar).set_MaxValue(100f);
-			((Control)trackBar).set_Location(new Point(250, 0));
-			Panel panel3 = new Panel();
-			((Control)panel3).set_Parent((Container)(object)settingsFlowPanel);
-			((Control)panel3).set_Width(((Container)this).get_ContentRegion().Width - 20);
-			((Container)panel3).set_HeightSizingMode((SizingMode)1);
-			subP = panel3;
-			Label label2 = new Label();
-			((Control)label2).set_Parent((Container)(object)subP);
-			((Label)label2).set_AutoSizeWidth(true);
-			((Control)label2).set_Location(new Point(30, 0));
-			label2.SetLocalizedText = () => strings.Radial_IdleBackgroundColor;
-			Panel panel4 = new Panel();
-			((Control)panel4).set_Parent((Container)(object)subP);
-			((Control)panel4).set_Location(new Point(0, 0));
-			((Control)panel4).set_Size(new Point(20));
-			panel4.BackgroundColor = _settings.Radial_IdleColor.get_Value();
-			Panel idleBackgroundPreview = panel4;
-			TextBox textBox = new TextBox();
-			((Control)textBox).set_Parent((Container)(object)subP);
-			((Control)textBox).set_Location(new Point(250, 0));
-			((TextInputBase)textBox).set_Text(_settings.Radial_IdleColor.get_Value().ToHex());
-			((Control)textBox).set_Width(((Container)this).get_ContentRegion().Width - 20 - 250);
-			textBox.TextChangedAction = delegate(string t)
-			{
-				//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-				if (t.ColorFromHex(out var outColor4))
+				Parent = settingsFlowPanel,
+				Checked = _settings.EnableRadialMenu.Value,
+				SetLocalizedText = () => strings.EnableRadialMenu,
+				SetLocalizedTooltip = () => strings.EnableRadialMenu_Tooltip,
+				CheckedChangedAction = delegate(bool b)
 				{
-					_settings.Radial_IdleColor.set_Value(outColor4);
-					idleBackgroundPreview.BackgroundColor = outColor4;
+					_settings.EnableRadialMenu.Value = b;
 				}
 			};
-			Panel panel5 = new Panel();
-			((Control)panel5).set_Parent((Container)(object)settingsFlowPanel);
-			((Control)panel5).set_Width(((Container)this).get_ContentRegion().Width - 20);
-			((Container)panel5).set_HeightSizingMode((SizingMode)1);
-			subP = panel5;
-			Label label3 = new Label();
-			((Control)label3).set_Parent((Container)(object)subP);
-			((Label)label3).set_AutoSizeWidth(true);
-			((Control)label3).set_Location(new Point(30, 0));
-			label3.SetLocalizedText = () => strings.Radial_IdleBorderColor;
-			Panel panel6 = new Panel();
-			((Control)panel6).set_Parent((Container)(object)subP);
-			((Control)panel6).set_Location(new Point(0, 0));
-			((Control)panel6).set_Size(new Point(20));
-			panel6.BackgroundColor = _settings.Radial_IdleBorderColor.get_Value();
-			Panel idleBorderPreview = panel6;
-			TextBox textBox2 = new TextBox();
-			((Control)textBox2).set_Parent((Container)(object)subP);
-			((Control)textBox2).set_Location(new Point(250, 0));
-			((TextInputBase)textBox2).set_Text(_settings.Radial_IdleBorderColor.get_Value().ToHex());
-			((Control)textBox2).set_Width(((Container)this).get_ContentRegion().Width - 20 - 250);
-			textBox2.TextChangedAction = delegate(string t)
+			new Kenedia.Modules.Core.Controls.Checkbox
 			{
-				//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-				if (t.ColorFromHex(out var outColor3))
+				Parent = settingsFlowPanel,
+				SetLocalizedText = () => strings.Radial_ShowAdvancedTooltip,
+				SetLocalizedTooltip = () => strings.Radial_ShowAdvancedTooltip_Tooltip,
+				Checked = _settings.Radial_ShowAdvancedTooltip.Value,
+				CheckedChangedAction = delegate(bool b)
 				{
-					_settings.Radial_IdleBorderColor.set_Value(outColor3);
-					idleBorderPreview.BackgroundColor = outColor3;
+					_settings.Radial_ShowAdvancedTooltip.Value = b;
 				}
 			};
-			Panel panel7 = new Panel();
-			((Control)panel7).set_Parent((Container)(object)settingsFlowPanel);
-			((Control)panel7).set_Width(((Container)this).get_ContentRegion().Width - 20);
-			((Container)panel7).set_HeightSizingMode((SizingMode)1);
-			subP = panel7;
-			Label label4 = new Label();
-			((Control)label4).set_Parent((Container)(object)subP);
-			((Label)label4).set_AutoSizeWidth(true);
-			((Control)label4).set_Location(new Point(30, 0));
-			label4.SetLocalizedText = () => strings.Radial_HoveredBackgroundColor;
-			Panel panel8 = new Panel();
-			((Control)panel8).set_Parent((Container)(object)subP);
-			((Control)panel8).set_Location(new Point(0, 0));
-			((Control)panel8).set_Size(new Point(20));
-			panel8.BackgroundColor = _settings.Radial_HoveredColor.get_Value();
-			Panel activeBackgroundPreview = panel8;
-			TextBox textBox3 = new TextBox();
-			((Control)textBox3).set_Parent((Container)(object)subP);
-			((Control)textBox3).set_Location(new Point(250, 0));
-			((TextInputBase)textBox3).set_Text(_settings.Radial_HoveredColor.get_Value().ToHex());
-			((Control)textBox3).set_Width(((Container)this).get_ContentRegion().Width - 20 - 250);
-			textBox3.TextChangedAction = delegate(string t)
+			new Kenedia.Modules.Core.Controls.Checkbox
 			{
-				//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-				if (t.ColorFromHex(out var outColor2))
+				Parent = settingsFlowPanel,
+				SetLocalizedText = () => strings.Radial_UseProfessionColor,
+				SetLocalizedTooltip = () => strings.Radial_UseProfessionColor_Tooltip,
+				Checked = _settings.Radial_UseProfessionColor.Value,
+				CheckedChangedAction = delegate(bool b)
 				{
-					_settings.Radial_HoveredColor.set_Value(outColor2);
-					activeBackgroundPreview.BackgroundColor = outColor2;
+					_settings.Radial_UseProfessionColor.Value = b;
 				}
 			};
-			Panel panel9 = new Panel();
-			((Control)panel9).set_Parent((Container)(object)settingsFlowPanel);
-			((Control)panel9).set_Width(((Container)this).get_ContentRegion().Width - 20);
-			((Container)panel9).set_HeightSizingMode((SizingMode)1);
-			subP = panel9;
-			Label label5 = new Label();
-			((Control)label5).set_Parent((Container)(object)subP);
-			((Label)label5).set_AutoSizeWidth(true);
-			((Control)label5).set_Location(new Point(30, 0));
-			label5.SetLocalizedText = () => strings.Radial_HoveredBorderColor;
-			Panel panel10 = new Panel();
-			((Control)panel10).set_Parent((Container)(object)subP);
-			((Control)panel10).set_Location(new Point(0, 0));
-			((Control)panel10).set_Size(new Point(20));
-			panel10.BackgroundColor = _settings.Radial_HoveredBorderColor.get_Value();
-			Panel activeBorderPreview = panel10;
-			TextBox textBox4 = new TextBox();
-			((Control)textBox4).set_Parent((Container)(object)subP);
-			((Control)textBox4).set_Location(new Point(250, 0));
-			((TextInputBase)textBox4).set_Text(_settings.Radial_HoveredBorderColor.get_Value().ToHex());
-			((Control)textBox4).set_Width(((Container)this).get_ContentRegion().Width - 20 - 250);
-			textBox4.TextChangedAction = delegate(string t)
+			new Kenedia.Modules.Core.Controls.Checkbox
 			{
-				//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-				if (t.ColorFromHex(out var outColor))
+				Parent = settingsFlowPanel,
+				SetLocalizedText = () => strings.Radial_UseProfessionIcons,
+				SetLocalizedTooltip = () => strings.Radial_UseProfessionIcons_Tooltip,
+				Checked = _settings.Radial_UseProfessionIcons.Value,
+				CheckedChangedAction = delegate(bool b)
 				{
-					_settings.Radial_HoveredBorderColor.set_Value(outColor);
-					activeBorderPreview.BackgroundColor = outColor;
+					_settings.Radial_UseProfessionIcons.Value = b;
+				}
+			};
+			new Kenedia.Modules.Core.Controls.Checkbox
+			{
+				Parent = settingsFlowPanel,
+				SetLocalizedText = () => strings.Radial_UseProfessionIconsColor,
+				SetLocalizedTooltip = () => strings.Radial_UseProfessionIconsColor_Tooltip,
+				Checked = _settings.Radial_UseProfessionIconsColor.Value,
+				CheckedChangedAction = delegate(bool b)
+				{
+					_settings.Radial_UseProfessionIconsColor.Value = b;
+				}
+			};
+			Kenedia.Modules.Core.Controls.Panel subP = new Kenedia.Modules.Core.Controls.Panel
+			{
+				Parent = settingsFlowPanel,
+				Width = base.ContentRegion.Width - 20,
+				HeightSizingMode = SizingMode.AutoSize
+			};
+			Kenedia.Modules.Core.Controls.Label scaleLabel = new Kenedia.Modules.Core.Controls.Label
+			{
+				Parent = subP,
+				AutoSizeWidth = true,
+				SetLocalizedText = () => string.Format(strings.Radial_Scale + " {0}%", _settings.Radial_Scale.Value * 100f),
+				SetLocalizedTooltip = () => strings.Radial_Scale_Tooltip
+			};
+			new Kenedia.Modules.Core.Controls.TrackBar
+			{
+				Parent = subP,
+				SetLocalizedTooltip = () => strings.Radial_Scale_Tooltip,
+				Value = _settings.Radial_Scale.Value * 100f,
+				ValueChangedAction = delegate(int v)
+				{
+					_settings.Radial_Scale.Value = (float)v / 100f;
+					scaleLabel.UserLocale_SettingChanged(_settings.Radial_Scale.Value, null);
+				},
+				MinValue = 0f,
+				MaxValue = 100f,
+				Location = new Point(250, 0)
+			};
+			subP = new Kenedia.Modules.Core.Controls.Panel
+			{
+				Parent = settingsFlowPanel,
+				Width = base.ContentRegion.Width - 20,
+				HeightSizingMode = SizingMode.AutoSize
+			};
+			new Kenedia.Modules.Core.Controls.Label
+			{
+				Parent = subP,
+				AutoSizeWidth = true,
+				Location = new Point(30, 0),
+				SetLocalizedText = () => strings.Radial_IdleBackgroundColor
+			};
+			Kenedia.Modules.Core.Controls.Panel idleBackgroundPreview = new Kenedia.Modules.Core.Controls.Panel
+			{
+				Parent = subP,
+				Location = new Point(0, 0),
+				Size = new Point(20),
+				BackgroundColor = _settings.Radial_IdleColor.Value
+			};
+			new Kenedia.Modules.Core.Controls.TextBox
+			{
+				Parent = subP,
+				Location = new Point(250, 0),
+				Text = _settings.Radial_IdleColor.Value.ToHex(),
+				Width = base.ContentRegion.Width - 20 - 250,
+				TextChangedAction = delegate(string t)
+				{
+					//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+					//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+					if (t.ColorFromHex(out var outColor4))
+					{
+						_settings.Radial_IdleColor.Value = outColor4;
+						idleBackgroundPreview.BackgroundColor = outColor4;
+					}
+				}
+			};
+			subP = new Kenedia.Modules.Core.Controls.Panel
+			{
+				Parent = settingsFlowPanel,
+				Width = base.ContentRegion.Width - 20,
+				HeightSizingMode = SizingMode.AutoSize
+			};
+			new Kenedia.Modules.Core.Controls.Label
+			{
+				Parent = subP,
+				AutoSizeWidth = true,
+				Location = new Point(30, 0),
+				SetLocalizedText = () => strings.Radial_IdleBorderColor
+			};
+			Kenedia.Modules.Core.Controls.Panel idleBorderPreview = new Kenedia.Modules.Core.Controls.Panel
+			{
+				Parent = subP,
+				Location = new Point(0, 0),
+				Size = new Point(20),
+				BackgroundColor = _settings.Radial_IdleBorderColor.Value
+			};
+			new Kenedia.Modules.Core.Controls.TextBox
+			{
+				Parent = subP,
+				Location = new Point(250, 0),
+				Text = _settings.Radial_IdleBorderColor.Value.ToHex(),
+				Width = base.ContentRegion.Width - 20 - 250,
+				TextChangedAction = delegate(string t)
+				{
+					//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+					//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+					if (t.ColorFromHex(out var outColor3))
+					{
+						_settings.Radial_IdleBorderColor.Value = outColor3;
+						idleBorderPreview.BackgroundColor = outColor3;
+					}
+				}
+			};
+			subP = new Kenedia.Modules.Core.Controls.Panel
+			{
+				Parent = settingsFlowPanel,
+				Width = base.ContentRegion.Width - 20,
+				HeightSizingMode = SizingMode.AutoSize
+			};
+			new Kenedia.Modules.Core.Controls.Label
+			{
+				Parent = subP,
+				AutoSizeWidth = true,
+				Location = new Point(30, 0),
+				SetLocalizedText = () => strings.Radial_HoveredBackgroundColor
+			};
+			Kenedia.Modules.Core.Controls.Panel activeBackgroundPreview = new Kenedia.Modules.Core.Controls.Panel
+			{
+				Parent = subP,
+				Location = new Point(0, 0),
+				Size = new Point(20),
+				BackgroundColor = _settings.Radial_HoveredColor.Value
+			};
+			new Kenedia.Modules.Core.Controls.TextBox
+			{
+				Parent = subP,
+				Location = new Point(250, 0),
+				Text = _settings.Radial_HoveredColor.Value.ToHex(),
+				Width = base.ContentRegion.Width - 20 - 250,
+				TextChangedAction = delegate(string t)
+				{
+					//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+					//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+					if (t.ColorFromHex(out var outColor2))
+					{
+						_settings.Radial_HoveredColor.Value = outColor2;
+						activeBackgroundPreview.BackgroundColor = outColor2;
+					}
+				}
+			};
+			subP = new Kenedia.Modules.Core.Controls.Panel
+			{
+				Parent = settingsFlowPanel,
+				Width = base.ContentRegion.Width - 20,
+				HeightSizingMode = SizingMode.AutoSize
+			};
+			new Kenedia.Modules.Core.Controls.Label
+			{
+				Parent = subP,
+				AutoSizeWidth = true,
+				Location = new Point(30, 0),
+				SetLocalizedText = () => strings.Radial_HoveredBorderColor
+			};
+			Kenedia.Modules.Core.Controls.Panel activeBorderPreview = new Kenedia.Modules.Core.Controls.Panel
+			{
+				Parent = subP,
+				Location = new Point(0, 0),
+				Size = new Point(20),
+				BackgroundColor = _settings.Radial_HoveredBorderColor.Value
+			};
+			new Kenedia.Modules.Core.Controls.TextBox
+			{
+				Parent = subP,
+				Location = new Point(250, 0),
+				Text = _settings.Radial_HoveredBorderColor.Value.ToHex(),
+				Width = base.ContentRegion.Width - 20 - 250,
+				TextChangedAction = delegate(string t)
+				{
+					//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+					//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+					if (t.ColorFromHex(out var outColor))
+					{
+						_settings.Radial_HoveredBorderColor.Value = outColor;
+						activeBorderPreview.BackgroundColor = outColor;
+					}
 				}
 			};
 		}
@@ -341,66 +382,76 @@ namespace Kenedia.Modules.Characters.Views
 			//IL_0264: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0274: Unknown result type (might be due to invalid IL or missing references)
 			//IL_030a: Unknown result type (might be due to invalid IL or missing references)
-			Panel panel = new Panel();
-			((Control)panel).set_Parent((Container)(object)_contentPanel);
-			((Control)panel).set_Width(((Container)this).get_ContentRegion().Width - 20);
-			((Container)panel).set_HeightSizingMode((SizingMode)1);
-			((Panel)panel).set_ShowBorder(true);
-			((Panel)panel).set_CanCollapse(true);
-			panel.TitleIcon = AsyncTexture2D.FromAssetId(759447);
-			panel.SetLocalizedTitle = () => strings.OCRAndImageRecognition;
-			panel.SetLocalizedTitleTooltip = () => strings.OCRAndImageRecognition_Tooltip;
-			Panel headerPanel = panel;
-			FlowPanel flowPanel = new FlowPanel();
-			((Control)flowPanel).set_Parent((Container)(object)headerPanel);
-			((Container)flowPanel).set_HeightSizingMode((SizingMode)1);
-			((Container)flowPanel).set_WidthSizingMode((SizingMode)2);
-			((FlowPanel)flowPanel).set_FlowDirection((ControlFlowDirection)3);
-			((FlowPanel)flowPanel).set_ControlPadding(new Vector2(10f));
-			FlowPanel contentFlowPanel = flowPanel;
-			FlowPanel flowPanel2 = new FlowPanel();
-			((Control)flowPanel2).set_Parent((Container)(object)contentFlowPanel);
-			((Container)flowPanel2).set_HeightSizingMode((SizingMode)1);
-			((Control)flowPanel2).set_Width((((Container)this).get_ContentRegion().Width - 20) / 2);
-			((FlowPanel)flowPanel2).set_FlowDirection((ControlFlowDirection)3);
-			((FlowPanel)flowPanel2).set_ControlPadding(new Vector2(3f, 3f));
-			((FlowPanel)flowPanel2).set_OuterControlPadding(new Vector2(5f));
-			FlowPanel settingsFlowPanel = flowPanel2;
-			Checkbox checkbox = new Checkbox();
-			((Control)checkbox).set_Parent((Container)(object)settingsFlowPanel);
-			((Checkbox)checkbox).set_Checked(_settings.UseOCR.get_Value());
-			checkbox.SetLocalizedText = () => strings.UseOCR;
-			checkbox.SetLocalizedTooltip = () => strings.UseOCR_Tooltip;
-			checkbox.CheckedChangedAction = delegate(bool b)
+			Kenedia.Modules.Core.Controls.Panel headerPanel = new Kenedia.Modules.Core.Controls.Panel
 			{
-				_settings.UseOCR.set_Value(b);
+				Parent = _contentPanel,
+				Width = base.ContentRegion.Width - 20,
+				HeightSizingMode = SizingMode.AutoSize,
+				ShowBorder = true,
+				CanCollapse = true,
+				TitleIcon = AsyncTexture2D.FromAssetId(759447),
+				SetLocalizedTitle = () => strings.OCRAndImageRecognition,
+				SetLocalizedTitleTooltip = () => strings.OCRAndImageRecognition_Tooltip
 			};
-			Checkbox checkbox2 = new Checkbox();
-			((Control)checkbox2).set_Parent((Container)(object)settingsFlowPanel);
-			((Checkbox)checkbox2).set_Checked(_settings.UseBetaGamestate.get_Value());
-			checkbox2.SetLocalizedText = () => strings.UseBetaGameState;
-			checkbox2.SetLocalizedTooltip = () => strings.UseBetaGameState_Tooltip;
-			checkbox2.CheckedChangedAction = delegate(bool b)
+			Kenedia.Modules.Core.Controls.FlowPanel contentFlowPanel = new Kenedia.Modules.Core.Controls.FlowPanel
 			{
-				_settings.UseBetaGamestate.set_Value(b);
+				Parent = headerPanel,
+				HeightSizingMode = SizingMode.AutoSize,
+				WidthSizingMode = SizingMode.Fill,
+				FlowDirection = ControlFlowDirection.SingleTopToBottom,
+				ControlPadding = new Vector2(10f)
 			};
-			FlowPanel flowPanel3 = new FlowPanel();
-			((Control)flowPanel3).set_Parent((Container)(object)headerPanel);
-			((Control)flowPanel3).set_Location(new Point(((Control)settingsFlowPanel).get_Right(), 0));
-			((Container)flowPanel3).set_HeightSizingMode((SizingMode)1);
-			((Control)flowPanel3).set_Width((((Container)this).get_ContentRegion().Width - 20) / 2);
-			((FlowPanel)flowPanel3).set_FlowDirection((ControlFlowDirection)3);
-			((FlowPanel)flowPanel3).set_ControlPadding(new Vector2(3f, 3f));
-			((FlowPanel)flowPanel3).set_OuterControlPadding(new Vector2(5f));
-			FlowPanel buttonFlowPanel = flowPanel3;
-			Button button = new Button();
-			((Control)button).set_Parent((Container)(object)buttonFlowPanel);
-			button.SetLocalizedText = () => strings.EditOCR;
-			button.SetLocalizedTooltip = () => strings.EditOCR_Tooltip;
-			((Control)button).set_Width(((Control)buttonFlowPanel).get_Width() - 15);
-			((Control)button).set_Height(40);
-			button.ClickAction = _ocr.ToggleContainer;
-			_sharedSettingsView.CreateLayout((Container)(object)contentFlowPanel, ((Container)this).get_ContentRegion().Width - 20);
+			Kenedia.Modules.Core.Controls.FlowPanel settingsFlowPanel = new Kenedia.Modules.Core.Controls.FlowPanel
+			{
+				Parent = contentFlowPanel,
+				HeightSizingMode = SizingMode.AutoSize,
+				Width = (base.ContentRegion.Width - 20) / 2,
+				FlowDirection = ControlFlowDirection.SingleTopToBottom,
+				ControlPadding = new Vector2(3f, 3f),
+				OuterControlPadding = new Vector2(5f)
+			};
+			new Kenedia.Modules.Core.Controls.Checkbox
+			{
+				Parent = settingsFlowPanel,
+				Checked = _settings.UseOCR.Value,
+				SetLocalizedText = () => strings.UseOCR,
+				SetLocalizedTooltip = () => strings.UseOCR_Tooltip,
+				CheckedChangedAction = delegate(bool b)
+				{
+					_settings.UseOCR.Value = b;
+				}
+			};
+			new Kenedia.Modules.Core.Controls.Checkbox
+			{
+				Parent = settingsFlowPanel,
+				Checked = _settings.UseBetaGamestate.Value,
+				SetLocalizedText = () => strings.UseBetaGameState,
+				SetLocalizedTooltip = () => strings.UseBetaGameState_Tooltip,
+				CheckedChangedAction = delegate(bool b)
+				{
+					_settings.UseBetaGamestate.Value = b;
+				}
+			};
+			Kenedia.Modules.Core.Controls.FlowPanel buttonFlowPanel = new Kenedia.Modules.Core.Controls.FlowPanel
+			{
+				Parent = headerPanel,
+				Location = new Point(settingsFlowPanel.Right, 0),
+				HeightSizingMode = SizingMode.AutoSize,
+				Width = (base.ContentRegion.Width - 20) / 2,
+				FlowDirection = ControlFlowDirection.SingleTopToBottom,
+				ControlPadding = new Vector2(3f, 3f),
+				OuterControlPadding = new Vector2(5f)
+			};
+			new Button
+			{
+				Parent = buttonFlowPanel,
+				SetLocalizedText = () => strings.EditOCR,
+				SetLocalizedTooltip = () => strings.EditOCR_Tooltip,
+				Width = buttonFlowPanel.Width - 15,
+				Height = 40,
+				ClickAction = new Action(_ocr.ToggleContainer)
+			};
+			_sharedSettingsView.CreateLayout(contentFlowPanel, base.ContentRegion.Width - 20);
 		}
 
 		private void CreateKeybinds()
@@ -413,143 +464,120 @@ namespace Kenedia.Modules.Characters.Views
 			//IL_01e3: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0274: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0305: Unknown result type (might be due to invalid IL or missing references)
-			Panel panel = new Panel();
-			((Control)panel).set_Parent((Container)(object)_contentPanel);
-			((Control)panel).set_Width(((Container)this).get_ContentRegion().Width - 20);
-			((Container)panel).set_HeightSizingMode((SizingMode)1);
-			((Panel)panel).set_ShowBorder(true);
-			((Panel)panel).set_CanCollapse(true);
-			panel.SetLocalizedTitle = () => strings.Keybinds;
-			panel.TitleIcon = AsyncTexture2D.FromAssetId(156734);
-			Panel p = panel;
-			FlowPanel flowPanel = new FlowPanel();
-			((Control)flowPanel).set_Parent((Container)(object)p);
-			((Control)flowPanel).set_Location(new Point(5));
-			((Container)flowPanel).set_HeightSizingMode((SizingMode)1);
-			((Container)flowPanel).set_WidthSizingMode((SizingMode)2);
-			((FlowPanel)flowPanel).set_FlowDirection((ControlFlowDirection)3);
-			((FlowPanel)flowPanel).set_ControlPadding(new Vector2(3f, 3f));
-			FlowPanel cP = flowPanel;
-			KeybindingAssigner keybindingAssigner = new KeybindingAssigner();
-			((Control)keybindingAssigner).set_Parent((Container)(object)cP);
-			((Control)keybindingAssigner).set_Width(((Container)this).get_ContentRegion().Width - 35);
-			((KeybindingAssigner)keybindingAssigner).set_KeyBinding(_settings.LogoutKey.get_Value());
-			keybindingAssigner.KeybindChangedAction = delegate(KeyBinding kb)
+			Kenedia.Modules.Core.Controls.Panel p = new Kenedia.Modules.Core.Controls.Panel
 			{
-				//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-				//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-				//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0040: Expected O, but got Unknown
-				SettingEntry<KeyBinding> logoutKey = _settings.LogoutKey;
-				KeyBinding val5 = new KeyBinding();
-				val5.set_ModifierKeys(kb.get_ModifierKeys());
-				val5.set_PrimaryKey(kb.get_PrimaryKey());
-				val5.set_Enabled(kb.get_Enabled());
-				val5.set_IgnoreWhenInTextField(true);
-				logoutKey.set_Value(val5);
+				Parent = _contentPanel,
+				Width = base.ContentRegion.Width - 20,
+				HeightSizingMode = SizingMode.AutoSize,
+				ShowBorder = true,
+				CanCollapse = true,
+				SetLocalizedTitle = () => strings.Keybinds,
+				TitleIcon = AsyncTexture2D.FromAssetId(156734)
 			};
-			keybindingAssigner.SetLocalizedKeyBindingName = () => strings.Logout;
-			keybindingAssigner.SetLocalizedTooltip = () => strings.LogoutDescription;
-			KeybindingAssigner keybindingAssigner2 = new KeybindingAssigner();
-			((Control)keybindingAssigner2).set_Parent((Container)(object)cP);
-			((Control)keybindingAssigner2).set_Width(((Container)this).get_ContentRegion().Width - 35);
-			((KeybindingAssigner)keybindingAssigner2).set_KeyBinding(_settings.ShortcutKey.get_Value());
-			keybindingAssigner2.KeybindChangedAction = delegate(KeyBinding kb)
+			Kenedia.Modules.Core.Controls.FlowPanel cP = new Kenedia.Modules.Core.Controls.FlowPanel
 			{
-				//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-				//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-				//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0040: Expected O, but got Unknown
-				SettingEntry<KeyBinding> shortcutKey = _settings.ShortcutKey;
-				KeyBinding val4 = new KeyBinding();
-				val4.set_ModifierKeys(kb.get_ModifierKeys());
-				val4.set_PrimaryKey(kb.get_PrimaryKey());
-				val4.set_Enabled(kb.get_Enabled());
-				val4.set_IgnoreWhenInTextField(true);
-				shortcutKey.set_Value(val4);
+				Parent = p,
+				Location = new Point(5),
+				HeightSizingMode = SizingMode.AutoSize,
+				WidthSizingMode = SizingMode.Fill,
+				FlowDirection = ControlFlowDirection.SingleTopToBottom,
+				ControlPadding = new Vector2(3f, 3f)
 			};
-			keybindingAssigner2.SetLocalizedKeyBindingName = () => strings.ShortcutToggle;
-			keybindingAssigner2.SetLocalizedTooltip = () => strings.ShortcutToggle_Tooltip;
-			KeybindingAssigner keybindingAssigner3 = new KeybindingAssigner();
-			((Control)keybindingAssigner3).set_Parent((Container)(object)cP);
-			((Control)keybindingAssigner3).set_Width(((Container)this).get_ContentRegion().Width - 35);
-			((KeybindingAssigner)keybindingAssigner3).set_KeyBinding(_settings.RadialKey.get_Value());
-			keybindingAssigner3.KeybindChangedAction = delegate(KeyBinding kb)
+			new Kenedia.Modules.Core.Controls.KeybindingAssigner
 			{
-				//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-				//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-				//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0040: Expected O, but got Unknown
-				SettingEntry<KeyBinding> radialKey = _settings.RadialKey;
-				KeyBinding val3 = new KeyBinding();
-				val3.set_ModifierKeys(kb.get_ModifierKeys());
-				val3.set_PrimaryKey(kb.get_PrimaryKey());
-				val3.set_Enabled(kb.get_Enabled());
-				val3.set_IgnoreWhenInTextField(true);
-				radialKey.set_Value(val3);
+				Parent = cP,
+				Width = base.ContentRegion.Width - 35,
+				KeyBinding = _settings.LogoutKey.Value,
+				KeybindChangedAction = delegate(KeyBinding kb)
+				{
+					//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+					_settings.LogoutKey.Value = new KeyBinding
+					{
+						ModifierKeys = kb.ModifierKeys,
+						PrimaryKey = kb.PrimaryKey,
+						Enabled = kb.Enabled,
+						IgnoreWhenInTextField = true
+					};
+				},
+				SetLocalizedKeyBindingName = () => strings.Logout,
+				SetLocalizedTooltip = () => strings.LogoutDescription
 			};
-			keybindingAssigner3.SetLocalizedKeyBindingName = () => strings.RadialMenuKey;
-			keybindingAssigner3.SetLocalizedTooltip = () => strings.RadialMenuKey_Tooltip;
-			KeybindingAssigner keybindingAssigner4 = new KeybindingAssigner();
-			((Control)keybindingAssigner4).set_Parent((Container)(object)cP);
-			((Control)keybindingAssigner4).set_Width(((Container)this).get_ContentRegion().Width - 35);
-			((KeybindingAssigner)keybindingAssigner4).set_KeyBinding(_settings.InventoryKey.get_Value());
-			keybindingAssigner4.KeybindChangedAction = delegate(KeyBinding kb)
+			new Kenedia.Modules.Core.Controls.KeybindingAssigner
 			{
-				//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-				//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-				//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0040: Expected O, but got Unknown
-				SettingEntry<KeyBinding> inventoryKey = _settings.InventoryKey;
-				KeyBinding val2 = new KeyBinding();
-				val2.set_ModifierKeys(kb.get_ModifierKeys());
-				val2.set_PrimaryKey(kb.get_PrimaryKey());
-				val2.set_Enabled(kb.get_Enabled());
-				val2.set_IgnoreWhenInTextField(true);
-				inventoryKey.set_Value(val2);
+				Parent = cP,
+				Width = base.ContentRegion.Width - 35,
+				KeyBinding = _settings.ShortcutKey.Value,
+				KeybindChangedAction = delegate(KeyBinding kb)
+				{
+					//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+					_settings.ShortcutKey.Value = new KeyBinding
+					{
+						ModifierKeys = kb.ModifierKeys,
+						PrimaryKey = kb.PrimaryKey,
+						Enabled = kb.Enabled,
+						IgnoreWhenInTextField = true
+					};
+				},
+				SetLocalizedKeyBindingName = () => strings.ShortcutToggle,
+				SetLocalizedTooltip = () => strings.ShortcutToggle_Tooltip
 			};
-			keybindingAssigner4.SetLocalizedKeyBindingName = () => strings.InventoryKey;
-			keybindingAssigner4.SetLocalizedTooltip = () => strings.InventoryKey_Tooltip;
-			KeybindingAssigner keybindingAssigner5 = new KeybindingAssigner();
-			((Control)keybindingAssigner5).set_Parent((Container)(object)cP);
-			((Control)keybindingAssigner5).set_Width(((Container)this).get_ContentRegion().Width - 35);
-			((KeybindingAssigner)keybindingAssigner5).set_KeyBinding(_settings.MailKey.get_Value());
-			keybindingAssigner5.KeybindChangedAction = delegate(KeyBinding kb)
+			new Kenedia.Modules.Core.Controls.KeybindingAssigner
 			{
-				//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-				//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-				//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0040: Expected O, but got Unknown
-				SettingEntry<KeyBinding> mailKey = _settings.MailKey;
-				KeyBinding val = new KeyBinding();
-				val.set_ModifierKeys(kb.get_ModifierKeys());
-				val.set_PrimaryKey(kb.get_PrimaryKey());
-				val.set_Enabled(kb.get_Enabled());
-				val.set_IgnoreWhenInTextField(true);
-				mailKey.set_Value(val);
+				Parent = cP,
+				Width = base.ContentRegion.Width - 35,
+				KeyBinding = _settings.RadialKey.Value,
+				KeybindChangedAction = delegate(KeyBinding kb)
+				{
+					//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+					_settings.RadialKey.Value = new KeyBinding
+					{
+						ModifierKeys = kb.ModifierKeys,
+						PrimaryKey = kb.PrimaryKey,
+						Enabled = kb.Enabled,
+						IgnoreWhenInTextField = true
+					};
+				},
+				SetLocalizedKeyBindingName = () => strings.RadialMenuKey,
+				SetLocalizedTooltip = () => strings.RadialMenuKey_Tooltip
 			};
-			keybindingAssigner5.SetLocalizedKeyBindingName = () => strings.MailKey;
-			keybindingAssigner5.SetLocalizedTooltip = () => strings.MailKey_Tooltip;
+			new Kenedia.Modules.Core.Controls.KeybindingAssigner
+			{
+				Parent = cP,
+				Width = base.ContentRegion.Width - 35,
+				KeyBinding = _settings.InventoryKey.Value,
+				KeybindChangedAction = delegate(KeyBinding kb)
+				{
+					//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+					_settings.InventoryKey.Value = new KeyBinding
+					{
+						ModifierKeys = kb.ModifierKeys,
+						PrimaryKey = kb.PrimaryKey,
+						Enabled = kb.Enabled,
+						IgnoreWhenInTextField = true
+					};
+				},
+				SetLocalizedKeyBindingName = () => strings.InventoryKey,
+				SetLocalizedTooltip = () => strings.InventoryKey_Tooltip
+			};
+			new Kenedia.Modules.Core.Controls.KeybindingAssigner
+			{
+				Parent = cP,
+				Width = base.ContentRegion.Width - 35,
+				KeyBinding = _settings.MailKey.Value,
+				KeybindChangedAction = delegate(KeyBinding kb)
+				{
+					//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+					_settings.MailKey.Value = new KeyBinding
+					{
+						ModifierKeys = kb.ModifierKeys,
+						PrimaryKey = kb.PrimaryKey,
+						Enabled = kb.Enabled,
+						IgnoreWhenInTextField = true
+					};
+				},
+				SetLocalizedKeyBindingName = () => strings.MailKey,
+				SetLocalizedTooltip = () => strings.MailKey_Tooltip
+			};
 		}
 
 		private void CreateBehavior()
@@ -559,147 +587,175 @@ namespace Kenedia.Modules.Characters.Views
 			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
 			//IL_06c4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0704: Unknown result type (might be due to invalid IL or missing references)
-			Panel panel = new Panel();
-			((Control)panel).set_Parent((Container)(object)_contentPanel);
-			((Control)panel).set_Width(((Container)this).get_ContentRegion().Width - 20);
-			((Container)panel).set_HeightSizingMode((SizingMode)1);
-			((Panel)panel).set_ShowBorder(true);
-			((Panel)panel).set_CanCollapse(true);
-			panel.SetLocalizedTitle = () => strings.ModuleBehavior;
-			panel.SetLocalizedTitleTooltip = () => strings.ModuleBehavior_Tooltip;
-			panel.TitleIcon = AsyncTexture2D.FromAssetId(60968);
-			Panel p = panel;
-			FlowPanel flowPanel = new FlowPanel();
-			((Control)flowPanel).set_Parent((Container)(object)p);
-			((Control)flowPanel).set_Location(new Point(5, 5));
-			((Container)flowPanel).set_HeightSizingMode((SizingMode)1);
-			((Container)flowPanel).set_WidthSizingMode((SizingMode)2);
-			((FlowPanel)flowPanel).set_FlowDirection((ControlFlowDirection)3);
-			((FlowPanel)flowPanel).set_ControlPadding(new Vector2(3f, 3f));
-			FlowPanel cP = flowPanel;
-			Checkbox checkbox = new Checkbox();
-			((Control)checkbox).set_Parent((Container)(object)cP);
-			((Checkbox)checkbox).set_Checked(_settings.OnlyEnterOnExact.get_Value());
-			checkbox.SetLocalizedText = () => strings.OnlyEnterOnExact;
-			checkbox.SetLocalizedTooltip = () => strings.OnlyEnterOnExact_Tooltip;
-			checkbox.CheckedChangedAction = delegate(bool b)
+			Kenedia.Modules.Core.Controls.Panel p = new Kenedia.Modules.Core.Controls.Panel
 			{
-				_settings.OnlyEnterOnExact.set_Value(b);
+				Parent = _contentPanel,
+				Width = base.ContentRegion.Width - 20,
+				HeightSizingMode = SizingMode.AutoSize,
+				ShowBorder = true,
+				CanCollapse = true,
+				SetLocalizedTitle = () => strings.ModuleBehavior,
+				SetLocalizedTitleTooltip = () => strings.ModuleBehavior_Tooltip,
+				TitleIcon = AsyncTexture2D.FromAssetId(60968)
 			};
-			Checkbox checkbox2 = new Checkbox();
-			((Control)checkbox2).set_Parent((Container)(object)cP);
-			((Checkbox)checkbox2).set_Checked(_settings.EnterOnSwap.get_Value());
-			checkbox2.SetLocalizedText = () => strings.EnterOnSwap;
-			checkbox2.SetLocalizedTooltip = () => strings.EnterOnSwap_Tooltip;
-			checkbox2.CheckedChangedAction = delegate(bool b)
+			Kenedia.Modules.Core.Controls.FlowPanel cP = new Kenedia.Modules.Core.Controls.FlowPanel
 			{
-				_settings.EnterOnSwap.set_Value(b);
+				Parent = p,
+				Location = new Point(5, 5),
+				HeightSizingMode = SizingMode.AutoSize,
+				WidthSizingMode = SizingMode.Fill,
+				FlowDirection = ControlFlowDirection.SingleTopToBottom,
+				ControlPadding = new Vector2(3f, 3f)
 			};
-			Checkbox checkbox3 = new Checkbox();
-			((Control)checkbox3).set_Parent((Container)(object)cP);
-			((Checkbox)checkbox3).set_Checked(_settings.OpenInventoryOnEnter.get_Value());
-			checkbox3.SetLocalizedText = () => strings.OpenInventoryOnEnter;
-			checkbox3.SetLocalizedTooltip = () => strings.OpenInventoryOnEnter_Tooltip;
-			checkbox3.CheckedChangedAction = delegate(bool b)
+			new Kenedia.Modules.Core.Controls.Checkbox
 			{
-				_settings.OpenInventoryOnEnter.set_Value(b);
+				Parent = cP,
+				Checked = _settings.OnlyEnterOnExact.Value,
+				SetLocalizedText = () => strings.OnlyEnterOnExact,
+				SetLocalizedTooltip = () => strings.OnlyEnterOnExact_Tooltip,
+				CheckedChangedAction = delegate(bool b)
+				{
+					_settings.OnlyEnterOnExact.Value = b;
+				}
 			};
-			Checkbox checkbox4 = new Checkbox();
-			((Control)checkbox4).set_Parent((Container)(object)cP);
-			((Checkbox)checkbox4).set_Checked(_settings.CloseWindowOnSwap.get_Value());
-			checkbox4.SetLocalizedText = () => strings.CloseWindowOnSwap;
-			checkbox4.SetLocalizedTooltip = () => strings.CloseWindowOnSwap_Tooltip;
-			checkbox4.CheckedChangedAction = delegate(bool b)
+			new Kenedia.Modules.Core.Controls.Checkbox
 			{
-				_settings.CloseWindowOnSwap.set_Value(b);
+				Parent = cP,
+				Checked = _settings.EnterOnSwap.Value,
+				SetLocalizedText = () => strings.EnterOnSwap,
+				SetLocalizedTooltip = () => strings.EnterOnSwap_Tooltip,
+				CheckedChangedAction = delegate(bool b)
+				{
+					_settings.EnterOnSwap.Value = b;
+				}
 			};
-			Checkbox checkbox5 = new Checkbox();
-			((Control)checkbox5).set_Parent((Container)(object)cP);
-			((Checkbox)checkbox5).set_Checked(_settings.DoubleClickToEnter.get_Value());
-			checkbox5.SetLocalizedText = () => strings.DoubleClickToEnter;
-			checkbox5.SetLocalizedTooltip = () => strings.DoubleClickToEnter_Tooltip;
-			checkbox5.CheckedChangedAction = delegate(bool b)
+			new Kenedia.Modules.Core.Controls.Checkbox
 			{
-				_settings.DoubleClickToEnter.set_Value(b);
+				Parent = cP,
+				Checked = _settings.OpenInventoryOnEnter.Value,
+				SetLocalizedText = () => strings.OpenInventoryOnEnter,
+				SetLocalizedTooltip = () => strings.OpenInventoryOnEnter_Tooltip,
+				CheckedChangedAction = delegate(bool b)
+				{
+					_settings.OpenInventoryOnEnter.Value = b;
+				}
 			};
-			Checkbox checkbox6 = new Checkbox();
-			((Control)checkbox6).set_Parent((Container)(object)cP);
-			((Checkbox)checkbox6).set_Checked(_settings.EnterToLogin.get_Value());
-			checkbox6.SetLocalizedText = () => strings.EnterToLogin;
-			checkbox6.SetLocalizedTooltip = () => strings.EnterToLogin_Tooltip;
-			checkbox6.CheckedChangedAction = delegate(bool b)
+			new Kenedia.Modules.Core.Controls.Checkbox
 			{
-				_settings.EnterToLogin.set_Value(b);
+				Parent = cP,
+				Checked = _settings.CloseWindowOnSwap.Value,
+				SetLocalizedText = () => strings.CloseWindowOnSwap,
+				SetLocalizedTooltip = () => strings.CloseWindowOnSwap_Tooltip,
+				CheckedChangedAction = delegate(bool b)
+				{
+					_settings.CloseWindowOnSwap.Value = b;
+				}
 			};
-			Checkbox checkbox7 = new Checkbox();
-			((Control)checkbox7).set_Parent((Container)(object)cP);
-			((Checkbox)checkbox7).set_Checked(_settings.AutoSortCharacters.get_Value());
-			checkbox7.SetLocalizedText = () => strings.AutoFix;
-			checkbox7.SetLocalizedTooltip = () => strings.AutoFix_Tooltip;
-			checkbox7.CheckedChangedAction = delegate(bool b)
+			new Kenedia.Modules.Core.Controls.Checkbox
 			{
-				_settings.AutoSortCharacters.set_Value(b);
+				Parent = cP,
+				Checked = _settings.DoubleClickToEnter.Value,
+				SetLocalizedText = () => strings.DoubleClickToEnter,
+				SetLocalizedTooltip = () => strings.DoubleClickToEnter_Tooltip,
+				CheckedChangedAction = delegate(bool b)
+				{
+					_settings.DoubleClickToEnter.Value = b;
+				}
 			};
-			Checkbox checkbox8 = new Checkbox();
-			((Control)checkbox8).set_Parent((Container)(object)cP);
-			((Checkbox)checkbox8).set_Checked(_settings.FilterDiacriticsInsensitive.get_Value());
-			checkbox8.SetLocalizedText = () => strings.FilterDiacriticsInsensitive;
-			checkbox8.SetLocalizedTooltip = () => strings.FilterDiacriticsInsensitive_Tooltip;
-			checkbox8.CheckedChangedAction = delegate(bool b)
+			new Kenedia.Modules.Core.Controls.Checkbox
 			{
-				_settings.FilterDiacriticsInsensitive.set_Value(b);
+				Parent = cP,
+				Checked = _settings.EnterToLogin.Value,
+				SetLocalizedText = () => strings.EnterToLogin,
+				SetLocalizedTooltip = () => strings.EnterToLogin_Tooltip,
+				CheckedChangedAction = delegate(bool b)
+				{
+					_settings.EnterToLogin.Value = b;
+				}
 			};
-			Checkbox checkbox9 = new Checkbox();
-			((Control)checkbox9).set_Parent((Container)(object)cP);
-			((Checkbox)checkbox9).set_Checked(_settings.AutomaticCharacterDelete.get_Value());
-			checkbox9.SetLocalizedText = () => strings.AutomaticCharacterDelete;
-			checkbox9.SetLocalizedTooltip = () => strings.AutomaticCharacterDelete_Tooltip;
-			checkbox9.CheckedChangedAction = delegate(bool b)
+			new Kenedia.Modules.Core.Controls.Checkbox
 			{
-				_settings.AutomaticCharacterDelete.set_Value(b);
+				Parent = cP,
+				Checked = _settings.AutoSortCharacters.Value,
+				SetLocalizedText = () => strings.AutoFix,
+				SetLocalizedTooltip = () => strings.AutoFix_Tooltip,
+				CheckedChangedAction = delegate(bool b)
+				{
+					_settings.AutoSortCharacters.Value = b;
+				}
 			};
-			Checkbox checkbox10 = new Checkbox();
-			((Control)checkbox10).set_Parent((Container)(object)cP);
-			((Checkbox)checkbox10).set_Checked(_settings.CancelOnlyOnESC.get_Value());
-			checkbox10.SetLocalizedText = () => strings.CancelOnlyOnESC;
-			checkbox10.SetLocalizedTooltip = () => strings.CancelOnlyOnESC_Tooltip;
-			checkbox10.CheckedChangedAction = delegate(bool b)
+			new Kenedia.Modules.Core.Controls.Checkbox
 			{
-				_settings.CancelOnlyOnESC.set_Value(b);
+				Parent = cP,
+				Checked = _settings.FilterDiacriticsInsensitive.Value,
+				SetLocalizedText = () => strings.FilterDiacriticsInsensitive,
+				SetLocalizedTooltip = () => strings.FilterDiacriticsInsensitive_Tooltip,
+				CheckedChangedAction = delegate(bool b)
+				{
+					_settings.FilterDiacriticsInsensitive.Value = b;
+				}
 			};
-			Checkbox checkbox11 = new Checkbox();
-			((Control)checkbox11).set_Parent((Container)(object)cP);
-			((Checkbox)checkbox11).set_Checked(_settings.FilterAsOne.get_Value());
-			checkbox11.SetLocalizedText = () => strings.FilterAsOne;
-			checkbox11.SetLocalizedTooltip = () => strings.FilterAsOne_Tooltip;
-			checkbox11.CheckedChangedAction = delegate(bool b)
+			new Kenedia.Modules.Core.Controls.Checkbox
 			{
-				_settings.FilterAsOne.set_Value(b);
+				Parent = cP,
+				Checked = _settings.AutomaticCharacterDelete.Value,
+				SetLocalizedText = () => strings.AutomaticCharacterDelete,
+				SetLocalizedTooltip = () => strings.AutomaticCharacterDelete_Tooltip,
+				CheckedChangedAction = delegate(bool b)
+				{
+					_settings.AutomaticCharacterDelete.Value = b;
+				}
 			};
-			Panel panel2 = new Panel();
-			((Control)panel2).set_Parent((Container)(object)cP);
-			((Container)panel2).set_WidthSizingMode((SizingMode)2);
-			((Container)panel2).set_HeightSizingMode((SizingMode)1);
-			Panel subP = panel2;
-			Label label = new Label();
-			((Control)label).set_Parent((Container)(object)subP);
-			((Label)label).set_AutoSizeWidth(true);
-			((Control)label).set_Height(20);
-			label.SetLocalizedText = () => string.Format(strings.CheckDistance, _settings.CheckDistance.get_Value());
-			label.SetLocalizedTooltip = () => strings.CheckDistance_Tooltip;
-			Label checkDistanceLabel = label;
-			TrackBar trackBar = new TrackBar();
-			((Control)trackBar).set_Location(new Point(225, 2));
-			((Control)trackBar).set_Parent((Container)(object)subP);
-			((TrackBar)trackBar).set_MinValue(0f);
-			((TrackBar)trackBar).set_MaxValue(72f);
-			((TrackBar)trackBar).set_Value((float)_settings.CheckDistance.get_Value());
-			((Control)trackBar).set_Width(((Container)this).get_ContentRegion().Width - 35 - 225);
-			trackBar.SetLocalizedTooltip = () => strings.CheckDistance_Tooltip;
-			trackBar.ValueChangedAction = delegate(int num)
+			new Kenedia.Modules.Core.Controls.Checkbox
 			{
-				_settings.CheckDistance.set_Value(num);
-				checkDistanceLabel.UserLocale_SettingChanged(null, null);
+				Parent = cP,
+				Checked = _settings.CancelOnlyOnESC.Value,
+				SetLocalizedText = () => strings.CancelOnlyOnESC,
+				SetLocalizedTooltip = () => strings.CancelOnlyOnESC_Tooltip,
+				CheckedChangedAction = delegate(bool b)
+				{
+					_settings.CancelOnlyOnESC.Value = b;
+				}
+			};
+			new Kenedia.Modules.Core.Controls.Checkbox
+			{
+				Parent = cP,
+				Checked = _settings.FilterAsOne.Value,
+				SetLocalizedText = () => strings.FilterAsOne,
+				SetLocalizedTooltip = () => strings.FilterAsOne_Tooltip,
+				CheckedChangedAction = delegate(bool b)
+				{
+					_settings.FilterAsOne.Value = b;
+				}
+			};
+			Kenedia.Modules.Core.Controls.Panel subP = new Kenedia.Modules.Core.Controls.Panel
+			{
+				Parent = cP,
+				WidthSizingMode = SizingMode.Fill,
+				HeightSizingMode = SizingMode.AutoSize
+			};
+			Kenedia.Modules.Core.Controls.Label checkDistanceLabel = new Kenedia.Modules.Core.Controls.Label
+			{
+				Parent = subP,
+				AutoSizeWidth = true,
+				Height = 20,
+				SetLocalizedText = () => string.Format(strings.CheckDistance, _settings.CheckDistance.Value),
+				SetLocalizedTooltip = () => strings.CheckDistance_Tooltip
+			};
+			new Kenedia.Modules.Core.Controls.TrackBar
+			{
+				Location = new Point(225, 2),
+				Parent = subP,
+				MinValue = 0f,
+				MaxValue = 72f,
+				Value = _settings.CheckDistance.Value,
+				Width = base.ContentRegion.Width - 35 - 225,
+				SetLocalizedTooltip = () => strings.CheckDistance_Tooltip,
+				ValueChangedAction = delegate(int num)
+				{
+					_settings.CheckDistance.Value = num;
+					checkDistanceLabel.UserLocale_SettingChanged(null, null);
+				}
 			};
 		}
 
@@ -716,201 +772,235 @@ namespace Kenedia.Modules.Characters.Views
 			//IL_0686: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0753: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0775: Unknown result type (might be due to invalid IL or missing references)
-			Panel panel = new Panel();
-			((Control)panel).set_Parent((Container)(object)_contentPanel);
-			((Control)panel).set_Width(((Container)this).get_ContentRegion().Width - 20);
-			((Container)panel).set_HeightSizingMode((SizingMode)1);
-			((Panel)panel).set_ShowBorder(true);
-			((Panel)panel).set_CanCollapse(true);
-			panel.TitleIcon = AsyncTexture2D.FromAssetId(156740);
-			panel.SetLocalizedTitle = () => strings.Appearance;
-			Panel p = panel;
-			FlowPanel flowPanel = new FlowPanel();
-			((Control)flowPanel).set_Parent((Container)(object)p);
-			((Control)flowPanel).set_Location(new Point(5, 5));
-			((Container)flowPanel).set_HeightSizingMode((SizingMode)1);
-			((Container)flowPanel).set_WidthSizingMode((SizingMode)2);
-			((FlowPanel)flowPanel).set_FlowDirection((ControlFlowDirection)3);
-			((FlowPanel)flowPanel).set_ControlPadding(new Vector2(3f, 3f));
-			FlowPanel cP = flowPanel;
-			Checkbox checkbox = new Checkbox();
-			((Control)checkbox).set_Parent((Container)(object)cP);
-			((Checkbox)checkbox).set_Checked(_settings.ShowCornerIcon.get_Value());
-			checkbox.SetLocalizedText = () => strings.ShowCorner_Name;
-			checkbox.SetLocalizedTooltip = () => string.Format(strings.ShowCorner_Tooltip, BaseModule<Characters, MainWindow, Settings, PathCollection>.ModuleName);
-			checkbox.CheckedChangedAction = delegate(bool b)
+			Kenedia.Modules.Core.Controls.Panel p = new Kenedia.Modules.Core.Controls.Panel
 			{
-				_settings.ShowCornerIcon.set_Value(b);
+				Parent = _contentPanel,
+				Width = base.ContentRegion.Width - 20,
+				HeightSizingMode = SizingMode.AutoSize,
+				ShowBorder = true,
+				CanCollapse = true,
+				TitleIcon = AsyncTexture2D.FromAssetId(156740),
+				SetLocalizedTitle = () => strings.Appearance
 			};
-			Checkbox checkbox2 = new Checkbox();
-			((Control)checkbox2).set_Parent((Container)(object)cP);
-			((Checkbox)checkbox2).set_Checked(_settings.ShowRandomButton.get_Value());
-			checkbox2.SetLocalizedText = () => strings.ShowRandomButton_Name;
-			checkbox2.SetLocalizedTooltip = () => strings.ShowRandomButton_Tooltip;
-			checkbox2.CheckedChangedAction = delegate(bool b)
+			Kenedia.Modules.Core.Controls.FlowPanel cP = new Kenedia.Modules.Core.Controls.FlowPanel
 			{
-				_settings.ShowRandomButton.set_Value(b);
+				Parent = p,
+				Location = new Point(5, 5),
+				HeightSizingMode = SizingMode.AutoSize,
+				WidthSizingMode = SizingMode.Fill,
+				FlowDirection = ControlFlowDirection.SingleTopToBottom,
+				ControlPadding = new Vector2(3f, 3f)
 			};
-			Checkbox checkbox3 = new Checkbox();
-			((Control)checkbox3).set_Parent((Container)(object)cP);
-			((Checkbox)checkbox3).set_Checked(_settings.ShowLastButton.get_Value());
-			checkbox3.SetLocalizedText = () => strings.ShowLastButton;
-			checkbox3.SetLocalizedTooltip = () => strings.ShowLastButton_Tooltip;
-			checkbox3.CheckedChangedAction = delegate(bool b)
+			new Kenedia.Modules.Core.Controls.Checkbox
 			{
-				_settings.ShowLastButton.set_Value(b);
+				Parent = cP,
+				Checked = _settings.ShowCornerIcon.Value,
+				SetLocalizedText = () => strings.ShowCorner_Name,
+				SetLocalizedTooltip = () => string.Format(strings.ShowCorner_Tooltip, BaseModule<Characters, MainWindow, Settings, PathCollection>.ModuleName),
+				CheckedChangedAction = delegate(bool b)
+				{
+					_settings.ShowCornerIcon.Value = b;
+				}
 			};
-			Checkbox checkbox4 = new Checkbox();
-			((Control)checkbox4).set_Parent((Container)(object)cP);
-			((Checkbox)checkbox4).set_Checked(_settings.ShowDetailedTooltip.get_Value());
-			checkbox4.SetLocalizedText = () => string.Format(strings.ShowItem, strings.DetailedTooltip);
-			checkbox4.SetLocalizedTooltip = () => strings.DetailedTooltip_Tooltip;
-			checkbox4.CheckedChangedAction = delegate(bool b)
+			new Kenedia.Modules.Core.Controls.Checkbox
 			{
-				_settings.ShowDetailedTooltip.set_Value(b);
+				Parent = cP,
+				Checked = _settings.ShowRandomButton.Value,
+				SetLocalizedText = () => strings.ShowRandomButton_Name,
+				SetLocalizedTooltip = () => strings.ShowRandomButton_Tooltip,
+				CheckedChangedAction = delegate(bool b)
+				{
+					_settings.ShowRandomButton.Value = b;
+				}
 			};
-			Panel panel2 = new Panel();
-			((Control)panel2).set_Parent((Container)(object)cP);
-			((Container)panel2).set_WidthSizingMode((SizingMode)2);
-			((Control)panel2).set_Height(30);
-			Panel subP = panel2;
-			Label label = new Label();
-			((Control)label).set_Parent((Container)(object)subP);
-			((Label)label).set_AutoSizeWidth(true);
-			((Control)label).set_Height(30);
-			label.SetLocalizedText = () => strings.CharacterDisplaySize;
-			Dropdown dropdown = new Dropdown();
-			((Control)dropdown).set_Location(new Point(250, 0));
-			((Control)dropdown).set_Parent((Container)(object)subP);
-			dropdown.SetLocalizedItems = () => new List<string>
+			new Kenedia.Modules.Core.Controls.Checkbox
 			{
-				strings.Small,
-				strings.Normal,
-				strings.Large,
-				strings.Custom
+				Parent = cP,
+				Checked = _settings.ShowLastButton.Value,
+				SetLocalizedText = () => strings.ShowLastButton,
+				SetLocalizedTooltip = () => strings.ShowLastButton_Tooltip,
+				CheckedChangedAction = delegate(bool b)
+				{
+					_settings.ShowLastButton.Value = b;
+				}
 			};
-			((Dropdown)dropdown).set_SelectedItem(_settings.PanelSize.get_Value().GetPanelSize());
-			dropdown.ValueChangedAction = delegate(string b)
+			new Kenedia.Modules.Core.Controls.Checkbox
 			{
-				_settings.PanelSize.set_Value(b.GetPanelSize());
+				Parent = cP,
+				Checked = _settings.ShowDetailedTooltip.Value,
+				SetLocalizedText = () => string.Format(strings.ShowItem, strings.DetailedTooltip),
+				SetLocalizedTooltip = () => strings.DetailedTooltip_Tooltip,
+				CheckedChangedAction = delegate(bool b)
+				{
+					_settings.ShowDetailedTooltip.Value = b;
+				}
 			};
-			Panel panel3 = new Panel();
-			((Control)panel3).set_Parent((Container)(object)cP);
-			((Container)panel3).set_WidthSizingMode((SizingMode)2);
-			((Control)panel3).set_Height(30);
-			subP = panel3;
-			Label label2 = new Label();
-			((Control)label2).set_Parent((Container)(object)subP);
-			((Label)label2).set_AutoSizeWidth(true);
-			((Control)label2).set_Height(30);
-			label2.SetLocalizedText = () => strings.CharacterDisplayOption;
-			Dropdown dropdown2 = new Dropdown();
-			((Control)dropdown2).set_Parent((Container)(object)subP);
-			((Control)dropdown2).set_Location(new Point(250, 0));
-			dropdown2.SetLocalizedItems = () => new List<string>
+			Kenedia.Modules.Core.Controls.Panel subP = new Kenedia.Modules.Core.Controls.Panel
 			{
-				strings.OnlyText,
-				strings.OnlyIcons,
-				strings.TextAndIcon
+				Parent = cP,
+				WidthSizingMode = SizingMode.Fill,
+				Height = 30
 			};
-			((Dropdown)dropdown2).set_SelectedItem(_settings.PanelLayout.get_Value().GetPanelLayout());
-			dropdown2.ValueChangedAction = delegate(string b)
+			new Kenedia.Modules.Core.Controls.Label
 			{
-				_settings.PanelLayout.set_Value(b.GetPanelLayout());
+				Parent = subP,
+				AutoSizeWidth = true,
+				Height = 30,
+				SetLocalizedText = () => strings.CharacterDisplaySize
 			};
-			Panel panel4 = new Panel();
-			((Control)panel4).set_Parent((Container)(object)cP);
-			((Container)panel4).set_WidthSizingMode((SizingMode)2);
-			((Control)panel4).set_Height(30);
-			subP = panel4;
-			Label label3 = new Label();
-			((Control)label3).set_Parent((Container)(object)subP);
-			((Label)label3).set_AutoSizeWidth(true);
-			label3.SetLocalizedText = () => string.Format(strings.FontSize, _settings.CustomCharacterFontSize.get_Value());
-			_customFontSizeLabel = label3;
-			Dropdown dropdown3 = new Dropdown();
-			((Control)dropdown3).set_Parent((Container)(object)subP);
-			((Control)dropdown3).set_Location(new Point(250, 0));
-			((Dropdown)dropdown3).set_SelectedItem(_settings.CustomCharacterFontSize.get_Value().ToString());
-			dropdown3.ValueChangedAction = delegate(string str)
+			new Kenedia.Modules.Core.Controls.Dropdown
 			{
-				GetFontSize(_settings.CustomCharacterFontSize, str);
-				_customFontSizeLabel.UserLocale_SettingChanged(null, null);
+				Location = new Point(250, 0),
+				Parent = subP,
+				SetLocalizedItems = () => new List<string>
+				{
+					strings.Small,
+					strings.Normal,
+					strings.Large,
+					strings.Custom
+				},
+				SelectedItem = _settings.PanelSize.Value.GetPanelSize(),
+				ValueChangedAction = delegate(string b)
+				{
+					_settings.PanelSize.Value = b.GetPanelSize();
+				}
 			};
-			_customFontSize = dropdown3;
-			Panel panel5 = new Panel();
-			((Control)panel5).set_Parent((Container)(object)cP);
-			((Container)panel5).set_WidthSizingMode((SizingMode)2);
-			((Control)panel5).set_Height(30);
-			subP = panel5;
-			Label label4 = new Label();
-			((Control)label4).set_Parent((Container)(object)subP);
-			((Label)label4).set_AutoSizeWidth(true);
-			label4.SetLocalizedText = () => string.Format(strings.NameFontSize, _settings.CustomCharacterNameFontSize.get_Value());
-			_customNameFontSizeLabel = label4;
-			Dropdown dropdown4 = new Dropdown();
-			((Control)dropdown4).set_Parent((Container)(object)subP);
-			((Control)dropdown4).set_Location(new Point(250, 0));
-			((Dropdown)dropdown4).set_SelectedItem(_settings.CustomCharacterNameFontSize.get_Value().ToString());
-			dropdown4.ValueChangedAction = delegate(string str)
+			subP = new Kenedia.Modules.Core.Controls.Panel
 			{
-				GetFontSize(_settings.CustomCharacterNameFontSize, str);
-				_customNameFontSizeLabel.UserLocale_SettingChanged(null, null);
+				Parent = cP,
+				WidthSizingMode = SizingMode.Fill,
+				Height = 30
 			};
-			_customNameFontSize = dropdown4;
-			foreach (object i in Enum.GetValues(typeof(FontSize)))
+			new Kenedia.Modules.Core.Controls.Label
 			{
-				((Dropdown)_customFontSize).get_Items().Add($"{(int)i}");
-				((Dropdown)_customNameFontSize).get_Items().Add($"{(int)i}");
+				Parent = subP,
+				AutoSizeWidth = true,
+				Height = 30,
+				SetLocalizedText = () => strings.CharacterDisplayOption
+			};
+			new Kenedia.Modules.Core.Controls.Dropdown
+			{
+				Parent = subP,
+				Location = new Point(250, 0),
+				SetLocalizedItems = () => new List<string>
+				{
+					strings.OnlyText,
+					strings.OnlyIcons,
+					strings.TextAndIcon
+				},
+				SelectedItem = _settings.PanelLayout.Value.GetPanelLayout(),
+				ValueChangedAction = delegate(string b)
+				{
+					_settings.PanelLayout.Value = b.GetPanelLayout();
+				}
+			};
+			subP = new Kenedia.Modules.Core.Controls.Panel
+			{
+				Parent = cP,
+				WidthSizingMode = SizingMode.Fill,
+				Height = 30
+			};
+			_customFontSizeLabel = new Kenedia.Modules.Core.Controls.Label
+			{
+				Parent = subP,
+				AutoSizeWidth = true,
+				SetLocalizedText = () => string.Format(strings.FontSize, _settings.CustomCharacterFontSize.Value)
+			};
+			_customFontSize = new Kenedia.Modules.Core.Controls.Dropdown
+			{
+				Parent = subP,
+				Location = new Point(250, 0),
+				SelectedItem = _settings.CustomCharacterFontSize.Value.ToString(),
+				ValueChangedAction = delegate(string str)
+				{
+					GetFontSize(_settings.CustomCharacterFontSize, str);
+					_customFontSizeLabel.UserLocale_SettingChanged(null, null);
+				}
+			};
+			subP = new Kenedia.Modules.Core.Controls.Panel
+			{
+				Parent = cP,
+				WidthSizingMode = SizingMode.Fill,
+				Height = 30
+			};
+			_customNameFontSizeLabel = new Kenedia.Modules.Core.Controls.Label
+			{
+				Parent = subP,
+				AutoSizeWidth = true,
+				SetLocalizedText = () => string.Format(strings.NameFontSize, _settings.CustomCharacterNameFontSize.Value)
+			};
+			_customNameFontSize = new Kenedia.Modules.Core.Controls.Dropdown
+			{
+				Parent = subP,
+				Location = new Point(250, 0),
+				SelectedItem = _settings.CustomCharacterNameFontSize.Value.ToString(),
+				ValueChangedAction = delegate(string str)
+				{
+					GetFontSize(_settings.CustomCharacterNameFontSize, str);
+					_customNameFontSizeLabel.UserLocale_SettingChanged(null, null);
+				}
+			};
+			foreach (object i in Enum.GetValues(typeof(ContentService.FontSize)))
+			{
+				_customFontSize.Items.Add($"{(int)i}");
+				_customNameFontSize.Items.Add($"{(int)i}");
 			}
-			Panel panel6 = new Panel();
-			((Control)panel6).set_Parent((Container)(object)cP);
-			((Container)panel6).set_WidthSizingMode((SizingMode)2);
-			((Control)panel6).set_Height(30);
-			subP = panel6;
-			Label label5 = new Label();
-			((Control)label5).set_Parent((Container)(object)subP);
-			((Label)label5).set_AutoSizeWidth(true);
-			label5.SetLocalizedText = () => string.Format(strings.IconSize, _settings.CustomCharacterIconSize.get_Value());
-			Label iconSizeLabel = label5;
-			TrackBar trackBar = new TrackBar();
-			((Control)trackBar).set_Parent((Container)(object)subP);
-			((Control)trackBar).set_Location(new Point(250, 0));
-			((TrackBar)trackBar).set_MinValue(8f);
-			((TrackBar)trackBar).set_MaxValue(256f);
-			((Control)trackBar).set_Width(((Container)this).get_ContentRegion().Width - 35 - 250);
-			((TrackBar)trackBar).set_Value((float)_settings.CustomCharacterIconSize.get_Value());
-			trackBar.ValueChangedAction = delegate(int num)
+			subP = new Kenedia.Modules.Core.Controls.Panel
 			{
-				_settings.CustomCharacterIconSize.set_Value(num);
-				iconSizeLabel.UserLocale_SettingChanged(num, null);
+				Parent = cP,
+				WidthSizingMode = SizingMode.Fill,
+				Height = 30
 			};
-			Panel panel7 = new Panel();
-			((Control)panel7).set_Parent((Container)(object)cP);
-			((Container)panel7).set_WidthSizingMode((SizingMode)2);
-			((Control)panel7).set_Height(30);
-			subP = panel7;
-			Checkbox checkbox5 = new Checkbox();
-			((Control)checkbox5).set_Parent((Container)(object)subP);
-			((Checkbox)checkbox5).set_Checked(_settings.CharacterPanelFixedWidth.get_Value());
-			checkbox5.CheckedChangedAction = delegate(bool b)
+			Kenedia.Modules.Core.Controls.Label iconSizeLabel = new Kenedia.Modules.Core.Controls.Label
 			{
-				_settings.CharacterPanelFixedWidth.set_Value(b);
+				Parent = subP,
+				AutoSizeWidth = true,
+				SetLocalizedText = () => string.Format(strings.IconSize, _settings.CustomCharacterIconSize.Value)
 			};
-			checkbox5.SetLocalizedText = () => string.Format(strings.CardWith, _settings.CharacterPanelWidth.get_Value());
-			checkbox5.SetLocalizedTooltip = () => string.Format(strings.CardWidth_Tooltip, _settings.CharacterPanelWidth.get_Value());
-			Checkbox cardWidthCheckbox = checkbox5;
-			TrackBar trackBar2 = new TrackBar();
-			((Control)trackBar2).set_Parent((Container)(object)subP);
-			((Control)trackBar2).set_Location(new Point(250, 0));
-			((TrackBar)trackBar2).set_MinValue(25f);
-			((TrackBar)trackBar2).set_MaxValue(750f);
-			((Control)trackBar2).set_Width(((Container)this).get_ContentRegion().Width - 35 - 250);
-			((TrackBar)trackBar2).set_Value((float)_settings.CharacterPanelWidth.get_Value());
-			trackBar2.ValueChangedAction = delegate(int num)
+			new Kenedia.Modules.Core.Controls.TrackBar
 			{
-				_settings.CharacterPanelWidth.set_Value(num);
-				cardWidthCheckbox.UserLocale_SettingChanged(null, null);
+				Parent = subP,
+				Location = new Point(250, 0),
+				MinValue = 8f,
+				MaxValue = 256f,
+				Width = base.ContentRegion.Width - 35 - 250,
+				Value = _settings.CustomCharacterIconSize.Value,
+				ValueChangedAction = delegate(int num)
+				{
+					_settings.CustomCharacterIconSize.Value = num;
+					iconSizeLabel.UserLocale_SettingChanged(num, null);
+				}
+			};
+			subP = new Kenedia.Modules.Core.Controls.Panel
+			{
+				Parent = cP,
+				WidthSizingMode = SizingMode.Fill,
+				Height = 30
+			};
+			Kenedia.Modules.Core.Controls.Checkbox cardWidthCheckbox = new Kenedia.Modules.Core.Controls.Checkbox
+			{
+				Parent = subP,
+				Checked = _settings.CharacterPanelFixedWidth.Value,
+				CheckedChangedAction = delegate(bool b)
+				{
+					_settings.CharacterPanelFixedWidth.Value = b;
+				},
+				SetLocalizedText = () => string.Format(strings.CardWith, _settings.CharacterPanelWidth.Value),
+				SetLocalizedTooltip = () => string.Format(strings.CardWidth_Tooltip, _settings.CharacterPanelWidth.Value)
+			};
+			new Kenedia.Modules.Core.Controls.TrackBar
+			{
+				Parent = subP,
+				Location = new Point(250, 0),
+				MinValue = 25f,
+				MaxValue = 750f,
+				Width = base.ContentRegion.Width - 35 - 250,
+				Value = _settings.CharacterPanelWidth.Value,
+				ValueChangedAction = delegate(int num)
+				{
+					_settings.CharacterPanelWidth.Value = num;
+					cardWidthCheckbox.UserLocale_SettingChanged(null, null);
+				}
 			};
 		}
 
@@ -925,94 +1015,108 @@ namespace Kenedia.Modules.Characters.Views
 			//IL_0267: Unknown result type (might be due to invalid IL or missing references)
 			//IL_030f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_034f: Unknown result type (might be due to invalid IL or missing references)
-			Panel panel = new Panel();
-			((Control)panel).set_Parent((Container)(object)_contentPanel);
-			((Control)panel).set_Width(((Container)this).get_ContentRegion().Width - 20);
-			((Container)panel).set_HeightSizingMode((SizingMode)1);
-			((Panel)panel).set_ShowBorder(true);
-			((Panel)panel).set_CanCollapse(true);
-			panel.SetLocalizedTitle = () => strings.Delays;
-			panel.TitleIcon = AsyncTexture2D.FromAssetId(155035);
-			Panel p = panel;
-			FlowPanel flowPanel = new FlowPanel();
-			((Control)flowPanel).set_Parent((Container)(object)p);
-			((Control)flowPanel).set_Location(new Point(5));
-			((Container)flowPanel).set_HeightSizingMode((SizingMode)1);
-			((Container)flowPanel).set_WidthSizingMode((SizingMode)2);
-			((FlowPanel)flowPanel).set_FlowDirection((ControlFlowDirection)3);
-			((FlowPanel)flowPanel).set_ControlPadding(new Vector2(3f, 3f));
-			FlowPanel cP = flowPanel;
-			Panel panel2 = new Panel();
-			((Control)panel2).set_Parent((Container)(object)cP);
-			((Container)panel2).set_WidthSizingMode((SizingMode)2);
-			((Container)panel2).set_HeightSizingMode((SizingMode)1);
-			Panel subP = panel2;
-			Label label = new Label();
-			((Control)label).set_Parent((Container)(object)subP);
-			((Label)label).set_AutoSizeWidth(true);
-			((Control)label).set_Height(20);
-			label.SetLocalizedText = () => string.Format(strings.KeyDelay, _settings.KeyDelay.get_Value());
-			label.SetLocalizedTooltip = () => strings.KeyDelay_Tooltip;
-			Label keyDelayLabel = label;
-			TrackBar trackBar = new TrackBar();
-			((Control)trackBar).set_Location(new Point(225, 2));
-			((Control)trackBar).set_Parent((Container)(object)subP);
-			((TrackBar)trackBar).set_MinValue(0f);
-			((TrackBar)trackBar).set_MaxValue(500f);
-			((TrackBar)trackBar).set_Value((float)_settings.KeyDelay.get_Value());
-			((Control)trackBar).set_Width(((Container)this).get_ContentRegion().Width - 35 - 225);
-			trackBar.ValueChangedAction = delegate(int num)
+			Kenedia.Modules.Core.Controls.Panel p = new Kenedia.Modules.Core.Controls.Panel
 			{
-				_settings.KeyDelay.set_Value(num);
-				keyDelayLabel.UserLocale_SettingChanged(null, null);
+				Parent = _contentPanel,
+				Width = base.ContentRegion.Width - 20,
+				HeightSizingMode = SizingMode.AutoSize,
+				ShowBorder = true,
+				CanCollapse = true,
+				SetLocalizedTitle = () => strings.Delays,
+				TitleIcon = AsyncTexture2D.FromAssetId(155035)
 			};
-			Panel panel3 = new Panel();
-			((Control)panel3).set_Parent((Container)(object)cP);
-			((Container)panel3).set_WidthSizingMode((SizingMode)2);
-			((Container)panel3).set_HeightSizingMode((SizingMode)1);
-			subP = panel3;
-			Label label2 = new Label();
-			((Control)label2).set_Parent((Container)(object)subP);
-			((Label)label2).set_AutoSizeWidth(true);
-			((Control)label2).set_Height(20);
-			label2.SetLocalizedText = () => string.Format(strings.FilterDelay, _settings.FilterDelay.get_Value());
-			label2.SetLocalizedTooltip = () => strings.FilterDelay_Tooltip;
-			Label filterDelayLabel = label2;
-			TrackBar trackBar2 = new TrackBar();
-			((Control)trackBar2).set_Location(new Point(225, 2));
-			((Control)trackBar2).set_Parent((Container)(object)subP);
-			((TrackBar)trackBar2).set_MinValue(0f);
-			((TrackBar)trackBar2).set_MaxValue(500f);
-			((TrackBar)trackBar2).set_Value((float)_settings.FilterDelay.get_Value());
-			((Control)trackBar2).set_Width(((Container)this).get_ContentRegion().Width - 35 - 225);
-			trackBar2.ValueChangedAction = delegate(int num)
+			Kenedia.Modules.Core.Controls.FlowPanel cP = new Kenedia.Modules.Core.Controls.FlowPanel
 			{
-				_settings.FilterDelay.set_Value(num);
-				filterDelayLabel.UserLocale_SettingChanged(num, null);
+				Parent = p,
+				Location = new Point(5),
+				HeightSizingMode = SizingMode.AutoSize,
+				WidthSizingMode = SizingMode.Fill,
+				FlowDirection = ControlFlowDirection.SingleTopToBottom,
+				ControlPadding = new Vector2(3f, 3f)
 			};
-			Panel panel4 = new Panel();
-			((Control)panel4).set_Parent((Container)(object)cP);
-			((Container)panel4).set_WidthSizingMode((SizingMode)2);
-			((Container)panel4).set_HeightSizingMode((SizingMode)1);
-			subP = panel4;
-			Label label3 = new Label();
-			((Control)label3).set_Parent((Container)(object)subP);
-			((Label)label3).set_AutoSizeWidth(true);
-			((Control)label3).set_Height(20);
-			label3.SetLocalizedText = () => string.Format(strings.SwapDelay, _settings.SwapDelay.get_Value());
-			label3.SetLocalizedTooltip = () => strings.SwapDelay_Tooltip;
-			Label swapDelayLabel = label3;
-			TrackBar trackBar3 = new TrackBar();
-			((Control)trackBar3).set_Location(new Point(225, 2));
-			((Control)trackBar3).set_Parent((Container)(object)subP);
-			((TrackBar)trackBar3).set_MinValue(500f);
-			((TrackBar)trackBar3).set_MaxValue(30000f);
-			((TrackBar)trackBar3).set_Value((float)_settings.SwapDelay.get_Value());
-			((Control)trackBar3).set_Width(((Container)this).get_ContentRegion().Width - 35 - 225);
-			trackBar3.ValueChangedAction = delegate(int num)
+			Kenedia.Modules.Core.Controls.Panel subP = new Kenedia.Modules.Core.Controls.Panel
 			{
-				_settings.SwapDelay.set_Value(num);
-				swapDelayLabel.UserLocale_SettingChanged(null, null);
+				Parent = cP,
+				WidthSizingMode = SizingMode.Fill,
+				HeightSizingMode = SizingMode.AutoSize
+			};
+			Kenedia.Modules.Core.Controls.Label keyDelayLabel = new Kenedia.Modules.Core.Controls.Label
+			{
+				Parent = subP,
+				AutoSizeWidth = true,
+				Height = 20,
+				SetLocalizedText = () => string.Format(strings.KeyDelay, _settings.KeyDelay.Value),
+				SetLocalizedTooltip = () => strings.KeyDelay_Tooltip
+			};
+			new Kenedia.Modules.Core.Controls.TrackBar
+			{
+				Location = new Point(225, 2),
+				Parent = subP,
+				MinValue = 0f,
+				MaxValue = 500f,
+				Value = _settings.KeyDelay.Value,
+				Width = base.ContentRegion.Width - 35 - 225,
+				ValueChangedAction = delegate(int num)
+				{
+					_settings.KeyDelay.Value = num;
+					keyDelayLabel.UserLocale_SettingChanged(null, null);
+				}
+			};
+			subP = new Kenedia.Modules.Core.Controls.Panel
+			{
+				Parent = cP,
+				WidthSizingMode = SizingMode.Fill,
+				HeightSizingMode = SizingMode.AutoSize
+			};
+			Kenedia.Modules.Core.Controls.Label filterDelayLabel = new Kenedia.Modules.Core.Controls.Label
+			{
+				Parent = subP,
+				AutoSizeWidth = true,
+				Height = 20,
+				SetLocalizedText = () => string.Format(strings.FilterDelay, _settings.FilterDelay.Value),
+				SetLocalizedTooltip = () => strings.FilterDelay_Tooltip
+			};
+			new Kenedia.Modules.Core.Controls.TrackBar
+			{
+				Location = new Point(225, 2),
+				Parent = subP,
+				MinValue = 0f,
+				MaxValue = 500f,
+				Value = _settings.FilterDelay.Value,
+				Width = base.ContentRegion.Width - 35 - 225,
+				ValueChangedAction = delegate(int num)
+				{
+					_settings.FilterDelay.Value = num;
+					filterDelayLabel.UserLocale_SettingChanged(num, null);
+				}
+			};
+			subP = new Kenedia.Modules.Core.Controls.Panel
+			{
+				Parent = cP,
+				WidthSizingMode = SizingMode.Fill,
+				HeightSizingMode = SizingMode.AutoSize
+			};
+			Kenedia.Modules.Core.Controls.Label swapDelayLabel = new Kenedia.Modules.Core.Controls.Label
+			{
+				Parent = subP,
+				AutoSizeWidth = true,
+				Height = 20,
+				SetLocalizedText = () => string.Format(strings.SwapDelay, _settings.SwapDelay.Value),
+				SetLocalizedTooltip = () => strings.SwapDelay_Tooltip
+			};
+			new Kenedia.Modules.Core.Controls.TrackBar
+			{
+				Location = new Point(225, 2),
+				Parent = subP,
+				MinValue = 500f,
+				MaxValue = 30000f,
+				Value = _settings.SwapDelay.Value,
+				Width = base.ContentRegion.Width - 35 - 225,
+				ValueChangedAction = delegate(int num)
+				{
+					_settings.SwapDelay.Value = num;
+					swapDelayLabel.UserLocale_SettingChanged(null, null);
+				}
 			};
 		}
 
@@ -1021,92 +1125,108 @@ namespace Kenedia.Modules.Characters.Views
 			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-			Panel panel = new Panel();
-			((Control)panel).set_Parent((Container)(object)_contentPanel);
-			((Control)panel).set_Width(((Container)this).get_ContentRegion().Width - 20);
-			((Container)panel).set_HeightSizingMode((SizingMode)1);
-			((Panel)panel).set_ShowBorder(true);
-			((Panel)panel).set_CanCollapse(true);
-			panel.SetLocalizedTitle = () => strings.GeneralAndWindows;
-			panel.TitleIcon = AsyncTexture2D.FromAssetId(157109);
-			Panel p = panel;
-			FlowPanel flowPanel = new FlowPanel();
-			((Control)flowPanel).set_Parent((Container)(object)p);
-			((Control)flowPanel).set_Location(new Point(5));
-			((Container)flowPanel).set_HeightSizingMode((SizingMode)1);
-			((Container)flowPanel).set_WidthSizingMode((SizingMode)2);
-			((FlowPanel)flowPanel).set_FlowDirection((ControlFlowDirection)3);
-			((FlowPanel)flowPanel).set_ControlPadding(new Vector2(3f, 3f));
-			FlowPanel cP = flowPanel;
-			Checkbox checkbox = new Checkbox();
-			((Control)checkbox).set_Parent((Container)(object)cP);
-			((Checkbox)checkbox).set_Checked(_settings.LoadCachedAccounts.get_Value());
-			checkbox.CheckedChangedAction = delegate(bool b)
+			Kenedia.Modules.Core.Controls.Panel p = new Kenedia.Modules.Core.Controls.Panel
 			{
-				_settings.LoadCachedAccounts.set_Value(b);
+				Parent = _contentPanel,
+				Width = base.ContentRegion.Width - 20,
+				HeightSizingMode = SizingMode.AutoSize,
+				ShowBorder = true,
+				CanCollapse = true,
+				SetLocalizedTitle = () => strings.GeneralAndWindows,
+				TitleIcon = AsyncTexture2D.FromAssetId(157109)
 			};
-			checkbox.SetLocalizedText = () => strings.LoadCachedAccounts;
-			checkbox.SetLocalizedTooltip = () => strings.LoadCachedAccounts_Tooltip;
-			Checkbox checkbox2 = new Checkbox();
-			((Control)checkbox2).set_Parent((Container)(object)cP);
-			((Checkbox)checkbox2).set_Checked(_settings.ShowStatusWindow.get_Value());
-			checkbox2.SetLocalizedText = () => strings.ShowStatusWindow_Name;
-			checkbox2.SetLocalizedTooltip = () => strings.ShowStatusWindow_Tooltip;
-			checkbox2.CheckedChangedAction = delegate(bool b)
+			Kenedia.Modules.Core.Controls.FlowPanel cP = new Kenedia.Modules.Core.Controls.FlowPanel
 			{
-				_settings.ShowStatusWindow.set_Value(b);
+				Parent = p,
+				Location = new Point(5),
+				HeightSizingMode = SizingMode.AutoSize,
+				WidthSizingMode = SizingMode.Fill,
+				FlowDirection = ControlFlowDirection.SingleTopToBottom,
+				ControlPadding = new Vector2(3f, 3f)
 			};
-			Checkbox checkbox3 = new Checkbox();
-			((Control)checkbox3).set_Parent((Container)(object)cP);
-			((Checkbox)checkbox3).set_Checked(_settings.ShowChoyaSpinner.get_Value());
-			checkbox3.SetLocalizedText = () => strings.ShowChoyaSpinner;
-			checkbox3.CheckedChangedAction = delegate(bool b)
+			new Kenedia.Modules.Core.Controls.Checkbox
 			{
-				_settings.ShowChoyaSpinner.set_Value(b);
+				Parent = cP,
+				Checked = _settings.LoadCachedAccounts.Value,
+				CheckedChangedAction = delegate(bool b)
+				{
+					_settings.LoadCachedAccounts.Value = b;
+				},
+				SetLocalizedText = () => strings.LoadCachedAccounts,
+				SetLocalizedTooltip = () => strings.LoadCachedAccounts_Tooltip
 			};
-			Checkbox checkbox4 = new Checkbox();
-			((Control)checkbox4).set_Parent((Container)(object)cP);
-			((Checkbox)checkbox4).set_Checked(_settings.OpenSidemenuOnSearch.get_Value());
-			checkbox4.CheckedChangedAction = delegate(bool b)
+			new Kenedia.Modules.Core.Controls.Checkbox
 			{
-				_settings.OpenSidemenuOnSearch.set_Value(b);
+				Parent = cP,
+				Checked = _settings.ShowStatusWindow.Value,
+				SetLocalizedText = () => strings.ShowStatusWindow_Name,
+				SetLocalizedTooltip = () => strings.ShowStatusWindow_Tooltip,
+				CheckedChangedAction = delegate(bool b)
+				{
+					_settings.ShowStatusWindow.Value = b;
+				}
 			};
-			checkbox4.SetLocalizedText = () => strings.OpenSidemenuOnSearch;
-			checkbox4.SetLocalizedTooltip = () => strings.OpenSidemenuOnSearch_Tooltip;
-			Checkbox checkbox5 = new Checkbox();
-			((Control)checkbox5).set_Parent((Container)(object)cP);
-			((Checkbox)checkbox5).set_Checked(_settings.FocusSearchOnShow.get_Value());
-			checkbox5.CheckedChangedAction = delegate(bool b)
+			new Kenedia.Modules.Core.Controls.Checkbox
 			{
-				_settings.FocusSearchOnShow.set_Value(b);
+				Parent = cP,
+				Checked = _settings.ShowChoyaSpinner.Value,
+				SetLocalizedText = () => strings.ShowChoyaSpinner,
+				CheckedChangedAction = delegate(bool b)
+				{
+					_settings.ShowChoyaSpinner.Value = b;
+				}
 			};
-			checkbox5.SetLocalizedText = () => strings.FocusSearchOnShow;
-			checkbox5.SetLocalizedTooltip = () => strings.FocusSearchOnShow_Tooltip;
-			Checkbox checkbox6 = new Checkbox();
-			((Control)checkbox6).set_Parent((Container)(object)cP);
-			((Checkbox)checkbox6).set_Checked(_settings.ShowNotifications.get_Value());
-			checkbox6.CheckedChangedAction = delegate(bool b)
+			new Kenedia.Modules.Core.Controls.Checkbox
 			{
-				_settings.ShowNotifications.set_Value(b);
+				Parent = cP,
+				Checked = _settings.OpenSidemenuOnSearch.Value,
+				CheckedChangedAction = delegate(bool b)
+				{
+					_settings.OpenSidemenuOnSearch.Value = b;
+				},
+				SetLocalizedText = () => strings.OpenSidemenuOnSearch,
+				SetLocalizedTooltip = () => strings.OpenSidemenuOnSearch_Tooltip
 			};
-			checkbox6.SetLocalizedText = () => strings.ShowNotifications;
-			checkbox6.SetLocalizedTooltip = () => strings.ShowNotifications_Tooltip;
-			Checkbox checkbox7 = new Checkbox();
-			((Control)checkbox7).set_Parent((Container)(object)cP);
-			((Checkbox)checkbox7).set_Checked(_settings.DebugMode.get_Value());
-			checkbox7.CheckedChangedAction = delegate(bool b)
+			new Kenedia.Modules.Core.Controls.Checkbox
 			{
-				_settings.DebugMode.set_Value(b);
+				Parent = cP,
+				Checked = _settings.FocusSearchOnShow.Value,
+				CheckedChangedAction = delegate(bool b)
+				{
+					_settings.FocusSearchOnShow.Value = b;
+				},
+				SetLocalizedText = () => strings.FocusSearchOnShow,
+				SetLocalizedTooltip = () => strings.FocusSearchOnShow_Tooltip
 			};
-			checkbox7.SetLocalizedText = () => strings.DebugMode_Name;
-			checkbox7.SetLocalizedTooltip = () => strings.DebugMode_Tooltip;
+			new Kenedia.Modules.Core.Controls.Checkbox
+			{
+				Parent = cP,
+				Checked = _settings.ShowNotifications.Value,
+				CheckedChangedAction = delegate(bool b)
+				{
+					_settings.ShowNotifications.Value = b;
+				},
+				SetLocalizedText = () => strings.ShowNotifications,
+				SetLocalizedTooltip = () => strings.ShowNotifications_Tooltip
+			};
+			new Kenedia.Modules.Core.Controls.Checkbox
+			{
+				Parent = cP,
+				Checked = _settings.DebugMode.Value,
+				CheckedChangedAction = delegate(bool b)
+				{
+					_settings.DebugMode.Value = b;
+				},
+				SetLocalizedText = () => strings.DebugMode_Name,
+				SetLocalizedTooltip = () => strings.DebugMode_Tooltip
+			};
 		}
 
 		private void GetFontSize(SettingEntry<int> setting, string item)
 		{
 			if (int.TryParse(item, out var fontSize))
 			{
-				setting.set_Value(fontSize);
+				setting.Value = fontSize;
 			}
 		}
 
@@ -1121,7 +1241,7 @@ namespace Kenedia.Modules.Characters.Views
 			if (gameTime.get_TotalGameTime().TotalMilliseconds - _tick >= 1000.0)
 			{
 				_tick = gameTime.get_TotalGameTime().TotalMilliseconds;
-				if (GameService.GameIntegration.get_Gw2Instance().get_Gw2HasFocus())
+				if (GameService.GameIntegration.Gw2Instance.Gw2HasFocus)
 				{
 					_sharedSettingsView?.UpdateOffset();
 				}

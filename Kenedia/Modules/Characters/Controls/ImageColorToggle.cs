@@ -1,5 +1,4 @@
 using System;
-using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Gw2Sharp.Models;
 
@@ -23,7 +22,7 @@ namespace Kenedia.Modules.Characters.Controls
 
 		protected override void OnClick(MouseEventArgs e)
 		{
-			((Control)this).OnClick(e);
+			base.OnClick(e);
 			base.Active = !base.Active;
 			_onChanged?.Invoke(base.Active);
 		}

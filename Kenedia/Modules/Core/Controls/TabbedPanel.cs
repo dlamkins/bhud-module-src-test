@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Blish_HUD.Controls;
-using Blish_HUD.Input;
 using Kenedia.Modules.Core.Extensions;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -10,11 +9,18 @@ namespace Kenedia.Modules.Core.Controls
 {
 	public class TabbedPanel : AnchoredContainer
 	{
-		protected readonly FlowPanel TabsButtonPanel;
+		protected readonly FlowPanel TabsButtonPanel = new FlowPanel
+		{
+			FlowDirection = ControlFlowDirection.SingleLeftToRight,
+			WidthSizingMode = SizingMode.Fill,
+			ControlPadding = new Vector2(1f, 0f),
+			Height = 25
+		};
 
 		private PanelTab _activeTab;
 
-		public List<PanelTab> Tabs { get; }
+		public List<PanelTab> Tabs { get; } = new List<PanelTab>();
+
 
 		public PanelTab ActiveTab
 		{
@@ -37,63 +43,57 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
 			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-			FlowPanel flowPanel = new FlowPanel();
-			((FlowPanel)flowPanel).set_FlowDirection((ControlFlowDirection)2);
-			((Container)flowPanel).set_WidthSizingMode((SizingMode)2);
-			((FlowPanel)flowPanel).set_ControlPadding(new Vector2(1f, 0f));
-			((Control)flowPanel).set_Height(25);
-			TabsButtonPanel = flowPanel;
-			Tabs = new List<PanelTab>();
-			base._002Ector();
-			((Control)TabsButtonPanel).set_Parent((Container)(object)this);
-			((Control)TabsButtonPanel).add_Resized((EventHandler<ResizedEventArgs>)OnTabButtonPanelResized);
-			((Container)this).set_HeightSizingMode((SizingMode)1);
+			TabsButtonPanel.Parent = this;
+			TabsButtonPanel.Resized += OnTabButtonPanelResized;
+			HeightSizingMode = SizingMode.AutoSize;
 			base.BackgroundImageColor = Color.get_Honeydew() * 0.95f;
 		}
 
 		public void AddTab(PanelTab tab)
 		{
 			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-			((Control)tab).set_Parent((Container)(object)this);
-			((Control)tab).add_Disposed((EventHandler<EventArgs>)OnTabDisposed);
-			((Control)tab.TabButton).set_Parent((Container)(object)TabsButtonPanel);
-			((Control)tab.TabButton).add_Click((EventHandler<MouseEventArgs>)delegate
+			PanelTab tab2 = tab;
+			tab2.Parent = this;
+			tab2.Disposed += OnTabDisposed;
+			tab2.TabButton.Parent = TabsButtonPanel;
+			tab2.TabButton.Click += delegate
 			{
-				TabButton_Click(tab);
-			});
-			((Control)tab).set_Location(new Point(0, ((Control)TabsButtonPanel).get_Bottom()));
-			Tabs.Add(tab);
+				TabButton_Click(tab2);
+			};
+			tab2.Location = new Point(0, TabsButtonPanel.Bottom);
+			Tabs.Add(tab2);
 			this.TabAdded?.Invoke(this, EventArgs.Empty);
 			if (ActiveTab == null)
 			{
-				PanelTab panelTab2 = (ActiveTab = tab);
+				PanelTab panelTab2 = (ActiveTab = tab2);
 			}
-			((Control)this).RecalculateLayout();
+			RecalculateLayout();
 		}
 
 		public void RemoveTab(PanelTab tab)
 		{
-			((Control)tab).remove_Disposed((EventHandler<EventArgs>)OnTabDisposed);
-			((Control)tab.TabButton).remove_Click((EventHandler<MouseEventArgs>)delegate
+			PanelTab tab2 = tab;
+			tab2.Disposed -= OnTabDisposed;
+			tab2.TabButton.Click -= delegate
 			{
-				TabButton_Click(tab);
-			});
-			((Control)tab).set_Parent((Container)null);
-			((Control)tab.TabButton).set_Parent((Container)null);
-			Tabs.Remove(tab);
+				TabButton_Click(tab2);
+			};
+			tab2.Parent = null;
+			tab2.TabButton.Parent = null;
+			Tabs.Remove(tab2);
 			this.TabRemoved?.Invoke(this, EventArgs.Empty);
-			((Control)this).RecalculateLayout();
+			RecalculateLayout();
 		}
 
 		public override void RecalculateLayout()
 		{
 			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
-			int button_amount = Math.Max(1, ((Container)TabsButtonPanel).get_Children().get_Count());
-			int width = (((Control)TabsButtonPanel).get_Width() - (button_amount - 1) * (int)((FlowPanel)TabsButtonPanel).get_ControlPadding().X) / button_amount;
-			foreach (Control child in ((Container)TabsButtonPanel).get_Children())
+			int button_amount = Math.Max(1, TabsButtonPanel.Children.Count);
+			int width = (TabsButtonPanel.Width - (button_amount - 1) * (int)TabsButtonPanel.ControlPadding.X) / button_amount;
+			foreach (Control child in TabsButtonPanel.Children)
 			{
-				child.set_Width(width);
+				child.Width = width;
 			}
 		}
 
@@ -128,12 +128,12 @@ namespace Kenedia.Modules.Core.Controls
 		protected override void DisposeControl()
 		{
 			base.DisposeControl();
-			((IEnumerable<IDisposable>)Tabs).DisposeAll();
+			Tabs.DisposeAll();
 		}
 
 		private void OnTabButtonPanelResized(object sender, ResizedEventArgs e)
 		{
-			((Control)this).RecalculateLayout();
+			RecalculateLayout();
 		}
 
 		private void TabButton_Click(PanelTab t)

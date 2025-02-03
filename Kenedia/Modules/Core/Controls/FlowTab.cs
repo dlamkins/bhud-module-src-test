@@ -18,13 +18,11 @@ namespace Kenedia.Modules.Core.Controls
 		{
 			get
 			{
-				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 				return _flowDirection;
 			}
 			set
 			{
-				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-				((Control)this).SetProperty<ControlFlowDirection>(ref _flowDirection, value, true, "FlowDirection");
+				SetProperty(ref _flowDirection, value, invalidateLayout: true, "FlowDirection");
 			}
 		}
 
@@ -38,7 +36,7 @@ namespace Kenedia.Modules.Core.Controls
 			set
 			{
 				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-				((Control)this).SetProperty<Vector2>(ref _controlPadding, value, true, "ControlPadding");
+				SetProperty(ref _controlPadding, value, invalidateLayout: true, "ControlPadding");
 			}
 		}
 
@@ -52,48 +50,43 @@ namespace Kenedia.Modules.Core.Controls
 			set
 			{
 				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-				((Control)this).SetProperty<Vector2>(ref _outerControlPadding, value, true, "OuterControlPadding");
+				SetProperty(ref _outerControlPadding, value, invalidateLayout: true, "OuterControlPadding");
 			}
 		}
 
 		public override void RecalculateLayout()
 		{
 			base.RecalculateLayout();
-			ReflowChildLayout(((Container)this)._children.ToArray());
+			ReflowChildLayout(_children.ToArray());
 		}
 
 		private void ReflowChildLayout(IEnumerable<Control> allChildren)
 		{
-			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0053: Expected I4, but got Unknown
-			IEnumerable<Control> filteredChildren = allChildren.Where((Control c) => ((object)c).GetType() != typeof(Scrollbar) && c.get_Visible());
-			ControlFlowDirection flowDirection = _flowDirection;
-			switch ((int)flowDirection)
+			IEnumerable<Control> filteredChildren = allChildren.Where((Control c) => c.GetType() != typeof(Scrollbar) && c.Visible);
+			switch (_flowDirection)
 			{
-			case 0:
+			case ControlFlowDirection.LeftToRight:
 				ReflowChildLayoutLeftToRight(filteredChildren);
 				break;
-			case 4:
+			case ControlFlowDirection.RightToLeft:
 				ReflowChildLayoutRightToLeft(filteredChildren);
 				break;
-			case 1:
+			case ControlFlowDirection.TopToBottom:
 				ReflowChildLayoutTopToBottom(filteredChildren);
 				break;
-			case 6:
+			case ControlFlowDirection.BottomToTop:
 				ReflowChildLayoutBottomToTop(filteredChildren);
 				break;
-			case 2:
+			case ControlFlowDirection.SingleLeftToRight:
 				ReflowChildLayoutSingleLeftToRight(filteredChildren);
 				break;
-			case 5:
+			case ControlFlowDirection.SingleRightToLeft:
 				ReflowChildLayoutSingleRightToLeft(filteredChildren);
 				break;
-			case 3:
+			case ControlFlowDirection.SingleTopToBottom:
 				ReflowChildLayoutSingleTopToBottom(filteredChildren);
 				break;
-			case 7:
+			case ControlFlowDirection.SingleBottomToTop:
 				ReflowChildLayoutSingleBottomToTop(filteredChildren);
 				break;
 			}
@@ -107,16 +100,16 @@ namespace Kenedia.Modules.Core.Controls
 			float nextBottom;
 			float currentBottom = (nextBottom = _outerControlPadding.Y);
 			float lastRight = outerPadX;
-			foreach (Control child in allChildren.Where((Control c) => c.get_Visible()))
+			foreach (Control child in allChildren.Where((Control c) => c.Visible))
 			{
-				if ((float)child.get_Width() >= (float)((Container)this).get_ContentRegion().Width - lastRight)
+				if ((float)child.Width >= (float)base.ContentRegion.Width - lastRight)
 				{
 					currentBottom = nextBottom + _controlPadding.Y;
 					lastRight = outerPadX;
 				}
-				child.set_Location(new Point((int)lastRight, (int)currentBottom));
-				lastRight = (float)child.get_Right() + _controlPadding.X;
-				nextBottom = Math.Max(nextBottom, child.get_Bottom());
+				child.Location = new Point((int)lastRight, (int)currentBottom);
+				lastRight = (float)child.Right + _controlPadding.X;
+				nextBottom = Math.Max(nextBottom, child.Bottom);
 			}
 		}
 
@@ -128,17 +121,17 @@ namespace Kenedia.Modules.Core.Controls
 			float outerPadX = _outerControlPadding.X;
 			float nextBottom;
 			float currentBottom = (nextBottom = _outerControlPadding.Y);
-			float lastLeft = (float)((Container)this).get_ContentRegion().Width - outerPadX;
-			foreach (Control child in allChildren.Where((Control c) => c.get_Visible()))
+			float lastLeft = (float)base.ContentRegion.Width - outerPadX;
+			foreach (Control child in allChildren.Where((Control c) => c.Visible))
 			{
-				if (outerPadX > lastLeft - (float)child.get_Width())
+				if (outerPadX > lastLeft - (float)child.Width)
 				{
 					currentBottom = nextBottom + _controlPadding.Y;
-					lastLeft = (float)((Container)this).get_ContentRegion().Width - outerPadX;
+					lastLeft = (float)base.ContentRegion.Width - outerPadX;
 				}
-				child.set_Location(new Point((int)(lastLeft - (float)child.get_Width()), (int)currentBottom));
-				lastLeft = (float)child.get_Left() - _controlPadding.X;
-				nextBottom = Math.Max(nextBottom, child.get_Bottom());
+				child.Location = new Point((int)(lastLeft - (float)child.Width), (int)currentBottom);
+				lastLeft = (float)child.Left - _controlPadding.X;
+				nextBottom = Math.Max(nextBottom, child.Bottom);
 			}
 		}
 
@@ -150,16 +143,16 @@ namespace Kenedia.Modules.Core.Controls
 			float nextRight = x;
 			float currentRight = x;
 			float lastBottom = outerPadY;
-			foreach (Control child in allChildren.Where((Control c) => c.get_Visible()))
+			foreach (Control child in allChildren.Where((Control c) => c.Visible))
 			{
-				if ((float)child.get_Height() >= (float)((Control)this).get_Height() - lastBottom)
+				if ((float)child.Height >= (float)base.Height - lastBottom)
 				{
 					currentRight = nextRight + _controlPadding.X;
 					lastBottom = outerPadY;
 				}
-				child.set_Location(new Point((int)currentRight, (int)lastBottom));
-				lastBottom = (float)child.get_Bottom() + _controlPadding.Y;
-				nextRight = Math.Max(nextRight, child.get_Right());
+				child.Location = new Point((int)currentRight, (int)lastBottom);
+				lastBottom = (float)child.Bottom + _controlPadding.Y;
+				nextRight = Math.Max(nextRight, child.Right);
 			}
 		}
 
@@ -170,17 +163,17 @@ namespace Kenedia.Modules.Core.Controls
 			float outerPadY = _outerControlPadding.Y;
 			float nextRight = x;
 			float currentRight = x;
-			float lastTop = (float)((Control)this).get_Height() - outerPadY;
-			foreach (Control child in allChildren.Where((Control c) => c.get_Visible()))
+			float lastTop = (float)base.Height - outerPadY;
+			foreach (Control child in allChildren.Where((Control c) => c.Visible))
 			{
-				if (outerPadY > lastTop - (float)child.get_Height())
+				if (outerPadY > lastTop - (float)child.Height)
 				{
 					currentRight = nextRight + _controlPadding.X;
-					lastTop = (float)((Control)this).get_Height() - outerPadY;
+					lastTop = (float)base.Height - outerPadY;
 				}
-				child.set_Location(new Point((int)currentRight, (int)(lastTop - (float)child.get_Height())));
-				lastTop = (float)child.get_Top() - _controlPadding.Y;
-				nextRight = Math.Max(nextRight, child.get_Right());
+				child.Location = new Point((int)currentRight, (int)(lastTop - (float)child.Height));
+				lastTop = (float)child.Top - _controlPadding.Y;
+				nextRight = Math.Max(nextRight, child.Right);
 			}
 		}
 
@@ -192,8 +185,8 @@ namespace Kenedia.Modules.Core.Controls
 			float lastLeft = x;
 			foreach (Control allChild in allChildren)
 			{
-				allChild.set_Location(new Point((int)lastLeft, (int)outerPadY));
-				lastLeft = (float)allChild.get_Right() + _controlPadding.X;
+				allChild.Location = new Point((int)lastLeft, (int)outerPadY);
+				lastLeft = (float)allChild.Right + _controlPadding.X;
 			}
 		}
 
@@ -203,11 +196,11 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
 			float outerPadX = _outerControlPadding.X;
 			float outerPadY = _outerControlPadding.Y;
-			float lastLeft = (float)((Container)this).get_ContentRegion().Width - outerPadX;
+			float lastLeft = (float)base.ContentRegion.Width - outerPadX;
 			foreach (Control child in allChildren)
 			{
-				child.set_Location(new Point((int)(lastLeft - (float)child.get_Width()), (int)outerPadY));
-				lastLeft = (float)child.get_Left() - _controlPadding.X;
+				child.Location = new Point((int)(lastLeft - (float)child.Width), (int)outerPadY);
+				lastLeft = (float)child.Left - _controlPadding.X;
 			}
 		}
 
@@ -218,8 +211,8 @@ namespace Kenedia.Modules.Core.Controls
 			float lastBottom = _outerControlPadding.Y;
 			foreach (Control allChild in allChildren)
 			{
-				allChild.set_Location(new Point((int)outerPadX, (int)lastBottom));
-				lastBottom = (float)allChild.get_Bottom() + _controlPadding.Y;
+				allChild.Location = new Point((int)outerPadX, (int)lastBottom);
+				lastBottom = (float)allChild.Bottom + _controlPadding.Y;
 			}
 		}
 
@@ -228,11 +221,11 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
 			float outerPadX = _outerControlPadding.X;
 			float outerPadY = _outerControlPadding.Y;
-			float lastTop = (float)((Control)this).get_Height() - outerPadY;
+			float lastTop = (float)base.Height - outerPadY;
 			foreach (Control child in allChildren)
 			{
-				child.set_Location(new Point((int)outerPadX, (int)(lastTop - (float)child.get_Height())));
-				lastTop = (float)child.get_Top() - _controlPadding.Y;
+				child.Location = new Point((int)outerPadX, (int)(lastTop - (float)child.Height));
+				lastTop = (float)child.Top - _controlPadding.Y;
 			}
 		}
 	}

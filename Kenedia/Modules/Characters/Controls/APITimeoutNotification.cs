@@ -46,20 +46,20 @@ namespace Kenedia.Modules.Characters.Controls
 			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-			((Control)this).RecalculateLayout();
-			int height = GameService.Content.get_DefaultFont14().get_LineHeight() + 4;
+			base.RecalculateLayout();
+			int height = GameService.Content.DefaultFont14.get_LineHeight() + 4;
 			_dismiss.Bounds = new Rectangle(0, 0, height, height);
 			DetailedTexture settingsCog = _settingsCog;
 			Rectangle bounds = _dismiss.Bounds;
 			settingsCog.Bounds = new Rectangle(((Rectangle)(ref bounds)).get_Right() + 2, 0, height, height);
-			int width2 = ((Control)this).get_Width();
+			int width2 = base.Width;
 			bounds = _settingsCog.Bounds;
 			int width = width2 - ((Rectangle)(ref bounds)).get_Right() - 6;
-			string wrappedText = TextUtil.WrapText(GameService.Content.get_DefaultFont14(), strings.APITimeoutNotification, width);
-			RectangleF rect = GameService.Content.get_DefaultFont14().GetStringRectangle(wrappedText);
+			string wrappedText = TextUtil.WrapText(GameService.Content.DefaultFont14, strings.APITimeoutNotification, width);
+			RectangleF rect = GameService.Content.DefaultFont14.GetStringRectangle(wrappedText);
 			bounds = _settingsCog.Bounds;
 			_textRectangle = new Rectangle(((Rectangle)(ref bounds)).get_Right() + 6, 0, width, (height > (int)rect.Height) ? height : ((int)rect.Height));
-			((Control)this).set_Height(Math.Max(height, _textRectangle.Height));
+			base.Height = Math.Max(height, _textRectangle.Height);
 		}
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
@@ -69,23 +69,20 @@ namespace Kenedia.Modules.Characters.Controls
 			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
 			string txt = string.Empty;
-			_dismiss.Draw((Control)(object)this, spriteBatch, ((Control)this).get_RelativeMousePosition());
-			_settingsCog.Draw((Control)(object)this, spriteBatch, ((Control)this).get_RelativeMousePosition());
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, strings.APITimeoutNotification, GameService.Content.get_DefaultFont14(), _textRectangle, Color.get_White(), true, (HorizontalAlignment)0, (VerticalAlignment)1);
-			((Control)this).set_BasicTooltipText(txt);
+			_dismiss.Draw(this, spriteBatch, base.RelativeMousePosition);
+			_settingsCog.Draw(this, spriteBatch, base.RelativeMousePosition);
+			spriteBatch.DrawStringOnCtrl(this, strings.APITimeoutNotification, GameService.Content.DefaultFont14, _textRectangle, Color.get_White(), wrap: true);
+			base.BasicTooltipText = txt;
 		}
 
 		protected override void OnClick(MouseEventArgs e)
 		{
-			((Control)this).OnClick(e);
+			base.OnClick(e);
 			if (_dismiss.Hovered)
 			{
-				Container parent = ((Control)this).get_Parent();
-				((Control)this).Dispose();
-				if (parent != null)
-				{
-					((Control)parent).Invalidate();
-				}
+				Container parent = base.Parent;
+				Dispose();
+				parent?.Invalidate();
 			}
 		}
 	}

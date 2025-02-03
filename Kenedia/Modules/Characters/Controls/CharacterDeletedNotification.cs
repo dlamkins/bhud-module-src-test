@@ -33,7 +33,7 @@ namespace Kenedia.Modules.Characters.Controls
 			}
 			set
 			{
-				Common.SetProperty(ref _markedCharacter, value, ((Control)this).RecalculateLayout);
+				Common.SetProperty(ref _markedCharacter, value, new Action(RecalculateLayout));
 			}
 		}
 
@@ -59,22 +59,22 @@ namespace Kenedia.Modules.Characters.Controls
 			//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0101: Unknown result type (might be due to invalid IL or missing references)
-			((Control)this).RecalculateLayout();
-			int height = GameService.Content.get_DefaultFont14().get_LineHeight() + 4;
+			base.RecalculateLayout();
+			int height = GameService.Content.DefaultFont14.get_LineHeight() + 4;
 			_dismiss.Bounds = new Rectangle(0, 0, height, height);
 			DetailedTexture delete = _delete;
 			Rectangle bounds = _dismiss.Bounds;
 			delete.Bounds = new Rectangle(((Rectangle)(ref bounds)).get_Right() + 2, 0, height, height);
 			if (MarkedCharacter != null)
 			{
-				int width2 = ((Control)this).get_Width();
+				int width2 = base.Width;
 				bounds = _delete.Bounds;
 				int width = width2 - ((Rectangle)(ref bounds)).get_Right() - 6;
-				string wrappedText = TextUtil.WrapText(GameService.Content.get_DefaultFont14(), string.Format(strings.DeletedCharacterNotification, MarkedCharacter.Name, MarkedCharacter.Created.ToString("d")), width);
-				RectangleF rect = GameService.Content.get_DefaultFont14().GetStringRectangle(wrappedText);
+				string wrappedText = TextUtil.WrapText(GameService.Content.DefaultFont14, string.Format(strings.DeletedCharacterNotification, MarkedCharacter.Name, MarkedCharacter.Created.ToString("d")), width);
+				RectangleF rect = GameService.Content.DefaultFont14.GetStringRectangle(wrappedText);
 				bounds = _delete.Bounds;
 				_textRectangle = new Rectangle(((Rectangle)(ref bounds)).get_Right() + 6, 0, width, (height > (int)rect.Height) ? height : ((int)rect.Height));
-				((Control)this).set_Height(Math.Max(height, _textRectangle.Height));
+				base.Height = Math.Max(height, _textRectangle.Height);
 			}
 		}
 
@@ -87,40 +87,36 @@ namespace Kenedia.Modules.Characters.Controls
 			string txt = string.Empty;
 			if (MarkedCharacter != null)
 			{
-				_delete.Draw((Control)(object)this, spriteBatch, ((Control)this).get_RelativeMousePosition());
+				_delete.Draw(this, spriteBatch, base.RelativeMousePosition);
 				if (_delete.Hovered)
 				{
 					txt = string.Format(strings.DeletedCharacterNotification_DeleteTooltip, MarkedCharacter.Name);
 				}
-				_dismiss.Draw((Control)(object)this, spriteBatch, ((Control)this).get_RelativeMousePosition());
+				_dismiss.Draw(this, spriteBatch, base.RelativeMousePosition);
 				if (_dismiss.Hovered)
 				{
 					txt = string.Format(strings.DeletedCharacterNotification_DismissTooltip, MarkedCharacter.Name);
 				}
-				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, string.Format(strings.DeletedCharacterNotification, MarkedCharacter.Name, MarkedCharacter.Created.ToString("d")), GameService.Content.get_DefaultFont14(), _textRectangle, Color.get_White(), true, (HorizontalAlignment)0, (VerticalAlignment)1);
+				spriteBatch.DrawStringOnCtrl(this, string.Format(strings.DeletedCharacterNotification, MarkedCharacter.Name, MarkedCharacter.Created.ToString("d")), GameService.Content.DefaultFont14, _textRectangle, Color.get_White(), wrap: true);
 			}
-			((Control)this).set_BasicTooltipText(txt);
+			base.BasicTooltipText = txt;
 		}
 
 		protected override void OnClick(MouseEventArgs e)
 		{
-			((Control)this).OnClick(e);
-			if (MarkedCharacter == null)
+			base.OnClick(e);
+			if (MarkedCharacter != null)
 			{
-				return;
-			}
-			if (_delete.Hovered)
-			{
-				MarkedCharacter.Delete();
-				((Control)this).Dispose();
-			}
-			if (_dismiss.Hovered)
-			{
-				Container parent = ((Control)this).get_Parent();
-				((Control)this).Dispose();
-				if (parent != null)
+				if (_delete.Hovered)
 				{
-					((Control)parent).Invalidate();
+					MarkedCharacter.Delete();
+					Dispose();
+				}
+				if (_dismiss.Hovered)
+				{
+					Container parent = base.Parent;
+					Dispose();
+					parent?.Invalidate();
 				}
 			}
 		}

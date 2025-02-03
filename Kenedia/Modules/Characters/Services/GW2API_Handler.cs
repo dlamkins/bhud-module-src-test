@@ -7,7 +7,6 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
-using Blish_HUD.Controls;
 using Blish_HUD.Modules.Managers;
 using Gw2Sharp.WebApi;
 using Gw2Sharp.WebApi.Exceptions;
@@ -70,7 +69,7 @@ namespace Kenedia.Modules.Characters.Services
 				if (Common.SetProperty(ref _account, value, this.AccountChanged, triggerOnUpdate: true, "Account"))
 				{
 					_paths.AccountName = ((value != null) ? value.get_Name() : null);
-					BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info("Account changed from " + (((temp != null) ? temp.get_Name() : null) ?? "No Account") + " to " + (((value != null) ? value.get_Name() : null) ?? "No Account") + "!");
+					BaseModule<Characters, Kenedia.Modules.Characters.Views.MainWindow, Settings, PathCollection>.Logger.Info("Account changed from " + (((temp != null) ? temp.get_Name() : null) ?? "No Account") + " to " + (((value != null) ? value.get_Name() : null) ?? "No Account") + "!");
 				}
 			}
 		}
@@ -90,6 +89,7 @@ namespace Kenedia.Modules.Characters.Services
 
 		private void UpdateAccountsList(Account account, IApiV2ObjectList<Character> characters)
 		{
+			Account account2 = account;
 			try
 			{
 				List<AccountSummary> accounts = new List<AccountSummary>();
@@ -97,10 +97,10 @@ namespace Kenedia.Modules.Characters.Services
 				if (File.Exists(_accountFilePath))
 				{
 					accounts = JsonConvert.DeserializeObject<List<AccountSummary>>(File.ReadAllText(_accountFilePath), SerializerSettings.Default);
-					accountEntry = accounts.Find((AccountSummary e) => e.AccountName == account.get_Name());
+					accountEntry = accounts.Find((AccountSummary e) => e.AccountName == account2.get_Name());
 					if (accountEntry != null)
 					{
-						accountEntry.AccountName = account.get_Name();
+						accountEntry.AccountName = account2.get_Name();
 						accountEntry.CharacterNames = new List<string>();
 						((IEnumerable<Character>)characters).ToList().ForEach(delegate(Character c)
 						{
@@ -112,7 +112,7 @@ namespace Kenedia.Modules.Characters.Services
 						List<AccountSummary> list = accounts;
 						AccountSummary obj = new AccountSummary
 						{
-							AccountName = account.get_Name(),
+							AccountName = account2.get_Name(),
 							CharacterNames = new List<string>()
 						};
 						AccountSummary item = obj;
@@ -129,7 +129,7 @@ namespace Kenedia.Modules.Characters.Services
 					List<AccountSummary> list2 = accounts;
 					AccountSummary obj2 = new AccountSummary
 					{
-						AccountName = account.get_Name(),
+						AccountName = account2.get_Name(),
 						CharacterNames = new List<string>()
 					};
 					AccountSummary item = obj2;
@@ -152,19 +152,11 @@ namespace Kenedia.Modules.Characters.Services
 		{
 			if (hideSpinner)
 			{
-				Func<LoadingSpinner> getSpinner = _getSpinner;
-				if (getSpinner != null)
-				{
-					LoadingSpinner loadingSpinner = getSpinner();
-					if (loadingSpinner != null)
-					{
-						((Control)loadingSpinner).Hide();
-					}
-				}
+				_getSpinner?.Invoke()?.Hide();
 			}
 			if (cancellationToken.IsCancellationRequested)
 			{
-				BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info("Canceled API Data fetch!");
+				BaseModule<Characters, Kenedia.Modules.Characters.Views.MainWindow, Settings, PathCollection>.Logger.Info("Canceled API Data fetch!");
 			}
 			_cancellationTokenSource = null;
 		}
@@ -174,29 +166,21 @@ namespace Kenedia.Modules.Characters.Services
 			_cancellationTokenSource?.Cancel();
 			_cancellationTokenSource = new CancellationTokenSource();
 			CancellationToken cancellationToken = _cancellationTokenSource.Token;
-			Func<LoadingSpinner> getSpinner = _getSpinner;
-			if (getSpinner != null)
-			{
-				LoadingSpinner loadingSpinner = getSpinner();
-				if (loadingSpinner != null)
-				{
-					((Control)loadingSpinner).Show();
-				}
-			}
+			_getSpinner?.Invoke()?.Show();
 			NotificationBadge notificationBadge = _notificationBadge();
 			bool result = default(bool);
 			object obj;
 			int num;
 			try
 			{
-				BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info("Fetching new API Data ...");
+				BaseModule<Characters, Kenedia.Modules.Characters.Views.MainWindow, Settings, PathCollection>.Logger.Info("Fetching new API Data ...");
 				if (_gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)(object)new TokenPermission[2]
 				{
 					(TokenPermission)1,
 					(TokenPermission)3
 				}))
 				{
-					Account account = await ((IBlobClient<Account>)(object)_gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()).GetAsync(cancellationToken);
+					Account account = await ((IBlobClient<Account>)(object)_gw2ApiManager.Gw2ApiClient.get_V2().get_Account()).GetAsync(cancellationToken);
 					if (cancellationToken.IsCancellationRequested)
 					{
 						Reset(cancellationToken, !cancellationToken.IsCancellationRequested);
@@ -204,8 +188,8 @@ namespace Kenedia.Modules.Characters.Services
 						return result;
 					}
 					Account = account;
-					BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info("Fetching characters for '" + Account.get_Name() + "' ...");
-					IApiV2ObjectList<Character> characters = await ((IAllExpandableClient<Character>)(object)_gw2ApiManager.get_Gw2ApiClient().get_V2().get_Characters()).AllAsync(cancellationToken);
+					BaseModule<Characters, Kenedia.Modules.Characters.Views.MainWindow, Settings, PathCollection>.Logger.Info("Fetching characters for '" + Account.get_Name() + "' ...");
+					IApiV2ObjectList<Character> characters = await ((IAllExpandableClient<Character>)(object)_gw2ApiManager.Gw2ApiClient.get_V2().get_Characters()).AllAsync(cancellationToken);
 					if (cancellationToken.IsCancellationRequested)
 					{
 						Reset(cancellationToken, !cancellationToken.IsCancellationRequested);
@@ -221,7 +205,7 @@ namespace Kenedia.Modules.Characters.Services
 				}
 				if (!cancellationToken.IsCancellationRequested)
 				{
-					BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Warn(strings.Error_InvalidPermissions);
+					BaseModule<Characters, Kenedia.Modules.Characters.Views.MainWindow, Settings, PathCollection>.Logger.Warn(strings.Error_InvalidPermissions);
 					MainWindow?.SendAPIPermissionNotification();
 					Task<Func<string>> text3 = HandleAPIExceptions(new Gw2ApiInvalidPermissionsException());
 					_apiStatus = StatusType.Error;
@@ -255,7 +239,7 @@ namespace Kenedia.Modules.Characters.Services
 			UnexpectedStatusException ex = (UnexpectedStatusException)obj;
 			Task<Func<string>> text = HandleAPIExceptions((Exception)(object)ex);
 			MainWindow?.SendAPITimeoutNotification();
-			BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Warn((Exception)(object)ex, strings.APITimeoutNotification);
+			BaseModule<Characters, Kenedia.Modules.Characters.Views.MainWindow, Settings, PathCollection>.Logger.Warn((Exception)(object)ex, strings.APITimeoutNotification);
 			Reset(cancellationToken, !cancellationToken.IsCancellationRequested);
 			_apiStatus = StatusType.Error;
 			notificationBadge?.AddNotification(new ConditionalNotification(await text, () => _apiStatus == StatusType.Success));
@@ -267,12 +251,12 @@ namespace Kenedia.Modules.Characters.Services
 			locale.GetValueOrDefault();
 			if (!locale.HasValue)
 			{
-				Locale value = GameService.Overlay.get_UserLocale().get_Value();
+				Locale value = GameService.Overlay.UserLocale.Value;
 				locale = value;
 			}
 			if (force || _data.Maps.Count == 0 || !_data.Maps.FirstOrDefault().Value.Names.TryGetValue(locale.Value, out var name) || string.IsNullOrEmpty(name))
 			{
-				BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info($"No data for {locale.Value} loaded yet. Fetching new data from the API.");
+				BaseModule<Characters, Kenedia.Modules.Characters.Views.MainWindow, Settings, PathCollection>.Logger.Info($"No data for {locale.Value} loaded yet. Fetching new data from the API.");
 				await GetMaps();
 			}
 		}
@@ -283,7 +267,7 @@ namespace Kenedia.Modules.Characters.Services
 			try
 			{
 				Dictionary<int, Map> _maps = _data.Maps;
-				foreach (Map i in (IEnumerable<Map>)(await ((IAllExpandableClient<Map>)(object)_gw2ApiManager.get_Gw2ApiClient().get_V2().get_Maps()).AllAsync(default(CancellationToken))))
+				foreach (Map i in (IEnumerable<Map>)(await ((IAllExpandableClient<Map>)(object)_gw2ApiManager.Gw2ApiClient.get_V2().get_Maps()).AllAsync(default(CancellationToken))))
 				{
 					Map map;
 					bool num = _maps.TryGetValue(i.get_Id(), out map);
@@ -328,12 +312,13 @@ namespace Kenedia.Modules.Characters.Services
 
 		private async Task<Func<string>> HandleAPIExceptions(Exception ex)
 		{
-			if (ex is Gw2ApiInvalidPermissionsException)
+			Exception ex2 = ex;
+			if (ex2 is Gw2ApiInvalidPermissionsException)
 			{
-				ex = (await TestAPI()) ?? ex;
+				ex2 = (await TestAPI()) ?? ex2;
 			}
-			Func<string> result = ((ex is ServiceUnavailableException) ? ((Func<string>)(() => strings_common.GW2API_Unavailable + GetExceptionMessage(ex))) : ((ex is RequestException) ? ((Func<string>)(() => strings_common.GW2API_RequestFailed + GetExceptionMessage(ex))) : ((ex is RequestException<string>) ? ((Func<string>)(() => strings_common.GW2API_RequestFailed + GetExceptionMessage(ex))) : ((!(ex is Gw2ApiInvalidPermissionsException)) ? ((Func<string>)(() => GetExceptionMessage(ex) ?? "")) : ((Func<string>)(() => strings.Error_InvalidPermissions + "\nIf you have a valid API Key added there are probably issues with the API currently."))))));
-			_lastException = ex;
+			Func<string> result = ((ex2 is ServiceUnavailableException) ? ((Func<string>)(() => strings_common.GW2API_Unavailable + GetExceptionMessage(ex2))) : ((ex2 is RequestException) ? ((Func<string>)(() => strings_common.GW2API_RequestFailed + GetExceptionMessage(ex2))) : ((ex2 is RequestException<string>) ? ((Func<string>)(() => strings_common.GW2API_RequestFailed + GetExceptionMessage(ex2))) : ((!(ex2 is Gw2ApiInvalidPermissionsException)) ? ((Func<string>)(() => GetExceptionMessage(ex2) ?? "")) : ((Func<string>)(() => strings.Error_InvalidPermissions + "\nIf you have a valid API Key added there are probably issues with the API currently."))))));
+			_lastException = ex2;
 			return result;
 		}
 
@@ -342,7 +327,7 @@ namespace Kenedia.Modules.Characters.Services
 			try
 			{
 				_lastApiCheck = Common.Now;
-				await ((IBlobClient<Build>)(object)_gw2ApiManager.get_Gw2ApiClient().get_V2().get_Build()).GetAsync(default(CancellationToken));
+				await ((IBlobClient<Build>)(object)_gw2ApiManager.Gw2ApiClient.get_V2().get_Build()).GetAsync(default(CancellationToken));
 				return null;
 			}
 			catch (Exception result)

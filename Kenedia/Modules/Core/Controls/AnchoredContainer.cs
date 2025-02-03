@@ -33,7 +33,7 @@ namespace Kenedia.Modules.Core.Controls
 			}
 			set
 			{
-				Common.SetProperty(ref _anchor, value, OnAnchorChanged);
+				Common.SetProperty(ref _anchor, value, new ValueChangedEventHandler<Control>(OnAnchorChanged));
 			}
 		}
 
@@ -42,33 +42,33 @@ namespace Kenedia.Modules.Core.Controls
 		public RectangleDimensions RelativePosition { get; set; } = new RectangleDimensions(0);
 
 
-		private void OnAnchorChanged(object sender, ValueChangedEventArgs<Control> e)
+		private void OnAnchorChanged(object sender, Kenedia.Modules.Core.Models.ValueChangedEventArgs<Control> e)
 		{
 			if (e.OldValue != null)
 			{
-				e.OldValue!.remove_Moved((EventHandler<MovedEventArgs>)Anchor_Moved);
-				e.OldValue!.remove_Resized((EventHandler<ResizedEventArgs>)Anchor_Moved);
+				e.OldValue!.Moved -= Anchor_Moved;
+				e.OldValue!.Resized -= Anchor_Moved;
 			}
 			if (e.NewValue != null)
 			{
-				e.NewValue!.add_Moved((EventHandler<MovedEventArgs>)Anchor_Moved);
-				e.NewValue!.add_Resized((EventHandler<ResizedEventArgs>)Anchor_Moved);
+				e.NewValue!.Moved += Anchor_Moved;
+				e.NewValue!.Resized += Anchor_Moved;
 			}
 		}
 
 		private void Anchor_Moved(object sender, EventArgs e)
 		{
 			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			((Control)this).set_Location(GetPosition());
+			base.Location = GetPosition();
 		}
 
 		protected override void OnResized(ResizedEventArgs e)
 		{
 			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			((Container)this).OnResized(e);
+			base.OnResized(e);
 			if (Anchor != null)
 			{
-				((Control)this).set_Location(GetPosition());
+				base.Location = GetPosition();
 			}
 		}
 
@@ -88,33 +88,33 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_022a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0231: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0238: Unknown result type (might be due to invalid IL or missing references)
-			Rectangle anchorBounds = Anchor.get_AbsoluteBounds();
+			Rectangle anchorBounds = Anchor.AbsoluteBounds;
 			switch (AnchorPosition)
 			{
 			case AnchorPos.Left:
-				return new Point(((Rectangle)(ref anchorBounds)).get_Left() - ((Control)this).get_Width() + RelativePosition.Left, ((Rectangle)(ref anchorBounds)).get_Top() + RelativePosition.Top);
+				return new Point(((Rectangle)(ref anchorBounds)).get_Left() - base.Width + RelativePosition.Left, ((Rectangle)(ref anchorBounds)).get_Top() + RelativePosition.Top);
 			case AnchorPos.Top:
-				return new Point(((Rectangle)(ref anchorBounds)).get_Left() + RelativePosition.Left, ((Rectangle)(ref anchorBounds)).get_Top() - ((Control)this).get_Height() + RelativePosition.Top);
+				return new Point(((Rectangle)(ref anchorBounds)).get_Left() + RelativePosition.Left, ((Rectangle)(ref anchorBounds)).get_Top() - base.Height + RelativePosition.Top);
 			case AnchorPos.Right:
 				return new Point(((Rectangle)(ref anchorBounds)).get_Right() + RelativePosition.Right, ((Rectangle)(ref anchorBounds)).get_Top() + RelativePosition.Top);
 			case AnchorPos.Bottom:
 				return new Point(((Rectangle)(ref anchorBounds)).get_Left() + RelativePosition.Left, ((Rectangle)(ref anchorBounds)).get_Bottom() + RelativePosition.Bottom);
 			case AnchorPos.AutoHorizontal:
-				if (((Rectangle)(ref anchorBounds)).get_Left() + anchorBounds.Width / 2 <= ((Control)GameService.Graphics.get_SpriteScreen()).get_Right() / 2)
+				if (((Rectangle)(ref anchorBounds)).get_Left() + anchorBounds.Width / 2 <= GameService.Graphics.SpriteScreen.Right / 2)
 				{
 					return new Point(((Rectangle)(ref anchorBounds)).get_Right() + RelativePosition.Right, ((Rectangle)(ref anchorBounds)).get_Top() + RelativePosition.Top);
 				}
-				return new Point(((Rectangle)(ref anchorBounds)).get_Left() - ((Control)this).get_Width() + RelativePosition.Left, ((Rectangle)(ref anchorBounds)).get_Top() + RelativePosition.Top);
+				return new Point(((Rectangle)(ref anchorBounds)).get_Left() - base.Width + RelativePosition.Left, ((Rectangle)(ref anchorBounds)).get_Top() + RelativePosition.Top);
 			case AnchorPos.AutoVertical:
-				if (((Rectangle)(ref anchorBounds)).get_Top() + anchorBounds.Height / 2 <= ((Control)GameService.Graphics.get_SpriteScreen()).get_Bottom() / 2)
+				if (((Rectangle)(ref anchorBounds)).get_Top() + anchorBounds.Height / 2 <= GameService.Graphics.SpriteScreen.Bottom / 2)
 				{
 					return new Point(((Rectangle)(ref anchorBounds)).get_Left() + RelativePosition.Left, ((Rectangle)(ref anchorBounds)).get_Bottom() + RelativePosition.Bottom);
 				}
-				return new Point(((Rectangle)(ref anchorBounds)).get_Left() + RelativePosition.Left, ((Rectangle)(ref anchorBounds)).get_Top() - ((Control)this).get_Height() + RelativePosition.Top);
+				return new Point(((Rectangle)(ref anchorBounds)).get_Left() + RelativePosition.Left, ((Rectangle)(ref anchorBounds)).get_Top() - base.Height + RelativePosition.Top);
 			case AnchorPos.None:
-				return ((Control)this).get_Location();
+				return base.Location;
 			default:
-				return ((Control)this).get_Location();
+				return base.Location;
 			}
 		}
 
@@ -125,9 +125,7 @@ namespace Kenedia.Modules.Core.Controls
 
 		protected override CaptureType CapturesInput()
 		{
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-			return (CaptureType)(((_003F?)CaptureInput) ?? ((Container)this).CapturesInput());
+			return CaptureInput ?? base.CapturesInput();
 		}
 	}
 }

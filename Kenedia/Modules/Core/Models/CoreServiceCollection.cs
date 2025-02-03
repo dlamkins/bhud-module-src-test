@@ -3,7 +3,7 @@ using Kenedia.Modules.Core.Services;
 
 namespace Kenedia.Modules.Core.Models
 {
-	public class ServiceCollection : IDisposable
+	public class CoreServiceCollection : IDisposable
 	{
 		private bool _isDisposed;
 
@@ -15,7 +15,7 @@ namespace Kenedia.Modules.Core.Models
 
 		public InputDetectionService InputDetectionService { get; }
 
-		public ServiceCollection(GameStateDetectionService gameState, ClientWindowService clientWindowService, SharedSettings sharedSettings, InputDetectionService inputDetectionService)
+		public CoreServiceCollection(GameStateDetectionService gameState, ClientWindowService clientWindowService, SharedSettings sharedSettings, InputDetectionService inputDetectionService)
 		{
 			GameStateDetectionService = gameState;
 			ClientWindowService = clientWindowService;

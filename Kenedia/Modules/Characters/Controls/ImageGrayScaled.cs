@@ -1,4 +1,3 @@
-using System;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
@@ -40,15 +39,15 @@ namespace Kenedia.Modules.Characters.Controls
 				{
 					if (temp != null)
 					{
-						temp.remove_TextureSwapped((EventHandler<ValueChangedEventArgs<Texture2D>>)Texture_TextureSwapped);
+						temp.TextureSwapped -= Texture_TextureSwapped;
 					}
 					if (_texture != null)
 					{
-						_texture.add_TextureSwapped((EventHandler<ValueChangedEventArgs<Texture2D>>)Texture_TextureSwapped);
+						_texture.TextureSwapped += Texture_TextureSwapped;
 					}
 					if (_texture != null)
 					{
-						_grayScaleTexture = _texture.get_Texture().ToGrayScaledPalettable();
+						_grayScaleTexture = _texture.Texture.ToGrayScaledPalettable();
 					}
 				}
 			}
@@ -97,8 +96,6 @@ namespace Kenedia.Modules.Characters.Controls
 
 		public Texture2D ToGrayScaledPalettable(Texture2D original)
 		{
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0051: Expected O, but got Unknown
 			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
@@ -108,15 +105,10 @@ namespace Kenedia.Modules.Characters.Controls
 			Color[] colors = (Color[])(object)new Color[original.get_Width() * original.get_Height()];
 			original.GetData<Color>(colors);
 			Color[] destColors = (Color[])(object)new Color[original.get_Width() * original.get_Height()];
-			GraphicsDeviceContext device = GameService.Graphics.LendGraphicsDeviceContext();
 			Texture2D newTexture;
-			try
+			using (GraphicsDeviceContext device = GameService.Graphics.LendGraphicsDeviceContext())
 			{
-				newTexture = new Texture2D(((GraphicsDeviceContext)(ref device)).get_GraphicsDevice(), original.get_Width(), original.get_Height());
-			}
-			finally
-			{
-				((GraphicsDeviceContext)(ref device)).Dispose();
+				newTexture = new Texture2D(device.GraphicsDevice, original.get_Width(), original.get_Height());
 			}
 			for (int i = 0; i < original.get_Width(); i++)
 			{
@@ -152,27 +144,14 @@ namespace Kenedia.Modules.Characters.Controls
 			//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
 			if (_texture != null)
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, (UseGrayScale && !Active && !((Control)this).get_MouseOver()) ? _grayScaleTexture : AsyncTexture2D.op_Implicit(_texture), (SizeRectangle != Rectangle.get_Empty()) ? SizeRectangle : bounds, (Rectangle?)((_textureRectangle == Rectangle.get_Empty()) ? _texture.get_Bounds() : _textureRectangle), Active ? ColorActive : (((Control)this).get_MouseOver() ? ColorHovered : (ColorInActive * (UseGrayScale ? 0.5f : Alpha))), 0f, default(Vector2), (SpriteEffects)0);
+				spriteBatch.DrawOnCtrl(this, (Texture2D)((UseGrayScale && !Active && !base.MouseOver) ? ((object)_grayScaleTexture) : ((object)(Texture2D)_texture)), (SizeRectangle != Rectangle.get_Empty()) ? SizeRectangle : bounds, (_textureRectangle == Rectangle.get_Empty()) ? _texture.Bounds : _textureRectangle, Active ? ColorActive : (base.MouseOver ? ColorHovered : (ColorInActive * (UseGrayScale ? 0.5f : Alpha))), 0f, default(Vector2), (SpriteEffects)0);
 			}
 		}
 
 		private void Texture_TextureSwapped(object sender, ValueChangedEventArgs<Texture2D> e)
 		{
-			_grayScaleTexture = _texture.get_Texture().ToGrayScaledPalettable();
-			_texture.remove_TextureSwapped((EventHandler<ValueChangedEventArgs<Texture2D>>)Texture_TextureSwapped);
+			_grayScaleTexture = _texture.Texture.ToGrayScaledPalettable();
+			_texture.TextureSwapped -= Texture_TextureSwapped;
 		}
-
-		public ImageGrayScaled()
-			: this()
-		{
-		}//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-		//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-
 	}
 }

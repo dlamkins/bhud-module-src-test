@@ -19,7 +19,7 @@ namespace Kenedia.Modules.Characters.Controls
 	{
 		private readonly AsyncTexture2D _iconFrame = AsyncTexture2D.FromAssetId(1414041);
 
-		private readonly FlowPanel _contentPanel;
+		private readonly Kenedia.Modules.Core.Controls.FlowPanel _contentPanel;
 
 		private readonly Dummy _iconDummy;
 
@@ -40,10 +40,10 @@ namespace Kenedia.Modules.Characters.Controls
 		public Color BackgroundTint { get; set; } = Color.get_Honeydew() * 0.95f;
 
 
-		public BitmapFont Font { get; set; } = GameService.Content.get_DefaultFont14();
+		public BitmapFont Font { get; set; } = GameService.Content.DefaultFont14;
 
 
-		public BitmapFont NameFont { get; set; } = GameService.Content.get_DefaultFont18();
+		public BitmapFont NameFont { get; set; } = GameService.Content.DefaultFont18;
 
 
 		public Character_Model Character
@@ -60,11 +60,11 @@ namespace Kenedia.Modules.Characters.Controls
 				{
 					if (temp != null)
 					{
-						temp.Updated -= Character_Updated;
+						temp.Updated -= new EventHandler(Character_Updated);
 					}
 					if (_character != null)
 					{
-						_character.Updated += Character_Updated;
+						_character.Updated += new EventHandler(Character_Updated);
 					}
 				}
 			}
@@ -93,18 +93,20 @@ namespace Kenedia.Modules.Characters.Controls
 			base.BorderColor = Color.get_Black();
 			base.BorderWidth = new RectangleDimensions(2);
 			base.BackgroundColor = Color.get_Black() * 0.6f;
-			((Container)this).set_HeightSizingMode((SizingMode)1);
-			((Container)this).set_AutoSizePadding(new Point(5, 5));
-			FlowPanel flowPanel = new FlowPanel();
-			((Control)flowPanel).set_Parent((Container)(object)this);
-			((FlowPanel)flowPanel).set_FlowDirection((ControlFlowDirection)3);
-			((FlowPanel)flowPanel).set_ControlPadding(new Vector2(5f, 2f));
-			((FlowPanel)flowPanel).set_OuterControlPadding(new Vector2(5f, 0f));
-			((Container)flowPanel).set_AutoSizePadding(new Point(5, 5));
-			_contentPanel = flowPanel;
-			Dummy dummy = new Dummy();
-			((Control)dummy).set_Parent((Container)(object)this);
-			_iconDummy = dummy;
+			HeightSizingMode = SizingMode.AutoSize;
+			base.AutoSizePadding = new Point(5, 5);
+			_contentPanel = new Kenedia.Modules.Core.Controls.FlowPanel
+			{
+				Parent = this,
+				FlowDirection = ControlFlowDirection.SingleTopToBottom,
+				ControlPadding = new Vector2(5f, 2f),
+				OuterControlPadding = new Vector2(5f, 0f),
+				AutoSizePadding = new Point(5, 5)
+			};
+			_iconDummy = new Dummy
+			{
+				Parent = this
+			};
 			_infoLabels = new CharacterLabels(_contentPanel)
 			{
 				Settings = settings,
@@ -128,9 +130,7 @@ namespace Kenedia.Modules.Characters.Controls
 			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
 			base.UpdateContainer(gameTime);
-			((Control)this).set_Location(new Point(Control.get_Input().get_Mouse().get_Position()
-				.X, Control.get_Input().get_Mouse().get_Position()
-				.Y + 35));
+			base.Location = new Point(Control.Input.Mouse.Position.X, Control.Input.Mouse.Position.Y + 35);
 		}
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
@@ -142,16 +142,16 @@ namespace Kenedia.Modules.Characters.Controls
 		public void UpdateSize()
 		{
 			_infoLabels.UpdateDataControlsVisibility(tooltip: true);
-			IEnumerable<Control> visibleControls = _infoLabels.DataControls.Where((Control e) => e.get_Visible());
+			IEnumerable<Control> visibleControls = _infoLabels.DataControls.Where((Control e) => e.Visible);
 			int num = visibleControls.Count();
-			int height = ((num > 0) ? visibleControls.Aggregate(0, (int result, Control ctrl) => result + ctrl.get_Height() + (int)((FlowPanel)_contentPanel).get_ControlPadding().Y) : 0);
+			int height = ((num > 0) ? visibleControls.Aggregate(0, (int result, Control ctrl) => result + ctrl.Height + (int)_contentPanel.ControlPadding.Y) : 0);
 			if (num > 0)
 			{
-				visibleControls.Max((Control ctrl) => (ctrl != _infoLabels.TagPanel) ? ctrl.get_Width() : 0);
+				visibleControls.Max((Control ctrl) => (ctrl != _infoLabels.TagPanel) ? ctrl.Width : 0);
 			}
-			((Control)_contentPanel).set_Height(height);
-			((Control)_contentPanel).set_Width(((Control)this).get_Width());
-			_infoLabels.TagPanel.FitWidestTag(((Control)this).get_Width() - 10);
+			_contentPanel.Height = height;
+			_contentPanel.Width = base.Width;
+			_infoLabels.TagPanel.FitWidestTag(base.Width - 10);
 		}
 
 		protected override void OnShown(EventArgs e)
@@ -160,9 +160,7 @@ namespace Kenedia.Modules.Characters.Controls
 			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
 			base.OnShown(e);
-			((Control)this).set_Location(new Point(Control.get_Input().get_Mouse().get_Position()
-				.X, Control.get_Input().get_Mouse().get_Position()
-				.Y + 35));
+			base.Location = new Point(Control.Input.Mouse.Position.X, Control.Input.Mouse.Position.Y + 35);
 			Character_Updated(this, null);
 		}
 
@@ -171,7 +169,7 @@ namespace Kenedia.Modules.Characters.Controls
 			base.DisposeControl();
 			if (_character != null)
 			{
-				_character.Updated -= Character_Updated;
+				_character.Updated -= new EventHandler(Character_Updated);
 			}
 		}
 	}

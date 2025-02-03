@@ -26,11 +26,10 @@ namespace Kenedia.Modules.Core.Controls
 		public Point? TextureSize { get; set; }
 
 		public FramedImage()
-			: this()
 		{
 			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			((Control)this).set_BackgroundColor(Color.get_Black() * 0.1f);
+			base.BackgroundColor = Color.get_Black() * 0.1f;
 		}
 
 		public FramedImage(int assetId)
@@ -40,8 +39,8 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
 			Texture = AsyncTexture2D.FromAssetId(assetId);
-			Rectangle bounds = Texture.get_Bounds();
-			((Control)this).set_Size(((Rectangle)(ref bounds)).get_Size());
+			Rectangle bounds = Texture.Bounds;
+			base.Size = ((Rectangle)(ref bounds)).get_Size();
 		}
 
 		public override void RecalculateLayout()
@@ -61,15 +60,15 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
-			((Control)this).RecalculateLayout();
-			int xOffset = (int)((double)((Control)this).get_Width() * 0.15);
-			int yOffset = (int)((double)((Control)this).get_Height() * 0.15);
-			Point size = (Point)(((_003F?)TextureSize) ?? ((Control)this).get_Size());
+			base.RecalculateLayout();
+			int xOffset = (int)((double)base.Width * 0.15);
+			int yOffset = (int)((double)base.Height * 0.15);
+			Point size = (Point)(((_003F?)TextureSize) ?? base.Size);
 			Point padding = default(Point);
-			((Point)(ref padding))._002Ector((((Control)this).get_Width() - size.X) / 2, (((Control)this).get_Height() - size.Y) / 2);
+			((Point)(ref padding))._002Ector((base.Width - size.X) / 2, (base.Height - size.Y) / 2);
 			_textureBounds = new Rectangle(xOffset / 2 + padding.X, yOffset / 2 + padding.Y, size.X - xOffset, size.Y - yOffset);
-			_iconFrameBounds = new Rectangle(0, yOffset, ((Control)this).get_Width() - xOffset, ((Control)this).get_Height() - yOffset);
-			_rightIconFrameBounds = new Rectangle(xOffset, 0, ((Control)this).get_Width() - xOffset, ((Control)this).get_Height() - yOffset);
+			_iconFrameBounds = new Rectangle(0, yOffset, base.Width - xOffset, base.Height - yOffset);
+			_rightIconFrameBounds = new Rectangle(xOffset, 0, base.Width - xOffset, base.Height - yOffset);
 		}
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
@@ -93,11 +92,11 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00de: Unknown result type (might be due to invalid IL or missing references)
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(IconFrame), _iconFrameBounds, (Rectangle?)((FrameTextureRegion == Rectangle.get_Empty()) ? IconFrame.get_Bounds() : FrameTextureRegion), Color.get_White());
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(IconFrame), _rightIconFrameBounds, (Rectangle?)((FrameTextureRegion == Rectangle.get_Empty()) ? IconFrame.get_Bounds() : FrameTextureRegion), Color.get_White(), 0f, Vector2.get_Zero(), (SpriteEffects)3);
+			spriteBatch.DrawOnCtrl(this, IconFrame, _iconFrameBounds, (FrameTextureRegion == Rectangle.get_Empty()) ? IconFrame.Bounds : FrameTextureRegion, Color.get_White());
+			spriteBatch.DrawOnCtrl(this, IconFrame, _rightIconFrameBounds, (FrameTextureRegion == Rectangle.get_Empty()) ? IconFrame.Bounds : FrameTextureRegion, Color.get_White(), 0f, Vector2.get_Zero(), (SpriteEffects)3);
 			if (Texture != null)
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(Texture), _textureBounds, (Rectangle?)((TextureRegion == Rectangle.get_Empty()) ? Texture.get_Bounds() : TextureRegion), Color.get_White());
+				spriteBatch.DrawOnCtrl(this, Texture, _textureBounds, (TextureRegion == Rectangle.get_Empty()) ? Texture.Bounds : TextureRegion, Color.get_White());
 			}
 		}
 	}

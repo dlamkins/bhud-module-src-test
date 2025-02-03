@@ -14,7 +14,7 @@ namespace Kenedia.Modules.Characters.Controls
 	{
 		private AsyncTexture2D _icon;
 
-		private BitmapFont _font = GameService.Content.get_DefaultFont14();
+		private BitmapFont _font = GameService.Content.DefaultFont14;
 
 		private string _text;
 
@@ -94,19 +94,18 @@ namespace Kenedia.Modules.Characters.Controls
 			AsyncTexture2D texture = Icon;
 			if (texture != null)
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(texture), _iconRectangle, (Rectangle?)((TextureRectangle == Rectangle.get_Empty()) ? texture.get_Bounds() : TextureRectangle), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
+				spriteBatch.DrawOnCtrl(this, texture, _iconRectangle, (TextureRectangle == Rectangle.get_Empty()) ? texture.Bounds : TextureRectangle, Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
 			}
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, Text, Font, _textRectangle, TextColor, false, (HorizontalAlignment)0, (VerticalAlignment)1);
+			spriteBatch.DrawStringOnCtrl(this, Text, Font, _textRectangle, TextColor);
 		}
 
 		protected override CaptureType CapturesInput()
 		{
-			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
 			if (!CaptureInput)
 			{
-				return (CaptureType)0;
+				return CaptureType.None;
 			}
-			return ((Control)this).CapturesInput();
+			return base.CapturesInput();
 		}
 
 		private void UpdateLayout()
@@ -127,27 +126,14 @@ namespace Kenedia.Modules.Characters.Controls
 			Size2 textbounds = Font.MeasureString(Text);
 			if (AutoSizeWidth)
 			{
-				((Control)this).set_Width(Math.Max((int)textbounds.Width + 4 + ((Icon != null) ? (((Control)this).get_Height() + 5) : 0), ((Control)this).get_Height()));
+				base.Width = Math.Max((int)textbounds.Width + 4 + ((Icon != null) ? (base.Height + 5) : 0), base.Height);
 			}
 			if (AutoSizeHeight)
 			{
-				((Control)this).set_Height(Math.Max((int)textbounds.Height + 4, 0));
+				base.Height = Math.Max((int)textbounds.Height + 4, 0);
 			}
-			_iconRectangle = (Rectangle)((Icon == null) ? Rectangle.get_Empty() : new Rectangle(2, 2, ((Control)this).get_LocalBounds().Height - 4, ((Control)this).get_LocalBounds().Height - 4));
-			_textRectangle = new Rectangle(((Rectangle)(ref _iconRectangle)).get_Right() + ((Icon != null) ? 5 : 0), 2, ((Control)this).get_LocalBounds().Width - (((Rectangle)(ref _iconRectangle)).get_Right() + ((Icon != null) ? 5 : 0) + 2), ((Control)this).get_LocalBounds().Height - 4);
+			_iconRectangle = (Rectangle)((Icon == null) ? Rectangle.get_Empty() : new Rectangle(2, 2, base.LocalBounds.Height - 4, base.LocalBounds.Height - 4));
+			_textRectangle = new Rectangle(((Rectangle)(ref _iconRectangle)).get_Right() + ((Icon != null) ? 5 : 0), 2, base.LocalBounds.Width - (((Rectangle)(ref _iconRectangle)).get_Right() + ((Icon != null) ? 5 : 0) + 2), base.LocalBounds.Height - 4);
 		}
-
-		public IconLabel()
-			: this()
-		{
-		}//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-		//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-
 	}
 }

@@ -14,26 +14,21 @@ namespace Kenedia.Modules.Characters.Views
 		private readonly Action _toggleWindow;
 
 		public SettingsView(Action? toggleWindow)
-			: this()
 		{
 			_toggleWindow = toggleWindow;
 		}
 
 		protected override void Build(Container buildPanel)
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0028: Expected O, but got Unknown
 			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-			StandardButton val = new StandardButton();
-			val.set_Text(strings_common.OpenSettings);
-			((Control)val).set_Width(192);
-			((Control)val).set_Parent(buildPanel);
-			_openSettingsButton = val;
-			((Control)_openSettingsButton).set_Location(new Point(Math.Max(((Control)buildPanel).get_Width() / 2 - ((Control)_openSettingsButton).get_Width() / 2, 20), Math.Max(((Control)buildPanel).get_Height() / 2 - ((Control)_openSettingsButton).get_Height(), 20) - ((Control)_openSettingsButton).get_Height() - 10));
-			((Control)_openSettingsButton).add_Click((EventHandler<MouseEventArgs>)OpenSettingsButton_Click);
+			_openSettingsButton = new StandardButton
+			{
+				Text = strings_common.OpenSettings,
+				Width = 192,
+				Parent = buildPanel
+			};
+			_openSettingsButton.Location = new Point(Math.Max(buildPanel.Width / 2 - _openSettingsButton.Width / 2, 20), Math.Max(buildPanel.Height / 2 - _openSettingsButton.Height, 20) - _openSettingsButton.Height - 10);
+			_openSettingsButton.Click += OpenSettingsButton_Click;
 		}
 
 		private void OpenSettingsButton_Click(object sender, MouseEventArgs e)
@@ -45,7 +40,7 @@ namespace Kenedia.Modules.Characters.Views
 		{
 			if (_openSettingsButton != null)
 			{
-				((Control)_openSettingsButton).remove_Click((EventHandler<MouseEventArgs>)OpenSettingsButton_Click);
+				_openSettingsButton.Click -= OpenSettingsButton_Click;
 			}
 		}
 	}

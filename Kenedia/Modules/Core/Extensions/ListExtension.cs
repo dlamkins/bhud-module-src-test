@@ -8,12 +8,14 @@ namespace Kenedia.Modules.Core.Extensions
 	{
 		public static bool ContainsAny<T>(this IEnumerable<T> sequence, params T[] matches)
 		{
-			return matches.Any((T value) => sequence.Contains(value));
+			IEnumerable<T> sequence2 = sequence;
+			return matches.Any((T value) => sequence2.Contains(value));
 		}
 
 		public static bool ContainsAll<T>(this IEnumerable<T> sequence, params T[] matches)
 		{
-			return matches.All((T value) => sequence.Contains(value));
+			IEnumerable<T> sequence2 = sequence;
+			return matches.All((T value) => sequence2.Contains(value));
 		}
 
 		public static void ForEach<T>(this IEnumerable<T> list, Action<T> action)
@@ -50,7 +52,7 @@ namespace Kenedia.Modules.Core.Extensions
 
 		public static List<List<T>> ChunkBy<T>(this List<T> source, int chunkSize)
 		{
-			return (from x in source.Select((T x, int i) => new
+			return (from x in Enumerable.Select(source, (T x, int i) => new
 				{
 					Index = i,
 					Value = x

@@ -57,10 +57,10 @@ namespace Kenedia.Modules.Characters.Controls
 
 		public TagFlowPanel TagPanel { get; }
 
-		public BitmapFont NameFont { get; set; } = GameService.Content.get_DefaultFont14();
+		public BitmapFont NameFont { get; set; } = GameService.Content.DefaultFont14;
 
 
-		public BitmapFont Font { get; set; } = GameService.Content.get_DefaultFont14();
+		public BitmapFont Font { get; set; } = GameService.Content.DefaultFont14;
 
 
 		public Character_Model Character
@@ -86,7 +86,7 @@ namespace Kenedia.Modules.Characters.Controls
 			}
 			set
 			{
-				Common.SetProperty(ref _data, value, OnDataChanged, triggerOnUpdate: true, "Data");
+				Common.SetProperty(ref _data, value, new PropertyChangedEventHandler(OnDataChanged), triggerOnUpdate: true, "Data");
 			}
 		}
 
@@ -99,15 +99,15 @@ namespace Kenedia.Modules.Characters.Controls
 			set
 			{
 				Settings temp = _settings;
-				if (Common.SetProperty(ref _settings, value, OnSettingsChanged, triggerOnUpdate: true, "Settings"))
+				if (Common.SetProperty(ref _settings, value, new PropertyChangedEventHandler(OnSettingsChanged), triggerOnUpdate: true, "Settings"))
 				{
 					if (temp != null)
 					{
-						temp.AppearanceSettingChanged -= Settings_AppearanceSettingChanged;
+						temp.AppearanceSettingChanged -= new EventHandler(Settings_AppearanceSettingChanged);
 					}
 					if (_settings != null)
 					{
-						_settings.AppearanceSettingChanged += Settings_AppearanceSettingChanged;
+						_settings.AppearanceSettingChanged += new EventHandler(Settings_AppearanceSettingChanged);
 					}
 				}
 			}
@@ -121,15 +121,15 @@ namespace Kenedia.Modules.Characters.Controls
 			}
 			set
 			{
-				Common.SetProperty(ref _textureManager, value, OnTextureManagerAdded, triggerOnUpdate: true, "TextureManager");
+				Common.SetProperty(ref _textureManager, value, new PropertyChangedEventHandler(OnTextureManagerAdded), triggerOnUpdate: true, "TextureManager");
 			}
 		}
 
 		public Func<Character_Model> CurrentCharacter { get; set; }
 
-		public FlowPanel Parent { get; }
+		public Kenedia.Modules.Core.Controls.FlowPanel Parent { get; }
 
-		public CharacterLabels(FlowPanel parent)
+		public CharacterLabels(Kenedia.Modules.Core.Controls.FlowPanel parent)
 		{
 			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
@@ -140,99 +140,101 @@ namespace Kenedia.Modules.Characters.Controls
 			//IL_0269: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02b8: Unknown result type (might be due to invalid IL or missing references)
 			Parent = parent;
-			IconLabel iconLabel = new IconLabel();
-			((Control)iconLabel).set_Parent((Container)(object)parent);
-			iconLabel.AutoSizeWidth = true;
-			iconLabel.AutoSizeHeight = true;
-			iconLabel.TextColor = Colors.ColonialWhite;
-			_nameLabel = iconLabel;
-			IconLabel iconLabel2 = new IconLabel();
-			((Control)iconLabel2).set_Parent((Container)(object)parent);
-			iconLabel2.AutoSizeWidth = true;
-			iconLabel2.AutoSizeHeight = true;
-			iconLabel2.Icon = AsyncTexture2D.FromAssetId(157085);
-			iconLabel2.TextureRectangle = new Rectangle(2, 2, 28, 28);
-			_levelLabel = iconLabel2;
-			IconLabel iconLabel3 = new IconLabel();
-			((Control)iconLabel3).set_Parent((Container)(object)parent);
-			iconLabel3.AutoSizeWidth = true;
-			iconLabel3.AutoSizeHeight = true;
-			_genderLabel = iconLabel3;
-			IconLabel iconLabel4 = new IconLabel();
-			((Control)iconLabel4).set_Parent((Container)(object)parent);
-			iconLabel4.AutoSizeWidth = true;
-			iconLabel4.AutoSizeHeight = true;
-			_raceLabel = iconLabel4;
-			IconLabel iconLabel5 = new IconLabel();
-			((Control)iconLabel5).set_Parent((Container)(object)parent);
-			iconLabel5.AutoSizeWidth = true;
-			iconLabel5.AutoSizeHeight = true;
-			_professionLabel = iconLabel5;
-			IconLabel iconLabel6 = new IconLabel();
-			((Control)iconLabel6).set_Parent((Container)(object)parent);
-			iconLabel6.AutoSizeWidth = true;
-			iconLabel6.AutoSizeHeight = true;
-			iconLabel6.Icon = AsyncTexture2D.FromAssetId(358406);
-			iconLabel6.TextureRectangle = new Rectangle(2, 2, 28, 28);
-			_mapLabel = iconLabel6;
-			CraftingControl craftingControl = new CraftingControl();
-			((Control)craftingControl).set_Parent((Container)(object)parent);
-			((Control)craftingControl).set_Width(((Control)parent).get_Width());
-			((Control)craftingControl).set_Height(20);
-			craftingControl.Character = Character;
-			_craftingControl = craftingControl;
-			IconLabel iconLabel7 = new IconLabel();
-			((Control)iconLabel7).set_Parent((Container)(object)parent);
-			iconLabel7.AutoSizeWidth = true;
-			iconLabel7.AutoSizeHeight = true;
-			iconLabel7.Icon = AsyncTexture2D.FromAssetId(1424243);
-			iconLabel7.TextureRectangle = new Rectangle(2, 2, 28, 28);
-			_ageLabel = iconLabel7;
-			IconLabel iconLabel8 = new IconLabel();
-			((Control)iconLabel8).set_Parent((Container)(object)parent);
-			iconLabel8.AutoSizeWidth = true;
-			iconLabel8.AutoSizeHeight = true;
-			iconLabel8.Icon = AsyncTexture2D.FromAssetId(593864);
-			iconLabel8.TextureRectangle = new Rectangle(2, 2, 28, 28);
-			_nextBirthdayLabel = iconLabel8;
-			IconLabel iconLabel9 = new IconLabel();
-			((Control)iconLabel9).set_Parent((Container)(object)parent);
-			iconLabel9.AutoSizeWidth = true;
-			iconLabel9.AutoSizeHeight = true;
-			iconLabel9.Icon = AsyncTexture2D.FromAssetId(155035);
-			iconLabel9.TextureRectangle = new Rectangle(10, 10, 44, 44);
-			_lastLoginLabel = iconLabel9;
-			IconLabel iconLabel10 = new IconLabel();
-			((Control)iconLabel10).set_Parent((Container)(object)parent);
-			iconLabel10.AutoSizeWidth = true;
-			iconLabel10.AutoSizeHeight = true;
-			iconLabel10.TextureRectangle = new Rectangle(2, 2, 28, 28);
-			iconLabel10.Icon = AsyncTexture2D.FromAssetId(156909);
-			_customIndex = iconLabel10;
-			TagFlowPanel tagFlowPanel = new TagFlowPanel();
-			((Control)tagFlowPanel).set_Parent((Container)(object)parent);
-			tagFlowPanel.Font = _lastLoginLabel.Font;
-			((FlowPanel)tagFlowPanel).set_FlowDirection((ControlFlowDirection)0);
-			((FlowPanel)tagFlowPanel).set_ControlPadding(new Vector2(3f, 2f));
-			((Container)tagFlowPanel).set_HeightSizingMode((SizingMode)1);
-			((Control)tagFlowPanel).set_Visible(false);
-			TagPanel = tagFlowPanel;
+			_nameLabel = new IconLabel
+			{
+				Parent = parent,
+				AutoSizeWidth = true,
+				AutoSizeHeight = true,
+				TextColor = ContentService.Colors.ColonialWhite
+			};
+			_levelLabel = new IconLabel
+			{
+				Parent = parent,
+				AutoSizeWidth = true,
+				AutoSizeHeight = true,
+				Icon = AsyncTexture2D.FromAssetId(157085),
+				TextureRectangle = new Rectangle(2, 2, 28, 28)
+			};
+			_genderLabel = new IconLabel
+			{
+				Parent = parent,
+				AutoSizeWidth = true,
+				AutoSizeHeight = true
+			};
+			_raceLabel = new IconLabel
+			{
+				Parent = parent,
+				AutoSizeWidth = true,
+				AutoSizeHeight = true
+			};
+			_professionLabel = new IconLabel
+			{
+				Parent = parent,
+				AutoSizeWidth = true,
+				AutoSizeHeight = true
+			};
+			_mapLabel = new IconLabel
+			{
+				Parent = parent,
+				AutoSizeWidth = true,
+				AutoSizeHeight = true,
+				Icon = AsyncTexture2D.FromAssetId(358406),
+				TextureRectangle = new Rectangle(2, 2, 28, 28)
+			};
+			_craftingControl = new CraftingControl
+			{
+				Parent = parent,
+				Width = parent.Width,
+				Height = 20,
+				Character = Character
+			};
+			_ageLabel = new IconLabel
+			{
+				Parent = parent,
+				AutoSizeWidth = true,
+				AutoSizeHeight = true,
+				Icon = AsyncTexture2D.FromAssetId(1424243),
+				TextureRectangle = new Rectangle(2, 2, 28, 28)
+			};
+			_nextBirthdayLabel = new IconLabel
+			{
+				Parent = parent,
+				AutoSizeWidth = true,
+				AutoSizeHeight = true,
+				Icon = AsyncTexture2D.FromAssetId(593864),
+				TextureRectangle = new Rectangle(2, 2, 28, 28)
+			};
+			_lastLoginLabel = new IconLabel
+			{
+				Parent = parent,
+				AutoSizeWidth = true,
+				AutoSizeHeight = true,
+				Icon = AsyncTexture2D.FromAssetId(155035),
+				TextureRectangle = new Rectangle(10, 10, 44, 44)
+			};
+			_customIndex = new IconLabel
+			{
+				Parent = parent,
+				AutoSizeWidth = true,
+				AutoSizeHeight = true,
+				TextureRectangle = new Rectangle(2, 2, 28, 28),
+				Icon = AsyncTexture2D.FromAssetId(156909)
+			};
+			TagPanel = new TagFlowPanel
+			{
+				Parent = parent,
+				Font = _lastLoginLabel.Font,
+				FlowDirection = ControlFlowDirection.LeftToRight,
+				ControlPadding = new Vector2(3f, 2f),
+				HeightSizingMode = SizingMode.AutoSize,
+				Visible = false
+			};
 			DataControls = new List<Control>
 			{
-				(Control)(object)_nameLabel,
-				(Control)(object)_customIndex,
-				(Control)(object)_levelLabel,
-				(Control)(object)_genderLabel,
-				(Control)(object)_raceLabel,
-				(Control)(object)_professionLabel,
-				(Control)(object)_mapLabel,
-				(Control)(object)_nextBirthdayLabel,
-				(Control)(object)_ageLabel,
-				(Control)(object)_lastLoginLabel,
-				(Control)(object)_craftingControl,
-				(Control)(object)TagPanel
+				_nameLabel, _customIndex, _levelLabel, _genderLabel, _raceLabel, _professionLabel, _mapLabel, _nextBirthdayLabel, _ageLabel, _lastLoginLabel,
+				_craftingControl, TagPanel
 			};
-			LocalizingService.LocaleChanged += UserLocale_SettingChanged;
+			LocalizingService.LocaleChanged += new EventHandler<ValueChangedEventArgs<Locale>>(UserLocale_SettingChanged);
 			UserLocale_SettingChanged(null, null);
 			UpdateDataControlsVisibility();
 			_created = true;
@@ -261,20 +263,20 @@ namespace Kenedia.Modules.Characters.Controls
 		{
 			if (_genderLabel != null)
 			{
-				_genderLabel.Icon = AsyncTexture2D.op_Implicit(_textureManager?.GetIcon(TextureManager.Icons.Gender));
+				_genderLabel.Icon = (AsyncTexture2D)(_textureManager?.GetIcon(Kenedia.Modules.Characters.Services.TextureManager.Icons.Gender));
 			}
 		}
 
 		public void RecalculateBounds()
 		{
 			UpdateDataControlsVisibility();
-			TagPanel.FitWidestTag(DataControls.Max((Control e) => (e.get_Visible() && e != TagPanel) ? e.get_Width() : 0));
+			TagPanel.FitWidestTag(DataControls.Max((Control e) => (e.Visible && e != TagPanel) ? e.Width : 0));
 		}
 
 		public void Dispose()
 		{
-			((IEnumerable<IDisposable>)DataControls)?.DisposeAll();
-			LocalizingService.LocaleChanged -= UserLocale_SettingChanged;
+			DataControls?.DisposeAll();
+			LocalizingService.LocaleChanged -= new EventHandler<ValueChangedEventArgs<Locale>>(UserLocale_SettingChanged);
 		}
 
 		public void UpdateCharacterInfo()
@@ -295,7 +297,7 @@ namespace Kenedia.Modules.Characters.Controls
 			_professionLabel.Text = Character.SpecializationName;
 			if (_professionLabel.Icon != null)
 			{
-				_professionLabel.TextureRectangle = ((_professionLabel.Icon.get_Width() == 32) ? new Rectangle(2, 2, 28, 28) : new Rectangle(4, 4, 56, 56));
+				_professionLabel.TextureRectangle = ((_professionLabel.Icon.Width == 32) ? new Rectangle(2, 2, 28, 28) : new Rectangle(4, 4, 56, 56));
 			}
 			IconLabel genderLabel = _genderLabel;
 			Gender gender = Character.Gender;
@@ -321,21 +323,21 @@ namespace Kenedia.Modules.Characters.Controls
 				}
 				foreach (Tag t in deleteList)
 				{
-					((Control)t).Dispose();
+					t.Dispose();
 					_tags.Remove(t);
 				}
 				foreach (string tag in addTags)
 				{
-					List<Tag> tags = _tags;
-					Tag tag3 = new Tag();
-					((Control)tag3).set_Parent((Container)(object)TagPanel);
-					tag3.Text = tag;
-					tag3.Active = true;
-					tag3.ShowDelete = false;
-					tag3.CanInteract = false;
-					tags.Add(tag3);
+					_tags.Add(new Tag
+					{
+						Parent = TagPanel,
+						Text = tag,
+						Active = true,
+						ShowDelete = false,
+						CanInteract = false
+					});
 				}
-				TagPanel.FitWidestTag(DataControls.Max((Control e) => (e.get_Visible() && e != TagPanel) ? e.get_Width() : 0));
+				TagPanel.FitWidestTag(DataControls.Max((Control e) => (e.Visible && e != TagPanel) ? e.Width : 0));
 			}
 			_craftingControl.Character = Character;
 		}
@@ -343,83 +345,72 @@ namespace Kenedia.Modules.Characters.Controls
 		public void UpdateDataControlsVisibility(bool tooltip = false)
 		{
 			//IL_039a: Unknown result type (might be due to invalid IL or missing references)
-			if (_settings == null)
+			if (_settings != null)
 			{
-				return;
-			}
-			Dictionary<string, ShowCheckPair> settings = _settings.DisplayToggles.get_Value();
-			NameFont = GetFont(nameFont: true);
-			Font = GetFont();
-			((Control)_nameLabel).set_Visible(!settings.TryGetValue("Name", out var name) || (tooltip ? name.ShowTooltip : name.Show));
-			_nameLabel.Font = NameFont;
-			((Control)_levelLabel).set_Visible(!settings.TryGetValue("Level", out var level) || (tooltip ? level.ShowTooltip : level.Show));
-			_levelLabel.Font = Font;
-			((Control)_genderLabel).set_Visible(!settings.TryGetValue("Gender", out var gender) || (tooltip ? gender.ShowTooltip : gender.Show));
-			_genderLabel.Font = Font;
-			((Control)_raceLabel).set_Visible(!settings.TryGetValue("Race", out var race) || (tooltip ? race.ShowTooltip : race.Show));
-			_raceLabel.Font = Font;
-			((Control)_professionLabel).set_Visible(!settings.TryGetValue("Profession", out var profession) || (tooltip ? profession.ShowTooltip : profession.Show));
-			_professionLabel.Font = Font;
-			((Control)_lastLoginLabel).set_Visible(!settings.TryGetValue("LastLogin", out var lastlogin) || (tooltip ? lastlogin.ShowTooltip : lastlogin.Show));
-			_lastLoginLabel.Font = Font;
-			((Control)_ageLabel).set_Visible(!settings.TryGetValue("Age", out var age) || (tooltip ? age.ShowTooltip : age.Show));
-			_ageLabel.Font = Font;
-			((Control)_nextBirthdayLabel).set_Visible(!settings.TryGetValue("NextBirthday", out var nextbirthday) || (tooltip ? nextbirthday.ShowTooltip : nextbirthday.Show));
-			_nextBirthdayLabel.Font = Font;
-			((Control)_mapLabel).set_Visible(!settings.TryGetValue("Map", out var map) || (tooltip ? map.ShowTooltip : map.Show));
-			_mapLabel.Font = Font;
-			((Control)_craftingControl).set_Visible(!settings.TryGetValue("CraftingProfession", out var craftingprofession) || (tooltip ? craftingprofession.ShowTooltip : craftingprofession.Show));
-			_craftingControl.Font = Font;
-			((Control)_customIndex).set_Visible(!settings.TryGetValue("CustomIndex", out var customindex) || (tooltip ? customindex.ShowTooltip : customindex.Show));
-			_customIndex.Font = Font;
-			((Control)TagPanel).set_Visible((!settings.TryGetValue("Tags", out var tags) || (tooltip ? tags.ShowTooltip : tags.Show)) && (Character?.Tags.Count ?? 0) > 0);
-			TagPanel.Font = Font;
-			((Control)_craftingControl).set_Height(Font.get_LineHeight() + 2);
-			if (Parent != null)
-			{
-				((FlowPanel)Parent).set_ControlPadding(new Vector2((float)(Font.get_LineHeight() / 10), (float)(Font.get_LineHeight() / 10)));
-				FlowPanel parent = Parent;
-				if (parent != null)
+				Dictionary<string, ShowCheckPair> settings = _settings.DisplayToggles.Value;
+				NameFont = GetFont(nameFont: true);
+				Font = GetFont();
+				_nameLabel.Visible = !settings.TryGetValue("Name", out var name) || (tooltip ? name.ShowTooltip : name.Show);
+				_nameLabel.Font = NameFont;
+				_levelLabel.Visible = !settings.TryGetValue("Level", out var level) || (tooltip ? level.ShowTooltip : level.Show);
+				_levelLabel.Font = Font;
+				_genderLabel.Visible = !settings.TryGetValue("Gender", out var gender) || (tooltip ? gender.ShowTooltip : gender.Show);
+				_genderLabel.Font = Font;
+				_raceLabel.Visible = !settings.TryGetValue("Race", out var race) || (tooltip ? race.ShowTooltip : race.Show);
+				_raceLabel.Font = Font;
+				_professionLabel.Visible = !settings.TryGetValue("Profession", out var profession) || (tooltip ? profession.ShowTooltip : profession.Show);
+				_professionLabel.Font = Font;
+				_lastLoginLabel.Visible = !settings.TryGetValue("LastLogin", out var lastlogin) || (tooltip ? lastlogin.ShowTooltip : lastlogin.Show);
+				_lastLoginLabel.Font = Font;
+				_ageLabel.Visible = !settings.TryGetValue("Age", out var age) || (tooltip ? age.ShowTooltip : age.Show);
+				_ageLabel.Font = Font;
+				_nextBirthdayLabel.Visible = !settings.TryGetValue("NextBirthday", out var nextbirthday) || (tooltip ? nextbirthday.ShowTooltip : nextbirthday.Show);
+				_nextBirthdayLabel.Font = Font;
+				_mapLabel.Visible = !settings.TryGetValue("Map", out var map) || (tooltip ? map.ShowTooltip : map.Show);
+				_mapLabel.Font = Font;
+				_craftingControl.Visible = !settings.TryGetValue("CraftingProfession", out var craftingprofession) || (tooltip ? craftingprofession.ShowTooltip : craftingprofession.Show);
+				_craftingControl.Font = Font;
+				_customIndex.Visible = !settings.TryGetValue("CustomIndex", out var customindex) || (tooltip ? customindex.ShowTooltip : customindex.Show);
+				_customIndex.Font = Font;
+				TagPanel.Visible = (!settings.TryGetValue("Tags", out var tags) || (tooltip ? tags.ShowTooltip : tags.Show)) && (Character?.Tags.Count ?? 0) > 0;
+				TagPanel.Font = Font;
+				_craftingControl.Height = Font.get_LineHeight() + 2;
+				if (Parent != null)
 				{
-					((Control)parent).Invalidate();
+					Parent.ControlPadding = new Vector2((float)(Font.get_LineHeight() / 10), (float)(Font.get_LineHeight() / 10));
+					Parent?.Invalidate();
 				}
 			}
 		}
 
 		private BitmapFont GetFont(bool nameFont = false)
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-			FontSize fontSize = (FontSize)8;
+			ContentService.FontSize fontSize = ContentService.FontSize.Size8;
 			if (_settings == null)
 			{
-				return GameService.Content.get_DefaultFont12();
+				return GameService.Content.DefaultFont12;
 			}
-			switch (_settings.PanelSize.get_Value())
+			switch (_settings.PanelSize.Value)
 			{
-			case Settings.PanelSizes.Small:
-				fontSize = (FontSize)(nameFont ? 16 : 12);
+			case Kenedia.Modules.Characters.Services.Settings.PanelSizes.Small:
+				fontSize = (nameFont ? ContentService.FontSize.Size16 : ContentService.FontSize.Size12);
 				break;
-			case Settings.PanelSizes.Normal:
-				fontSize = (FontSize)(nameFont ? 18 : 14);
+			case Kenedia.Modules.Characters.Services.Settings.PanelSizes.Normal:
+				fontSize = (nameFont ? ContentService.FontSize.Size18 : ContentService.FontSize.Size14);
 				break;
-			case Settings.PanelSizes.Large:
-				fontSize = (FontSize)(nameFont ? 22 : 18);
+			case Kenedia.Modules.Characters.Services.Settings.PanelSizes.Large:
+				fontSize = (nameFont ? ContentService.FontSize.Size22 : ContentService.FontSize.Size18);
 				break;
-			case Settings.PanelSizes.Custom:
-				fontSize = (FontSize)(nameFont ? _settings.CustomCharacterNameFontSize.get_Value() : _settings.CustomCharacterFontSize.get_Value());
+			case Kenedia.Modules.Characters.Services.Settings.PanelSizes.Custom:
+				fontSize = (ContentService.FontSize)(nameFont ? _settings.CustomCharacterNameFontSize.Value : _settings.CustomCharacterFontSize.Value);
 				break;
 			}
-			return GameService.Content.GetFont((FontFace)0, fontSize, (FontStyle)0);
+			return GameService.Content.GetFont(ContentService.FontFace.Menomonia, fontSize, ContentService.FontStyle.Regular);
 		}
 
 		internal void Update()
 		{
-			if (Character != null && ((Control)_lastLoginLabel).get_Visible())
+			if (Character != null && _lastLoginLabel.Visible)
 			{
 				if (CurrentCharacter?.Invoke() != Character)
 				{
@@ -431,22 +422,18 @@ namespace Kenedia.Modules.Characters.Controls
 					_lastLoginLabel.Text = string.Format("{1} {0} {2:00}:{3:00}:{4:00}", strings.Days, 0, 0, 0, 0);
 				}
 			}
-			if (Character != null && ((Control)_nextBirthdayLabel).get_Visible())
+			if (Character != null && _nextBirthdayLabel.Visible)
 			{
 				TimeSpan ts = Character.UntilNextBirthday;
 				_nextBirthdayLabel.Text = string.Format("{1} {0} {2:00}:{3:00}:{4:00}", strings.Days, Math.Floor(ts.TotalDays), ts.Hours, ts.Minutes, ts.Seconds);
 			}
-			if (Character != null && ((Control)_ageLabel).get_Visible())
+			if (Character != null && _ageLabel.Visible)
 			{
 				_ageLabel.Text = string.Format("{1} ({0} Years)", Character.Age, Character.Created.Date.ToString("d"));
 			}
-			if (_created)
+			if (_created && (Parent?.Visible ?? false))
 			{
-				FlowPanel parent = Parent;
-				if (parent != null && ((Control)parent).get_Visible())
-				{
-					UpdateCharacterInfo();
-				}
+				UpdateCharacterInfo();
 			}
 		}
 

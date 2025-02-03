@@ -25,11 +25,10 @@ namespace Kenedia.Modules.Core.Controls
 		public BitmapFont Font { get; set; }
 
 		public TabButton()
-			: this()
 		{
 			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			((Control)this).set_Height(25);
+			base.Height = 25;
 		}
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
@@ -87,29 +86,29 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_027d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0283: Unknown result type (might be due to invalid IL or missing references)
 			Color bgColor = (Active ? Color.get_Transparent() : Color.get_Black());
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), bounds, (Rectangle?)Rectangle.get_Empty(), bgColor * (((Control)this).get_MouseOver() ? 0.35f : 0.55f));
+			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, bounds, Rectangle.get_Empty(), bgColor * (base.MouseOver ? 0.35f : 0.55f));
 			if (Icon != null)
 			{
-				Rectangle tRect = ((TextureRectangle != Rectangle.get_Empty()) ? TextureRectangle : Icon.get_Bounds());
+				Rectangle tRect = ((TextureRectangle != Rectangle.get_Empty()) ? TextureRectangle : Icon.Bounds);
 				int size = bounds.Height - 4;
 				if (UseGrayScale && IconGrayScale == null)
 				{
-					IconGrayScale = AsyncTexture2D.op_Implicit(Icon.get_Texture().ToGrayScaledPalettable());
+					IconGrayScale = (AsyncTexture2D)Icon.Texture.ToGrayScaledPalettable();
 				}
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(Active ? Icon : (UseGrayScale ? IconGrayScale : Icon)), new Rectangle(2 + (bounds.Width - size) / 2, 3, size, size), (Rectangle?)tRect, (Color)(Active ? Color.get_White() : new Color(75, 75, 75)), 0f, default(Vector2), (SpriteEffects)0);
+				spriteBatch.DrawOnCtrl(this, Active ? Icon : (UseGrayScale ? IconGrayScale : Icon), new Rectangle(2 + (bounds.Width - size) / 2, 3, size, size), tRect, (Color)(Active ? Color.get_White() : new Color(75, 75, 75)), 0f, default(Vector2), (SpriteEffects)0);
 			}
 			Color color = Color.get_Black();
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), bounds.Width, 2), (Rectangle?)Rectangle.get_Empty(), color * 0.5f);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), bounds.Width, 1), (Rectangle?)Rectangle.get_Empty(), color * 0.6f);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), 2, bounds.Height), (Rectangle?)Rectangle.get_Empty(), color * 0.5f);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), 1, bounds.Height), (Rectangle?)Rectangle.get_Empty(), color * 0.6f);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Right() - 2, ((Rectangle)(ref bounds)).get_Top(), 2, bounds.Height), (Rectangle?)Rectangle.get_Empty(), color * 0.5f);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Right() - 1, ((Rectangle)(ref bounds)).get_Top(), 1, bounds.Height), (Rectangle?)Rectangle.get_Empty(), color * 0.6f);
+			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), bounds.Width, 2), Rectangle.get_Empty(), color * 0.5f);
+			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), bounds.Width, 1), Rectangle.get_Empty(), color * 0.6f);
+			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), 2, bounds.Height), Rectangle.get_Empty(), color * 0.5f);
+			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), 1, bounds.Height), Rectangle.get_Empty(), color * 0.6f);
+			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref bounds)).get_Right() - 2, ((Rectangle)(ref bounds)).get_Top(), 2, bounds.Height), Rectangle.get_Empty(), color * 0.5f);
+			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref bounds)).get_Right() - 1, ((Rectangle)(ref bounds)).get_Top(), 1, bounds.Height), Rectangle.get_Empty(), color * 0.6f);
 		}
 
 		protected override void OnClick(MouseEventArgs e)
 		{
-			((Control)this).OnClick(e);
+			base.OnClick(e);
 		}
 	}
 }

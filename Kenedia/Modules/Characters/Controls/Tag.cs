@@ -13,9 +13,9 @@ using MonoGame.Extended.BitmapFonts;
 
 namespace Kenedia.Modules.Characters.Controls
 {
-	public class Tag : FlowPanel, IFontControl
+	public class Tag : Blish_HUD.Controls.FlowPanel, IFontControl
 	{
-		private readonly Label _text;
+		private readonly Kenedia.Modules.Core.Controls.Label _text;
 
 		private readonly ImageButton _delete;
 
@@ -41,19 +41,19 @@ namespace Kenedia.Modules.Characters.Controls
 		{
 			get
 			{
-				return ((Label)_text).get_Font();
+				return _text.Font;
 			}
 			set
 			{
 				//IL_0026: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-				if (value != null && ((Label)_text).get_Font() != value)
+				if (value != null && _text.Font != value)
 				{
-					((Control)_dummy).set_Size(new Point(value.get_LineHeight(), value.get_LineHeight()));
-					((Control)_delete).set_Size(new Point(value.get_LineHeight(), value.get_LineHeight()));
-					((Label)_text).set_Font(value);
-					((Control)_text).set_Height(Math.Max(20, value.get_LineHeight() + 4));
-					((Control)this).set_Height(Math.Max(20, value.get_LineHeight() + 4) + 5);
+					_dummy.Size = new Point(value.get_LineHeight(), value.get_LineHeight());
+					_delete.Size = new Point(value.get_LineHeight(), value.get_LineHeight());
+					_text.Font = value;
+					_text.Height = Math.Max(20, value.get_LineHeight() + 4);
+					base.Height = Math.Max(20, value.get_LineHeight() + 4) + 5;
 				}
 			}
 		}
@@ -89,7 +89,7 @@ namespace Kenedia.Modules.Characters.Controls
 				if (value != null)
 				{
 					CreateDisabledBackground(null, null);
-					_background.add_TextureSwapped((EventHandler<ValueChangedEventArgs<Texture2D>>)CreateDisabledBackground);
+					_background.TextureSwapped += CreateDisabledBackground;
 				}
 			}
 		}
@@ -98,15 +98,15 @@ namespace Kenedia.Modules.Characters.Controls
 		{
 			get
 			{
-				return ((Control)_delete).get_Visible();
+				return _delete.Visible;
 			}
 			set
 			{
 				if (_delete != null)
 				{
-					((Control)_delete).set_Visible(value);
-					((Control)_dummy).set_Visible(!value);
-					((Control)this).Invalidate();
+					_delete.Visible = value;
+					_dummy.Visible = !value;
+					Invalidate();
 				}
 			}
 		}
@@ -115,12 +115,7 @@ namespace Kenedia.Modules.Characters.Controls
 		{
 			get
 			{
-				Label text = _text;
-				if (text == null)
-				{
-					return null;
-				}
-				return ((Label)text).get_Text();
+				return _text?.Text;
 			}
 			set
 			{
@@ -131,9 +126,9 @@ namespace Kenedia.Modules.Characters.Controls
 				//IL_006c: Unknown result type (might be due to invalid IL or missing references)
 				if (_text != null)
 				{
-					((Label)_text).set_Text(value);
-					((Control)_text).set_Width((int)Font.MeasureString(value).Width + 4);
-					((Control)this).set_Width((int)Font.MeasureString(value).Width + ((Control)_delete).get_Width() + (int)((FlowPanel)this).get_OuterControlPadding().X + ((Container)this).get_AutoSizePadding().X + (int)((FlowPanel)this).get_ControlPadding().X);
+					_text.Text = value;
+					_text.Width = (int)Font.MeasureString(value).Width + 4;
+					base.Width = (int)Font.MeasureString(value).Width + _delete.Width + (int)base.OuterControlPadding.X + base.AutoSizePadding.X + (int)base.ControlPadding.X;
 				}
 			}
 		}
@@ -143,7 +138,6 @@ namespace Kenedia.Modules.Characters.Controls
 		public event EventHandler ActiveChanged;
 
 		public Tag()
-			: this()
 		{
 			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
@@ -160,35 +154,38 @@ namespace Kenedia.Modules.Characters.Controls
 			//IL_01e3: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0205: Unknown result type (might be due to invalid IL or missing references)
 			Background = AsyncTexture2D.FromAssetId(1620622);
-			((FlowPanel)this).set_FlowDirection((ControlFlowDirection)2);
-			((FlowPanel)this).set_OuterControlPadding(new Vector2(3f, 3f));
-			((FlowPanel)this).set_ControlPadding(new Vector2(4f, 0f));
-			((Container)this).set_AutoSizePadding(new Point(5, 0));
-			ImageButton imageButton = new ImageButton();
-			((Control)imageButton).set_Parent((Container)(object)this);
-			imageButton.Texture = AsyncTexture2D.FromAssetId(156012);
-			imageButton.HoveredTexture = AsyncTexture2D.FromAssetId(156011);
-			imageButton.TextureRectangle = new Rectangle(4, 4, 24, 24);
-			((Control)imageButton).set_Size(new Point(20, 20));
-			((Control)imageButton).set_BasicTooltipText(string.Format(strings.DeleteItem, strings.Tag));
-			_delete = imageButton;
-			((Control)_delete).add_Click((EventHandler<MouseEventArgs>)Delete_Click);
-			ImageButton imageButton2 = new ImageButton();
-			((Control)imageButton2).set_Parent((Container)(object)this);
-			imageButton2.Texture = AsyncTexture2D.FromAssetId(156025);
-			imageButton2.TextureRectangle = new Rectangle(44, 48, 43, 46);
-			((Control)imageButton2).set_Size(new Point(20, 20));
-			((Control)imageButton2).set_Visible(false);
-			_dummy = imageButton2;
-			Label label = new Label();
-			((Control)label).set_Parent((Container)(object)this);
-			((Control)label).set_Height(Math.Max(20, Control.get_Content().get_DefaultFont14().get_LineHeight() + 4));
-			((Label)label).set_VerticalAlignment((VerticalAlignment)1);
-			((Label)label).set_Text("Tag");
-			_text = label;
-			((Control)this).set_Height(Math.Max(20, Font.get_LineHeight() + 4) + 5);
-			((Control)this).set_Width((int)Font.MeasureString("Tag").Width + ((Control)_delete).get_Width() + (int)((FlowPanel)this).get_OuterControlPadding().X + ((Container)this).get_AutoSizePadding().X + (int)((FlowPanel)this).get_ControlPadding().X);
-			((Control)_text).set_Width((int)Font.MeasureString("Tag").Width + 4);
+			base.FlowDirection = ControlFlowDirection.SingleLeftToRight;
+			base.OuterControlPadding = new Vector2(3f, 3f);
+			base.ControlPadding = new Vector2(4f, 0f);
+			base.AutoSizePadding = new Point(5, 0);
+			_delete = new ImageButton
+			{
+				Parent = this,
+				Texture = AsyncTexture2D.FromAssetId(156012),
+				HoveredTexture = AsyncTexture2D.FromAssetId(156011),
+				TextureRectangle = new Rectangle(4, 4, 24, 24),
+				Size = new Point(20, 20),
+				BasicTooltipText = string.Format(strings.DeleteItem, strings.Tag)
+			};
+			_delete.Click += Delete_Click;
+			_dummy = new ImageButton
+			{
+				Parent = this,
+				Texture = AsyncTexture2D.FromAssetId(156025),
+				TextureRectangle = new Rectangle(44, 48, 43, 46),
+				Size = new Point(20, 20),
+				Visible = false
+			};
+			_text = new Kenedia.Modules.Core.Controls.Label
+			{
+				Parent = this,
+				Height = Math.Max(20, Control.Content.DefaultFont14.get_LineHeight() + 4),
+				VerticalAlignment = VerticalAlignment.Middle,
+				Text = "Tag"
+			};
+			base.Height = Math.Max(20, Font.get_LineHeight() + 4) + 5;
+			base.Width = (int)Font.MeasureString("Tag").Width + _delete.Width + (int)base.OuterControlPadding.X + base.AutoSizePadding.X + (int)base.ControlPadding.X;
+			_text.Width = (int)Font.MeasureString("Tag").Width + 4;
 		}
 
 		public void SetActive(bool active)
@@ -248,25 +245,25 @@ namespace Kenedia.Modules.Characters.Controls
 			//IL_024d: Unknown result type (might be due to invalid IL or missing references)
 			if (_background != null)
 			{
-				AsyncTexture2D texture = (Active ? _background : ((_disabledBackground != null) ? AsyncTexture2D.op_Implicit(_disabledBackground) : _background));
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(texture), bounds, (Rectangle?)bounds, Active ? (Color.get_White() * 0.98f) : (_disabledColor * 0.8f));
+				AsyncTexture2D texture = (Active ? _background : ((_disabledBackground != null) ? ((AsyncTexture2D)_disabledBackground) : _background));
+				spriteBatch.DrawOnCtrl(this, texture, bounds, bounds, Active ? (Color.get_White() * 0.98f) : (_disabledColor * 0.8f));
 			}
 			Color color = Color.get_Black();
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), bounds.Width, 2), (Rectangle?)Rectangle.get_Empty(), color * 0.5f);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), bounds.Width, 1), (Rectangle?)Rectangle.get_Empty(), color * 0.6f);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Bottom() - 2, bounds.Width, 2), (Rectangle?)Rectangle.get_Empty(), color * 0.5f);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Bottom() - 1, bounds.Width, 1), (Rectangle?)Rectangle.get_Empty(), color * 0.6f);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), 2, bounds.Height), (Rectangle?)Rectangle.get_Empty(), color * 0.5f);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), 1, bounds.Height), (Rectangle?)Rectangle.get_Empty(), color * 0.6f);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Right() - 2, ((Rectangle)(ref bounds)).get_Top(), 2, bounds.Height), (Rectangle?)Rectangle.get_Empty(), color * 0.5f);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Right() - 1, ((Rectangle)(ref bounds)).get_Top(), 1, bounds.Height), (Rectangle?)Rectangle.get_Empty(), color * 0.6f);
+			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), bounds.Width, 2), Rectangle.get_Empty(), color * 0.5f);
+			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), bounds.Width, 1), Rectangle.get_Empty(), color * 0.6f);
+			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Bottom() - 2, bounds.Width, 2), Rectangle.get_Empty(), color * 0.5f);
+			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Bottom() - 1, bounds.Width, 1), Rectangle.get_Empty(), color * 0.6f);
+			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), 2, bounds.Height), Rectangle.get_Empty(), color * 0.5f);
+			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), 1, bounds.Height), Rectangle.get_Empty(), color * 0.6f);
+			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref bounds)).get_Right() - 2, ((Rectangle)(ref bounds)).get_Top(), 2, bounds.Height), Rectangle.get_Empty(), color * 0.5f);
+			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref bounds)).get_Right() - 1, ((Rectangle)(ref bounds)).get_Top(), 1, bounds.Height), Rectangle.get_Empty(), color * 0.6f);
 		}
 
 		protected override void OnClick(MouseEventArgs e)
 		{
-			if (!((Control)_delete).get_MouseOver())
+			if (!_delete.MouseOver)
 			{
-				((Panel)this).OnClick(e);
+				base.OnClick(e);
 				if (CanInteract)
 				{
 					Active = !Active;
@@ -279,13 +276,13 @@ namespace Kenedia.Modules.Characters.Controls
 		{
 			this.Deleted?.Invoke(this, EventArgs.Empty);
 			OnDeleteAction?.Invoke();
-			((Control)this).Dispose();
+			Dispose();
 		}
 
 		private void CreateDisabledBackground(object sender, ValueChangedEventArgs<Texture2D> e)
 		{
-			_disabledBackground = _background.get_Texture().ToGrayScaledPalettable();
-			_background.remove_TextureSwapped((EventHandler<ValueChangedEventArgs<Texture2D>>)CreateDisabledBackground);
+			_disabledBackground = _background.Texture.ToGrayScaledPalettable();
+			_background.TextureSwapped -= CreateDisabledBackground;
 		}
 	}
 }

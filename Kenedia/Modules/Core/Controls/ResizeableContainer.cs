@@ -44,9 +44,9 @@ namespace Kenedia.Modules.Core.Controls
 				//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-				Rectangle localBounds = ((Control)this).get_LocalBounds();
+				Rectangle localBounds = base.LocalBounds;
 				int num = ((Rectangle)(ref localBounds)).get_Right() - 15;
-				localBounds = ((Control)this).get_LocalBounds();
+				localBounds = base.LocalBounds;
 				return new Rectangle(num, ((Rectangle)(ref localBounds)).get_Bottom() - 15, 15, 15);
 			}
 		}
@@ -56,6 +56,8 @@ namespace Kenedia.Modules.Core.Controls
 
 		public bool CanChange { get; set; } = true;
 
+
+		public bool ShowCenter { get; set; }
 
 		public override void UpdateContainer(GameTime gameTime)
 		{
@@ -76,19 +78,18 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
 			base.UpdateContainer(gameTime);
-			_dragging = _dragging && ((Control)this).get_MouseOver();
-			_resizing = _resizing && ((Control)this).get_MouseOver();
-			_mouseOverResizeHandle = _mouseOverResizeHandle && ((Control)this).get_MouseOver();
+			_dragging = _dragging && base.MouseOver;
+			_resizing = _resizing && base.MouseOver;
+			_mouseOverResizeHandle = _mouseOverResizeHandle && base.MouseOver;
 			if (_dragging)
 			{
-				((Control)this).set_Location(Control.get_Input().get_Mouse().get_Position()
-					.Add(new Point(-_draggingStart.X, -_draggingStart.Y)));
+				base.Location = Control.Input.Mouse.Position.Add(new Point(-_draggingStart.X, -_draggingStart.Y));
 			}
 			if (_resizing)
 			{
-				Point nOffset = Control.get_Input().get_Mouse().get_Position() - _dragStart;
+				Point nOffset = Control.Input.Mouse.Position - _dragStart;
 				Point newSize = _resizeStart + nOffset;
-				((Control)this).set_Size(new Point(MathHelper.Clamp(newSize.X, 50, MaxSize.X), MathHelper.Clamp(newSize.Y, 25, MaxSize.Y)));
+				base.Size = new Point(MathHelper.Clamp(newSize.X, 50, MaxSize.X), MathHelper.Clamp(newSize.Y, 25, MaxSize.Y));
 			}
 		}
 
@@ -97,17 +98,16 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
-			_resizeHandleBounds = new Rectangle(((Control)this).get_Width() - _resizeTexture.get_Width(), ((Control)this).get_Height() - _resizeTexture.get_Height(), _resizeTexture.get_Width(), _resizeTexture.get_Height());
+			_resizeHandleBounds = new Rectangle(base.Width - _resizeTexture.Width, base.Height - _resizeTexture.Height, _resizeTexture.Width, _resizeTexture.Height);
 		}
 
 		protected override CaptureType CapturesInput()
 		{
-			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
 			if (!CaptureInput)
 			{
-				return (CaptureType)0;
+				return CaptureType.None;
 			}
-			return ((Container)this).CapturesInput();
+			return base.CapturesInput();
 		}
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
@@ -118,16 +118,25 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0109: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010f: Unknown result type (might be due to invalid IL or missing references)
 			base.PaintBeforeChildren(spriteBatch, bounds);
-			if (_resizeTexture != null && CanChange && (!ShowResizeOnlyOnMouseOver || ((Control)this).get_MouseOver()))
+			if (_resizeTexture != null && CanChange && (!ShowResizeOnlyOnMouseOver || base.MouseOver))
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit((_resizing || _mouseOverResizeHandle) ? _resizeTextureHovered : _resizeTexture), new Rectangle(((Rectangle)(ref bounds)).get_Right() - _resizeTexture.get_Width() - 1, ((Rectangle)(ref bounds)).get_Bottom() - _resizeTexture.get_Height() - 1, _resizeTexture.get_Width(), _resizeTexture.get_Height()), (Rectangle?)_resizeTexture.get_Bounds(), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
+				spriteBatch.DrawOnCtrl(this, (_resizing || _mouseOverResizeHandle) ? _resizeTextureHovered : _resizeTexture, new Rectangle(((Rectangle)(ref bounds)).get_Right() - _resizeTexture.Width - 1, ((Rectangle)(ref bounds)).get_Bottom() - _resizeTexture.Height - 1, _resizeTexture.Width, _resizeTexture.Height), _resizeTexture.Bounds, Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
+			}
+			if (ShowCenter)
+			{
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(base.Width / 2 - 2, base.Height / 2 - 2, 4, 4), ContentService.Textures.Pixel.get_Bounds(), Color.get_Red(), 0f, default(Vector2), (SpriteEffects)0);
 			}
 		}
 
 		protected override void OnLeftMouseButtonReleased(MouseEventArgs e)
 		{
-			((Control)this).OnLeftMouseButtonReleased(e);
+			base.OnLeftMouseButtonReleased(e);
 			if (CanChange)
 			{
 				_dragging = false;
@@ -147,15 +156,15 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
 			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-			((Control)this).OnLeftMouseButtonPressed(e);
+			base.OnLeftMouseButtonPressed(e);
 			if (CanChange)
 			{
 				Rectangle resizeCorner = ResizeCorner;
-				_resizing = ((Rectangle)(ref resizeCorner)).Contains(e.get_MousePosition());
-				_resizeStart = ((Control)this).get_Size();
-				_dragStart = Control.get_Input().get_Mouse().get_Position();
+				_resizing = ((Rectangle)(ref resizeCorner)).Contains(e.MousePosition);
+				_resizeStart = base.Size;
+				_dragStart = Control.Input.Mouse.Position;
 				_dragging = !_resizing;
-				_draggingStart = (_dragging ? ((Control)this).get_RelativeMousePosition() : Point.get_Zero());
+				_draggingStart = (_dragging ? base.RelativeMousePosition : Point.get_Zero());
 			}
 		}
 
@@ -166,7 +175,7 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			return new Point(MathHelper.Clamp(newSize.X, ((Container)this).get_ContentRegion().X, 1024), MathHelper.Clamp(newSize.Y, ((Container)this).get_ContentRegion().Y, 1024));
+			return new Point(MathHelper.Clamp(newSize.X, base.ContentRegion.X, 1024), MathHelper.Clamp(newSize.Y, base.ContentRegion.Y, 1024));
 		}
 
 		protected override void OnMouseMoved(MouseEventArgs e)
@@ -177,7 +186,7 @@ namespace Kenedia.Modules.Core.Controls
 			if (CanChange)
 			{
 				ResetMouseRegionStates();
-				if (((Rectangle)(ref _resizeHandleBounds)).Contains(((Control)this).get_RelativeMousePosition()) && ((Control)this).get_RelativeMousePosition().X > ((Rectangle)(ref _resizeHandleBounds)).get_Right() - 16 && ((Control)this).get_RelativeMousePosition().Y > ((Rectangle)(ref _resizeHandleBounds)).get_Bottom() - 16)
+				if (((Rectangle)(ref _resizeHandleBounds)).Contains(base.RelativeMousePosition) && base.RelativeMousePosition.X > ((Rectangle)(ref _resizeHandleBounds)).get_Right() - 16 && base.RelativeMousePosition.Y > ((Rectangle)(ref _resizeHandleBounds)).get_Bottom() - 16)
 				{
 					_mouseOverResizeHandle = true;
 				}

@@ -46,8 +46,8 @@ namespace Kenedia.Modules.Characters.Services
 					//IL_0025: Unknown result type (might be due to invalid IL or missing references)
 					//IL_002a: Unknown result type (might be due to invalid IL or missing references)
 					//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-					Locale value = GameService.Overlay.get_UserLocale().get_Value();
-					Locale locale = (Locale)(((int)value != 4 && (int)value != 5) ? ((int)GameService.Overlay.get_UserLocale().get_Value()) : 0);
+					Locale value = GameService.Overlay.UserLocale.Value;
+					Locale locale = (Locale)(((int)value != 4 && (int)value != 5) ? ((int)GameService.Overlay.UserLocale.Value) : 0);
 					if (!Names.TryGetValue(locale, out var name))
 					{
 						return "No Name Set.";
@@ -82,7 +82,7 @@ namespace Kenedia.Modules.Characters.Services
 					_icon = value;
 					if (_icon != null)
 					{
-						_icon.add_TextureSwapped((EventHandler<ValueChangedEventArgs<Texture2D>>)Icon_TextureSwapped);
+						_icon.TextureSwapped += Icon_TextureSwapped;
 					}
 				}
 			}
@@ -98,7 +98,7 @@ namespace Kenedia.Modules.Characters.Services
 					_iconBig = value;
 					if (_iconBig != null)
 					{
-						_iconBig.add_TextureSwapped((EventHandler<ValueChangedEventArgs<Texture2D>>)IconBig_TextureSwapped);
+						_iconBig.TextureSwapped += IconBig_TextureSwapped;
 					}
 				}
 			}
@@ -119,8 +119,8 @@ namespace Kenedia.Modules.Characters.Services
 					//IL_0025: Unknown result type (might be due to invalid IL or missing references)
 					//IL_002a: Unknown result type (might be due to invalid IL or missing references)
 					//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-					Locale value = GameService.Overlay.get_UserLocale().get_Value();
-					Locale locale = (Locale)(((int)value != 4 && (int)value != 5) ? ((int)GameService.Overlay.get_UserLocale().get_Value()) : 0);
+					Locale value = GameService.Overlay.UserLocale.Value;
+					Locale locale = (Locale)(((int)value != 4 && (int)value != 5) ? ((int)GameService.Overlay.UserLocale.Value) : 0);
 					if (!Names.TryGetValue(locale, out var name))
 					{
 						return "No Name Set.";
@@ -129,23 +129,23 @@ namespace Kenedia.Modules.Characters.Services
 				}
 			}
 
-			private void IconBig_TextureSwapped(object sender, ValueChangedEventArgs<Texture2D> e)
+			private void IconBig_TextureSwapped(object sender, Blish_HUD.ValueChangedEventArgs<Texture2D> e)
 			{
 				//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-				if (e.get_NewValue() != null)
+				if (e.NewValue != null)
 				{
-					IconBig.remove_TextureSwapped((EventHandler<ValueChangedEventArgs<Texture2D>>)IconBig_TextureSwapped);
-					_iconBig = AsyncTexture2D.op_Implicit(Texture2DExtension.GetRegion(Texture2DExtension.Duplicate(IconBig.get_Texture()), new Rectangle(5, 5, IconBig.get_Width() - 10, IconBig.get_Height() - 10)));
+					IconBig.TextureSwapped -= IconBig_TextureSwapped;
+					_iconBig = (AsyncTexture2D)IconBig.Texture.Duplicate().GetRegion(new Rectangle(5, 5, IconBig.Width - 10, IconBig.Height - 10));
 				}
 			}
 
-			private void Icon_TextureSwapped(object sender, ValueChangedEventArgs<Texture2D> e)
+			private void Icon_TextureSwapped(object sender, Blish_HUD.ValueChangedEventArgs<Texture2D> e)
 			{
 				//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-				if (e.get_NewValue() != null)
+				if (e.NewValue != null)
 				{
-					Icon.remove_TextureSwapped((EventHandler<ValueChangedEventArgs<Texture2D>>)Icon_TextureSwapped);
-					_icon = AsyncTexture2D.op_Implicit(Texture2DExtension.GetRegion(Texture2DExtension.Duplicate(IconBig.get_Texture()), new Rectangle(5, 5, Icon.get_Width() - 10, Icon.get_Height() - 10)));
+					Icon.TextureSwapped -= Icon_TextureSwapped;
+					_icon = (AsyncTexture2D)IconBig.Texture.Duplicate().GetRegion(new Rectangle(5, 5, Icon.Width - 10, Icon.Height - 10));
 				}
 			}
 		}
@@ -178,8 +178,8 @@ namespace Kenedia.Modules.Characters.Services
 					//IL_0025: Unknown result type (might be due to invalid IL or missing references)
 					//IL_002a: Unknown result type (might be due to invalid IL or missing references)
 					//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-					Locale value = GameService.Overlay.get_UserLocale().get_Value();
-					Locale locale = (Locale)(((int)value != 4 && (int)value != 5) ? ((int)GameService.Overlay.get_UserLocale().get_Value()) : 0);
+					Locale value = GameService.Overlay.UserLocale.Value;
+					Locale locale = (Locale)(((int)value != 4 && (int)value != 5) ? ((int)GameService.Overlay.UserLocale.Value) : 0);
 					if (!Names.TryGetValue(locale, out var name))
 					{
 						return "No Name Set.";
@@ -211,8 +211,8 @@ namespace Kenedia.Modules.Characters.Services
 					//IL_0025: Unknown result type (might be due to invalid IL or missing references)
 					//IL_002a: Unknown result type (might be due to invalid IL or missing references)
 					//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-					Locale value = GameService.Overlay.get_UserLocale().get_Value();
-					Locale locale = (Locale)(((int)value != 4 && (int)value != 5) ? ((int)GameService.Overlay.get_UserLocale().get_Value()) : 0);
+					Locale value = GameService.Overlay.UserLocale.Value;
+					Locale locale = (Locale)(((int)value != 4 && (int)value != 5) ? ((int)GameService.Overlay.UserLocale.Value) : 0);
 					if (!Names.TryGetValue(locale, out var name))
 					{
 						return "No Name Set.";
@@ -1776,7 +1776,7 @@ namespace Kenedia.Modules.Characters.Services
 			BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info("Trying to load Maps from " + path);
 			try
 			{
-				StaticInfo = await StaticInfo.GetStaticInfo();
+				StaticInfo = await Kenedia.Modules.Characters.Models.StaticInfo.GetStaticInfo();
 				if (File.Exists(path))
 				{
 					string jsonString = await new StreamReader(path).ReadToEndAsync();
@@ -1791,11 +1791,11 @@ namespace Kenedia.Modules.Characters.Services
 			{
 				BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Warn($"{ex}");
 			}
-			Races[(RaceType)0].Icon = AsyncTexture2D.op_Implicit(_contentsManager.GetTexture("textures\\races\\asura.png"));
-			Races[(RaceType)1].Icon = AsyncTexture2D.op_Implicit(_contentsManager.GetTexture("textures\\races\\charr.png"));
-			Races[(RaceType)2].Icon = AsyncTexture2D.op_Implicit(_contentsManager.GetTexture("textures\\races\\human.png"));
-			Races[(RaceType)3].Icon = AsyncTexture2D.op_Implicit(_contentsManager.GetTexture("textures\\races\\norn.png"));
-			Races[(RaceType)4].Icon = AsyncTexture2D.op_Implicit(_contentsManager.GetTexture("textures\\races\\sylvari.png"));
+			Races[(RaceType)0].Icon = (AsyncTexture2D)_contentsManager.GetTexture("textures\\races\\asura.png");
+			Races[(RaceType)1].Icon = (AsyncTexture2D)_contentsManager.GetTexture("textures\\races\\charr.png");
+			Races[(RaceType)2].Icon = (AsyncTexture2D)_contentsManager.GetTexture("textures\\races\\human.png");
+			Races[(RaceType)3].Icon = (AsyncTexture2D)_contentsManager.GetTexture("textures\\races\\norn.png");
+			Races[(RaceType)4].Icon = (AsyncTexture2D)_contentsManager.GetTexture("textures\\races\\sylvari.png");
 		}
 
 		public void Dispose()

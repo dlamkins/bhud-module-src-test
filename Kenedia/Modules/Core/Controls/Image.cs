@@ -11,7 +11,7 @@ using Microsoft.Xna.Framework;
 
 namespace Kenedia.Modules.Core.Controls
 {
-	public class Image : Image, ILocalizable
+	public class Image : Blish_HUD.Controls.Image, ILocalizable
 	{
 		private Func<string> _setLocalizedTooltip;
 
@@ -40,16 +40,15 @@ namespace Kenedia.Modules.Core.Controls
 			set
 			{
 				_setLocalizedTooltip = value;
-				((Control)this).set_BasicTooltipText(value?.Invoke());
+				base.BasicTooltipText = value?.Invoke();
 			}
 		}
 
 		public Image()
-			: this()
 		{
-			LocalizingService.LocaleChanged += UserLocale_SettingChanged;
+			LocalizingService.LocaleChanged += new EventHandler<ValueChangedEventArgs<Locale>>(UserLocale_SettingChanged);
 			UserLocale_SettingChanged(null, null);
-			((Control)this).add_PropertyChanged((PropertyChangedEventHandler)OnPropertyChanged);
+			base.PropertyChanged += OnPropertyChanged;
 		}
 
 		private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -61,11 +60,11 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
 			if (e.PropertyName == "BackgroundColor")
 			{
-				Color backgroundColor = ((Control)this).get_BackgroundColor();
+				Color backgroundColor = base.BackgroundColor;
 				Color? hoveredBackgroundColor = _hoveredBackgroundColor;
 				if (!hoveredBackgroundColor.HasValue || backgroundColor != hoveredBackgroundColor.GetValueOrDefault())
 				{
-					_defaultBackgroundColor = ((Control)this).get_BackgroundColor();
+					_defaultBackgroundColor = base.BackgroundColor;
 				}
 			}
 		}
@@ -74,30 +73,30 @@ namespace Kenedia.Modules.Core.Controls
 		{
 			if (SetLocalizedTooltip != null)
 			{
-				((Control)this).set_BasicTooltipText(SetLocalizedTooltip?.Invoke());
+				base.BasicTooltipText = SetLocalizedTooltip?.Invoke();
 			}
 		}
 
 		protected override void DisposeControl()
 		{
-			((Control)this).DisposeControl();
-			GameService.Overlay.get_UserLocale().remove_SettingChanged((EventHandler<ValueChangedEventArgs<Locale>>)UserLocale_SettingChanged);
+			base.DisposeControl();
+			GameService.Overlay.UserLocale.SettingChanged -= UserLocale_SettingChanged;
 		}
 
 		protected override void OnMouseEntered(MouseEventArgs e)
 		{
 			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-			((Control)this).OnMouseEntered(e);
-			((Control)this).set_BackgroundColor((Color)(((_003F?)_hoveredBackgroundColor) ?? ((Control)this).get_BackgroundColor()));
+			base.OnMouseEntered(e);
+			base.BackgroundColor = (Color)(((_003F?)_hoveredBackgroundColor) ?? base.BackgroundColor);
 		}
 
 		protected override void OnMouseLeft(MouseEventArgs e)
 		{
 			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-			((Control)this).OnMouseLeft(e);
-			((Control)this).set_BackgroundColor((Color)(((_003F?)_defaultBackgroundColor) ?? ((Control)this).get_BackgroundColor()));
+			base.OnMouseLeft(e);
+			base.BackgroundColor = (Color)(((_003F?)_defaultBackgroundColor) ?? base.BackgroundColor);
 		}
 	}
 }

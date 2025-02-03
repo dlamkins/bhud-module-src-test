@@ -16,7 +16,7 @@ namespace Kenedia.Modules.Characters.Controls
 	{
 		private readonly AsyncTexture2D _craftingIcon = AsyncTexture2D.FromAssetId(156711);
 
-		private BitmapFont _font = GameService.Content.get_DefaultFont14();
+		private BitmapFont _font = GameService.Content.DefaultFont14;
 
 		public Data Data { get; set; }
 
@@ -36,7 +36,7 @@ namespace Kenedia.Modules.Characters.Controls
 				_font = value;
 				if (value != null)
 				{
-					((Control)this).set_Width(((Control)this).get_Height() + 4 + (int)value.MeasureString(strings.NoCraftingProfession).Width);
+					base.Width = base.Height + 4 + (int)value.MeasureString(strings.NoCraftingProfession).Width;
 				}
 			}
 		}
@@ -44,12 +44,10 @@ namespace Kenedia.Modules.Characters.Controls
 		public string Text { get; set; }
 
 		public CraftingControl()
-			: this()
 		{
 		}
 
 		public CraftingControl(Data data, Settings settings)
-			: this()
 		{
 			Data = data;
 			Settings = settings;
@@ -81,7 +79,7 @@ namespace Kenedia.Modules.Characters.Controls
 			//IL_0240: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0245: Unknown result type (might be due to invalid IL or missing references)
 			string toolTipText = null;
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_craftingIcon), new Rectangle(4, 4, bounds.Height - 7, bounds.Height - 7), (Rectangle?)new Rectangle(6, 6, 20, 20), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
+			spriteBatch.DrawOnCtrl((Control)this, (Texture2D)_craftingIcon, new Rectangle(4, 4, bounds.Height - 7, bounds.Height - 7), (Rectangle?)new Rectangle(6, 6, 20, 20), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
 			bool craftingDisplayed = false;
 			if (Character != null && Character.Crafting.Count > 0 && Settings != null && Data != null)
 			{
@@ -96,14 +94,14 @@ namespace Kenedia.Modules.Characters.Controls
 						continue;
 					}
 					Text = "NA";
-					bool onlyMax = Settings.DisplayToggles.get_Value()["OnlyMaxCrafting"].Show;
+					bool onlyMax = Settings.DisplayToggles.Value["OnlyMaxCrafting"].Show;
 					if (craftingProfession.Icon != null && (!onlyMax || crafting.Rating == craftingProfession.MaxRating))
 					{
 						craftingDisplayed = true;
 						((Rectangle)(ref craftBounds))._002Ector(bounds.Height + 6 + i * bounds.Height, 2, bounds.Height - 4, bounds.Height - 4);
-						SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(craftingProfession.Icon), craftBounds, (Rectangle?)new Rectangle(8, 8, 16, 16), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
+						spriteBatch.DrawOnCtrl((Control)this, (Texture2D)craftingProfession.Icon, craftBounds, (Rectangle?)new Rectangle(8, 8, 16, 16), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
 						i++;
-						if (((Rectangle)(ref craftBounds)).Contains(((Control)this).get_RelativeMousePosition()))
+						if (((Rectangle)(ref craftBounds)).Contains(base.RelativeMousePosition))
 						{
 							toolTipText = craftingProfession.Name + " (" + crafting.Rating + "/" + craftingProfession.MaxRating + ")";
 						}
@@ -113,9 +111,9 @@ namespace Kenedia.Modules.Characters.Controls
 			if (!craftingDisplayed)
 			{
 				string text = (Text = strings.NoCraftingProfession);
-				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, Font, new Rectangle(bounds.Height + 4, 0, bounds.Width - (bounds.Height + 4), bounds.Height), Color.get_Gray(), false, (HorizontalAlignment)0, (VerticalAlignment)1);
+				spriteBatch.DrawStringOnCtrl(this, text, Font, new Rectangle(bounds.Height + 4, 0, bounds.Width - (bounds.Height + 4), bounds.Height), Color.get_Gray());
 			}
-			((Control)this).set_BasicTooltipText(toolTipText);
+			base.BasicTooltipText = toolTipText;
 		}
 	}
 }

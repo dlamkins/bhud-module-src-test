@@ -1,13 +1,12 @@
 using System;
 using Blish_HUD.Content;
-using Blish_HUD.Controls;
 using Microsoft.Xna.Framework;
 
 namespace Kenedia.Modules.Core.Controls
 {
 	public class PanelTab : Panel
 	{
-		private AsyncTexture2D _icon;
+		private new AsyncTexture2D _icon;
 
 		private Rectangle _textureRectangle = Rectangle.get_Empty();
 
@@ -17,7 +16,7 @@ namespace Kenedia.Modules.Core.Controls
 
 		public TabButton TabButton { get; private set; }
 
-		public AsyncTexture2D Icon
+		public new AsyncTexture2D Icon
 		{
 			get
 			{
@@ -58,7 +57,7 @@ namespace Kenedia.Modules.Core.Controls
 			set
 			{
 				_name = value;
-				((Control)TabButton).set_BasicTooltipText(value);
+				TabButton.BasicTooltipText = value;
 			}
 		}
 
@@ -95,31 +94,28 @@ namespace Kenedia.Modules.Core.Controls
 		{
 			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			TabButton tabButton = new TabButton();
-			((Control)tabButton).set_BasicTooltipText(Name);
-			TabButton = tabButton;
+			TabButton = new TabButton
+			{
+				BasicTooltipText = Name
+			};
 		}
 
 		protected void OnActivated()
 		{
-			((Control)this).Show();
+			Show();
 			this.Activated?.Invoke(this, EventArgs.Empty);
 		}
 
 		protected void OnDeactivated()
 		{
-			((Control)this).Hide();
+			Hide();
 			this.Deactivated?.Invoke(this, EventArgs.Empty);
 		}
 
 		protected override void DisposeControl()
 		{
 			base.DisposeControl();
-			TabButton tabButton = TabButton;
-			if (tabButton != null)
-			{
-				((Control)tabButton).Dispose();
-			}
+			TabButton?.Dispose();
 			_icon = null;
 		}
 	}

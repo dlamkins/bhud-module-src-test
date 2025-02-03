@@ -42,26 +42,26 @@ namespace Kenedia.Modules.Characters.Controls
 		private Point _center;
 
 		public RadialMenu(Settings settings, ObservableCollection<Character_Model> characters, Container parent, Func<Character_Model> currentCharacter, Data data, TextureManager textureManager)
-			: this()
 		{
 			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
 			_settings = settings;
 			_characters = characters;
 			_currentCharacter = currentCharacter;
 			_data = data;
-			((Control)this).set_Parent(parent);
-			CharacterTooltip characterTooltip = new CharacterTooltip(currentCharacter, textureManager, data, settings);
-			((Control)characterTooltip).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			((Control)characterTooltip).set_ZIndex(1073741824);
-			((Control)characterTooltip).set_Size(new Point(300, 50));
-			((Control)characterTooltip).set_Visible(false);
-			_tooltip = characterTooltip;
+			base.Parent = parent;
+			_tooltip = new CharacterTooltip(currentCharacter, textureManager, data, settings)
+			{
+				Parent = GameService.Graphics.SpriteScreen,
+				ZIndex = 1073741824,
+				Size = new Point(300, 50),
+				Visible = false
+			};
 			foreach (Character_Model character in _characters)
 			{
-				character.Updated += Character_Updated;
+				character.Updated += new EventHandler(Character_Updated);
 			}
-			((Control)((Control)this).get_Parent()).add_Resized((EventHandler<ResizedEventArgs>)Parent_Resized);
-			Control.get_Input().get_Keyboard().add_KeyPressed((EventHandler<KeyboardEventArgs>)Keyboard_KeyPressed);
+			base.Parent.Resized += Parent_Resized;
+			Control.Input.Keyboard.KeyPressed += Keyboard_KeyPressed;
 		}
 
 		public bool HasDisplayedCharacters()
@@ -77,20 +77,20 @@ namespace Kenedia.Modules.Characters.Controls
 		{
 			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0008: Invalid comparison between Unknown and I4
-			if ((int)e.get_Key() == 27)
+			if ((int)e.Key == 27)
 			{
-				((Control)this).Hide();
+				Hide();
 			}
 		}
 
 		private void Parent_Resized(object sender, ResizedEventArgs e)
 		{
-			((Control)this).RecalculateLayout();
+			RecalculateLayout();
 		}
 
 		private void Character_Updated(object sender, EventArgs e)
 		{
-			((Control)this).RecalculateLayout();
+			RecalculateLayout();
 		}
 
 		public override void RecalculateLayout()
@@ -127,17 +127,17 @@ namespace Kenedia.Modules.Characters.Controls
 			//IL_02b6: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02c6: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02e2: Unknown result type (might be due to invalid IL or missing references)
-			((Control)this).RecalculateLayout();
-			if (((Control)this).get_Parent() == null)
+			base.RecalculateLayout();
+			if (base.Parent == null)
 			{
 				return;
 			}
 			_displayedCharacters = ((_characters.Count > 0) ? _characters.Where((Character_Model e) => e.ShowOnRadial).ToList() : new List<Character_Model>());
 			_displayedCharacters.Sort((Character_Model a, Character_Model b) => a.Name.CompareTo(b.Name));
-			int num = (int)((float)Math.Min(((Control)((Control)this).get_Parent()).get_Width(), ((Control)((Control)this).get_Parent()).get_Height()) * _settings.Radial_Scale.get_Value());
-			((Control)this).set_Size(new Point(((Control)((Control)this).get_Parent()).get_Width(), ((Control)((Control)this).get_Parent()).get_Height()));
+			int num = (int)((float)Math.Min(base.Parent.Width, base.Parent.Height) * _settings.Radial_Scale.Value);
+			base.Size = new Point(base.Parent.Width, base.Parent.Height);
 			_sections.Clear();
-			_center = ((Control)this).get_RelativeMousePosition();
+			_center = base.RelativeMousePosition;
 			int amount = _displayedCharacters.Count;
 			_ = Math.PI * 2.0 / (double)amount;
 			int radius = num / 2;
@@ -175,18 +175,17 @@ namespace Kenedia.Modules.Characters.Controls
 
 		protected override void OnMouseMoved(MouseEventArgs e)
 		{
-			((Control)this).OnMouseMoved(e);
+			base.OnMouseMoved(e);
 			_selected = null;
 		}
 
 		public override void DoUpdate(GameTime gameTime)
 		{
 			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			((Control)this).DoUpdate(gameTime);
-			if (!Control.get_Input().get_Keyboard().get_KeysDown()
-				.Contains(_settings.RadialKey.get_Value().get_PrimaryKey()))
+			base.DoUpdate(gameTime);
+			if (!Control.Input.Keyboard.KeysDown.Contains(_settings.RadialKey.Value.PrimaryKey))
 			{
-				((Control)this).Hide();
+				Hide();
 			}
 		}
 
@@ -243,7 +242,7 @@ namespace Kenedia.Modules.Characters.Controls
 			//IL_050f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_051b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0521: Unknown result type (might be due to invalid IL or missing references)
-			Point relativeMousePosition = ((Control)this).get_RelativeMousePosition();
+			Point relativeMousePosition = base.RelativeMousePosition;
 			Vector2 mouse = ((Point)(ref relativeMousePosition)).ToVector2();
 			string txt = string.Empty;
 			foreach (RadialMenuSection section in _sections)
@@ -252,7 +251,7 @@ namespace Kenedia.Modules.Characters.Controls
 				{
 					_selected = (section.Triangle.Contains(mouse) ? section : null);
 				}
-				if (!(((Control)this).get_RelativeMousePosition() == _center) && _selected == null && section.Triangle.Contains(mouse))
+				if (!(base.RelativeMousePosition == _center) && _selected == null && section.Triangle.Contains(mouse))
 				{
 					continue;
 				}
@@ -260,23 +259,23 @@ namespace Kenedia.Modules.Characters.Controls
 				{
 					foreach (PointF line2 in section.Lines)
 					{
-						ShapeExtensions.DrawLine(spriteBatch, section.Triangle.Point3, new Vector2(line2.X, line2.Y), _settings.Radial_UseProfessionColor.get_Value() ? (section.Character.Profession.GetData(_data.Professions).Color * 0.7f) : _settings.Radial_IdleColor.get_Value(), 1f, 0f);
+						ShapeExtensions.DrawLine(spriteBatch, section.Triangle.Point3, new Vector2(line2.X, line2.Y), _settings.Radial_UseProfessionColor.Value ? (section.Character.Profession.GetData(_data.Professions).Color * 0.7f) : _settings.Radial_IdleColor.Value, 1f, 0f);
 					}
-					ShapeExtensions.DrawPolygon(spriteBatch, Vector2.get_Zero(), (IReadOnlyList<Vector2>)section.Triangle.ToVectorList(), _settings.Radial_IdleBorderColor.get_Value(), 1f, 0f);
+					ShapeExtensions.DrawPolygon(spriteBatch, Vector2.get_Zero(), (IReadOnlyList<Vector2>)section.Triangle.ToVectorList(), _settings.Radial_IdleBorderColor.Value, 1f, 0f);
 				}
 				else
 				{
 					_ = section.Rectangle;
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), section.Rectangle, (Rectangle?)Rectangle.get_Empty(), _settings.Radial_IdleColor.get_Value(), 0f, default(Vector2), (SpriteEffects)0);
+					spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, section.Rectangle, Rectangle.get_Empty(), _settings.Radial_IdleColor.Value, 0f, default(Vector2), (SpriteEffects)0);
 				}
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_settings.Radial_UseProfessionIcons.get_Value() ? section.Character.ProfessionIcon : section.Character.Icon), section.IconRectangle, (Rectangle?)(_settings.Radial_UseProfessionIcons.get_Value() ? section.Character.ProfessionIcon.get_Bounds() : section.Character.Icon.get_Bounds()), _settings.Radial_UseProfessionIconsColor.get_Value() ? section.Character.Profession.GetData(_data.Professions).Color : Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
+				spriteBatch.DrawOnCtrl(this, _settings.Radial_UseProfessionIcons.Value ? section.Character.ProfessionIcon : section.Character.Icon, section.IconRectangle, _settings.Radial_UseProfessionIcons.Value ? section.Character.ProfessionIcon.Bounds : section.Character.Icon.Bounds, _settings.Radial_UseProfessionIconsColor.Value ? section.Character.Profession.GetData(_data.Professions).Color : Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
 			}
 			if (_selected != null)
 			{
-				if (_settings.Radial_ShowAdvancedTooltip.get_Value())
+				if (_settings.Radial_ShowAdvancedTooltip.Value)
 				{
 					_tooltip.Character = _selected!.Character;
-					((Control)_tooltip).Show();
+					_tooltip.Show();
 				}
 				else
 				{
@@ -286,34 +285,34 @@ namespace Kenedia.Modules.Characters.Controls
 				{
 					foreach (PointF line in _selected!.Lines)
 					{
-						ShapeExtensions.DrawLine(spriteBatch, _selected!.Triangle.Point3, new Vector2(line.X, line.Y), _settings.Radial_UseProfessionColor.get_Value() ? _selected!.Character.Profession.GetData(_data.Professions).Color : _settings.Radial_HoveredColor.get_Value(), 1f, 0f);
+						ShapeExtensions.DrawLine(spriteBatch, _selected!.Triangle.Point3, new Vector2(line.X, line.Y), _settings.Radial_UseProfessionColor.Value ? _selected!.Character.Profession.GetData(_data.Professions).Color : _settings.Radial_HoveredColor.Value, 1f, 0f);
 					}
-					ShapeExtensions.DrawPolygon(spriteBatch, Vector2.get_Zero(), (IReadOnlyList<Vector2>)_selected!.Triangle.ToVectorList(), _settings.Radial_HoveredBorderColor.get_Value(), 1f, 0f);
+					ShapeExtensions.DrawPolygon(spriteBatch, Vector2.get_Zero(), (IReadOnlyList<Vector2>)_selected!.Triangle.ToVectorList(), _settings.Radial_HoveredBorderColor.Value, 1f, 0f);
 				}
 				else
 				{
 					_ = _selected!.Rectangle;
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), _selected!.Rectangle, (Rectangle?)Rectangle.get_Empty(), _settings.Radial_HoveredColor.get_Value(), 0f, default(Vector2), (SpriteEffects)0);
+					spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, _selected!.Rectangle, Rectangle.get_Empty(), _settings.Radial_HoveredColor.Value, 0f, default(Vector2), (SpriteEffects)0);
 				}
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_settings.Radial_UseProfessionIcons.get_Value() ? _selected!.Character.ProfessionIcon : _selected!.Character.Icon), _selected!.IconRectangle, (Rectangle?)(_settings.Radial_UseProfessionIcons.get_Value() ? _selected!.Character.ProfessionIcon.get_Bounds() : _selected!.Character.Icon.get_Bounds()), _settings.Radial_UseProfessionIconsColor.get_Value() ? _selected!.Character.Profession.GetData(_data.Professions).Color : Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
+				spriteBatch.DrawOnCtrl(this, _settings.Radial_UseProfessionIcons.Value ? _selected!.Character.ProfessionIcon : _selected!.Character.Icon, _selected!.IconRectangle, _settings.Radial_UseProfessionIcons.Value ? _selected!.Character.ProfessionIcon.Bounds : _selected!.Character.Icon.Bounds, _settings.Radial_UseProfessionIconsColor.Value ? _selected!.Character.Profession.GetData(_data.Professions).Color : Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
 			}
 			else
 			{
 				_tooltip.Character = null;
-				((Control)_tooltip).Hide();
+				_tooltip.Hide();
 			}
-			if (!_settings.Radial_ShowAdvancedTooltip.get_Value())
+			if (!_settings.Radial_ShowAdvancedTooltip.Value)
 			{
-				((Control)this).set_BasicTooltipText(txt);
+				base.BasicTooltipText = txt;
 			}
 		}
 
 		protected override async void OnClick(MouseEventArgs e)
 		{
-			_003C_003En__0(e);
+			base.OnClick(e);
 			if (_selected != null)
 			{
-				((Control)this).Hide();
+				Hide();
 				if (await ExtendedInputService.WaitForNoKeyPressed())
 				{
 					_selected?.Character.Swap();
@@ -323,34 +322,30 @@ namespace Kenedia.Modules.Characters.Controls
 
 		protected override void OnShown(EventArgs e)
 		{
-			((Control)this).OnShown(e);
-			((Control)this).RecalculateLayout();
+			base.OnShown(e);
+			RecalculateLayout();
 			_selected = null;
 		}
 
 		protected override void OnHidden(EventArgs e)
 		{
-			((Control)this).OnHidden(e);
+			base.OnHidden(e);
 			_tooltip.Character = null;
-			((Control)_tooltip).Hide();
+			_tooltip.Hide();
 		}
 
 		protected override void DisposeControl()
 		{
-			if (((Control)this).get_Parent() != null)
+			if (base.Parent != null)
 			{
-				((Control)((Control)this).get_Parent()).remove_Resized((EventHandler<ResizedEventArgs>)Parent_Resized);
+				base.Parent.Resized -= Parent_Resized;
 			}
 			foreach (Character_Model character in _characters)
 			{
-				character.Updated -= Character_Updated;
+				character.Updated -= new EventHandler(Character_Updated);
 			}
-			CharacterTooltip tooltip = _tooltip;
-			if (tooltip != null)
-			{
-				((Control)tooltip).Dispose();
-			}
-			((Control)this).DisposeControl();
+			_tooltip?.Dispose();
+			base.DisposeControl();
 		}
 	}
 }

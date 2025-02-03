@@ -56,7 +56,7 @@ namespace Kenedia.Modules.Core.Controls
 			set
 			{
 				_fadeOut = value;
-				((Control)this).set_Opacity(1f);
+				base.Opacity = 1f;
 			}
 		}
 
@@ -108,7 +108,7 @@ namespace Kenedia.Modules.Core.Controls
 			set
 			{
 				_borderWidth = value;
-				((Control)this).RecalculateLayout();
+				RecalculateLayout();
 			}
 		}
 
@@ -121,7 +121,7 @@ namespace Kenedia.Modules.Core.Controls
 			set
 			{
 				_contentPadding = value;
-				((Control)this).RecalculateLayout();
+				RecalculateLayout();
 			}
 		}
 
@@ -136,7 +136,7 @@ namespace Kenedia.Modules.Core.Controls
 
 		public Color? BackgroundImageHoveredColor { get; set; }
 
-		public Color? BackgroundColor { get; set; }
+		public new Color? BackgroundColor { get; set; }
 
 		public Color? BackgroundHoveredColor { get; set; }
 
@@ -151,35 +151,30 @@ namespace Kenedia.Modules.Core.Controls
 			set
 			{
 				_setLocalizedTooltip = value;
-				((Control)this).set_BasicTooltipText(value?.Invoke());
+				base.BasicTooltipText = value?.Invoke();
 			}
 		}
 
 		public FramedContainer()
-			: this()
 		{
 			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-			LocalizingService.LocaleChanged += UserLocale_SettingChanged;
+			LocalizingService.LocaleChanged += new EventHandler<ValueChangedEventArgs<Locale>>(UserLocale_SettingChanged);
 			UserLocale_SettingChanged(null, null);
 			RecalculateFading();
 		}
 
 		public override void RecalculateLayout()
 		{
-			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0063: Invalid comparison between Unknown and I4
 			//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009c: Invalid comparison between Unknown and I4
 			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0123: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0128: Unknown result type (might be due to invalid IL or missing references)
-			((Control)this).RecalculateLayout();
-			base._contentRegion = new Rectangle(_contentPadding.Left + BorderWidth.Left, _contentPadding.Top + BorderWidth.Top, ((Control)this).get_Width() - _contentPadding.Horizontal - BorderWidth.Horizontal - (((int)((Container)this).get_WidthSizingMode() == 1) ? ((Container)this).get_AutoSizePadding().X : 0), ((Control)this).get_Height() - _contentPadding.Vertical - BorderWidth.Vertical - (((int)((Container)this).get_HeightSizingMode() == 1) ? ((Container)this).get_AutoSizePadding().Y : 0));
-			_backgroundBounds = new Rectangle(Math.Max(BorderWidth.Left - 2, 0), Math.Max(BorderWidth.Top - 2, 0), ((Control)this).get_Width() - Math.Max(BorderWidth.Horizontal - 4, 0), ((Control)this).get_Height() - Math.Max(BorderWidth.Vertical - 4, 0));
+			base.RecalculateLayout();
+			_contentRegion = new Rectangle(_contentPadding.Left + BorderWidth.Left, _contentPadding.Top + BorderWidth.Top, base.Width - _contentPadding.Horizontal - BorderWidth.Horizontal - ((WidthSizingMode == SizingMode.AutoSize) ? base.AutoSizePadding.X : 0), base.Height - _contentPadding.Vertical - BorderWidth.Vertical - ((HeightSizingMode == SizingMode.AutoSize) ? base.AutoSizePadding.Y : 0));
+			_backgroundBounds = new Rectangle(Math.Max(BorderWidth.Left - 2, 0), Math.Max(BorderWidth.Top - 2, 0), base.Width - Math.Max(BorderWidth.Horizontal - 4, 0), base.Height - Math.Max(BorderWidth.Vertical - 4, 0));
 			CalculateBorders();
 		}
 
@@ -226,13 +221,13 @@ namespace Kenedia.Modules.Core.Controls
 			_bottomBorders.Clear();
 			_rightBorders.Clear();
 			Rectangle r = default(Rectangle);
-			((Rectangle)(ref r))._002Ector(-1, 0, ((Control)this).get_Width() + 2, 0);
+			((Rectangle)(ref r))._002Ector(-1, 0, base.Width + 2, 0);
 			int strength = BorderWidth.Top;
 			int fadeLines = Math.Max(0, Math.Min(strength - 1, 4));
 			if (fadeLines >= 1)
 			{
 				List<(Rectangle, float)> topBorders = _topBorders;
-				((Rectangle)(ref r))._002Ector(0, 0, ((Control)this).get_Width(), 1);
+				((Rectangle)(ref r))._002Ector(0, 0, base.Width, 1);
 				topBorders.Add((r, 0.5f));
 			}
 			if (fadeLines >= 3)
@@ -254,13 +249,13 @@ namespace Kenedia.Modules.Core.Controls
 			{
 				_topBorders.Add((new Rectangle(((Rectangle)(ref r)).get_Left() + 1, ((Rectangle)(ref r)).get_Bottom(), r.Width - 2, 1), 0.5f));
 			}
-			((Rectangle)(ref r))._002Ector(-1, -1, 0, ((Control)this).get_Height() + 2);
+			((Rectangle)(ref r))._002Ector(-1, -1, 0, base.Height + 2);
 			strength = BorderWidth.Left;
 			fadeLines = Math.Max(0, Math.Min(strength - 1, 4));
 			if (fadeLines >= 1)
 			{
 				List<(Rectangle, float)> leftBorders = _leftBorders;
-				((Rectangle)(ref r))._002Ector(0, 0, 1, ((Control)this).get_Height());
+				((Rectangle)(ref r))._002Ector(0, 0, 1, base.Height);
 				leftBorders.Add((r, 0.5f));
 			}
 			if (fadeLines >= 3)
@@ -282,13 +277,13 @@ namespace Kenedia.Modules.Core.Controls
 			{
 				_leftBorders.Add((new Rectangle(((Rectangle)(ref r)).get_Right(), ((Rectangle)(ref r)).get_Top() + 1, 1, r.Height - 2), 0.5f));
 			}
-			((Rectangle)(ref r))._002Ector(((Control)this).get_Width(), -1, 0, ((Control)this).get_Height() + 2);
+			((Rectangle)(ref r))._002Ector(base.Width, -1, 0, base.Height + 2);
 			strength = BorderWidth.Right;
 			fadeLines = Math.Max(0, Math.Min(strength - 1, 4));
 			if (fadeLines >= 1)
 			{
 				List<(Rectangle, float)> rightBorders = _rightBorders;
-				((Rectangle)(ref r))._002Ector(((Control)this).get_Width() - 1, 0, 1, ((Control)this).get_Height());
+				((Rectangle)(ref r))._002Ector(base.Width - 1, 0, 1, base.Height);
 				rightBorders.Add((r, 0.5f));
 			}
 			if (fadeLines >= 3)
@@ -310,13 +305,13 @@ namespace Kenedia.Modules.Core.Controls
 			{
 				_rightBorders.Add((new Rectangle(((Rectangle)(ref r)).get_Left() - 1, ((Rectangle)(ref r)).get_Top() + 1, 1, r.Height - 2), 0.5f));
 			}
-			((Rectangle)(ref r))._002Ector(-1, ((Control)this).get_Height(), ((Control)this).get_Width() + 2, 2);
+			((Rectangle)(ref r))._002Ector(-1, base.Height, base.Width + 2, 2);
 			strength = BorderWidth.Bottom;
 			fadeLines = Math.Max(0, Math.Min(strength - 1, 4));
 			if (fadeLines >= 1)
 			{
 				List<(Rectangle, float)> bottomBorders = _bottomBorders;
-				((Rectangle)(ref r))._002Ector(0, ((Control)this).get_Height() - 1, ((Control)this).get_Width(), 1);
+				((Rectangle)(ref r))._002Ector(0, base.Height - 1, base.Width, 1);
 				bottomBorders.Add((r, 0.5f));
 			}
 			if (fadeLines >= 3)
@@ -358,44 +353,44 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_0175: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0181: Unknown result type (might be due to invalid IL or missing references)
 			//IL_018d: Unknown result type (might be due to invalid IL or missing references)
-			Color? borderColor = ((HoveredBorderColor.HasValue && ((Control)this).get_MouseOver()) ? HoveredBorderColor : BorderColor);
+			Color? borderColor = ((HoveredBorderColor.HasValue && base.MouseOver) ? HoveredBorderColor : BorderColor);
 			if (!borderColor.HasValue)
 			{
 				return;
 			}
 			foreach (var r4 in _topBorders)
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), r4.Item1, (Rectangle?)Rectangle.get_Empty(), borderColor.Value * r4.Item2);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, r4.Item1, Rectangle.get_Empty(), borderColor.Value * r4.Item2);
 			}
 			foreach (var r3 in _leftBorders)
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), r3.Item1, (Rectangle?)Rectangle.get_Empty(), borderColor.Value * r3.Item2);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, r3.Item1, Rectangle.get_Empty(), borderColor.Value * r3.Item2);
 			}
 			foreach (var r2 in _bottomBorders)
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), r2.Item1, (Rectangle?)Rectangle.get_Empty(), borderColor.Value * r2.Item2);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, r2.Item1, Rectangle.get_Empty(), borderColor.Value * r2.Item2);
 			}
 			foreach (var r in _rightBorders)
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), r.Item1, (Rectangle?)Rectangle.get_Empty(), borderColor.Value * r.Item2);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, r.Item1, Rectangle.get_Empty(), borderColor.Value * r.Item2);
 			}
 		}
 
 		public override void UpdateContainer(GameTime gameTime)
 		{
-			((Container)this).UpdateContainer(gameTime);
-			if (!FadeOut || !((Control)this).get_Visible() || !(DateTime.Now.Subtract(LastInteraction).TotalMilliseconds >= FadeDelay))
+			base.UpdateContainer(gameTime);
+			if (!FadeOut || !base.Visible || !(DateTime.Now.Subtract(LastInteraction).TotalMilliseconds >= FadeDelay))
 			{
 				return;
 			}
 			double timeSinceTick = gameTime.get_TotalGameTime().TotalMilliseconds - _fadeTick;
 			if (timeSinceTick >= _fadeTickDuration)
 			{
-				((Control)this).set_Opacity(((Control)this).get_Opacity() - (float)(_fadePerMs * ((_fadeTick == 0.0) ? _fadeTickDuration : timeSinceTick)));
+				base.Opacity -= (float)(_fadePerMs * ((_fadeTick == 0.0) ? _fadeTickDuration : timeSinceTick));
 				_fadeTick = gameTime.get_TotalGameTime().TotalMilliseconds;
-				if (((Control)this).get_Opacity() <= 0f)
+				if (base.Opacity <= 0f)
 				{
-					((Control)this).Hide();
+					Hide();
 					_fadeTick = 0.0;
 				}
 			}
@@ -411,16 +406,16 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-			((Container)this).PaintBeforeChildren(spriteBatch, bounds);
-			Color? backgroundColor = ((BackgroundHoveredColor.HasValue && ((Control)this).get_MouseOver()) ? BackgroundHoveredColor : BackgroundColor);
+			base.PaintBeforeChildren(spriteBatch, bounds);
+			Color? backgroundColor = ((BackgroundHoveredColor.HasValue && base.MouseOver) ? BackgroundHoveredColor : BackgroundColor);
 			if (backgroundColor.HasValue)
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), _backgroundBounds, (Rectangle?)Rectangle.get_Empty(), backgroundColor.Value);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, _backgroundBounds, Rectangle.get_Empty(), backgroundColor.Value);
 			}
-			Color? backgroundImageColor = ((BackgroundImageHoveredColor.HasValue && ((Control)this).get_MouseOver()) ? BackgroundImageHoveredColor : BackgroundImageColor);
+			Color? backgroundImageColor = ((BackgroundImageHoveredColor.HasValue && base.MouseOver) ? BackgroundImageHoveredColor : BackgroundImageColor);
 			if (BackgroundImage != null && backgroundImageColor.HasValue)
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(BackgroundImage), _backgroundBounds, (Rectangle?)(Rectangle)(((_003F?)TextureRectangle) ?? BackgroundImage.get_Bounds()), backgroundImageColor.Value);
+				spriteBatch.DrawOnCtrl(this, BackgroundImage, _backgroundBounds, (Rectangle)(((_003F?)TextureRectangle) ?? BackgroundImage.Bounds), backgroundImageColor.Value);
 			}
 			DrawBorders(spriteBatch);
 		}
@@ -429,41 +424,41 @@ namespace Kenedia.Modules.Core.Controls
 		{
 			if (SetLocalizedTooltip != null)
 			{
-				((Control)this).set_BasicTooltipText(SetLocalizedTooltip?.Invoke());
+				base.BasicTooltipText = SetLocalizedTooltip?.Invoke();
 			}
 		}
 
 		protected override void OnMouseMoved(MouseEventArgs e)
 		{
-			((Control)this).OnMouseMoved(e);
+			base.OnMouseMoved(e);
 			SetInteracted();
 		}
 
 		protected override void OnShown(EventArgs e)
 		{
-			((Control)this).OnShown(e);
+			base.OnShown(e);
 			SetInteracted();
 		}
 
 		protected override void OnHidden(EventArgs e)
 		{
-			((Control)this).OnHidden(e);
+			base.OnHidden(e);
 			if (FadeOut)
 			{
-				((Control)this).set_Opacity(1f);
+				base.Opacity = 1f;
 			}
 		}
 
 		protected void SetInteracted()
 		{
 			LastInteraction = DateTime.Now;
-			((Control)this).set_Opacity(1f);
+			base.Opacity = 1f;
 		}
 
 		protected override void DisposeControl()
 		{
-			((Container)this).DisposeControl();
-			LocalizingService.LocaleChanged -= UserLocale_SettingChanged;
+			base.DisposeControl();
+			LocalizingService.LocaleChanged -= new EventHandler<ValueChangedEventArgs<Locale>>(UserLocale_SettingChanged);
 		}
 
 		private void RecalculateFading()

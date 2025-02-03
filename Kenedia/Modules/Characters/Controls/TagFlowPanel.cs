@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Blish_HUD.Controls;
@@ -9,7 +8,7 @@ namespace Kenedia.Modules.Characters.Controls
 {
 	public class TagFlowPanel : FontFlowPanel
 	{
-		private List<Tag> Tags => ((IEnumerable)((Container)this).get_Children()).Cast<Tag>().ToList();
+		private List<Tag> Tags => base.Children.Cast<Tag>().ToList();
 
 		private Rectangle CalculateTagPanelSize(int? width = null, bool fitLargest = false)
 		{
@@ -31,11 +30,11 @@ namespace Kenedia.Modules.Characters.Controls
 				return Rectangle.get_Empty();
 			}
 			tags = (from e in tags
-				orderby ((Control)e).get_Width() descending, e.Text
+				orderby e.Width descending, e.Text
 				select e).ToList();
 			List<Tag> added = new List<Tag>();
-			int widest = ((Tags.Count > 0) ? Tags.Max((Tag e) => ((Control)e).get_Width()) : 0);
-			widest += (int)((FlowPanel)this).get_OuterControlPadding().X + ((Container)this).get_AutoSizePadding().X;
+			int widest = ((Tags.Count > 0) ? Tags.Max((Tag e) => e.Width) : 0);
+			widest += (int)base.OuterControlPadding.X + base.AutoSizePadding.X;
 			int valueOrDefault = width.GetValueOrDefault();
 			if (!width.HasValue)
 			{
@@ -54,15 +53,15 @@ namespace Kenedia.Modules.Characters.Controls
 					continue;
 				}
 				t.TagPanelIndex = index;
-				height += ((Control)t).get_Height() + (int)((FlowPanel)this).get_ControlPadding().Y;
-				curWidth = ((Control)t).get_Width() + (int)((FlowPanel)this).get_ControlPadding().X;
+				height += t.Height + (int)base.ControlPadding.Y;
+				curWidth = t.Width + (int)base.ControlPadding.X;
 				if (curWidth + 25 < width)
 				{
 					foreach (Tag e2 in tags)
 					{
-						if (e2 != t && !added.Contains(e2) && ((Control)e2).get_Width() + (int)((FlowPanel)this).get_ControlPadding().X + curWidth <= width)
+						if (e2 != t && !added.Contains(e2) && e2.Width + (int)base.ControlPadding.X + curWidth <= width)
 						{
-							curWidth += ((Control)e2).get_Width() + (int)((FlowPanel)this).get_ControlPadding().X;
+							curWidth += e2.Width + (int)base.ControlPadding.X;
 							index = (e2.TagPanelIndex = index + 1);
 							added.Add(e2);
 							if (curWidth + 25 >= width)
@@ -80,7 +79,7 @@ namespace Kenedia.Modules.Characters.Controls
 				added.Add(t);
 				index++;
 			}
-			return new Rectangle(((Control)this).get_Location(), new Point(width.Value, height + (int)(((FlowPanel)this).get_OuterControlPadding().Y + (float)((Container)this).get_AutoSizePadding().Y)));
+			return new Rectangle(base.Location, new Point(width.Value, height + (int)(base.OuterControlPadding.Y + (float)base.AutoSizePadding.Y)));
 		}
 
 		public void FitWidestTag(int? width = null)
@@ -90,14 +89,14 @@ namespace Kenedia.Modules.Characters.Controls
 			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
 			Rectangle bounds = CalculateTagPanelSize(width);
-			((FlowPanel)this).SortChildren<Tag>((Comparison<Tag>)((Tag a, Tag b) => a.TagPanelIndex.CompareTo(b.TagPanelIndex)));
-			((Control)this).set_Height(bounds.Height);
-			((Control)this).set_Width(bounds.Width);
+			SortChildren((Tag a, Tag b) => a.TagPanelIndex.CompareTo(b.TagPanelIndex));
+			base.Height = bounds.Height;
+			base.Width = bounds.Width;
 		}
 
 		public override void Invalidate()
 		{
-			((Control)this).Invalidate();
+			base.Invalidate();
 		}
 
 		protected override void OnChildAdded(ChildChangedEventArgs e)
@@ -108,8 +107,8 @@ namespace Kenedia.Modules.Characters.Controls
 			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
 			base.OnChildAdded(e);
 			Rectangle bounds = CalculateTagPanelSize();
-			((Control)this).set_Height(bounds.Height);
-			((Control)this).set_Width(bounds.Width);
+			base.Height = bounds.Height;
+			base.Width = bounds.Width;
 		}
 
 		protected override void OnChildRemoved(ChildChangedEventArgs e)
@@ -118,10 +117,10 @@ namespace Kenedia.Modules.Characters.Controls
 			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			((FlowPanel)this).OnChildRemoved(e);
+			base.OnChildRemoved(e);
 			Rectangle bounds = CalculateTagPanelSize();
-			((Control)this).set_Height(bounds.Height);
-			((Control)this).set_Width(bounds.Width);
+			base.Height = bounds.Height;
+			base.Width = bounds.Width;
 		}
 
 		protected override void OnFontChanged(object sender = null, EventArgs e = null)
@@ -132,8 +131,8 @@ namespace Kenedia.Modules.Characters.Controls
 			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
 			base.OnFontChanged(sender, e);
 			Rectangle bounds = CalculateTagPanelSize();
-			((Control)this).set_Height(bounds.Height);
-			((Control)this).set_Width(bounds.Width);
+			base.Height = bounds.Height;
+			base.Width = bounds.Width;
 		}
 	}
 }

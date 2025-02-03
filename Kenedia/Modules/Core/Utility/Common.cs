@@ -17,7 +17,7 @@ namespace Kenedia.Modules.Core.Utility
 	{
 		private static char[] s_invalids;
 
-		public static double Now => GameService.Overlay.get_CurrentGameTime().get_TotalGameTime().TotalMilliseconds;
+		public static double Now => GameService.Overlay.CurrentGameTime.get_TotalGameTime().TotalMilliseconds;
 
 		public static bool SetProperty<T>(ref T property, T newValue, ValueChangedEventHandler<T> OnUpdated, bool triggerOnUpdate = true)
 		{
@@ -26,7 +26,7 @@ namespace Kenedia.Modules.Core.Utility
 			{
 				if (triggerOnUpdate)
 				{
-					OnUpdated?.Invoke(property, new ValueChangedEventArgs<T>(temp, newValue));
+					OnUpdated?.Invoke(property, new Kenedia.Modules.Core.Models.ValueChangedEventArgs<T>(temp, newValue));
 				}
 				return true;
 			}

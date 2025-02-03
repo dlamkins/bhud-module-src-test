@@ -17,7 +17,6 @@ using Kenedia.Modules.Core.Extensions;
 using Kenedia.Modules.Core.Services;
 using Kenedia.Modules.Core.Utility.WindowsUtil;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace Kenedia.Modules.Characters.Controls
 {
@@ -37,7 +36,7 @@ namespace Kenedia.Modules.Characters.Controls
 
 		private readonly Dummy _characterPotraitsBackground;
 
-		private readonly Label _disclaimer;
+		private readonly Kenedia.Modules.Core.Controls.Label _disclaimer;
 
 		private readonly FramedContainer _disclaimerBackground;
 
@@ -60,7 +59,6 @@ namespace Kenedia.Modules.Characters.Controls
 		public Func<string> AccountImagePath { get; set; }
 
 		public PotraitCapture(ClientWindowService clientWindowService, SharedSettings sharedSettings, TextureManager tM)
-			: this()
 		{
 			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
@@ -84,7 +82,6 @@ namespace Kenedia.Modules.Characters.Controls
 			//IL_0316: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0389: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0394: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03ed: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0432: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0440: Unknown result type (might be due to invalid IL or missing references)
 			//IL_04bc: Unknown result type (might be due to invalid IL or missing references)
@@ -93,106 +90,115 @@ namespace Kenedia.Modules.Characters.Controls
 			//IL_0521: Unknown result type (might be due to invalid IL or missing references)
 			_clientWindowService = clientWindowService;
 			_sharedSettings = sharedSettings;
-			Point res = GameService.Graphics.get_Resolution();
-			((Control)this).set_Size(new Point(100, 100));
-			((Container)this).set_WidthSizingMode((SizingMode)1);
-			((Container)this).set_HeightSizingMode((SizingMode)1);
-			((Control)this).set_Location(new Point((res.X - ((Control)this).get_Size().X) / 2, res.Y - 125 - ((Control)this).get_Size().Y));
-			ImageButton imageButton = new ImageButton();
-			((Control)imageButton).set_Parent((Container)(object)this);
-			imageButton.Texture = AsyncTexture2D.op_Implicit(tM.GetControlTexture(TextureManager.ControlTextures.Drag_Button));
-			imageButton.HoveredTexture = AsyncTexture2D.op_Implicit(tM.GetControlTexture(TextureManager.ControlTextures.Drag_Button_Hovered));
-			((Control)imageButton).set_Size(new Point(32, 32));
-			((Control)imageButton).set_Location(new Point(0, 0));
-			imageButton.SetLocalizedTooltip = () => strings.DragOverCharacter_Instructions;
-			_dragButton = imageButton;
-			((Control)_dragButton).add_LeftMouseButtonPressed((EventHandler<MouseEventArgs>)DragButton_LeftMouseButtonPressed);
-			((Control)_dragButton).add_LeftMouseButtonReleased((EventHandler<MouseEventArgs>)DragButton_LeftMouseButtonReleased);
-			ImageButton imageButton2 = new ImageButton();
-			((Control)imageButton2).set_Parent((Container)(object)this);
-			imageButton2.Texture = AsyncTexture2D.op_Implicit(tM.GetControlTexture(TextureManager.ControlTextures.Potrait_Button));
-			imageButton2.HoveredTexture = AsyncTexture2D.op_Implicit(tM.GetControlTexture(TextureManager.ControlTextures.Potrait_Button_Hovered));
-			((Control)imageButton2).set_Size(new Point(32, 32));
-			((Control)imageButton2).set_Location(new Point(((Control)_dragButton).get_Right() + 5, 0));
-			imageButton2.SetLocalizedTooltip = () => strings.CapturePotraits;
-			imageButton2.ClickAction = delegate
+			Point res = GameService.Graphics.Resolution;
+			base.Size = new Point(100, 100);
+			WidthSizingMode = SizingMode.AutoSize;
+			HeightSizingMode = SizingMode.AutoSize;
+			base.Location = new Point((res.X - base.Size.X) / 2, res.Y - 125 - base.Size.Y);
+			_dragButton = new ImageButton
 			{
-				CapturePotraits();
+				Parent = this,
+				Texture = (AsyncTexture2D)tM.GetControlTexture(TextureManager.ControlTextures.Drag_Button),
+				HoveredTexture = (AsyncTexture2D)tM.GetControlTexture(TextureManager.ControlTextures.Drag_Button_Hovered),
+				Size = new Point(32, 32),
+				Location = new Point(0, 0),
+				SetLocalizedTooltip = () => strings.DragOverCharacter_Instructions
 			};
-			_captureButton = imageButton2;
-			FramedContainer framedContainer = new FramedContainer();
-			((Control)framedContainer).set_Parent((Container)(object)this);
-			((Control)framedContainer).set_Location(new Point(((Control)_captureButton).get_Right() + 5, 0));
-			framedContainer.BorderColor = Color.get_Black();
-			framedContainer.BackgroundImage = AsyncTexture2D.FromAssetId(156003);
-			framedContainer.TextureRectangle = new Rectangle(50, 50, 500, 500);
-			((Container)framedContainer).set_WidthSizingMode((SizingMode)1);
-			((Container)framedContainer).set_AutoSizePadding(new Point(15, 0));
-			((Control)framedContainer).set_Height(32);
-			_disclaimerBackground = framedContainer;
-			NumberBox numberBox = new NumberBox();
-			((Control)numberBox).set_Parent((Container)(object)_disclaimerBackground);
-			((Control)numberBox).set_Location(new Point(5, (((Control)_disclaimerBackground).get_Height() - 25) / 2));
-			((Control)numberBox).set_Size(new Point(100, 25));
-			numberBox.Value = _characterPotraitSize;
-			numberBox.SetLocalizedTooltip = () => strings.PotraitSize;
-			numberBox.ValueChangedAction = delegate(int num)
+			_dragButton.LeftMouseButtonPressed += DragButton_LeftMouseButtonPressed;
+			_dragButton.LeftMouseButtonReleased += DragButton_LeftMouseButtonReleased;
+			_captureButton = new ImageButton
 			{
-				_characterPotraitSize = num;
-				RepositionPotraitFrames();
+				Parent = this,
+				Texture = (AsyncTexture2D)tM.GetControlTexture(TextureManager.ControlTextures.Potrait_Button),
+				HoveredTexture = (AsyncTexture2D)tM.GetControlTexture(TextureManager.ControlTextures.Potrait_Button_Hovered),
+				Size = new Point(32, 32),
+				Location = new Point(_dragButton.Right + 5, 0),
+				SetLocalizedTooltip = () => strings.CapturePotraits,
+				ClickAction = delegate
+				{
+					CapturePotraits();
+				}
 			};
-			_sizeBox = numberBox;
-			NumberBox numberBox2 = new NumberBox();
-			((Control)numberBox2).set_Parent((Container)(object)_disclaimerBackground);
-			((Control)numberBox2).set_Location(new Point(((Control)_sizeBox).get_Right() + 5, (((Control)_disclaimerBackground).get_Height() - 25) / 2));
-			((Control)numberBox2).set_Size(new Point(100, 25));
-			numberBox2.Value = _gap;
-			numberBox2.SetLocalizedTooltip = () => strings.PotraitGap;
-			numberBox2.ValueChangedAction = delegate(int value)
+			_disclaimerBackground = new FramedContainer
 			{
-				_gap = value;
-				RepositionPotraitFrames();
+				Parent = this,
+				Location = new Point(_captureButton.Right + 5, 0),
+				BorderColor = Color.get_Black(),
+				BackgroundImage = AsyncTexture2D.FromAssetId(156003),
+				TextureRectangle = new Rectangle(50, 50, 500, 500),
+				WidthSizingMode = SizingMode.AutoSize,
+				AutoSizePadding = new Point(15, 0),
+				Height = 32
 			};
-			_gapBox = numberBox2;
-			Label label = new Label();
-			((Control)label).set_Parent((Container)(object)_disclaimerBackground);
-			((Control)label).set_Location(new Point(((Control)_gapBox).get_Right() + 5, 0));
-			((Label)label).set_TextColor(Colors.ColonialWhite);
-			((Label)label).set_AutoSizeWidth(true);
-			((Control)label).set_Height(32);
-			((Label)label).set_Font(GameService.Content.get_DefaultFont16());
-			label.SetLocalizedText = () => strings.BestResultLargerDisclaimer;
-			((Control)label).set_Padding(new Thickness(0f, 0f));
-			_disclaimer = label;
-			ImageButton imageButton3 = new ImageButton();
-			((Control)imageButton3).set_Parent((Container)(object)this);
-			imageButton3.Texture = AsyncTexture2D.op_Implicit(tM.GetControlTexture(TextureManager.ControlTextures.Plus_Button));
-			imageButton3.HoveredTexture = AsyncTexture2D.op_Implicit(tM.GetControlTexture(TextureManager.ControlTextures.Plus_Button_Hovered));
-			((Control)imageButton3).set_Size(new Point(32, 32));
-			((Control)imageButton3).set_Location(new Point(0, 35));
-			imageButton3.SetLocalizedTooltip = () => string.Format(strings.AddItem, strings.PotraitFrame);
-			imageButton3.ClickAction = delegate
+			_sizeBox = new NumberBox
 			{
-				AddPotrait();
+				Parent = _disclaimerBackground,
+				Location = new Point(5, (_disclaimerBackground.Height - 25) / 2),
+				Size = new Point(100, 25),
+				Value = _characterPotraitSize,
+				SetLocalizedTooltip = () => strings.PotraitSize,
+				ValueChangedAction = delegate(int num)
+				{
+					_characterPotraitSize = num;
+					RepositionPotraitFrames();
+				}
 			};
-			_addButton = imageButton3;
-			ImageButton imageButton4 = new ImageButton();
-			((Control)imageButton4).set_Parent((Container)(object)this);
-			imageButton4.Texture = AsyncTexture2D.op_Implicit(tM.GetControlTexture(TextureManager.ControlTextures.Minus_Button));
-			imageButton4.HoveredTexture = AsyncTexture2D.op_Implicit(tM.GetControlTexture(TextureManager.ControlTextures.Minus_Button_Hovered));
-			((Control)imageButton4).set_Size(new Point(32, 32));
-			((Control)imageButton4).set_Location(new Point(0, 70));
-			imageButton4.SetLocalizedTooltip = () => string.Format(strings.RemoveItem, strings.PotraitFrame);
-			imageButton4.ClickAction = delegate
+			_gapBox = new NumberBox
 			{
-				RemovePortrait();
+				Parent = _disclaimerBackground,
+				Location = new Point(_sizeBox.Right + 5, (_disclaimerBackground.Height - 25) / 2),
+				Size = new Point(100, 25),
+				Value = _gap,
+				SetLocalizedTooltip = () => strings.PotraitGap,
+				ValueChangedAction = delegate(int value)
+				{
+					_gap = value;
+					RepositionPotraitFrames();
+				}
 			};
-			_removeButton = imageButton4;
-			Dummy dummy = new Dummy();
-			((Control)dummy).set_BackgroundColor(Color.get_Black() * 0.8f);
-			((Control)dummy).set_Parent((Container)(object)Control.get_Graphics().get_SpriteScreen());
-			((Control)dummy).set_ZIndex(2147483646);
-			_characterPotraitsBackground = dummy;
+			_disclaimer = new Kenedia.Modules.Core.Controls.Label
+			{
+				Parent = _disclaimerBackground,
+				Location = new Point(_gapBox.Right + 5, 0),
+				TextColor = ContentService.Colors.ColonialWhite,
+				AutoSizeWidth = true,
+				Height = 32,
+				Font = GameService.Content.DefaultFont16,
+				SetLocalizedText = () => strings.BestResultLargerDisclaimer,
+				Padding = new Thickness(0f, 0f)
+			};
+			_addButton = new ImageButton
+			{
+				Parent = this,
+				Texture = (AsyncTexture2D)tM.GetControlTexture(TextureManager.ControlTextures.Plus_Button),
+				HoveredTexture = (AsyncTexture2D)tM.GetControlTexture(TextureManager.ControlTextures.Plus_Button_Hovered),
+				Size = new Point(32, 32),
+				Location = new Point(0, 35),
+				SetLocalizedTooltip = () => string.Format(strings.AddItem, strings.PotraitFrame),
+				ClickAction = delegate
+				{
+					AddPotrait();
+				}
+			};
+			_removeButton = new ImageButton
+			{
+				Parent = this,
+				Texture = (AsyncTexture2D)tM.GetControlTexture(TextureManager.ControlTextures.Minus_Button),
+				HoveredTexture = (AsyncTexture2D)tM.GetControlTexture(TextureManager.ControlTextures.Minus_Button_Hovered),
+				Size = new Point(32, 32),
+				Location = new Point(0, 70),
+				SetLocalizedTooltip = () => string.Format(strings.RemoveItem, strings.PotraitFrame),
+				ClickAction = delegate
+				{
+					RemovePortrait();
+				}
+			};
+			_characterPotraitsBackground = new Dummy
+			{
+				BackgroundColor = Color.get_Black() * 0.8f,
+				Parent = Control.Graphics.SpriteScreen,
+				ZIndex = 2147483646
+			};
 			AddPotrait();
 			AddPotrait();
 		}
@@ -202,67 +208,30 @@ namespace Kenedia.Modules.Characters.Controls
 			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-			((Container)this).UpdateContainer(gameTime);
-			_dragging = _dragging && ((Control)this).get_MouseOver();
+			base.UpdateContainer(gameTime);
+			_dragging = _dragging && base.MouseOver;
 			if (_dragging)
 			{
-				((Control)this).set_Location(Control.get_Input().get_Mouse().get_Position()
-					.Add(new Point(-_draggingStart.X, -_draggingStart.Y)));
+				base.Location = Control.Input.Mouse.Position.Add(new Point(-_draggingStart.X, -_draggingStart.Y));
 			}
 			ForceOnScreen();
 		}
 
 		protected override void DisposeControl()
 		{
-			((Container)this).DisposeControl();
-			ImageButton captureButton = _captureButton;
-			if (captureButton != null)
-			{
-				((Control)captureButton).Dispose();
-			}
-			ImageButton addButton = _addButton;
-			if (addButton != null)
-			{
-				((Control)addButton).Dispose();
-			}
-			ImageButton removeButton = _removeButton;
-			if (removeButton != null)
-			{
-				((Control)removeButton).Dispose();
-			}
-			Label disclaimer = _disclaimer;
-			if (disclaimer != null)
-			{
-				((Control)disclaimer).Dispose();
-			}
-			FramedContainer disclaimerBackground = _disclaimerBackground;
-			if (disclaimerBackground != null)
-			{
-				((Control)disclaimerBackground).Dispose();
-			}
-			ImageButton dragButton = _dragButton;
-			if (dragButton != null)
-			{
-				((Control)dragButton).Dispose();
-			}
-			NumberBox sizeBox = _sizeBox;
-			if (sizeBox != null)
-			{
-				((Control)sizeBox).Dispose();
-			}
-			NumberBox gapBox = _gapBox;
-			if (gapBox != null)
-			{
-				((Control)gapBox).Dispose();
-			}
-			Dummy characterPotraitsBackground = _characterPotraitsBackground;
-			if (characterPotraitsBackground != null)
-			{
-				((Control)characterPotraitsBackground).Dispose();
-			}
+			base.DisposeControl();
+			_captureButton?.Dispose();
+			_addButton?.Dispose();
+			_removeButton?.Dispose();
+			_disclaimer?.Dispose();
+			_disclaimerBackground?.Dispose();
+			_dragButton?.Dispose();
+			_sizeBox?.Dispose();
+			_gapBox?.Dispose();
+			_characterPotraitsBackground?.Dispose();
 			foreach (FramedMaskedRegion characterPotraitFrame in _characterPotraitFrames)
 			{
-				((Control)characterPotraitFrame).Dispose();
+				characterPotraitFrame.Dispose();
 			}
 		}
 
@@ -271,7 +240,7 @@ namespace Kenedia.Modules.Characters.Controls
 			if (_characterPotraitFrames.Count > 1)
 			{
 				FramedMaskedRegion frame = _characterPotraitFrames.Last();
-				((Control)frame).Dispose();
+				frame.Dispose();
 				_characterPotraitFrames.Remove(frame);
 				RepositionPotraitFrames();
 			}
@@ -279,12 +248,12 @@ namespace Kenedia.Modules.Characters.Controls
 
 		private void AddPotrait()
 		{
-			List<FramedMaskedRegion> characterPotraitFrames = _characterPotraitFrames;
-			FramedMaskedRegion framedMaskedRegion = new FramedMaskedRegion();
-			((Control)framedMaskedRegion).set_Parent((Container)(object)Control.get_Graphics().get_SpriteScreen());
-			((Control)framedMaskedRegion).set_ZIndex(int.MaxValue);
-			((Control)framedMaskedRegion).set_Visible(((Control)this).get_Visible());
-			characterPotraitFrames.Add(framedMaskedRegion);
+			_characterPotraitFrames.Add(new FramedMaskedRegion
+			{
+				Parent = Control.Graphics.SpriteScreen,
+				ZIndex = int.MaxValue,
+				Visible = base.Visible
+			});
 			RepositionPotraitFrames();
 		}
 
@@ -300,18 +269,18 @@ namespace Kenedia.Modules.Characters.Controls
 			//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
 			int index = 0;
 			Point pos = default(Point);
-			((Point)(ref pos))._002Ector(((Control)_captureButton).get_AbsoluteBounds().X + 5, ((Control)_captureButton).get_AbsoluteBounds().Y + 40);
-			((Control)_characterPotraitsBackground).set_Location(pos.Add(new Point(-5, -5)));
+			((Point)(ref pos))._002Ector(_captureButton.AbsoluteBounds.X + 5, _captureButton.AbsoluteBounds.Y + 40);
+			_characterPotraitsBackground.Location = pos.Add(new Point(-5, -5));
 			foreach (FramedMaskedRegion characterPotraitFrame in _characterPotraitFrames)
 			{
-				((Control)characterPotraitFrame).set_Width(_characterPotraitSize);
-				((Control)characterPotraitFrame).set_Height(_characterPotraitSize);
-				((Control)characterPotraitFrame).set_Location(pos);
+				characterPotraitFrame.Width = _characterPotraitSize;
+				characterPotraitFrame.Height = _characterPotraitSize;
+				characterPotraitFrame.Location = pos;
 				pos.X += _characterPotraitSize + _gap;
 				index++;
 			}
-			((Control)_characterPotraitsBackground).set_Width(pos.X - ((Control)_characterPotraitsBackground).get_Location().X - _gap + 5);
-			((Control)_characterPotraitsBackground).set_Height(_characterPotraitSize + 10);
+			_characterPotraitsBackground.Width = pos.X - _characterPotraitsBackground.Location.X - _gap + 5;
+			_characterPotraitsBackground.Height = _characterPotraitSize + 10;
 		}
 
 		private void DragButton_LeftMouseButtonReleased(object sender, MouseEventArgs e)
@@ -325,13 +294,11 @@ namespace Kenedia.Modules.Characters.Controls
 			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
 			_dragging = true;
-			_draggingStart = (_dragging ? ((Control)this).get_RelativeMousePosition() : Point.get_Zero());
+			_draggingStart = (_dragging ? base.RelativeMousePosition : Point.get_Zero());
 		}
 
 		private void CapturePotraits()
 		{
-			//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
@@ -353,15 +320,15 @@ namespace Kenedia.Modules.Characters.Controls
 				where regex.IsMatch(path)
 				select path).ToList();
 			User32Dll.RECT wndBounds = _clientWindowService.WindowBounds;
-			ScreenModeSetting? screenMode = GameService.GameIntegration.get_GfxSettings().get_ScreenMode();
-			Point p = (Point)(((screenMode.HasValue ? ScreenModeSetting.op_Implicit(screenMode.GetValueOrDefault()) : null) == ScreenModeSetting.op_Implicit(ScreenModeSetting.get_Windowed())) ? new Point(_sharedSettings.WindowOffset.Left, _sharedSettings.WindowOffset.Top) : Point.get_Zero());
-			double factor = GameService.Graphics.get_UIScaleMultiplier();
+			ScreenModeSetting? screenMode = GameService.GameIntegration.GfxSettings.ScreenMode;
+			Point p = (Point)(((screenMode.HasValue ? ((string)screenMode.GetValueOrDefault()) : null) == (string)ScreenModeSetting.Windowed) ? new Point(_sharedSettings.WindowOffset.Left, _sharedSettings.WindowOffset.Top) : Point.get_Zero());
+			double factor = GameService.Graphics.UIScaleMultiplier;
 			Size size = new Size(_characterPotraitSize, _characterPotraitSize);
 			foreach (FramedMaskedRegion characterPotraitFrame in _characterPotraitFrames)
 			{
 				Rectangle bounds = characterPotraitFrame.MaskedRegion;
 				using Bitmap bitmap = new Bitmap((int)((double)bounds.Width * factor), (int)((double)bounds.Height * factor));
-				using (Graphics g = Graphics.FromImage(bitmap))
+				using (Graphics g = System.Drawing.Graphics.FromImage(bitmap))
 				{
 					int x = (int)((double)bounds.X * factor);
 					int y = (int)((double)bounds.Y * factor);
@@ -370,7 +337,7 @@ namespace Kenedia.Modules.Characters.Controls
 				bitmap.Save(GetImagePath(images), ImageFormat.Png);
 			}
 			OnImageCaptured?.Invoke();
-			ScreenNotification.ShowNotification(string.Format("[Characters]: " + strings.CapturedXPotraits, _characterPotraitFrames.Count), (NotificationType)0, (Texture2D)null, 4);
+			ScreenNotification.ShowNotification(string.Format("[Characters]: " + strings.CapturedXPotraits, _characterPotraitFrames.Count));
 			string GetImagePath(List<string> imagePaths)
 			{
 				for (int i = 1; i < int.MaxValue; i++)
@@ -388,7 +355,7 @@ namespace Kenedia.Modules.Characters.Controls
 
 		protected override void OnMoved(MovedEventArgs e)
 		{
-			((Control)this).OnMoved(e);
+			base.OnMoved(e);
 			if (_characterPotraitFrames.Count > 0)
 			{
 				RepositionPotraitFrames();
@@ -397,43 +364,43 @@ namespace Kenedia.Modules.Characters.Controls
 
 		protected override void OnShown(EventArgs e)
 		{
-			((Control)this).OnShown(e);
-			((Control)_characterPotraitsBackground).Show();
+			base.OnShown(e);
+			_characterPotraitsBackground.Show();
 			foreach (FramedMaskedRegion characterPotraitFrame in _characterPotraitFrames)
 			{
-				((Control)characterPotraitFrame).Show();
+				characterPotraitFrame.Show();
 			}
 			ForceOnScreen();
 		}
 
 		protected override void OnHidden(EventArgs e)
 		{
-			((Control)this).OnHidden(e);
-			((Control)_characterPotraitsBackground).Hide();
+			base.OnHidden(e);
+			_characterPotraitsBackground.Hide();
 			foreach (FramedMaskedRegion characterPotraitFrame in _characterPotraitFrames)
 			{
-				((Control)characterPotraitFrame).Hide();
+				characterPotraitFrame.Hide();
 			}
 		}
 
 		private void ForceOnScreen()
 		{
-			Screen screen = Control.get_Graphics().get_SpriteScreen();
-			if (((Control)this).get_Bottom() > ((Control)screen).get_Bottom())
+			Screen screen = Control.Graphics.SpriteScreen;
+			if (base.Bottom > screen.Bottom)
 			{
-				((Control)this).set_Bottom(((Control)screen).get_Bottom());
+				base.Bottom = screen.Bottom;
 			}
-			if (((Control)this).get_Top() < ((Control)screen).get_Top() + ((Control)this).get_Height())
+			if (base.Top < screen.Top + base.Height)
 			{
-				((Control)this).set_Top(((Control)screen).get_Top() + ((Control)this).get_Height());
+				base.Top = screen.Top + base.Height;
 			}
-			if (((Control)this).get_Left() < ((Control)screen).get_Left())
+			if (base.Left < screen.Left)
 			{
-				((Control)this).set_Left(((Control)screen).get_Left());
+				base.Left = screen.Left;
 			}
-			if (((Control)this).get_Right() > ((Control)screen).get_Right())
+			if (base.Right > screen.Right)
 			{
-				((Control)this).set_Left(((Control)screen).get_Right() - ((Control)this).get_Width());
+				base.Left = screen.Right - base.Width;
 			}
 		}
 	}

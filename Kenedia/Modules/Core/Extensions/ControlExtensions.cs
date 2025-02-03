@@ -6,25 +6,26 @@ namespace Kenedia.Modules.Core.Extensions
 {
 	public static class ControlExtensions
 	{
-		public static bool IsVisible(this Control control)
+		private static bool IsParentSetAndVisible(this Control ctrl)
 		{
-			return IsParentSetAndVisible(control);
-			static bool IsParentSetAndVisible(Control ctrl)
+			if (ctrl?.Parent?.Visible ?? false)
 			{
-				if (ctrl.get_Visible() && ctrl.get_Parent() != null)
+				if (ctrl.Parent != GameService.Graphics.SpriteScreen)
 				{
-					if (ctrl.get_Parent() != GameService.Graphics.get_SpriteScreen() || !((Control)ctrl.get_Parent()).get_Visible())
-					{
-						if (((Control)ctrl.get_Parent()).get_Visible())
-						{
-							return IsParentSetAndVisible((Control)(object)ctrl.get_Parent());
-						}
-						return false;
-					}
-					return true;
+					return ctrl.Parent.IsParentSetAndVisible();
 				}
-				return false;
+				return true;
 			}
+			return false;
+		}
+
+		public static bool IsVisible(this Control ctrl)
+		{
+			if (ctrl?.Visible ?? false)
+			{
+				return ctrl.IsParentSetAndVisible();
+			}
+			return false;
 		}
 
 		public static bool IsDrawn(this Control c)
@@ -34,15 +35,15 @@ namespace Kenedia.Modules.Core.Extensions
 			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-			if (c.get_Parent() != null && ((Control)c.get_Parent()).get_Visible())
+			if (c.Parent != null && c.Parent.Visible)
 			{
-				Rectangle absoluteBounds = ((Control)c.get_Parent()).get_AbsoluteBounds();
-				Rectangle absoluteBounds2 = c.get_AbsoluteBounds();
+				Rectangle absoluteBounds = c.Parent.AbsoluteBounds;
+				Rectangle absoluteBounds2 = c.AbsoluteBounds;
 				if (((Rectangle)(ref absoluteBounds)).Contains(((Rectangle)(ref absoluteBounds2)).get_Center()))
 				{
-					if (c.get_Parent() != GameService.Graphics.get_SpriteScreen())
+					if (c.Parent != GameService.Graphics.SpriteScreen)
 					{
-						return ((Control)(object)c.get_Parent()).IsDrawn();
+						return c.Parent.IsDrawn();
 					}
 					return true;
 				}
@@ -56,14 +57,14 @@ namespace Kenedia.Modules.Core.Extensions
 			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-			if (c.get_Parent() != null && ((Control)c.get_Parent()).get_Visible())
+			if (c.Parent != null && c.Parent.Visible)
 			{
-				Rectangle absoluteBounds = ((Control)c.get_Parent()).get_AbsoluteBounds();
+				Rectangle absoluteBounds = c.Parent.AbsoluteBounds;
 				if (((Rectangle)(ref absoluteBounds)).Contains(((Rectangle)(ref b)).get_Center()))
 				{
-					if (c.get_Parent() != GameService.Graphics.get_SpriteScreen())
+					if (c.Parent != GameService.Graphics.SpriteScreen)
 					{
-						return ((Control)(object)c.get_Parent()).IsDrawn(b);
+						return c.Parent.IsDrawn(b);
 					}
 					return true;
 				}
@@ -73,8 +74,8 @@ namespace Kenedia.Modules.Core.Extensions
 
 		public static bool ToggleVisibility(this Control c, bool? visible = null)
 		{
-			c.set_Visible(visible ?? (!c.get_Visible()));
-			return c.get_Visible();
+			c.Visible = visible ?? (!c.Visible);
+			return c.Visible;
 		}
 
 		public static void SetLocation(this Control c, int? x = null, int? y = null)
@@ -85,22 +86,22 @@ namespace Kenedia.Modules.Core.Extensions
 			int valueOrDefault = x.GetValueOrDefault();
 			if (!x.HasValue)
 			{
-				valueOrDefault = c.get_Location().X;
+				valueOrDefault = c.Location.X;
 				x = valueOrDefault;
 			}
 			valueOrDefault = y.GetValueOrDefault();
 			if (!y.HasValue)
 			{
-				valueOrDefault = c.get_Location().Y;
+				valueOrDefault = c.Location.Y;
 				y = valueOrDefault;
 			}
-			c.set_Location(new Point(x.Value, y.Value));
+			c.Location = new Point(x.Value, y.Value);
 		}
 
 		public static void SetLocation(this Control c, Point location)
 		{
 			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			c.set_Location(location);
+			c.Location = location;
 		}
 
 		public static void SetSize(this Control c, int? width = null, int? height = null)
@@ -109,22 +110,22 @@ namespace Kenedia.Modules.Core.Extensions
 			int valueOrDefault = width.GetValueOrDefault();
 			if (!width.HasValue)
 			{
-				valueOrDefault = c.get_Width();
+				valueOrDefault = c.Width;
 				width = valueOrDefault;
 			}
 			valueOrDefault = height.GetValueOrDefault();
 			if (!height.HasValue)
 			{
-				valueOrDefault = c.get_Height();
+				valueOrDefault = c.Height;
 				height = valueOrDefault;
 			}
-			c.set_Size(new Point(width.Value, height.Value));
+			c.Size = new Point(width.Value, height.Value);
 		}
 
 		public static void SetSize(this Control c, Point size)
 		{
 			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			c.set_Size(size);
+			c.Size = size;
 		}
 
 		public static void SetBounds(this Control c, Rectangle bounds)

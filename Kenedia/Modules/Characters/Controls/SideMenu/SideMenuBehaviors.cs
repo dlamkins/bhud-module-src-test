@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Resources;
 using Blish_HUD;
 using Blish_HUD.Controls;
-using Gw2Sharp.WebApi;
 using Kenedia.Modules.Characters.Extensions;
 using Kenedia.Modules.Characters.Res;
 using Kenedia.Modules.Characters.Services;
@@ -32,15 +31,15 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 			new KeyValuePair<string, DisplayCheckToggle>("Tags", null)
 		};
 
-		private readonly Panel _separator;
+		private readonly Kenedia.Modules.Core.Controls.Panel _separator;
 
-		private readonly Dropdown _orderDropdown;
+		private readonly Kenedia.Modules.Core.Controls.Dropdown _orderDropdown;
 
-		private readonly Dropdown _flowDropdown;
+		private readonly Kenedia.Modules.Core.Controls.Dropdown _flowDropdown;
 
-		private readonly Dropdown _filterBehaviorDropdown;
+		private readonly Kenedia.Modules.Core.Controls.Dropdown _filterBehaviorDropdown;
 
-		private readonly Dropdown _matchingDropdown;
+		private readonly Kenedia.Modules.Core.Controls.Dropdown _matchingDropdown;
 
 		private readonly DisplayCheckToggle _toggleAll;
 
@@ -63,43 +62,47 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 			_resourceManager = resourceManager;
 			_settings = settings;
 			_onSortChanged = onSortChanged;
-			base.FlowDirection = (ControlFlowDirection)3;
-			((Container)this).set_WidthSizingMode((SizingMode)2);
-			((Container)this).set_AutoSizePadding(new Point(5, 5));
-			((Container)this).set_HeightSizingMode((SizingMode)1);
+			base.FlowDirection = ControlFlowDirection.SingleTopToBottom;
+			WidthSizingMode = SizingMode.Fill;
+			base.AutoSizePadding = new Point(5, 5);
+			HeightSizingMode = SizingMode.AutoSize;
 			base.OuterControlPadding = new Vector2(5f, 5f);
 			base.ControlPadding = new Vector2(5f, 5f);
-			((Control)this).set_Location(new Point(0, 25));
-			Dropdown dropdown = new Dropdown();
-			((Control)dropdown).set_Parent((Container)(object)this);
-			dropdown.SetLocalizedTooltip = () => strings.CustomOrderDisclaimer;
-			_orderDropdown = dropdown;
-			((Dropdown)_orderDropdown).add_ValueChanged((EventHandler<ValueChangedEventArgs>)OrderDropdown_ValueChanged);
-			Dropdown dropdown2 = new Dropdown();
-			((Control)dropdown2).set_Parent((Container)(object)this);
-			_flowDropdown = dropdown2;
-			((Dropdown)_flowDropdown).add_ValueChanged((EventHandler<ValueChangedEventArgs>)FlowDropdown_ValueChanged);
-			Dropdown dropdown3 = new Dropdown();
-			((Control)dropdown3).set_Parent((Container)(object)this);
-			_filterBehaviorDropdown = dropdown3;
-			((Dropdown)_filterBehaviorDropdown).add_ValueChanged((EventHandler<ValueChangedEventArgs>)FilterBehaviorDropdown_ValueChanged);
-			Dropdown dropdown4 = new Dropdown();
-			((Control)dropdown4).set_Parent((Container)(object)this);
-			_matchingDropdown = dropdown4;
-			((Dropdown)_matchingDropdown).add_ValueChanged((EventHandler<ValueChangedEventArgs>)MatchingDropdown_ValueChanged);
-			DisplayCheckToggle displayCheckToggle = new DisplayCheckToggle(textureManager);
-			((Control)displayCheckToggle).set_Parent((Container)(object)this);
-			_toggleAll = displayCheckToggle;
-			_toggleAll.ShowChanged += All_ShowChanged;
-			_toggleAll.CheckChanged += All_CheckChanged;
-			_toggleAll.ShowTooltipChanged += All_ShowTooltipCheckChanged;
-			Panel obj = new Panel
+			base.Location = new Point(0, 25);
+			_orderDropdown = new Kenedia.Modules.Core.Controls.Dropdown
 			{
-				BackgroundColor = Color.get_White() * 0.6f
+				Parent = this,
+				SetLocalizedTooltip = () => strings.CustomOrderDisclaimer
 			};
-			((Control)obj).set_Height(2);
-			((Control)obj).set_Parent((Container)(object)this);
-			_separator = obj;
+			_orderDropdown.ValueChanged += OrderDropdown_ValueChanged;
+			_flowDropdown = new Kenedia.Modules.Core.Controls.Dropdown
+			{
+				Parent = this
+			};
+			_flowDropdown.ValueChanged += FlowDropdown_ValueChanged;
+			_filterBehaviorDropdown = new Kenedia.Modules.Core.Controls.Dropdown
+			{
+				Parent = this
+			};
+			_filterBehaviorDropdown.ValueChanged += FilterBehaviorDropdown_ValueChanged;
+			_matchingDropdown = new Kenedia.Modules.Core.Controls.Dropdown
+			{
+				Parent = this
+			};
+			_matchingDropdown.ValueChanged += MatchingDropdown_ValueChanged;
+			_toggleAll = new DisplayCheckToggle(textureManager)
+			{
+				Parent = this
+			};
+			_toggleAll.ShowChanged += new EventHandler<bool>(All_ShowChanged);
+			_toggleAll.CheckChanged += new EventHandler<bool>(All_CheckChanged);
+			_toggleAll.ShowTooltipChanged += new EventHandler<bool>(All_ShowTooltipCheckChanged);
+			_separator = new Kenedia.Modules.Core.Controls.Panel
+			{
+				BackgroundColor = Color.get_White() * 0.6f,
+				Height = 2,
+				Parent = this
+			};
 			for (int i = 0; i < _toggles.Count; i++)
 			{
 				KeyValuePair<string, DisplayCheckToggle> t = _toggles[i];
@@ -117,13 +120,14 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 					show = false;
 					break;
 				}
-				DisplayCheckToggle displayCheckToggle2 = new DisplayCheckToggle(textureManager, settings2, key, show);
-				((Control)displayCheckToggle2).set_Parent((Container)(object)this);
-				DisplayCheckToggle ctrl = displayCheckToggle2;
-				ctrl.Changed += Toggle_Changed;
+				DisplayCheckToggle ctrl = new DisplayCheckToggle(textureManager, settings2, key, show)
+				{
+					Parent = this
+				};
+				ctrl.Changed += new EventHandler<Tuple<bool, bool>>(Toggle_Changed);
 				_toggles[i] = new KeyValuePair<string, DisplayCheckToggle>(t.Key, ctrl);
 			}
-			GameService.Overlay.get_UserLocale().add_SettingChanged((EventHandler<ValueChangedEventArgs<Locale>>)OnLanguageChanged);
+			GameService.Overlay.UserLocale.SettingChanged += OnLanguageChanged;
 			OnLanguageChanged();
 		}
 
@@ -157,53 +161,53 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 
 		private void MatchingDropdown_ValueChanged(object sender, ValueChangedEventArgs e)
 		{
-			_settings.ResultMatchingBehavior.set_Value(e.get_CurrentValue().GetMatchingBehavior());
+			_settings.ResultMatchingBehavior.Value = e.CurrentValue.GetMatchingBehavior();
 		}
 
 		private void FilterBehaviorDropdown_ValueChanged(object sender, ValueChangedEventArgs e)
 		{
-			_settings.ResultFilterBehavior.set_Value(e.get_CurrentValue().GetFilterBehavior());
+			_settings.ResultFilterBehavior.Value = e.CurrentValue.GetFilterBehavior();
 		}
 
 		private void FlowDropdown_ValueChanged(object sender, ValueChangedEventArgs e)
 		{
-			_settings.SortOrder.set_Value(e.get_CurrentValue().GetSortOrder());
+			_settings.SortOrder.Value = e.CurrentValue.GetSortOrder();
 			_onSortChanged?.Invoke();
 		}
 
 		private void OrderDropdown_ValueChanged(object sender, ValueChangedEventArgs e)
 		{
-			_settings.SortType.set_Value(e.get_CurrentValue().GetSortType());
+			_settings.SortType.Value = e.CurrentValue.GetSortType();
 			_onSortChanged?.Invoke();
 		}
 
 		public void OnLanguageChanged(object s = null, EventArgs e = null)
 		{
-			((Dropdown)_orderDropdown).set_SelectedItem(_settings.SortType.get_Value().GetSortType());
-			((Dropdown)_orderDropdown).get_Items().Clear();
-			((Dropdown)_orderDropdown).get_Items().Add(string.Format(strings.SortBy, strings.Name));
-			((Dropdown)_orderDropdown).get_Items().Add(string.Format(strings.SortBy, strings.Level));
-			((Dropdown)_orderDropdown).get_Items().Add(string.Format(strings.SortBy, strings.Race));
-			((Dropdown)_orderDropdown).get_Items().Add(string.Format(strings.SortBy, strings.Gender));
-			((Dropdown)_orderDropdown).get_Items().Add(string.Format(strings.SortBy, strings.Profession));
-			((Dropdown)_orderDropdown).get_Items().Add(string.Format(strings.SortBy, strings.Specialization));
-			((Dropdown)_orderDropdown).get_Items().Add(string.Format(strings.SortBy, strings.TimeSinceLogin));
-			((Dropdown)_orderDropdown).get_Items().Add(string.Format(strings.SortBy, strings.NextBirthday));
-			((Dropdown)_orderDropdown).get_Items().Add(string.Format(strings.SortBy, strings.Age));
-			((Dropdown)_orderDropdown).get_Items().Add(string.Format(strings.SortBy, strings.Map));
-			((Dropdown)_orderDropdown).get_Items().Add(strings.Custom);
-			((Dropdown)_flowDropdown).set_SelectedItem(_settings.SortOrder.get_Value().GetSortOrder());
-			((Dropdown)_flowDropdown).get_Items().Clear();
-			((Dropdown)_flowDropdown).get_Items().Add(strings.Ascending);
-			((Dropdown)_flowDropdown).get_Items().Add(strings.Descending);
-			((Dropdown)_matchingDropdown).set_SelectedItem(_settings.ResultMatchingBehavior.get_Value().GetMatchingBehavior());
-			((Dropdown)_matchingDropdown).get_Items().Clear();
-			((Dropdown)_matchingDropdown).get_Items().Add(strings.MatchAnyFilter);
-			((Dropdown)_matchingDropdown).get_Items().Add(strings.MatchAllFilter);
-			((Dropdown)_filterBehaviorDropdown).set_SelectedItem(_settings.ResultFilterBehavior.get_Value().GetFilterBehavior());
-			((Dropdown)_filterBehaviorDropdown).get_Items().Clear();
-			((Dropdown)_filterBehaviorDropdown).get_Items().Add(strings.IncludeMatches);
-			((Dropdown)_filterBehaviorDropdown).get_Items().Add(strings.ExcludeMatches);
+			_orderDropdown.SelectedItem = _settings.SortType.Value.GetSortType();
+			_orderDropdown.Items.Clear();
+			_orderDropdown.Items.Add(string.Format(strings.SortBy, strings.Name));
+			_orderDropdown.Items.Add(string.Format(strings.SortBy, strings.Level));
+			_orderDropdown.Items.Add(string.Format(strings.SortBy, strings.Race));
+			_orderDropdown.Items.Add(string.Format(strings.SortBy, strings.Gender));
+			_orderDropdown.Items.Add(string.Format(strings.SortBy, strings.Profession));
+			_orderDropdown.Items.Add(string.Format(strings.SortBy, strings.Specialization));
+			_orderDropdown.Items.Add(string.Format(strings.SortBy, strings.TimeSinceLogin));
+			_orderDropdown.Items.Add(string.Format(strings.SortBy, strings.NextBirthday));
+			_orderDropdown.Items.Add(string.Format(strings.SortBy, strings.Age));
+			_orderDropdown.Items.Add(string.Format(strings.SortBy, strings.Map));
+			_orderDropdown.Items.Add(strings.Custom);
+			_flowDropdown.SelectedItem = _settings.SortOrder.Value.GetSortOrder();
+			_flowDropdown.Items.Clear();
+			_flowDropdown.Items.Add(strings.Ascending);
+			_flowDropdown.Items.Add(strings.Descending);
+			_matchingDropdown.SelectedItem = _settings.ResultMatchingBehavior.Value.GetMatchingBehavior();
+			_matchingDropdown.Items.Clear();
+			_matchingDropdown.Items.Add(strings.MatchAnyFilter);
+			_matchingDropdown.Items.Add(strings.MatchAllFilter);
+			_filterBehaviorDropdown.SelectedItem = _settings.ResultFilterBehavior.Value.GetFilterBehavior();
+			_filterBehaviorDropdown.Items.Clear();
+			_filterBehaviorDropdown.Items.Add(strings.IncludeMatches);
+			_filterBehaviorDropdown.Items.Add(strings.ExcludeMatches);
 			_toggleAll.Text = strings.ToggleAll;
 			foreach (KeyValuePair<string, DisplayCheckToggle> t in _toggles)
 			{
@@ -217,11 +221,11 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 		protected override void DisposeControl()
 		{
 			base.DisposeControl();
-			GameService.Overlay.get_UserLocale().remove_SettingChanged((EventHandler<ValueChangedEventArgs<Locale>>)OnLanguageChanged);
-			((Dropdown)_orderDropdown).remove_ValueChanged((EventHandler<ValueChangedEventArgs>)OrderDropdown_ValueChanged);
-			((Dropdown)_flowDropdown).remove_ValueChanged((EventHandler<ValueChangedEventArgs>)FlowDropdown_ValueChanged);
-			((Dropdown)_filterBehaviorDropdown).remove_ValueChanged((EventHandler<ValueChangedEventArgs>)FilterBehaviorDropdown_ValueChanged);
-			((Dropdown)_matchingDropdown).remove_ValueChanged((EventHandler<ValueChangedEventArgs>)MatchingDropdown_ValueChanged);
+			GameService.Overlay.UserLocale.SettingChanged -= OnLanguageChanged;
+			_orderDropdown.ValueChanged -= OrderDropdown_ValueChanged;
+			_flowDropdown.ValueChanged -= FlowDropdown_ValueChanged;
+			_filterBehaviorDropdown.ValueChanged -= FilterBehaviorDropdown_ValueChanged;
+			_matchingDropdown.ValueChanged -= MatchingDropdown_ValueChanged;
 		}
 
 		protected override void OnResized(ResizedEventArgs e)
@@ -232,13 +236,13 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-			((Container)this).OnResized(e);
-			_contentRectangle = new Rectangle((int)base.OuterControlPadding.X, (int)base.OuterControlPadding.Y, ((Control)this).get_Width() - (int)base.OuterControlPadding.X * 2, ((Control)this).get_Height() - (int)base.OuterControlPadding.Y * 2);
-			((Control)_orderDropdown).set_Width(_contentRectangle.Width);
-			((Control)_flowDropdown).set_Width(_contentRectangle.Width);
-			((Control)_filterBehaviorDropdown).set_Width(_contentRectangle.Width);
-			((Control)_matchingDropdown).set_Width(_contentRectangle.Width);
-			((Control)_separator).set_Width(_contentRectangle.Width);
+			base.OnResized(e);
+			_contentRectangle = new Rectangle((int)base.OuterControlPadding.X, (int)base.OuterControlPadding.Y, base.Width - (int)base.OuterControlPadding.X * 2, base.Height - (int)base.OuterControlPadding.Y * 2);
+			_orderDropdown.Width = _contentRectangle.Width;
+			_flowDropdown.Width = _contentRectangle.Width;
+			_filterBehaviorDropdown.Width = _contentRectangle.Width;
+			_matchingDropdown.Width = _contentRectangle.Width;
+			_separator.Width = _contentRectangle.Width;
 		}
 	}
 }

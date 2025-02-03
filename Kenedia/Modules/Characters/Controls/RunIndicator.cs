@@ -13,15 +13,15 @@ namespace Kenedia.Modules.Characters.Controls
 {
 	public class RunIndicator : FramedContainer
 	{
-		private readonly LoadingSpinner _loadingSpinner;
+		private readonly Kenedia.Modules.Core.Controls.LoadingSpinner _loadingSpinner;
 
 		private readonly ChoyaSpinner _choyaSpinner;
 
-		private readonly Label _titleText;
+		private readonly Kenedia.Modules.Core.Controls.Label _titleText;
 
-		private readonly Label _statusText;
+		private readonly Kenedia.Modules.Core.Controls.Label _statusText;
 
-		private readonly Label _disclaimerText;
+		private readonly Kenedia.Modules.Core.Controls.Label _disclaimerText;
 
 		private Point _screenPartionSize;
 
@@ -61,75 +61,80 @@ namespace Kenedia.Modules.Characters.Controls
 			_isEnabled = isEnabled;
 			_textureManager = textureManager;
 			_showChoya = showChoya;
-			_screenPartionSize = new Point(Math.Min(640, ((Control)GameService.Graphics.get_SpriteScreen()).get_Size().X / 5), Math.Min(360, ((Control)GameService.Graphics.get_SpriteScreen()).get_Size().Y / 5));
-			int x = (((Control)GameService.Graphics.get_SpriteScreen()).get_Size().X - _screenPartionSize.X) / 2;
-			int y = (((Control)GameService.Graphics.get_SpriteScreen()).get_Size().Y - _screenPartionSize.Y) / 2;
-			((Control)this).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			((Control)this).set_Size(_screenPartionSize);
-			((Control)this).set_Location(new Point(x, y));
+			_screenPartionSize = new Point(Math.Min(640, GameService.Graphics.SpriteScreen.Size.X / 5), Math.Min(360, GameService.Graphics.SpriteScreen.Size.Y / 5));
+			int x = (GameService.Graphics.SpriteScreen.Size.X - _screenPartionSize.X) / 2;
+			int y = (GameService.Graphics.SpriteScreen.Size.Y - _screenPartionSize.Y) / 2;
+			base.Parent = GameService.Graphics.SpriteScreen;
+			base.Size = _screenPartionSize;
+			base.Location = new Point(x, y);
 			base.BackgroundImage = AsyncTexture2D.FromAssetId(1863949);
-			base.TextureRectangle = new Rectangle(30, 0, base.BackgroundImage.get_Width() - 30, base.BackgroundImage.get_Height());
-			((Control)this).set_Visible(false);
+			base.TextureRectangle = new Rectangle(30, 0, base.BackgroundImage.Width - 30, base.BackgroundImage.Height);
+			base.Visible = false;
 			base.BackgroundImageColor = Color.get_White() * 0.9f;
-			Label label = new Label();
-			((Control)label).set_Parent((Container)(object)this);
-			((Control)label).set_Location(new Point(0, 10));
-			((Label)label).set_Text(BaseModule<Characters, MainWindow, Settings, PathCollection>.ModuleName);
-			((Label)label).set_AutoSizeHeight(true);
-			((Label)label).set_HorizontalAlignment((HorizontalAlignment)1);
-			((Label)label).set_Font(GameService.Content.GetFont((FontFace)0, (FontSize)36, (FontStyle)0));
-			((Label)label).set_TextColor(Color.get_White());
-			((Control)label).set_Width(((Control)this).get_Width());
-			_titleText = label;
+			_titleText = new Kenedia.Modules.Core.Controls.Label
+			{
+				Parent = this,
+				Location = new Point(0, 10),
+				Text = BaseModule<Characters, MainWindow, Settings, PathCollection>.ModuleName,
+				AutoSizeHeight = true,
+				HorizontalAlignment = HorizontalAlignment.Center,
+				Font = GameService.Content.GetFont(ContentService.FontFace.Menomonia, ContentService.FontSize.Size36, ContentService.FontStyle.Regular),
+				TextColor = Color.get_White(),
+				Width = base.Width
+			};
 			int spinnerSize = Math.Max(_screenPartionSize.Y / 2, 96);
-			LoadingSpinner loadingSpinner = new LoadingSpinner();
-			((Control)loadingSpinner).set_Parent((Container)(object)this);
-			((Control)loadingSpinner).set_Size(new Point(spinnerSize, spinnerSize));
-			((Control)loadingSpinner).set_Location(new Point((_screenPartionSize.X - spinnerSize) / 2, (_screenPartionSize.Y - spinnerSize) / 2 - 20));
-			((Control)loadingSpinner).set_Visible(!_showChoya.get_Value());
-			_loadingSpinner = loadingSpinner;
-			ChoyaSpinner choyaSpinner = new ChoyaSpinner(_textureManager);
-			((Control)choyaSpinner).set_Parent((Container)(object)this);
-			((Control)choyaSpinner).set_Size(new Point(_screenPartionSize.X - 20, spinnerSize));
-			((Control)choyaSpinner).set_Location(new Point(10, (_screenPartionSize.Y - spinnerSize) / 2 - 20));
-			((Control)choyaSpinner).set_Visible(_showChoya.get_Value());
-			_choyaSpinner = choyaSpinner;
-			Label label2 = new Label();
-			((Control)label2).set_Parent((Container)(object)this);
-			((Label)label2).set_Text("Doing something very fancy right now ...");
-			((Control)label2).set_Height(100);
-			((Label)label2).set_HorizontalAlignment((HorizontalAlignment)1);
-			((Label)label2).set_Font(GameService.Content.get_DefaultFont18());
-			((Control)label2).set_Width(((Control)this).get_Width());
-			((Control)label2).set_Location(new Point(0, ((Control)this).get_Height() - 125));
-			_statusText = label2;
-			Label label3 = new Label();
-			((Control)label3).set_Parent((Container)(object)this);
-			((Label)label3).set_Text("Any Key or Mouse press will cancel the current action!");
-			((Control)label3).set_Height(50);
-			((Label)label3).set_HorizontalAlignment((HorizontalAlignment)1);
-			((Label)label3).set_Font(GameService.Content.GetFont((FontFace)0, (FontSize)14, (FontStyle)0));
-			((Control)label3).set_Width(((Control)this).get_Width());
-			((Control)label3).set_Location(new Point(0, ((Control)this).get_Height() - 50));
-			_disclaimerText = label3;
-			_characterSwapping.StatusChanged += CharacterSwapping_StatusChanged;
-			_characterSorting.StatusChanged += CharacterSorting_StatusChanged;
-			_characterSwapping.Started += ShowIndicator;
-			_characterSorting.Started += ShowIndicator;
-			_characterSwapping.Finished += HideIndicator;
-			_characterSorting.Finished += HideIndicator;
-			_showChoya.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowChoya_SettingChanged);
+			_loadingSpinner = new Kenedia.Modules.Core.Controls.LoadingSpinner
+			{
+				Parent = this,
+				Size = new Point(spinnerSize, spinnerSize),
+				Location = new Point((_screenPartionSize.X - spinnerSize) / 2, (_screenPartionSize.Y - spinnerSize) / 2 - 20),
+				Visible = !_showChoya.Value
+			};
+			_choyaSpinner = new ChoyaSpinner(_textureManager)
+			{
+				Parent = this,
+				Size = new Point(_screenPartionSize.X - 20, spinnerSize),
+				Location = new Point(10, (_screenPartionSize.Y - spinnerSize) / 2 - 20),
+				Visible = _showChoya.Value
+			};
+			_statusText = new Kenedia.Modules.Core.Controls.Label
+			{
+				Parent = this,
+				Text = "Doing something very fancy right now ...",
+				Height = 100,
+				HorizontalAlignment = HorizontalAlignment.Center,
+				Font = GameService.Content.DefaultFont18,
+				Width = base.Width,
+				Location = new Point(0, base.Height - 125)
+			};
+			_disclaimerText = new Kenedia.Modules.Core.Controls.Label
+			{
+				Parent = this,
+				Text = "Any Key or Mouse press will cancel the current action!",
+				Height = 50,
+				HorizontalAlignment = HorizontalAlignment.Center,
+				Font = GameService.Content.GetFont(ContentService.FontFace.Menomonia, ContentService.FontSize.Size14, ContentService.FontStyle.Regular),
+				Width = base.Width,
+				Location = new Point(0, base.Height - 50)
+			};
+			_characterSwapping.StatusChanged += new EventHandler(CharacterSwapping_StatusChanged);
+			_characterSorting.StatusChanged += new EventHandler(CharacterSorting_StatusChanged);
+			_characterSwapping.Started += new EventHandler(ShowIndicator);
+			_characterSorting.Started += new EventHandler(ShowIndicator);
+			_characterSwapping.Finished += new EventHandler(HideIndicator);
+			_characterSorting.Finished += new EventHandler(HideIndicator);
+			_showChoya.SettingChanged += ShowChoya_SettingChanged;
 		}
 
-		private void ShowChoya_SettingChanged(object sender, ValueChangedEventArgs<bool> e)
+		private void ShowChoya_SettingChanged(object sender, Blish_HUD.ValueChangedEventArgs<bool> e)
 		{
-			((Control)_loadingSpinner).set_Visible(!e.get_NewValue());
-			((Control)_choyaSpinner).set_Visible(e.get_NewValue());
+			_loadingSpinner.Visible = !e.NewValue;
+			_choyaSpinner.Visible = e.NewValue;
 		}
 
 		private void HideIndicator(object sender, EventArgs e)
 		{
-			((Control)this).Hide();
+			Hide();
 		}
 
 		private void ShowIndicator(object sender, EventArgs e)
@@ -148,48 +153,48 @@ namespace Kenedia.Modules.Characters.Controls
 			//IL_0163: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0187: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01b2: Unknown result type (might be due to invalid IL or missing references)
-			if (_isEnabled.get_Value())
+			if (_isEnabled.Value)
 			{
-				_screenPartionSize = new Point(Math.Min(640, ((Control)GameService.Graphics.get_SpriteScreen()).get_Size().X / 5), Math.Min(360, ((Control)GameService.Graphics.get_SpriteScreen()).get_Size().Y / 5));
-				int x = (((Control)GameService.Graphics.get_SpriteScreen()).get_Size().X - _screenPartionSize.X) / 2;
-				int y = (((Control)GameService.Graphics.get_SpriteScreen()).get_Size().Y - _screenPartionSize.Y) / 2;
-				((Control)this).set_Location(new Point(x, y));
-				((Control)this).set_Size(_screenPartionSize);
-				((Control)_titleText).set_Width(((Control)this).get_Width());
-				((Control)_statusText).set_Width(((Control)this).get_Width());
-				((Control)_statusText).set_Location(new Point(0, ((Control)this).get_Height() - 125));
+				_screenPartionSize = new Point(Math.Min(640, GameService.Graphics.SpriteScreen.Size.X / 5), Math.Min(360, GameService.Graphics.SpriteScreen.Size.Y / 5));
+				int x = (GameService.Graphics.SpriteScreen.Size.X - _screenPartionSize.X) / 2;
+				int y = (GameService.Graphics.SpriteScreen.Size.Y - _screenPartionSize.Y) / 2;
+				base.Location = new Point(x, y);
+				base.Size = _screenPartionSize;
+				_titleText.Width = base.Width;
+				_statusText.Width = base.Width;
+				_statusText.Location = new Point(0, base.Height - 125);
 				int spinnerSize = Math.Min(_screenPartionSize.Y / 2, 96);
-				((Control)_loadingSpinner).set_Size(new Point(spinnerSize, spinnerSize));
-				((Control)_loadingSpinner).set_Location(new Point((_screenPartionSize.X - spinnerSize) / 2, (_screenPartionSize.Y - spinnerSize) / 2 - 20));
-				((Control)_choyaSpinner).set_Size(new Point(_screenPartionSize.X - 20, spinnerSize));
-				((Control)_choyaSpinner).set_Location(new Point(10, (_screenPartionSize.Y - spinnerSize) / 2 - 20));
-				((Control)_disclaimerText).set_Width(((Control)this).get_Width());
-				((Control)_disclaimerText).set_Location(new Point(0, ((Control)this).get_Height() - 50));
-				((Control)this).Invalidate();
-				((Control)this).Show();
+				_loadingSpinner.Size = new Point(spinnerSize, spinnerSize);
+				_loadingSpinner.Location = new Point((_screenPartionSize.X - spinnerSize) / 2, (_screenPartionSize.Y - spinnerSize) / 2 - 20);
+				_choyaSpinner.Size = new Point(_screenPartionSize.X - 20, spinnerSize);
+				_choyaSpinner.Location = new Point(10, (_screenPartionSize.Y - spinnerSize) / 2 - 20);
+				_disclaimerText.Width = base.Width;
+				_disclaimerText.Location = new Point(0, base.Height - 50);
+				Invalidate();
+				Show();
 			}
 		}
 
 		protected override void DisposeControl()
 		{
 			base.DisposeControl();
-			_showChoya.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowChoya_SettingChanged);
-			_characterSwapping.StatusChanged -= CharacterSwapping_StatusChanged;
-			_characterSorting.StatusChanged -= CharacterSorting_StatusChanged;
-			_characterSwapping.Started -= ShowIndicator;
-			_characterSorting.Started -= ShowIndicator;
-			_characterSwapping.Finished -= HideIndicator;
-			_characterSorting.Finished -= HideIndicator;
+			_showChoya.SettingChanged -= ShowChoya_SettingChanged;
+			_characterSwapping.StatusChanged -= new EventHandler(CharacterSwapping_StatusChanged);
+			_characterSorting.StatusChanged -= new EventHandler(CharacterSorting_StatusChanged);
+			_characterSwapping.Started -= new EventHandler(ShowIndicator);
+			_characterSorting.Started -= new EventHandler(ShowIndicator);
+			_characterSwapping.Finished -= new EventHandler(HideIndicator);
+			_characterSorting.Finished -= new EventHandler(HideIndicator);
 		}
 
 		private void CharacterSorting_StatusChanged(object sender, EventArgs e)
 		{
-			((Label)_statusText).set_Text(_characterSorting.Status);
+			_statusText.Text = _characterSorting.Status;
 		}
 
 		private void CharacterSwapping_StatusChanged(object sender, EventArgs e)
 		{
-			((Label)_statusText).set_Text(_characterSwapping.Status);
+			_statusText.Text = _characterSwapping.Status;
 		}
 	}
 }

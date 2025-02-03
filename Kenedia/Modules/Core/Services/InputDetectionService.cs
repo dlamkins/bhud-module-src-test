@@ -21,9 +21,9 @@ namespace Kenedia.Modules.Core.Services
 
 		private double _lastClickOrKey;
 
-		private List<Keys> _ignoredKeys = new List<Keys> { (Keys)0 };
+		private readonly List<Keys> _ignoredKeys = new List<Keys>(1) { (Keys)0 };
 
-		private List<Keys> _noKeys = new List<Keys>();
+		private readonly List<Keys> _noKeys = new List<Keys>();
 
 		private Point _lastMousePosition;
 
@@ -156,19 +156,18 @@ namespace Kenedia.Modules.Core.Services
 			{
 				double now = gameTime.get_TotalGameTime().TotalMilliseconds;
 				IEnumerable<Keys> enumerable;
-				if (GameService.Input.get_Keyboard().get_KeysDown().Count <= 0)
+				if (GameService.Input.Keyboard.KeysDown.Count <= 0)
 				{
 					IEnumerable<Keys> noKeys = _noKeys;
 					enumerable = noKeys;
 				}
 				else
 				{
-					enumerable = GameService.Input.get_Keyboard().get_KeysDown().Except(_ignoredKeys)
-						.Distinct();
+					enumerable = GameService.Input.Keyboard.KeysDown.Except(_ignoredKeys).Distinct();
 				}
 				IEnumerable<Keys> keys = enumerable;
 				LastKeyInteraction = ((keys.Count() > 0) ? now : LastKeyInteraction);
-				MouseState mouse = GameService.Input.get_Mouse().get_State();
+				MouseState mouse = GameService.Input.Mouse.State;
 				LastMouseClick = (((int)((MouseState)(ref mouse)).get_LeftButton() == 1 || (int)((MouseState)(ref mouse)).get_RightButton() == 1 || (int)((MouseState)(ref mouse)).get_MiddleButton() == 1) ? now : LastMouseClick);
 				LastMouseMove = ((((MouseState)(ref mouse)).get_Position() != _lastMousePosition) ? now : LastMouseMove);
 				LastMouseInteraction = Math.Max(LastMouseMove, LastMouseClick);

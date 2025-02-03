@@ -155,7 +155,7 @@ namespace Kenedia.Modules.Characters.Models
 				{
 					foreach (CharacterCrafting crafting in Crafting)
 					{
-						Data.CraftingProfession craftingProf = _data.CrafingProfessions.Where((KeyValuePair<int, Data.CraftingProfession> e) => e.Value.Id == crafting.Id)?.FirstOrDefault().Value;
+						Data.CraftingProfession craftingProf = _data.CrafingProfessions.Where<KeyValuePair<int, Data.CraftingProfession>>((KeyValuePair<int, Data.CraftingProfession> e) => e.Value.Id == crafting.Id)?.FirstOrDefault().Value;
 						if (craftingProf != null)
 						{
 							list.Add(new KeyValuePair<int, Data.CraftingProfession>(crafting.Rating, craftingProf));
@@ -353,9 +353,9 @@ namespace Kenedia.Modules.Characters.Models
 					string path = ModulePath + (IconPath ?? string.Empty);
 					if (IconPath != null && File.Exists(path))
 					{
-						GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate(GraphicsDevice graphicsDevice)
+						GameService.Graphics.QueueMainThreadRender(delegate(GraphicsDevice graphicsDevice)
 						{
-							_icon = AsyncTexture2D.op_Implicit(TextureUtil.FromStreamPremultiplied(graphicsDevice, (Stream)new FileStream(ModulePath + IconPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)));
+							_icon = (AsyncTexture2D)TextureUtil.FromStreamPremultiplied(graphicsDevice, new FileStream(ModulePath + IconPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
 						});
 					}
 					_pathChecked = true;
@@ -706,7 +706,7 @@ namespace Kenedia.Modules.Characters.Models
 
 		public void Swap(bool ignoreOCR = false)
 		{
-			if (!GameService.Gw2Mumble.get_CurrentMap().IsPvpMap())
+			if (!GameService.Gw2Mumble.CurrentMap.IsPvpMap())
 			{
 				Save();
 				_characterSwapping?.Start(this, ignoreOCR);
@@ -714,7 +714,7 @@ namespace Kenedia.Modules.Characters.Models
 			}
 			else
 			{
-				ScreenNotification.ShowNotification("[Characters]: " + strings.Error_Competivive, (NotificationType)2, (Texture2D)null, 4);
+				ScreenNotification.ShowNotification("[Characters]: " + strings.Error_Competivive, ScreenNotification.NotificationType.Error);
 			}
 		}
 
@@ -722,12 +722,12 @@ namespace Kenedia.Modules.Characters.Models
 		{
 			if (character == null)
 			{
-				character = GameService.Gw2Mumble.get_PlayerCharacter();
+				character = GameService.Gw2Mumble.PlayerCharacter;
 			}
-			if (character != null && character.get_Name() == Name)
+			if (character != null && character.Name == Name)
 			{
-				Specialization = (SpecializationType)character.get_Specialization();
-				Map = (GameService.Gw2Mumble.get_CurrentMap().IsCommonMap() ? GameService.Gw2Mumble.get_CurrentMap().get_Id() : Map);
+				Specialization = (SpecializationType)character.Specialization;
+				Map = (GameService.Gw2Mumble.CurrentMap.IsCommonMap() ? GameService.Gw2Mumble.CurrentMap.Id : Map);
 				LastLogin = DateTime.UtcNow;
 			}
 		}

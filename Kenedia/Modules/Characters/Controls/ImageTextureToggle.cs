@@ -53,30 +53,19 @@ namespace Kenedia.Modules.Characters.Controls
 			if (ActiveTexture != null)
 			{
 				AsyncTexture2D texture = (_active ? ActiveTexture : (InactiveTexture ?? ActiveTexture));
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(texture), new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), bounds.Height, bounds.Height), (Rectangle?)((TextureRectangle == Rectangle.get_Empty()) ? texture.get_Bounds() : TextureRectangle), ((Control)this).get_MouseOver() ? ColorHovered : (_active ? ColorActive : ColorInactive), 0f, default(Vector2), (SpriteEffects)0);
+				spriteBatch.DrawOnCtrl(this, texture, new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), bounds.Height, bounds.Height), (TextureRectangle == Rectangle.get_Empty()) ? texture.Bounds : TextureRectangle, base.MouseOver ? ColorHovered : (_active ? ColorActive : ColorInactive), 0f, default(Vector2), (SpriteEffects)0);
 			}
 			if (ActiveText != null)
 			{
 				string text = (_active ? ActiveText : (InactiveText ?? ActiveText));
-				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, GameService.Content.get_DefaultFont14(), new Rectangle(((Rectangle)(ref bounds)).get_Left() + bounds.Height + 3, ((Rectangle)(ref bounds)).get_Top(), bounds.Width - bounds.Height - 3, bounds.Height), Color.get_White(), false, false, 0, (HorizontalAlignment)0, (VerticalAlignment)1);
+				spriteBatch.DrawStringOnCtrl(this, text, GameService.Content.DefaultFont14, new Rectangle(((Rectangle)(ref bounds)).get_Left() + bounds.Height + 3, ((Rectangle)(ref bounds)).get_Top(), bounds.Width - bounds.Height - 3, bounds.Height), Color.get_White(), wrap: false, stroke: false, 0);
 			}
 		}
 
 		protected override void OnClick(MouseEventArgs e)
 		{
-			((Control)this).OnClick(e);
+			base.OnClick(e);
 			_active = !_active;
 		}
-
-		public ImageTextureToggle()
-			: this()
-		{
-		}//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-
 	}
 }

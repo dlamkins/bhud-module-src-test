@@ -20,7 +20,7 @@ namespace Kenedia.Modules.Core.Controls
 
 		private Func<string> _setLocalizedTooltip;
 
-		public BitmapFont Font { get; set; } = Control.get_Content().get_DefaultFont16();
+		public BitmapFont Font { get; set; } = Control.Content.DefaultFont16;
 
 
 		public string Title { get; set; }
@@ -34,7 +34,7 @@ namespace Kenedia.Modules.Core.Controls
 			set
 			{
 				_setLocalizedTooltip = value;
-				((Control)this).set_BasicTooltipText(value?.Invoke());
+				base.BasicTooltipText = value?.Invoke();
 			}
 		}
 
@@ -55,15 +55,15 @@ namespace Kenedia.Modules.Core.Controls
 		{
 			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-			((Control)this).RecalculateLayout();
-			_titleBounds = new Rectangle(5, 0, ((Control)this).get_Width() - 10, ((Control)this).get_Height());
+			base.RecalculateLayout();
+			_titleBounds = new Rectangle(5, 0, base.Width - 10, base.Height);
 		}
 
 		public void UserLocale_SettingChanged(object sender, ValueChangedEventArgs<Locale> e)
 		{
 			if (SetLocalizedTooltip != null)
 			{
-				((Control)this).set_BasicTooltipText(SetLocalizedTooltip?.Invoke());
+				base.BasicTooltipText = SetLocalizedTooltip?.Invoke();
 			}
 			if (SetLocalizedTitle != null)
 			{
@@ -77,18 +77,11 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_texturePanelHeader), bounds, (Rectangle?)_texturePanelHeader.get_Bounds());
+			spriteBatch.DrawOnCtrl((Control)this, (Texture2D)_texturePanelHeader, bounds, (Rectangle?)_texturePanelHeader.Bounds);
 			if (Title != null)
 			{
-				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, Title, Font, _titleBounds, Color.get_White(), false, (HorizontalAlignment)0, (VerticalAlignment)1);
+				spriteBatch.DrawStringOnCtrl(this, Title, Font, _titleBounds, Color.get_White());
 			}
 		}
-
-		public TitleHeader()
-			: this()
-		{
-		}//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-
 	}
 }

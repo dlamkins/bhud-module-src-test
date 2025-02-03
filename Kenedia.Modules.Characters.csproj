@@ -15,17 +15,25 @@
   <ItemGroup />
   <ItemGroup>
     <Reference Include="MonoGame.Framework" />
-    <Reference Include="Blish HUD" />
+    <Reference Include="Blish HUD">
+      <HintPath>..\..\working\Blish HUD.exe</HintPath>
+    </Reference>
     <Reference Include="MonoGame.Extended" />
     <Reference Include="SemVer" />
     <Reference Include="Gw2Sharp" />
     <Reference Include="Newtonsoft.Json" />
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Core" />
     <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions">
+      <HintPath>..\..\working\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
+    </Reference>
     <Reference Include="Patagames.Ocr">
       <HintPath>..\..\working\Patagames.Ocr.dll</HintPath>
     </Reference>
-    <Reference Include="System.Net.Http" />
+    <Reference Include="Microsoft.Extensions.DependencyInjection">
+      <HintPath>..\..\working\Microsoft.Extensions.DependencyInjection.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>

@@ -12,7 +12,7 @@ using MonoGame.Extended.TextureAtlases;
 
 namespace Kenedia.Modules.Core.Controls
 {
-	public class Scrollbar : Control
+	public class Scrollbar : Blish_HUD.Controls.Control
 	{
 		private enum ClickFocus
 		{
@@ -38,19 +38,19 @@ namespace Kenedia.Modules.Core.Controls
 
 		private const int s_scroll_wheel = 30;
 
-		private static readonly TextureRegion2D s_textureTrack = Control.TextureAtlasControl.GetRegion("scrollbar/sb-track");
+		private static readonly TextureRegion2D s_textureTrack = Blish_HUD.Controls.Resources.Control.TextureAtlasControl.GetRegion("scrollbar/sb-track");
 
-		private static readonly TextureRegion2D s_textureUpArrow = Control.TextureAtlasControl.GetRegion("scrollbar/sb-arrow-up");
+		private static readonly TextureRegion2D s_textureUpArrow = Blish_HUD.Controls.Resources.Control.TextureAtlasControl.GetRegion("scrollbar/sb-arrow-up");
 
-		private static readonly TextureRegion2D s_textureDownArrow = Control.TextureAtlasControl.GetRegion("scrollbar/sb-arrow-down");
+		private static readonly TextureRegion2D s_textureDownArrow = Blish_HUD.Controls.Resources.Control.TextureAtlasControl.GetRegion("scrollbar/sb-arrow-down");
 
-		private static readonly TextureRegion2D s_textureBar = Control.TextureAtlasControl.GetRegion("scrollbar/sb-bar-active");
+		private static readonly TextureRegion2D s_textureBar = Blish_HUD.Controls.Resources.Control.TextureAtlasControl.GetRegion("scrollbar/sb-bar-active");
 
-		private static readonly TextureRegion2D s_textureThumb = Control.TextureAtlasControl.GetRegion("scrollbar/sb-thumb");
+		private static readonly TextureRegion2D s_textureThumb = Blish_HUD.Controls.Resources.Control.TextureAtlasControl.GetRegion("scrollbar/sb-thumb");
 
-		private static readonly TextureRegion2D s_textureTopCap = Control.TextureAtlasControl.GetRegion("scrollbar/sb-cap-top");
+		private static readonly TextureRegion2D s_textureTopCap = Blish_HUD.Controls.Resources.Control.TextureAtlasControl.GetRegion("scrollbar/sb-cap-top");
 
-		private static readonly TextureRegion2D s_textureBottomCap = Control.TextureAtlasControl.GetRegion("scrollbar/sb-cap-bottom");
+		private static readonly TextureRegion2D s_textureBottomCap = Blish_HUD.Controls.Resources.Control.TextureAtlasControl.GetRegion("scrollbar/sb-cap-bottom");
 
 		private ClickFocus _scrollFocus;
 
@@ -121,7 +121,7 @@ namespace Kenedia.Modules.Core.Controls
 			}
 			set
 			{
-				if (((Control)this).SetProperty<float>(ref _scrollDistance, MathHelper.Clamp(value, 0f, 1f), true, "ScrollDistance"))
+				if (SetProperty(ref _scrollDistance, MathHelper.Clamp(value, 0f, 1f), invalidateLayout: true, "ScrollDistance"))
 				{
 					_targetScrollDistance = _scrollDistance;
 				}
@@ -137,7 +137,7 @@ namespace Kenedia.Modules.Core.Controls
 			}
 			set
 			{
-				if (((Control)this).SetProperty<int>(ref _scrollbarHeight, value, true, "ScrollbarHeight"))
+				if (SetProperty(ref _scrollbarHeight, value, invalidateLayout: true, "ScrollbarHeight"))
 				{
 					RecalculateScrollbarSize();
 					UpdateAssocContainer();
@@ -149,7 +149,7 @@ namespace Kenedia.Modules.Core.Controls
 		{
 			get
 			{
-				if (((Control)this).get_Visible())
+				if (base.Visible)
 				{
 					return _scrollbarPercent < 0.99;
 				}
@@ -167,16 +167,15 @@ namespace Kenedia.Modules.Core.Controls
 			}
 			set
 			{
-				((Control)this).SetProperty<Container>(ref _associatedContainer, value, false, "AssociatedContainer");
+				SetProperty(ref _associatedContainer, value, invalidateLayout: false, "AssociatedContainer");
 			}
 		}
 
-		private int ContainerContentDiff => _containerLowestContent - _associatedContainer.get_ContentRegion().Height;
+		private int ContainerContentDiff => _containerLowestContent - _associatedContainer.ContentRegion.Height;
 
-		private int TrackLength => base._size.Y - s_textureUpArrow.get_Height() - s_textureDownArrow.get_Height();
+		private int TrackLength => _size.Y - s_textureUpArrow.get_Height() - s_textureDownArrow.get_Height();
 
 		public Scrollbar(Container container)
-			: this()
 		{
 			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
@@ -191,68 +190,66 @@ namespace Kenedia.Modules.Core.Controls
 			_downArrowBounds = Rectangle.get_Empty();
 			_barBounds = Rectangle.get_Empty();
 			_trackBounds = Rectangle.get_Empty();
-			((Control)this).set_Width(12);
-			Control.get_Input().get_Mouse().add_LeftMouseButtonReleased((EventHandler<MouseEventArgs>)MouseOnLeftMouseButtonReleased);
-			((Control)_associatedContainer).add_MouseWheelScrolled((EventHandler<MouseEventArgs>)HandleWheelScroll);
+			base.Width = 12;
+			Blish_HUD.Controls.Control.Input.Mouse.LeftMouseButtonReleased += MouseOnLeftMouseButtonReleased;
+			_associatedContainer.MouseWheelScrolled += HandleWheelScroll;
 		}
 
 		protected override void DisposeControl()
 		{
-			((Control)this).DisposeControl();
-			Control.get_Input().get_Mouse().remove_LeftMouseButtonReleased((EventHandler<MouseEventArgs>)MouseOnLeftMouseButtonReleased);
-			((Control)_associatedContainer).remove_MouseWheelScrolled((EventHandler<MouseEventArgs>)HandleWheelScroll);
+			base.DisposeControl();
+			Blish_HUD.Controls.Control.Input.Mouse.LeftMouseButtonReleased -= MouseOnLeftMouseButtonReleased;
+			_associatedContainer.MouseWheelScrolled -= HandleWheelScroll;
 		}
 
-		protected override void OnLeftMouseButtonPressed(MouseEventArgs e)
+		protected override void OnLeftMouseButtonPressed(Blish_HUD.Input.MouseEventArgs e)
 		{
 			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			((Control)this).OnLeftMouseButtonPressed(e);
-			Point position = Control.get_Input().get_Mouse().get_Position();
-			Rectangle absoluteBounds = ((Control)this).get_AbsoluteBounds();
+			base.OnLeftMouseButtonPressed(e);
+			Point position = Blish_HUD.Controls.Control.Input.Mouse.Position;
+			Rectangle absoluteBounds = base.AbsoluteBounds;
 			ScrollFocus = GetScrollFocus(position - ((Rectangle)(ref absoluteBounds)).get_Location());
-			_lastClickTime = GameService.Overlay.get_CurrentGameTime().get_TotalGameTime().TotalMilliseconds;
+			_lastClickTime = GameService.Overlay.CurrentGameTime.get_TotalGameTime().TotalMilliseconds;
 		}
 
-		private void MouseOnLeftMouseButtonReleased(object sender, MouseEventArgs e)
+		private void MouseOnLeftMouseButtonReleased(object sender, Blish_HUD.Input.MouseEventArgs e)
 		{
 			ScrollFocus = ClickFocus.None;
 		}
 
-		protected override void OnMouseWheelScrolled(MouseEventArgs e)
+		protected override void OnMouseWheelScrolled(Blish_HUD.Input.MouseEventArgs e)
 		{
 			HandleWheelScroll(this, e);
-			((Control)this).OnMouseWheelScrolled(e);
+			base.OnMouseWheelScrolled(e);
 		}
 
-		private void HandleWheelScroll(object sender, MouseEventArgs e)
+		private void HandleWheelScroll(object sender, Blish_HUD.Input.MouseEventArgs e)
 		{
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0021: Expected O, but got Unknown
 			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-			if (!((Control)this).get_Visible() || _scrollbarPercent > 0.99)
+			if (!base.Visible || _scrollbarPercent > 0.99)
 			{
 				return;
 			}
-			Control ctrl = (Control)sender;
+			Blish_HUD.Controls.Control ctrl = (Blish_HUD.Controls.Control)sender;
 			while (ctrl != _associatedContainer && ctrl != null)
 			{
 				if (ctrl is Panel)
 				{
 					return;
 				}
-				ctrl = (Control)(object)ctrl.get_Parent();
+				ctrl = ctrl.Parent;
 			}
-			MouseState state = GameService.Input.get_Mouse().get_State();
+			MouseState state = GameService.Input.Mouse.State;
 			if (((MouseState)(ref state)).get_ScrollWheelValue() != 0)
 			{
-				state = GameService.Input.get_Mouse().get_State();
+				state = GameService.Input.Mouse.State;
 				float normalScroll = Math.Sign(((MouseState)(ref state)).get_ScrollWheelValue());
 				ScrollAnimated((int)normalScroll * -30 * SystemInformation.MouseWheelScrollLines);
 			}
@@ -322,8 +319,8 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_010c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0111: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0113: Unknown result type (might be due to invalid IL or missing references)
-			Point position = Control.get_Input().get_Mouse().get_Position();
-			Rectangle absoluteBounds = ((Control)this).get_AbsoluteBounds();
+			Point position = Blish_HUD.Controls.Control.Input.Mouse.Position;
+			Rectangle absoluteBounds = base.AbsoluteBounds;
 			Point relMousePos = position - ((Rectangle)(ref absoluteBounds)).get_Location();
 			if (ScrollFocus == ClickFocus.None)
 			{
@@ -365,9 +362,9 @@ namespace Kenedia.Modules.Core.Controls
 			{
 				if (!c)
 				{
-					return scroll;
+					return new Action<int>(scroll);
 				}
-				return ScrollAnimated;
+				return new Action<int>(ScrollAnimated);
 			}
 			void scroll(int pixels)
 			{
@@ -378,26 +375,26 @@ namespace Kenedia.Modules.Core.Controls
 		private void ScrollAnimated(int pixels)
 		{
 			TargetScrollDistance = ((float)ContainerContentDiff * ScrollDistance + (float)pixels) / (float)ContainerContentDiff;
-			_targetScrollDistanceAnim = ((TweenerImpl)Control.get_Animation().get_Tweener()).Tween<Scrollbar>(this, (object)new
+			_targetScrollDistanceAnim = Blish_HUD.Controls.Control.Animation.Tweener.Tween(this, new
 			{
 				ScrollDistance = TargetScrollDistance
-			}, 0f, 0f, true).Ease((Func<float, float>)Ease.QuadOut);
+			}, 0f).Ease(Ease.QuadOut);
 		}
 
 		protected override CaptureType CapturesInput()
 		{
-			return (CaptureType)12;
+			return CaptureType.Mouse | CaptureType.MouseWheel;
 		}
 
 		private void UpdateAssocContainer()
 		{
 			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-			AssociatedContainer.set_VerticalScrollOffset((int)Math.Floor((float)(_containerLowestContent - AssociatedContainer.get_ContentRegion().Height) * ScrollDistance));
+			AssociatedContainer.VerticalScrollOffset = (int)Math.Floor((float)(_containerLowestContent - AssociatedContainer.ContentRegion.Height) * ScrollDistance);
 		}
 
 		public override void DoUpdate(GameTime gameTime)
 		{
-			((Control)this).DoUpdate(gameTime);
+			base.DoUpdate(gameTime);
 			double timeDiff = gameTime.get_TotalGameTime().TotalMilliseconds - _lastClickTime;
 			if (ScrollFocus == ClickFocus.Bar)
 			{
@@ -407,7 +404,7 @@ namespace Kenedia.Modules.Core.Controls
 			{
 				HandleClickScroll(clicked: false);
 			}
-			((Control)this).Invalidate();
+			Invalidate();
 		}
 
 		public override void RecalculateLayout()
@@ -427,10 +424,10 @@ namespace Kenedia.Modules.Core.Controls
 				ScrollDistance = 0f;
 				TargetScrollDistance = 0f;
 			}
-			_upArrowBounds = new Rectangle(((Control)this).get_Width() / 2 - s_textureUpArrow.get_Width() / 2, 0, s_textureUpArrow.get_Width(), s_textureUpArrow.get_Height());
-			_downArrowBounds = new Rectangle(((Control)this).get_Width() / 2 - s_textureDownArrow.get_Width() / 2, ((Control)this).get_Height() - s_textureDownArrow.get_Height(), s_textureDownArrow.get_Width(), s_textureDownArrow.get_Height());
-			_barBounds = new Rectangle(((Control)this).get_Width() / 2 - s_textureBar.get_Width() / 2, (int)(ScrollDistance * (float)(TrackLength - ScrollbarHeight)) + s_textureUpArrow.get_Height(), s_textureBar.get_Width(), ScrollbarHeight);
-			_trackBounds = new Rectangle(((Control)this).get_Width() / 2 - s_textureTrack.get_Width() / 2, ((Rectangle)(ref _upArrowBounds)).get_Bottom(), s_textureTrack.get_Width(), TrackLength);
+			_upArrowBounds = new Rectangle(base.Width / 2 - s_textureUpArrow.get_Width() / 2, 0, s_textureUpArrow.get_Width(), s_textureUpArrow.get_Height());
+			_downArrowBounds = new Rectangle(base.Width / 2 - s_textureDownArrow.get_Width() / 2, base.Height - s_textureDownArrow.get_Height(), s_textureDownArrow.get_Width(), s_textureDownArrow.get_Height());
+			_barBounds = new Rectangle(base.Width / 2 - s_textureBar.get_Width() / 2, (int)(ScrollDistance * (float)(TrackLength - ScrollbarHeight)) + s_textureUpArrow.get_Height(), s_textureBar.get_Width(), ScrollbarHeight);
+			_trackBounds = new Rectangle(base.Width / 2 - s_textureTrack.get_Width() / 2, ((Rectangle)(ref _upArrowBounds)).get_Bottom(), s_textureTrack.get_Width(), TrackLength);
 		}
 
 		private void RecalculateScrollbarSize()
@@ -441,18 +438,18 @@ namespace Kenedia.Modules.Core.Controls
 			{
 				return;
 			}
-			Control[] tempContainerChidlren = _associatedContainer.get_Children().ToArray();
+			Blish_HUD.Controls.Control[] tempContainerChidlren = _associatedContainer.Children.ToArray();
 			_containerLowestContent = 0;
 			for (int i = 0; i < tempContainerChidlren.Length; i++)
 			{
-				ref Control child = ref tempContainerChidlren[i];
-				if (child.get_Visible())
+				ref Blish_HUD.Controls.Control child = ref tempContainerChidlren[i];
+				if (child.Visible)
 				{
-					_containerLowestContent = Math.Max(_containerLowestContent, child.get_Bottom());
+					_containerLowestContent = Math.Max(_containerLowestContent, child.Bottom);
 				}
 			}
-			_containerLowestContent = Math.Max(_containerLowestContent, _associatedContainer.get_ContentRegion().Height);
-			_scrollbarPercent = (double)_associatedContainer.get_ContentRegion().Height / (double)_containerLowestContent;
+			_containerLowestContent = Math.Max(_containerLowestContent, _associatedContainer.ContentRegion.Height);
+			_scrollbarPercent = (double)_associatedContainer.ContentRegion.Height / (double)_containerLowestContent;
 			ScrollbarHeight = (int)Math.Max(Math.Floor((double)TrackLength * _scrollbarPercent) - 1.0, 32.0);
 			UpdateAssocContainer();
 		}
@@ -478,15 +475,15 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_0199: Unknown result type (might be due to invalid IL or missing references)
 			if (!(_scrollbarPercent > 0.99))
 			{
-				Color drawTint = (((ScrollFocus == ClickFocus.None && ((Control)this).get_MouseOver()) || (_associatedContainer != null && ((Control)_associatedContainer).get_MouseOver())) ? Color.get_White() : Colors.Darkened(0.6f));
-				drawTint = ((ScrollFocus != 0) ? Colors.Darkened(0.9f) : drawTint);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, s_textureTrack, _trackBounds);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, s_textureUpArrow, _upArrowBounds, drawTint);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, s_textureDownArrow, _downArrowBounds, drawTint);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, s_textureBar, _barBounds, drawTint);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, s_textureTopCap, new Rectangle(((Control)this).get_Width() / 2 - s_textureTopCap.get_Width() / 2, ((Rectangle)(ref _barBounds)).get_Top() - 6, s_textureTopCap.get_Width(), s_textureTopCap.get_Height()));
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, s_textureBottomCap, new Rectangle(((Control)this).get_Width() / 2 - s_textureBottomCap.get_Width() / 2, ((Rectangle)(ref _barBounds)).get_Bottom() - s_textureBottomCap.get_Height() + 6, s_textureBottomCap.get_Width(), s_textureBottomCap.get_Height()));
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, s_textureThumb, new Rectangle(((Control)this).get_Width() / 2 - s_textureThumb.get_Width() / 2, ((Rectangle)(ref _barBounds)).get_Top() + (ScrollbarHeight / 2 - s_textureThumb.get_Height() / 2), s_textureThumb.get_Width(), s_textureThumb.get_Height()), drawTint);
+				Color drawTint = (((ScrollFocus == ClickFocus.None && base.MouseOver) || (_associatedContainer != null && _associatedContainer.MouseOver)) ? Color.get_White() : ContentService.Colors.Darkened(0.6f));
+				drawTint = ((ScrollFocus != 0) ? ContentService.Colors.Darkened(0.9f) : drawTint);
+				spriteBatch.DrawOnCtrl(this, s_textureTrack, _trackBounds);
+				spriteBatch.DrawOnCtrl(this, s_textureUpArrow, _upArrowBounds, drawTint);
+				spriteBatch.DrawOnCtrl(this, s_textureDownArrow, _downArrowBounds, drawTint);
+				spriteBatch.DrawOnCtrl(this, s_textureBar, _barBounds, drawTint);
+				spriteBatch.DrawOnCtrl(this, s_textureTopCap, new Rectangle(base.Width / 2 - s_textureTopCap.get_Width() / 2, ((Rectangle)(ref _barBounds)).get_Top() - 6, s_textureTopCap.get_Width(), s_textureTopCap.get_Height()));
+				spriteBatch.DrawOnCtrl(this, s_textureBottomCap, new Rectangle(base.Width / 2 - s_textureBottomCap.get_Width() / 2, ((Rectangle)(ref _barBounds)).get_Bottom() - s_textureBottomCap.get_Height() + 6, s_textureBottomCap.get_Width(), s_textureBottomCap.get_Height()));
+				spriteBatch.DrawOnCtrl(this, s_textureThumb, new Rectangle(base.Width / 2 - s_textureThumb.get_Width() / 2, ((Rectangle)(ref _barBounds)).get_Top() + (ScrollbarHeight / 2 - s_textureThumb.get_Height() / 2), s_textureThumb.get_Width(), s_textureThumb.get_Height()), drawTint);
 			}
 		}
 	}

@@ -21,6 +21,8 @@ namespace Kenedia.Modules.Core.Controls
 
 		private Control _anchor;
 
+		private WindowBase2 _container;
+
 		public Control Anchor
 		{
 			get
@@ -29,7 +31,7 @@ namespace Kenedia.Modules.Core.Controls
 			}
 			set
 			{
-				Common.SetProperty(ref _anchor, value, SetAnchor);
+				Common.SetProperty(ref _anchor, value, new ValueChangedEventHandler<Control>(SetAnchor));
 			}
 		}
 
@@ -37,23 +39,21 @@ namespace Kenedia.Modules.Core.Controls
 
 
 		public Pointer()
-			: this()
 		{
 			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-			((Control)this).set_Size(new Point(32));
-			((Control)this).set_Parent((Container)(object)Control.get_Graphics().get_SpriteScreen());
-			((Control)this).set_ZIndex(int.MaxValue);
-			((Control)this).set_ClipsBounds(false);
+			base.Size = new Point(32);
+			base.Parent = Control.Graphics.SpriteScreen;
+			base.ClipsBounds = false;
 		}
 
 		private static Control GetAncestorsParent(Control control)
 		{
 			if (control != null)
 			{
-				if (control != Control.get_Graphics().get_SpriteScreen() && control.get_Visible())
+				if (control != Control.Graphics.SpriteScreen && control.Visible)
 				{
-					return GetAncestorsParent((Control)(object)control.get_Parent());
+					return GetAncestorsParent(control.Parent);
 				}
 				return control;
 			}
@@ -66,14 +66,14 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-			if (c.get_Parent() != null && ((Control)c.get_Parent()).get_Visible())
+			if (c.Parent != null && c.Parent.Visible)
 			{
-				Rectangle absoluteBounds = ((Control)c.get_Parent()).get_AbsoluteBounds();
+				Rectangle absoluteBounds = c.Parent.AbsoluteBounds;
 				if (((Rectangle)(ref absoluteBounds)).Contains(((Rectangle)(ref b)).get_Center()))
 				{
-					if (c.get_Parent() != Control.get_Graphics().get_SpriteScreen())
+					if (c.Parent != Control.Graphics.SpriteScreen)
 					{
-						return IsDrawn((Control)(object)c.get_Parent(), b);
+						return IsDrawn(c.Parent, b);
 					}
 					return true;
 				}
@@ -81,16 +81,21 @@ namespace Kenedia.Modules.Core.Controls
 			return false;
 		}
 
-		private void SetAnchor(object sender, ValueChangedEventArgs<Control> e)
+		protected override CaptureType CapturesInput()
+		{
+			return CaptureType.None;
+		}
+
+		private void SetAnchor(object sender, Kenedia.Modules.Core.Models.ValueChangedEventArgs<Control> e)
 		{
 		}
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
 			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			if (Anchor != null && Anchor.get_Visible() && IsDrawn(Anchor, ((Control)this).get_AbsoluteBounds()))
+			if (Anchor != null && Anchor.Visible && IsDrawn(Anchor, base.AbsoluteBounds))
 			{
-				_pointerArrow.Draw((Control)(object)this, spriteBatch);
+				_pointerArrow.Draw(this, spriteBatch);
 			}
 		}
 
@@ -106,20 +111,20 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-			((Control)this).DoUpdate(gameTime);
-			if (Anchor != null && Anchor.get_Visible())
+			base.DoUpdate(gameTime);
+			if (Anchor != null && Anchor.Visible)
 			{
 				_animationStart += (float)gameTime.get_ElapsedGameTime().TotalSeconds;
-				int size = Math.Min(((Control)this).get_Width(), ((Control)this).get_Height());
-				Rectangle absoluteBounds = Anchor.get_AbsoluteBounds();
+				int size = Math.Min(base.Width, base.Height);
+				Rectangle absoluteBounds = Anchor.AbsoluteBounds;
 				int num = ((Rectangle)(ref absoluteBounds)).get_Left() - size / 2;
-				absoluteBounds = Anchor.get_AbsoluteBounds();
-				((Control)this).set_Location(new Point(num, ((Rectangle)(ref absoluteBounds)).get_Center().Y - size / 2));
+				absoluteBounds = Anchor.AbsoluteBounds;
+				base.Location = new Point(num, ((Rectangle)(ref absoluteBounds)).get_Center().Y - size / 2);
 				_anchorDrawBounds = new Rectangle(1, 0, size, size);
 				BounceDistance = 15f;
 				float duration = 0.75f;
 				int animationOffset = (int)Tweening.Quartic.EaseOut(_animationStart, 0f - BounceDistance, BounceDistance, duration);
-				_pointerArrow.Bounds = RectangleExtension.Add(_anchorDrawBounds, animationOffset, 0, 0, 0);
+				_pointerArrow.Bounds = _anchorDrawBounds.Add(animationOffset, 0, 0, 0);
 				if ((float)animationOffset < 0f - BounceDistance)
 				{
 					_animationStart -= duration * 2f;

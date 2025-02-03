@@ -9,7 +9,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Blish_HUD;
-using Blish_HUD.Controls;
 using Blish_HUD.GameIntegration.GfxSettings;
 using Characters.Views;
 using Kenedia.Modules.Characters.Models;
@@ -56,7 +55,7 @@ namespace Kenedia.Modules.Characters
 			}
 			set
 			{
-				Common.SetProperty(ref _mainWindow, value, MainWindowChanged, triggerOnUpdate: true, "MainWindow");
+				Common.SetProperty(ref _mainWindow, value, new PropertyChangedEventHandler(MainWindowChanged), triggerOnUpdate: true, "MainWindow");
 			}
 		}
 
@@ -78,11 +77,11 @@ namespace Kenedia.Modules.Characters
 		{
 			get
 			{
-				return _settings.OCRNoPixelColumns.get_Value();
+				return _settings.OCRNoPixelColumns.Value;
 			}
 			set
 			{
-				_settings.OCRNoPixelColumns.set_Value(value);
+				_settings.OCRNoPixelColumns.Value = value;
 			}
 		}
 
@@ -95,22 +94,23 @@ namespace Kenedia.Modules.Characters
 			try
 			{
 				string path = (OcrApi.PathToEngine = basePath + "tesseract.dll");
-				BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info($"Set Path to Tesseract Engine: {OcrApi.PathToEngine}. File exists: {File.Exists(path)}");
+				BaseModule<Characters, Kenedia.Modules.Characters.Views.MainWindow, Settings, PathCollection>.Logger.Info($"Set Path to Tesseract Engine: {OcrApi.PathToEngine}. File exists: {File.Exists(path)}");
 				_ocrApi = OcrApi.Create();
 				_ocrApi.Init(basePath, "gw2");
 				IsLoaded = true;
 			}
 			catch (Exception ex)
 			{
-				BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Warn("Creating the OcrApi Instance failed. OCR will not be useable. Character names can not be confirmed.");
-				BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Warn($"{ex}");
+				BaseModule<Characters, Kenedia.Modules.Characters.Views.MainWindow, Settings, PathCollection>.Logger.Warn("Creating the OcrApi Instance failed. OCR will not be useable. Character names can not be confirmed.");
+				BaseModule<Characters, Kenedia.Modules.Characters.Views.MainWindow, Settings, PathCollection>.Logger.Warn($"{ex}");
 				MainWindow?.SendTesseractFailedNotification(PathToEngine);
 			}
-			OCRView oCRView = new OCRView(_settings, this);
-			((Control)oCRView).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			((Control)oCRView).set_ZIndex(1073741822);
-			((Control)oCRView).set_Visible(false);
-			_view = oCRView;
+			_view = new OCRView(_settings, this)
+			{
+				Parent = GameService.Graphics.SpriteScreen,
+				ZIndex = 1073741822,
+				Visible = false
+			};
 		}
 
 		public void Dispose()
@@ -118,11 +118,7 @@ namespace Kenedia.Modules.Characters
 			if (!_isDisposed)
 			{
 				_isDisposed = true;
-				OCRView view = _view;
-				if (view != null)
-				{
-					((Control)view).Dispose();
-				}
+				_view?.Dispose();
 				Texture2D cleanedTexture = CleanedTexture;
 				if (cleanedTexture != null)
 				{
@@ -149,9 +145,9 @@ namespace Kenedia.Modules.Characters
 					}
 					await Task.Delay(5);
 					User32Dll.RECT wndBounds = _clientWindowService.WindowBounds;
-					ScreenModeSetting? screenMode = GameService.GameIntegration.get_GfxSettings().get_ScreenMode();
-					Point p = (Point)(((screenMode.HasValue ? ScreenModeSetting.op_Implicit(screenMode.GetValueOrDefault()) : null) == ScreenModeSetting.op_Implicit(ScreenModeSetting.get_Windowed())) ? new Point(_sharedSettings.WindowOffset.Left, _sharedSettings.WindowOffset.Top) : Point.get_Zero());
-					double factor = GameService.Graphics.get_UIScaleMultiplier();
+					ScreenModeSetting? screenMode = GameService.GameIntegration.GfxSettings.ScreenMode;
+					Point p = (Point)(((screenMode.HasValue ? ((string)screenMode.GetValueOrDefault()) : null) == (string)ScreenModeSetting.Windowed) ? new Point(_sharedSettings.WindowOffset.Left, _sharedSettings.WindowOffset.Top) : Point.get_Zero());
+					double factor = GameService.Graphics.UIScaleMultiplier;
 					Point size = default(Point);
 					((Point)(ref size))._002Ector((int)((double)_settings.ActiveOCRRegion.Width * factor), (int)((double)_settings.ActiveOCRRegion.Height * factor));
 					using (Bitmap bitmap = new Bitmap(size.X, size.Y))
@@ -185,7 +181,7 @@ namespace Kenedia.Modules.Characters
 								for (int k = 0; k < bitmap.Height; k++)
 								{
 									Color oc = bitmap.GetPixel(i, k);
-									int threshold = _settings.OCR_ColorThreshold.get_Value();
+									int threshold = _settings.OCR_ColorThreshold.Value;
 									if (oc.R >= threshold && oc.G >= threshold && oc.B >= threshold && emptyPixelRow < CustomThreshold)
 									{
 										bitmap.SetPixel(i, k, Color.Black);

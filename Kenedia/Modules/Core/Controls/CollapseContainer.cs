@@ -34,7 +34,12 @@ namespace Kenedia.Modules.Core.Controls
 
 		private readonly AsyncTexture2D _textureAccordionArrow = AsyncTexture2D.FromAssetId(155953);
 
-		private readonly BasicTooltip _tooltip;
+		private readonly BasicTooltip _tooltip = new BasicTooltip
+		{
+			Parent = Control.Graphics.SpriteScreen,
+			ZIndex = 1073741823,
+			Visible = false
+		};
 
 		private Vector2 _layoutAccordionArrowOrigin;
 
@@ -56,11 +61,11 @@ namespace Kenedia.Modules.Core.Controls
 
 		private Rectangle _layoutAccordionArrowBounds;
 
-		private RectangleDimensions _contentPadding;
+		private RectangleDimensions _contentPadding = new RectangleDimensions(0);
 
-		private RectangleDimensions _titleIconPadding;
+		private RectangleDimensions _titleIconPadding = new RectangleDimensions(3, 3, 5, 3);
 
-		private int _titleBarHeight;
+		private int _titleBarHeight = 36;
 
 		private Func<string> _setLocalizedTitleTooltip;
 
@@ -76,7 +81,8 @@ namespace Kenedia.Modules.Core.Controls
 		public float ArrowRotation { get; set; }
 
 		[JsonIgnore]
-		public float AccentOpacity { get; set; }
+		public float AccentOpacity { get; set; } = 1f;
+
 
 		public RectangleDimensions TitleIconPadding
 		{
@@ -87,7 +93,7 @@ namespace Kenedia.Modules.Core.Controls
 			set
 			{
 				_titleIconPadding = value;
-				((Control)this).RecalculateLayout();
+				RecalculateLayout();
 			}
 		}
 
@@ -100,7 +106,7 @@ namespace Kenedia.Modules.Core.Controls
 			set
 			{
 				_titleBarHeight = value;
-				((Control)this).RecalculateLayout();
+				RecalculateLayout();
 			}
 		}
 
@@ -113,7 +119,7 @@ namespace Kenedia.Modules.Core.Controls
 			set
 			{
 				_contentPadding = value;
-				((Control)this).RecalculateLayout();
+				RecalculateLayout();
 			}
 		}
 
@@ -138,7 +144,7 @@ namespace Kenedia.Modules.Core.Controls
 			set
 			{
 				_setLocalizedTooltip = value;
-				((Control)this).set_BasicTooltipText(value?.Invoke());
+				base.BasicTooltipText = value?.Invoke();
 			}
 		}
 
@@ -176,13 +182,14 @@ namespace Kenedia.Modules.Core.Controls
 			}
 			set
 			{
-				Common.SetProperty(ref _title, value, ((Control)this).RecalculateLayout);
+				Common.SetProperty(ref _title, value, new Action(RecalculateLayout));
 			}
 		}
 
 		public AsyncTexture2D TitleIcon { get; set; }
 
-		public Point MaxSize { get; set; }
+		public Point MaxSize { get; set; } = Point.get_Zero();
+
 
 		[JsonIgnore]
 		public bool Collapsed
@@ -212,7 +219,7 @@ namespace Kenedia.Modules.Core.Controls
 			}
 			set
 			{
-				((Control)this).SetProperty<bool>(ref _canCollapse, value, true, "CanCollapse");
+				SetProperty(ref _canCollapse, value, invalidateLayout: true, "CanCollapse");
 			}
 		}
 
@@ -224,7 +231,7 @@ namespace Kenedia.Modules.Core.Controls
 			}
 			set
 			{
-				((Control)this).SetProperty<bool>(ref _showBorder, value, true, "ShowBorder");
+				SetProperty(ref _showBorder, value, invalidateLayout: true, "ShowBorder");
 			}
 		}
 
@@ -237,28 +244,11 @@ namespace Kenedia.Modules.Core.Controls
 			set
 			{
 				Control temp = _sizeDeterminingChild;
-				if (Common.SetProperty(ref _sizeDeterminingChild, value, OnChildSet) && temp != null)
+				if (Common.SetProperty(ref _sizeDeterminingChild, value, new Action(OnChildSet)) && temp != null)
 				{
-					temp.remove_Resized((EventHandler<ResizedEventArgs>)SizeDeterminingChild_Resized);
+					temp.Resized -= SizeDeterminingChild_Resized;
 				}
 			}
-		}
-
-		public CollapseContainer()
-		{
-			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-			BasicTooltip basicTooltip = new BasicTooltip();
-			((Control)basicTooltip).set_Parent((Container)(object)Control.get_Graphics().get_SpriteScreen());
-			((Control)basicTooltip).set_ZIndex(1073741823);
-			((Control)basicTooltip).set_Visible(false);
-			_tooltip = basicTooltip;
-			_contentPadding = new RectangleDimensions(0);
-			_titleIconPadding = new RectangleDimensions(3, 3, 5, 3);
-			_titleBarHeight = 36;
-			AccentOpacity = 1f;
-			MaxSize = Point.get_Zero();
-			((Container)this)._002Ector();
 		}
 
 		public void Expand()
@@ -273,20 +263,16 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
 			if (_collapsed)
 			{
-				Tween collapseAnim = _collapseAnim;
-				if (collapseAnim != null)
-				{
-					collapseAnim.CancelAndComplete();
-				}
-				((Control)this).SetProperty<bool>(ref _collapsed, false, false, "Expand");
-				Point bounds = ((SizeDeterminingChild != null) ? ControlUtil.GetControlBounds((Control[])(object)new Control[1] { SizeDeterminingChild }) : Point.get_Zero());
+				_collapseAnim?.CancelAndComplete();
+				SetProperty(ref _collapsed, newValue: false, invalidateLayout: false, "Expand");
+				Point bounds = ((SizeDeterminingChild != null) ? ControlUtil.GetControlBounds(new Control[1] { SizeDeterminingChild }) : Point.get_Zero());
 				int height = ((MaxSize != Point.get_Zero()) ? Math.Min(MaxSize.Y, bounds.Y + ContentPadding.Vertical + _titleBarHeight) : (bounds.Y + ContentPadding.Vertical + _titleBarHeight));
-				_collapseAnim = ((TweenerImpl)Control.get_Animation().get_Tweener()).Tween<CollapseContainer>(this, (object)new
+				_collapseAnim = Control.Animation.Tweener.Tween(this, new
 				{
 					Height = height,
 					ArrowRotation = 0f,
 					AccentOpacity = 1f
-				}, 0.15f, 0f, true).Ease((Func<float, float>)Ease.QuadOut);
+				}, 0.15f).Ease(Ease.QuadOut);
 			}
 		}
 
@@ -294,18 +280,18 @@ namespace Kenedia.Modules.Core.Controls
 		{
 			if (!_collapsed)
 			{
-				if (_collapseAnim != null && _collapseAnim.get_Completion() < 1f)
+				if (_collapseAnim != null && _collapseAnim.Completion < 1f)
 				{
 					_collapseAnim.CancelAndComplete();
 				}
-				((Control)this).SetProperty<bool>(ref _canCollapse, true, false, "Collapse");
-				((Control)this).SetProperty<bool>(ref _collapsed, true, false, "Collapse");
-				_collapseAnim = ((TweenerImpl)Control.get_Animation().get_Tweener()).Tween<CollapseContainer>(this, (object)new
+				SetProperty(ref _canCollapse, newValue: true, invalidateLayout: false, "Collapse");
+				SetProperty(ref _collapsed, newValue: true, invalidateLayout: false, "Collapse");
+				_collapseAnim = Control.Animation.Tweener.Tween(this, new
 				{
 					Height = _titleBarHeight,
 					ArrowRotation = -(float)Math.PI / 2f,
 					AccentOpacity = 0f
-				}, 0.15f, 0f, true).Ease((Func<float, float>)Ease.QuadOut);
+				}, 0.15f).Ease(Ease.QuadOut);
 			}
 		}
 
@@ -313,14 +299,14 @@ namespace Kenedia.Modules.Core.Controls
 		{
 			if (_sizeDeterminingChild != null)
 			{
-				_sizeDeterminingChild.add_Resized((EventHandler<ResizedEventArgs>)SizeDeterminingChild_Resized);
-				_sizeDeterminingChild.add_Hidden((EventHandler<EventArgs>)SizeDeterminingChild_Hidden);
+				_sizeDeterminingChild.Resized += SizeDeterminingChild_Resized;
+				_sizeDeterminingChild.Hidden += SizeDeterminingChild_Hidden;
 			}
 		}
 
 		private void SizeDeterminingChild_Hidden(object sender, EventArgs e)
 		{
-			((Control)this).Hide();
+			Hide();
 		}
 
 		private void SizeDeterminingChild_Resized(object sender, ResizedEventArgs e)
@@ -338,19 +324,19 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-			Point bounds = ((_sizeDeterminingChild != null) ? ControlUtil.GetControlBounds((Control[])(object)new Control[1] { _sizeDeterminingChild }) : Point.get_Zero());
+			Point bounds = ((_sizeDeterminingChild != null) ? ControlUtil.GetControlBounds(new Control[1] { _sizeDeterminingChild }) : Point.get_Zero());
 			int height = ((MaxSize != Point.get_Zero()) ? Math.Min(MaxSize.Y, bounds.Y + ContentPadding.Vertical + _titleBarHeight) : (bounds.Y + ContentPadding.Vertical + _titleBarHeight));
-			((Control)this).set_Height(Collapsed ? _titleBarHeight : height);
+			base.Height = (Collapsed ? _titleBarHeight : height);
 		}
 
 		protected override void OnClick(MouseEventArgs e)
 		{
 			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-			if (_canCollapse && ((Rectangle)(ref _layoutHeaderBounds)).Contains(((Control)this).get_RelativeMousePosition()))
+			if (_canCollapse && ((Rectangle)(ref _layoutHeaderBounds)).Contains(base.RelativeMousePosition))
 			{
 				ToggleAccordionState();
 			}
-			((Control)this).OnClick(e);
+			base.OnClick(e);
 		}
 
 		private bool ToggleAccordionState()
@@ -387,7 +373,7 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_02a7: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02ac: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02b1: Unknown result type (might be due to invalid IL or missing references)
-			((Control)this).RecalculateLayout();
+			base.RecalculateLayout();
 			int num = ((!string.IsNullOrEmpty(_title) || TitleIcon != null) ? _titleBarHeight : 0);
 			int num2 = 0;
 			int num3 = 0;
@@ -398,16 +384,16 @@ namespace Kenedia.Modules.Core.Controls
 				num2 = 4;
 				num3 = 7;
 				num4 = 4;
-				int num5 = Math.Min(((Control)this)._size.X, 256);
-				_layoutTopLeftAccentBounds = new Rectangle(-2, num - 12, num5, _textureCornerAccent.get_Height());
-				_layoutBottomRightAccentBounds = new Rectangle(((Control)this)._size.X - num5 + 2, ((Control)this)._size.Y - 59, num5, _textureCornerAccent.get_Height());
-				_layoutCornerAccentSrc = new Rectangle(256 - num5, 0, num5, _textureCornerAccent.get_Height());
-				_layoutLeftAccentBounds = new Rectangle(num4 - 7, num, _textureLeftSideAccent.get_Width(), Math.Min(((Control)this)._size.Y - num - num3, _textureLeftSideAccent.get_Height()));
-				_layoutLeftAccentSrc = new Rectangle(0, 0, _textureLeftSideAccent.get_Width(), _layoutLeftAccentBounds.Height);
+				int num5 = Math.Min(_size.X, 256);
+				_layoutTopLeftAccentBounds = new Rectangle(-2, num - 12, num5, _textureCornerAccent.Height);
+				_layoutBottomRightAccentBounds = new Rectangle(_size.X - num5 + 2, _size.Y - 59, num5, _textureCornerAccent.Height);
+				_layoutCornerAccentSrc = new Rectangle(256 - num5, 0, num5, _textureCornerAccent.Height);
+				_layoutLeftAccentBounds = new Rectangle(num4 - 7, num, _textureLeftSideAccent.Width, Math.Min(_size.Y - num - num3, _textureLeftSideAccent.Height));
+				_layoutLeftAccentSrc = new Rectangle(0, 0, _textureLeftSideAccent.Width, _layoutLeftAccentBounds.Height);
 			}
-			_panelBounds = new Rectangle(num4, num, ((Control)this)._size.X - num4 - num2, ((Control)this)._size.Y - num - num3);
-			((Container)this).set_ContentRegion(new Rectangle(num4 + ContentPadding.Left, num + ContentPadding.Top, ((Control)this)._size.X - num4 - num2 - ContentPadding.Horizontal, ((Control)this)._size.Y - num - num3 - ContentPadding.Vertical));
-			_layoutHeaderBounds = new Rectangle(0, 0, ((Control)this).get_Width(), num);
+			_panelBounds = new Rectangle(num4, num, _size.X - num4 - num2, _size.Y - num - num3);
+			base.ContentRegion = new Rectangle(num4 + ContentPadding.Left, num + ContentPadding.Top, _size.X - num4 - num2 - ContentPadding.Horizontal, _size.Y - num - num3 - ContentPadding.Vertical);
+			_layoutHeaderBounds = new Rectangle(0, 0, base.Width, num);
 			_layoutHeaderIconBounds = (Rectangle)((TitleIcon != null) ? new Rectangle(((Rectangle)(ref _layoutHeaderBounds)).get_Left() + _titleIconPadding.Left, _titleIconPadding.Top, num - _titleIconPadding.Vertical, num - _titleIconPadding.Vertical) : Rectangle.get_Empty());
 			_layoutHeaderTextBounds = new Rectangle(((Rectangle)(ref _layoutHeaderIconBounds)).get_Right() + _titleIconPadding.Right, 0, _layoutHeaderBounds.Width - _layoutHeaderIconBounds.Width, num);
 			int arrowSize = num - 4;
@@ -450,43 +436,43 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_021b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0220: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0231: Unknown result type (might be due to invalid IL or missing references)
-			((Control)_tooltip).set_Visible(false);
+			_tooltip.Visible = false;
 			if (!string.IsNullOrEmpty(_title))
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_texturePanelHeader), _layoutHeaderBounds);
-				if (_canCollapse && ((Control)this)._mouseOver && ((Control)this).get_RelativeMousePosition().Y <= 36)
+				spriteBatch.DrawOnCtrl((Control)this, (Texture2D)_texturePanelHeader, _layoutHeaderBounds);
+				if (_canCollapse && _mouseOver && base.RelativeMousePosition.Y <= 36)
 				{
-					((Control)_tooltip).set_Visible(true);
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_texturePanelHeaderActive), _layoutHeaderBounds);
+					_tooltip.Visible = true;
+					spriteBatch.DrawOnCtrl((Control)this, (Texture2D)_texturePanelHeaderActive, _layoutHeaderBounds);
 				}
 				else
 				{
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_texturePanelHeader), _layoutHeaderBounds);
+					spriteBatch.DrawOnCtrl((Control)this, (Texture2D)_texturePanelHeader, _layoutHeaderBounds);
 				}
-				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, _title, Control.get_Content().get_DefaultFont16(), _layoutHeaderTextBounds, Color.get_White(), false, (HorizontalAlignment)0, (VerticalAlignment)1);
+				spriteBatch.DrawStringOnCtrl(this, _title, Control.Content.DefaultFont16, _layoutHeaderTextBounds, Color.get_White());
 				if (TitleIcon != null)
 				{
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(TitleIcon), _layoutHeaderIconBounds, (Rectangle?)TitleIcon.get_Bounds(), Color.get_White());
+					spriteBatch.DrawOnCtrl(this, TitleIcon, _layoutHeaderIconBounds, TitleIcon.Bounds, Color.get_White());
 				}
 				if (_canCollapse)
 				{
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_textureAccordionArrow), _layoutAccordionArrowBounds, (Rectangle?)null, Color.get_White(), ArrowRotation, _layoutAccordionArrowOrigin, (SpriteEffects)0);
+					spriteBatch.DrawOnCtrl(this, _textureAccordionArrow, _layoutAccordionArrowBounds, null, Color.get_White(), ArrowRotation, _layoutAccordionArrowOrigin, (SpriteEffects)0);
 				}
 			}
 			if (ShowBorder)
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), _panelBounds, Color.get_Black() * (0.1f * AccentOpacity));
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_textureCornerAccent), _layoutTopLeftAccentBounds, (Rectangle?)_layoutCornerAccentSrc, Color.get_White() * AccentOpacity, 0f, Vector2.get_Zero(), (SpriteEffects)1);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_textureCornerAccent), _layoutBottomRightAccentBounds, (Rectangle?)_layoutCornerAccentSrc, Color.get_White() * AccentOpacity, 0f, Vector2.get_Zero(), (SpriteEffects)2);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_textureLeftSideAccent), _layoutLeftAccentBounds, (Rectangle?)_layoutLeftAccentSrc, Color.get_Black() * AccentOpacity, 0f, Vector2.get_Zero(), (SpriteEffects)2);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, _panelBounds, Color.get_Black() * (0.1f * AccentOpacity));
+				spriteBatch.DrawOnCtrl(this, _textureCornerAccent, _layoutTopLeftAccentBounds, _layoutCornerAccentSrc, Color.get_White() * AccentOpacity, 0f, Vector2.get_Zero(), (SpriteEffects)1);
+				spriteBatch.DrawOnCtrl(this, _textureCornerAccent, _layoutBottomRightAccentBounds, _layoutCornerAccentSrc, Color.get_White() * AccentOpacity, 0f, Vector2.get_Zero(), (SpriteEffects)2);
+				spriteBatch.DrawOnCtrl(this, _textureLeftSideAccent, _layoutLeftAccentBounds, _layoutLeftAccentSrc, Color.get_Black() * AccentOpacity, 0f, Vector2.get_Zero(), (SpriteEffects)2);
 			}
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), _panelBounds, Color.get_Black() * (0.3f * AccentOpacity));
+			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, _panelBounds, Color.get_Black() * (0.3f * AccentOpacity));
 		}
 
 		protected override void DisposeControl()
 		{
-			((Container)this).DisposeControl();
-			_sizeDeterminingChild.remove_Resized((EventHandler<ResizedEventArgs>)SizeDeterminingChild_Resized);
+			base.DisposeControl();
+			_sizeDeterminingChild.Resized -= SizeDeterminingChild_Resized;
 			_sizeDeterminingChild = null;
 		}
 	}

@@ -25,13 +25,12 @@ namespace Kenedia.Modules.Characters.Controls
 		private float _rotation;
 
 		public ChoyaSpinner(TextureManager textureManager)
-			: this()
 		{
 			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
 			_textureManager = textureManager;
-			_choyaTexture = AsyncTexture2D.op_Implicit(_textureManager.GetControlTexture(TextureManager.ControlTextures.Choya));
-			_choyaSize = Math.Min(_choyaTexture.get_Bounds().Width, _choyaTexture.get_Bounds().Height);
+			_choyaTexture = (AsyncTexture2D)_textureManager.GetControlTexture(TextureManager.ControlTextures.Choya);
+			_choyaSize = Math.Min(_choyaTexture.Bounds.Width, _choyaTexture.Bounds.Height);
 		}
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
@@ -42,29 +41,29 @@ namespace Kenedia.Modules.Characters.Controls
 			//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
-			double now = GameService.Overlay.get_CurrentGameTime().get_TotalGameTime().TotalMilliseconds;
+			double now = GameService.Overlay.CurrentGameTime.get_TotalGameTime().TotalMilliseconds;
 			double duration = now - _start;
 			_rotation = (float)(duration / 0.75 / 360.0);
 			if (now - _lastTick > 18.0)
 			{
 				_lastTick = now;
 				_xOffset += 5;
-				if (_xOffset >= ((Control)this).get_Width() + _choyaSize / 4)
+				if (_xOffset >= base.Width + _choyaSize / 4)
 				{
 					_xOffset = -_choyaSize / 5;
 				}
 			}
-			int size = Math.Min(((Control)this).get_Width(), ((Control)this).get_Height());
+			int size = Math.Min(base.Width, base.Height);
 			if (_choyaTexture != null)
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_choyaTexture), new Rectangle(new Point(_xOffset, ((Control)this).get_Height() / 2), new Point(size)), (Rectangle?)_choyaTexture.get_Bounds(), Color.get_White(), _rotation, new Vector2((float)(_choyaSize / 2)), (SpriteEffects)0);
+				spriteBatch.DrawOnCtrl(this, _choyaTexture, new Rectangle(new Point(_xOffset, base.Height / 2), new Point(size)), _choyaTexture.Bounds, Color.get_White(), _rotation, new Vector2((float)(_choyaSize / 2)), (SpriteEffects)0);
 			}
 		}
 
 		protected override void OnShown(EventArgs e)
 		{
-			((Control)this).OnShown(e);
-			_start = GameService.Overlay.get_CurrentGameTime().get_TotalGameTime().TotalMilliseconds;
+			base.OnShown(e);
+			_start = GameService.Overlay.CurrentGameTime.get_TotalGameTime().TotalMilliseconds;
 		}
 	}
 }

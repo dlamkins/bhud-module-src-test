@@ -29,11 +29,11 @@ namespace Characters.Views
 
 		private readonly NumberBox _thresholdBox;
 
-		private readonly Label _instructions;
+		private readonly Kenedia.Modules.Core.Controls.Label _instructions;
 
-		private readonly Label _bestMatchLabel;
+		private readonly Kenedia.Modules.Core.Controls.Label _bestMatchLabel;
 
-		private readonly Label _resultLabel;
+		private readonly Kenedia.Modules.Core.Controls.Label _resultLabel;
 
 		private readonly Kenedia.Modules.Core.Controls.Image _sourceImage;
 
@@ -128,277 +128,322 @@ namespace Characters.Views
 			base.BorderColor = Color.get_Black();
 			base.BackgroundImage = AsyncTexture2D.FromAssetId(156003);
 			base.TextureRectangle = new Rectangle(50, 50, 500, 500);
-			((Control)this).set_Height(350);
-			((Control)this).set_Width(620);
-			FlowPanel flowPanel = new FlowPanel();
-			((Control)flowPanel).set_Parent((Container)(object)this);
-			((Control)flowPanel).set_Width(((Control)this).get_Width());
-			((Container)flowPanel).set_HeightSizingMode((SizingMode)1);
-			((Container)flowPanel).set_AutoSizePadding(new Point(3, 3));
-			((FlowPanel)flowPanel).set_OuterControlPadding(new Vector2(3f, 3f));
-			((FlowPanel)flowPanel).set_ControlPadding(new Vector2(3f, 3f));
-			((FlowPanel)flowPanel).set_FlowDirection((ControlFlowDirection)3);
-			flowPanel.BorderColor = Color.get_Black();
-			flowPanel.BorderWidth = new RectangleDimensions(2);
-			FlowPanel contentFlowPanel = flowPanel;
-			FlowPanel flowPanel2 = new FlowPanel();
-			((FlowPanel)flowPanel2).set_FlowDirection((ControlFlowDirection)2);
-			((Control)flowPanel2).set_Parent((Container)(object)contentFlowPanel);
-			((Container)flowPanel2).set_WidthSizingMode((SizingMode)2);
-			((Container)flowPanel2).set_HeightSizingMode((SizingMode)1);
-			((FlowPanel)flowPanel2).set_ControlPadding(new Vector2(5f, 5f));
-			FlowPanel headerPanel = flowPanel2;
-			Label label = new Label();
-			((Control)label).set_Parent((Container)(object)headerPanel);
-			((Label)label).set_AutoSizeHeight(true);
-			((Control)label).set_Width(((Container)contentFlowPanel).get_ContentRegion().Width - 35);
-			((Label)label).set_WrapText(true);
-			((Label)label).set_TextColor(Colors.ColonialWhite);
-			label.SetLocalizedText = () => strings.OCR_Instructions;
-			_instructions = label;
-			ImageButton imageButton = new ImageButton();
-			((Control)imageButton).set_Parent((Container)(object)headerPanel);
-			imageButton.Texture = AsyncTexture2D.FromAssetId(156012);
-			imageButton.HoveredTexture = AsyncTexture2D.FromAssetId(156011);
-			((Control)imageButton).set_Size(new Point(25, 25));
-			imageButton.TextureRectangle = new Rectangle(7, 7, 20, 20);
-			_closeButton = imageButton;
-			((Control)_closeButton).add_Click((EventHandler<MouseEventArgs>)CloseButton_Click);
-			FlowPanel flowPanel3 = new FlowPanel();
-			((Control)flowPanel3).set_Parent((Container)(object)contentFlowPanel);
-			((Container)flowPanel3).set_WidthSizingMode((SizingMode)2);
-			((Container)flowPanel3).set_HeightSizingMode((SizingMode)1);
-			((FlowPanel)flowPanel3).set_ControlPadding(new Vector2(10f, 0f));
-			((FlowPanel)flowPanel3).set_FlowDirection((ControlFlowDirection)2);
-			FlowPanel fp = flowPanel3;
-			FramedContainer framedContainer = new FramedContainer();
-			((Control)framedContainer).set_Parent((Container)(object)fp);
-			((Control)framedContainer).set_Width(500);
-			((Control)framedContainer).set_Height(GameService.Content.get_DefaultFont32().get_LineHeight() + 8);
-			framedContainer.BorderColor = Color.get_Black() * 0.7f;
-			framedContainer.BackgroundColor = Color.get_Black() * 0.4f;
-			framedContainer.BorderWidth = new RectangleDimensions(2);
-			FramedContainer p = framedContainer;
-			Label label2 = new Label();
-			((Control)label2).set_Location(new Point(5, 0));
-			((Control)label2).set_Parent((Container)(object)p);
-			((Control)label2).set_Height(((Control)p).get_Height());
-			((Label)label2).set_AutoSizeWidth(true);
-			((Label)label2).set_TextColor(Colors.ColonialWhite);
-			((Label)label2).set_Font(GameService.Content.get_DefaultFont32());
-			((Label)label2).set_VerticalAlignment((VerticalAlignment)1);
-			_bestMatchLabel = label2;
-			Label label3 = new Label();
-			((Control)label3).set_Parent((Container)(object)fp);
-			((Label)label3).set_VerticalAlignment((VerticalAlignment)1);
-			((Control)label3).set_Height(((Control)p).get_Height());
-			((Control)label3).set_Width(100);
-			((Label)label3).set_TextColor(Color.get_White());
-			((Label)label3).set_Font(GameService.Content.get_DefaultFont16());
-			((Label)label3).set_WrapText(true);
-			label3.SetLocalizedText = () => "Best Match";
-			FlowPanel flowPanel4 = new FlowPanel();
-			((Control)flowPanel4).set_Parent((Container)(object)contentFlowPanel);
-			((Container)flowPanel4).set_WidthSizingMode((SizingMode)2);
-			((Container)flowPanel4).set_HeightSizingMode((SizingMode)1);
-			((FlowPanel)flowPanel4).set_ControlPadding(new Vector2(10f, 0f));
-			((FlowPanel)flowPanel4).set_FlowDirection((ControlFlowDirection)2);
-			fp = flowPanel4;
-			FramedContainer framedContainer2 = new FramedContainer();
-			((Control)framedContainer2).set_Parent((Container)(object)fp);
-			((Control)framedContainer2).set_Width(500);
-			((Control)framedContainer2).set_Height(GameService.Content.get_DefaultFont32().get_LineHeight() + 8);
-			framedContainer2.BorderColor = Color.get_Black() * 0.7f;
-			framedContainer2.BackgroundColor = Color.get_Black() * 0.4f;
-			framedContainer2.BorderWidth = new RectangleDimensions(2);
-			p = framedContainer2;
-			Label label4 = new Label();
-			((Control)label4).set_Location(new Point(5, 0));
-			((Control)label4).set_Parent((Container)(object)p);
-			((Control)label4).set_Height(((Control)p).get_Height());
-			((Label)label4).set_AutoSizeWidth(true);
-			((Label)label4).set_TextColor(Colors.ColonialWhite);
-			((Label)label4).set_Font(GameService.Content.get_DefaultFont32());
-			((Label)label4).set_VerticalAlignment((VerticalAlignment)1);
-			_resultLabel = label4;
-			Label label5 = new Label();
-			((Control)label5).set_Parent((Container)(object)fp);
-			((Label)label5).set_VerticalAlignment((VerticalAlignment)1);
-			((Control)label5).set_Height(((Control)p).get_Height());
-			((Control)label5).set_Width(100);
-			((Label)label5).set_TextColor(Color.get_White());
-			((Label)label5).set_Font(GameService.Content.get_DefaultFont16());
-			((Label)label5).set_WrapText(true);
-			label5.SetLocalizedText = () => "OCR Result";
-			FlowPanel flowPanel5 = new FlowPanel();
-			((Control)flowPanel5).set_Parent((Container)(object)contentFlowPanel);
-			((Container)flowPanel5).set_WidthSizingMode((SizingMode)2);
-			((Container)flowPanel5).set_HeightSizingMode((SizingMode)1);
-			((FlowPanel)flowPanel5).set_ControlPadding(new Vector2(10f, 0f));
-			((FlowPanel)flowPanel5).set_FlowDirection((ControlFlowDirection)2);
-			fp = flowPanel5;
-			FramedContainer framedContainer3 = new FramedContainer();
-			((Control)framedContainer3).set_Parent((Container)(object)fp);
-			((Control)framedContainer3).set_Width(500);
-			((Control)framedContainer3).set_Height(55);
-			framedContainer3.BorderColor = Color.get_Black() * 0.7f;
-			framedContainer3.BackgroundColor = Color.get_Black() * 0.4f;
-			framedContainer3.BorderWidth = new RectangleDimensions(2);
-			p = framedContainer3;
-			Kenedia.Modules.Core.Controls.Image image = new Kenedia.Modules.Core.Controls.Image();
-			((Control)image).set_Location(new Point(5, 5));
-			((Control)image).set_Parent((Container)(object)p);
-			_scaledImage = image;
-			Label label6 = new Label();
-			((Control)label6).set_Parent((Container)(object)fp);
-			((Control)label6).set_Height(((Control)p).get_Height());
-			((Control)label6).set_Width(100);
-			((Label)label6).set_TextColor(Color.get_White());
-			((Label)label6).set_Font(GameService.Content.get_DefaultFont16());
-			((Label)label6).set_WrapText(true);
-			label6.SetLocalizedText = () => "Scaled";
-			((Label)label6).set_VerticalAlignment((VerticalAlignment)1);
-			FlowPanel flowPanel6 = new FlowPanel();
-			((Control)flowPanel6).set_Parent((Container)(object)contentFlowPanel);
-			((Container)flowPanel6).set_WidthSizingMode((SizingMode)2);
-			((Container)flowPanel6).set_HeightSizingMode((SizingMode)1);
-			((FlowPanel)flowPanel6).set_ControlPadding(new Vector2(10f, 0f));
-			((FlowPanel)flowPanel6).set_FlowDirection((ControlFlowDirection)2);
-			fp = flowPanel6;
-			FramedContainer framedContainer4 = new FramedContainer();
-			((Control)framedContainer4).set_Parent((Container)(object)fp);
-			((Control)framedContainer4).set_Width(500);
-			((Control)framedContainer4).set_Height(55);
-			framedContainer4.BorderColor = Color.get_Black() * 0.7f;
-			framedContainer4.BackgroundColor = Color.get_Black() * 0.4f;
-			framedContainer4.BorderWidth = new RectangleDimensions(2);
-			p = framedContainer4;
-			Kenedia.Modules.Core.Controls.Image image2 = new Kenedia.Modules.Core.Controls.Image();
-			((Control)image2).set_Location(new Point(5, 5));
-			((Control)image2).set_Parent((Container)(object)p);
-			_cleanedImage = image2;
-			Label label7 = new Label();
-			((Control)label7).set_Parent((Container)(object)fp);
-			((Control)label7).set_Height(((Control)p).get_Height());
-			((Control)label7).set_Width(100);
-			((Label)label7).set_TextColor(Color.get_White());
-			((Label)label7).set_Font(GameService.Content.get_DefaultFont16());
-			((Label)label7).set_WrapText(true);
-			label7.SetLocalizedText = () => "Cleaned";
-			((Label)label7).set_VerticalAlignment((VerticalAlignment)1);
-			FlowPanel flowPanel7 = new FlowPanel();
-			((Control)flowPanel7).set_Parent((Container)(object)contentFlowPanel);
-			((Container)flowPanel7).set_WidthSizingMode((SizingMode)2);
-			((Container)flowPanel7).set_HeightSizingMode((SizingMode)1);
-			((FlowPanel)flowPanel7).set_ControlPadding(new Vector2(10f, 0f));
-			((FlowPanel)flowPanel7).set_FlowDirection((ControlFlowDirection)2);
-			fp = flowPanel7;
-			FramedContainer framedContainer5 = new FramedContainer();
-			((Control)framedContainer5).set_Parent((Container)(object)fp);
-			((Control)framedContainer5).set_Width(500);
-			((Control)framedContainer5).set_Height(55);
-			framedContainer5.BorderColor = Color.get_Black() * 0.7f;
-			framedContainer5.BackgroundColor = Color.get_Black() * 0.4f;
-			framedContainer5.BorderWidth = new RectangleDimensions(2);
-			p = framedContainer5;
-			Kenedia.Modules.Core.Controls.Image image3 = new Kenedia.Modules.Core.Controls.Image();
-			((Control)image3).set_Location(new Point(5, 5));
-			((Control)image3).set_Parent((Container)(object)p);
-			_sourceImage = image3;
-			Label label8 = new Label();
-			((Control)label8).set_Parent((Container)(object)fp);
-			((Control)label8).set_Height(((Control)p).get_Height());
-			((Control)label8).set_Width(100);
-			((Label)label8).set_TextColor(Color.get_White());
-			((Label)label8).set_Font(GameService.Content.get_DefaultFont16());
-			((Label)label8).set_WrapText(true);
-			label8.SetLocalizedText = () => "Source";
-			((Label)label8).set_VerticalAlignment((VerticalAlignment)1);
-			FlowPanel flowPanel8 = new FlowPanel();
-			((Control)flowPanel8).set_Parent((Container)(object)contentFlowPanel);
-			((Container)flowPanel8).set_WidthSizingMode((SizingMode)1);
-			((Container)flowPanel8).set_HeightSizingMode((SizingMode)1);
-			((FlowPanel)flowPanel8).set_OuterControlPadding(new Vector2(0f, 5f));
-			((FlowPanel)flowPanel8).set_ControlPadding(new Vector2(5f, 5f));
-			((FlowPanel)flowPanel8).set_FlowDirection((ControlFlowDirection)2);
-			FlowPanel thresholdPanel = flowPanel8;
-			Label label9 = new Label();
-			((Control)label9).set_Parent((Container)(object)thresholdPanel);
-			((Control)label9).set_Height(25);
-			((Label)label9).set_AutoSizeWidth(true);
-			((Label)label9).set_TextColor(Colors.ColonialWhite);
-			label9.SetLocalizedText = () => strings.EmptyColumns;
-			label9.SetLocalizedTooltip = () => strings.EmptyColumns_Tooltip;
-			NumberBox numberBox = new NumberBox();
-			((Control)numberBox).set_Parent((Container)(object)thresholdPanel);
-			((Control)numberBox).set_Size(new Point(100, 25));
-			numberBox.MinValue = 0;
-			numberBox.MaxValue = 100;
-			numberBox.Value = _settings.OCRNoPixelColumns.get_Value();
-			numberBox.SetLocalizedTooltip = () => strings.EmptyColumnsThreshold_Tooltip;
-			numberBox.ValueChangedAction = delegate(int num)
+			base.Height = 350;
+			base.Width = 620;
+			Kenedia.Modules.Core.Controls.FlowPanel contentFlowPanel = new Kenedia.Modules.Core.Controls.FlowPanel
 			{
-				_settings.OCRNoPixelColumns.set_Value(num);
+				Parent = this,
+				Width = base.Width,
+				HeightSizingMode = SizingMode.AutoSize,
+				AutoSizePadding = new Point(3, 3),
+				OuterControlPadding = new Vector2(3f, 3f),
+				ControlPadding = new Vector2(3f, 3f),
+				FlowDirection = ControlFlowDirection.SingleTopToBottom,
+				BorderColor = Color.get_Black(),
+				BorderWidth = new RectangleDimensions(2)
 			};
-			_columnBox = numberBox;
-			Panel panel = new Panel();
-			((Control)panel).set_Parent((Container)(object)thresholdPanel);
-			panel.BackgroundColor = new Color(_spacingColor.R, _spacingColor.G, _spacingColor.B, _spacingColor.A);
-			((Control)panel).set_Size(new Point(25, 25));
-			Label label10 = new Label();
-			((Control)label10).set_Parent((Container)(object)thresholdPanel);
-			((Control)label10).set_Height(25);
-			((Label)label10).set_AutoSizeWidth(true);
-			((Label)label10).set_TextColor(Colors.ColonialWhite);
-			label10.SetLocalizedText = () => strings.EmptyColumn;
-			label10.SetLocalizedTooltip = () => strings.EmptyColumn_Tooltip;
-			Panel panel2 = new Panel();
-			((Control)panel2).set_Parent((Container)(object)thresholdPanel);
-			panel2.BackgroundColor = new Color(_ignoredColor.R, _ignoredColor.G, _ignoredColor.B, _ignoredColor.A);
-			((Control)panel2).set_Size(new Point(25, 25));
-			Label label11 = new Label();
-			((Control)label11).set_Parent((Container)(object)thresholdPanel);
-			((Control)label11).set_Height(25);
-			((Label)label11).set_AutoSizeWidth(true);
-			((Label)label11).set_TextColor(Colors.ColonialWhite);
-			label11.SetLocalizedText = () => strings.IgnoredPart;
-			label11.SetLocalizedTooltip = () => strings.IgnoredPart_Tooltip;
-			NumberBox numberBox2 = new NumberBox();
-			((Control)numberBox2).set_Parent((Container)(object)thresholdPanel);
-			((Control)numberBox2).set_Height(25);
-			((Control)numberBox2).set_Width(100);
-			numberBox2.MinValue = 0;
-			numberBox2.MaxValue = 255;
-			numberBox2.Value = _settings.OCR_ColorThreshold.get_Value();
-			numberBox2.SetLocalizedTooltip = () => "Threshold of 'white' a pixel has to be to be converted to black to be read (RGB Value: 0 - 255)";
-			numberBox2.ValueChangedAction = delegate(int num)
+			Kenedia.Modules.Core.Controls.FlowPanel headerPanel = new Kenedia.Modules.Core.Controls.FlowPanel
 			{
-				_settings.OCR_ColorThreshold.set_Value(num);
+				FlowDirection = ControlFlowDirection.SingleLeftToRight,
+				Parent = contentFlowPanel,
+				WidthSizingMode = SizingMode.Fill,
+				HeightSizingMode = SizingMode.AutoSize,
+				ControlPadding = new Vector2(5f, 5f)
 			};
-			_thresholdBox = numberBox2;
-			MaskedRegion maskedRegion = new MaskedRegion();
-			((Control)maskedRegion).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			((Control)maskedRegion).set_ZIndex(int.MaxValue);
-			((Control)maskedRegion).set_Visible(false);
-			_maskedRegion = maskedRegion;
-			ResizeableContainer resizeableContainer = new ResizeableContainer();
-			((Control)resizeableContainer).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			((Control)resizeableContainer).set_Visible(false);
+			_instructions = new Kenedia.Modules.Core.Controls.Label
+			{
+				Parent = headerPanel,
+				AutoSizeHeight = true,
+				Width = contentFlowPanel.ContentRegion.Width - 35,
+				WrapText = true,
+				TextColor = ContentService.Colors.ColonialWhite,
+				SetLocalizedText = () => strings.OCR_Instructions
+			};
+			_closeButton = new ImageButton
+			{
+				Parent = headerPanel,
+				Texture = AsyncTexture2D.FromAssetId(156012),
+				HoveredTexture = AsyncTexture2D.FromAssetId(156011),
+				Size = new Point(25, 25),
+				TextureRectangle = new Rectangle(7, 7, 20, 20)
+			};
+			_closeButton.Click += CloseButton_Click;
+			Kenedia.Modules.Core.Controls.FlowPanel fp = new Kenedia.Modules.Core.Controls.FlowPanel
+			{
+				Parent = contentFlowPanel,
+				WidthSizingMode = SizingMode.Fill,
+				HeightSizingMode = SizingMode.AutoSize,
+				ControlPadding = new Vector2(10f, 0f),
+				FlowDirection = ControlFlowDirection.SingleLeftToRight
+			};
+			FramedContainer p = new FramedContainer
+			{
+				Parent = fp,
+				Width = 500,
+				Height = GameService.Content.DefaultFont32.get_LineHeight() + 8,
+				BorderColor = Color.get_Black() * 0.7f,
+				BackgroundColor = Color.get_Black() * 0.4f,
+				BorderWidth = new RectangleDimensions(2)
+			};
+			_bestMatchLabel = new Kenedia.Modules.Core.Controls.Label
+			{
+				Location = new Point(5, 0),
+				Parent = p,
+				Height = p.Height,
+				AutoSizeWidth = true,
+				TextColor = ContentService.Colors.ColonialWhite,
+				Font = GameService.Content.DefaultFont32,
+				VerticalAlignment = VerticalAlignment.Middle
+			};
+			new Kenedia.Modules.Core.Controls.Label
+			{
+				Parent = fp,
+				VerticalAlignment = VerticalAlignment.Middle,
+				Height = p.Height,
+				Width = 100,
+				TextColor = Color.get_White(),
+				Font = GameService.Content.DefaultFont16,
+				WrapText = true,
+				SetLocalizedText = () => "Best Match"
+			};
+			fp = new Kenedia.Modules.Core.Controls.FlowPanel
+			{
+				Parent = contentFlowPanel,
+				WidthSizingMode = SizingMode.Fill,
+				HeightSizingMode = SizingMode.AutoSize,
+				ControlPadding = new Vector2(10f, 0f),
+				FlowDirection = ControlFlowDirection.SingleLeftToRight
+			};
+			p = new FramedContainer
+			{
+				Parent = fp,
+				Width = 500,
+				Height = GameService.Content.DefaultFont32.get_LineHeight() + 8,
+				BorderColor = Color.get_Black() * 0.7f,
+				BackgroundColor = Color.get_Black() * 0.4f,
+				BorderWidth = new RectangleDimensions(2)
+			};
+			_resultLabel = new Kenedia.Modules.Core.Controls.Label
+			{
+				Location = new Point(5, 0),
+				Parent = p,
+				Height = p.Height,
+				AutoSizeWidth = true,
+				TextColor = ContentService.Colors.ColonialWhite,
+				Font = GameService.Content.DefaultFont32,
+				VerticalAlignment = VerticalAlignment.Middle
+			};
+			new Kenedia.Modules.Core.Controls.Label
+			{
+				Parent = fp,
+				VerticalAlignment = VerticalAlignment.Middle,
+				Height = p.Height,
+				Width = 100,
+				TextColor = Color.get_White(),
+				Font = GameService.Content.DefaultFont16,
+				WrapText = true,
+				SetLocalizedText = () => "OCR Result"
+			};
+			fp = new Kenedia.Modules.Core.Controls.FlowPanel
+			{
+				Parent = contentFlowPanel,
+				WidthSizingMode = SizingMode.Fill,
+				HeightSizingMode = SizingMode.AutoSize,
+				ControlPadding = new Vector2(10f, 0f),
+				FlowDirection = ControlFlowDirection.SingleLeftToRight
+			};
+			p = new FramedContainer
+			{
+				Parent = fp,
+				Width = 500,
+				Height = 55,
+				BorderColor = Color.get_Black() * 0.7f,
+				BackgroundColor = Color.get_Black() * 0.4f,
+				BorderWidth = new RectangleDimensions(2)
+			};
+			_scaledImage = new Kenedia.Modules.Core.Controls.Image
+			{
+				Location = new Point(5, 5),
+				Parent = p
+			};
+			new Kenedia.Modules.Core.Controls.Label
+			{
+				Parent = fp,
+				Height = p.Height,
+				Width = 100,
+				TextColor = Color.get_White(),
+				Font = GameService.Content.DefaultFont16,
+				WrapText = true,
+				SetLocalizedText = () => "Scaled",
+				VerticalAlignment = VerticalAlignment.Middle
+			};
+			fp = new Kenedia.Modules.Core.Controls.FlowPanel
+			{
+				Parent = contentFlowPanel,
+				WidthSizingMode = SizingMode.Fill,
+				HeightSizingMode = SizingMode.AutoSize,
+				ControlPadding = new Vector2(10f, 0f),
+				FlowDirection = ControlFlowDirection.SingleLeftToRight
+			};
+			p = new FramedContainer
+			{
+				Parent = fp,
+				Width = 500,
+				Height = 55,
+				BorderColor = Color.get_Black() * 0.7f,
+				BackgroundColor = Color.get_Black() * 0.4f,
+				BorderWidth = new RectangleDimensions(2)
+			};
+			_cleanedImage = new Kenedia.Modules.Core.Controls.Image
+			{
+				Location = new Point(5, 5),
+				Parent = p
+			};
+			new Kenedia.Modules.Core.Controls.Label
+			{
+				Parent = fp,
+				Height = p.Height,
+				Width = 100,
+				TextColor = Color.get_White(),
+				Font = GameService.Content.DefaultFont16,
+				WrapText = true,
+				SetLocalizedText = () => "Cleaned",
+				VerticalAlignment = VerticalAlignment.Middle
+			};
+			fp = new Kenedia.Modules.Core.Controls.FlowPanel
+			{
+				Parent = contentFlowPanel,
+				WidthSizingMode = SizingMode.Fill,
+				HeightSizingMode = SizingMode.AutoSize,
+				ControlPadding = new Vector2(10f, 0f),
+				FlowDirection = ControlFlowDirection.SingleLeftToRight
+			};
+			p = new FramedContainer
+			{
+				Parent = fp,
+				Width = 500,
+				Height = 55,
+				BorderColor = Color.get_Black() * 0.7f,
+				BackgroundColor = Color.get_Black() * 0.4f,
+				BorderWidth = new RectangleDimensions(2)
+			};
+			_sourceImage = new Kenedia.Modules.Core.Controls.Image
+			{
+				Location = new Point(5, 5),
+				Parent = p
+			};
+			new Kenedia.Modules.Core.Controls.Label
+			{
+				Parent = fp,
+				Height = p.Height,
+				Width = 100,
+				TextColor = Color.get_White(),
+				Font = GameService.Content.DefaultFont16,
+				WrapText = true,
+				SetLocalizedText = () => "Source",
+				VerticalAlignment = VerticalAlignment.Middle
+			};
+			Kenedia.Modules.Core.Controls.FlowPanel thresholdPanel = new Kenedia.Modules.Core.Controls.FlowPanel
+			{
+				Parent = contentFlowPanel,
+				WidthSizingMode = SizingMode.AutoSize,
+				HeightSizingMode = SizingMode.AutoSize,
+				OuterControlPadding = new Vector2(0f, 5f),
+				ControlPadding = new Vector2(5f, 5f),
+				FlowDirection = ControlFlowDirection.SingleLeftToRight
+			};
+			new Kenedia.Modules.Core.Controls.Label
+			{
+				Parent = thresholdPanel,
+				Height = 25,
+				AutoSizeWidth = true,
+				TextColor = ContentService.Colors.ColonialWhite,
+				SetLocalizedText = () => strings.EmptyColumns,
+				SetLocalizedTooltip = () => strings.EmptyColumns_Tooltip
+			};
+			_columnBox = new NumberBox
+			{
+				Parent = thresholdPanel,
+				Size = new Point(100, 25),
+				MinValue = 0,
+				MaxValue = 100,
+				Value = _settings.OCRNoPixelColumns.Value,
+				SetLocalizedTooltip = () => strings.EmptyColumnsThreshold_Tooltip,
+				ValueChangedAction = delegate(int num)
+				{
+					_settings.OCRNoPixelColumns.Value = num;
+				}
+			};
+			new Kenedia.Modules.Core.Controls.Panel
+			{
+				Parent = thresholdPanel,
+				BackgroundColor = new Color(_spacingColor.R, _spacingColor.G, _spacingColor.B, _spacingColor.A),
+				Size = new Point(25, 25)
+			};
+			new Kenedia.Modules.Core.Controls.Label
+			{
+				Parent = thresholdPanel,
+				Height = 25,
+				AutoSizeWidth = true,
+				TextColor = ContentService.Colors.ColonialWhite,
+				SetLocalizedText = () => strings.EmptyColumn,
+				SetLocalizedTooltip = () => strings.EmptyColumn_Tooltip
+			};
+			new Kenedia.Modules.Core.Controls.Panel
+			{
+				Parent = thresholdPanel,
+				BackgroundColor = new Color(_ignoredColor.R, _ignoredColor.G, _ignoredColor.B, _ignoredColor.A),
+				Size = new Point(25, 25)
+			};
+			new Kenedia.Modules.Core.Controls.Label
+			{
+				Parent = thresholdPanel,
+				Height = 25,
+				AutoSizeWidth = true,
+				TextColor = ContentService.Colors.ColonialWhite,
+				SetLocalizedText = () => strings.IgnoredPart,
+				SetLocalizedTooltip = () => strings.IgnoredPart_Tooltip
+			};
+			_thresholdBox = new NumberBox
+			{
+				Parent = thresholdPanel,
+				Height = 25,
+				Width = 100,
+				MinValue = 0,
+				MaxValue = 255,
+				Value = _settings.OCR_ColorThreshold.Value,
+				SetLocalizedTooltip = () => "Threshold of 'white' a pixel has to be to be converted to black to be read (RGB Value: 0 - 255)",
+				ValueChangedAction = delegate(int num)
+				{
+					_settings.OCR_ColorThreshold.Value = num;
+				}
+			};
+			_maskedRegion = new MaskedRegion
+			{
+				Parent = GameService.Graphics.SpriteScreen,
+				ZIndex = int.MaxValue,
+				Visible = false
+			};
+			ResizeableContainer obj = new ResizeableContainer
+			{
+				Parent = GameService.Graphics.SpriteScreen,
+				Visible = false
+			};
 			Rectangle activeOCRRegion = _settings.ActiveOCRRegion;
-			((Control)resizeableContainer).set_Location(((Rectangle)(ref activeOCRRegion)).get_Location());
+			obj.Location = ((Rectangle)(ref activeOCRRegion)).get_Location();
 			activeOCRRegion = _settings.ActiveOCRRegion;
-			((Control)resizeableContainer).set_Size(((Rectangle)(ref activeOCRRegion)).get_Size());
-			resizeableContainer.BorderColor = Colors.ColonialWhite;
-			resizeableContainer.ShowResizeOnlyOnMouseOver = true;
-			resizeableContainer.MaxSize = new Point(((Control)this).get_Width(), 100);
-			resizeableContainer.BorderWidth = new RectangleDimensions(2);
-			((Control)resizeableContainer).set_ZIndex(2147483646);
-			_ocrRegionContainer = resizeableContainer;
-			((Control)_ocrRegionContainer).add_Resized((EventHandler<ResizedEventArgs>)Container_Changed);
-			((Control)_ocrRegionContainer).add_Moved((EventHandler<MovedEventArgs>)Container_Changed);
+			obj.Size = ((Rectangle)(ref activeOCRRegion)).get_Size();
+			obj.BorderColor = ContentService.Colors.ColonialWhite;
+			obj.ShowResizeOnlyOnMouseOver = true;
+			obj.MaxSize = new Point(base.Width, 100);
+			obj.BorderWidth = new RectangleDimensions(2);
+			obj.ZIndex = 2147483646;
+			_ocrRegionContainer = obj;
+			_ocrRegionContainer.Resized += Container_Changed;
+			_ocrRegionContainer.Moved += Container_Changed;
 			activeOCRRegion = _settings.ActiveOCRRegion;
 			((Rectangle)(ref activeOCRRegion)).get_Size();
-			((Control)this).set_Location(new Point(((Control)_ocrRegionContainer).get_Left(), ((Control)_ocrRegionContainer).get_Top() - ((Control)this).get_Height() - 5));
+			base.Location = new Point(_ocrRegionContainer.Left, _ocrRegionContainer.Top - base.Height - 5);
 			ForceOnScreen();
 		}
 
@@ -409,22 +454,14 @@ namespace Characters.Views
 			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
 			Rectangle b = _settings.ActiveOCRRegion;
-			((Control)_maskedRegion).set_Size(((Rectangle)(ref b)).get_Size());
-			((Control)_maskedRegion).set_Location(((Rectangle)(ref b)).get_Location());
-			MaskedRegion maskedRegion = _maskedRegion;
-			if (maskedRegion != null)
-			{
-				((Control)maskedRegion).Show();
-			}
+			_maskedRegion.Size = ((Rectangle)(ref b)).get_Size();
+			_maskedRegion.Location = ((Rectangle)(ref b)).get_Location();
+			_maskedRegion?.Show();
 		}
 
 		public void DisableMaskedRegion()
 		{
-			MaskedRegion maskedRegion = _maskedRegion;
-			if (maskedRegion != null)
-			{
-				((Control)maskedRegion).Hide();
-			}
+			_maskedRegion?.Hide();
 		}
 
 		private void Container_Changed(object sender, EventArgs e)
@@ -439,9 +476,9 @@ namespace Characters.Views
 			if (!_sizeSet)
 			{
 				string key = _settings.OCRKey;
-				Dictionary<string, Rectangle> regions = _settings.OCRRegions.get_Value();
+				Dictionary<string, Rectangle> regions = _settings.OCRRegions.Value;
 				Rectangle bounds = default(Rectangle);
-				((Rectangle)(ref bounds))._002Ector(((Control)_ocrRegionContainer).get_Left() + _ocrRegionContainer.BorderWidth.Left, ((Control)_ocrRegionContainer).get_Top() + _ocrRegionContainer.BorderWidth.Top, ((Control)_ocrRegionContainer).get_Width() - _ocrRegionContainer.BorderWidth.Horizontal, ((Control)_ocrRegionContainer).get_Height() - _ocrRegionContainer.BorderWidth.Vertical);
+				((Rectangle)(ref bounds))._002Ector(_ocrRegionContainer.Left + _ocrRegionContainer.BorderWidth.Left, _ocrRegionContainer.Top + _ocrRegionContainer.BorderWidth.Top, _ocrRegionContainer.Width - _ocrRegionContainer.BorderWidth.Horizontal, _ocrRegionContainer.Height - _ocrRegionContainer.BorderWidth.Vertical);
 				if (!regions.ContainsKey(key))
 				{
 					regions.Add(key, bounds);
@@ -452,10 +489,10 @@ namespace Characters.Views
 				}
 			}
 			_sizeSet = false;
-			((Control)this).set_Location(new Point(((Control)_ocrRegionContainer).get_Left(), ((Control)_ocrRegionContainer).get_Top() - ((Control)this).get_Height() - 5));
+			base.Location = new Point(_ocrRegionContainer.Left, _ocrRegionContainer.Top - base.Height - 5);
 			Rectangle b = _settings.ActiveOCRRegion;
-			((Control)_maskedRegion).set_Size(((Rectangle)(ref b)).get_Size());
-			((Control)_maskedRegion).set_Location(((Rectangle)(ref b)).get_Location());
+			_maskedRegion.Size = ((Rectangle)(ref b)).get_Size();
+			_maskedRegion.Location = ((Rectangle)(ref b)).get_Location();
 		}
 
 		private void CloseButton_Click(object sender, MouseEventArgs e)
@@ -475,62 +512,62 @@ namespace Characters.Views
 			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
-			bool visible = ((Control)(object)this).ToggleVisibility();
+			bool visible = this.ToggleVisibility();
 			ForceOnScreen();
-			((Control)(object)_ocrRegionContainer)?.ToggleVisibility(visible);
-			((Control)(object)_maskedRegion)?.ToggleVisibility(visible);
-			if (((Control)_ocrRegionContainer).get_Visible())
+			_ocrRegionContainer?.ToggleVisibility(visible);
+			_maskedRegion?.ToggleVisibility(visible);
+			if (_ocrRegionContainer.Visible)
 			{
 				_sizeSet = true;
 				ResizeableContainer ocrRegionContainer = _ocrRegionContainer;
 				Rectangle activeOCRRegion = _settings.ActiveOCRRegion;
-				((Control)ocrRegionContainer).set_Location(((Rectangle)(ref activeOCRRegion)).get_Location().Add(new Point(-_ocrRegionContainer.BorderWidth.Left, -_ocrRegionContainer.BorderWidth.Top)));
+				ocrRegionContainer.Location = ((Rectangle)(ref activeOCRRegion)).get_Location().Add(new Point(-_ocrRegionContainer.BorderWidth.Left, -_ocrRegionContainer.BorderWidth.Top));
 				ResizeableContainer ocrRegionContainer2 = _ocrRegionContainer;
 				activeOCRRegion = _settings.ActiveOCRRegion;
-				((Control)ocrRegionContainer2).set_Size(((Rectangle)(ref activeOCRRegion)).get_Size().Add(new Point(_ocrRegionContainer.BorderWidth.Horizontal, _ocrRegionContainer.BorderWidth.Vertical)));
+				ocrRegionContainer2.Size = ((Rectangle)(ref activeOCRRegion)).get_Size().Add(new Point(_ocrRegionContainer.BorderWidth.Horizontal, _ocrRegionContainer.BorderWidth.Vertical));
 			}
 		}
 
 		public override async void UpdateContainer(GameTime gameTime)
 		{
 			base.UpdateContainer(gameTime);
-			if (!((Control)this).get_Visible())
+			if (!base.Visible)
 			{
 				return;
 			}
 			ForceOnScreen();
 			MaskedRegion maskedRegion = _maskedRegion;
-			Rectangle val = ((Control)_ocrRegionContainer).get_AbsoluteBounds();
-			((Control)maskedRegion).set_Visible(!((Rectangle)(ref val)).Contains(Control.get_Input().get_Mouse().get_Position()));
-			if (gameTime.get_TotalGameTime().TotalMilliseconds - _readTick > 250.0 && ((Control)_maskedRegion).get_Visible())
+			Rectangle val = _ocrRegionContainer.AbsoluteBounds;
+			maskedRegion.Visible = !((Rectangle)(ref val)).Contains(Control.Input.Mouse.Position);
+			if (gameTime.get_TotalGameTime().TotalMilliseconds - _readTick > 250.0 && _maskedRegion.Visible)
 			{
 				_readTick = gameTime.get_TotalGameTime().TotalMilliseconds;
 				string result = await _ocr.Read(show: true);
 				if (result != null)
 				{
-					((Image)_sourceImage).set_Texture(AsyncTexture2D.op_Implicit(_ocr.SourceTexture));
+					_sourceImage.Texture = _ocr.SourceTexture;
 					Kenedia.Modules.Core.Controls.Image sourceImage = _sourceImage;
 					val = _ocr.SourceTexture.get_Bounds();
-					((Control)sourceImage).set_Size(((Rectangle)(ref val)).get_Size());
-					((Image)_cleanedImage).set_Texture(AsyncTexture2D.op_Implicit(_ocr.CleanedTexture));
+					sourceImage.Size = ((Rectangle)(ref val)).get_Size();
+					_cleanedImage.Texture = _ocr.CleanedTexture;
 					Kenedia.Modules.Core.Controls.Image cleanedImage = _cleanedImage;
 					val = _ocr.CleanedTexture.get_Bounds();
-					((Control)cleanedImage).set_Size(((Rectangle)(ref val)).get_Size());
-					((Image)_scaledImage).set_Texture(AsyncTexture2D.op_Implicit(_ocr.ScaledTexture));
+					cleanedImage.Size = ((Rectangle)(ref val)).get_Size();
+					_scaledImage.Texture = _ocr.ScaledTexture;
 					Kenedia.Modules.Core.Controls.Image scaledImage = _scaledImage;
 					val = _ocr.ScaledTexture.get_Bounds();
-					((Control)scaledImage).set_Size(((Rectangle)(ref val)).get_Size());
-					((Label)_resultLabel).set_Font(Control.get_Content().get_DefaultFont32());
-					((Label)_resultLabel).set_WrapText(false);
-					((Label)_bestMatchLabel).set_Text(_ocr.BestMatchResult);
-					((Label)_resultLabel).set_Text(_ocr.ReadResult);
+					scaledImage.Size = ((Rectangle)(ref val)).get_Size();
+					_resultLabel.Font = Control.Content.DefaultFont32;
+					_resultLabel.WrapText = false;
+					_bestMatchLabel.Text = _ocr.BestMatchResult;
+					_resultLabel.Text = _ocr.ReadResult;
 				}
 				else if (!_ocr.IsLoaded)
 				{
-					((Label)_bestMatchLabel).set_Text((!string.IsNullOrEmpty(result)) ? _ocr.BestMatchResult : $"Tesseract Engine Loaded: {_ocr.IsLoaded}");
-					((Label)_resultLabel).set_Text((!string.IsNullOrEmpty(result)) ? _ocr.ReadResult : (_ocr.PathToEngine ?? ""));
-					((Label)_resultLabel).set_Font(Control.get_Content().get_DefaultFont14());
-					((Label)_resultLabel).set_WrapText(true);
+					_bestMatchLabel.Text = ((!string.IsNullOrEmpty(result)) ? _ocr.BestMatchResult : $"Tesseract Engine Loaded: {_ocr.IsLoaded}");
+					_resultLabel.Text = ((!string.IsNullOrEmpty(result)) ? _ocr.ReadResult : (_ocr.PathToEngine ?? ""));
+					_resultLabel.Font = Control.Content.DefaultFont14;
+					_resultLabel.WrapText = true;
 				}
 			}
 		}
@@ -538,76 +575,36 @@ namespace Characters.Views
 		protected override void DisposeControl()
 		{
 			base.DisposeControl();
-			NumberBox columnBox = _columnBox;
-			if (columnBox != null)
-			{
-				((Control)columnBox).Dispose();
-			}
-			NumberBox thresholdBox = _thresholdBox;
-			if (thresholdBox != null)
-			{
-				((Control)thresholdBox).Dispose();
-			}
-			ResizeableContainer ocrRegionContainer = _ocrRegionContainer;
-			if (ocrRegionContainer != null)
-			{
-				((Control)ocrRegionContainer).Dispose();
-			}
-			Label instructions = _instructions;
-			if (instructions != null)
-			{
-				((Control)instructions).Dispose();
-			}
-			Kenedia.Modules.Core.Controls.Image sourceImage = _sourceImage;
-			if (sourceImage != null)
-			{
-				((Control)sourceImage).Dispose();
-			}
-			Kenedia.Modules.Core.Controls.Image cleanedImage = _cleanedImage;
-			if (cleanedImage != null)
-			{
-				((Control)cleanedImage).Dispose();
-			}
-			Kenedia.Modules.Core.Controls.Image scaledImage = _scaledImage;
-			if (scaledImage != null)
-			{
-				((Control)scaledImage).Dispose();
-			}
-			Label resultLabel = _resultLabel;
-			if (resultLabel != null)
-			{
-				((Control)resultLabel).Dispose();
-			}
-			Label bestMatchLabel = _bestMatchLabel;
-			if (bestMatchLabel != null)
-			{
-				((Control)bestMatchLabel).Dispose();
-			}
-			MaskedRegion maskedRegion = _maskedRegion;
-			if (maskedRegion != null)
-			{
-				((Control)maskedRegion).Dispose();
-			}
+			_columnBox?.Dispose();
+			_thresholdBox?.Dispose();
+			_ocrRegionContainer?.Dispose();
+			_instructions?.Dispose();
+			_sourceImage?.Dispose();
+			_cleanedImage?.Dispose();
+			_scaledImage?.Dispose();
+			_resultLabel?.Dispose();
+			_bestMatchLabel?.Dispose();
+			_maskedRegion?.Dispose();
 		}
 
 		private void ForceOnScreen()
 		{
-			Screen screen = Control.get_Graphics().get_SpriteScreen();
-			if (((Control)_ocrRegionContainer).get_Bottom() > ((Control)screen).get_Bottom())
+			Screen screen = Control.Graphics.SpriteScreen;
+			if (_ocrRegionContainer.Bottom > screen.Bottom)
 			{
-				((Control)_ocrRegionContainer).set_Bottom(((Control)screen).get_Bottom());
+				_ocrRegionContainer.Bottom = screen.Bottom;
 			}
-			if (((Control)_ocrRegionContainer).get_Top() < ((Control)screen).get_Top() + ((Control)this).get_Height())
+			if (_ocrRegionContainer.Top < screen.Top + base.Height)
 			{
-				((Control)_ocrRegionContainer).set_Top(((Control)screen).get_Top() + ((Control)this).get_Height());
+				_ocrRegionContainer.Top = screen.Top + base.Height;
 			}
-			if (((Control)_ocrRegionContainer).get_Left() < ((Control)screen).get_Left())
+			if (_ocrRegionContainer.Left < screen.Left)
 			{
-				((Control)_ocrRegionContainer).set_Left(((Control)screen).get_Left());
+				_ocrRegionContainer.Left = screen.Left;
 			}
-			if (((Control)this).get_Right() > ((Control)screen).get_Right())
+			if (base.Right > screen.Right)
 			{
-				((Control)_ocrRegionContainer).set_Left(((Control)screen).get_Right() - ((Control)this).get_Width());
+				_ocrRegionContainer.Left = screen.Right - base.Width;
 			}
 		}
 	}

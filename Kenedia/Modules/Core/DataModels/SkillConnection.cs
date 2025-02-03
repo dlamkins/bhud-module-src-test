@@ -77,7 +77,7 @@ namespace Kenedia.Modules.Core.DataModels
 			Unleashed = c.Chain?.Unleashed;
 			if (c.Chain != null)
 			{
-				Chain = new List<int?>
+				Chain = new List<int?>(5)
 				{
 					c.Chain.First,
 					c.Chain.Second,
@@ -89,7 +89,7 @@ namespace Kenedia.Modules.Core.DataModels
 			}
 			if (c.FlipSkills != null)
 			{
-				FlipSkills = new List<int?>
+				FlipSkills = new List<int?>(6)
 				{
 					c.FlipSkills.Default,
 					c.FlipSkills.State1,

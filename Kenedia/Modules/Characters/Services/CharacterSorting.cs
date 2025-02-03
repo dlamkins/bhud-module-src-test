@@ -162,7 +162,7 @@ namespace Kenedia.Modules.Characters.Services
 			delay.GetValueOrDefault();
 			if (!delay.HasValue)
 			{
-				int value = _settings.KeyDelay.get_Value();
+				int value = _settings.KeyDelay.Value;
 				delay = value;
 			}
 			if (delay > 0)
@@ -232,7 +232,7 @@ namespace Kenedia.Modules.Characters.Services
 			Stopwatch stopwatch = Stopwatch.StartNew();
 			for (int i = 0; i < _models.Count; i++)
 			{
-				Keyboard.Stroke((VirtualKeyShort)37, false);
+				Keyboard.Stroke(VirtualKeyShort.LEFT);
 				await Delay(cancellationToken, null, 0.05);
 				if (IsTaskCanceled(cancellationToken))
 				{
@@ -252,7 +252,7 @@ namespace Kenedia.Modules.Characters.Services
 		{
 			Status = strings.FixCharacter_MoveNext;
 			ExtendedInputService.MouseWiggle();
-			Keyboard.Stroke((VirtualKeyShort)39, false);
+			Keyboard.Stroke(VirtualKeyShort.RIGHT);
 			await Delay(cancellationToken);
 			_currentIndex++;
 		}

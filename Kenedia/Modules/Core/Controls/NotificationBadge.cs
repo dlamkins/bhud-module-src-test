@@ -40,7 +40,7 @@ namespace Kenedia.Modules.Core.Controls
 		public float HoveredOpacity { get; set; } = 1f;
 
 
-		public float Opacity
+		public new float Opacity
 		{
 			get
 			{
@@ -61,18 +61,17 @@ namespace Kenedia.Modules.Core.Controls
 			}
 			set
 			{
-				Common.SetProperty(ref _anchor, value, OnAnchorChanged);
+				Common.SetProperty(ref _anchor, value, new ValueChangedEventHandler<Control>(OnAnchorChanged));
 			}
 		}
 
 		public Action ClickAction { get; set; }
 
 		public NotificationBadge()
-			: this()
 		{
 			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-			((Control)this).set_Size(new Point(32));
-			LocalizingService.LocaleChanged += UserLocale_SettingChanged;
+			base.Size = new Point(32);
+			LocalizingService.LocaleChanged += new EventHandler<Blish_HUD.ValueChangedEventArgs<Locale>>(UserLocale_SettingChanged);
 			Notifications.CollectionChanged += Notifications_CollectionChanged;
 		}
 
@@ -82,15 +81,15 @@ namespace Kenedia.Modules.Core.Controls
 			{
 				e.OldItems?.Cast<ConditionalNotification>().ForEach(delegate(ConditionalNotification n)
 				{
-					n.ConditionMatched -= Notification_ConditionMatched;
+					n.ConditionMatched -= new EventHandler(Notification_ConditionMatched);
 				});
 				e.NewItems?.Cast<ConditionalNotification>().ForEach(delegate(ConditionalNotification n)
 				{
-					n.ConditionMatched += Notification_ConditionMatched;
+					n.ConditionMatched += new EventHandler(Notification_ConditionMatched);
 				});
 				_message = ((Notifications.Count > 0) ? string.Join(Environment.NewLine, Notifications.Select((ConditionalNotification e) => e.NotificationText).Distinct().Enumerate(Environment.NewLine, "[{0}]: ")) : string.Empty);
-				((Control)this).set_BasicTooltipText(_message);
-				((Control)this).set_Visible(Notifications.Count > 0);
+				base.BasicTooltipText = _message;
+				base.Visible = Notifications.Count > 0;
 			}
 		}
 
@@ -99,28 +98,28 @@ namespace Kenedia.Modules.Core.Controls
 			_removeNotifications.Add(sender as ConditionalNotification);
 		}
 
-		private void OnAnchorChanged(object sender, ValueChangedEventArgs<Control> e)
+		private void OnAnchorChanged(object sender, Kenedia.Modules.Core.Models.ValueChangedEventArgs<Control> e)
 		{
 			if (e.OldValue != null)
 			{
-				e.OldValue!.remove_MouseEntered((EventHandler<MouseEventArgs>)SetHoveredOpacity);
-				e.OldValue!.remove_MouseLeft((EventHandler<MouseEventArgs>)SetOpacity);
+				e.OldValue!.MouseEntered -= SetHoveredOpacity;
+				e.OldValue!.MouseLeft -= SetOpacity;
 			}
 			if (e.NewValue != null)
 			{
-				e.NewValue!.add_MouseEntered((EventHandler<MouseEventArgs>)SetHoveredOpacity);
-				e.NewValue!.add_MouseLeft((EventHandler<MouseEventArgs>)SetOpacity);
+				e.NewValue!.MouseEntered += SetHoveredOpacity;
+				e.NewValue!.MouseLeft += SetOpacity;
 			}
 		}
 
 		private void SetOpacity(object sender = null, EventArgs e = null)
 		{
-			((Control)this).set_Opacity(Opacity);
+			base.Opacity = Opacity;
 		}
 
 		private void SetHoveredOpacity(object sender = null, EventArgs e = null)
 		{
-			((Control)this).set_Opacity(HoveredOpacity);
+			base.Opacity = HoveredOpacity;
 		}
 
 		public override void RecalculateLayout()
@@ -128,69 +127,66 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			((Control)this).RecalculateLayout();
-			_badge.Bounds = new Rectangle(Point.get_Zero(), ((Control)this).get_Size());
+			base.RecalculateLayout();
+			_badge.Bounds = new Rectangle(Point.get_Zero(), base.Size);
 		}
 
-		public void UserLocale_SettingChanged(object sender = null, ValueChangedEventArgs<Locale> e = null)
+		public void UserLocale_SettingChanged(object sender = null, Blish_HUD.ValueChangedEventArgs<Locale> e = null)
 		{
 			_message = ((Notifications.Count > 0) ? string.Join(Environment.NewLine, Notifications.Select((ConditionalNotification e) => e.NotificationText).Distinct().Enumerate(Environment.NewLine, "[{0}]: ")) : string.Empty);
-			((Control)this).set_BasicTooltipText(_message);
+			base.BasicTooltipText = _message;
 		}
 
 		protected override void OnMouseMoved(MouseEventArgs e)
 		{
-			((Control)this).OnMouseMoved(e);
+			base.OnMouseMoved(e);
 			SetHoveredOpacity();
 		}
 
 		protected override void OnMouseLeft(MouseEventArgs e)
 		{
-			((Control)this).OnMouseLeft(e);
+			base.OnMouseLeft(e);
 			SetOpacity();
 		}
 
 		protected override void OnMouseEntered(MouseEventArgs e)
 		{
-			((Control)this).OnMouseEntered(e);
+			base.OnMouseEntered(e);
 			SetHoveredOpacity();
 		}
 
 		protected override void OnClick(MouseEventArgs e)
 		{
-			((Control)this).OnClick(e);
+			base.OnClick(e);
 			ClickAction?.Invoke();
 		}
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			_badge.Draw((Control)(object)this, spriteBatch);
+			_badge.Draw(this, spriteBatch);
 		}
 
 		protected override void DisposeControl()
 		{
-			((Control)this).DisposeControl();
+			base.DisposeControl();
 			Anchor = null;
 			_badge = null;
 			Notifications?.Clear();
-			LocalizingService.LocaleChanged -= UserLocale_SettingChanged;
+			LocalizingService.LocaleChanged -= new EventHandler<Blish_HUD.ValueChangedEventArgs<Locale>>(UserLocale_SettingChanged);
 		}
 
 		protected override CaptureType CapturesInput()
 		{
-			//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-			if (((Control)this).get_MouseOver())
+			if (base.MouseOver)
 			{
-				return ((Control)this).CapturesInput();
+				return base.CapturesInput();
 			}
-			return (CaptureType)(((_003F?)CaptureInput) ?? ((Control)this).CapturesInput());
+			return CaptureInput ?? base.CapturesInput();
 		}
 
 		public override void DoUpdate(GameTime gameTime)
 		{
-			((Control)this).DoUpdate(gameTime);
+			base.DoUpdate(gameTime);
 			if (gameTime.get_TotalGameTime().TotalMilliseconds - _lastChecked < 1000.0 || Notifications.Count <= 0)
 			{
 				return;

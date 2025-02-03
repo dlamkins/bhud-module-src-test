@@ -4,4 +4,4 @@ using System.Runtime.CompilerServices;
 using System.Runtime.Versioning;
 
 [assembly: AssemblyVersion("0.0.0.0")]
-[module: RefSafetyRules(11)]
+[module: System.Runtime.CompilerServices.RefSafetyRules(11)]

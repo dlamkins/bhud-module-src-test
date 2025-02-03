@@ -18,9 +18,9 @@ namespace Kenedia.Modules.Core.Views
 	{
 		private Rectangle _subTitleRectangle;
 
-		protected BitmapFont TitleFont = Control.get_Content().get_DefaultFont32();
+		protected BitmapFont TitleFont = Control.Content.DefaultFont32;
 
-		protected BitmapFont SubTitleFont = Control.get_Content().get_DefaultFont18();
+		protected BitmapFont SubTitleFont = Control.Content.DefaultFont18;
 
 		private Rectangle _subEmblemRectangle;
 
@@ -34,7 +34,7 @@ namespace Kenedia.Modules.Core.Views
 
 		private string _name;
 
-		protected BitmapFont VersionFont = Control.get_Content().get_DefaultFont14();
+		protected BitmapFont VersionFont = Control.Content.DefaultFont14;
 
 		private Version _version;
 
@@ -42,7 +42,7 @@ namespace Kenedia.Modules.Core.Views
 
 		private readonly List<AnchoredContainer> _attachedContainers = new List<AnchoredContainer>();
 
-		public bool IsActive => WindowBase2.get_ActiveWindow() == this;
+		public bool IsActive => WindowBase2.ActiveWindow == this;
 
 		public Version Version
 		{
@@ -52,7 +52,7 @@ namespace Kenedia.Modules.Core.Views
 			}
 			set
 			{
-				Common.SetProperty(ref _version, value, ((Control)this).RecalculateLayout);
+				Common.SetProperty(ref _version, value, new Action(RecalculateLayout));
 			}
 		}
 
@@ -64,7 +64,7 @@ namespace Kenedia.Modules.Core.Views
 			}
 			set
 			{
-				Common.SetProperty(ref _name, value, ((Control)this).RecalculateLayout);
+				Common.SetProperty(ref _name, value, new Action(RecalculateLayout));
 			}
 		}
 
@@ -76,7 +76,7 @@ namespace Kenedia.Modules.Core.Views
 			}
 			set
 			{
-				Common.SetProperty(ref _subName, value, ((Control)this).RecalculateLayout);
+				Common.SetProperty(ref _subName, value, new Action(RecalculateLayout));
 			}
 		}
 
@@ -84,14 +84,14 @@ namespace Kenedia.Modules.Core.Views
 
 		public AsyncTexture2D SubWindowEmblem { get; set; }
 
-		public Color NameColor { get; set; } = Colors.ColonialWhite;
+		public Color NameColor { get; set; } = ContentService.Colors.ColonialWhite;
 
 
 		public Color SubNameColor { get; set; } = Color.get_White();
 
 
 		public TabbedWindow(AsyncTexture2D background, Rectangle windowRegion, Rectangle contentRegion)
-			: this(background, windowRegion, contentRegion)
+			: base(background, windowRegion, contentRegion)
 		{
 		}//IL_003c: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0041: Unknown result type (might be due to invalid IL or missing references)
@@ -117,21 +117,21 @@ namespace Kenedia.Modules.Core.Views
 			//IL_0103: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
 			//IL_011c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0182: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01da: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01dc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_021f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0224: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0241: Unknown result type (might be due to invalid IL or missing references)
-			//IL_025a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_025c: Unknown result type (might be due to invalid IL or missing references)
-			((WindowBase2)this).RecalculateLayout();
+			//IL_017e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0183: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0220: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0225: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0242: Unknown result type (might be due to invalid IL or missing references)
+			//IL_025b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_025d: Unknown result type (might be due to invalid IL or missing references)
+			base.RecalculateLayout();
 			_subEmblemRectangle = new Rectangle(21, 6, 64, 64);
 			_mainEmblemRectangle = new Rectangle(-43, -58, 128, 128);
-			_titleTextRegion = new Rectangle(Math.Max(Math.Max((MainWindowEmblem != null) ? ((Rectangle)(ref _mainEmblemRectangle)).get_Right() : 0, (SubWindowEmblem != null) ? ((Rectangle)(ref _subEmblemRectangle)).get_Right() : 0) - 16, 0), 5, ((Control)this).get_Width() - Math.Max(((Rectangle)(ref _mainEmblemRectangle)).get_Right(), ((Rectangle)(ref _subEmblemRectangle)).get_Right()) - 30, 30);
+			_titleTextRegion = new Rectangle(Math.Max(Math.Max((MainWindowEmblem != null) ? ((Rectangle)(ref _mainEmblemRectangle)).get_Right() : 0, (SubWindowEmblem != null) ? ((Rectangle)(ref _subEmblemRectangle)).get_Right() : 0) - 16, 0), 5, base.Width - Math.Max(((Rectangle)(ref _mainEmblemRectangle)).get_Right(), ((Rectangle)(ref _subEmblemRectangle)).get_Right()) - 30, 30);
 			_versionRectangle = Rectangle.get_Empty();
 			if (Version != null && !string.IsNullOrEmpty($"v. {Version}"))
 			{
@@ -141,11 +141,11 @@ namespace Kenedia.Modules.Core.Views
 			if (!string.IsNullOrEmpty(Name))
 			{
 				Rectangle titleRectangle = default(Rectangle);
-				foreach (BitmapFont font in new List<BitmapFont>
+				foreach (BitmapFont font in new List<BitmapFont>(3)
 				{
-					Control.get_Content().get_DefaultFont32(),
-					Control.get_Content().get_DefaultFont18(),
-					Control.get_Content().get_DefaultFont16()
+					Control.Content.DefaultFont32,
+					Control.Content.DefaultFont18,
+					Control.Content.DefaultFont16
 				})
 				{
 					RectangleF titleBounds2 = font.GetStringRectangle(Name);
@@ -169,12 +169,12 @@ namespace Kenedia.Modules.Core.Views
 
 		public override void UpdateContainer(GameTime gameTime)
 		{
-			((TabbedWindow2)this).UpdateContainer(gameTime);
+			base.UpdateContainer(gameTime);
 			foreach (AnchoredContainer container in _attachedContainers)
 			{
-				if (((Control)container).get_ZIndex() != ((Control)this).get_ZIndex())
+				if (container.ZIndex != ZIndex)
 				{
-					((Control)container).set_ZIndex(((Control)this).get_ZIndex());
+					container.ZIndex = ZIndex;
 				}
 			}
 		}
@@ -183,15 +183,12 @@ namespace Kenedia.Modules.Core.Views
 		{
 			foreach (AnchoredContainer c in _attachedContainers)
 			{
-				if (container != c && ((Control)c).get_Visible())
+				if (container != c && c.Visible)
 				{
-					((Control)c).Hide();
+					c.Hide();
 				}
 			}
-			if (container != null)
-			{
-				((Control)container).Show();
-			}
+			container?.Show();
 		}
 
 		public override void PaintAfterChildren(SpriteBatch spriteBatch, Rectangle bounds)
@@ -213,50 +210,42 @@ namespace Kenedia.Modules.Core.Views
 			//IL_0113: Unknown result type (might be due to invalid IL or missing references)
 			//IL_016a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_016f: Unknown result type (might be due to invalid IL or missing references)
-			((TabbedWindow2)this).PaintAfterChildren(spriteBatch, bounds);
+			base.PaintAfterChildren(spriteBatch, bounds);
 			if (MainWindowEmblem != null)
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(MainWindowEmblem), _mainEmblemRectangle, (Rectangle?)MainWindowEmblem.get_Bounds(), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
+				spriteBatch.DrawOnCtrl(this, MainWindowEmblem, _mainEmblemRectangle, MainWindowEmblem.Bounds, Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
 			}
 			if (SubWindowEmblem != null)
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(SubWindowEmblem), _subEmblemRectangle, (Rectangle?)SubWindowEmblem.get_Bounds(), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
+				spriteBatch.DrawOnCtrl(this, SubWindowEmblem, _subEmblemRectangle, SubWindowEmblem.Bounds, Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
 			}
 			if (_titleRectangle.Width <= _titleTextRegion.Width && !string.IsNullOrEmpty(Name))
 			{
-				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, Name, TitleFont, _titleRectangle, NameColor, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				spriteBatch.DrawStringOnCtrl(this, Name, TitleFont, _titleRectangle, NameColor, wrap: false, stroke: true);
 			}
 			if (_subTitleRectangle.Width <= _titleTextRegion.Width && !string.IsNullOrEmpty(SubName))
 			{
-				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, SubName, SubTitleFont, _subTitleRectangle, SubNameColor, false, true, 1, (HorizontalAlignment)0, (VerticalAlignment)1);
+				spriteBatch.DrawStringOnCtrl(this, SubName, SubTitleFont, _subTitleRectangle, SubNameColor, wrap: false, stroke: true);
 			}
 			if (Version != null && _titleTextRegion.Width >= _titleRectangle.Width + 10 + _versionRectangle.Width)
 			{
-				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, $"v. {Version}", VersionFont, _versionRectangle, Color.get_White(), false, true, 1, (HorizontalAlignment)2, (VerticalAlignment)2);
+				spriteBatch.DrawStringOnCtrl(this, $"v. {Version}", VersionFont, _versionRectangle, Color.get_White(), wrap: false, stroke: true, 1, HorizontalAlignment.Right, VerticalAlignment.Bottom);
 			}
 		}
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
 			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			((WindowBase2)this).PaintBeforeChildren(spriteBatch, bounds);
+			base.PaintBeforeChildren(spriteBatch, bounds);
 		}
 
 		protected override void DisposeControl()
 		{
-			((WindowBase2)this).DisposeControl();
-			((IEnumerable<IDisposable>)((Container)this).get_Children()).DisposeAll();
-			AsyncTexture2D subWindowEmblem = SubWindowEmblem;
-			if (subWindowEmblem != null)
-			{
-				subWindowEmblem.Dispose();
-			}
+			base.DisposeControl();
+			base.Children.DisposeAll();
+			SubWindowEmblem?.Dispose();
 			SubWindowEmblem = null;
-			AsyncTexture2D mainWindowEmblem = MainWindowEmblem;
-			if (mainWindowEmblem != null)
-			{
-				mainWindowEmblem.Dispose();
-			}
+			MainWindowEmblem?.Dispose();
 			MainWindowEmblem = null;
 		}
 
@@ -272,12 +261,12 @@ namespace Kenedia.Modules.Core.Views
 
 		protected override void OnHidden(EventArgs e)
 		{
-			((Control)this).OnHidden(e);
+			base.OnHidden(e);
 			foreach (AnchoredContainer container in _attachedContainers)
 			{
-				if (((Control)container).get_Parent() == Control.get_Graphics().get_SpriteScreen())
+				if (container.Parent == Control.Graphics.SpriteScreen)
 				{
-					((Control)container).Hide();
+					container.Hide();
 				}
 			}
 		}

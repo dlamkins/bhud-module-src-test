@@ -8,7 +8,7 @@ using Kenedia.Modules.Core.Services;
 
 namespace Kenedia.Modules.Core.Controls
 {
-	public class CornerIcon : CornerIcon, ILocalizable
+	public class CornerIcon : Blish_HUD.Controls.CornerIcon, ILocalizable
 	{
 		private Func<string> _setLocalizedTooltip;
 
@@ -23,14 +23,13 @@ namespace Kenedia.Modules.Core.Controls
 			set
 			{
 				_setLocalizedTooltip = value;
-				((Control)this).set_BasicTooltipText(value?.Invoke());
+				base.BasicTooltipText = value?.Invoke();
 			}
 		}
 
 		public CornerIcon()
-			: this()
 		{
-			LocalizingService.LocaleChanged += UserLocale_SettingChanged;
+			LocalizingService.LocaleChanged += new EventHandler<ValueChangedEventArgs<Locale>>(UserLocale_SettingChanged);
 			UserLocale_SettingChanged(null, null);
 		}
 
@@ -38,19 +37,19 @@ namespace Kenedia.Modules.Core.Controls
 		{
 			if (SetLocalizedTooltip != null)
 			{
-				((Control)this).set_BasicTooltipText(SetLocalizedTooltip?.Invoke());
+				base.BasicTooltipText = SetLocalizedTooltip?.Invoke();
 			}
 		}
 
 		protected override void DisposeControl()
 		{
-			((CornerIcon)this).DisposeControl();
-			GameService.Overlay.get_UserLocale().remove_SettingChanged((EventHandler<ValueChangedEventArgs<Locale>>)UserLocale_SettingChanged);
+			base.DisposeControl();
+			GameService.Overlay.UserLocale.SettingChanged -= UserLocale_SettingChanged;
 		}
 
 		protected override void OnClick(MouseEventArgs e)
 		{
-			((CornerIcon)this).OnClick(e);
+			base.OnClick(e);
 			ClickAction?.Invoke();
 		}
 	}

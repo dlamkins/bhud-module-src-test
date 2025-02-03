@@ -25,6 +25,7 @@ namespace Kenedia.Modules.Characters.Models
 
 		public static void Import(string path, ObservableCollection<Character_Model> characters, string imagePath, string accountName, TagList tags)
 		{
+			TagList tags2 = tags;
 			if (!File.Exists(path))
 			{
 				return;
@@ -46,9 +47,9 @@ namespace Kenedia.Modules.Characters.Models
 						if (!string.IsNullOrEmpty(t))
 						{
 							character.AddTag(t);
-							if (!tags.Contains(t))
+							if (!tags2.Contains(t))
 							{
-								tags.Add(t);
+								tags2.Add(t);
 							}
 						}
 					});

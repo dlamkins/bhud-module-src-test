@@ -61,7 +61,7 @@ namespace Kenedia.Modules.Core.Models
 			Locale valueOrDefault = lang.GetValueOrDefault();
 			if (!lang.HasValue)
 			{
-				valueOrDefault = GameService.Overlay.get_UserLocale().get_Value();
+				valueOrDefault = GameService.Overlay.UserLocale.Value;
 				lang = valueOrDefault;
 			}
 			if (lang.HasValue)
@@ -81,7 +81,7 @@ namespace Kenedia.Modules.Core.Models
 			Locale valueOrDefault = lang.GetValueOrDefault();
 			if (!lang.HasValue)
 			{
-				valueOrDefault = GameService.Overlay.get_UserLocale().get_Value();
+				valueOrDefault = GameService.Overlay.UserLocale.Value;
 				lang = valueOrDefault;
 			}
 			if (!lang.HasValue || !TryGetValue(lang.Value, out var text) || string.IsNullOrEmpty(text))

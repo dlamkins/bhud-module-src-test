@@ -15,7 +15,7 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 {
 	public class SideMenu : TabbedPanel, ILocalizable
 	{
-		private readonly Panel _headerPanel;
+		private readonly Kenedia.Modules.Core.Controls.Panel _headerPanel;
 
 		private readonly List<Control> _buttons = new List<Control>();
 
@@ -60,30 +60,31 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 			_refreshAPI = refreshAPI;
 			_settings = settings;
 			_characterSorting = characterSorting;
-			((Control)this).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+			base.Parent = GameService.Graphics.SpriteScreen;
 			base.BorderWidth = new RectangleDimensions(2);
 			base.BorderColor = Color.get_Black();
 			base.BackgroundColor = Color.get_Black() * 0.4f;
 			base.BackgroundImage = AsyncTexture2D.FromAssetId(156003);
-			((Control)this).set_ZIndex(11);
-			Panel panel = new Panel();
-			((Control)panel).set_Parent((Container)(object)this);
-			panel.BackgroundColor = Color.get_Black() * 0.95f;
-			((Control)panel).set_Height(25);
-			_headerPanel = panel;
-			((Control)TabsButtonPanel).set_Location(new Point(0, ((Control)_headerPanel).get_Bottom()));
+			ZIndex = 11;
+			_headerPanel = new Kenedia.Modules.Core.Controls.Panel
+			{
+				Parent = this,
+				BackgroundColor = Color.get_Black() * 0.95f,
+				Height = 25
+			};
+			TabsButtonPanel.Location = new Point(0, _headerPanel.Bottom);
 			CreateHeaderButtons();
-			((Control)this).set_Width(250);
-			((Container)this).set_HeightSizingMode((SizingMode)1);
+			base.Width = 250;
+			HeightSizingMode = SizingMode.AutoSize;
 			if (base.BackgroundImage != null)
 			{
-				base.TextureRectangle = new Rectangle(30, 30, base.BackgroundImage.get_Width() - 60, base.BackgroundImage.get_Height() - 60);
+				base.TextureRectangle = new Rectangle(30, 30, base.BackgroundImage.Width - 60, base.BackgroundImage.Height - 60);
 			}
 		}
 
 		private void CloseButton_Click(object sender, MouseEventArgs e)
 		{
-			((Control)this).Hide();
+			Hide();
 		}
 
 		private void CreateHeaderButtons()
@@ -98,86 +99,92 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 			//IL_02ef: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0381: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0392: Unknown result type (might be due to invalid IL or missing references)
-			ImageButton imageButton = new ImageButton();
-			((Control)imageButton).set_Parent((Container)(object)_headerPanel);
-			imageButton.Texture = AsyncTexture2D.op_Implicit(_textureManager.GetIcon(TextureManager.Icons.Camera));
-			imageButton.HoveredTexture = AsyncTexture2D.op_Implicit(_textureManager.GetIcon(TextureManager.Icons.Camera_Hovered));
-			((Control)imageButton).set_Size(new Point(20, 20));
-			imageButton.ClickAction = delegate
+			_ocrButton = new ImageButton
 			{
-				_toggleOCR?.Invoke();
-			};
-			imageButton.SetLocalizedTooltip = () => strings.EditOCR_Tooltip;
-			_ocrButton = imageButton;
-			_buttons.Add((Control)(object)_ocrButton);
-			ImageButton imageButton2 = new ImageButton();
-			((Control)imageButton2).set_Parent((Container)(object)_headerPanel);
-			imageButton2.Texture = AsyncTexture2D.FromAssetId(358353);
-			imageButton2.HoveredTexture = AsyncTexture2D.op_Implicit(_textureManager.GetIcon(TextureManager.Icons.Portrait_Hovered));
-			((Control)imageButton2).set_Size(new Point(20, 20));
-			imageButton2.ColorHovered = Color.get_White();
-			imageButton2.SetLocalizedTooltip = () => strings.TogglePortraitCapture_Tooltip;
-			imageButton2.ClickAction = delegate
-			{
-				_togglePotrait?.Invoke();
-			};
-			_potraitButton = imageButton2;
-			_buttons.Add((Control)(object)_potraitButton);
-			ImageButton imageButton3 = new ImageButton();
-			((Control)imageButton3).set_Parent((Container)(object)_headerPanel);
-			imageButton3.Texture = AsyncTexture2D.FromAssetId(156760);
-			imageButton3.HoveredTexture = AsyncTexture2D.FromAssetId(156759);
-			((Control)imageButton3).set_Size(new Point(20, 20));
-			imageButton3.SetLocalizedTooltip = () => strings.FixCharacters_Tooltip;
-			imageButton3.ClickAction = delegate
-			{
-				if (!GameService.GameIntegration.get_Gw2Instance().get_IsInGame())
+				Parent = _headerPanel,
+				Texture = (AsyncTexture2D)_textureManager.GetIcon(TextureManager.Icons.Camera),
+				HoveredTexture = (AsyncTexture2D)_textureManager.GetIcon(TextureManager.Icons.Camera_Hovered),
+				Size = new Point(20, 20),
+				ClickAction = delegate
 				{
-					_characterSorting.Start();
+					_toggleOCR?.Invoke();
+				},
+				SetLocalizedTooltip = () => strings.EditOCR_Tooltip
+			};
+			_buttons.Add(_ocrButton);
+			_potraitButton = new ImageButton
+			{
+				Parent = _headerPanel,
+				Texture = AsyncTexture2D.FromAssetId(358353),
+				HoveredTexture = (AsyncTexture2D)_textureManager.GetIcon(TextureManager.Icons.Portrait_Hovered),
+				Size = new Point(20, 20),
+				ColorHovered = Color.get_White(),
+				SetLocalizedTooltip = () => strings.TogglePortraitCapture_Tooltip,
+				ClickAction = delegate
+				{
+					_togglePotrait?.Invoke();
 				}
 			};
-			_fixButton = imageButton3;
-			_buttons.Add((Control)(object)_fixButton);
-			ImageButton imageButton4 = new ImageButton();
-			((Control)imageButton4).set_Parent((Container)(object)_headerPanel);
-			imageButton4.Texture = AsyncTexture2D.FromAssetId(156749);
-			imageButton4.HoveredTexture = AsyncTexture2D.FromAssetId(156750);
-			((Control)imageButton4).set_Size(new Point(20, 20));
-			imageButton4.ClickAction = delegate
+			_buttons.Add(_potraitButton);
+			_fixButton = new ImageButton
 			{
-				_refreshAPI?.Invoke();
+				Parent = _headerPanel,
+				Texture = AsyncTexture2D.FromAssetId(156760),
+				HoveredTexture = AsyncTexture2D.FromAssetId(156759),
+				Size = new Point(20, 20),
+				SetLocalizedTooltip = () => strings.FixCharacters_Tooltip,
+				ClickAction = delegate
+				{
+					if (!GameService.GameIntegration.Gw2Instance.IsInGame)
+					{
+						_characterSorting.Start();
+					}
+				}
 			};
-			imageButton4.SetLocalizedTooltip = () => strings.RefreshAPI;
-			_refreshButton = imageButton4;
-			_buttons.Add((Control)(object)_refreshButton);
-			ImageToggleButton imageToggleButton = new ImageToggleButton(delegate(bool b)
+			_buttons.Add(_fixButton);
+			_refreshButton = new ImageButton
 			{
-				_settings.PinSideMenus.set_Value(b);
-			});
-			((Control)imageToggleButton).set_Parent((Container)(object)_headerPanel);
-			imageToggleButton.Texture = AsyncTexture2D.op_Implicit(_textureManager.GetIcon(TextureManager.Icons.Pin));
-			imageToggleButton.HoveredTexture = AsyncTexture2D.op_Implicit(_textureManager.GetIcon(TextureManager.Icons.Pin_Hovered));
-			imageToggleButton.ActiveTexture = AsyncTexture2D.op_Implicit(_textureManager.GetIcon(TextureManager.Icons.Pin_Hovered));
-			imageToggleButton.ColorDefault = new Color(175, 175, 175);
-			imageToggleButton.ColorActive = Colors.ColonialWhite;
-			((Control)imageToggleButton).set_Size(new Point(20, 20));
-			imageToggleButton.Active = _settings.PinSideMenus.get_Value();
-			imageToggleButton.SetLocalizedTooltip = () => strings.PinSideMenus_Tooltip;
-			_pinButton = imageToggleButton;
-			_buttons.Add((Control)(object)_pinButton);
-			ImageButton imageButton5 = new ImageButton();
-			((Control)imageButton5).set_Parent((Container)(object)_headerPanel);
-			imageButton5.Texture = AsyncTexture2D.FromAssetId(156012);
-			imageButton5.HoveredTexture = AsyncTexture2D.FromAssetId(156011);
-			((Control)imageButton5).set_Size(new Point(20, 20));
-			imageButton5.TextureRectangle = new Rectangle(7, 7, 20, 20);
-			imageButton5.ClickAction = delegate
-			{
-				((Control)this).Hide();
+				Parent = _headerPanel,
+				Texture = AsyncTexture2D.FromAssetId(156749),
+				HoveredTexture = AsyncTexture2D.FromAssetId(156750),
+				Size = new Point(20, 20),
+				ClickAction = delegate
+				{
+					_refreshAPI?.Invoke();
+				},
+				SetLocalizedTooltip = () => strings.RefreshAPI
 			};
-			imageButton5.SetLocalizedTooltip = () => strings.Close;
-			_closeButton = imageButton5;
-			_buttons.Add((Control)(object)_closeButton);
+			_buttons.Add(_refreshButton);
+			_pinButton = new ImageToggleButton(delegate(bool b)
+			{
+				_settings.PinSideMenus.Value = b;
+			})
+			{
+				Parent = _headerPanel,
+				Texture = (AsyncTexture2D)_textureManager.GetIcon(TextureManager.Icons.Pin),
+				HoveredTexture = (AsyncTexture2D)_textureManager.GetIcon(TextureManager.Icons.Pin_Hovered),
+				ActiveTexture = (AsyncTexture2D)_textureManager.GetIcon(TextureManager.Icons.Pin_Hovered),
+				ColorDefault = new Color(175, 175, 175),
+				ColorActive = ContentService.Colors.ColonialWhite,
+				Size = new Point(20, 20),
+				Active = _settings.PinSideMenus.Value,
+				SetLocalizedTooltip = () => strings.PinSideMenus_Tooltip
+			};
+			_buttons.Add(_pinButton);
+			_closeButton = new ImageButton
+			{
+				Parent = _headerPanel,
+				Texture = AsyncTexture2D.FromAssetId(156012),
+				HoveredTexture = AsyncTexture2D.FromAssetId(156011),
+				Size = new Point(20, 20),
+				TextureRectangle = new Rectangle(7, 7, 20, 20),
+				ClickAction = delegate
+				{
+					Hide();
+				},
+				SetLocalizedTooltip = () => strings.Close
+			};
+			_buttons.Add(_closeButton);
 		}
 
 		public void ResetToggles()
@@ -196,7 +203,7 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 			base.RecalculateLayout();
 			if (_headerPanel != null)
 			{
-				((Control)_headerPanel).set_Width(((Container)this).get_ContentRegion().Width);
+				_headerPanel.Width = base.ContentRegion.Width;
 			}
 		}
 
@@ -207,7 +214,7 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 			{
 				if (t != tab)
 				{
-					((Control)t).set_Height(5);
+					t.Height = 5;
 				}
 			}
 			return result;
@@ -225,13 +232,13 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 			base.OnResized(e);
 			if (base.BackgroundImage != null)
 			{
-				base.TextureRectangle = new Rectangle(30, 30, Math.Min(base.BackgroundImage.get_Width() - 100, ((Control)this).get_Width()), Math.Min(base.BackgroundImage.get_Height() - 100, ((Control)this).get_Height()));
+				base.TextureRectangle = new Rectangle(30, 30, Math.Min(base.BackgroundImage.Width - 100, base.Width), Math.Min(base.BackgroundImage.Height - 100, base.Height));
 			}
-			int gap = (((Control)_headerPanel).get_Width() - 7 - _buttons.Count * 20) / (_buttons.Count - 1);
+			int gap = (_headerPanel.Width - 7 - _buttons.Count * 20) / (_buttons.Count - 1);
 			for (int i = 0; i < _buttons.Count; i++)
 			{
 				Control b = _buttons[i];
-				b.set_Location(new Point(6 + i * gap + i * b.get_Width(), 3));
+				b.Location = new Point(6 + i * gap + i * b.Width, 3);
 			}
 		}
 	}

@@ -44,20 +44,19 @@ namespace Kenedia.Modules.Core.Services
 				return;
 			}
 			_resolutionTick = gameTime.get_TotalGameTime().TotalMilliseconds;
-			MouseState state = GameService.Input.get_Mouse().get_State();
+			MouseState state = GameService.Input.Mouse.State;
 			if ((int)((MouseState)(ref state)).get_LeftButton() != 1)
 			{
 				Point resolution = Resolution;
-				if (!((Point)(ref resolution)).Equals(GameService.Graphics.get_Resolution()))
+				if (!((Point)(ref resolution)).Equals(GameService.Graphics.Resolution))
 				{
 					Point prev = Resolution;
-					Resolution = GameService.Graphics.get_Resolution();
+					Resolution = GameService.Graphics.Resolution;
 					this.ResolutionChanged?.Invoke(this, new ValueChangedEventArgs<Point>(prev, Resolution));
 				}
 			}
-			IntPtr hWnd = GameService.GameIntegration.get_Gw2Instance().get_Gw2WindowHandle();
-			User32Dll.RECT newRect = default(User32Dll.RECT);
-			if (User32Dll.GetWindowRect(hWnd, ref newRect) && !WindowBounds.Matches(newRect))
+			IntPtr hWnd = GameService.GameIntegration.Gw2Instance.Gw2WindowHandle;
+			if (User32Dll.GetWindowRect(hWnd, out var newRect) && !WindowBounds.Matches(newRect))
 			{
 				WindowBounds = newRect;
 				if (User32Dll.GetClientRect(hWnd, out var rect))

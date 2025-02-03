@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -29,7 +28,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Kenedia.Modules.Characters.Views
 {
-	public class MainWindow : StandardWindow
+	public class MainWindow : Kenedia.Modules.Core.Views.StandardWindow
 	{
 		private readonly Settings _settings;
 
@@ -63,9 +62,9 @@ namespace Kenedia.Modules.Characters.Views
 
 		private NotificationPanel _notifications;
 
-		private readonly FlowPanel _dropdownPanel;
+		private readonly Kenedia.Modules.Core.Controls.FlowPanel _dropdownPanel;
 
-		private readonly FlowPanel _buttonPanel;
+		private readonly Kenedia.Modules.Core.Controls.FlowPanel _buttonPanel;
 
 		private readonly FilterBox _filterBox;
 
@@ -100,12 +99,12 @@ namespace Kenedia.Modules.Characters.Views
 		public DraggingControl DraggingControl { get; set; } = new DraggingControl();
 
 
-		public FlowPanel CharactersPanel { get; private set; }
+		public Kenedia.Modules.Core.Controls.FlowPanel CharactersPanel { get; private set; }
 
-		public FlowPanel ContentPanel { get; private set; }
+		public Kenedia.Modules.Core.Controls.FlowPanel ContentPanel { get; private set; }
 
 		public MainWindow(Texture2D background, Rectangle windowRegion, Rectangle contentRegion, Settings settings, TextureManager textureManager, ObservableCollection<Character_Model> characterModels, SearchFilterCollection searchFilters, SearchFilterCollection tagFilters, Action toggleOCR, Action togglePotrait, Action refreshAPI, Func<string> accountImagePath, TagList tags, Func<Character_Model> currentCharacter, Data data, CharacterSorting characterSorting)
-			: base(AsyncTexture2D.op_Implicit(background), windowRegion, contentRegion)
+			: base((AsyncTexture2D)background, windowRegion, contentRegion)
 		{
 			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
@@ -117,7 +116,6 @@ namespace Kenedia.Modules.Characters.Views
 			//IL_01e5: Unknown result type (might be due to invalid IL or missing references)
 			//IL_020f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02fa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0374: Unknown result type (might be due to invalid IL or missing references)
 			//IL_03c1: Unknown result type (might be due to invalid IL or missing references)
 			//IL_03cc: Unknown result type (might be due to invalid IL or missing references)
 			//IL_03dc: Unknown result type (might be due to invalid IL or missing references)
@@ -136,192 +134,202 @@ namespace Kenedia.Modules.Characters.Views
 			_toggleOCR = toggleOCR;
 			_currentCharacter = currentCharacter;
 			_data = data;
-			FlowPanel flowPanel = new FlowPanel();
-			((Control)flowPanel).set_Parent((Container)(object)this);
-			((Control)flowPanel).set_Location(new Point(0, 0));
-			((Container)flowPanel).set_WidthSizingMode((SizingMode)2);
-			((Container)flowPanel).set_HeightSizingMode((SizingMode)2);
-			((Container)flowPanel).set_AutoSizePadding(new Point(5, 5));
-			((FlowPanel)flowPanel).set_ControlPadding(new Vector2(0f, 5f));
-			ContentPanel = flowPanel;
-			((Control)DraggingControl).add_LeftMouseButtonReleased((EventHandler<MouseEventArgs>)DraggingControl_LeftMouseButtonReleased);
-			CollapseContainer collapseContainer = new CollapseContainer();
-			((Control)collapseContainer).set_Parent((Container)(object)ContentPanel);
-			((Container)collapseContainer).set_WidthSizingMode((SizingMode)2);
-			collapseContainer.SetLocalizedTitle = () => strings.Notifications;
-			collapseContainer.TitleIcon = AsyncTexture2D.FromAssetId(222246);
-			collapseContainer.TitleBarHeight = 24;
-			((Control)collapseContainer).set_Height(24);
-			collapseContainer.ContentPadding = new RectangleDimensions(5);
-			collapseContainer.MaxSize = new Point(-1, 350);
-			collapseContainer.Collapsed = true;
-			((Control)collapseContainer).set_Visible(false);
-			_collapseWrapper = collapseContainer;
-			((Control)_collapseWrapper).add_Hidden((EventHandler<EventArgs>)CollapseWrapper_Hidden);
-			NotificationPanel notificationPanel = new NotificationPanel(_rawCharacterModels);
-			((Control)notificationPanel).set_Parent((Container)(object)_collapseWrapper);
-			((Container)notificationPanel).set_WidthSizingMode((SizingMode)2);
-			notificationPanel.MaxSize = new Point(-1, 310);
-			_notifications = notificationPanel;
-			_collapseWrapper.SizeDeterminingChild = (Control)(object)_notifications;
-			FlowPanel flowPanel2 = new FlowPanel();
-			((Control)flowPanel2).set_Parent((Container)(object)ContentPanel);
-			((Control)flowPanel2).set_Location(new Point(0, 2));
-			((FlowPanel)flowPanel2).set_FlowDirection((ControlFlowDirection)2);
-			((Container)flowPanel2).set_WidthSizingMode((SizingMode)2);
-			((Container)flowPanel2).set_HeightSizingMode((SizingMode)1);
-			((FlowPanel)flowPanel2).set_ControlPadding(new Vector2(5f, 0f));
-			_dropdownPanel = flowPanel2;
-			FilterBox filterBox = new FilterBox();
-			((Control)filterBox).set_Parent((Container)(object)_dropdownPanel);
-			((TextInputBase)filterBox).set_PlaceholderText(strings.Search);
-			((Control)filterBox).set_Width(100);
-			filterBox.FilteringDelay = _settings.FilterDelay.get_Value();
-			filterBox.EnterPressedAction = FilterBox_EnterPressed;
-			filterBox.ClickAction = FilterBox_Click;
-			filterBox.PerformFiltering = delegate
+			ContentPanel = new Kenedia.Modules.Core.Controls.FlowPanel
 			{
-				PerformFiltering();
+				Parent = this,
+				Location = new Point(0, 0),
+				WidthSizingMode = SizingMode.Fill,
+				HeightSizingMode = SizingMode.Fill,
+				AutoSizePadding = new Point(5, 5),
+				ControlPadding = new Vector2(0f, 5f)
 			};
-			filterBox.FilteringOnTextChange = true;
-			_filterBox = filterBox;
-			_settings.FilterDelay.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)FilterDelay_SettingChanged);
-			ImageButton imageButton = new ImageButton();
-			((Control)imageButton).set_Parent((Container)(object)this);
-			imageButton.Texture = AsyncTexture2D.FromAssetId(2175783);
-			imageButton.HoveredTexture = AsyncTexture2D.FromAssetId(2175782);
-			imageButton.ClickedTexture = AsyncTexture2D.FromAssetId(2175784);
-			((Control)imageButton).set_Size(new Point(20, 20));
-			imageButton.SetLocalizedTooltip = () => strings.ClearFilters;
-			((Control)imageButton).set_Visible(false);
-			imageButton.ClickAction = delegate
+			DraggingControl.LeftMouseButtonReleased += DraggingControl_LeftMouseButtonReleased;
+			_collapseWrapper = new CollapseContainer
 			{
-				((TextInputBase)_filterBox).set_Text((string)null);
-				_filterCharacters = true;
-				SideMenu.ResetToggles();
+				Parent = ContentPanel,
+				WidthSizingMode = SizingMode.Fill,
+				SetLocalizedTitle = () => strings.Notifications,
+				TitleIcon = AsyncTexture2D.FromAssetId(222246),
+				TitleBarHeight = 24,
+				Height = 24,
+				ContentPadding = new RectangleDimensions(5),
+				MaxSize = new Point(-1, 350),
+				Collapsed = true,
+				Visible = false
 			};
-			_clearButton = imageButton;
-			FlowPanel flowPanel3 = new FlowPanel();
-			((Control)flowPanel3).set_Parent((Container)(object)_dropdownPanel);
-			((FlowPanel)flowPanel3).set_FlowDirection((ControlFlowDirection)2);
-			((Container)flowPanel3).set_WidthSizingMode((SizingMode)1);
-			((Container)flowPanel3).set_HeightSizingMode((SizingMode)1);
-			((Control)flowPanel3).set_Padding(new Thickness(15f));
-			_buttonPanel = flowPanel3;
-			((Control)_buttonPanel).add_Resized((EventHandler<ResizedEventArgs>)ButtonPanel_Resized);
-			ImageButton imageButton2 = new ImageButton();
-			((Control)imageButton2).set_Parent((Container)(object)_buttonPanel);
-			imageButton2.Texture = AsyncTexture2D.FromAssetId(1078535);
-			((Control)imageButton2).set_Size(new Point(25, 25));
-			imageButton2.ImageColor = Colors.ColonialWhite;
-			imageButton2.ColorHovered = Color.get_White();
-			imageButton2.SetLocalizedTooltip = () => strings.LastButton_Tooltip;
-			((Control)imageButton2).set_Visible(_settings.ShowLastButton.get_Value());
-			imageButton2.ClickAction = delegate
+			_collapseWrapper.Hidden += CollapseWrapper_Hidden;
+			_notifications = new NotificationPanel(_rawCharacterModels)
 			{
-				if (CharacterModels.Count > 1)
+				Parent = _collapseWrapper,
+				WidthSizingMode = SizingMode.Fill,
+				MaxSize = new Point(-1, 310)
+			};
+			_collapseWrapper.SizeDeterminingChild = _notifications;
+			_dropdownPanel = new Kenedia.Modules.Core.Controls.FlowPanel
+			{
+				Parent = ContentPanel,
+				Location = new Point(0, 2),
+				FlowDirection = ControlFlowDirection.SingleLeftToRight,
+				WidthSizingMode = SizingMode.Fill,
+				HeightSizingMode = SizingMode.AutoSize,
+				ControlPadding = new Vector2(5f, 0f)
+			};
+			_filterBox = new FilterBox
+			{
+				Parent = _dropdownPanel,
+				PlaceholderText = strings.Search,
+				Width = 100,
+				FilteringDelay = _settings.FilterDelay.Value,
+				EnterPressedAction = new Action<string>(FilterBox_EnterPressed),
+				ClickAction = new Action(FilterBox_Click),
+				PerformFiltering = delegate
 				{
-					CharacterModels.Aggregate((Character_Model a, Character_Model b) => (!(b.LastLogin > a.LastLogin)) ? b : a)?.Swap(ignoreOCR: true);
-				}
-				else if (CharacterModels.Count == 1)
+					PerformFiltering();
+				},
+				FilteringOnTextChange = true
+			};
+			_settings.FilterDelay.SettingChanged += FilterDelay_SettingChanged;
+			_clearButton = new ImageButton
+			{
+				Parent = this,
+				Texture = AsyncTexture2D.FromAssetId(2175783),
+				HoveredTexture = AsyncTexture2D.FromAssetId(2175782),
+				ClickedTexture = AsyncTexture2D.FromAssetId(2175784),
+				Size = new Point(20, 20),
+				SetLocalizedTooltip = () => strings.ClearFilters,
+				Visible = false,
+				ClickAction = delegate
 				{
-					CharacterModels?.FirstOrDefault()?.Swap(ignoreOCR: true);
+					_filterBox.Text = null;
+					_filterCharacters = true;
+					SideMenu.ResetToggles();
 				}
 			};
-			_lastButton = imageButton2;
-			_lastButton.Texture.add_TextureSwapped((EventHandler<ValueChangedEventArgs<Texture2D>>)Texture_TextureSwapped);
-			ImageButton imageButton3 = new ImageButton();
-			((Control)imageButton3).set_Parent((Container)(object)_buttonPanel);
-			((Control)imageButton3).set_Size(new Point(25, 25));
-			imageButton3.SetLocalizedTooltip = () => strings.RandomButton_Tooltip;
-			imageButton3.Texture = AsyncTexture2D.op_Implicit(_textureManager.GetIcon(TextureManager.Icons.Dice));
-			imageButton3.HoveredTexture = AsyncTexture2D.op_Implicit(_textureManager.GetIcon(TextureManager.Icons.Dice_Hovered));
-			((Control)imageButton3).set_Visible(_settings.ShowRandomButton.get_Value());
-			imageButton3.ClickAction = delegate
+			_buttonPanel = new Kenedia.Modules.Core.Controls.FlowPanel
 			{
-				List<Control> list = ((IEnumerable<Control>)((Container)CharactersPanel).get_Children()).Where((Control e) => e.get_Visible()).ToList();
-				int num = RandomService.Rnd.Next(list.Count);
-				if (list.Count > num)
+				Parent = _dropdownPanel,
+				FlowDirection = ControlFlowDirection.SingleLeftToRight,
+				WidthSizingMode = SizingMode.AutoSize,
+				HeightSizingMode = SizingMode.AutoSize,
+				Padding = new Thickness(15f)
+			};
+			_buttonPanel.Resized += ButtonPanel_Resized;
+			_lastButton = new ImageButton
+			{
+				Parent = _buttonPanel,
+				Texture = AsyncTexture2D.FromAssetId(1078535),
+				Size = new Point(25, 25),
+				ImageColor = ContentService.Colors.ColonialWhite,
+				ColorHovered = Color.get_White(),
+				SetLocalizedTooltip = () => strings.LastButton_Tooltip,
+				Visible = _settings.ShowLastButton.Value,
+				ClickAction = delegate
 				{
-					((CharacterCard)(object)list[num])?.Character.Swap();
+					if (CharacterModels.Count > 1)
+					{
+						CharacterModels.Aggregate((Character_Model a, Character_Model b) => (!(b.LastLogin > a.LastLogin)) ? b : a)?.Swap(ignoreOCR: true);
+					}
+					else if (CharacterModels.Count == 1)
+					{
+						CharacterModels?.FirstOrDefault()?.Swap(ignoreOCR: true);
+					}
 				}
 			};
-			_randomButton = imageButton3;
-			ImageButton imageButton4 = new ImageButton();
-			((Control)imageButton4).set_Parent((Container)(object)_buttonPanel);
-			imageButton4.Texture = AsyncTexture2D.FromAssetId(155052);
-			imageButton4.HoveredTexture = AsyncTexture2D.FromAssetId(157110);
-			((Control)imageButton4).set_Size(new Point(25, 25));
-			imageButton4.SetLocalizedTooltip = () => string.Format(strings.ShowItem, string.Format(strings.ItemSettings, strings.Display));
-			imageButton4.ClickAction = delegate
+			_lastButton.Texture.TextureSwapped += Texture_TextureSwapped;
+			_randomButton = new ImageButton
 			{
-				SettingsWindow settingsWindow = SettingsWindow;
-				if (settingsWindow != null)
+				Parent = _buttonPanel,
+				Size = new Point(25, 25),
+				SetLocalizedTooltip = () => strings.RandomButton_Tooltip,
+				Texture = (AsyncTexture2D)_textureManager.GetIcon(TextureManager.Icons.Dice),
+				HoveredTexture = (AsyncTexture2D)_textureManager.GetIcon(TextureManager.Icons.Dice_Hovered),
+				Visible = _settings.ShowRandomButton.Value,
+				ClickAction = delegate
 				{
-					((WindowBase2)settingsWindow).ToggleWindow();
+					List<Control> list = CharactersPanel.Children.Where((Control e) => e.Visible).ToList();
+					int num = RandomService.Rnd.Next(list.Count);
+					if (list.Count > num)
+					{
+						((CharacterCard)list[num])?.Character.Swap();
+					}
 				}
 			};
-			_displaySettingsButton = imageButton4;
-			ImageButton imageButton5 = new ImageButton();
-			((Control)imageButton5).set_Parent((Container)(object)_buttonPanel);
-			imageButton5.Texture = AsyncTexture2D.FromAssetId(605018);
-			((Control)imageButton5).set_Size(new Point(25, 25));
-			imageButton5.ImageColor = Colors.ColonialWhite;
-			imageButton5.ColorHovered = Color.get_White();
-			imageButton5.SetLocalizedTooltip = () => string.Format(strings.Toggle, "Side Menu");
-			imageButton5.ClickAction = delegate
+			_displaySettingsButton = new ImageButton
 			{
-				ShowAttached(((Control)SideMenu).get_Visible() ? null : SideMenu);
+				Parent = _buttonPanel,
+				Texture = AsyncTexture2D.FromAssetId(155052),
+				HoveredTexture = AsyncTexture2D.FromAssetId(157110),
+				Size = new Point(25, 25),
+				SetLocalizedTooltip = () => string.Format(strings.ShowItem, string.Format(strings.ItemSettings, strings.Display)),
+				ClickAction = delegate
+				{
+					SettingsWindow?.ToggleWindow();
+				}
 			};
-			_toggleSideMenuButton = imageButton5;
-			FlowPanel flowPanel4 = new FlowPanel();
-			((Control)flowPanel4).set_Parent((Container)(object)ContentPanel);
-			((Control)flowPanel4).set_Size(((Control)this).get_Size());
-			((FlowPanel)flowPanel4).set_ControlPadding(new Vector2(2f, 4f));
-			((Container)flowPanel4).set_WidthSizingMode((SizingMode)2);
-			((Container)flowPanel4).set_HeightSizingMode((SizingMode)2);
-			((Panel)flowPanel4).set_CanScroll(true);
-			CharactersPanel = flowPanel4;
-			CharacterEdit characterEdit = new CharacterEdit(textureManager, togglePotrait, accountImagePath, tags, settings, PerformFiltering);
-			((Control)characterEdit).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			characterEdit.Anchor = (Control)(object)this;
-			characterEdit.AnchorPosition = AnchoredContainer.AnchorPos.AutoHorizontal;
-			characterEdit.RelativePosition = new RectangleDimensions(0, 45, 0, 0);
-			((Control)characterEdit).set_Visible(false);
-			characterEdit.FadeOut = !_settings.PinSideMenus.get_Value();
-			CharacterEdit = characterEdit;
-			SideMenu sideMenu = new SideMenu(toggleOCR, togglePotrait, refreshAPI, textureManager, settings, characterSorting);
-			((Control)sideMenu).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			sideMenu.Anchor = (Control)(object)this;
-			sideMenu.AnchorPosition = AnchoredContainer.AnchorPos.AutoHorizontal;
-			sideMenu.RelativePosition = new RectangleDimensions(0, 45, 0, 0);
-			((Control)sideMenu).set_Visible(false);
-			sideMenu.FadeOut = !_settings.PinSideMenus.get_Value();
-			SideMenu = sideMenu;
+			_toggleSideMenuButton = new ImageButton
+			{
+				Parent = _buttonPanel,
+				Texture = AsyncTexture2D.FromAssetId(605018),
+				Size = new Point(25, 25),
+				ImageColor = ContentService.Colors.ColonialWhite,
+				ColorHovered = Color.get_White(),
+				SetLocalizedTooltip = () => string.Format(strings.Toggle, "Side Menu"),
+				ClickAction = delegate
+				{
+					ShowAttached(SideMenu.Visible ? null : SideMenu);
+				}
+			};
+			CharactersPanel = new Kenedia.Modules.Core.Controls.FlowPanel
+			{
+				Parent = ContentPanel,
+				Size = base.Size,
+				ControlPadding = new Vector2(2f, 4f),
+				WidthSizingMode = SizingMode.Fill,
+				HeightSizingMode = SizingMode.Fill,
+				CanScroll = true
+			};
+			CharacterEdit = new CharacterEdit(textureManager, togglePotrait, accountImagePath, tags, settings, new Action(PerformFiltering))
+			{
+				Parent = GameService.Graphics.SpriteScreen,
+				Anchor = this,
+				AnchorPosition = AnchoredContainer.AnchorPos.AutoHorizontal,
+				RelativePosition = new RectangleDimensions(0, 45, 0, 0),
+				Visible = false,
+				FadeOut = !_settings.PinSideMenus.Value
+			};
+			SideMenu = new SideMenu(toggleOCR, togglePotrait, refreshAPI, textureManager, settings, characterSorting)
+			{
+				Parent = GameService.Graphics.SpriteScreen,
+				Anchor = this,
+				AnchorPosition = AnchoredContainer.AnchorPos.AutoHorizontal,
+				RelativePosition = new RectangleDimensions(0, 45, 0, 0),
+				Visible = false,
+				FadeOut = !_settings.PinSideMenus.Value
+			};
 			AttachContainer(CharacterEdit);
 			AttachContainer(SideMenu);
 			UpdateMissingNotification();
 			CheckOCRRegion();
 			_created = true;
-			_settings.PinSideMenus.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)PinSideMenus_SettingChanged);
-			_settings.ShowRandomButton.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowRandomButton_SettingChanged);
-			_settings.ShowLastButton.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowLastButton_SettingChanged);
-			_settings.IncludeBetaCharacters.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)IncludeBetaCharacters_SettingChanged);
-			GameService.Gw2Mumble.get_CurrentMap().add_MapChanged((EventHandler<ValueEventArgs<int>>)CurrentMap_MapChanged);
+			_settings.PinSideMenus.SettingChanged += PinSideMenus_SettingChanged;
+			_settings.ShowRandomButton.SettingChanged += ShowRandomButton_SettingChanged;
+			_settings.ShowLastButton.SettingChanged += ShowLastButton_SettingChanged;
+			_settings.IncludeBetaCharacters.SettingChanged += IncludeBetaCharacters_SettingChanged;
+			GameService.Gw2Mumble.CurrentMap.MapChanged += CurrentMap_MapChanged;
 		}
 
-		private void IncludeBetaCharacters_SettingChanged(object sender, ValueChangedEventArgs<bool> e)
+		private void IncludeBetaCharacters_SettingChanged(object sender, Blish_HUD.ValueChangedEventArgs<bool> e)
 		{
 		}
 
 		private void CollapseWrapper_Hidden(object sender, EventArgs e)
 		{
-			((Control)ContentPanel).Invalidate();
+			ContentPanel.Invalidate();
 		}
 
-		private void FilterDelay_SettingChanged(object sender, ValueChangedEventArgs<int> e)
+		private void FilterDelay_SettingChanged(object sender, Blish_HUD.ValueChangedEventArgs<int> e)
 		{
-			_filterBox.FilteringDelay = e.get_NewValue();
+			_filterBox.FilteringDelay = e.NewValue;
 		}
 
 		private void CurrentMap_MapChanged(object sender, ValueEventArgs<int> e)
@@ -330,28 +338,28 @@ namespace Kenedia.Modules.Characters.Views
 			PerformFiltering();
 		}
 
-		private void Texture_TextureSwapped(object sender, ValueChangedEventArgs<Texture2D> e)
+		private void Texture_TextureSwapped(object sender, Blish_HUD.ValueChangedEventArgs<Texture2D> e)
 		{
-			_lastButton.Texture.remove_TextureSwapped((EventHandler<ValueChangedEventArgs<Texture2D>>)Texture_TextureSwapped);
-			_lastButton.Texture = AsyncTexture2D.op_Implicit(e.get_NewValue().ToGrayScaledPalettable());
+			_lastButton.Texture.TextureSwapped -= Texture_TextureSwapped;
+			_lastButton.Texture = (AsyncTexture2D)e.NewValue.ToGrayScaledPalettable();
 		}
 
-		private void ShowLastButton_SettingChanged(object sender, ValueChangedEventArgs<bool> e)
+		private void ShowLastButton_SettingChanged(object sender, Blish_HUD.ValueChangedEventArgs<bool> e)
 		{
-			((Control)_lastButton).set_Visible(e.get_NewValue());
-			((Control)_buttonPanel).Invalidate();
+			_lastButton.Visible = e.NewValue;
+			_buttonPanel.Invalidate();
 		}
 
-		private void PinSideMenus_SettingChanged(object sender, ValueChangedEventArgs<bool> e)
+		private void PinSideMenus_SettingChanged(object sender, Blish_HUD.ValueChangedEventArgs<bool> e)
 		{
-			CharacterEdit.FadeOut = !e.get_NewValue();
-			SideMenu.FadeOut = !e.get_NewValue();
+			CharacterEdit.FadeOut = !e.NewValue;
+			SideMenu.FadeOut = !e.NewValue;
 		}
 
-		private void ShowRandomButton_SettingChanged(object sender, ValueChangedEventArgs<bool> e)
+		private void ShowRandomButton_SettingChanged(object sender, Blish_HUD.ValueChangedEventArgs<bool> e)
 		{
-			((Control)_randomButton).set_Visible(e.get_NewValue());
-			((Control)_buttonPanel).Invalidate();
+			_randomButton.Visible = e.NewValue;
+			_buttonPanel.Invalidate();
 		}
 
 		private void ButtonPanel_Resized(object sender, ResizedEventArgs e)
@@ -361,12 +369,12 @@ namespace Kenedia.Modules.Characters.Views
 			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-			((Control)_filterBox).set_Width(((Control)_dropdownPanel).get_Width() - ((Control)_buttonPanel).get_Width() - 2);
+			_filterBox.Width = _dropdownPanel.Width - _buttonPanel.Width - 2;
 			ImageButton clearButton = _clearButton;
-			Rectangle localBounds = ((Control)_filterBox).get_LocalBounds();
+			Rectangle localBounds = _filterBox.LocalBounds;
 			int num = ((Rectangle)(ref localBounds)).get_Right() - 25;
-			localBounds = ((Control)_filterBox).get_LocalBounds();
-			((Control)clearButton).set_Location(new Point(num, ((Rectangle)(ref localBounds)).get_Top() + 8));
+			localBounds = _filterBox.LocalBounds;
+			clearButton.Location = new Point(num, ((Rectangle)(ref localBounds)).get_Top() + 8);
 		}
 
 		public void FilterCharacters(object sender = null, EventArgs e = null)
@@ -376,39 +384,39 @@ namespace Kenedia.Modules.Characters.Views
 
 		public void PerformFiltering()
 		{
-			Regex regex = (_settings.FilterAsOne.get_Value() ? new Regex("^(?!\\s*$).+") : new Regex("\\w+|\"[\\w\\s]*\""));
-			List<Match> strings = regex.Matches(((TextInputBase)_filterBox).get_Text().Trim().ToLower()).Cast<Match>().ToList();
+			Regex regex = (_settings.FilterAsOne.Value ? new Regex("^(?!\\s*$).+") : new Regex("\\w+|\"[\\w\\s]*\""));
+			List<Match> strings = regex.Matches(_filterBox.Text.Trim().ToLower()).Cast<Match>().ToList();
 			new List<string>();
 			List<KeyValuePair<string, SearchFilter<Character_Model>>> stringFilters = new List<KeyValuePair<string, SearchFilter<Character_Model>>>();
 			_003C_003Ec__DisplayClass68_0 CS_0024_003C_003E8__locals0;
 			foreach (Match match in strings)
 			{
 				string string_text = SearchableString(match.ToString().Replace("\"", ""));
-				if (_settings.DisplayToggles.get_Value()["Name"].Check)
+				if (_settings.DisplayToggles.Value["Name"].Check)
 				{
 					stringFilters.Add(new KeyValuePair<string, SearchFilter<Character_Model>>("Name", new SearchFilter<Character_Model>((Character_Model c) => SearchableString(c.Name).Contains(string_text), enabled: true)));
 				}
-				if (_settings.DisplayToggles.get_Value()["Profession"].Check)
+				if (_settings.DisplayToggles.Value["Profession"].Check)
 				{
 					stringFilters.Add(new KeyValuePair<string, SearchFilter<Character_Model>>("Specialization", new SearchFilter<Character_Model>((Character_Model c) => SearchableString(c.SpecializationName).Contains(string_text), enabled: true)));
 				}
-				if (_settings.DisplayToggles.get_Value()["Profession"].Check)
+				if (_settings.DisplayToggles.Value["Profession"].Check)
 				{
 					stringFilters.Add(new KeyValuePair<string, SearchFilter<Character_Model>>("Profession", new SearchFilter<Character_Model>((Character_Model c) => SearchableString(c.ProfessionName).Contains(string_text), enabled: true)));
 				}
-				if (_settings.DisplayToggles.get_Value()["Level"].Check)
+				if (_settings.DisplayToggles.Value["Level"].Check)
 				{
 					stringFilters.Add(new KeyValuePair<string, SearchFilter<Character_Model>>("Level", new SearchFilter<Character_Model>((Character_Model c) => SearchableString(c.Level.ToString()).Contains(string_text), enabled: true)));
 				}
-				if (_settings.DisplayToggles.get_Value()["Race"].Check)
+				if (_settings.DisplayToggles.Value["Race"].Check)
 				{
 					stringFilters.Add(new KeyValuePair<string, SearchFilter<Character_Model>>("Race", new SearchFilter<Character_Model>((Character_Model c) => SearchableString(c.RaceName).Contains(string_text), enabled: true)));
 				}
-				if (_settings.DisplayToggles.get_Value()["Map"].Check)
+				if (_settings.DisplayToggles.Value["Map"].Check)
 				{
 					stringFilters.Add(new KeyValuePair<string, SearchFilter<Character_Model>>("Map", new SearchFilter<Character_Model>((Character_Model c) => SearchableString(c.MapName).Contains(string_text), enabled: true)));
 				}
-				if (_settings.DisplayToggles.get_Value()["Gender"].Check)
+				if (_settings.DisplayToggles.Value["Gender"].Check)
 				{
 					stringFilters.Add(new KeyValuePair<string, SearchFilter<Character_Model>>("Gender", new SearchFilter<Character_Model>(delegate(Character_Model c)
 					{
@@ -419,13 +427,13 @@ namespace Kenedia.Modules.Characters.Views
 						return SearchableString(((object)(Gender)(ref gender)).ToString()).Contains(string_text);
 					}, enabled: true)));
 				}
-				if (_settings.DisplayToggles.get_Value()["CraftingProfession"].Check)
+				if (_settings.DisplayToggles.Value["CraftingProfession"].Check)
 				{
 					stringFilters.Add(new KeyValuePair<string, SearchFilter<Character_Model>>("CraftingProfession", new SearchFilter<Character_Model>(delegate(Character_Model c)
 					{
-						foreach (KeyValuePair<int, Data.CraftingProfession> current2 in c.CraftingDisciplines)
+						foreach (KeyValuePair<int, Data.CraftingProfession> current3 in c.CraftingDisciplines)
 						{
-							if ((!_settings.DisplayToggles.get_Value()["OnlyMaxCrafting"].Check || current2.Key == current2.Value.MaxRating) && SearchableString(current2.Value.Name).Contains(string_text))
+							if ((!_settings.DisplayToggles.Value["OnlyMaxCrafting"].Check || current3.Key == current3.Value.MaxRating) && SearchableString(current3.Value.Name).Contains(string_text))
 							{
 								return true;
 							}
@@ -433,15 +441,15 @@ namespace Kenedia.Modules.Characters.Views
 						return false;
 					}, enabled: true)));
 				}
-				if (!_settings.DisplayToggles.get_Value()["Tags"].Check)
+				if (!_settings.DisplayToggles.Value["Tags"].Check)
 				{
 					continue;
 				}
 				stringFilters.Add(new KeyValuePair<string, SearchFilter<Character_Model>>("Tags", new SearchFilter<Character_Model>(delegate(Character_Model c)
 				{
-					foreach (string current in c.Tags)
+					foreach (string current2 in c.Tags)
 					{
-						if (SearchableString(current).Contains(string_text))
+						if (SearchableString(current2).Contains(string_text))
 						{
 							return true;
 						}
@@ -449,33 +457,42 @@ namespace Kenedia.Modules.Characters.Views
 					return false;
 				}, enabled: true)));
 			}
-			bool matchAny = _settings.ResultMatchingBehavior.get_Value() == Settings.MatchingBehavior.MatchAny;
-			bool matchAll = _settings.ResultMatchingBehavior.get_Value() == Settings.MatchingBehavior.MatchAll;
-			bool include = _settings.ResultFilterBehavior.get_Value() == Settings.FilterBehavior.Include;
+			bool matchAny = _settings.ResultMatchingBehavior.Value == Settings.MatchingBehavior.MatchAny;
+			bool matchAll = _settings.ResultMatchingBehavior.Value == Settings.MatchingBehavior.MatchAll;
+			bool include = _settings.ResultFilterBehavior.Value == Settings.FilterBehavior.Include;
 			List<KeyValuePair<string, SearchFilter<Character_Model>>> toggleFilters = _searchFilters.Where((KeyValuePair<string, SearchFilter<Character_Model>> e) => e.Value.IsEnabled).ToList();
 			List<KeyValuePair<string, SearchFilter<Character_Model>>> tagFilters = _tagFilters.Where((KeyValuePair<string, SearchFilter<Character_Model>> e) => e.Value.IsEnabled).ToList();
-			foreach (var (ctrl2, toggleResult, stringsResult, tagsResult, betaResult) in from CharacterCard ctrl in (IEnumerable)((Container)CharactersPanel).get_Children()
+			foreach (var item in from CharacterCard ctrl in CharactersPanel.Children
 				let c = ctrl.Character
 				where c != null
 				let toggleResult = toggleFilters.Count == 0 || include == FilterResult(c)
 				let stringsResult = stringFilters.Count == 0 || include == StringFilterResult(c)
 				let tagsResult = tagFilters.Count == 0 || include == TagResult(c)
+				let showResult = (from e in toggleFilters
+					where e.Value.IsEnabled
+					select e.Key).Contains("Hidden") || c.Show
 				let betaResult = (_data.StaticInfo.IsBeta && c.Beta) || (from e in toggleFilters
 					where e.Value.IsEnabled
 					select e.Key).Contains("Hidden") || !c.Beta
-				select (ctrl, toggleResult, stringsResult, tagsResult, betaResult))
+				select (ctrl, toggleResult, stringsResult, tagsResult, showResult, betaResult))
 			{
-				((Control)ctrl2).set_Visible(toggleResult && stringsResult && tagsResult && betaResult);
+				CharacterCard ctrl2 = item.Item1;
+				bool toggleResult = item.Item2;
+				bool stringsResult = item.Item3;
+				bool tagsResult = item.Item4;
+				bool showResult = item.Item5;
+				bool betaResult = item.Item6;
+				ctrl2.Visible = toggleResult && stringsResult && tagsResult && showResult && betaResult;
 			}
 			SortCharacters();
-			((Control)CharactersPanel).Invalidate();
-			((Control)_clearButton).set_Visible(stringFilters.Count > 0 || toggleFilters.Count > 0 || tagFilters.Count > 0);
+			CharactersPanel.Invalidate();
+			_clearButton.Visible = stringFilters.Count > 0 || toggleFilters.Count > 0 || tagFilters.Count > 0;
 			bool FilterResult(Character_Model c)
 			{
 				List<bool> results3 = new List<bool>();
-				foreach (KeyValuePair<string, SearchFilter<Character_Model>> item in toggleFilters)
+				foreach (KeyValuePair<string, SearchFilter<Character_Model>> item2 in toggleFilters)
 				{
-					bool result2 = item.Value.CheckForMatch(c);
+					bool result2 = item2.Value.CheckForMatch(c);
 					results3.Add(result2);
 					if (result2 && matchAny)
 					{
@@ -490,14 +507,14 @@ namespace Kenedia.Modules.Characters.Views
 			}
 			string SearchableString(string s)
 			{
-				return (_settings.FilterDiacriticsInsensitive.get_Value() ? s.RemoveDiacritics() : s).ToLower();
+				return (_settings.FilterDiacriticsInsensitive.Value ? s.RemoveDiacritics() : s).ToLower();
 			}
 			bool StringFilterResult(Character_Model c)
 			{
 				List<bool> results2 = new List<bool>();
-				foreach (KeyValuePair<string, SearchFilter<Character_Model>> item2 in stringFilters)
+				foreach (KeyValuePair<string, SearchFilter<Character_Model>> item3 in stringFilters)
 				{
-					bool matched = item2.Value.CheckForMatch(c);
+					bool matched = item3.Value.CheckForMatch(c);
 					if (matched && matchAny)
 					{
 						return true;
@@ -516,9 +533,9 @@ namespace Kenedia.Modules.Characters.Views
 			bool TagResult(Character_Model c)
 			{
 				List<bool> results = new List<bool>();
-				foreach (KeyValuePair<string, SearchFilter<Character_Model>> item3 in tagFilters)
+				foreach (KeyValuePair<string, SearchFilter<Character_Model>> item4 in tagFilters)
 				{
-					bool result = item3.Value.CheckForMatch(c);
+					bool result = item4.Value.CheckForMatch(c);
 					results.Add(result);
 					if (result && matchAny)
 					{
@@ -539,17 +556,15 @@ namespace Kenedia.Modules.Characters.Views
 			{
 				return;
 			}
-			foreach (Character_Model c in CharacterModels.Except(LoadedModels))
+			foreach (Character_Model c in CharacterModels.Except<Character_Model>(LoadedModels))
 			{
 				LoadedModels.Add(c);
-				List<CharacterCard> characterCards = CharacterCards;
-				CharacterCard obj = new CharacterCard(_currentCharacter, _textureManager, _data, this, _settings)
+				CharacterCards.Add(new CharacterCard(_currentCharacter, _textureManager, _data, this, _settings)
 				{
-					Character = c
-				};
-				((Control)obj).set_Parent((Container)(object)CharactersPanel);
-				obj.AttachedCards = CharacterCards;
-				characterCards.Add(obj);
+					Character = c,
+					Parent = CharactersPanel,
+					AttachedCards = CharacterCards
+				});
 			}
 			FilterCharacters();
 			CharacterCards.FirstOrDefault()?.UniformWithAttached();
@@ -557,12 +572,12 @@ namespace Kenedia.Modules.Characters.Views
 
 		public void SortCharacters()
 		{
-			Settings.SortBy sortby = _settings.SortType.get_Value();
-			bool asc = _settings.SortOrder.get_Value() == Settings.SortDirection.Ascending;
+			Settings.SortBy sortby = _settings.SortType.Value;
+			bool asc = _settings.SortOrder.Value == Settings.SortDirection.Ascending;
 			bool isNum = ((sortby == Settings.SortBy.Level || (uint)(sortby - 4) <= 1u || (uint)(sortby - 10) <= 1u) ? true : false);
-			if (_settings.SortType.get_Value() != Settings.SortBy.Custom)
+			if (_settings.SortType.Value != Settings.SortBy.Custom)
 			{
-				((FlowPanel)CharactersPanel).SortChildren<CharacterCard>((Comparison<CharacterCard>)delegate(CharacterCard a, CharacterCard b)
+				CharactersPanel.SortChildren(delegate(CharacterCard a, CharacterCard b)
 				{
 					if (isNum)
 					{
@@ -581,16 +596,16 @@ namespace Kenedia.Modules.Characters.Views
 			}
 			else
 			{
-				((FlowPanel)CharactersPanel).SortChildren<CharacterCard>((Comparison<CharacterCard>)((CharacterCard a, CharacterCard b) => a.Index.CompareTo(b.Index)));
+				CharactersPanel.SortChildren((CharacterCard a, CharacterCard b) => a.Index.CompareTo(b.Index));
 			}
 			string getString(Character_Model c)
 			{
-				string sortType = ((_settings.SortType.get_Value() == Settings.SortBy.NextBirthday) ? "SecondsUntilNextBirthday" : _settings.SortType.get_Value().ToString());
+				string sortType = ((_settings.SortType.Value == Settings.SortBy.NextBirthday) ? "SecondsUntilNextBirthday" : _settings.SortType.Value.ToString());
 				return Common.GetPropertyValueAsString(c, sortType);
 			}
 			int getValue(Character_Model c)
 			{
-				string sortType2 = ((_settings.SortType.get_Value() == Settings.SortBy.NextBirthday) ? "SecondsUntilNextBirthday" : _settings.SortType.get_Value().ToString());
+				string sortType2 = ((_settings.SortType.Value == Settings.SortBy.NextBirthday) ? "SecondsUntilNextBirthday" : _settings.SortType.Value.ToString());
 				return Common.GetPropertyValue<int>(c, sortType2);
 			}
 		}
@@ -598,8 +613,8 @@ namespace Kenedia.Modules.Characters.Views
 		public override void UpdateContainer(GameTime gameTime)
 		{
 			base.UpdateContainer(gameTime);
-			((Control)this).set_BasicTooltipText((((WindowBase2)this).get_MouseOverTitleBar() && base.Version != null) ? $"v. {base.Version}" : null);
-			if (_filterCharacters && gameTime.get_TotalGameTime().TotalMilliseconds - _filterTick > (double)_settings.FilterDelay.get_Value())
+			base.BasicTooltipText = ((base.MouseOverTitleBar && base.Version != null) ? $"v. {base.Version}" : null);
+			if (_filterCharacters && gameTime.get_TotalGameTime().TotalMilliseconds - _filterTick > (double)_settings.FilterDelay.Value)
 			{
 				_filterTick = gameTime.get_TotalGameTime().TotalMilliseconds;
 				_filterCharacters = false;
@@ -627,15 +642,15 @@ namespace Kenedia.Modules.Characters.Views
 		{
 			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			((Control)this).OnShown(e);
-			if (_settings.FocusSearchOnShow.get_Value())
+			base.OnShown(e);
+			if (_settings.FocusSearchOnShow.Value)
 			{
-				foreach (Keys item in GameService.Input.get_Keyboard().get_KeysDown())
+				foreach (Keys item in GameService.Input.Keyboard.KeysDown)
 				{
-					Keyboard.Release((VirtualKeyShort)(short)item, false);
-					Keyboard.Release((VirtualKeyShort)(short)item, true);
+					Keyboard.Release((VirtualKeyShort)item);
+					Keyboard.Release((VirtualKeyShort)item, sendToSystem: true);
 				}
-				((TextInputBase)_filterBox).set_Focused(true);
+				_filterBox.Focused = true;
 			}
 			CharacterCards.FirstOrDefault()?.UniformWithAttached();
 		}
@@ -668,102 +683,66 @@ namespace Kenedia.Modules.Characters.Views
 			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
-			((WindowBase2)this).OnResized(e);
+			base.OnResized(e);
 			if (_created)
 			{
 				Rectangle val;
 				if (ContentPanel != null)
 				{
-					FlowPanel contentPanel = ContentPanel;
-					val = ((Container)this).get_ContentRegion();
+					Kenedia.Modules.Core.Controls.FlowPanel contentPanel = ContentPanel;
+					val = base.ContentRegion;
 					int x = ((Rectangle)(ref val)).get_Size().X;
-					val = ((Container)this).get_ContentRegion();
-					((Control)contentPanel).set_Size(new Point(x, ((Rectangle)(ref val)).get_Size().Y - 35));
+					val = base.ContentRegion;
+					contentPanel.Size = new Point(x, ((Rectangle)(ref val)).get_Size().Y - 35);
 				}
 				if (_dropdownPanel != null)
 				{
-					((Control)_filterBox).set_Width(((Control)_dropdownPanel).get_Width() - ((Control)_buttonPanel).get_Width() - 2);
+					_filterBox.Width = _dropdownPanel.Width - _buttonPanel.Width - 2;
 					ImageButton clearButton = _clearButton;
-					val = ((Control)_filterBox).get_LocalBounds();
+					val = _filterBox.LocalBounds;
 					int num = ((Rectangle)(ref val)).get_Right() - 23;
-					val = ((Control)_filterBox).get_LocalBounds();
-					((Control)clearButton).set_Location(new Point(num, ((Rectangle)(ref val)).get_Top() + 8));
+					val = _filterBox.LocalBounds;
+					clearButton.Location = new Point(num, ((Rectangle)(ref val)).get_Top() + 8);
 				}
-				if (e.get_CurrentSize().Y < 135)
+				if (e.CurrentSize.Y < 135)
 				{
-					((Control)this).set_Size(new Point(((Control)this).get_Size().X, 135));
+					base.Size = new Point(base.Size.X, 135);
 				}
-				_settings.WindowSize.set_Value(((Control)this).get_Size());
+				_settings.WindowSize.Value = base.Size;
 			}
 		}
 
 		protected override void DisposeControl()
 		{
 			base.DisposeControl();
-			_settings.PinSideMenus.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)PinSideMenus_SettingChanged);
-			_settings.ShowRandomButton.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowRandomButton_SettingChanged);
-			_settings.ShowLastButton.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowLastButton_SettingChanged);
-			_settings.FilterDelay.remove_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)FilterDelay_SettingChanged);
-			GameService.Gw2Mumble.get_CurrentMap().remove_MapChanged((EventHandler<ValueEventArgs<int>>)CurrentMap_MapChanged);
-			((Control)DraggingControl).remove_LeftMouseButtonReleased((EventHandler<MouseEventArgs>)DraggingControl_LeftMouseButtonReleased);
-			((Control)_buttonPanel).remove_Resized((EventHandler<ResizedEventArgs>)ButtonPanel_Resized);
-			((Control)_collapseWrapper).remove_Hidden((EventHandler<EventArgs>)CollapseWrapper_Hidden);
-			CollapseContainer collapseWrapper = _collapseWrapper;
-			if (collapseWrapper != null)
-			{
-				((Control)collapseWrapper).Dispose();
-			}
-			FlowPanel contentPanel = ContentPanel;
-			if (contentPanel != null)
-			{
-				((Control)contentPanel).Dispose();
-			}
-			FlowPanel charactersPanel = CharactersPanel;
-			if (charactersPanel != null)
-			{
-				((Control)charactersPanel).Dispose();
-			}
-			DraggingControl draggingControl = DraggingControl;
-			if (draggingControl != null)
-			{
-				((Control)draggingControl).Dispose();
-			}
-			CharacterEdit characterEdit = CharacterEdit;
-			if (characterEdit != null)
-			{
-				((Control)characterEdit).Dispose();
-			}
-			FlowPanel dropdownPanel = _dropdownPanel;
-			if (dropdownPanel != null)
-			{
-				((Control)dropdownPanel).Dispose();
-			}
-			ImageButton displaySettingsButton = _displaySettingsButton;
-			if (displaySettingsButton != null)
-			{
-				((Control)displaySettingsButton).Dispose();
-			}
-			FilterBox filterBox = _filterBox;
-			if (filterBox != null)
-			{
-				((Control)filterBox).Dispose();
-			}
-			SideMenu sideMenu = SideMenu;
-			if (sideMenu != null)
-			{
-				((Control)sideMenu).Dispose();
-			}
+			_settings.PinSideMenus.SettingChanged -= PinSideMenus_SettingChanged;
+			_settings.ShowRandomButton.SettingChanged -= ShowRandomButton_SettingChanged;
+			_settings.ShowLastButton.SettingChanged -= ShowLastButton_SettingChanged;
+			_settings.FilterDelay.SettingChanged -= FilterDelay_SettingChanged;
+			GameService.Gw2Mumble.CurrentMap.MapChanged -= CurrentMap_MapChanged;
+			DraggingControl.LeftMouseButtonReleased -= DraggingControl_LeftMouseButtonReleased;
+			_buttonPanel.Resized -= ButtonPanel_Resized;
+			_collapseWrapper.Hidden -= CollapseWrapper_Hidden;
+			_collapseWrapper?.Dispose();
+			ContentPanel?.Dispose();
+			CharactersPanel?.Dispose();
+			DraggingControl?.Dispose();
+			CharacterEdit?.Dispose();
+			_dropdownPanel?.Dispose();
+			_displaySettingsButton?.Dispose();
+			_filterBox?.Dispose();
+			SideMenu?.Dispose();
 		}
 
 		private async void FilterBox_EnterPressed(string t)
 		{
-			if (!_settings.EnterToLogin.get_Value())
+			if (!_settings.EnterToLogin.Value)
 			{
 				return;
 			}
 			_filterBox.ForceFilter();
-			CharacterCard c = (CharacterCard)(object)((IEnumerable<Control>)((Container)CharactersPanel).get_Children()).Where((Control e) => e.get_Visible()).FirstOrDefault();
-			((Control)_filterBox).UnsetFocus();
+			CharacterCard c = (CharacterCard)CharactersPanel.Children.Where((Control e) => e.Visible).FirstOrDefault();
+			_filterBox.UnsetFocus();
 			await Task.Delay(5);
 			if (await ExtendedInputService.WaitForNoKeyPressed())
 			{
@@ -777,7 +756,7 @@ namespace Kenedia.Modules.Characters.Views
 
 		private void FilterBox_Click()
 		{
-			if (_settings.OpenSidemenuOnSearch.get_Value())
+			if (_settings.OpenSidemenuOnSearch.Value)
 			{
 				ShowAttached(SideMenu);
 			}
@@ -794,14 +773,14 @@ namespace Kenedia.Modules.Characters.Views
 			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-			MouseHandler i = Control.get_Input().get_Mouse();
-			IEnumerable<CharacterCard> enumerable = ((IEnumerable)((Container)CharactersPanel).get_Children()).Cast<CharacterCard>();
+			MouseHandler i = Control.Input.Mouse;
+			IEnumerable<CharacterCard> enumerable = CharactersPanel.Children.Cast<CharacterCard>();
 			int newIndex = -1;
 			int index = 0;
 			foreach (CharacterCard c in enumerable)
 			{
-				Rectangle absoluteBounds = ((Control)c).get_AbsoluteBounds();
-				if (((Rectangle)(ref absoluteBounds)).Contains(i.get_Position()) && newIndex == -1)
+				Rectangle absoluteBounds = c.AbsoluteBounds;
+				if (((Rectangle)(ref absoluteBounds)).Contains(i.Position) && newIndex == -1)
 				{
 					characterControl.Index = c.Index;
 					characterControl.Character.Index = c.Index;
@@ -825,17 +804,18 @@ namespace Kenedia.Modules.Characters.Views
 		{
 			if (_tesseractFailedNotification == null)
 			{
-				TesseractFailedNotification tesseractFailedNotification = new TesseractFailedNotification();
-				((Control)tesseractFailedNotification).set_Parent((Container)(object)_notifications);
-				((Control)tesseractFailedNotification).set_Height(25);
-				tesseractFailedNotification.PathToEngine = pathToEngine;
-				tesseractFailedNotification.ClickAction = _toggleOCR;
-				_tesseractFailedNotification = tesseractFailedNotification;
+				_tesseractFailedNotification = new TesseractFailedNotification
+				{
+					Parent = _notifications,
+					Height = 25,
+					PathToEngine = pathToEngine,
+					ClickAction = _toggleOCR
+				};
 			}
-			if (_settings.ShowNotifications.get_Value() && ((Container)_notifications).get_Children().get_Count() > 0 && ((IEnumerable<Control>)((Container)_notifications).get_Children()).Any((Control e) => e.get_Visible()))
+			if (_settings.ShowNotifications.Value && _notifications.Children.Count > 0 && _notifications.Children.Any((Control e) => e.Visible))
 			{
-				((Control)_collapseWrapper).Show();
-				((Control)ContentPanel).Invalidate();
+				_collapseWrapper.Show();
+				ContentPanel.Invalidate();
 			}
 		}
 
@@ -843,15 +823,16 @@ namespace Kenedia.Modules.Characters.Views
 		{
 			if (_apiTimeoutNotification == null)
 			{
-				APITimeoutNotification aPITimeoutNotification = new APITimeoutNotification();
-				((Control)aPITimeoutNotification).set_Parent((Container)(object)_notifications);
-				((Control)aPITimeoutNotification).set_Height(25);
-				_apiTimeoutNotification = aPITimeoutNotification;
+				_apiTimeoutNotification = new APITimeoutNotification
+				{
+					Parent = _notifications,
+					Height = 25
+				};
 			}
-			if (_settings.ShowNotifications.get_Value() && ((Container)_notifications).get_Children().get_Count() > 0 && ((IEnumerable<Control>)((Container)_notifications).get_Children()).Any((Control e) => e.get_Visible()))
+			if (_settings.ShowNotifications.Value && _notifications.Children.Count > 0 && _notifications.Children.Any((Control e) => e.Visible))
 			{
-				((Control)_collapseWrapper).Show();
-				((Control)ContentPanel).Invalidate();
+				_collapseWrapper.Show();
+				ContentPanel.Invalidate();
 			}
 		}
 
@@ -859,15 +840,16 @@ namespace Kenedia.Modules.Characters.Views
 		{
 			if (_apiPermissionNotification == null)
 			{
-				APIPermissionNotification aPIPermissionNotification = new APIPermissionNotification();
-				((Control)aPIPermissionNotification).set_Parent((Container)(object)_notifications);
-				((Control)aPIPermissionNotification).set_Height(25);
-				_apiPermissionNotification = aPIPermissionNotification;
+				_apiPermissionNotification = new APIPermissionNotification
+				{
+					Parent = _notifications,
+					Height = 25
+				};
 			}
-			if (_settings.ShowNotifications.get_Value() && ((Container)_notifications).get_Children().get_Count() > 0 && ((IEnumerable<Control>)((Container)_notifications).get_Children()).Any((Control e) => e.get_Visible()))
+			if (_settings.ShowNotifications.Value && _notifications.Children.Count > 0 && _notifications.Children.Any((Control e) => e.Visible))
 			{
-				((Control)_collapseWrapper).Show();
-				((Control)ContentPanel).Invalidate();
+				_collapseWrapper.Show();
+				ContentPanel.Invalidate();
 			}
 		}
 
@@ -878,62 +860,54 @@ namespace Kenedia.Modules.Characters.Views
 			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
 			Rectangle defaultRect = default(Rectangle);
-			((Rectangle)(ref defaultRect))._002Ector(50, (GameService.Graphics.get_Resolution().Y - 350) / 2, 530, 50);
-			if (_settings.UseOCR.get_Value())
+			((Rectangle)(ref defaultRect))._002Ector(50, (GameService.Graphics.Resolution.Y - 350) / 2, 530, 50);
+			if (_settings.UseOCR.Value)
 			{
 				Rectangle activeOCRRegion = _settings.ActiveOCRRegion;
 				if (((Rectangle)(ref activeOCRRegion)).Equals(defaultRect))
 				{
-					OCRSetupNotification obj = new OCRSetupNotification
+					new OCRSetupNotification
 					{
-						Resolution = _settings.OCRKey
-					};
-					((Control)obj).set_Parent((Container)(object)_notifications);
-					((Control)obj).set_Height(25);
-					obj.ClickAction = delegate
-					{
-						_toggleOCR?.Invoke();
-						SettingsWindow settingsWindow = SettingsWindow;
-						if (settingsWindow != null)
+						Resolution = _settings.OCRKey,
+						Parent = _notifications,
+						Height = 25,
+						ClickAction = delegate
 						{
-							((Control)settingsWindow).Show();
+							_toggleOCR?.Invoke();
+							SettingsWindow?.Show();
 						}
 					};
 				}
 			}
-			if (_settings.ShowNotifications.get_Value() && ((Container)_notifications).get_Children().get_Count() > 0 && ((IEnumerable<Control>)((Container)_notifications).get_Children()).Any((Control e) => e.get_Visible()))
+			if (_settings.ShowNotifications.Value && _notifications.Children.Count > 0 && _notifications.Children.Any((Control e) => e.Visible))
 			{
-				((Control)_collapseWrapper).Show();
-				((Control)ContentPanel).Invalidate();
+				_collapseWrapper.Show();
+				ContentPanel.Invalidate();
 			}
 			if (_collapseWrapper.Collapsed)
 			{
-				((Control)_collapseWrapper).set_Height(_collapseWrapper.TitleBarHeight);
+				_collapseWrapper.Height = _collapseWrapper.TitleBarHeight;
 			}
 		}
 
 		public void UpdateMissingNotification()
 		{
 			_notifications.UpdateCharacters();
-			if (_settings.ShowNotifications.get_Value() && ((Container)_notifications).get_Children().get_Count() > 0 && ((IEnumerable<Control>)((Container)_notifications).get_Children()).Any((Control e) => e.get_Visible()))
+			if (_settings.ShowNotifications.Value && _notifications.Children.Count > 0 && _notifications.Children.Any((Control e) => e.Visible))
 			{
-				((Control)_collapseWrapper).Show();
-				((Control)ContentPanel).Invalidate();
+				_collapseWrapper.Show();
+				ContentPanel.Invalidate();
 			}
 			if (_collapseWrapper.Collapsed)
 			{
-				((Control)_collapseWrapper).set_Height(_collapseWrapper.TitleBarHeight);
+				_collapseWrapper.Height = _collapseWrapper.TitleBarHeight;
 			}
 		}
 
 		public void AdjustForBeta()
 		{
 			LoadedModels?.Clear();
-			FlowPanel charactersPanel = CharactersPanel;
-			if (charactersPanel != null)
-			{
-				((Container)charactersPanel).ClearChildren();
-			}
+			CharactersPanel?.ClearChildren();
 			CharacterCards?.Clear();
 			CreateCharacterControls();
 		}

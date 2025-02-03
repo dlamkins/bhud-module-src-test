@@ -12,40 +12,20 @@ namespace Kenedia.Modules.Core.Extensions
 	{
 		public static Texture2D CreateTexture2D(this MemoryStream s)
 		{
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-			GraphicsDeviceContext device = GameService.Graphics.LendGraphicsDeviceContext();
-			try
-			{
-				return Texture2D.FromStream(((GraphicsDeviceContext)(ref device)).get_GraphicsDevice(), (Stream)s);
-			}
-			finally
-			{
-				((GraphicsDeviceContext)(ref device)).Dispose();
-			}
+			using GraphicsDeviceContext device = GameService.Graphics.LendGraphicsDeviceContext();
+			return Texture2D.FromStream(device.GraphicsDevice, (Stream)s);
 		}
 
 		public static Texture2D CreateTexture2D(this Bitmap bitmap)
 		{
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
 			MemoryStream s = new MemoryStream();
 			bitmap.Save(s, ImageFormat.Png);
-			GraphicsDeviceContext device = GameService.Graphics.LendGraphicsDeviceContext();
-			try
-			{
-				return Texture2D.FromStream(((GraphicsDeviceContext)(ref device)).get_GraphicsDevice(), (Stream)s);
-			}
-			finally
-			{
-				((GraphicsDeviceContext)(ref device)).Dispose();
-			}
+			using GraphicsDeviceContext device = GameService.Graphics.LendGraphicsDeviceContext();
+			return Texture2D.FromStream(device.GraphicsDevice, (Stream)s);
 		}
 
 		public static Texture2D ToGrayScaledPalettable(this Texture2D original)
 		{
-			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005e: Expected O, but got Unknown
 			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
@@ -59,15 +39,10 @@ namespace Kenedia.Modules.Core.Extensions
 			Color[] colors = (Color[])(object)new Color[original.get_Width() * original.get_Height()];
 			original.GetData<Color>(colors);
 			Color[] destColors = (Color[])(object)new Color[original.get_Width() * original.get_Height()];
-			GraphicsDeviceContext device = GameService.Graphics.LendGraphicsDeviceContext();
 			Texture2D newTexture;
-			try
+			using (GraphicsDeviceContext device = GameService.Graphics.LendGraphicsDeviceContext())
 			{
-				newTexture = new Texture2D(((GraphicsDeviceContext)(ref device)).get_GraphicsDevice(), original.get_Width(), original.get_Height());
-			}
-			finally
-			{
-				((GraphicsDeviceContext)(ref device)).Dispose();
+				newTexture = new Texture2D(device.GraphicsDevice, original.get_Width(), original.get_Height());
 			}
 			for (int i = 0; i < original.get_Width(); i++)
 			{

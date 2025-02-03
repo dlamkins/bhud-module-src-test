@@ -51,15 +51,15 @@ namespace Kenedia.Modules.Core.Controls
 			}
 		}
 
-		public string BasicTooltipText
+		public new string BasicTooltipText
 		{
 			get
 			{
-				return ((Control)_inputField).get_BasicTooltipText();
+				return _inputField.BasicTooltipText;
 			}
 			set
 			{
-				((Control)_inputField).set_BasicTooltipText(value);
+				_inputField.BasicTooltipText = value;
 			}
 		}
 
@@ -72,7 +72,7 @@ namespace Kenedia.Modules.Core.Controls
 			set
 			{
 				_value = value;
-				((TextInputBase)_inputField).set_Text($"{value}");
+				_inputField.Text = $"{value}";
 			}
 		}
 
@@ -84,7 +84,7 @@ namespace Kenedia.Modules.Core.Controls
 			}
 			set
 			{
-				Common.SetProperty(ref _showButtons, value, ((Control)this).RecalculateLayout);
+				Common.SetProperty(ref _showButtons, value, new Action(RecalculateLayout));
 			}
 		}
 
@@ -101,13 +101,13 @@ namespace Kenedia.Modules.Core.Controls
 
 		public NumberBox()
 		{
-			((Control)_inputField).set_Parent((Container)(object)this);
-			((TextInputBase)_inputField).add_TextChanged((EventHandler<EventArgs>)InputField_TextChanged);
-			((TextInputBase)_inputField).add_InputFocusChanged((EventHandler<ValueEventArgs<bool>>)InputField_TextChanged);
-			((TextBox)_inputField).set_HorizontalAlignment((HorizontalAlignment)1);
-			((Control)this).set_Width(100);
-			((Control)this).set_Height(20);
-			LocalizingService.LocaleChanged += UserLocale_SettingChanged;
+			_inputField.Parent = this;
+			_inputField.TextChanged += InputField_TextChanged;
+			_inputField.InputFocusChanged += InputField_TextChanged;
+			_inputField.HorizontalAlignment = HorizontalAlignment.Center;
+			base.Width = 100;
+			base.Height = 20;
+			LocalizingService.LocaleChanged += new EventHandler<ValueChangedEventArgs<Locale>>(UserLocale_SettingChanged);
 			UserLocale_SettingChanged(null, null);
 		}
 
@@ -120,12 +120,12 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
-			int size = Math.Min(((Control)this).get_Height(), ((Control)this).get_Width());
-			_addRectangle = (Rectangle)(ShowButtons ? new Rectangle(((Control)this).get_Width() - size, (((Control)this).get_Height() - size) / 2, size, size) : Rectangle.get_Empty());
-			_minusRectangle = (Rectangle)(ShowButtons ? new Rectangle(((Control)this).get_Width() - size * 2, (((Control)this).get_Height() - size) / 2, size, size) : Rectangle.get_Empty());
+			int size = Math.Min(base.Height, base.Width);
+			_addRectangle = (Rectangle)(ShowButtons ? new Rectangle(base.Width - size, (base.Height - size) / 2, size, size) : Rectangle.get_Empty());
+			_minusRectangle = (Rectangle)(ShowButtons ? new Rectangle(base.Width - size * 2, (base.Height - size) / 2, size, size) : Rectangle.get_Empty());
 			int spacing = (ShowButtons ? 2 : 0);
-			((Control)_inputField).set_Width(Math.Max(0, ((Control)this).get_Width() - (_addRectangle.Width + _minusRectangle.Width) - spacing));
-			((Control)_inputField).set_Height(((Control)this).get_Height());
+			_inputField.Width = Math.Max(0, base.Width - (_addRectangle.Width + _minusRectangle.Width) - spacing);
+			_inputField.Height = base.Height;
 		}
 
 		public override void PaintAfterChildren(SpriteBatch spriteBatch, Rectangle bounds)
@@ -143,16 +143,16 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
-			((Container)this).PaintAfterChildren(spriteBatch, bounds);
+			base.PaintAfterChildren(spriteBatch, bounds);
 			if (ShowButtons)
 			{
 				if (_addRectangle.Width > 0 && _addRectangle.Height > 0)
 				{
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(((Rectangle)(ref _addRectangle)).Contains(((Control)this).get_RelativeMousePosition()) ? _addButtonHovered : _addButton), _addRectangle, (Rectangle?)new Rectangle(6, 6, 20, 20), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
+					spriteBatch.DrawOnCtrl((Control)this, (Texture2D)(((Rectangle)(ref _addRectangle)).Contains(base.RelativeMousePosition) ? _addButtonHovered : _addButton), _addRectangle, (Rectangle?)new Rectangle(6, 6, 20, 20), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
 				}
 				if (_minusRectangle.Width > 0 && _minusRectangle.Height > 0)
 				{
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(((Rectangle)(ref _minusRectangle)).Contains(((Control)this).get_RelativeMousePosition()) ? _minusButtonHovered : _minusButton), _minusRectangle, (Rectangle?)new Rectangle(6, 6, 20, 20), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
+					spriteBatch.DrawOnCtrl((Control)this, (Texture2D)(((Rectangle)(ref _minusRectangle)).Contains(base.RelativeMousePosition) ? _minusButtonHovered : _minusButton), _minusRectangle, (Rectangle?)new Rectangle(6, 6, 20, 20), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
 				}
 			}
 		}
@@ -162,11 +162,11 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
 			base.OnClick(e);
-			if (((Rectangle)(ref _addRectangle)).Contains(((Control)this).get_RelativeMousePosition()))
+			if (((Rectangle)(ref _addRectangle)).Contains(base.RelativeMousePosition))
 			{
 				Value += Step;
 			}
-			if (((Rectangle)(ref _minusRectangle)).Contains(((Control)this).get_RelativeMousePosition()))
+			if (((Rectangle)(ref _minusRectangle)).Contains(base.RelativeMousePosition))
 			{
 				Value -= Step;
 			}
@@ -175,15 +175,15 @@ namespace Kenedia.Modules.Core.Controls
 		private void InputField_TextChanged(object sender, EventArgs e)
 		{
 			int value;
-			bool isNumeric = int.TryParse(((TextInputBase)_inputField).get_Text(), out value);
+			bool isNumeric = int.TryParse(_inputField.Text, out value);
 			if (!isNumeric)
 			{
-				((TextInputBase)_inputField).set_Text(_lastText);
-				((TextInputBase)_inputField).set_CursorIndex(_lastText.Length);
+				_inputField.Text = _lastText;
+				_inputField.CursorIndex = _lastText.Length;
 				return;
 			}
-			_lastText = ((TextInputBase)_inputField).get_Text();
-			if (((TextInputBase)_inputField).get_Focused())
+			_lastText = _inputField.Text;
+			if (_inputField.Focused)
 			{
 				return;
 			}
@@ -200,7 +200,7 @@ namespace Kenedia.Modules.Core.Controls
 			}
 			else
 			{
-				((TextInputBase)_inputField).set_Text($"{Value}");
+				_inputField.Text = $"{Value}";
 			}
 		}
 
@@ -215,7 +215,7 @@ namespace Kenedia.Modules.Core.Controls
 		protected override void DisposeControl()
 		{
 			base.DisposeControl();
-			GameService.Overlay.get_UserLocale().remove_SettingChanged((EventHandler<ValueChangedEventArgs<Locale>>)UserLocale_SettingChanged);
+			GameService.Overlay.UserLocale.SettingChanged -= UserLocale_SettingChanged;
 		}
 	}
 }
