@@ -11,6 +11,7 @@ using Blish_HUD.Input;
 using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
 using Gw2Sharp.Models;
+using Gw2Sharp.WebApi.V2;
 using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
 using Manlaan.Mounts.Things;
@@ -39,7 +40,9 @@ namespace Manlaan.Mounts
 
 		private Gw2ApiManager Gw2ApiManager;
 
-		private bool _isCombatLaunchUnlocked;
+		private bool? _isCombatLaunchUnlocked;
+
+		private string _isCombatLaunchUnlockedReason;
 
 		private DateTime lastTimeJumped = DateTime.MinValue;
 
@@ -72,11 +75,12 @@ namespace Manlaan.Mounts
 			Gw2ApiManager = gw2ApiManager;
 			Module._debug.Add("StoreThingForLaterActivation", () => string.Join(", ", StoredThingForLater.Select((KeyValuePair<string, Thing> x) => x.Key + "=" + x.Value.Name).ToArray()) ?? "");
 			Module._debug.Add("Lake", () => $"name: {_lake?.Name} surface {_lake?.WaterSurface} Z {GameService.Gw2Mumble.get_PlayerCharacter().get_Position().Z} distance {_lake?.Distance}");
+			Module._debug.Add("IsCombatLaunchUnlocked", () => _isCombatLaunchUnlockedReason ?? "");
 		}
 
 		public bool IsCombatLaunchUnlocked()
 		{
-			if (_isCombatLaunchUnlocked)
+			if (!_isCombatLaunchUnlocked.HasValue || _isCombatLaunchUnlocked.Value)
 			{
 				return Module._settingCombatLaunchMasteryUnlocked.get_Value();
 			}
@@ -85,11 +89,24 @@ namespace Manlaan.Mounts
 
 		public async Task IsCombatLaunchUnlockedAsync()
 		{
-			if (!Gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)new List<TokenPermission> { (TokenPermission)6 }))
+			if (!Gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)new List<TokenPermission> { (TokenPermission)1 }))
 			{
-				_isCombatLaunchUnlocked = false;
+				_isCombatLaunchUnlockedReason = "API permissions \"account\" is not enabled.";
+				Logger.Error("IsCombatLaunchUnlockedAsync " + _isCombatLaunchUnlockedReason);
+				return;
 			}
-			_isCombatLaunchUnlocked = ((IEnumerable<Mastery>)(await ((IAllExpandableClient<Mastery>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Masteries()).AllAsync(default(CancellationToken)))).Any((Mastery m) => m.get_Levels().Any((MasteryLevel ml) => ml.get_Name() == "Combat Launch"));
+			try
+			{
+				_isCombatLaunchUnlocked = ((IEnumerable<AccountMastery>)(await ((IBlobClient<IApiV2ObjectList<AccountMastery>>)(object)Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
+					.get_Masteries()).GetAsync(default(CancellationToken)))).Any((AccountMastery m) => m.get_Id() == 36 && m.get_Level() >= 4);
+				_isCombatLaunchUnlockedReason = "API call succeeded at " + DateTime.Now.ToString("HH:mm:ss") + ", CombatLaunch is " + (_isCombatLaunchUnlocked.Value ? "unlocked" : "not unlocked");
+				Logger.Info("IsCombatLaunchUnlockedAsync " + _isCombatLaunchUnlockedReason);
+			}
+			catch (Exception ex)
+			{
+				_isCombatLaunchUnlockedReason = "something went wrong, see log for error";
+				Logger.Error(ex, "IsCombatLaunchUnlockedAsync " + _isCombatLaunchUnlockedReason);
+			}
 		}
 
 		public bool IsPlayerInWvwMap()

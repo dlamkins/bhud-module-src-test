@@ -16,6 +16,8 @@ namespace Manlaan.Mounts
 
 		public SettingEntry<bool> DisplayCornerIcons;
 
+		public SettingEntry<bool> IsEnabledInCompetitiveMaps;
+
 		public SettingEntry<IconOrientation> Orientation;
 
 		public SettingEntry<Point> Location;
@@ -47,11 +49,12 @@ namespace Manlaan.Mounts
 		public IconThingSettings(SettingCollection settingCollection, int id, string defaultName = "", List<Thing> defaultThings = null)
 			: base(settingCollection, defaultThings, $"IconThingSettings{id}Things")
 		{
-			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
 			Id = id;
 			Name = settingCollection.DefineSetting<string>($"IconThingSettings{Id}name", defaultName, (Func<string>)null, (Func<string>)null);
 			IsEnabled = settingCollection.DefineSetting<bool>($"IconThingSettings{Id}IsEnabled", true, (Func<string>)null, (Func<string>)null);
 			DisplayCornerIcons = settingCollection.DefineSetting<bool>($"IconThingSettings{Id}DisplayCornerIcons", true, (Func<string>)null, (Func<string>)null);
+			IsEnabledInCompetitiveMaps = settingCollection.DefineSetting<bool>($"IconThingSettings{Id}IsEnabledInCompetitiveMaps", true, (Func<string>)null, (Func<string>)null);
 			Orientation = settingCollection.DefineSetting<IconOrientation>($"IconThingSettings{Id}Orientation", IconOrientation.Horizontal, (Func<string>)null, (Func<string>)null);
 			Location = settingCollection.DefineSetting<Point>($"IconThingSettings{Id}Location", new Point(100, 100), (Func<string>)null, (Func<string>)null);
 			IsDraggingEnabled = settingCollection.DefineSetting<bool>($"IconThingSettings{Id}IsDragging", false, (Func<string>)null, (Func<string>)null);
@@ -61,6 +64,7 @@ namespace Manlaan.Mounts
 			SettingComplianceExtensions.SetRange(Opacity, 0f, 1f);
 			IsEnabled.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged);
 			DisplayCornerIcons.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged);
+			IsEnabledInCompetitiveMaps.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged);
 			Orientation.add_SettingChanged((EventHandler<ValueChangedEventArgs<IconOrientation>>)SettingChanged);
 			Location.add_SettingChanged((EventHandler<ValueChangedEventArgs<Point>>)SettingChanged);
 			IsDraggingEnabled.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)SettingChanged);
@@ -74,6 +78,7 @@ namespace Manlaan.Mounts
 			settingCollection.UndefineSetting($"IconThingSettings{Id}name");
 			settingCollection.UndefineSetting($"IconThingSettings{Id}IsEnabled");
 			settingCollection.UndefineSetting($"IconThingSettings{Id}DisplayCornerIcons");
+			settingCollection.UndefineSetting($"IconThingSettings{Id}IsEnabledInCompetitiveMaps");
 			settingCollection.UndefineSetting($"IconThingSettings{Id}Orientation");
 			settingCollection.UndefineSetting($"IconThingSettings{Id}Location");
 			settingCollection.UndefineSetting($"IconThingSettings{Id}IsDragging");

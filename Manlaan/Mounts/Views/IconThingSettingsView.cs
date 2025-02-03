@@ -15,7 +15,7 @@ namespace Manlaan.Mounts.Views
 	{
 		private int totalWidth = 2500;
 
-		private int labelWidth = 170;
+		private int labelWidth = 180;
 
 		private Panel IconSettingsListPanel;
 
@@ -346,75 +346,93 @@ namespace Manlaan.Mounts.Views
 			//IL_0310: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0316: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0320: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0328: Unknown result type (might be due to invalid IL or missing references)
-			//IL_032f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0336: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0342: Unknown result type (might be due to invalid IL or missing references)
-			//IL_034d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_035a: Expected O, but got Unknown
-			//IL_035b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0360: Unknown result type (might be due to invalid IL or missing references)
+			//IL_032c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0333: Unknown result type (might be due to invalid IL or missing references)
+			//IL_033a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0346: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0351: Unknown result type (might be due to invalid IL or missing references)
+			//IL_035e: Expected O, but got Unknown
+			//IL_035f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0364: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0369: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0373: Unknown result type (might be due to invalid IL or missing references)
-			//IL_037d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0385: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0396: Expected O, but got Unknown
-			//IL_043a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_043f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_044a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0454: Unknown result type (might be due to invalid IL or missing references)
-			//IL_045c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0463: Unknown result type (might be due to invalid IL or missing references)
-			//IL_046a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0476: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0481: Unknown result type (might be due to invalid IL or missing references)
-			//IL_048e: Expected O, but got Unknown
-			//IL_048f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0494: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04a5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04af: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04ba: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04d0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04e7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04f8: Expected O, but got Unknown
-			//IL_050f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0514: Unknown result type (might be due to invalid IL or missing references)
-			//IL_051f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0529: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0531: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0538: Unknown result type (might be due to invalid IL or missing references)
-			//IL_053f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_054b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0556: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0563: Expected O, but got Unknown
-			//IL_0564: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0569: Unknown result type (might be due to invalid IL or missing references)
-			//IL_057a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0584: Unknown result type (might be due to invalid IL or missing references)
-			//IL_058f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_059a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05a5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05d2: Expected O, but got Unknown
-			//IL_05e9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05ee: Unknown result type (might be due to invalid IL or missing references)
+			//IL_037f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0395: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03b7: Expected O, but got Unknown
+			//IL_03ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03d3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03e8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03f0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03f7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03fe: Unknown result type (might be due to invalid IL or missing references)
+			//IL_040a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0415: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0422: Expected O, but got Unknown
+			//IL_0423: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0428: Unknown result type (might be due to invalid IL or missing references)
+			//IL_043b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0445: Unknown result type (might be due to invalid IL or missing references)
+			//IL_044d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_045e: Expected O, but got Unknown
+			//IL_0502: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0507: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0512: Unknown result type (might be due to invalid IL or missing references)
+			//IL_051c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0524: Unknown result type (might be due to invalid IL or missing references)
+			//IL_052b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0532: Unknown result type (might be due to invalid IL or missing references)
+			//IL_053e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0549: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0556: Expected O, but got Unknown
+			//IL_0557: Unknown result type (might be due to invalid IL or missing references)
+			//IL_055c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_056d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0577: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0582: Unknown result type (might be due to invalid IL or missing references)
+			//IL_058d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0598: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05c0: Expected O, but got Unknown
+			//IL_05d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05e7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05f1: Unknown result type (might be due to invalid IL or missing references)
 			//IL_05f9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0603: Unknown result type (might be due to invalid IL or missing references)
-			//IL_060f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0616: Unknown result type (might be due to invalid IL or missing references)
-			//IL_061d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0629: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0634: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0641: Expected O, but got Unknown
+			//IL_0600: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0607: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0613: Unknown result type (might be due to invalid IL or missing references)
+			//IL_061e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_062b: Expected O, but got Unknown
+			//IL_062c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0631: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0642: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0647: Unknown result type (might be due to invalid IL or missing references)
 			//IL_064c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0656: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0657: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0662: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0678: Unknown result type (might be due to invalid IL or missing references)
-			//IL_068b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_066d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0689: Unknown result type (might be due to invalid IL or missing references)
 			//IL_069a: Expected O, but got Unknown
-			//IL_06c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06c1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06fc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0709: Expected O, but got Unknown
+			//IL_070a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_070f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0714: Unknown result type (might be due to invalid IL or missing references)
+			//IL_071e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_072a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0740: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0753: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0762: Expected O, but got Unknown
+			//IL_078b: Unknown result type (might be due to invalid IL or missing references)
 			((Container)IconSettingsDetailPanel).ClearChildren();
 			Label val = new Label();
 			((Control)val).set_Location(new Point(0, 0));
@@ -495,18 +513,37 @@ namespace Manlaan.Mounts.Views
 			}
 			Label val8 = new Label();
 			((Control)val8).set_Location(new Point(0, nextY + 6));
-			((Control)val8).set_Width(75);
+			((Control)val8).set_Width(labelWidth);
 			val8.set_AutoSizeHeight(false);
 			val8.set_WrapText(false);
 			((Control)val8).set_Parent((Container)(object)IconSettingsDetailPanel);
-			val8.set_Text("Orientation: ");
-			((Control)val8).set_BasicTooltipText("The orientation of the icon row, either horizontal or vertical.");
-			Label settingManualOrientation_Label = val8;
-			Dropdown val9 = new Dropdown();
-			((Control)val9).set_Location(new Point(((Control)settingManualOrientation_Label).get_Right() + 5, ((Control)settingManualOrientation_Label).get_Top() - 4));
-			((Control)val9).set_Width(100);
+			val8.set_Text("Enabled in competitive maps");
+			((Control)val8).set_BasicTooltipText("Disabled icon rows are not displayed.");
+			Label radialSettingsIsEnabledInCompetitiveMaps_Label = val8;
+			Checkbox val9 = new Checkbox();
+			((Control)val9).set_Size(new Point(20, 20));
 			((Control)val9).set_Parent((Container)(object)IconSettingsDetailPanel);
-			Dropdown settingManualOrientation_Select = val9;
+			val9.set_Checked(currentIconSettings.IsEnabledInCompetitiveMaps.get_Value());
+			((Control)val9).set_Location(new Point(((Control)radialSettingsIsEnabledInCompetitiveMaps_Label).get_Right() + 5, ((Control)radialSettingsIsEnabledInCompetitiveMaps_Label).get_Top() - 1));
+			Checkbox radialSettingsIsEnabledInCompetitiveMaps_Checkbox = val9;
+			radialSettingsIsEnabledInCompetitiveMaps_Checkbox.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
+			{
+				currentIconSettings.IsEnabledInCompetitiveMaps.set_Value(radialSettingsIsEnabledInCompetitiveMaps_Checkbox.get_Checked());
+			});
+			Label val10 = new Label();
+			((Control)val10).set_Location(new Point(0, ((Control)radialSettingsIsEnabledInCompetitiveMaps_Label).get_Bottom() + 6));
+			((Control)val10).set_Width(75);
+			val10.set_AutoSizeHeight(false);
+			val10.set_WrapText(false);
+			((Control)val10).set_Parent((Container)(object)IconSettingsDetailPanel);
+			val10.set_Text("Orientation: ");
+			((Control)val10).set_BasicTooltipText("The orientation of the icon row, either horizontal or vertical.");
+			Label settingManualOrientation_Label = val10;
+			Dropdown val11 = new Dropdown();
+			((Control)val11).set_Location(new Point(((Control)settingManualOrientation_Label).get_Right() + 5, ((Control)settingManualOrientation_Label).get_Top() - 4));
+			((Control)val11).set_Width(100);
+			((Control)val11).set_Parent((Container)(object)IconSettingsDetailPanel);
+			Dropdown settingManualOrientation_Select = val11;
 			foreach (IconOrientation s in Enum.GetValues(typeof(IconOrientation)))
 			{
 				settingManualOrientation_Select.get_Items().Add(s.ToString());
@@ -516,65 +553,65 @@ namespace Manlaan.Mounts.Views
 			{
 				currentIconSettings.Orientation.set_Value((IconOrientation)Enum.Parse(typeof(IconOrientation), settingManualOrientation_Select.get_SelectedItem()));
 			});
-			Label val10 = new Label();
-			((Control)val10).set_Location(new Point(0, ((Control)settingManualOrientation_Label).get_Bottom() + 6));
-			((Control)val10).set_Width(75);
-			val10.set_AutoSizeHeight(false);
-			val10.set_WrapText(false);
-			((Control)val10).set_Parent((Container)(object)IconSettingsDetailPanel);
-			val10.set_Text("Icon Size: ");
-			((Control)val10).set_BasicTooltipText("The icon size of actions in the row.");
-			Label settingManualWidth_Label = val10;
-			TrackBar val11 = new TrackBar();
-			((Control)val11).set_Location(new Point(((Control)settingManualWidth_Label).get_Right() + 5, ((Control)settingManualWidth_Label).get_Top()));
-			((Control)val11).set_Width(220);
-			val11.set_MaxValue(200f);
-			val11.set_MinValue(0f);
-			val11.set_Value((float)currentIconSettings.Size.get_Value());
-			((Control)val11).set_Parent((Container)(object)IconSettingsDetailPanel);
-			TrackBar settingImgWidth_Slider = val11;
+			Label val12 = new Label();
+			((Control)val12).set_Location(new Point(0, ((Control)settingManualOrientation_Label).get_Bottom() + 6));
+			((Control)val12).set_Width(75);
+			val12.set_AutoSizeHeight(false);
+			val12.set_WrapText(false);
+			((Control)val12).set_Parent((Container)(object)IconSettingsDetailPanel);
+			val12.set_Text("Icon Size: ");
+			((Control)val12).set_BasicTooltipText("The icon size of actions in the row.");
+			Label settingManualWidth_Label = val12;
+			TrackBar val13 = new TrackBar();
+			((Control)val13).set_Location(new Point(((Control)settingManualWidth_Label).get_Right() + 5, ((Control)settingManualWidth_Label).get_Top()));
+			((Control)val13).set_Width(220);
+			val13.set_MaxValue(200f);
+			val13.set_MinValue(0f);
+			val13.set_Value((float)currentIconSettings.Size.get_Value());
+			((Control)val13).set_Parent((Container)(object)IconSettingsDetailPanel);
+			TrackBar settingImgWidth_Slider = val13;
 			settingImgWidth_Slider.add_ValueChanged((EventHandler<ValueEventArgs<float>>)delegate
 			{
 				currentIconSettings.Size.set_Value((int)settingImgWidth_Slider.get_Value());
 				((Control)settingImgWidth_Slider).set_BasicTooltipText($"{currentIconSettings.Size.get_Value()}");
 			});
-			Label val12 = new Label();
-			((Control)val12).set_Location(new Point(0, ((Control)settingManualWidth_Label).get_Bottom() + 6));
-			((Control)val12).set_Width(75);
-			val12.set_AutoSizeHeight(false);
-			val12.set_WrapText(false);
-			((Control)val12).set_Parent((Container)(object)IconSettingsDetailPanel);
-			val12.set_Text("Opacity: ");
-			((Control)val12).set_BasicTooltipText("The opacity of actions in the row.");
-			Label settingManualOpacity_Label = val12;
-			TrackBar val13 = new TrackBar();
-			((Control)val13).set_Location(new Point(((Control)settingManualOpacity_Label).get_Right() + 5, ((Control)settingManualOpacity_Label).get_Top()));
-			((Control)val13).set_Width(220);
-			val13.set_MaxValue(100f);
-			val13.set_MinValue(0f);
-			val13.set_Value(currentIconSettings.Opacity.get_Value() * 100f);
-			((Control)val13).set_Parent((Container)(object)IconSettingsDetailPanel);
-			TrackBar settingOpacity_Slider = val13;
+			Label val14 = new Label();
+			((Control)val14).set_Location(new Point(0, ((Control)settingManualWidth_Label).get_Bottom() + 6));
+			((Control)val14).set_Width(75);
+			val14.set_AutoSizeHeight(false);
+			val14.set_WrapText(false);
+			((Control)val14).set_Parent((Container)(object)IconSettingsDetailPanel);
+			val14.set_Text("Opacity: ");
+			((Control)val14).set_BasicTooltipText("The opacity of actions in the row.");
+			Label settingManualOpacity_Label = val14;
+			TrackBar val15 = new TrackBar();
+			((Control)val15).set_Location(new Point(((Control)settingManualOpacity_Label).get_Right() + 5, ((Control)settingManualOpacity_Label).get_Top()));
+			((Control)val15).set_Width(220);
+			val15.set_MaxValue(100f);
+			val15.set_MinValue(0f);
+			val15.set_Value(currentIconSettings.Opacity.get_Value() * 100f);
+			((Control)val15).set_Parent((Container)(object)IconSettingsDetailPanel);
+			TrackBar settingOpacity_Slider = val15;
 			settingOpacity_Slider.add_ValueChanged((EventHandler<ValueEventArgs<float>>)delegate
 			{
 				currentIconSettings.Opacity.set_Value(settingOpacity_Slider.get_Value() / 100f);
 				((Control)settingImgWidth_Slider).set_BasicTooltipText($"{currentIconSettings.Opacity.get_Value()}");
 			});
-			Label val14 = new Label();
-			((Control)val14).set_Location(new Point(0, ((Control)settingManualOpacity_Label).get_Bottom() + 6));
-			((Control)val14).set_Width(labelWidth);
-			val14.set_AutoSizeHeight(false);
-			val14.set_WrapText(false);
-			((Control)val14).set_Parent((Container)(object)IconSettingsDetailPanel);
-			val14.set_Text("Drag: ");
-			((Control)val14).set_BasicTooltipText("Option to enable repositioning the icon row using the white icon at the beginning of the row.");
-			Label radialSettingsIsDraggingEnabled_Label = val14;
-			Checkbox val15 = new Checkbox();
-			((Control)val15).set_Size(new Point(20, 20));
-			((Control)val15).set_Parent((Container)(object)IconSettingsDetailPanel);
-			val15.set_Checked(currentIconSettings.IsDraggingEnabled.get_Value());
-			((Control)val15).set_Location(new Point(((Control)radialSettingsIsDraggingEnabled_Label).get_Right() + 5, ((Control)radialSettingsIsDraggingEnabled_Label).get_Top() - 1));
-			Checkbox radialSettingsIsDraggingEnabled_Checkbox = val15;
+			Label val16 = new Label();
+			((Control)val16).set_Location(new Point(0, ((Control)settingManualOpacity_Label).get_Bottom() + 6));
+			((Control)val16).set_Width(labelWidth);
+			val16.set_AutoSizeHeight(false);
+			val16.set_WrapText(false);
+			((Control)val16).set_Parent((Container)(object)IconSettingsDetailPanel);
+			val16.set_Text("Drag: ");
+			((Control)val16).set_BasicTooltipText("Option to enable repositioning the icon row using the white icon at the beginning of the row.");
+			Label radialSettingsIsDraggingEnabled_Label = val16;
+			Checkbox val17 = new Checkbox();
+			((Control)val17).set_Size(new Point(20, 20));
+			((Control)val17).set_Parent((Container)(object)IconSettingsDetailPanel);
+			val17.set_Checked(currentIconSettings.IsDraggingEnabled.get_Value());
+			((Control)val17).set_Location(new Point(((Control)radialSettingsIsDraggingEnabled_Label).get_Right() + 5, ((Control)radialSettingsIsDraggingEnabled_Label).get_Top() - 1));
+			Checkbox radialSettingsIsDraggingEnabled_Checkbox = val17;
 			radialSettingsIsDraggingEnabled_Checkbox.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
 			{
 				currentIconSettings.IsDraggingEnabled.set_Value(radialSettingsIsDraggingEnabled_Checkbox.get_Checked());
