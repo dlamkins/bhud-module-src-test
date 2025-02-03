@@ -17,9 +17,20 @@ namespace Kenedia.Modules.Core.Extensions
 			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0012: Invalid comparison between Unknown and I4
 			MapType type = map.Type;
-			if ((int)type == 5 || (int)type == 7 || (int)type == 16)
+			if (((int)type != 5 && (int)type != 7 && (int)type != 16) || 1 == 0)
 			{
-				return true;
+				return map.IsHomesteadMap();
+			}
+			return true;
+		}
+
+		public static bool IsHomesteadMap(this CurrentMap map)
+		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0007: Invalid comparison between Unknown and I4
+			if ((int)map.Type == 4)
+			{
+				return map.Id == 1558;
 			}
 			return false;
 		}
