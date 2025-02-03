@@ -14,22 +14,33 @@ public static class LinqExtensions
 			throw new ArgumentOutOfRangeException("size", "Size must be greater than 0.");
 		}
 		using IEnumerator<T> enumerator = source.GetEnumerator();
-		while (enumerator.MoveNext())
+		while (true)
 		{
-			yield return GetBatch(enumerator, size - 1);
+			IEnumerable<T> batch = GetBatch(enumerator, size);
+			if (batch != null)
+			{
+				yield return batch;
+				continue;
+			}
+			break;
 		}
 	}
 
-	private static IEnumerable<T> GetBatch<T>(IEnumerator<T> enumerator, int size)
+	private static IEnumerable<T>? GetBatch<T>(IEnumerator<T> enumerator, int size)
 	{
-		yield return enumerator.Current;
+		if (!enumerator.MoveNext())
+		{
+			return null;
+		}
+		List<T> batch = new List<T> { enumerator.Current };
 		for (int i = 0; i < size; i++)
 		{
 			if (!enumerator.MoveNext())
 			{
 				break;
 			}
-			yield return enumerator.Current;
+			batch.Add(enumerator.Current);
 		}
+		return batch;
 	}
 }

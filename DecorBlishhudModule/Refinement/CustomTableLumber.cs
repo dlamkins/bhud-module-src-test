@@ -407,9 +407,14 @@ namespace DecorBlishhudModule.Refinement
 
 		private static async Task RefreshPrices(string type)
 		{
+			if (_currentItemsByType == null)
+			{
+				Console.WriteLine("Error: _currentItemsByType is null.");
+				return;
+			}
 			if (!_currentItemsByType.ContainsKey(type) || _currentItemsByType[type] == null)
 			{
-				Console.WriteLine("Error: _currentItemsByType does not contain key: " + type + " or is null");
+				Console.WriteLine("Error: _currentItemsByType does not contain key '" + type + "' or is null.");
 				return;
 			}
 			List<Item> items = _currentItemsByType[type];
@@ -420,22 +425,50 @@ namespace DecorBlishhudModule.Refinement
 			}
 			try
 			{
-				items = await ItemFetcher.UpdateItemPrices(items);
-				_currentItemsByType[type] = items;
+				List<Item> updatedItems = await ItemFetcher.UpdateItemPrices(items);
+				if (updatedItems == null)
+				{
+					Console.WriteLine("Error: UpdateItemPrices returned null.");
+					return;
+				}
+				_currentItemsByType[type] = updatedItems;
+			}
+			catch (Exception ex2)
+			{
+				Console.WriteLine($"Error updating item prices: {ex2}");
+				return;
+			}
+			try
+			{
+				await UpdatePriceColumns(type);
 			}
 			catch (Exception ex)
 			{
-				Console.WriteLine("Error updating item prices: " + ex.Message);
-				return;
+				Console.WriteLine($"Error in UpdatePriceColumns: {ex}");
 			}
-			await UpdatePriceColumns(type);
 		}
 
 		private static async Task UpdatePriceColumns(string type)
 		{
+			if (_currentItemsByType == null)
+			{
+				Console.WriteLine("Error: _currentItemsByType is null.");
+				return;
+			}
 			if (!_currentItemsByType.ContainsKey(type) || _currentItemsByType[type] == null)
 			{
 				Console.WriteLine("Error: Cannot update price columns. _currentItemsByType[" + type + "] is null.");
+				return;
+			}
+			List<Item> items = _currentItemsByType[type];
+			if (items.Count == 0)
+			{
+				Console.WriteLine("Error: _currentItemsByType[" + type + "] is empty.");
+				return;
+			}
+			if (_defBuy == null || _defSell == null || _eff1Buy == null || _eff1Sell == null || _eff2Buy == null || _eff2Sell == null)
+			{
+				Console.WriteLine("Error: One or more UI elements are null. Cannot update price columns.");
 				return;
 			}
 			((Container)_defBuy).get_Children().Clear();
@@ -444,69 +477,106 @@ namespace DecorBlishhudModule.Refinement
 			((Container)_eff1Sell).get_Children().Clear();
 			((Container)_eff2Buy).get_Children().Clear();
 			((Container)_eff2Sell).get_Children().Clear();
-			foreach (Item item in _currentItemsByType[type])
+			foreach (Item item in items)
 			{
-				Color rowBackgroundColor = ((_currentItemsByType[type].IndexOf(item) % 2 != 0) ? new Color(0, 0, 0, 175) : new Color(0, 0, 0, 75));
+				if (item == null)
+				{
+					Console.WriteLine("Warning: Found null item in _currentItemsByType[type]. Skipping...");
+					continue;
+				}
+				Color rowBackgroundColor = ((items.IndexOf(item) % 2 != 0) ? new Color(0, 0, 0, 175) : new Color(0, 0, 0, 75));
 				try
 				{
-					await CreateCurrencyDisplay(_defBuy, item, item.DefaultBuy, rowBackgroundColor);
-					await CreateCurrencyDisplay(_defSell, item, item.DefaultSell, rowBackgroundColor);
-					await CreateCurrencyDisplay(_eff1Buy, item, item.TradeEfficiency1Buy, rowBackgroundColor);
-					await CreateCurrencyDisplay(_eff1Sell, item, item.TradeEfficiency1Sell, rowBackgroundColor);
-					await CreateCurrencyDisplay(_eff2Buy, item, item.TradeEfficiency2Buy, rowBackgroundColor);
-					await CreateCurrencyDisplay(_eff2Sell, item, item.TradeEfficiency2Sell, rowBackgroundColor);
+					await CreateCurrencyDisplay(_defBuy, item, item.DefaultBuy ?? null, rowBackgroundColor);
+					await CreateCurrencyDisplay(_defSell, item, item.DefaultSell ?? null, rowBackgroundColor);
+					await CreateCurrencyDisplay(_eff1Buy, item, item.TradeEfficiency1Buy ?? null, rowBackgroundColor);
+					await CreateCurrencyDisplay(_eff1Sell, item, item.TradeEfficiency1Sell ?? null, rowBackgroundColor);
+					await CreateCurrencyDisplay(_eff2Buy, item, item.TradeEfficiency2Buy ?? null, rowBackgroundColor);
+					await CreateCurrencyDisplay(_eff2Sell, item, item.TradeEfficiency2Sell ?? null, rowBackgroundColor);
 				}
 				catch (Exception ex)
 				{
-					Console.WriteLine("Error creating currency display for item " + item?.Name + ": " + ex.Message);
+					Console.WriteLine("Error creating currency display for item " + (item.Name ?? "Unknown") + ": " + ex.Message);
 				}
 			}
 		}
 
 		private static async Task InitializeNameTimer(Panel parentPanel, string type)
 		{
-			FlowPanel val = new FlowPanel();
-			((Control)val).set_Parent((Container)(object)parentPanel);
-			val.set_FlowDirection((ControlFlowDirection)1);
-			((Control)val).set_Padding(new Thickness(10f, 10f));
-			_nameTimer = val;
-			Label val2 = new Label();
-			((Control)val2).set_Parent((Container)(object)_nameTimer);
-			val2.set_Text("      Prices will update in 30 s");
-			val2.set_Font(GameService.Content.get_DefaultFont16());
-			val2.set_TextColor(Color.get_White());
-			((Control)val2).set_Size(new Point(255, 30));
-			val2.set_ShowShadow(true);
-			val2.set_ShadowColor(new Color(0, 0, 0, 255));
-			Label updateTimerLabel = val2;
-			int secondsCounter = 60;
-			Timer timer = new Timer(1000.0);
-			timer.Elapsed += delegate
+			if (parentPanel == null)
 			{
-				if (secondsCounter > 0)
-				{
-					secondsCounter--;
-					updateTimerLabel.set_Text($"      Prices will update in {secondsCounter} s");
-				}
-			};
-			timer.AutoReset = true;
-			timer.Enabled = true;
-			Timer timer2 = new Timer(61000.0);
-			timer2.Elapsed += async delegate
+				Console.WriteLine("Error: parentPanel is null. Cannot initialize name timer.");
+				return;
+			}
+			if (string.IsNullOrEmpty(type))
 			{
-				try
+				Console.WriteLine("Error: type is null or empty. Cannot initialize name timer.");
+				return;
+			}
+			try
+			{
+				FlowPanel val = new FlowPanel();
+				((Control)val).set_Parent((Container)(object)parentPanel);
+				val.set_FlowDirection((ControlFlowDirection)1);
+				((Control)val).set_Padding(new Thickness(10f, 10f));
+				_nameTimer = val;
+				if (_nameTimer == null)
 				{
-					secondsCounter = 60;
-					await RefreshPrices(type);
-					updateTimerLabel.set_Text($"      Prices will update in {secondsCounter} s");
+					Console.WriteLine("Error: _nameTimer could not be created.");
+					return;
 				}
-				catch (Exception ex)
+				if (GameService.Content.get_DefaultFont16() == null)
 				{
-					Console.WriteLine("Error in price update timer: " + ex.Message);
+					Console.WriteLine("Error: GameService.Content.DefaultFont16 is null. Cannot create label.");
+					return;
 				}
-			};
-			timer2.AutoReset = true;
-			timer2.Enabled = true;
+				Label val2 = new Label();
+				((Control)val2).set_Parent((Container)(object)_nameTimer);
+				val2.set_Text("      Prices will update in 60 s");
+				val2.set_Font(GameService.Content.get_DefaultFont16());
+				val2.set_TextColor(Color.get_White());
+				((Control)val2).set_Size(new Point(255, 30));
+				val2.set_ShowShadow(true);
+				val2.set_ShadowColor(new Color(0, 0, 0, 255));
+				Label updateTimerLabel = val2;
+				if (updateTimerLabel == null)
+				{
+					Console.WriteLine("Error: Failed to create updateTimerLabel.");
+					return;
+				}
+				int secondsCounter = 60;
+				Timer timer = new Timer(1000.0);
+				timer.Elapsed += delegate
+				{
+					if (secondsCounter > 0)
+					{
+						secondsCounter--;
+						updateTimerLabel.set_Text($"      Prices will update in {secondsCounter} s");
+					}
+				};
+				timer.AutoReset = true;
+				timer.Enabled = true;
+				Timer timer2 = new Timer(61000.0);
+				timer2.Elapsed += async delegate
+				{
+					try
+					{
+						secondsCounter = 60;
+						await RefreshPrices(type);
+						updateTimerLabel.set_Text($"      Prices will update in {secondsCounter} s");
+					}
+					catch (Exception ex2)
+					{
+						Console.WriteLine("Error in price update timer: " + ex2.Message);
+					}
+				};
+				timer2.AutoReset = true;
+				timer2.Enabled = true;
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine("Unexpected error in InitializeNameTimer: " + ex.Message);
+			}
 		}
 	}
 }
