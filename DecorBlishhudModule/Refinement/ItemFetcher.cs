@@ -108,18 +108,19 @@ namespace DecorBlishhudModule.Refinement
 				Logger.Warn("No items provided for price update.");
 				return new List<Item>();
 			}
+			if (DecorModule.DecorModuleInstance == null || DecorModule.DecorModuleInstance.Client == null)
+			{
+				Logger.Error("DecorModuleInstance or its HTTP client is not initialized.");
+				return items;
+			}
 			List<int> source = items.Select((Item i) => i.Id).Distinct().ToList();
 			int batchSize = 200;
 			IEnumerable<IEnumerable<int>> batches = source.Batch(batchSize) ?? new List<IEnumerable<int>>();
-			if (DecorModule.DecorModuleInstance?.Client == null)
-			{
-				Logger.Error("HTTP client is not initialized.");
-				return items;
-			}
 			foreach (IEnumerable<int> batch in batches)
 			{
 				string ids = string.Join(",", batch);
 				string priceApiUrl = "https://api.guildwars2.com/v2/commerce/prices?ids=" + ids;
+				Logger.Info("Fetching price data from: " + priceApiUrl);
 				try
 				{
 					string priceResponse = await RetryPolicyAsync(() => DecorModule.DecorModuleInstance.Client.GetStringAsync(priceApiUrl));
@@ -148,8 +149,16 @@ namespace DecorBlishhudModule.Refinement
 				}
 				catch (HttpRequestException val)
 				{
-					HttpRequestException ex = val;
-					Logger.Error("Error fetching prices for batch " + ids + ": " + ((Exception)(object)ex).Message);
+					HttpRequestException ex3 = val;
+					Logger.Error("HTTP request error while fetching prices for batch " + ids + ": " + ((Exception)(object)ex3).Message);
+				}
+				catch (JsonException ex2)
+				{
+					Logger.Error("JSON parsing error while processing price data for batch " + ids + ": " + ex2.Message);
+				}
+				catch (Exception ex)
+				{
+					Logger.Error("Unexpected error in UpdateItemPrices for batch " + ids + ": " + ex.Message);
 				}
 			}
 			return items;
@@ -159,7 +168,7 @@ namespace DecorBlishhudModule.Refinement
 		{
 			object obj2 = default(object);
 			int result = default(int);
-			HttpRequestException ex = default(HttpRequestException);
+			HttpRequestException ex2 = default(HttpRequestException);
 			for (int i = 0; i < retries; i++)
 			{
 				try
@@ -176,14 +185,19 @@ namespace DecorBlishhudModule.Refinement
 					}
 					else
 					{
-						ex = (HttpRequestException)obj2;
+						ex2 = (HttpRequestException)obj2;
 						result = ((i < retries - 1) ? 1 : 0);
 					}
 					return (byte)result != 0;
 				}).Invoke())
 				{
-					Logger.Warn("Retrying due to error: " + ((Exception)(object)ex).Message);
+					Logger.Warn("Retrying due to error: " + ((Exception)(object)ex2).Message);
 					await Task.Delay(1000);
+				}
+				catch (Exception ex)
+				{
+					Logger.Error("Unexpected error: " + ex.Message);
+					break;
 				}
 			}
 			throw new HttpRequestException("Failed after multiple retries.");

@@ -6,7 +6,7 @@ using System.Runtime.Versioning;
 [assembly: AssemblyCompany("DecorBlishhudModule")]
 [assembly: AssemblyConfiguration("Release")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
-[assembly: AssemblyInformationalVersion("1.0.0+2b60ada383de35bc4e3d00d2c5874edf50035cac")]
+[assembly: AssemblyInformationalVersion("1.0.0+f6172b2ed951de1591ae1b9e7d17e86ccfdd82d4")]
 [assembly: AssemblyProduct("DecorBlishhudModule")]
 [assembly: AssemblyTitle("DecorBlishhudModule")]
 [assembly: AssemblyVersion("1.0.0.0")]

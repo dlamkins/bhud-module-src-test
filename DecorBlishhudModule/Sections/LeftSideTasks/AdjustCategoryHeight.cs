@@ -17,7 +17,7 @@ namespace DecorBlishhudModule.Sections.LeftSideTasks
 			}
 			else
 			{
-				int heightIncrementPerDecorationSet = (_isIconView ? 53 : 312);
+				int heightIncrementPerDecorationSet = (_isIconView ? 53 : 311);
 				int numDecorationSets = (int)Math.Ceiling((double)visibleDecorationCount / (_isIconView ? 9.0 : 4.0));
 				int calculatedHeight = 45 + numDecorationSets * heightIncrementPerDecorationSet;
 				((Control)categoryFlowPanel).set_Height(calculatedHeight + (_isIconView ? 4 : 10));
