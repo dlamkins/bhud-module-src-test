@@ -22,7 +22,7 @@ namespace DecorBlishhudModule.Sections.LeftSideTasks
 					if (decorationIcon != null && ((Control)decorationIcon).get_Tooltip() != null)
 					{
 						Label tooltipLabel = ((IEnumerable)((Container)((Control)decorationIcon).get_Tooltip()).get_Children()).OfType<Label>().FirstOrDefault();
-						bool matchesSearch = tooltipLabel != null && tooltipLabel.get_Text().ToLower().Contains(searchText);
+						bool matchesSearch = tooltipLabel != null && searchText.Split(' ').All((string word) => tooltipLabel.get_Text().ToLower().Contains(word));
 						((Control)decorationIconPanel).set_Visible(matchesSearch);
 						if (matchesSearch)
 						{
