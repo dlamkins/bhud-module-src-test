@@ -1,128 +1,110 @@
+using System;
+using System.Runtime.CompilerServices;
+using Blish_HUD;
 using Blish_HUD.Common.UI.Views;
+using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using SL.ChatLinks.UI.Tabs.Items.Tooltips;
 
 namespace SL.ChatLinks.UI.Tabs.Items.Collections
 {
-	public sealed class ItemsListEntry : FlowPanel
+	public sealed class ItemsListEntry : Control
 	{
+		[CompilerGenerated]
+		private ItemsListViewModel _003CviewModel_003EP;
+
 		private static readonly Color ActiveColor = new Color(109, 100, 69, 0);
 
 		private static readonly Color HoverColor = new Color(109, 100, 69, 127);
 
-		private readonly Image _image;
+		private readonly AsyncTexture2D? _icon;
 
-		private readonly Panel _labelHolder;
+		private readonly Rectangle _iconBounds;
 
-		private readonly Label _name;
-
-		public ItemsListViewModel ViewModel { get; }
+		private Rectangle _textBounds;
 
 		public ItemsListEntry(ItemsListViewModel viewModel)
-			: this()
 		{
-			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004d: Expected O, but got Unknown
-			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+			_003CviewModel_003EP = viewModel;
+			_icon = _003CviewModel_003EP.GetIcon();
+			_iconBounds = new Rectangle(0, 0, 35, 35);
+			_textBounds = Rectangle.get_Empty();
+			((Control)this)._002Ector();
+		}
+
+		public override void DoUpdate(GameTime gameTime)
+		{
+			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0076: Expected O, but got Unknown
-			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0099: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cb: Expected O, but got Unknown
-			ViewModel = viewModel;
-			((Container)this).set_WidthSizingMode((SizingMode)2);
-			((Container)this).set_HeightSizingMode((SizingMode)1);
-			((FlowPanel)this).set_FlowDirection((ControlFlowDirection)2);
-			Image val = new Image();
-			((Control)val).set_Parent((Container)(object)this);
-			((Control)val).set_Size(new Point(35));
-			val.set_Texture(viewModel.GetIcon());
-			_image = val;
-			Panel val2 = new Panel();
-			((Control)val2).set_Parent((Container)(object)this);
-			((Container)val2).set_WidthSizingMode((SizingMode)2);
-			((Control)val2).set_Height(35);
-			((Container)val2).set_HorizontalScrollOffset(-5);
-			_labelHolder = val2;
-			Label val3 = new Label();
-			((Control)val3).set_Parent((Container)(object)_labelHolder);
-			val3.set_Text(viewModel.Item.Name);
-			val3.set_TextColor(viewModel.Color);
-			((Control)val3).set_Height(35);
-			((Control)val3).set_Width(395);
-			val3.set_WrapText(true);
-			val3.set_VerticalAlignment((VerticalAlignment)1);
-			_name = val3;
+			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005a: Expected O, but got Unknown
+			//IL_005f: Expected O, but got Unknown
+			Color backgroundColor = (_003CviewModel_003EP.IsSelected ? ActiveColor : ((!((Control)this).get_MouseOver()) ? Color.get_Transparent() : HoverColor));
+			((Control)this).set_BackgroundColor(backgroundColor);
+			if (((Control)this).get_MouseOver() && ((Control)this).get_Tooltip() == null)
+			{
+				Tooltip val = new Tooltip((ITooltipView)(object)new ItemTooltipView(_003CviewModel_003EP.CreateTooltipViewModel()));
+				Tooltip val2 = val;
+				((Control)this).set_Tooltip(val);
+			}
 		}
 
-		public override void UpdateContainer(GameTime gameTime)
+		public override void RecalculateLayout()
 		{
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009c: Expected O, but got Unknown
-			//IL_00a1: Expected O, but got Unknown
-			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c8: Expected O, but got Unknown
-			//IL_00cd: Expected O, but got Unknown
-			if (ViewModel.IsSelected)
+			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+			Container parent = ((Control)this).get_Parent();
+			if (parent != null)
 			{
-				((Control)_labelHolder).set_BackgroundColor(ActiveColor);
-				_name.set_ShowShadow(true);
+				((Control)this).set_Width(parent.get_ContentRegion().Width);
+				((Control)this).set_Height(35);
+				_textBounds = new Rectangle(40, 0, ((Control)this).get_Width() - 40, 35);
 			}
-			else if (((Control)this).get_MouseOver())
-			{
-				((Control)_labelHolder).set_BackgroundColor(HoverColor);
-				_name.set_ShowShadow(true);
-			}
-			else
-			{
-				((Control)_labelHolder).set_BackgroundColor(Color.get_Transparent());
-				_name.set_ShowShadow(false);
-			}
-			if (((Control)this).get_MouseOver())
-			{
-				Image image = _image;
-				if (((Control)image).get_Tooltip() == null)
-				{
-					Tooltip val = new Tooltip((ITooltipView)(object)new ItemTooltipView(ViewModel.CreateTooltipViewModel()));
-					Tooltip val2 = val;
-					((Control)image).set_Tooltip(val);
-				}
-				Label name = _name;
-				if (((Control)name).get_Tooltip() == null)
-				{
-					Tooltip val3 = new Tooltip((ITooltipView)(object)new ItemTooltipView(ViewModel.CreateTooltipViewModel()));
-					Tooltip val2 = val3;
-					((Control)name).set_Tooltip(val3);
-				}
-			}
-			((Container)this).UpdateContainer(gameTime);
 		}
 
-		protected override void DisposeControl()
+		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			((Control)_image).Dispose();
-			((Control)_name).Dispose();
-			((FlowPanel)this).DisposeControl();
+			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0116: Unknown result type (might be due to invalid IL or missing references)
+			if (_icon != null)
+			{
+				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_icon), _iconBounds, Color.get_White());
+			}
+			if (((Control)this).get_MouseOver() || _003CviewModel_003EP.IsSelected)
+			{
+				ReadOnlySpan<(int, int)> readOnlySpan = new ReadOnlySpan<(int, int)>(new(int, int)[4]
+				{
+					(1, 1),
+					(-1, 1),
+					(-1, -1),
+					(1, -1)
+				});
+				for (int i = 0; i < readOnlySpan.Length; i++)
+				{
+					var (x, y) = readOnlySpan[i];
+					SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, _003CviewModel_003EP.Item.Name, Control.get_Content().get_DefaultFont14(), RectangleExtension.OffsetBy(_textBounds, x, y), new Color(Color.get_Black(), 0.4f), true, (HorizontalAlignment)0, (VerticalAlignment)1);
+				}
+			}
+			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, _003CviewModel_003EP.Item.Name, Control.get_Content().get_DefaultFont14(), _textBounds, _003CviewModel_003EP.Color, true, (HorizontalAlignment)0, (VerticalAlignment)1);
 		}
 	}
 }

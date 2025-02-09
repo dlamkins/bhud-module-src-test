@@ -1,38 +1,45 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using GuildWars2;
 using GuildWars2.Items;
+using Microsoft.Extensions.Localization;
 using SL.ChatLinks.UI.Tabs.Items.Collections;
 using SL.Common;
 using SL.Common.ModelBinding;
 
 namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 {
-	public sealed class UpgradeSelectorViewModel : ViewModel
+	public sealed class UpgradeSelectorViewModel : ViewModel, IDisposable
 	{
-		[CompilerGenerated]
-		private Customizer _003Ccustomizer_003EP;
+		private ObservableCollection<IGrouping<string, ItemsListViewModel>>? _options;
 
-		[CompilerGenerated]
-		private ItemsListViewModelFactory _003CitemsListViewModelFactory_003EP;
+		private readonly IStringLocalizer<UpgradeSelector> _localizer;
 
-		[CompilerGenerated]
-		private Item _003Ctarget_003EP;
+		private readonly Customizer _customizer;
 
-		[CompilerGenerated]
-		private UpgradeSlotType _003CslotType_003EP;
+		private readonly ItemsListViewModelFactory _itemsListViewModelFactory;
 
-		[CompilerGenerated]
-		private UpgradeComponent? _003CselectedUpgradeComponent_003EP;
+		private readonly Item _target;
 
-		[CompilerGenerated]
-		private IEventAggregator _003CeventAggregator_003EP;
+		private readonly UpgradeSlotType _slotType;
 
-		private List<IGrouping<string, ItemsListViewModel>>? _options;
+		private readonly UpgradeComponent? _selectedUpgradeComponent;
 
-		public IReadOnlyList<IGrouping<string, ItemsListViewModel>> Options => _options ?? (_options = GetOptions());
+		private readonly IEventAggregator _eventAggregator;
+
+		public ObservableCollection<IGrouping<string, ItemsListViewModel>> Options
+		{
+			get
+			{
+				return _options ?? (_options = GetOptions());
+			}
+			private set
+			{
+				SetField(ref _options, value, "Options");
+			}
+		}
 
 		public IEnumerable<ItemsListViewModel> AllOptions => Options.SelectMany((IGrouping<string, ItemsListViewModel> group) => group);
 
@@ -48,15 +55,21 @@ namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 
 		public event EventHandler? Deselected;
 
-		public UpgradeSelectorViewModel(Customizer customizer, ItemsListViewModelFactory itemsListViewModelFactory, Item target, UpgradeSlotType slotType, UpgradeComponent? selectedUpgradeComponent, IEventAggregator eventAggregator)
+		public UpgradeSelectorViewModel(IStringLocalizer<UpgradeSelector> localizer, Customizer customizer, ItemsListViewModelFactory itemsListViewModelFactory, Item target, UpgradeSlotType slotType, UpgradeComponent? selectedUpgradeComponent, IEventAggregator eventAggregator)
 		{
-			_003Ccustomizer_003EP = customizer;
-			_003CitemsListViewModelFactory_003EP = itemsListViewModelFactory;
-			_003Ctarget_003EP = target;
-			_003CslotType_003EP = slotType;
-			_003CselectedUpgradeComponent_003EP = selectedUpgradeComponent;
-			_003CeventAggregator_003EP = eventAggregator;
-			base._002Ector();
+			_localizer = localizer;
+			_customizer = customizer;
+			_itemsListViewModelFactory = itemsListViewModelFactory;
+			_target = target;
+			_slotType = slotType;
+			_selectedUpgradeComponent = selectedUpgradeComponent;
+			_eventAggregator = eventAggregator;
+			eventAggregator.Subscribe(new Action<LocaleChanged>(OnLocaleChanged));
+		}
+
+		private void OnLocaleChanged(LocaleChanged changed)
+		{
+			Options = null;
 		}
 
 		private void OnSelect(ItemsListViewModel selection)
@@ -75,28 +88,52 @@ namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 
 		private void OnMouseEnteredUpgradeSelector()
 		{
-			_003CeventAggregator_003EP.Publish(new MouseEnteredUpgradeSelector());
+			_eventAggregator.Publish(new MouseEnteredUpgradeSelector());
 		}
 
 		private void OnMouseLeftUpgradeSelector()
 		{
-			_003CeventAggregator_003EP.Publish(new MouseLeftUpgradeSelector());
+			_eventAggregator.Publish(new MouseLeftUpgradeSelector());
 		}
 
-		private List<IGrouping<string, ItemsListViewModel>> GetOptions()
+		private ObservableCollection<IGrouping<string, ItemsListViewModel>> GetOptions()
 		{
 			Dictionary<string, int> groupOrder = new Dictionary<string, int>
 			{
-				{ "Runes", 1 },
-				{ "Sigils", 1 },
-				{ "Runes (PvP)", 2 },
-				{ "Sigils (PvP)", 2 },
-				{ "Infusions", 3 },
-				{ "Enrichments", 3 },
-				{ "Universal Upgrades", 4 },
-				{ "Uncategorized", 5 }
+				{
+					_localizer["Runes"],
+					1
+				},
+				{
+					_localizer["Sigils"],
+					1
+				},
+				{
+					_localizer["Runes (PvP)"],
+					2
+				},
+				{
+					_localizer["Sigils (PvP)"],
+					2
+				},
+				{
+					_localizer["Infusions"],
+					3
+				},
+				{
+					_localizer["Enrichments"],
+					3
+				},
+				{
+					_localizer["Universal Upgrades"],
+					4
+				},
+				{
+					_localizer["Uncategorized"],
+					5
+				}
 			};
-			return (from grouped in (from _003C_003Eh__TransparentIdentifier0 in _003Ccustomizer_003EP.GetUpgradeComponents(_003Ctarget_003EP, _003CslotType_003EP).Select(delegate(UpgradeComponent upgrade)
+			IOrderedEnumerable<IGrouping<string, ItemsListViewModel>> orderedEnumerable = from grouped in (from _003C_003Eh__TransparentIdentifier0 in _customizer.GetUpgradeComponents(_target, _slotType).Select(delegate(UpgradeComponent upgrade)
 					{
 						int rank = ((!upgrade.Rarity.IsDefined()) ? 99 : (upgrade.Rarity.ToEnum() switch
 						{
@@ -112,89 +149,77 @@ namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 						}));
 						return new { upgrade, rank };
 					})
-					let vm = _003CitemsListViewModelFactory_003EP.Create(upgrade, upgrade == _003CselectedUpgradeComponent_003EP)
+					let vm = _itemsListViewModelFactory.Create(upgrade, upgrade.Id == _selectedUpgradeComponent?.Id)
 					orderby rank, upgrade.Level, upgrade.Name
 					select _003C_003Eh__TransparentIdentifier1).GroupBy(_003C_003Eh__TransparentIdentifier1 =>
 				{
 					UpgradeComponent upgrade2 = _003C_003Eh__TransparentIdentifier1._003C_003Eh__TransparentIdentifier0.upgrade;
-					if (upgrade2 is Gem)
+					LocalizedString localizedString = ((upgrade2 is Gem) ? _localizer["Universal Upgrades"] : ((!(upgrade2 is Rune)) ? ((!(upgrade2 is Sigil)) ? (_003C_003Eh__TransparentIdentifier1._003C_003Eh__TransparentIdentifier0.upgrade.InfusionUpgradeFlags.Infusion ? _localizer["Infusions"] : ((!_003C_003Eh__TransparentIdentifier1._003C_003Eh__TransparentIdentifier0.upgrade.InfusionUpgradeFlags.Enrichment) ? _localizer["Uncategorized"] : _localizer["Enrichments"])) : ((!_003C_003Eh__TransparentIdentifier1._003C_003Eh__TransparentIdentifier0.upgrade.GameTypes.All(delegate(Extensible<GameType> type)
 					{
-						return "Universal Upgrades";
-					}
-					if (upgrade2 is Rune)
-					{
-						if (_003C_003Eh__TransparentIdentifier1._003C_003Eh__TransparentIdentifier0.upgrade.GameTypes.All(delegate(Extensible<GameType> type)
+						bool flag3 = type.IsDefined();
+						bool flag4;
+						if (flag3)
 						{
-							bool flag3 = type.IsDefined();
-							bool flag4;
-							if (flag3)
+							GameType? gameType2 = type.ToEnum();
+							if (gameType2.HasValue)
 							{
-								GameType? gameType2 = type.ToEnum();
-								if (gameType2.HasValue)
+								GameType valueOrDefault2 = gameType2.GetValueOrDefault();
+								if ((uint)(valueOrDefault2 - 4) <= 1u)
 								{
-									GameType valueOrDefault2 = gameType2.GetValueOrDefault();
-									if ((uint)(valueOrDefault2 - 4) <= 1u)
-									{
-										flag4 = true;
-										goto IL_0030;
-									}
+									flag4 = true;
+									goto IL_0030;
 								}
-								flag4 = false;
-								goto IL_0030;
 							}
-							goto IL_0032;
-							IL_0032:
-							return flag3;
-							IL_0030:
-							flag3 = flag4;
-							goto IL_0032;
-						}))
-						{
-							return "Runes (PvP)";
+							flag4 = false;
+							goto IL_0030;
 						}
-						return "Runes";
-					}
-					if (upgrade2 is Sigil)
+						goto IL_0032;
+						IL_0032:
+						return flag3;
+						IL_0030:
+						flag3 = flag4;
+						goto IL_0032;
+					})) ? _localizer["Sigils"] : _localizer["Sigils (PvP)"])) : ((!_003C_003Eh__TransparentIdentifier1._003C_003Eh__TransparentIdentifier0.upgrade.GameTypes.All(delegate(Extensible<GameType> type)
 					{
-						if (_003C_003Eh__TransparentIdentifier1._003C_003Eh__TransparentIdentifier0.upgrade.GameTypes.All(delegate(Extensible<GameType> type)
+						bool flag = type.IsDefined();
+						bool flag2;
+						if (flag)
 						{
-							bool flag = type.IsDefined();
-							bool flag2;
-							if (flag)
+							GameType? gameType = type.ToEnum();
+							if (gameType.HasValue)
 							{
-								GameType? gameType = type.ToEnum();
-								if (gameType.HasValue)
+								GameType valueOrDefault = gameType.GetValueOrDefault();
+								if ((uint)(valueOrDefault - 4) <= 1u)
 								{
-									GameType valueOrDefault = gameType.GetValueOrDefault();
-									if ((uint)(valueOrDefault - 4) <= 1u)
-									{
-										flag2 = true;
-										goto IL_0030;
-									}
+									flag2 = true;
+									goto IL_0030;
 								}
-								flag2 = false;
-								goto IL_0030;
 							}
-							goto IL_0032;
-							IL_0032:
-							return flag;
-							IL_0030:
-							flag = flag2;
-							goto IL_0032;
-						}))
-						{
-							return "Sigils (PvP)";
+							flag2 = false;
+							goto IL_0030;
 						}
-						return "Sigils";
-					}
-					if (_003C_003Eh__TransparentIdentifier1._003C_003Eh__TransparentIdentifier0.upgrade.InfusionUpgradeFlags.Infusion)
-					{
-						return "Infusions";
-					}
-					return _003C_003Eh__TransparentIdentifier1._003C_003Eh__TransparentIdentifier0.upgrade.InfusionUpgradeFlags.Enrichment ? "Enrichments" : "Uncategorized";
+						goto IL_0032;
+						IL_0032:
+						return flag;
+						IL_0030:
+						flag = flag2;
+						goto IL_0032;
+					})) ? _localizer["Runes"] : _localizer["Runes (PvP)"])));
+					return (string)localizedString;
 				}, _003C_003Eh__TransparentIdentifier1 => _003C_003Eh__TransparentIdentifier1.vm)
 				orderby groupOrder[grouped.Key]
-				select grouped).ToList();
+				select grouped;
+			ObservableCollection<IGrouping<string, ItemsListViewModel>> observableCollection = new ObservableCollection<IGrouping<string, ItemsListViewModel>>();
+			foreach (IGrouping<string, ItemsListViewModel> item in orderedEnumerable)
+			{
+				observableCollection.Add(item);
+			}
+			return observableCollection;
+		}
+
+		public void Dispose()
+		{
+			_eventAggregator.Unsubscribe<LocaleChanged>(new Action<LocaleChanged>(OnLocaleChanged));
 		}
 	}
 }

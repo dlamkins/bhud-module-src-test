@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
-using System.Runtime.CompilerServices;
 using Blish_HUD.Content;
 using GuildWars2.Items;
+using Microsoft.Extensions.Localization;
 using Microsoft.Xna.Framework;
 using SL.ChatLinks.UI.Tabs.Items.Tooltips;
 using SL.Common;
@@ -13,22 +13,19 @@ using SL.Common.ModelBinding;
 
 namespace SL.ChatLinks.UI.Tabs.Items.Collections
 {
-	public sealed class ItemsListViewModel : ViewModel
+	public sealed class ItemsListViewModel : ViewModel, IDisposable
 	{
-		[CompilerGenerated]
-		private IClipBoard _003Cclipboard_003EP;
+		private readonly IStringLocalizer<ItemsList> _localizer;
 
-		[CompilerGenerated]
-		private ItemIcons _003Cicons_003EP;
+		private readonly IEventAggregator _eventAggregator;
 
-		[CompilerGenerated]
-		private Customizer _003Ccustomizer_003EP;
+		private readonly IClipBoard _clipboard;
 
-		[CompilerGenerated]
-		private Item _003Citem_003EP;
+		private readonly ItemIcons _icons;
 
-		[CompilerGenerated]
-		private ItemTooltipViewModelFactory _003CtooltipViewModelFactory_003EP;
+		private readonly Customizer _customizer;
+
+		private readonly ItemTooltipViewModelFactory _tooltipViewModelFactory;
 
 		private bool _isSelected;
 
@@ -48,49 +45,72 @@ namespace SL.ChatLinks.UI.Tabs.Items.Collections
 			}
 		}
 
+		public string SelectLabel => (string)_localizer["Select"];
+
+		public string DeselectLabel => (string)_localizer["Deselect"];
+
 		public RelayCommand ToggleCommand => new RelayCommand(delegate
 		{
 			IsSelected = !IsSelected;
 		});
 
+		public string CopyNameLabel => (string)_localizer["Copy Name"];
+
 		public RelayCommand CopyNameCommand => new RelayCommand(delegate
 		{
-			_003Cclipboard_003EP.SetText(Item.Name);
+			_clipboard.SetText(Item.Name);
 		});
+
+		public string CopyChatLinkLabel => (string)_localizer["Copy Chat Link"];
 
 		public RelayCommand CopyChatLinkCommand => new RelayCommand(delegate
 		{
-			_003Cclipboard_003EP.SetText(Item.ChatLink);
+			_clipboard.SetText(Item.ChatLink);
 		});
+
+		public string OpenWikiLabel => (string)_localizer["Open Wiki"];
 
 		public RelayCommand OpenWikiCommand => new RelayCommand(delegate
 		{
-			Process.Start("https://wiki.guildwars2.com/wiki/?search=" + WebUtility.UrlEncode(_003Citem_003EP.ChatLink));
+			Process.Start(_localizer["Wiki search", new object[1] { WebUtility.UrlEncode(Item.ChatLink) }]);
 		});
+
+		public string OpenApiLabel => (string)_localizer["Open API"];
 
 		public RelayCommand OpenApiCommand => new RelayCommand(delegate
 		{
-			Process.Start($"https://api.guildwars2.com/v2/items/{_003Citem_003EP.Id}?v=latest");
+			Process.Start(_localizer["Item API", new object[1] { Item.Id }]);
 		});
 
-		public ItemsListViewModel(IClipBoard clipboard, ItemIcons icons, Customizer customizer, Item item, ItemTooltipViewModelFactory tooltipViewModelFactory, bool isSelected)
+		public ItemsListViewModel(IStringLocalizer<ItemsList> localizer, IEventAggregator eventAggregator, IClipBoard clipboard, ItemIcons icons, Customizer customizer, Item item, ItemTooltipViewModelFactory tooltipViewModelFactory, bool isSelected)
 		{
-			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-			_003Cclipboard_003EP = clipboard;
-			_003Cicons_003EP = icons;
-			_003Ccustomizer_003EP = customizer;
-			_003Citem_003EP = item;
-			_003CtooltipViewModelFactory_003EP = tooltipViewModelFactory;
+			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
+			_localizer = localizer;
+			_eventAggregator = eventAggregator;
+			_clipboard = clipboard;
+			_icons = icons;
+			_customizer = customizer;
+			_tooltipViewModelFactory = tooltipViewModelFactory;
 			_isSelected = isSelected;
-			Item = _003Citem_003EP ?? throw new ArgumentNullException("item");
-			Color = ItemColors.Rarity(_003Citem_003EP.Rarity);
-			base._002Ector();
+			Item = item ?? throw new ArgumentNullException("item");
+			Color = ItemColors.Rarity(item.Rarity);
+			_eventAggregator.Subscribe(new Action<LocaleChanged>(OnLocaleChanged));
+		}
+
+		private void OnLocaleChanged(LocaleChanged changed)
+		{
+			OnPropertyChanged("SelectLabel");
+			OnPropertyChanged("DeselectLabel");
+			OnPropertyChanged("CopyNameLabel");
+			OnPropertyChanged("CopyChatLinkLabel");
+			OnPropertyChanged("OpenWikiLabel");
+			OnPropertyChanged("OpenApiLabel");
 		}
 
 		public AsyncTexture2D? GetIcon()
 		{
-			return _003Cicons_003EP.GetIcon(_003Citem_003EP);
+			return _icons.GetIcon(Item);
 		}
 
 		public ItemTooltipViewModel CreateTooltipViewModel()
@@ -102,7 +122,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Collections
 				upgrades.AddRange(UpgradeSlots(upgradable));
 				upgrades.AddRange(InfusionSlots(upgradable));
 			}
-			return _003CtooltipViewModelFactory_003EP.Create(_003Citem_003EP, 1, upgrades);
+			return _tooltipViewModelFactory.Create(Item, 1, upgrades);
 		}
 
 		private IEnumerable<UpgradeSlot> UpgradeSlots(IUpgradable upgradable)
@@ -110,7 +130,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Collections
 			return upgradable.UpgradeSlots.Select((int? upgradeComponentId) => new UpgradeSlot
 			{
 				Type = UpgradeSlotType.Default,
-				UpgradeComponent = _003Ccustomizer_003EP.GetUpgradeComponent(upgradeComponentId)
+				UpgradeComponent = _customizer.GetUpgradeComponent(upgradeComponentId)
 			});
 		}
 
@@ -140,12 +160,17 @@ namespace SL.ChatLinks.UI.Tabs.Items.Collections
 				goto IL_002c;
 				IL_002c:
 				upgradeSlot.Type = type;
-				upgradeSlot.UpgradeComponent = _003Ccustomizer_003EP.GetUpgradeComponent(infusionSlot.ItemId);
+				upgradeSlot.UpgradeComponent = _customizer.GetUpgradeComponent(infusionSlot.ItemId);
 				return upgradeSlot;
 				IL_002a:
 				type = UpgradeSlotType.Default;
 				goto IL_002c;
 			});
+		}
+
+		public void Dispose()
+		{
+			_eventAggregator.Unsubscribe<LocaleChanged>(new Action<LocaleChanged>(OnLocaleChanged));
 		}
 	}
 }

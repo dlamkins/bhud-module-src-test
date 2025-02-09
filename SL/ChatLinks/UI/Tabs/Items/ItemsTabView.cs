@@ -1,10 +1,13 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
-using Microsoft.Extensions.Logging;
 using Microsoft.Xna.Framework;
 using SL.ChatLinks.UI.Tabs.Items.Collections;
 using SL.Common.Controls;
@@ -14,57 +17,123 @@ namespace SL.ChatLinks.UI.Tabs.Items
 {
 	public class ItemsTabView : View
 	{
-		private readonly TextBox _searchBox;
-
-		private readonly LoadingSpinner _loadingSpinner;
-
-		private readonly ItemsList _searchResults;
+		private readonly FlowPanel _layout;
 
 		private readonly ViewContainer _editor;
 
 		public ItemsTabViewModel ViewModel { get; }
 
-		public ItemsTabView(ILogger<ItemsTabView> logger, ItemsTabViewModel viewModel)
+		public ItemsTabView(ItemsTabViewModel viewModel)
 			: this()
 		{
-			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002e: Expected O, but got Unknown
-			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0045: Expected O, but got Unknown
+			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0060: Expected O, but got Unknown
-			//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00de: Expected O, but got Unknown
+			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0070: Expected O, but got Unknown
+			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008b: Expected O, but got Unknown
+			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b4: Expected O, but got Unknown
+			//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0105: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0111: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012d: Expected O, but got Unknown
+			//IL_0181: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0186: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0192: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b0: Expected O, but got Unknown
+			ItemsTabView itemsTabView = this;
 			ViewModel = viewModel;
-			TextBox val = new TextBox();
-			((Control)val).set_Width(400);
-			((TextInputBase)val).set_PlaceholderText("Enter item name or chat link...");
-			_searchBox = val;
-			LoadingSpinner val2 = new LoadingSpinner();
-			((Control)val2).set_Size(new Point(((Control)_searchBox).get_Height()));
-			((Control)val2).set_Right(((Control)_searchBox).get_Right());
-			_loadingSpinner = val2;
+			ViewModel.Initialize();
+			FlowPanel val = new FlowPanel();
+			val.set_FlowDirection((ControlFlowDirection)2);
+			((Container)val).set_WidthSizingMode((SizingMode)2);
+			((Container)val).set_HeightSizingMode((SizingMode)2);
+			_layout = val;
+			FlowPanel val2 = new FlowPanel();
+			((Control)val2).set_Parent((Container)(object)_layout);
+			val2.set_FlowDirection((ControlFlowDirection)3);
+			((Control)val2).set_Width(400);
+			((Container)val2).set_HeightSizingMode((SizingMode)2);
+			FlowPanel searchLayout = val2;
+			Panel val3 = new Panel();
+			((Control)val3).set_Parent((Container)(object)searchLayout);
+			((Container)val3).set_WidthSizingMode((SizingMode)2);
+			((Container)val3).set_HeightSizingMode((SizingMode)1);
+			Panel searchBoxPanel = val3;
+			TextBox val4 = new TextBox();
+			((Control)val4).set_Parent((Container)(object)searchBoxPanel);
+			((Control)val4).set_Width(400);
+			((TextInputBase)val4).set_PlaceholderText(viewModel.SearchPlaceholderText);
+			TextBox searchBox = val4;
+			((TextInputBase)searchBox).add_TextChanged((EventHandler<EventArgs>)SearchTextChanged);
+			searchBox.add_EnterPressed((EventHandler<EventArgs>)SearchEnterPressed);
+			((TextInputBase)searchBox).add_InputFocusChanged((EventHandler<ValueEventArgs<bool>>)delegate(object sender, ValueEventArgs<bool> args)
+			{
+				if (args.get_Value())
+				{
+					((TextInputBase)searchBox).set_SelectionStart(0);
+					((TextInputBase)searchBox).set_SelectionEnd(((TextInputBase)searchBox).get_Length());
+				}
+				else
+				{
+					((TextInputBase)searchBox).set_SelectionStart(((TextInputBase)searchBox).get_SelectionEnd());
+				}
+			});
+			LoadingSpinner val5 = new LoadingSpinner();
+			((Control)val5).set_Parent((Container)(object)searchBoxPanel);
+			((Control)val5).set_Size(new Point(((Control)searchBox).get_Height()));
+			((Control)val5).set_Right(((Control)searchBox).get_Right());
+			LoadingSpinner loadingSpinner = val5;
 			ItemsList itemsList = new ItemsList();
+			((Control)itemsList).set_Parent((Container)(object)searchLayout);
 			((Container)itemsList).set_WidthSizingMode((SizingMode)0);
 			((Control)itemsList).set_Width(400);
 			((Container)itemsList).set_HeightSizingMode((SizingMode)2);
-			((Control)itemsList).set_Top(((Control)_searchBox).get_Bottom());
 			itemsList.Entries = ViewModel.SearchResults;
-			_searchResults = itemsList;
-			ViewContainer val3 = new ViewContainer();
-			((Control)val3).set_Left(((Control)_searchResults).get_Right() + 20);
-			((Control)val3).set_Width(450);
-			((Container)val3).set_HeightSizingMode((SizingMode)2);
-			val3.set_FadeView(true);
-			_editor = val3;
-			_searchResults.SelectionChanged += new Action<ListBox<ItemsListViewModel>, ListBoxSelectionChangedEventArgs<ItemsListViewModel>>(SelectionChanged);
+			ItemsList searchResults = itemsList;
+			searchResults.SelectionChanged += new Action<ListBox<ItemsListViewModel>, ListBoxSelectionChangedEventArgs<ItemsListViewModel>>(SelectionChanged);
+			ViewContainer val6 = new ViewContainer();
+			((Control)val6).set_Parent((Container)(object)_layout);
+			((Control)val6).set_Width(450);
+			((Container)val6).set_HeightSizingMode((SizingMode)2);
+			val6.set_FadeView(true);
+			_editor = val6;
+			Binder.Bind(ViewModel, (ItemsTabViewModel vm) => vm.SearchText, searchBox);
+			Binder.Bind(ViewModel, (ItemsTabViewModel vm) => vm.Searching, loadingSpinner);
+			Binder.Bind<ItemsTabViewModel, Scrollbar, string>(ViewModel, (Expression<Func<ItemsTabViewModel, string>>)((ItemsTabViewModel vm) => vm.ResultText), ((IEnumerable)((Container)searchLayout).get_Children()).OfType<Scrollbar>().Single(), (Expression<Func<Scrollbar, string>>)((Scrollbar ctl) => ((Control)ctl).get_BasicTooltipText()), BindingMode.ToView);
+			viewModel.PropertyChanged += delegate(object _, PropertyChangedEventArgs args)
+			{
+				string propertyName = args.PropertyName;
+				if (!(propertyName == "SearchPlaceholderText"))
+				{
+					if (propertyName == "SearchResults")
+					{
+						searchResults.Entries = itemsTabView.ViewModel.SearchResults;
+					}
+				}
+				else
+				{
+					((TextInputBase)searchBox).set_PlaceholderText(itemsTabView.ViewModel.SearchPlaceholderText);
+				}
+			};
 		}
 
 		private void SelectionChanged(ListBox<ItemsListViewModel> sender, ListBoxSelectionChangedEventArgs<ItemsListViewModel> args)
@@ -78,11 +147,13 @@ namespace SL.ChatLinks.UI.Tabs.Items
 					ItemsListViewModel listItem = listItem2.Data;
 					if (listItem != null)
 					{
+						ViewModel.SelectedItem = listItem.Item;
 						_editor.Show((IView)(object)new ChatLinkEditorView(ViewModel.CreateChatLinkEditorViewModel(listItem.Item)));
 						return;
 					}
 				}
 			}
+			ViewModel.SelectedItem = null;
 			_editor.Clear();
 		}
 
@@ -94,22 +165,12 @@ namespace SL.ChatLinks.UI.Tabs.Items
 
 		protected override void Build(Container buildPanel)
 		{
-			((Control)_searchBox).set_Parent(buildPanel);
-			((Control)_loadingSpinner).set_Parent(buildPanel);
-			((Control)_searchResults).set_Parent(buildPanel);
-			((Control)_editor).set_Parent(buildPanel);
-			Binder.Bind(ViewModel, (ItemsTabViewModel vm) => vm.SearchText, _searchBox);
-			Binder.Bind(ViewModel, (ItemsTabViewModel vm) => vm.Searching, _loadingSpinner);
-			((TextInputBase)_searchBox).add_TextChanged((EventHandler<EventArgs>)SearchTextChanged);
-			_searchBox.add_EnterPressed((EventHandler<EventArgs>)SearchEnterPressed);
-			((TextInputBase)_searchBox).add_InputFocusChanged((EventHandler<ValueEventArgs<bool>>)SearchInputFocusChanged);
+			((Control)_layout).set_Parent(buildPanel);
 		}
 
 		protected override void Unload()
 		{
-			((TextInputBase)_searchBox).remove_TextChanged((EventHandler<EventArgs>)SearchEnterPressed);
-			_searchBox.remove_EnterPressed((EventHandler<EventArgs>)SearchEnterPressed);
-			((TextInputBase)_searchBox).remove_InputFocusChanged((EventHandler<ValueEventArgs<bool>>)SearchInputFocusChanged);
+			ViewModel.Unload();
 		}
 
 		private void SearchTextChanged(object sender, EventArgs e)
@@ -120,19 +181,6 @@ namespace SL.ChatLinks.UI.Tabs.Items
 		private void SearchEnterPressed(object sender, EventArgs e)
 		{
 			ViewModel.SearchCommand.Execute(null);
-		}
-
-		private void SearchInputFocusChanged(object sender, ValueEventArgs<bool> args)
-		{
-			if (args.get_Value())
-			{
-				((TextInputBase)_searchBox).set_SelectionStart(0);
-				((TextInputBase)_searchBox).set_SelectionEnd(((TextInputBase)_searchBox).get_Length());
-			}
-			else
-			{
-				((TextInputBase)_searchBox).set_SelectionStart(((TextInputBase)_searchBox).get_SelectionEnd());
-			}
 		}
 	}
 }

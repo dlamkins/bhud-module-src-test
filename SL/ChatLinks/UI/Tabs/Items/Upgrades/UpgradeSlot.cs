@@ -37,6 +37,9 @@ namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 				_label = FormatSlot();
 				((Control)_label).set_Parent((Container)(object)this);
 				break;
+			case "EmptySlotTooltip":
+				((Control)_label).set_BasicTooltipText(ViewModel.EmptySlotTooltip);
+				break;
 			}
 		}
 
@@ -81,8 +84,8 @@ namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 				FormattedLabel label = _label;
 				if (((Control)label).get_BasicTooltipText() == null)
 				{
-					string text;
-					((Control)label).set_BasicTooltipText(text = "Click to customize\r\nRight-click for options");
+					string emptySlotTooltip;
+					((Control)label).set_BasicTooltipText(emptySlotTooltip = ViewModel.EmptySlotTooltip);
 				}
 			}
 		}
@@ -127,34 +130,40 @@ namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 			switch (ViewModel.Type)
 			{
 			case UpgradeSlotType.Default:
-				builder.CreatePart(" Unused Upgrade Slot", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder part)
+				builder.CreatePart(" " + ViewModel.UnusedUpgradeSlotLabel, (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder part)
 				{
 					//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-					part.SetPrefixImage(AsyncTexture2D.op_Implicit(Resources.Texture("unused_upgrade_slot.png")));
+					part.SetPrefixImage(AsyncTexture2D.op_Implicit(EmbeddedResources.Texture("unused_upgrade_slot.png")));
 					part.SetPrefixImageSize(new Point(16));
 					part.SetFontSize((FontSize)16);
 				});
 				break;
 			case UpgradeSlotType.Infusion:
-				builder.CreatePart(" Unused Infusion Slot", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder part)
+				builder.CreatePart(" " + ViewModel.UnusedInfusionSlotLabel, (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder part)
 				{
 					//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-					part.SetPrefixImage(AsyncTexture2D.op_Implicit(Resources.Texture("unused_infusion_slot.png")));
+					part.SetPrefixImage(AsyncTexture2D.op_Implicit(EmbeddedResources.Texture("unused_infusion_slot.png")));
 					part.SetPrefixImageSize(new Point(16));
 					part.SetFontSize((FontSize)16);
 				});
 				break;
 			case UpgradeSlotType.Enrichment:
-				builder.CreatePart(" Unused Enrichment Slot", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder part)
+				builder.CreatePart(" " + ViewModel.UnusedEnrichmenSlotLabel, (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder part)
 				{
 					//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-					part.SetPrefixImage(AsyncTexture2D.op_Implicit(Resources.Texture("unused_enrichment_slot.png")));
+					part.SetPrefixImage(AsyncTexture2D.op_Implicit(EmbeddedResources.Texture("unused_enrichment_slot.png")));
 					part.SetPrefixImageSize(new Point(16));
 					part.SetFontSize((FontSize)16);
 				});
 				break;
 			}
 			return builder.Build();
+		}
+
+		protected override void DisposeControl()
+		{
+			((Container)this).DisposeControl();
+			ViewModel.Dispose();
 		}
 	}
 }

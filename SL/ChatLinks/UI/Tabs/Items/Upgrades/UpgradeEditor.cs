@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq.Expressions;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Microsoft.Xna.Framework;
 using SL.Common;
 using SL.Common.Controls;
+using SL.Common.ModelBinding;
 
 namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 {
@@ -36,12 +38,12 @@ namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 			((Control)_upgradeSlot).add_Click((EventHandler<MouseEventArgs>)UpgradeSlotClicked);
 			((Control)_upgradeSlot).set_Menu(new ContextMenuStrip((Func<IEnumerable<ContextMenuStripItem>>)(() => new _003C_003Ez__ReadOnlyArray<ContextMenuStripItem>((ContextMenuStripItem[])(object)new ContextMenuStripItem[6]
 			{
-				ViewModel.CustomizeCommand.ToMenuItem(() => "Customize"),
-				ViewModel.RemoveCommand.ToMenuItem(() => ViewModel.RemoveItemText),
-				ViewModel.CopyNameCommand.ToMenuItem(() => "Copy Name"),
-				ViewModel.CopyChatLinkCommand.ToMenuItem(() => "Copy Chat Link"),
-				ViewModel.OpenWikiCommand.ToMenuItem(() => "Open Wiki"),
-				ViewModel.OpenApiCommand.ToMenuItem(() => "Open API")
+				ViewModel.CustomizeCommand.ToMenuItem(() => ViewModel.CustomizeLabel),
+				ViewModel.RemoveCommand.ToMenuItem(() => ViewModel.RemoveItemLabel),
+				ViewModel.CopyNameCommand.ToMenuItem(() => ViewModel.CopyNameLabel),
+				ViewModel.CopyChatLinkCommand.ToMenuItem(() => ViewModel.CopyChatLinkLabel),
+				ViewModel.OpenWikiCommand.ToMenuItem(() => ViewModel.OpenWikiLabel),
+				ViewModel.OpenApiCommand.ToMenuItem(() => ViewModel.OpenApiLabel)
 			}))));
 		}
 
@@ -57,14 +59,13 @@ namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0038: Expected O, but got Unknown
+			//IL_002d: Expected O, but got Unknown
 			StandardButton val = new StandardButton();
 			((Control)val).set_Parent((Container)(object)this);
 			((Control)val).set_Width(350);
-			val.set_Text("Cancel");
 			val.set_Icon(AsyncTexture2D.FromAssetId(155149));
 			_cancelButton = val;
+			Binder.Bind<UpgradeEditorViewModel, StandardButton, string>(ViewModel, (Expression<Func<UpgradeEditorViewModel, string>>)((UpgradeEditorViewModel vm) => vm.CancelLabel), _cancelButton, (Expression<Func<StandardButton, string>>)((StandardButton btn) => btn.get_Text()), BindingMode.ToView);
 			UpgradeSelector upgradeSelector = new UpgradeSelector(ViewModel.CreateUpgradeComponentListViewModel());
 			((Control)upgradeSelector).set_Parent((Container)(object)this);
 			_options = upgradeSelector;
@@ -97,6 +98,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 			UpgradeSlot upgradeSlot = new UpgradeSlot(ViewModel.UpgradeSlotViewModel);
 			((Control)upgradeSlot).set_Parent((Container)(object)this);
 			((Container)upgradeSlot).set_WidthSizingMode((SizingMode)2);
+			((Control)upgradeSlot).set_Opacity(ViewModel.IsCustomizable ? 1f : 0.33f);
 			return upgradeSlot;
 		}
 
@@ -113,6 +115,12 @@ namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 					HideOptions();
 				}
 			}
+		}
+
+		protected override void DisposeControl()
+		{
+			((FlowPanel)this).DisposeControl();
+			ViewModel.Dispose();
 		}
 	}
 }

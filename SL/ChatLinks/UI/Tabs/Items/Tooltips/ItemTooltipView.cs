@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Common.UI.Views;
 using Blish_HUD.Content;
@@ -9,6 +10,7 @@ using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using GuildWars2;
 using GuildWars2.Hero;
+using GuildWars2.Hero.Equipment.Wardrobe;
 using GuildWars2.Items;
 using Microsoft.Xna.Framework;
 using SL.Common;
@@ -19,170 +21,42 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 {
 	public sealed class ItemTooltipView : View, ITooltipView, IView
 	{
+		private static readonly Color Gray = new Color(153, 153, 153);
+
+		private static readonly Color ActiveBuffColor = new Color(85, 153, 255);
+
 		private readonly FlowPanel _layout;
 
 		public ItemTooltipViewModel ViewModel { get; }
 
 		public ItemTooltipView(ItemTooltipViewModel viewModel)
-			: this()
 		{
-			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0031: Expected O, but got Unknown
-			ViewModel = viewModel;
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0024: Expected O, but got Unknown
 			FlowPanel val = new FlowPanel();
 			val.set_FlowDirection((ControlFlowDirection)3);
 			((Control)val).set_Width(350);
 			((Container)val).set_HeightSizingMode((SizingMode)1);
 			_layout = val;
-			Item item = viewModel.Item;
-			Armor armor = item as Armor;
-			if ((object)armor == null)
-			{
-				Backpack back = item as Backpack;
-				if ((object)back == null)
-				{
-					Bag bag = item as Bag;
-					if ((object)bag == null)
-					{
-						Consumable consumable = item as Consumable;
-						if ((object)consumable == null)
-						{
-							Container container = item as Container;
-							if ((object)container == null)
-							{
-								CraftingMaterial craftingMaterial = item as CraftingMaterial;
-								if ((object)craftingMaterial == null)
-								{
-									GatheringTool gatheringTool = item as GatheringTool;
-									if ((object)gatheringTool == null)
-									{
-										Trinket trinket = item as Trinket;
-										if ((object)trinket == null)
-										{
-											Gizmo gizmo = item as Gizmo;
-											if ((object)gizmo == null)
-											{
-												JadeTechModule jadeTechModule = item as JadeTechModule;
-												if ((object)jadeTechModule == null)
-												{
-													Miniature miniature = item as Miniature;
-													if ((object)miniature == null)
-													{
-														PowerCore powerCore = item as PowerCore;
-														if ((object)powerCore == null)
-														{
-															Relic relic = item as Relic;
-															if ((object)relic == null)
-															{
-																SalvageTool salvageTool = item as SalvageTool;
-																if ((object)salvageTool == null)
-																{
-																	Trophy trophy = item as Trophy;
-																	if ((object)trophy == null)
-																	{
-																		UpgradeComponent upgradeComponent = item as UpgradeComponent;
-																		if ((object)upgradeComponent == null)
-																		{
-																			Weapon weapon = item as Weapon;
-																			if ((object)weapon != null)
-																			{
-																				PrintWeapon(weapon);
-																			}
-																			else
-																			{
-																				Print(viewModel.Item);
-																			}
-																		}
-																		else
-																		{
-																			PrintUpgradeComponent(upgradeComponent);
-																		}
-																	}
-																	else
-																	{
-																		PrintTrophy(trophy);
-																	}
-																}
-																else
-																{
-																	PrintSalvageTool(salvageTool);
-																}
-															}
-															else
-															{
-																PrintRelic(relic);
-															}
-														}
-														else
-														{
-															PrintPowerCore(powerCore);
-														}
-													}
-													else
-													{
-														PrintMiniature(miniature);
-													}
-												}
-												else
-												{
-													PrintJadeTechModule(jadeTechModule);
-												}
-											}
-											else
-											{
-												PrintGizmo(gizmo);
-											}
-										}
-										else
-										{
-											PrintTrinket(trinket);
-										}
-									}
-									else
-									{
-										PrintGatheringTool(gatheringTool);
-									}
-								}
-								else
-								{
-									PrintCraftingMaterial(craftingMaterial);
-								}
-							}
-							else
-							{
-								PrintContainer(container);
-							}
-						}
-						else
-						{
-							PrintConsumable(consumable);
-						}
-					}
-					else
-					{
-						PrintBag(bag);
-					}
-				}
-				else
-				{
-					PrintBackpack(back);
-				}
-			}
-			else
-			{
-				PrintArmor(armor);
-			}
+			ViewModel = viewModel;
+			((View)this)._002Ector();
+		}
+
+		protected override async Task<bool> Load(IProgress<string> progress)
+		{
+			await ViewModel.Load(progress);
+			return true;
 		}
 
 		private void PrintArmor(Armor armor)
 		{
 			PrintHeader(armor);
-			PrintAttributes(armor.Attributes.ToDictionary((KeyValuePair<Extensible<AttributeName>, int> stat) => ViewModel.AttributeName(stat.Key), (KeyValuePair<Extensible<AttributeName>, int> stat) => stat.Value));
+			PrintAttributes(armor.Attributes.ToDictionary((KeyValuePair<Extensible<AttributeName>, int> stat) => stat.Key.ToString(), (KeyValuePair<Extensible<AttributeName>, int> stat) => stat.Value));
 			PrintUpgrades();
-			PrintItemSkin(armor.DefaultSkinId);
+			PrintItemSkin();
 			PrintItemRarity(armor.Rarity);
 			PrintWeightClass(armor.WeightClass);
 			if (!(armor is Boots))
@@ -197,32 +71,32 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 							{
 								if (armor is Shoulders)
 								{
-									PrintPlainText("Shoulder Armor");
+									PrintPlainText((string)ViewModel.Localizer["Shoulder Armor"]);
 								}
 							}
 							else
 							{
-								PrintPlainText("Leg Armor");
+								PrintPlainText((string)ViewModel.Localizer["Leg Armor"]);
 							}
 						}
 						else
 						{
-							PrintPlainText("Head Armor");
+							PrintPlainText((string)ViewModel.Localizer["Head Armor"]);
 						}
 					}
 					else
 					{
-						PrintPlainText("Hand Armor");
+						PrintPlainText((string)ViewModel.Localizer["Hand Armor"]);
 					}
 				}
 				else
 				{
-					PrintPlainText("Chest Armor");
+					PrintPlainText((string)ViewModel.Localizer["Chest Armor"]);
 				}
 			}
 			else
 			{
-				PrintPlainText("Foot Armor");
+				PrintPlainText((string)ViewModel.Localizer["Foot Armor"]);
 			}
 			PrintRequiredLevel(armor.Level);
 			PrintDescription(armor.Description);
@@ -236,11 +110,11 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 		private void PrintBackpack(Backpack back)
 		{
 			PrintHeader(back);
-			PrintAttributes(back.Attributes.ToDictionary((KeyValuePair<Extensible<AttributeName>, int> stat) => ViewModel.AttributeName(stat.Key), (KeyValuePair<Extensible<AttributeName>, int> stat) => stat.Value));
+			PrintAttributes(back.Attributes.ToDictionary((KeyValuePair<Extensible<AttributeName>, int> stat) => ViewModel.Localizer[stat.Key.ToString()].ToString(), (KeyValuePair<Extensible<AttributeName>, int> stat) => stat.Value));
 			PrintUpgrades();
-			PrintItemSkin(back.DefaultSkinId);
+			PrintItemSkin();
 			PrintItemRarity(back.Rarity);
-			PrintPlainText("Back Item");
+			PrintPlainText((string)ViewModel.Localizer["Back Item"]);
 			PrintRequiredLevel(back.Level);
 			PrintDescription(back.Description);
 			PrintInBank();
@@ -262,14 +136,34 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 
 		private void PrintConsumable(Consumable consumable)
 		{
+			//IL_0316: Unknown result type (might be due to invalid IL or missing references)
+			//IL_033d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_036e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_040c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0433: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0464: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0502: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0529: Unknown result type (might be due to invalid IL or missing references)
+			//IL_055a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05f8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_061f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0650: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06ee: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0715: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0746: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0804: Unknown result type (might be due to invalid IL or missing references)
+			//IL_082b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_085c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0932: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0963: Unknown result type (might be due to invalid IL or missing references)
 			PrintHeader(consumable);
 			if (consumable is Currency || consumable is Service)
 			{
-				PrintPlainText("Takes effect immediately upon receipt.");
+				PrintPlainText((string)ViewModel.Localizer["Takes effect immediately upon receipt"]);
 			}
 			else
 			{
-				PrintPlainText("Double-click to consume.");
+				PrintPlainText((string)ViewModel.Localizer["Double-click to consume"]);
 			}
 			Food food = consumable as Food;
 			if ((object)food != null)
@@ -312,27 +206,244 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 			PrintDescription(consumable.Description);
 			if (!(consumable is Currency) && !(consumable is Service))
 			{
-				Transmutation transmutation = consumable as Transmutation;
-				if ((object)transmutation == null)
+				if (!(consumable is Transmutation))
 				{
-					if (consumable is Booze)
+					if (!(consumable is Booze))
 					{
-						PrintPlainText("\r\nExcessive alcohol consumption will result in intoxication.\r\n\r\nConsumable          ");
+						ContentUnlocker unlocker = consumable as ContentUnlocker;
+						if ((object)unlocker == null)
+						{
+							Dye unlocker2 = consumable as Dye;
+							if ((object)unlocker2 == null)
+							{
+								GliderSkinUnlocker unlocker3 = consumable as GliderSkinUnlocker;
+								if ((object)unlocker3 == null)
+								{
+									JadeBotSkinUnlocker unlocker4 = consumable as JadeBotSkinUnlocker;
+									if ((object)unlocker4 == null)
+									{
+										MistChampionSkinUnlocker unlocker5 = consumable as MistChampionSkinUnlocker;
+										if ((object)unlocker5 == null)
+										{
+											OutfitUnlocker unlocker6 = consumable as OutfitUnlocker;
+											if ((object)unlocker6 == null)
+											{
+												RecipeSheet unlocker7 = consumable as RecipeSheet;
+												if ((object)unlocker7 != null)
+												{
+													if (!string.IsNullOrEmpty(unlocker7.Description))
+													{
+														PrintPlainText(" ");
+													}
+													if (ViewModel.DefaultLocked)
+													{
+														if (ViewModel.Unlocked.HasValue)
+														{
+															if (ViewModel.Unlocked.Value)
+															{
+																PrintPlainText(ViewModel.UnlockedText + "\r\n", ViewModel.UnlockedTextColor);
+															}
+														}
+														else
+														{
+															PrintPlainText(ViewModel.AuthorizationText + "\r\n", Gray);
+														}
+													}
+													else
+													{
+														PrintPlainText(string.Format("{0}\r\n", ViewModel.Localizer["Unlock status unknown"]), Gray);
+													}
+													PrintPlainText((string)ViewModel.Localizer["Consumable"]);
+												}
+												else if (string.IsNullOrEmpty(consumable.Description))
+												{
+													PrintPlainText((string)ViewModel.Localizer["Consumable"]);
+												}
+												else
+												{
+													PrintPlainText("\r\n" + ViewModel.Localizer["Consumable"]);
+												}
+											}
+											else
+											{
+												if (!string.IsNullOrEmpty(unlocker6.Description))
+												{
+													PrintPlainText(" ");
+												}
+												if (ViewModel.DefaultLocked)
+												{
+													if (ViewModel.Unlocked.HasValue)
+													{
+														if (ViewModel.Unlocked.Value)
+														{
+															PrintPlainText(string.Format("{0}\r\n", ViewModel.Localizer["You have already unlocked this outfit"]), Color.get_Red());
+														}
+													}
+													else
+													{
+														PrintPlainText(ViewModel.AuthorizationText + "\r\n", Gray);
+													}
+												}
+												else
+												{
+													PrintPlainText(string.Format("{0}\r\n", ViewModel.Localizer["Unlock status unknown"]), Gray);
+												}
+												PrintPlainText((string)ViewModel.Localizer["Consumable"]);
+											}
+										}
+										else
+										{
+											if (!string.IsNullOrEmpty(unlocker5.Description))
+											{
+												PrintPlainText(" ");
+											}
+											if (ViewModel.DefaultLocked)
+											{
+												if (ViewModel.Unlocked.HasValue)
+												{
+													if (ViewModel.Unlocked.Value)
+													{
+														PrintPlainText("You have already unlocked this outfit!\r\n", Color.get_Red());
+													}
+												}
+												else
+												{
+													PrintPlainText(ViewModel.AuthorizationText + "\r\n", Gray);
+												}
+											}
+											else
+											{
+												PrintPlainText(string.Format("{0}\r\n", ViewModel.Localizer["Unlock status unknown"]), Gray);
+											}
+											PrintPlainText((string)ViewModel.Localizer["Consumable"]);
+										}
+									}
+									else
+									{
+										if (!string.IsNullOrEmpty(unlocker4.Description))
+										{
+											PrintPlainText(" ");
+										}
+										if (ViewModel.DefaultLocked)
+										{
+											if (ViewModel.Unlocked.HasValue)
+											{
+												if (ViewModel.Unlocked.Value)
+												{
+													PrintPlainText("You have already unlocked this Jade Bot!\r\n", Color.get_Red());
+												}
+											}
+											else
+											{
+												PrintPlainText(ViewModel.AuthorizationText + "\r\n", Gray);
+											}
+										}
+										else
+										{
+											PrintPlainText(string.Format("{0}\r\n", ViewModel.Localizer["Unlock status unknown"]), Gray);
+										}
+										PrintPlainText((string)ViewModel.Localizer["Consumable"]);
+									}
+								}
+								else
+								{
+									if (!string.IsNullOrEmpty(unlocker3.Description))
+									{
+										PrintPlainText(" ");
+									}
+									if (ViewModel.DefaultLocked)
+									{
+										if (ViewModel.Unlocked.HasValue)
+										{
+											if (ViewModel.Unlocked.Value)
+											{
+												PrintPlainText("You have already unlocked this glider!\r\n", Color.get_Red());
+											}
+										}
+										else
+										{
+											PrintPlainText(ViewModel.AuthorizationText + "\r\n", Gray);
+										}
+									}
+									else
+									{
+										PrintPlainText(string.Format("{0}\r\n", ViewModel.Localizer["Unlock status unknown"]), Gray);
+									}
+									PrintPlainText((string)ViewModel.Localizer["Consumable"]);
+								}
+							}
+							else
+							{
+								if (!string.IsNullOrEmpty(unlocker2.Description))
+								{
+									PrintPlainText(" ");
+								}
+								if (ViewModel.DefaultLocked)
+								{
+									if (ViewModel.Unlocked.HasValue)
+									{
+										if (ViewModel.Unlocked.Value)
+										{
+											PrintPlainText("You have already unlocked this dye!\r\n", Color.get_Red());
+										}
+									}
+									else
+									{
+										PrintPlainText(ViewModel.AuthorizationText + "\r\n", Gray);
+									}
+								}
+								else
+								{
+									PrintPlainText(string.Format("{0}\r\n", ViewModel.Localizer["Unlock status unknown"]), Gray);
+								}
+								PrintPlainText((string)ViewModel.Localizer["Consumable"]);
+							}
+						}
+						else
+						{
+							if (!string.IsNullOrEmpty(unlocker.Description))
+							{
+								PrintPlainText(" ");
+							}
+							if (ViewModel.DefaultLocked)
+							{
+								if (ViewModel.Unlocked.HasValue)
+								{
+									if (ViewModel.Unlocked.Value)
+									{
+										PrintPlainText(string.Format("{0}\r\n", ViewModel.Localizer["You already have that content unlocked"]), Color.get_Red());
+									}
+								}
+								else
+								{
+									PrintPlainText(ViewModel.AuthorizationText + "\r\n", Gray);
+								}
+							}
+							else
+							{
+								PrintPlainText(string.Format("{0}\r\n", ViewModel.Localizer["Unlock status unknown"]), Gray);
+							}
+							PrintPlainText((string)ViewModel.Localizer["Consumable"]);
+						}
 					}
 					else
 					{
-						PrintPlainText(string.IsNullOrEmpty(consumable.Description) ? "Consumable" : "\r\nConsumable");
+						PrintPlainText(string.Format("\r\n{0}\r\n\r\n{1}", ViewModel.Localizer["Excessive alcohol consumption will result in intoxication"], ViewModel.Localizer["Consumable"]));
 					}
 				}
 				else
 				{
-					PrintItemSkin(transmutation.SkinIds.First());
-					PrintPlainText("\r\nConsumable");
+					PrintTransmutation();
+					PrintPlainText("\r\n" + ViewModel.Localizer["Consumable"]);
 				}
+			}
+			else if (string.IsNullOrEmpty(consumable.Description))
+			{
+				PrintPlainText((string)ViewModel.Localizer["Service"]);
 			}
 			else
 			{
-				PrintPlainText(string.IsNullOrEmpty(consumable.Description) ? "Service" : "\r\nService");
+				PrintPlainText("\r\n" + ViewModel.Localizer["Service"]);
 			}
 			PrintRequiredLevel(consumable.Level);
 			PrintInBank();
@@ -345,7 +456,14 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 		{
 			PrintHeader(container);
 			PrintDescription(container.Description);
-			PrintPlainText(string.IsNullOrEmpty(container.Description) ? "Consumable" : "\r\nConsumable");
+			if (string.IsNullOrEmpty(container.Description))
+			{
+				PrintPlainText((string)ViewModel.Localizer["Consumable"]);
+			}
+			else
+			{
+				PrintPlainText("\r\n" + ViewModel.Localizer["Consumable"]);
+			}
 			PrintInBank();
 			PrintUniqueness(container);
 			PrintItemBinding(container);
@@ -375,7 +493,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 		private void PrintTrinket(Trinket trinket)
 		{
 			PrintHeader(trinket);
-			PrintAttributes(trinket.Attributes.ToDictionary((KeyValuePair<Extensible<AttributeName>, int> stat) => ViewModel.AttributeName(stat.Key), (KeyValuePair<Extensible<AttributeName>, int> stat) => stat.Value));
+			PrintAttributes(trinket.Attributes.ToDictionary((KeyValuePair<Extensible<AttributeName>, int> stat) => ViewModel.Localizer[stat.Key.ToString()].ToString(), (KeyValuePair<Extensible<AttributeName>, int> stat) => stat.Value));
 			PrintUpgrades();
 			PrintItemRarity(trinket.Rarity);
 			if (!(trinket is Accessory))
@@ -384,17 +502,17 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 				{
 					if (trinket is Ring)
 					{
-						PrintPlainText("Ring");
+						PrintPlainText((string)ViewModel.Localizer["Ring"]);
 					}
 				}
 				else
 				{
-					PrintPlainText("Amulet");
+					PrintPlainText((string)ViewModel.Localizer["Amulet"]);
 				}
 			}
 			else
 			{
-				PrintPlainText("Accessory");
+				PrintPlainText((string)ViewModel.Localizer["Accessory"]);
 			}
 			PrintRequiredLevel(trinket.Level);
 			PrintDescription(trinket.Description);
@@ -407,8 +525,29 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 
 		private void PrintGizmo(Gizmo gizmo)
 		{
+			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
 			PrintHeader(gizmo);
 			PrintDescription(gizmo.Description, gizmo.Level > 0);
+			if (ViewModel.DefaultLocked)
+			{
+				if (ViewModel.Unlocked.HasValue)
+				{
+					if (ViewModel.Unlocked.Value)
+					{
+						PrintPlainText(string.Format("\r\n{0}", ViewModel.Localizer["Novelty Unlocked"]));
+					}
+					else
+					{
+						PrintPlainText(string.Format("\r\n{0}", ViewModel.Localizer["Novelty Locked"]), Gray);
+					}
+				}
+				else
+				{
+					PrintPlainText("\r\n" + ViewModel.AuthorizationText, Gray);
+				}
+				PrintPlainText(string.Format("\r\n{0}", ViewModel.Localizer["Consumable"]));
+			}
 			PrintRequiredLevel(gizmo.Level);
 			PrintInBank();
 			PrintUniqueness(gizmo);
@@ -421,9 +560,9 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 			PrintHeader(jadeTechModule);
 			PrintDescription(jadeTechModule.Description);
 			PrintItemRarity(jadeTechModule.Rarity);
-			PrintPlainText("Module");
+			PrintPlainText((string)ViewModel.Localizer["Module"]);
 			PrintRequiredLevel(jadeTechModule.Level);
-			PrintPlainText("Required Mastery: Jade Bots");
+			PrintPlainText((string)ViewModel.Localizer["Required Mastery: Jade Bots"]);
 			PrintInBank();
 			PrintUniqueness(jadeTechModule);
 			PrintItemBinding(jadeTechModule);
@@ -432,10 +571,29 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 
 		private void PrintMiniature(Miniature miniature)
 		{
+			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
 			PrintHeader(miniature);
 			PrintDescription(miniature.Description);
-			PrintMini(miniature.MiniatureId);
-			PrintPlainText("Mini");
+			if (ViewModel.DefaultLocked)
+			{
+				if (ViewModel.Unlocked.HasValue)
+				{
+					if (ViewModel.Unlocked.Value)
+					{
+						PrintPlainText(string.Format("\r\n{0}\r\n", ViewModel.Localizer["Mini Unlocked"]));
+					}
+					else
+					{
+						PrintPlainText(string.Format("\r\n{0}\r\n", ViewModel.Localizer["Mini Locked"]), Gray);
+					}
+				}
+				else
+				{
+					PrintPlainText("\r\n" + ViewModel.AuthorizationText + "\r\n", Gray);
+				}
+			}
+			PrintPlainText((string)ViewModel.Localizer["Mini"]);
 			PrintInBank();
 			PrintUniqueness(miniature);
 			PrintItemBinding(miniature);
@@ -447,7 +605,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 			PrintHeader(powerCore);
 			PrintDescription(powerCore.Description, finalNewLine: true);
 			PrintItemRarity(powerCore.Rarity);
-			PrintPlainText("Power Core");
+			PrintPlainText((string)ViewModel.Localizer["Power Core"]);
 			PrintRequiredLevel(powerCore.Level);
 			PrintInBank();
 			PrintUniqueness(powerCore);
@@ -460,7 +618,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 			PrintHeader(relic);
 			PrintDescription(relic.Description, finalNewLine: true);
 			PrintItemRarity(relic.Rarity);
-			PrintPlainText("Relic");
+			PrintPlainText((string)ViewModel.Localizer["Relic"]);
 			PrintRequiredLevel(relic.Level);
 			PrintInBank();
 			PrintUniqueness(relic);
@@ -473,7 +631,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 			PrintHeader(salvageTool);
 			PrintPlainText(" ");
 			PrintItemRarity(salvageTool.Rarity);
-			PrintPlainText("Consumable");
+			PrintPlainText((string)ViewModel.Localizer["Consumable"]);
 			PrintDescription(salvageTool.Description);
 			PrintInBank();
 			PrintUniqueness(salvageTool);
@@ -485,7 +643,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 		{
 			PrintHeader(trophy);
 			PrintDescription(trophy.Description);
-			PrintPlainText("Trophy");
+			PrintPlainText((string)ViewModel.Localizer["Trophy"]);
 			PrintInBank();
 			PrintUniqueness(trophy);
 			PrintItemBinding(trophy);
@@ -512,7 +670,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 						goto IL_008f;
 					}
 				}
-				PrintAttributes(upgradeComponent.Attributes.ToDictionary((KeyValuePair<Extensible<AttributeName>, int> stat) => ViewModel.AttributeName(stat.Key), (KeyValuePair<Extensible<AttributeName>, int> stat) => stat.Value));
+				PrintAttributes(upgradeComponent.Attributes.ToDictionary((KeyValuePair<Extensible<AttributeName>, int> stat) => ViewModel.Localizer[stat.Key.ToString()].ToString(), (KeyValuePair<Extensible<AttributeName>, int> stat) => stat.Value));
 			}
 			goto IL_008f;
 			IL_008f:
@@ -529,9 +687,9 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 			PrintHeader(weapon);
 			PrintWeaponStrength(weapon);
 			PrintDefense(weapon.Defense);
-			PrintAttributes(weapon.Attributes.ToDictionary((KeyValuePair<Extensible<AttributeName>, int> stat) => ViewModel.AttributeName(stat.Key), (KeyValuePair<Extensible<AttributeName>, int> stat) => stat.Value));
+			PrintAttributes(weapon.Attributes.ToDictionary((KeyValuePair<Extensible<AttributeName>, int> stat) => ViewModel.Localizer[stat.Key.ToString()].ToString(), (KeyValuePair<Extensible<AttributeName>, int> stat) => stat.Value));
 			PrintUpgrades();
-			PrintItemSkin(weapon.DefaultSkinId);
+			PrintItemSkin();
 			PrintItemRarity(weapon.Rarity);
 			if (!(weapon is Axe))
 			{
@@ -577,112 +735,112 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 																							{
 																								if (weapon is Warhorn)
 																								{
-																									PrintPlainText("Warhorn");
+																									PrintPlainText((string)ViewModel.Localizer["Warhorn"]);
 																								}
 																							}
 																							else
 																							{
-																								PrintPlainText("Trident");
+																								PrintPlainText((string)ViewModel.Localizer["Trident"]);
 																							}
 																						}
 																						else
 																						{
-																							PrintPlainText("Toy");
+																							PrintPlainText((string)ViewModel.Localizer["Toy"]);
 																						}
 																					}
 																					else
 																					{
-																						PrintPlainText("Torch");
+																						PrintPlainText((string)ViewModel.Localizer["Torch"]);
 																					}
 																				}
 																				else
 																				{
-																					PrintPlainText("Sword");
+																					PrintPlainText((string)ViewModel.Localizer["Sword"]);
 																				}
 																			}
 																			else
 																			{
-																				PrintPlainText("Staff");
+																				PrintPlainText((string)ViewModel.Localizer["Staff"]);
 																			}
 																		}
 																		else
 																		{
-																			PrintPlainText("Spear");
+																			PrintPlainText((string)ViewModel.Localizer["Spear"]);
 																		}
 																	}
 																	else
 																	{
-																		PrintPlainText("Small Bundle");
+																		PrintPlainText((string)ViewModel.Localizer["Small Bundle"]);
 																	}
 																}
 																else
 																{
-																	PrintPlainText("Shortbow");
+																	PrintPlainText((string)ViewModel.Localizer["Shortbow"]);
 																}
 															}
 															else
 															{
-																PrintPlainText("Shield");
+																PrintPlainText((string)ViewModel.Localizer["Shield"]);
 															}
 														}
 														else
 														{
-															PrintPlainText("Scepter");
+															PrintPlainText((string)ViewModel.Localizer["Scepter"]);
 														}
 													}
 													else
 													{
-														PrintPlainText("Rifle");
+														PrintPlainText((string)ViewModel.Localizer["Rifle"]);
 													}
 												}
 												else
 												{
-													PrintPlainText("Pistol");
+													PrintPlainText((string)ViewModel.Localizer["Pistol"]);
 												}
 											}
 											else
 											{
-												PrintPlainText("Mace");
+												PrintPlainText((string)ViewModel.Localizer["Mace"]);
 											}
 										}
 										else
 										{
-											PrintPlainText("Longbow");
+											PrintPlainText((string)ViewModel.Localizer["Longbow"]);
 										}
 									}
 									else
 									{
-										PrintPlainText("Large Bundle");
+										PrintPlainText((string)ViewModel.Localizer["Large Bundle"]);
 									}
 								}
 								else
 								{
-									PrintPlainText("Harpoon Gun");
+									PrintPlainText((string)ViewModel.Localizer["Harpoon Gun"]);
 								}
 							}
 							else
 							{
-								PrintPlainText("Hammer");
+								PrintPlainText((string)ViewModel.Localizer["Hammer"]);
 							}
 						}
 						else
 						{
-							PrintPlainText("Greatsword");
+							PrintPlainText((string)ViewModel.Localizer["Greatsword"]);
 						}
 					}
 					else
 					{
-						PrintPlainText("Focus");
+						PrintPlainText((string)ViewModel.Localizer["Focus"]);
 					}
 				}
 				else
 				{
-					PrintPlainText("Dagger");
+					PrintPlainText((string)ViewModel.Localizer["Dagger"]);
 				}
 			}
 			else
 			{
-				PrintPlainText("Axe");
+				PrintPlainText((string)ViewModel.Localizer["Axe"]);
 			}
 			PrintRequiredLevel(weapon.Level);
 			PrintDescription(weapon.Description);
@@ -777,7 +935,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 		{
 			if (defense > 0)
 			{
-				PrintPlainText($"Defense: {defense:N0}");
+				PrintPlainText((string)ViewModel.Localizer["Defense", new object[1] { defense }]);
 			}
 		}
 
@@ -794,7 +952,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 				{
 					builder.AppendLine();
 				}
-				builder.AppendFormat($"+{stat.Value:N0} {stat.Key}");
+				builder.Append(ViewModel.Localizer[stat.Key, new object[1] { stat.Value }]);
 			}
 			PrintPlainText(builder.ToString());
 		}
@@ -802,7 +960,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 		public void PrintUpgrades()
 		{
 			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01eb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01df: Unknown result type (might be due to invalid IL or missing references)
 			using IEnumerator<UpgradeSlot> enumerator = ViewModel.UpgradesSlots.GetEnumerator();
 			FormattedLabelBuilder builder;
 			for (; enumerator.MoveNext(); ((Control)builder.Build()).set_Parent((Container)(object)_layout))
@@ -816,14 +974,14 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 					}).CreatePart(" " + slot.UpgradeComponent!.Name, (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder part)
 					{
 						//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-						//IL_005d: Unknown result type (might be due to invalid IL or missing references)
+						//IL_0051: Unknown result type (might be due to invalid IL or missing references)
 						if (!string.IsNullOrEmpty(slot.UpgradeComponent!.IconHref))
 						{
 							part.SetPrefixImage(ViewModel.GetIcon(slot.UpgradeComponent));
 							part.SetPrefixImageSize(new Point(16));
 						}
 						part.SetFontSize((FontSize)16);
-						part.SetTextColor(new Color(85, 153, 255));
+						part.SetTextColor(ActiveBuffColor);
 					});
 					Rune rune = slot.UpgradeComponent as Rune;
 					if ((object)rune != null)
@@ -832,9 +990,9 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 						{
 							builder.CreatePart($"\r\n({ordinal:0}): {bonus}", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder part)
 							{
-								//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+								//IL_000a: Unknown result type (might be due to invalid IL or missing references)
 								part.SetFontSize((FontSize)16);
-								part.SetTextColor(new Color(153, 153, 153));
+								part.SetTextColor(Gray);
 							});
 						}
 						continue;
@@ -849,7 +1007,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 							{
 								part.SetFontSize((FontSize)16);
 							});
-							builder.AddMarkup(slot.UpgradeComponent!.Buff!.Description, (Color?)new Color(85, 153, 255));
+							builder.AddMarkup(slot.UpgradeComponent!.Buff!.Description, ActiveBuffColor);
 							continue;
 						}
 					}
@@ -859,11 +1017,11 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 						{
 							part.SetFontSize((FontSize)16);
 						});
-						builder.CreatePart($"+{stat.Value:N0} {ViewModel.AttributeName(stat.Key)}", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder part)
+						builder.CreatePart($"+{stat.Value:N0} {ViewModel.Localizer[stat.Key.ToString()]}", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder part)
 						{
-							//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+							//IL_000a: Unknown result type (might be due to invalid IL or missing references)
 							part.SetFontSize((FontSize)16);
-							part.SetTextColor(new Color(85, 153, 255));
+							part.SetTextColor(ActiveBuffColor);
 						});
 					}
 					continue;
@@ -873,10 +1031,10 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 				case UpgradeSlotType.Infusion:
 					builder.CreatePart("\r\n", (Action<FormattedLabelPartBuilder>)delegate
 					{
-					}).CreatePart(" Unused Infusion Slot", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder part)
+					}).CreatePart(" " + ViewModel.Localizer["Unused infusion slot"], (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder part)
 					{
 						//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-						part.SetPrefixImage(AsyncTexture2D.op_Implicit(Resources.Texture("unused_infusion_slot.png")));
+						part.SetPrefixImage(AsyncTexture2D.op_Implicit(EmbeddedResources.Texture("unused_infusion_slot.png")));
 						part.SetPrefixImageSize(new Point(16));
 						part.SetFontSize((FontSize)16);
 					});
@@ -884,10 +1042,10 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 				case UpgradeSlotType.Enrichment:
 					builder.CreatePart("\r\n", (Action<FormattedLabelPartBuilder>)delegate
 					{
-					}).CreatePart(" Unused Enrichment Slot", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder part)
+					}).CreatePart(" " + ViewModel.Localizer["Unused enrichment slot"], (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder part)
 					{
 						//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-						part.SetPrefixImage(AsyncTexture2D.op_Implicit(Resources.Texture("unused_enrichment_slot.png")));
+						part.SetPrefixImage(AsyncTexture2D.op_Implicit(EmbeddedResources.Texture("unused_enrichment_slot.png")));
 						part.SetPrefixImageSize(new Point(16));
 						part.SetFontSize((FontSize)16);
 					});
@@ -895,10 +1053,10 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 				default:
 					builder.CreatePart("\r\n", (Action<FormattedLabelPartBuilder>)delegate
 					{
-					}).CreatePart(" Unused Upgrade Slot", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder part)
+					}).CreatePart(" " + ViewModel.Localizer["Unused upgrade slot"], (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder part)
 					{
 						//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-						part.SetPrefixImage(AsyncTexture2D.op_Implicit(Resources.Texture("unused_upgrade_slot.png")));
+						part.SetPrefixImage(AsyncTexture2D.op_Implicit(EmbeddedResources.Texture("unused_upgrade_slot.png")));
 						part.SetPrefixImageSize(new Point(16));
 						part.SetFontSize((FontSize)16);
 					});
@@ -907,14 +1065,64 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 			}
 		}
 
-		public void PrintItemSkin(int skinId)
+		public void PrintItemSkin()
 		{
+			//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
+			if (!ViewModel.DefaultLocked)
+			{
+				return;
+			}
+			if (ViewModel.Unlocked.HasValue)
+			{
+				if (ViewModel.Unlocked.Value)
+				{
+					PrintPlainText(string.Format("\r\n{0}\r\n{1}", ViewModel.Localizer["Skin Unlocked"], ViewModel.DefaultSkin?.Name));
+				}
+				else
+				{
+					PrintPlainText(string.Format("\r\n{0}\r\n{1}", ViewModel.Localizer["Skin Locked"], ViewModel.DefaultSkin?.Name), Gray);
+				}
+			}
+			else
+			{
+				PrintPlainText("\r\n" + ViewModel.AuthorizationText + "\r\n" + ViewModel.DefaultSkin?.Name, Gray);
+			}
+		}
+
+		public void PrintTransmutation()
+		{
+			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00af: Unknown result type (might be due to invalid IL or missing references)
+			if (!ViewModel.DefaultLocked)
+			{
+				return;
+			}
+			if (ViewModel.Unlocked.HasValue)
+			{
+				if (ViewModel.Unlocked.Value)
+				{
+					PrintPlainText(string.Format("\r\n{0}", ViewModel.Localizer["Skin Unlocked"]));
+				}
+				else
+				{
+					PrintPlainText(string.Format("\r\n{0}", ViewModel.Localizer["Skin Locked"]), Gray);
+				}
+			}
+			else
+			{
+				PrintPlainText("\r\n" + ViewModel.AuthorizationText, Gray);
+			}
 		}
 
 		public void PrintItemRarity(Extensible<Rarity> rarity)
 		{
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			if (rarity != Rarity.Basic)
+			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+			if (rarity == Rarity.Basic)
+			{
+				PrintPlainText(" ");
+			}
+			else
 			{
 				PrintPlainText($"\r\n{rarity}", ItemColors.Rarity(rarity));
 			}
@@ -929,7 +1137,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 		{
 			if (level > 0)
 			{
-				PrintPlainText($"Required Level: {level}");
+				PrintPlainText((string)ViewModel.Localizer["Required Level", new object[1] { level }]);
 			}
 		}
 
@@ -972,19 +1180,19 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 			{
 				if (item.Flags.AccountBound)
 				{
-					PrintPlainText("Account Bound on Acquire");
+					PrintPlainText((string)ViewModel.Localizer["Account Bound on Acquire"]);
 				}
 				else if (item.Flags.AccountBindOnUse)
 				{
-					PrintPlainText("Account Bound on Use");
+					PrintPlainText((string)ViewModel.Localizer["Account Bound on Use"]);
 				}
 				if (item.Flags.Soulbound)
 				{
-					PrintPlainText("Soulbound on Acquire");
+					PrintPlainText((string)ViewModel.Localizer["Soulbound on Acquire"]);
 				}
 				else if (item.Flags.SoulbindOnUse)
 				{
-					PrintPlainText("Soulbound on Use");
+					PrintPlainText((string)ViewModel.Localizer["Soulbound on Use"]);
 				}
 			}
 		}
@@ -1095,79 +1303,52 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 			val3.set_Font(GameService.Content.get_DefaultFont16());
 		}
 
-		public void PrintMini(int miniatureId)
-		{
-		}
-
 		public void PrintBuff(Buff buff)
 		{
 			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
 			((Control)new FormattedLabelBuilder().SetWidth(((Control)_layout).get_Width()).AutoSizeHeight().Wrap()
 				.CreatePart("\r\n", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder part)
 				{
 					part.SetFontSize((FontSize)16);
 				})
-				.AddMarkup(buff.Description, (Color?)new Color(85, 153, 255))
+				.AddMarkup(buff.Description, ActiveBuffColor)
 				.Build()).set_Parent((Container)(object)_layout);
 		}
 
 		public void PrintBonuses(IReadOnlyList<string> bonuses)
 		{
-			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
 			StringBuilder text = new StringBuilder();
 			foreach (var (bonus, ordinal) in bonuses.Select((string value, int index) => (value, index + 1)))
 			{
 				text.Append($"\r\n({ordinal:0}): {bonus}");
 			}
-			PrintPlainText(text.ToString(), (Color?)new Color(153, 153, 153));
+			PrintPlainText(text.ToString(), Gray);
 		}
 
 		public void PrintWeaponStrength(Weapon weapon)
 		{
 			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
 			FormattedLabelBuilder builder = new FormattedLabelBuilder().SetWidth(((Control)_layout).get_Width()).AutoSizeHeight().Wrap();
-			builder.CreatePart($"Weapon Strength: {weapon.MinPower:N0} - {weapon.MaxPower:N0}", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder part)
+			builder.CreatePart((string)ViewModel.Localizer["Weapon Strength", new object[2] { weapon.MinPower, weapon.MaxPower }], (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder part)
 			{
 				part.SetFontSize((FontSize)16);
 			});
-			if (weapon.DamageType.IsDefined())
+			Extensible<DamageType> damageType = weapon.DamageType;
+			WeaponSkin defaultSkin = ViewModel.DefaultSkin as WeaponSkin;
+			if ((object)defaultSkin != null)
 			{
-				switch (weapon.DamageType.ToEnum())
+				damageType = defaultSkin.DamageType;
+			}
+			if (damageType != DamageType.Physical)
+			{
+				builder.CreatePart($" ({ViewModel.Localizer[damageType.ToString()]})", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder part)
 				{
-				case DamageType.Choking:
-					builder.CreatePart(" (Choking)", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder part)
-					{
-						//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-						part.SetFontSize((FontSize)16);
-						part.SetTextColor(new Color(153, 153, 153));
-					});
-					break;
-				case DamageType.Fire:
-					builder.CreatePart(" (Fire)", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder part)
-					{
-						//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-						part.SetFontSize((FontSize)16);
-						part.SetTextColor(new Color(153, 153, 153));
-					});
-					break;
-				case DamageType.Ice:
-					builder.CreatePart(" (Ice)", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder part)
-					{
-						//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-						part.SetFontSize((FontSize)16);
-						part.SetTextColor(new Color(153, 153, 153));
-					});
-					break;
-				case DamageType.Lightning:
-					builder.CreatePart(" (Lightning)", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder part)
-					{
-						//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-						part.SetFontSize((FontSize)16);
-						part.SetTextColor(new Color(153, 153, 153));
-					});
-					break;
-				}
+					//IL_000a: Unknown result type (might be due to invalid IL or missing references)
+					part.SetFontSize((FontSize)16);
+					part.SetTextColor(Gray);
+				});
 			}
 			((Control)builder.Build()).set_Parent((Container)(object)_layout);
 		}
@@ -1176,7 +1357,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 		{
 			if (equipment.StatChoices.Count > 0)
 			{
-				PrintPlainText("Double-click to select stats.");
+				PrintPlainText((string)ViewModel.Localizer["Double-click to select stats."]);
 			}
 		}
 
@@ -1184,12 +1365,150 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 		{
 			if (item.Flags.Unique)
 			{
-				PrintPlainText("Unique");
+				PrintPlainText((string)ViewModel.Localizer["Unique"]);
 			}
 		}
 
 		protected override void Build(Container buildPanel)
 		{
+			Item item = ViewModel.Item;
+			Armor armor = item as Armor;
+			if ((object)armor == null)
+			{
+				Backpack back = item as Backpack;
+				if ((object)back == null)
+				{
+					Bag bag = item as Bag;
+					if ((object)bag == null)
+					{
+						Consumable consumable = item as Consumable;
+						if ((object)consumable == null)
+						{
+							Container container = item as Container;
+							if ((object)container == null)
+							{
+								CraftingMaterial craftingMaterial = item as CraftingMaterial;
+								if ((object)craftingMaterial == null)
+								{
+									GatheringTool gatheringTool = item as GatheringTool;
+									if ((object)gatheringTool == null)
+									{
+										Trinket trinket = item as Trinket;
+										if ((object)trinket == null)
+										{
+											Gizmo gizmo = item as Gizmo;
+											if ((object)gizmo == null)
+											{
+												JadeTechModule jadeTechModule = item as JadeTechModule;
+												if ((object)jadeTechModule == null)
+												{
+													Miniature miniature = item as Miniature;
+													if ((object)miniature == null)
+													{
+														PowerCore powerCore = item as PowerCore;
+														if ((object)powerCore == null)
+														{
+															Relic relic = item as Relic;
+															if ((object)relic == null)
+															{
+																SalvageTool salvageTool = item as SalvageTool;
+																if ((object)salvageTool == null)
+																{
+																	Trophy trophy = item as Trophy;
+																	if ((object)trophy == null)
+																	{
+																		UpgradeComponent upgradeComponent = item as UpgradeComponent;
+																		if ((object)upgradeComponent == null)
+																		{
+																			Weapon weapon = item as Weapon;
+																			if ((object)weapon != null)
+																			{
+																				PrintWeapon(weapon);
+																			}
+																			else
+																			{
+																				Print(ViewModel.Item);
+																			}
+																		}
+																		else
+																		{
+																			PrintUpgradeComponent(upgradeComponent);
+																		}
+																	}
+																	else
+																	{
+																		PrintTrophy(trophy);
+																	}
+																}
+																else
+																{
+																	PrintSalvageTool(salvageTool);
+																}
+															}
+															else
+															{
+																PrintRelic(relic);
+															}
+														}
+														else
+														{
+															PrintPowerCore(powerCore);
+														}
+													}
+													else
+													{
+														PrintMiniature(miniature);
+													}
+												}
+												else
+												{
+													PrintJadeTechModule(jadeTechModule);
+												}
+											}
+											else
+											{
+												PrintGizmo(gizmo);
+											}
+										}
+										else
+										{
+											PrintTrinket(trinket);
+										}
+									}
+									else
+									{
+										PrintGatheringTool(gatheringTool);
+									}
+								}
+								else
+								{
+									PrintCraftingMaterial(craftingMaterial);
+								}
+							}
+							else
+							{
+								PrintContainer(container);
+							}
+						}
+						else
+						{
+							PrintConsumable(consumable);
+						}
+					}
+					else
+					{
+						PrintBag(bag);
+					}
+				}
+				else
+				{
+					PrintBackpack(back);
+				}
+			}
+			else
+			{
+				PrintArmor(armor);
+			}
 			((Control)_layout).set_Parent(buildPanel);
 		}
 	}

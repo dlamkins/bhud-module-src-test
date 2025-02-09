@@ -8,57 +8,75 @@ using GuildWars2.Chat;
 using GuildWars2.Items;
 using Microsoft.EntityFrameworkCore;
 using SL.ChatLinks.Storage;
+using SL.Common;
 
 namespace SL.ChatLinks.UI.Tabs.Items
 {
 	public sealed class ItemSearch
 	{
 		[CompilerGenerated]
-		private ChatLinksContext _003Ccontext_003EP;
+		private IDbContextFactory _003CcontextFactory_003EP;
+
+		[CompilerGenerated]
+		private ILocale _003Clocale_003EP;
 
 		private static readonly Regex ChatLinkPattern = new Regex("^\\[&[A-Za-z0-9+/=]+\\]$", RegexOptions.Compiled);
 
-		private readonly IQueryable<Item> _items;
-
-		public ItemSearch(ChatLinksContext context)
+		public ItemSearch(IDbContextFactory contextFactory, ILocale locale)
 		{
-			_003Ccontext_003EP = context;
-			_items = _003Ccontext_003EP.Items.AsNoTracking();
+			_003CcontextFactory_003EP = contextFactory;
+			_003Clocale_003EP = locale;
 			base._002Ector();
 		}
 
-		public IAsyncEnumerable<Item> NewItems(int limit)
+		public async ValueTask<int> CountItems()
 		{
-			return _items.OrderByDescending((Item item) => item.Id).Take(limit).AsAsyncEnumerable();
+			await using ChatLinksContext context = _003CcontextFactory_003EP.CreateDbContext(_003Clocale_003EP.Current);
+			return await context.Items.CountAsync();
 		}
 
-		public async IAsyncEnumerable<Item> Search(string query, int limit, [EnumeratorCancellation] CancellationToken cancellationToken)
+		public async IAsyncEnumerable<Item> NewItems(int limit)
 		{
-			if (ChatLinkPattern.IsMatch(query))
+			await using ChatLinksContext context = _003CcontextFactory_003EP.CreateDbContext(_003Clocale_003EP.Current);
+			await foreach (Item item in (from item in context.Items.AsNoTracking()
+				orderby item.Id descending
+				select item).Take(limit).AsAsyncEnumerable())
 			{
-				ItemLink chatLink = ItemLink.Parse(query);
-				await foreach (Item item in SearchByChatLink(chatLink, cancellationToken))
+				yield return item;
+			}
+		}
+
+		public async IAsyncEnumerable<Item> Search(string searchText, int limit, ResultContext resultContext, [EnumeratorCancellation] CancellationToken cancellationToken)
+		{
+			if (ChatLinkPattern.IsMatch(searchText))
+			{
+				ItemLink chatLink = ItemLink.Parse(searchText);
+				await foreach (Item item in SearchByChatLink(chatLink, resultContext, cancellationToken))
 				{
 					yield return item;
 				}
 				yield break;
 			}
-			await foreach (Item item2 in _003Ccontext_003EP.Items.FromSqlInterpolated($"SELECT * FROM Items\r\nWHERE Name LIKE '%' || {query} || '%'\r\nORDER BY LevenshteinDistance({query}, Name)").AsNoTracking().Take(limit)
-				.AsAsyncEnumerable()
+			await using ChatLinksContext context = _003CcontextFactory_003EP.CreateDbContext(_003Clocale_003EP.Current);
+			IQueryable<Item> query = context.Items.FromSqlInterpolated($"SELECT * FROM Items\r\nWHERE Name LIKE '%' || {searchText} || '%'\r\nORDER BY LevenshteinDistance({searchText}, Name)");
+			resultContext.ResultTotal = await query.CountAsync(cancellationToken);
+			await foreach (Item item2 in query.AsNoTracking().Take(limit).AsAsyncEnumerable()
 				.WithCancellation(cancellationToken))
 			{
 				yield return item2;
 			}
 		}
 
-		private async IAsyncEnumerable<Item> SearchByChatLink(ItemLink link, [EnumeratorCancellation] CancellationToken cancellationToken)
+		private async IAsyncEnumerable<Item> SearchByChatLink(ItemLink link, ResultContext resultContext, [EnumeratorCancellation] CancellationToken cancellationToken)
 		{
 			ItemLink link2 = link;
-			Item item = await _items.SingleOrDefaultAsync((Item row) => row.Id == link2.ItemId, cancellationToken);
+			await using ChatLinksContext context = _003CcontextFactory_003EP.CreateDbContext(_003Clocale_003EP.Current);
+			Item item = await context.Items.AsNoTracking().SingleOrDefaultAsync((Item row) => row.Id == link2.ItemId, cancellationToken);
 			if ((object)item == null)
 			{
 				yield break;
 			}
+			resultContext.ResultTotal++;
 			yield return item;
 			HashSet<int> relatedItems = new HashSet<int>();
 			if (link2.SuffixItemId.HasValue)
@@ -161,7 +179,10 @@ namespace SL.ChatLinks.UI.Tabs.Items
 					}
 				}
 			}
-			await foreach (Item item2 in _items.Where((Item i) => relatedItems.Contains(i.Id)).AsAsyncEnumerable().WithCancellation(cancellationToken))
+			resultContext.ResultTotal += relatedItems.Count;
+			await foreach (Item item2 in (from i in context.Items.AsNoTracking()
+				where relatedItems.Contains(i.Id)
+				select i).AsAsyncEnumerable().WithCancellation(cancellationToken))
 			{
 				yield return item2;
 			}

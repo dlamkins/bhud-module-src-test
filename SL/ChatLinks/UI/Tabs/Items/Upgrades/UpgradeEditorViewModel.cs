@@ -1,25 +1,25 @@
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Net;
-using System.Runtime.CompilerServices;
 using GuildWars2.Items;
+using Microsoft.Extensions.Localization;
 using SL.Common;
 using SL.Common.ModelBinding;
 
 namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 {
-	public sealed class UpgradeEditorViewModel : ViewModel
+	public sealed class UpgradeEditorViewModel : ViewModel, IDisposable
 	{
-		[CompilerGenerated]
-		private IEventAggregator _003CeventAggregator_003EP;
-
-		[CompilerGenerated]
-		private IClipBoard _003Cclipboard_003EP;
-
-		[CompilerGenerated]
-		private UpgradeSelectorViewModelFactory _003CupgradeComponentListViewModelFactory_003EP;
-
 		private bool _customizing;
+
+		private readonly IStringLocalizer<UpgradeEditor> _localizer;
+
+		private readonly IEventAggregator _eventAggregator;
+
+		private readonly IClipBoard _clipboard;
+
+		private readonly UpgradeSelectorViewModelFactory _upgradeComponentListViewModelFactory;
 
 		public bool Customizing
 		{
@@ -33,6 +33,12 @@ namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 			}
 		}
 
+		public bool IsCustomizable => TargetItem is IUpgradable;
+
+		public string CustomizeLabel => (string)_localizer["Customize"];
+
+		public string CancelLabel => (string)_localizer["Cancel"];
+
 		public RelayCommand CustomizeCommand => new RelayCommand(delegate
 		{
 			Customizing = !Customizing;
@@ -41,43 +47,50 @@ namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 		public RelayCommand RemoveCommand => new RelayCommand(delegate
 		{
 			UpgradeSlotViewModel.SelectedUpgradeComponent = null;
-			OnPropertyChanged("EffectiveUpgradeComponent");
-			_003CeventAggregator_003EP.Publish(new UpgradeSlotChanged());
+			_eventAggregator.Publish(new UpgradeSlotChanged());
 		}, () => (object)UpgradeSlotViewModel.SelectedUpgradeComponent != null);
+
+		public string CopyNameLabel => (string)_localizer["Copy Name"];
 
 		public RelayCommand CopyNameCommand => new RelayCommand(delegate
 		{
 			string text = EffectiveUpgradeComponent?.Name;
 			if (text != null)
 			{
-				_003Cclipboard_003EP.SetText(text);
+				_clipboard.SetText(text);
 			}
 		}, () => (object)EffectiveUpgradeComponent != null);
+
+		public string CopyChatLinkLabel => (string)_localizer["Copy Chat Link"];
 
 		public RelayCommand CopyChatLinkCommand => new RelayCommand(delegate
 		{
 			string text = EffectiveUpgradeComponent?.ChatLink;
 			if (text != null)
 			{
-				_003Cclipboard_003EP.SetText(text);
+				_clipboard.SetText(text);
 			}
 		}, () => (object)EffectiveUpgradeComponent != null);
+
+		public string OpenWikiLabel => (string)_localizer["Open Wiki"];
 
 		public RelayCommand OpenWikiCommand => new RelayCommand(delegate
 		{
 			string text = EffectiveUpgradeComponent?.ChatLink;
 			if (text != null)
 			{
-				Process.Start("https://wiki.guildwars2.com/wiki/?search=" + WebUtility.UrlEncode(text));
+				Process.Start(_localizer["Wiki search", new object[1] { WebUtility.UrlEncode(text) }]);
 			}
 		}, () => (object)EffectiveUpgradeComponent != null);
+
+		public string OpenApiLabel => (string)_localizer["Open API"];
 
 		public RelayCommand OpenApiCommand => new RelayCommand(delegate
 		{
 			int? num = EffectiveUpgradeComponent?.Id;
 			if (num.HasValue)
 			{
-				Process.Start($"https://api.guildwars2.com/v2/items/{num}?v=latest");
+				Process.Start(_localizer["Item API", new object[1] { num }]);
 			}
 		}, () => (object)EffectiveUpgradeComponent != null);
 
@@ -92,41 +105,72 @@ namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 
 		public UpgradeComponent? EffectiveUpgradeComponent => UpgradeSlotViewModel.SelectedUpgradeComponent ?? UpgradeSlotViewModel.DefaultUpgradeComponent;
 
-		public string RemoveItemText
+		public string RemoveItemLabel
 		{
 			get
 			{
 				UpgradeSlotViewModel upgradeSlotViewModel = UpgradeSlotViewModel;
-				if (upgradeSlotViewModel != null)
+				if (upgradeSlotViewModel == null)
 				{
-					if ((object)upgradeSlotViewModel.SelectedUpgradeComponent != null)
-					{
-						return "Remove " + UpgradeSlotViewModel.SelectedUpgradeComponent!.Name;
-					}
-					if ((object)upgradeSlotViewModel.DefaultUpgradeComponent != null)
-					{
-						return "Remove " + UpgradeSlotViewModel.DefaultUpgradeComponent!.Name;
-					}
+					goto IL_0074;
 				}
-				return "Remove";
+				LocalizedString localizedString;
+				if ((object)upgradeSlotViewModel.SelectedUpgradeComponent == null)
+				{
+					if ((object)upgradeSlotViewModel.DefaultUpgradeComponent == null)
+					{
+						goto IL_0074;
+					}
+					localizedString = _localizer["Remove upgrade", new object[1] { UpgradeSlotViewModel.DefaultUpgradeComponent!.Name }];
+				}
+				else
+				{
+					localizedString = _localizer["Remove upgrade", new object[1] { UpgradeSlotViewModel.SelectedUpgradeComponent!.Name }];
+				}
+				goto IL_0085;
+				IL_0085:
+				return (string)localizedString;
+				IL_0074:
+				localizedString = _localizer["Remove"];
+				goto IL_0085;
 			}
 		}
 
 		public UpgradeSlotType UpgradeSlotType => UpgradeSlotViewModel.Type;
 
-		public UpgradeEditorViewModel(IEventAggregator eventAggregator, IClipBoard clipboard, UpgradeSlotViewModel upgradeSlotViewModel, UpgradeSelectorViewModelFactory upgradeComponentListViewModelFactory, Item target)
+		public UpgradeEditorViewModel(IStringLocalizer<UpgradeEditor> localizer, IEventAggregator eventAggregator, IClipBoard clipboard, UpgradeSlotViewModel upgradeSlotViewModel, UpgradeSelectorViewModelFactory upgradeComponentListViewModelFactory, Item target)
 		{
-			_003CeventAggregator_003EP = eventAggregator;
-			_003Cclipboard_003EP = clipboard;
-			_003CupgradeComponentListViewModelFactory_003EP = upgradeComponentListViewModelFactory;
+			_localizer = localizer;
+			_eventAggregator = eventAggregator;
+			_clipboard = clipboard;
+			_upgradeComponentListViewModelFactory = upgradeComponentListViewModelFactory;
 			UpgradeSlotViewModel = upgradeSlotViewModel;
 			TargetItem = target;
-			base._002Ector();
+			eventAggregator.Subscribe(new Action<LocaleChanged>(OnLocaleChanged));
+			upgradeSlotViewModel.PropertyChanged += delegate(object sender, PropertyChangedEventArgs args)
+			{
+				string propertyName = args.PropertyName;
+				if (propertyName == "DefaultUpgradeComponent" || propertyName == "SelectedUpgradeComponent")
+				{
+					OnPropertyChanged("EffectiveUpgradeComponent");
+				}
+			};
+		}
+
+		private void OnLocaleChanged(LocaleChanged changed)
+		{
+			OnPropertyChanged("CustomizeLabel");
+			OnPropertyChanged("CancelLabel");
+			OnPropertyChanged("CopyNameLabel");
+			OnPropertyChanged("CopyChatLinkLabel");
+			OnPropertyChanged("OpenWikiLabel");
+			OnPropertyChanged("OpenApiLabel");
+			OnPropertyChanged("RemoveItemLabel");
 		}
 
 		public UpgradeSelectorViewModel CreateUpgradeComponentListViewModel()
 		{
-			UpgradeSelectorViewModel upgradeSelectorViewModel = _003CupgradeComponentListViewModelFactory_003EP.Create(TargetItem, UpgradeSlotViewModel.Type, UpgradeSlotViewModel.SelectedUpgradeComponent);
+			UpgradeSelectorViewModel upgradeSelectorViewModel = _upgradeComponentListViewModelFactory.Create(TargetItem, UpgradeSlotViewModel.Type, UpgradeSlotViewModel.SelectedUpgradeComponent);
 			upgradeSelectorViewModel.Selected += new EventHandler<UpgradeComponent>(Selected);
 			upgradeSelectorViewModel.Deselected += new EventHandler(Deselected);
 			return upgradeSelectorViewModel;
@@ -136,16 +180,19 @@ namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 		{
 			UpgradeSlotViewModel.SelectedUpgradeComponent = args;
 			Customizing = false;
-			OnPropertyChanged("EffectiveUpgradeComponent");
-			_003CeventAggregator_003EP.Publish(new UpgradeSlotChanged());
+			_eventAggregator.Publish(new UpgradeSlotChanged());
 		}
 
 		private void Deselected(object sender, EventArgs args)
 		{
 			UpgradeSlotViewModel.SelectedUpgradeComponent = null;
 			Customizing = false;
-			OnPropertyChanged("EffectiveUpgradeComponent");
-			_003CeventAggregator_003EP.Publish(new UpgradeSlotChanged());
+			_eventAggregator.Publish(new UpgradeSlotChanged());
+		}
+
+		public void Dispose()
+		{
+			_eventAggregator.Unsubscribe<LocaleChanged>(new Action<LocaleChanged>(OnLocaleChanged));
 		}
 	}
 }

@@ -16,5 +16,10 @@ namespace SL.ChatLinks.UI.Tabs.Items
 		{
 			((Control)_chatLinkEditor).set_Parent(buildPanel);
 		}
+
+		protected override void Unload()
+		{
+			((Control)_chatLinkEditor).Dispose();
+		}
 	}
 }

@@ -5,11 +5,14 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using Blish_HUD.Content;
 using GuildWars2.Chat;
 using GuildWars2.Items;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using Microsoft.Xna.Framework;
+using SL.ChatLinks.Storage;
 using SL.ChatLinks.UI.Tabs.Items.Tooltips;
 using SL.ChatLinks.UI.Tabs.Items.Upgrades;
 using SL.Common;
@@ -17,17 +20,25 @@ using SL.Common.ModelBinding;
 
 namespace SL.ChatLinks.UI.Tabs.Items
 {
-	public sealed class ChatLinkEditorViewModel : ViewModel
+	public sealed class ChatLinkEditorViewModel : ViewModel, IDisposable
 	{
 		private readonly IOptionsMonitor<ChatLinkOptions> _options;
 
-		private bool _allowScroll = true;
+		private readonly IStringLocalizer<ChatLinkEditor> _localizer;
 
-		private int _quantity = 1;
+		private readonly IEventAggregator _eventAggregator;
+
+		private readonly IDbContextFactory _contextFactory;
+
+		private Item _item;
 
 		private UpgradeComponent? _suffixItem;
 
 		private UpgradeComponent? _secondarySuffixItem;
+
+		private bool _allowScroll = true;
+
+		private int _quantity = 1;
 
 		private readonly List<UpgradeEditorViewModel> _upgradeEditorViewModels;
 
@@ -81,7 +92,20 @@ namespace SL.ChatLinks.UI.Tabs.Items
 			}
 		}
 
-		public Item Item { get; }
+		public Item Item
+		{
+			get
+			{
+				return _item;
+			}
+			set
+			{
+				if (SetField(ref _item, value, "Item"))
+				{
+					OnPropertyChanged("ItemName");
+				}
+			}
+		}
 
 		public ObservableCollection<UpgradeEditorViewModel> UpgradeEditorViewModels => new ObservableCollection<UpgradeEditorViewModel>(_upgradeEditorViewModels);
 
@@ -177,41 +201,40 @@ namespace SL.ChatLinks.UI.Tabs.Items
 			}
 		}
 
-		public string ChatLink
+		public string ChatLink => new ItemLink
 		{
-			get
-			{
-				return new ItemLink
-				{
-					ItemId = Item.Id,
-					Count = Quantity,
-					SuffixItemId = SuffixItem?.Id,
-					SecondarySuffixItemId = SecondarySuffixItem?.Id
-				}.ToString();
-			}
-			set
-			{
-			}
-		}
+			ItemId = Item.Id,
+			Count = Quantity,
+			SuffixItemId = SuffixItem?.Id,
+			SecondarySuffixItemId = SecondarySuffixItem?.Id
+		}.ToString();
+
+		public string CopyNameLabel => (string)_localizer["Copy Name"];
 
 		public RelayCommand CopyNameCommand => new RelayCommand(delegate
 		{
 			_clipboard.SetText(Item.Name);
 		});
 
+		public string CopyChatLinkLabel => (string)_localizer["Copy Chat Link"];
+
 		public RelayCommand CopyChatLinkCommand => new RelayCommand(delegate
 		{
 			_clipboard.SetText(ChatLink);
 		});
 
+		public string OpenWikiLabel => (string)_localizer["Open Wiki"];
+
 		public RelayCommand OpenWikiCommand => new RelayCommand(delegate
 		{
-			Process.Start("https://wiki.guildwars2.com/wiki/?search=" + WebUtility.UrlEncode(Item.ChatLink));
+			Process.Start(_localizer["Wiki search", new object[1] { WebUtility.UrlEncode(Item.ChatLink) }]);
 		});
+
+		public string OpenApiLabel => (string)_localizer["Open API"];
 
 		public RelayCommand OpenApiCommand => new RelayCommand(delegate
 		{
-			Process.Start($"https://api.guildwars2.com/v2/items/{Item.Id}?v=latest");
+			Process.Start(_localizer["Item API", new object[1] { Item.Id }]);
 		});
 
 		public RelayCommand MinQuantityCommand => new RelayCommand(delegate
@@ -224,17 +247,26 @@ namespace SL.ChatLinks.UI.Tabs.Items
 			Quantity = 250;
 		});
 
-		public ChatLinkEditorViewModel(IOptionsMonitor<ChatLinkOptions> options, IEventAggregator eventAggregator, ItemTooltipViewModelFactory tooltipViewModelFactory, UpgradeEditorViewModelFactory upgradeEditorViewModelFactory, ItemIcons icons, Customizer customizer, IClipBoard clipboard, Item item)
+		public string StackSizeLabel => (string)_localizer["Stack Size"];
+
+		public string ResetTooltip => (string)_localizer["Reset"];
+
+		public string InfusionWarning => (string)_localizer["Infusion warning"];
+
+		public ChatLinkEditorViewModel(IOptionsMonitor<ChatLinkOptions> options, IStringLocalizer<ChatLinkEditor> localizer, IEventAggregator eventAggregator, IDbContextFactory contextFactory, ItemTooltipViewModelFactory tooltipViewModelFactory, UpgradeEditorViewModelFactory upgradeEditorViewModelFactory, ItemIcons icons, Customizer customizer, IClipBoard clipboard, Item item)
 		{
-			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0069: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
 			_options = options;
+			_localizer = localizer;
+			_eventAggregator = eventAggregator;
+			_contextFactory = contextFactory;
 			_tooltipViewModelFactory = tooltipViewModelFactory;
 			_upgradeEditorViewModelFactory = upgradeEditorViewModelFactory;
 			_icons = icons;
 			_customizer = customizer;
 			_clipboard = clipboard;
-			Item = item;
+			_item = item;
 			ItemNameColor = ItemColors.Rarity(item.Rarity);
 			_upgradeEditorViewModels = CreateUpgradeEditorViewModels().ToList();
 			foreach (var item2 in _upgradeEditorViewModels.Select((UpgradeEditorViewModel vm, int index) => (index + 1, vm)))
@@ -274,6 +306,20 @@ namespace SL.ChatLinks.UI.Tabs.Items
 			eventAggregator.Subscribe(new Action<MouseEnteredUpgradeSelector>(OnMouseEnteredUpgradeSelector));
 			eventAggregator.Subscribe(new Action<MouseLeftUpgradeSelector>(OnMouseLeftUpgradeSelector));
 			eventAggregator.Subscribe(new Action<UpgradeSlotChanged>(OnUpgradeSlotChanged));
+			eventAggregator.Subscribe(new Func<LocaleChanged, ValueTask>(OnLocaleChanged));
+		}
+
+		private async ValueTask OnLocaleChanged(LocaleChanged args)
+		{
+			OnPropertyChanged("CopyNameLabel");
+			OnPropertyChanged("CopyChatLinkLabel");
+			OnPropertyChanged("OpenWikiLabel");
+			OnPropertyChanged("OpenApiLabel");
+			OnPropertyChanged("StackSizeLabel");
+			OnPropertyChanged("ResetTooltip");
+			OnPropertyChanged("InfusionWarning");
+			await using ChatLinksContext context = _contextFactory.CreateDbContext(args.Language);
+			Item = context.Items.SingleOrDefault((Item item) => item.Id == Item.Id);
 		}
 
 		private void OnUpgradeSlotChanged(UpgradeSlotChanged obj)
@@ -320,7 +366,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 			}
 			foreach (int? defaultUpgradeComponentId in upgradable.UpgradeSlots)
 			{
-				yield return _upgradeEditorViewModelFactory.Create(Item, UpgradeSlotType.Default, defaultUpgradeComponentId);
+				yield return _upgradeEditorViewModelFactory.Create(Item, UpgradeSlotType.Default, _customizer.GetUpgradeComponent(defaultUpgradeComponentId));
 			}
 			foreach (InfusionSlot infusionSlot in upgradable.InfusionSlots)
 			{
@@ -329,14 +375,14 @@ namespace SL.ChatLinks.UI.Tabs.Items
 				InfusionSlotFlags flags = infusionSlot.Flags;
 				if ((object)flags == null)
 				{
-					goto IL_017b;
+					goto IL_017d;
 				}
 				UpgradeSlotType slotType;
 				if (!flags.Enrichment)
 				{
 					if (!flags.Infusion)
 					{
-						goto IL_017b;
+						goto IL_017d;
 					}
 					slotType = UpgradeSlotType.Infusion;
 				}
@@ -344,13 +390,21 @@ namespace SL.ChatLinks.UI.Tabs.Items
 				{
 					slotType = UpgradeSlotType.Enrichment;
 				}
-				goto IL_017e;
-				IL_017b:
+				goto IL_0180;
+				IL_017d:
 				slotType = UpgradeSlotType.Default;
-				goto IL_017e;
-				IL_017e:
-				yield return upgradeEditorViewModelFactory.Create(item, slotType, infusionSlot.ItemId);
+				goto IL_0180;
+				IL_0180:
+				yield return upgradeEditorViewModelFactory.Create(item, slotType, _customizer.GetUpgradeComponent(infusionSlot.ItemId));
 			}
+		}
+
+		public void Dispose()
+		{
+			_eventAggregator.Unsubscribe<MouseEnteredUpgradeSelector>(new Action<MouseEnteredUpgradeSelector>(OnMouseEnteredUpgradeSelector));
+			_eventAggregator.Unsubscribe<MouseLeftUpgradeSelector>(new Action<MouseLeftUpgradeSelector>(OnMouseLeftUpgradeSelector));
+			_eventAggregator.Unsubscribe<UpgradeSlotChanged>(new Action<UpgradeSlotChanged>(OnUpgradeSlotChanged));
+			_eventAggregator.Unsubscribe<LocaleChanged>(new Func<LocaleChanged, ValueTask>(OnLocaleChanged));
 		}
 	}
 }

@@ -1,0 +1,17 @@
+using GuildWars2.Hero;
+using GuildWars2.Hero.Equipment.Wardrobe;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using SL.ChatLinks.Storage.Converters;
+
+namespace SL.ChatLinks.Storage.Models
+{
+	public sealed class ArmorSkinEntityTypeConfiguration : IEntityTypeConfiguration<ArmorSkin>
+	{
+		public void Configure(EntityTypeBuilder<ArmorSkin> builder)
+		{
+			builder.Property((ArmorSkin skin) => skin.WeightClass).HasConversion(new ExtensibleEnumConverter<WeightClass>());
+			builder.Property((ArmorSkin skin) => skin.DyeSlots).HasJsonValueConversion();
+		}
+	}
+}

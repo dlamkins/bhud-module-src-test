@@ -5,5 +5,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 		public bool RaiseStackSize { get; set; }
 
 		public bool BananaMode { get; set; }
+
+		public int MaxResultCount { get; set; }
 	}
 }

@@ -1,5 +1,5 @@
-using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -11,51 +11,19 @@ using SL.Common;
 
 namespace SL.ChatLinks.UI.Tabs.Items
 {
-	public sealed class Customizer : IDisposable, IAsyncDisposable
+	public sealed class Customizer
 	{
 		[CompilerGenerated]
-		private ChatLinksContext _003Ccontext_003EP;
+		private IDbContextFactory _003CcontextFactory_003EP;
 
 		[CompilerGenerated]
-		private IEventAggregator _003CeventAggregator_003EP;
+		private ILocale _003Clocale_003EP;
 
-		public IReadOnlyDictionary<int, UpgradeComponent> UpgradeComponents { get; private set; }
-
-		public Customizer(ChatLinksContext context, IEventAggregator eventAggregator)
+		public Customizer(IDbContextFactory contextFactory, ILocale locale)
 		{
-			_003Ccontext_003EP = context;
-			_003CeventAggregator_003EP = eventAggregator;
-			UpgradeComponents = new Dictionary<int, UpgradeComponent>(0);
+			_003CcontextFactory_003EP = contextFactory;
+			_003Clocale_003EP = locale;
 			base._002Ector();
-		}
-
-		public async Task LoadAsync()
-		{
-			UpgradeComponents = await _003Ccontext_003EP.Set<UpgradeComponent>().AsNoTracking().ToDictionaryAsync((UpgradeComponent upgrade) => upgrade.Id);
-			_003CeventAggregator_003EP.Subscribe(new Func<DatabaseSyncCompleted, ValueTask>(OnDatabaseSyncCompleted));
-		}
-
-		private async ValueTask OnDatabaseSyncCompleted(DatabaseSyncCompleted _)
-		{
-			UpgradeComponents = await _003Ccontext_003EP.Set<UpgradeComponent>().AsNoTracking().ToDictionaryAsync((UpgradeComponent upgrade) => upgrade.Id);
-		}
-
-		public void Dispose()
-		{
-			_003CeventAggregator_003EP.Unsubscribe<DatabaseSyncCompleted>(new Func<DatabaseSyncCompleted, ValueTask>(OnDatabaseSyncCompleted));
-			_003Ccontext_003EP.Dispose();
-		}
-
-		public async ValueTask DisposeAsync()
-		{
-			_003CeventAggregator_003EP.Unsubscribe<DatabaseSyncCompleted>(new Func<DatabaseSyncCompleted, ValueTask>(OnDatabaseSyncCompleted));
-			await _003Ccontext_003EP.DisposeAsync();
-		}
-
-		public IEnumerable<UpgradeComponent> GetUpgradeComponents(Item targetItem, UpgradeSlotType slotType)
-		{
-			Item targetItem2 = targetItem;
-			return UpgradeComponents.Values.Where((UpgradeComponent component) => FilterUpgradeSlot(targetItem2, slotType, component));
 		}
 
 		public UpgradeComponent? DefaultSuffixItem(Item item)
@@ -65,140 +33,173 @@ namespace SL.ChatLinks.UI.Tabs.Items
 			{
 				return null;
 			}
-			return GetUpgradeComponent(upgradable.SuffixItemId) ?? GetUpgradeComponent(upgradable.SecondarySuffixItemId);
+			return GetUpgradeComponent(upgradable.SuffixItemId);
+		}
+
+		public async ValueTask<UpgradeComponent?> GetUpgradeComponentAsync(int? upgradeComponentId)
+		{
+			if (!upgradeComponentId.HasValue)
+			{
+				return null;
+			}
+			await using ChatLinksContext context = _003CcontextFactory_003EP.CreateDbContext(_003Clocale_003EP.Current);
+			return await context.Items.OfType<UpgradeComponent>().SingleOrDefaultAsync((UpgradeComponent item) => item.Id == upgradeComponentId.Value);
 		}
 
 		public UpgradeComponent? GetUpgradeComponent(int? upgradeComponentId)
 		{
-			if (upgradeComponentId.HasValue && UpgradeComponents.TryGetValue(upgradeComponentId.Value, out var upgradeComponent))
+			if (!upgradeComponentId.HasValue)
 			{
-				return upgradeComponent;
+				return null;
 			}
-			return null;
+			using ChatLinksContext context = _003CcontextFactory_003EP.CreateDbContext(_003Clocale_003EP.Current);
+			return context.Items.OfType<UpgradeComponent>().SingleOrDefault((UpgradeComponent item) => item.Id == upgradeComponentId.Value);
 		}
 
-		private bool FilterUpgradeSlot(Item targetItem, UpgradeSlotType slotType, UpgradeComponent component)
+		public IEnumerable<UpgradeComponent> GetUpgradeComponents(Item targetItem, UpgradeSlotType slotType)
 		{
-			if (slotType == UpgradeSlotType.Infusion)
+			using ChatLinksContext context = _003CcontextFactory_003EP.CreateDbContext(_003Clocale_003EP.Current);
+			IQueryable<UpgradeComponent> source;
+			switch (slotType)
 			{
-				return component.InfusionUpgradeFlags.Infusion;
-			}
-			if (component.InfusionUpgradeFlags.Infusion)
+			case UpgradeSlotType.Infusion:
+				source = context.Set<UpgradeComponent>().FromSqlRaw("SELECT *\r\nFROM Items\r\nWHERE Type = 'upgrade_component'\r\n  AND InfusionUpgradeFlags -> '$.infusion' = 'true'");
+				break;
+			case UpgradeSlotType.Enrichment:
+				source = context.Set<UpgradeComponent>().FromSqlRaw("SELECT *\r\nFROM Items\r\nWHERE Type = 'upgrade_component'\r\n  AND InfusionUpgradeFlags -> '$.enrichment' = 'true'");
+				break;
+			case UpgradeSlotType.Default:
 			{
-				return false;
-			}
-			if (slotType == UpgradeSlotType.Enrichment)
-			{
-				return component.InfusionUpgradeFlags.Enrichment;
-			}
-			if (component.InfusionUpgradeFlags.Enrichment)
-			{
-				return false;
-			}
-			if (component is Gem)
-			{
-				return true;
-			}
-			Armor armor = targetItem as Armor;
-			if ((object)armor == null)
-			{
+				if (targetItem is Trinket)
+				{
+					source = context.Set<UpgradeComponent>().FromSqlRaw("SELECT *\r\nFROM Items\r\nWHERE Type in ('upgrade_component', 'gem')\r\n\tAND UpgradeComponentFlags -> '$.Trinket' = 'true'\r\n\tAND InfusionUpgradeFlags -> '$.infusion' = 'false'\r\n\tAND InfusionUpgradeFlags -> '$.enrichment' = 'false'");
+					break;
+				}
+				if (targetItem is Backpack)
+				{
+					source = context.Set<UpgradeComponent>().FromSqlRaw("SELECT *\r\nFROM Items\r\nWHERE Type = 'gem'\r\n\tAND InfusionUpgradeFlags -> '$.infusion' = 'false'\r\n\tAND InfusionUpgradeFlags -> '$.enrichment' = 'false'");
+					break;
+				}
+				Armor armor3 = targetItem as Armor;
+				if ((object)armor3 != null && armor3.WeightClass == WeightClass.Heavy)
+				{
+					source = context.Set<UpgradeComponent>().FromSqlRaw("SELECT *\r\nFROM Items\r\nWHERE Type in ('upgrade_component', 'gem', 'rune')\r\n\tAND UpgradeComponentFlags -> '$.HeavyArmor' = 'true'\r\n\tAND InfusionUpgradeFlags -> '$.infusion' = 'false'\r\n\tAND InfusionUpgradeFlags -> '$.enrichment' = 'false'");
+					break;
+				}
+				Armor armor2 = targetItem as Armor;
+				if ((object)armor2 != null && armor2.WeightClass == WeightClass.Medium)
+				{
+					source = context.Set<UpgradeComponent>().FromSqlRaw("SELECT *\r\nFROM Items\r\nWHERE Type in ('upgrade_component', 'gem', 'rune')\r\n\tAND UpgradeComponentFlags -> '$.MediumArmor' = 'true'\r\n\tAND InfusionUpgradeFlags -> '$.infusion' = 'false'\r\n\tAND InfusionUpgradeFlags -> '$.enrichment' = 'false'");
+					break;
+				}
+				Armor armor = targetItem as Armor;
+				if ((object)armor != null && armor.WeightClass == WeightClass.Light)
+				{
+					source = context.Set<UpgradeComponent>().FromSqlRaw("SELECT *\r\nFROM Items\r\nWHERE Type in ('upgrade_component', 'gem', 'rune')\r\n\tAND UpgradeComponentFlags -> '$.LightArmor' = 'true'\r\n\tAND InfusionUpgradeFlags -> '$.infusion' = 'false'\r\n\tAND InfusionUpgradeFlags -> '$.enrichment' = 'false'");
+					break;
+				}
 				if (targetItem is Axe)
 				{
-					return component.UpgradeComponentFlags.Axe;
+					source = context.Set<UpgradeComponent>().FromSqlRaw("SELECT *\r\nFROM Items\r\nWHERE Type in ('upgrade_component', 'gem', 'sigil')\r\n\tAND UpgradeComponentFlags -> '$.Axe' = 'true'\r\n\tAND InfusionUpgradeFlags -> '$.infusion' = 'false'\r\n\tAND InfusionUpgradeFlags -> '$.enrichment' = 'false'");
+					break;
 				}
 				if (targetItem is Dagger)
 				{
-					return component.UpgradeComponentFlags.Dagger;
+					source = context.Set<UpgradeComponent>().FromSqlRaw("SELECT *\r\nFROM Items\r\nWHERE Type in ('upgrade_component', 'gem', 'sigil')\r\n\tAND UpgradeComponentFlags -> '$.Dagger' = 'true'\r\n\tAND InfusionUpgradeFlags -> '$.infusion' = 'false'\r\n\tAND InfusionUpgradeFlags -> '$.enrichment' = 'false'");
+					break;
 				}
 				if (targetItem is Focus)
 				{
-					return component.UpgradeComponentFlags.Focus;
+					source = context.Set<UpgradeComponent>().FromSqlRaw("SELECT *\r\nFROM Items\r\nWHERE Type in ('upgrade_component', 'gem', 'sigil')\r\n\tAND UpgradeComponentFlags -> '$.Focus' = 'true'\r\n\tAND InfusionUpgradeFlags -> '$.infusion' = 'false'\r\n\tAND InfusionUpgradeFlags -> '$.enrichment' = 'false'");
+					break;
 				}
 				if (targetItem is Greatsword)
 				{
-					return component.UpgradeComponentFlags.Greatsword;
+					source = context.Set<UpgradeComponent>().FromSqlRaw("SELECT *\r\nFROM Items\r\nWHERE Type in ('upgrade_component', 'gem', 'sigil')\r\n\tAND UpgradeComponentFlags -> '$.Greatsword' = 'true'\r\n\tAND InfusionUpgradeFlags -> '$.infusion' = 'false'\r\n\tAND InfusionUpgradeFlags -> '$.enrichment' = 'false'");
+					break;
 				}
 				if (targetItem is Hammer)
 				{
-					return component.UpgradeComponentFlags.Hammer;
+					source = context.Set<UpgradeComponent>().FromSqlRaw("SELECT *\r\nFROM Items\r\nWHERE Type in ('upgrade_component', 'gem', 'sigil')\r\n\tAND UpgradeComponentFlags -> '$.Hammer' = 'true'\r\n\tAND InfusionUpgradeFlags -> '$.infusion' = 'false'\r\n\tAND InfusionUpgradeFlags -> '$.enrichment' = 'false'");
+					break;
 				}
 				if (targetItem is HarpoonGun)
 				{
-					return component.UpgradeComponentFlags.HarpoonGun;
+					source = context.Set<UpgradeComponent>().FromSqlRaw("SELECT *\r\nFROM Items\r\nWHERE Type in ('upgrade_component', 'gem', 'sigil')\r\n\tAND UpgradeComponentFlags -> '$.HarpoonGun' = 'true'\r\n\tAND InfusionUpgradeFlags -> '$.infusion' = 'false'\r\n\tAND InfusionUpgradeFlags -> '$.enrichment' = 'false'");
+					break;
 				}
 				if (targetItem is Longbow)
 				{
-					return component.UpgradeComponentFlags.LongBow;
+					source = context.Set<UpgradeComponent>().FromSqlRaw("SELECT *\r\nFROM Items\r\nWHERE Type in ('upgrade_component', 'gem', 'sigil')\r\n\tAND UpgradeComponentFlags -> '$.LongBow' = 'true'\r\n\tAND InfusionUpgradeFlags -> '$.infusion' = 'false'\r\n\tAND InfusionUpgradeFlags -> '$.enrichment' = 'false'");
+					break;
 				}
 				if (targetItem is Mace)
 				{
-					return component.UpgradeComponentFlags.Mace;
+					source = context.Set<UpgradeComponent>().FromSqlRaw("SELECT *\r\nFROM Items\r\nWHERE Type in ('upgrade_component', 'gem', 'sigil')\r\n\tAND UpgradeComponentFlags -> '$.Mace' = 'true'\r\n\tAND InfusionUpgradeFlags -> '$.infusion' = 'false'\r\n\tAND InfusionUpgradeFlags -> '$.enrichment' = 'false'");
+					break;
 				}
 				if (targetItem is Pistol)
 				{
-					return component.UpgradeComponentFlags.Pistol;
+					source = context.Set<UpgradeComponent>().FromSqlRaw("SELECT *\r\nFROM Items\r\nWHERE Type in ('upgrade_component', 'gem', 'sigil')\r\n\tAND UpgradeComponentFlags -> '$.Pistol' = 'true'\r\n\tAND InfusionUpgradeFlags -> '$.infusion' = 'false'\r\n\tAND InfusionUpgradeFlags -> '$.enrichment' = 'false'");
+					break;
 				}
 				if (targetItem is Rifle)
 				{
-					return component.UpgradeComponentFlags.Rifle;
+					source = context.Set<UpgradeComponent>().FromSqlRaw("SELECT *\r\nFROM Items\r\nWHERE Type in ('upgrade_component', 'gem', 'sigil')\r\n\tAND UpgradeComponentFlags -> '$.Rifle' = 'true'\r\n\tAND InfusionUpgradeFlags -> '$.infusion' = 'false'\r\n\tAND InfusionUpgradeFlags -> '$.enrichment' = 'false'");
+					break;
 				}
 				if (targetItem is Scepter)
 				{
-					return component.UpgradeComponentFlags.Scepter;
+					source = context.Set<UpgradeComponent>().FromSqlRaw("SELECT *\r\nFROM Items\r\nWHERE Type in ('upgrade_component', 'gem', 'sigil')\r\n\tAND UpgradeComponentFlags -> '$.Scepter' = 'true'\r\n\tAND InfusionUpgradeFlags -> '$.infusion' = 'false'\r\n\tAND InfusionUpgradeFlags -> '$.enrichment' = 'false'");
+					break;
 				}
 				if (targetItem is Shield)
 				{
-					return component.UpgradeComponentFlags.Shield;
+					source = context.Set<UpgradeComponent>().FromSqlRaw("SELECT *\r\nFROM Items\r\nWHERE Type in ('upgrade_component', 'gem', 'sigil')\r\n\tAND UpgradeComponentFlags -> '$.Shield' = 'true'\r\n\tAND InfusionUpgradeFlags -> '$.infusion' = 'false'\r\n\tAND InfusionUpgradeFlags -> '$.enrichment' = 'false'");
+					break;
 				}
 				if (targetItem is Shortbow)
 				{
-					return component.UpgradeComponentFlags.ShortBow;
+					source = context.Set<UpgradeComponent>().FromSqlRaw("SELECT *\r\nFROM Items\r\nWHERE Type in ('upgrade_component', 'gem', 'sigil')\r\n\tAND UpgradeComponentFlags -> '$.ShortBow' = 'true'\r\n\tAND InfusionUpgradeFlags -> '$.infusion' = 'false'\r\n\tAND InfusionUpgradeFlags -> '$.enrichment' = 'false'");
+					break;
 				}
 				if (targetItem is Spear)
 				{
-					return component.UpgradeComponentFlags.Spear;
+					source = context.Set<UpgradeComponent>().FromSqlRaw("SELECT *\r\nFROM Items\r\nWHERE Type in ('upgrade_component', 'gem', 'sigil')\r\n\tAND UpgradeComponentFlags -> '$.Spear' = 'true'\r\n\tAND InfusionUpgradeFlags -> '$.infusion' = 'false'\r\n\tAND InfusionUpgradeFlags -> '$.enrichment' = 'false'");
+					break;
 				}
 				if (targetItem is Staff)
 				{
-					return component.UpgradeComponentFlags.Staff;
+					source = context.Set<UpgradeComponent>().FromSqlRaw("SELECT *\r\nFROM Items\r\nWHERE Type in ('upgrade_component', 'gem', 'sigil')\r\n\tAND UpgradeComponentFlags -> '$.Staff' = 'true'\r\n\tAND InfusionUpgradeFlags -> '$.infusion' = 'false'\r\n\tAND InfusionUpgradeFlags -> '$.enrichment' = 'false'");
+					break;
 				}
 				if (targetItem is Sword)
 				{
-					return component.UpgradeComponentFlags.Sword;
+					source = context.Set<UpgradeComponent>().FromSqlRaw("SELECT *\r\nFROM Items\r\nWHERE Type in ('upgrade_component', 'gem', 'sigil')\r\n\tAND UpgradeComponentFlags -> '$.Sword' = 'true'\r\n\tAND InfusionUpgradeFlags -> '$.infusion' = 'false'\r\n\tAND InfusionUpgradeFlags -> '$.enrichment' = 'false'");
+					break;
 				}
 				if (targetItem is Torch)
 				{
-					return component.UpgradeComponentFlags.Torch;
+					source = context.Set<UpgradeComponent>().FromSqlRaw("SELECT *\r\nFROM Items\r\nWHERE Type in ('upgrade_component', 'gem', 'sigil')\r\n\tAND UpgradeComponentFlags -> '$.Torch' = 'true'\r\n\tAND InfusionUpgradeFlags -> '$.infusion' = 'false'\r\n\tAND InfusionUpgradeFlags -> '$.enrichment' = 'false'");
+					break;
 				}
 				if (targetItem is Trident)
 				{
-					return component.UpgradeComponentFlags.Trident;
-				}
-				if (targetItem is Trinket)
-				{
-					return component.UpgradeComponentFlags.Trinket;
+					source = context.Set<UpgradeComponent>().FromSqlRaw("SELECT *\r\nFROM Items\r\nWHERE Type in ('upgrade_component', 'gem', 'sigil')\r\n\tAND UpgradeComponentFlags -> '$.Trident' = 'true'\r\n\tAND InfusionUpgradeFlags -> '$.infusion' = 'false'\r\n\tAND InfusionUpgradeFlags -> '$.enrichment' = 'false'");
+					break;
 				}
 				if (targetItem is Warhorn)
 				{
-					return component.UpgradeComponentFlags.Warhorn;
+					source = context.Set<UpgradeComponent>().FromSqlRaw("SELECT *\r\nFROM Items\r\nWHERE Type in ('upgrade_component', 'gem', 'sigil')\r\n\tAND UpgradeComponentFlags -> '$.Warhorn' = 'true'\r\n\tAND InfusionUpgradeFlags -> '$.infusion' = 'false'\r\n\tAND InfusionUpgradeFlags -> '$.enrichment' = 'false'");
+					break;
 				}
+				goto default;
 			}
-			else
-			{
-				if (armor.WeightClass == WeightClass.Light)
-				{
-					return component.UpgradeComponentFlags.LightArmor;
-				}
-				if (armor.WeightClass == WeightClass.Medium)
-				{
-					return component.UpgradeComponentFlags.MediumArmor;
-				}
-				if (armor.WeightClass == WeightClass.Heavy)
-				{
-					return component.UpgradeComponentFlags.HeavyArmor;
-				}
+			default:
+				source = context.Set<UpgradeComponent>().FromSqlRaw("SELECT *\r\nFROM Items\r\nWHERE Type in ('upgrade_component', 'gem', 'rune', 'sigil')\r\n  AND InfusionUpgradeFlags -> '$.infusion' = 'false'\r\n  AND InfusionUpgradeFlags -> '$.enrichment' = 'false'");
+				break;
 			}
-			return true;
+			return source.ToImmutableList();
 		}
 	}
 }

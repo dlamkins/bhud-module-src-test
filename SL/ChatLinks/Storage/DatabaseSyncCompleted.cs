@@ -5,7 +5,7 @@ using System.Text;
 
 namespace SL.ChatLinks.Storage
 {
-	public record DatabaseSyncCompleted
+	public record DatabaseSyncCompleted(IReadOnlyDictionary<string, int> Updated)
 	{
 		[CompilerGenerated]
 		protected virtual Type EqualityContract
@@ -15,6 +15,12 @@ namespace SL.ChatLinks.Storage
 			{
 				return typeof(DatabaseSyncCompleted);
 			}
+		}
+
+		public DatabaseSyncCompleted(IReadOnlyDictionary<string, int> Updated)
+		{
+			this.Updated = ;
+			base._002Ector();
 		}
 
 		[CompilerGenerated]
@@ -34,13 +40,16 @@ namespace SL.ChatLinks.Storage
 		[CompilerGenerated]
 		protected virtual bool PrintMembers(StringBuilder builder)
 		{
-			return false;
+			RuntimeHelpers.EnsureSufficientExecutionStack();
+			builder.Append("Updated = ");
+			builder.Append(Updated);
+			return true;
 		}
 
 		[CompilerGenerated]
 		public override int GetHashCode()
 		{
-			return EqualityComparer<Type>.Default.GetHashCode(EqualityContract);
+			return EqualityComparer<Type>.Default.GetHashCode(EqualityContract) * -1521134295 + EqualityComparer<IReadOnlyDictionary<string, int>>.Default.GetHashCode(Updated);
 		}
 
 		[CompilerGenerated]
@@ -48,9 +57,9 @@ namespace SL.ChatLinks.Storage
 		{
 			if ((object)this != other)
 			{
-				if ((object)other != null)
+				if ((object)other != null && EqualityContract == other!.EqualityContract)
 				{
-					return EqualityContract == other!.EqualityContract;
+					return EqualityComparer<IReadOnlyDictionary<string, int>>.Default.Equals(Updated, other!.Updated);
 				}
 				return false;
 			}
@@ -60,10 +69,7 @@ namespace SL.ChatLinks.Storage
 		[CompilerGenerated]
 		protected DatabaseSyncCompleted(DatabaseSyncCompleted original)
 		{
-		}
-
-		public DatabaseSyncCompleted()
-		{
+			Updated = original.Updated;
 		}
 	}
 }
