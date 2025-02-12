@@ -342,12 +342,14 @@ namespace DecorBlishhudModule
 				((Control)borderPanel2).set_Parent((Container)(object)categoryFlowPanel);
 				((Control)borderPanel2).set_Size(new Point(254, 300));
 				((Control)borderPanel2).set_BackgroundColor(new Color(0, 0, 0, 36));
+				((Control)borderPanel2).set_BasicTooltipText(decoration.Name);
 				((Control)borderPanel2).set_Tooltip(tooltip);
 				BorderPanel mainContainer = borderPanel2;
 				Panel val3 = new Panel();
 				((Control)val3).set_Parent((Container)(object)mainContainer);
 				((Control)val3).set_Location(new Point(0, 0));
 				((Control)val3).set_Size(new Point(256, 50));
+				((Control)val3).set_BasicTooltipText(decoration.Name);
 				((Control)val3).set_Tooltip(tooltip);
 				val3.set_BackgroundTexture(AsyncTexture2D.op_Implicit(DecorModule.DecorModuleInstance.BlackTexture));
 				Panel iconTextContainer = val3;
@@ -366,6 +368,7 @@ namespace DecorBlishhudModule
 				val5.set_Font((decoration.Name.ToString().Length > 30) ? GameService.Content.get_DefaultFont12() : GameService.Content.get_DefaultFont14());
 				val5.set_HorizontalAlignment((HorizontalAlignment)0);
 				val5.set_VerticalAlignment((VerticalAlignment)1);
+				((Control)val5).set_BasicTooltipText(decoration.Name);
 				((Control)val5).set_Tooltip(tooltip);
 				int width2 = imageTexture.get_Width();
 				int imageHeight = imageTexture.get_Height();
@@ -384,6 +387,7 @@ namespace DecorBlishhudModule
 				((Control)val6).set_Parent((Container)(object)mainContainer);
 				((Control)val6).set_Location(new Point(xOffset + 2, centeredYOffset - 1));
 				((Control)val6).set_Size(new Point(width - 3, height));
+				((Control)val6).set_BasicTooltipText(decoration.Name);
 				((Control)val6).set_Tooltip(tooltip);
 				Image decorationImage = val6;
 				((Control)mainContainer).add_MouseEntered((EventHandler<MouseEventArgs>)delegate
@@ -409,6 +413,7 @@ namespace DecorBlishhudModule
 					decorWindow = DecorModule.DecorModuleInstance.DecorWindow;
 					Image val11 = new Image(AsyncTexture2D.op_Implicit(borderedTexture));
 					((Control)val11).set_Parent((Container)(object)decorWindow);
+					((Control)val11).set_BasicTooltipText(decoration.Name);
 					((Control)val11).set_Tooltip(tooltip);
 					decorationImage = val11;
 					await BigImageSection.UpdateDecorationImageAsync(decoration, (Container)(object)decorWindow, decorationImage);
