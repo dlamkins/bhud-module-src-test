@@ -108,12 +108,27 @@ namespace SL.ChatLinks
 
 		protected override async Task LoadAsync()
 		{
-			DatabaseSeeder databaseManager = _serviceProvider.GetRequiredService<DatabaseSeeder>();
+			ILogger<Module> logger = _serviceProvider.GetRequiredService<ILogger<Module>>();
 			ILocale locale = _serviceProvider.GetRequiredService<ILocale>();
-			await databaseManager.Migrate(locale.Current);
+			DatabaseSeeder seeder = _serviceProvider.GetRequiredService<DatabaseSeeder>();
+			try
+			{
+				await seeder.Migrate(locale.Current);
+			}
+			catch (Exception reason2)
+			{
+				logger.LogWarning(reason2, "Database migration failed, starting with potentially invalid database schema.");
+			}
 			_serviceProvider.GetRequiredService<MainIcon>();
 			_serviceProvider.GetRequiredService<MainWindow>();
-			await databaseManager.Sync(locale.Current, CancellationToken.None);
+			try
+			{
+				await seeder.Sync(locale.Current, CancellationToken.None);
+			}
+			catch (Exception reason)
+			{
+				logger.LogWarning(reason, "Database sync failed, starting with potentially stale data.");
+			}
 		}
 
 		private static void SetupSqlite3()

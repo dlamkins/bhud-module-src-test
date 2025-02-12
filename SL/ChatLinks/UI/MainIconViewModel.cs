@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -11,6 +12,7 @@ using Microsoft.Extensions.Primitives;
 using Microsoft.Xna.Framework.Graphics;
 using SL.ChatLinks.Storage;
 using SL.Common;
+using SL.Common.Controls;
 using SL.Common.ModelBinding;
 
 namespace SL.ChatLinks.UI
@@ -134,7 +136,7 @@ namespace SL.ChatLinks.UI
 				_003Clogger_003EP.LogError(reason, "Sync failed");
 				ScreenNotification.ShowNotification((string)_003Clocalizer_003EP["Sync failed"], (NotificationType)1, (Texture2D)null, 4);
 			}
-		}, () => string.IsNullOrEmpty(LoadingMessage), delegate(EventHandler handler)
+		}, () => !_003Cseeder_003EP.IsSynchronizing, delegate(EventHandler handler)
 		{
 			DatabaseUpdated += handler;
 		}, delegate(EventHandler handler)
@@ -209,6 +211,31 @@ namespace SL.ChatLinks.UI
 			OnPropertyChanged("SyncLabel");
 			OnPropertyChanged("BananaModeLabel");
 			OnPropertyChanged("RaiseStackSizeLabel");
+		}
+
+		public IEnumerable<ContextMenuStripItem> ContextMenuItems()
+		{
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000c: Expected O, but got Unknown
+			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003d: Expected O, but got Unknown
+			ContextMenuStripItem bananaModeItem = new ContextMenuStripItem(BananaModeLabel);
+			bananaModeItem.set_CanCheck(true);
+			bananaModeItem.set_Checked(BananaMode);
+			bananaModeItem.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate(object sender, CheckChangedEvent args)
+			{
+				BananaMode = args.get_Checked();
+			});
+			ContextMenuStripItem raiseStackSizeItem = new ContextMenuStripItem(RaiseStackSizeLabel);
+			raiseStackSizeItem.set_CanCheck(true);
+			raiseStackSizeItem.set_Checked(RaiseStackSize);
+			raiseStackSizeItem.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate(object sender, CheckChangedEvent args)
+			{
+				RaiseStackSize = args.get_Checked();
+			});
+			ContextMenuStripItem syncItem = SyncCommand.ToMenuItem(() => SyncLabel);
+			ContextMenuStripItem koFiItem = KoFiCommand.ToMenuItem(() => KoFiLabel);
+			return new _003C_003Ez__ReadOnlyArray<ContextMenuStripItem>((ContextMenuStripItem[])(object)new ContextMenuStripItem[4] { bananaModeItem, raiseStackSizeItem, syncItem, koFiItem });
 		}
 	}
 }

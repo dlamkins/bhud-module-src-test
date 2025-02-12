@@ -43,6 +43,23 @@ namespace SL.ChatLinks
 
 		private readonly StaticDataClient _staticDataClient;
 
+		private readonly SemaphoreSlim _syncSemaphore = new SemaphoreSlim(1, 1);
+
+		private Task? _currentSync;
+
+		public bool IsSynchronizing
+		{
+			get
+			{
+				Task currentSync = _currentSync;
+				if (currentSync != null)
+				{
+					return !currentSync.IsCompleted;
+				}
+				return false;
+			}
+		}
+
 		public DatabaseSeeder(ILogger<DatabaseSeeder> logger, IOptions<DatabaseOptions> options, IDbContextFactory contextFactory, IEventAggregator eventAggregator, Gw2Client gw2Client, StaticDataClient staticDataClient)
 		{
 			_logger = logger;
@@ -109,43 +126,72 @@ namespace SL.ChatLinks
 
 		public async Task Migrate(Language language)
 		{
-			Language language2 = language;
-			DataManifest currentDataManifest = await DataManifest();
-			Database currentDatabase = null;
-			if ((object)currentDataManifest == null || !currentDataManifest.Databases.TryGetValue(language2.Alpha2Code, out currentDatabase) || currentDatabase.SchemaVersion > ChatLinksContext.SchemaVersion || IsEmpty(currentDatabase))
+			DataManifest currentDataManifest = (await DataManifest()) ?? new DataManifest
 			{
-				SeedDatabase seedDatabase = (await _staticDataClient.GetSeedIndex(CancellationToken.None)).Databases.SingleOrDefault((SeedDatabase seed) => seed.SchemaVersion == ChatLinksContext.SchemaVersion && seed.Language == language2.Alpha2Code);
+				Version = 1,
+				Databases = new Dictionary<string, Database>()
+			};
+			if (!currentDataManifest.Databases.TryGetValue(language.Alpha2Code, out var currentDatabase) || currentDatabase.SchemaVersion > ChatLinksContext.SchemaVersion || IsEmpty(currentDatabase))
+			{
+				Database seedDatabase = await DownloadDatabase(language);
 				if ((object)seedDatabase != null)
 				{
-					string destination = Path.Combine(_options.Value.Directory, seedDatabase.Name);
-					await _staticDataClient.Download(seedDatabase, destination, CancellationToken.None);
-					if ((object)currentDataManifest == null)
-					{
-						currentDataManifest = new DataManifest
-						{
-							Version = 1,
-							Databases = new Dictionary<string, Database>()
-						};
-					}
-					currentDatabase = new Database
-					{
-						Name = seedDatabase.Name,
-						SchemaVersion = seedDatabase.SchemaVersion
-					};
-					currentDataManifest.Databases[language2.Alpha2Code] = currentDatabase;
+					currentDatabase = seedDatabase;
+					currentDataManifest.Databases[language.Alpha2Code] = seedDatabase;
 					await SaveManifest(currentDataManifest);
 					await _eventAggregator.PublishAsync(new DatabaseDownloaded());
 				}
 			}
-			await using ChatLinksContext context = _contextFactory.CreateDbContext(currentDatabase.Name);
-			await context.Database.MigrateAsync();
+			if ((object)currentDatabase == null)
+			{
+				_logger.LogWarning("No usable database found for language {Language}.", language.Alpha2Code);
+			}
+			else
+			{
+				await using ChatLinksContext context = _contextFactory.CreateDbContext(currentDatabase.Name);
+				await context.Database.MigrateAsync();
+			}
+		}
+
+		private async Task<Database?> DownloadDatabase(Language language)
+		{
+			Language language2 = language;
+			SeedDatabase seedDatabase = (await _staticDataClient.GetSeedIndex(CancellationToken.None)).Databases.SingleOrDefault((SeedDatabase seed) => seed.SchemaVersion == ChatLinksContext.SchemaVersion && seed.Language == language2.Alpha2Code);
+			if ((object)seedDatabase == null)
+			{
+				return null;
+			}
+			string destination = Path.Combine(_options.Value.Directory, seedDatabase.Name);
+			await _staticDataClient.Download(seedDatabase, destination, CancellationToken.None);
+			return new Database
+			{
+				Name = seedDatabase.Name,
+				SchemaVersion = seedDatabase.SchemaVersion
+			};
 		}
 
 		public async Task Sync(Language language, CancellationToken cancellationToken)
 		{
-			await using ChatLinksContext context = _contextFactory.CreateDbContext(language);
-			context.ChangeTracker.AutoDetectChangesEnabled = false;
-			await Seed(context, language, cancellationToken);
+			Language language2 = language;
+			await _syncSemaphore.WaitAsync(cancellationToken);
+			try
+			{
+				if (_currentSync == null || _currentSync!.IsCompleted)
+				{
+					_currentSync = Task.Run(async delegate
+					{
+						await using ChatLinksContext context = _contextFactory.CreateDbContext(language2);
+						context.ChangeTracker.AutoDetectChangesEnabled = false;
+						await Seed(context, language2, cancellationToken);
+					}, cancellationToken);
+				}
+			}
+			finally
+			{
+				_syncSemaphore.Release();
+			}
+			await _currentSync;
+			await _eventAggregator.PublishAsync(new DatabaseSyncCompleted(), cancellationToken);
 		}
 
 		public async Task SeedAll()
@@ -178,7 +224,7 @@ namespace SL.ChatLinks
 			await SaveManifest(manifest);
 		}
 
-		public async Task Seed(ChatLinksContext context, Language language, CancellationToken cancellationToken)
+		private async Task Seed(ChatLinksContext context, Language language, CancellationToken cancellationToken)
 		{
 			Dictionary<string, int> dictionary = new Dictionary<string, int>();
 			Dictionary<string, int> dictionary2 = dictionary;
@@ -205,7 +251,7 @@ namespace SL.ChatLinks
 			dictionary12["novelties"] = await SeedNovelties(context, language, cancellationToken);
 			Dictionary<string, int> dictionary13 = dictionary;
 			dictionary13["outfits"] = await SeedOutfits(context, language, cancellationToken);
-			await _eventAggregator.PublishAsync(new DatabaseSyncCompleted(dictionary), cancellationToken);
+			await _eventAggregator.PublishAsync(new DatabaseSeeded(language, dictionary), cancellationToken);
 		}
 
 		private async Task<int> SeedItems(ChatLinksContext context, Language language, CancellationToken cancellationToken)

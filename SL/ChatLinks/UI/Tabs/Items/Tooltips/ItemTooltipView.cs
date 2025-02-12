@@ -1117,20 +1117,23 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 
 		public void PrintItemRarity(Extensible<Rarity> rarity)
 		{
-			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
 			if (rarity == Rarity.Basic)
 			{
 				PrintPlainText(" ");
 			}
 			else
 			{
-				PrintPlainText($"\r\n{rarity}", ItemColors.Rarity(rarity));
+				PrintPlainText($"\r\n{ViewModel.Localizer[rarity.ToString()]}", ItemColors.Rarity(rarity));
 			}
 		}
 
 		public void PrintWeightClass(Extensible<WeightClass> weightClass)
 		{
-			PrintPlainText(weightClass.ToString());
+			if (weightClass != WeightClass.Clothing)
+			{
+				PrintPlainText((string)ViewModel.Localizer[weightClass.ToString()]);
+			}
 		}
 
 		public void PrintRequiredLevel(int level)
