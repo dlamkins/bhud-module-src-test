@@ -92,9 +92,9 @@ namespace DecorBlishhudModule.Refinement
 			_eff1Qty = CreateInnerHeader("Qty", 68, (Panel)(object)_eff1, (Item item) => item.TradeEfficiency1Qty, type);
 			_eff1Buy = CreateInnerHeader("Buy", 93, (Panel)(object)_eff1, (Item item) => item.TradeEfficiency1Buy, type);
 			_eff1Sell = CreateInnerHeader("Sell", 93, (Panel)(object)_eff1, (Item item) => item.TradeEfficiency1Sell, type);
-			_eff2Qty = CreateInnerHeader("Qty", 68, (Panel)(object)_eff2, (Item item) => item.TradeEfficiency2Qty, type);
-			_eff2Buy = CreateInnerHeader("Buy", 93, (Panel)(object)_eff2, (Item item) => item.TradeEfficiency2Buy, type);
-			_eff2Sell = CreateInnerHeader("Sell", 93, (Panel)(object)_eff2, (Item item) => item.TradeEfficiency2Sell, type);
+			_eff2Qty = CreateInnerHeader("Qty", 68, (Panel)(object)_eff2, (Item item) => ItemFetcher.ParseDoubleInvariant(item.TradeEfficiency2Qty.ToString()), type);
+			_eff2Buy = CreateInnerHeader("Buy", 93, (Panel)(object)_eff2, (Item item) => ItemFetcher.ParseDoubleInvariant(item.TradeEfficiency2Buy), type);
+			_eff2Sell = CreateInnerHeader("Sell", 93, (Panel)(object)_eff2, (Item item) => ItemFetcher.ParseDoubleInvariant(item.TradeEfficiency2Sell), type);
 			await PopulateTable(type);
 		}
 
@@ -256,7 +256,7 @@ namespace DecorBlishhudModule.Refinement
 				await CreateCurrencyDisplay(_eff1Sell, item2, item2.TradeEfficiency1Sell, rowBackgroundColor);
 				Label val7 = new Label();
 				((Control)val7).set_Parent((Container)(object)_eff2Qty);
-				val7.set_Text("    " + item2.TradeEfficiency2Qty);
+				val7.set_Text("    " + ItemFetcher.ParseDoubleInvariant(item2.TradeEfficiency2Qty.ToString()));
 				((Control)val7).set_Size(new Point(68, 30));
 				val7.set_TextColor(Color.get_White());
 				val7.set_Font(GameService.Content.get_DefaultFont16());

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
@@ -85,7 +86,7 @@ namespace DecorBlishhudModule.Refinement
 							TradeEfficiency1Qty = (int.TryParse(columns[4].InnerText.Trim(), out var te1Qty) ? te1Qty : 0),
 							TradeEfficiency1Buy = columns[5].InnerText.Trim(),
 							TradeEfficiency1Sell = columns[6].InnerText.Trim(),
-							TradeEfficiency2Qty = (double.TryParse(columns[7].InnerText.Trim(), out var te2Qty) ? te2Qty : 0.5),
+							TradeEfficiency2Qty = ParseDoubleInvariant(columns[7].InnerText.Trim()),
 							TradeEfficiency2Buy = columns[8].InnerText.Trim(),
 							TradeEfficiency2Sell = columns[9].InnerText.Trim()
 						});
@@ -200,6 +201,31 @@ namespace DecorBlishhudModule.Refinement
 				}
 			}
 			throw new HttpRequestException("Failed after multiple retries.");
+		}
+
+		public static double ParseDoubleInvariant(string value, double defaultValue = 0.5)
+		{
+			if (string.IsNullOrWhiteSpace(value))
+			{
+				return defaultValue;
+			}
+			value = value.Trim();
+			bool hasComma = value.Contains(",");
+			bool hasDot = value.Contains(".");
+			if (hasComma && hasDot)
+			{
+				int lastComma = value.LastIndexOf(",");
+				value = ((value.LastIndexOf(".") <= lastComma) ? value.Replace(".", "").Replace(",", ".") : value.Replace(",", ""));
+			}
+			else if (hasComma)
+			{
+				value = value.Replace(",", ".");
+			}
+			if (double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out var parsedValue))
+			{
+				return parsedValue;
+			}
+			return defaultValue;
 		}
 	}
 }
