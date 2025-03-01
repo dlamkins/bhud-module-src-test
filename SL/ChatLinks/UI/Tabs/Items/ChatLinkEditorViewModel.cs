@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Blish_HUD.Content;
 using GuildWars2.Chat;
@@ -107,7 +108,18 @@ namespace SL.ChatLinks.UI.Tabs.Items
 			}
 		}
 
-		public ObservableCollection<UpgradeEditorViewModel> UpgradeEditorViewModels => new ObservableCollection<UpgradeEditorViewModel>(_upgradeEditorViewModels);
+		public ObservableCollection<UpgradeEditorViewModel> UpgradeEditorViewModels
+		{
+			get
+			{
+				ObservableCollection<UpgradeEditorViewModel> observableCollection = new ObservableCollection<UpgradeEditorViewModel>();
+				foreach (UpgradeEditorViewModel upgradeEditorViewModel in _upgradeEditorViewModels)
+				{
+					observableCollection.Add(upgradeEditorViewModel);
+				}
+				return observableCollection;
+			}
+		}
 
 		public string ItemName
 		{
@@ -117,7 +129,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 				if (!Item.Flags.HideSuffix)
 				{
 					UpgradeComponent defaultSuffix = _customizer.DefaultSuffixItem(Item);
-					if (!string.IsNullOrEmpty(defaultSuffix?.SuffixName) && name.EndsWith(defaultSuffix.SuffixName))
+					if (!string.IsNullOrEmpty(defaultSuffix?.SuffixName) && name.EndsWith(defaultSuffix.SuffixName, StringComparison.Ordinal))
 					{
 						string text = name;
 						int length = defaultSuffix.SuffixName.Length;
@@ -255,8 +267,11 @@ namespace SL.ChatLinks.UI.Tabs.Items
 
 		public ChatLinkEditorViewModel(IOptionsMonitor<ChatLinkOptions> options, IStringLocalizer<ChatLinkEditor> localizer, IEventAggregator eventAggregator, IDbContextFactory contextFactory, ItemTooltipViewModelFactory tooltipViewModelFactory, UpgradeEditorViewModelFactory upgradeEditorViewModelFactory, ItemIcons icons, Customizer customizer, IClipBoard clipboard, Item item)
 		{
-			//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
+			ThrowHelper.ThrowIfNull(options, "options");
+			ThrowHelper.ThrowIfNull(eventAggregator, "eventAggregator");
+			ThrowHelper.ThrowIfNull(item, "item");
 			_options = options;
 			_localizer = localizer;
 			_eventAggregator = eventAggregator;
@@ -268,7 +283,9 @@ namespace SL.ChatLinks.UI.Tabs.Items
 			_clipboard = clipboard;
 			_item = item;
 			ItemNameColor = ItemColors.Rarity(item.Rarity);
-			_upgradeEditorViewModels = CreateUpgradeEditorViewModels().ToList();
+			List<UpgradeEditorViewModel> list = new List<UpgradeEditorViewModel>();
+			list.AddRange(CreateUpgradeEditorViewModels());
+			_upgradeEditorViewModels = list;
 			foreach (var item2 in _upgradeEditorViewModels.Select((UpgradeEditorViewModel vm, int index) => (index + 1, vm)))
 			{
 				var (slot, vm2) = item2;
@@ -306,10 +323,10 @@ namespace SL.ChatLinks.UI.Tabs.Items
 			eventAggregator.Subscribe(new Action<MouseEnteredUpgradeSelector>(OnMouseEnteredUpgradeSelector));
 			eventAggregator.Subscribe(new Action<MouseLeftUpgradeSelector>(OnMouseLeftUpgradeSelector));
 			eventAggregator.Subscribe(new Action<UpgradeSlotChanged>(OnUpgradeSlotChanged));
-			eventAggregator.Subscribe(new Func<LocaleChanged, ValueTask>(OnLocaleChanged));
+			eventAggregator.Subscribe(new Func<LocaleChanged, Task>(OnLocaleChanged));
 		}
 
-		private async ValueTask OnLocaleChanged(LocaleChanged args)
+		private async Task OnLocaleChanged(LocaleChanged args)
 		{
 			OnPropertyChanged("CopyNameLabel");
 			OnPropertyChanged("CopyChatLinkLabel");
@@ -318,8 +335,20 @@ namespace SL.ChatLinks.UI.Tabs.Items
 			OnPropertyChanged("StackSizeLabel");
 			OnPropertyChanged("ResetTooltip");
 			OnPropertyChanged("InfusionWarning");
-			await using ChatLinksContext context = _contextFactory.CreateDbContext(args.Language);
-			Item = context.Items.SingleOrDefault((Item item) => item.Id == Item.Id);
+			ChatLinksContext context = _contextFactory.CreateDbContext(args.Language);
+			ConfiguredAsyncDisposable configuredAsyncDisposable = context.ConfigureAwait(continueOnCapturedContext: false);
+			try
+			{
+				Item = context.Items.SingleOrDefault((Item item) => item.Id == Item.Id);
+			}
+			finally
+			{
+				IAsyncDisposable asyncDisposable = configuredAsyncDisposable as IAsyncDisposable;
+				if (asyncDisposable != null)
+				{
+					await asyncDisposable.DisposeAsync();
+				}
+			}
 		}
 
 		private void OnUpgradeSlotChanged(UpgradeSlotChanged obj)
@@ -404,7 +433,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 			_eventAggregator.Unsubscribe<MouseEnteredUpgradeSelector>(new Action<MouseEnteredUpgradeSelector>(OnMouseEnteredUpgradeSelector));
 			_eventAggregator.Unsubscribe<MouseLeftUpgradeSelector>(new Action<MouseLeftUpgradeSelector>(OnMouseLeftUpgradeSelector));
 			_eventAggregator.Unsubscribe<UpgradeSlotChanged>(new Action<UpgradeSlotChanged>(OnUpgradeSlotChanged));
-			_eventAggregator.Unsubscribe<LocaleChanged>(new Func<LocaleChanged, ValueTask>(OnLocaleChanged));
+			_eventAggregator.Unsubscribe<LocaleChanged>(new Func<LocaleChanged, Task>(OnLocaleChanged));
 		}
 	}
 }

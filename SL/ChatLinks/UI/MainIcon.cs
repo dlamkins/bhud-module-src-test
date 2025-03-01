@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
+using SL.Common;
 
 namespace SL.ChatLinks.UI
 {
@@ -11,10 +12,11 @@ namespace SL.ChatLinks.UI
 		public MainIconViewModel ViewModel { get; }
 
 		public MainIcon(MainIconViewModel viewModel)
-			: this(viewModel.Texture, viewModel.HoverTexture, viewModel.Name)
+			: this(viewModel?.Texture, viewModel?.HoverTexture, viewModel?.Name)
 		{
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006f: Expected O, but got Unknown
+			//IL_0082: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008c: Expected O, but got Unknown
+			ThrowHelper.ThrowIfNull(viewModel, "viewModel");
 			((Control)this).set_Parent((Container)(object)Control.get_Graphics().get_SpriteScreen());
 			((CornerIcon)this).set_Priority(viewModel.Priority);
 			ViewModel = viewModel;

@@ -140,6 +140,8 @@ namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 
 		public UpgradeEditorViewModel(IStringLocalizer<UpgradeEditor> localizer, IEventAggregator eventAggregator, IClipBoard clipboard, UpgradeSlotViewModel upgradeSlotViewModel, UpgradeSelectorViewModelFactory upgradeComponentListViewModelFactory, Item target)
 		{
+			ThrowHelper.ThrowIfNull(eventAggregator, "eventAggregator");
+			ThrowHelper.ThrowIfNull(upgradeSlotViewModel, "upgradeSlotViewModel");
 			_localizer = localizer;
 			_eventAggregator = eventAggregator;
 			_clipboard = clipboard;
@@ -171,14 +173,14 @@ namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 		public UpgradeSelectorViewModel CreateUpgradeComponentListViewModel()
 		{
 			UpgradeSelectorViewModel upgradeSelectorViewModel = _upgradeComponentListViewModelFactory.Create(TargetItem, UpgradeSlotViewModel.Type, UpgradeSlotViewModel.SelectedUpgradeComponent);
-			upgradeSelectorViewModel.Selected += new EventHandler<UpgradeComponent>(Selected);
+			upgradeSelectorViewModel.Selected += new EventHandler<UpgradeSelectedEventArgs>(Selected);
 			upgradeSelectorViewModel.Deselected += new EventHandler(Deselected);
 			return upgradeSelectorViewModel;
 		}
 
-		private void Selected(object sender, UpgradeComponent args)
+		private void Selected(object sender, UpgradeSelectedEventArgs args)
 		{
-			UpgradeSlotViewModel.SelectedUpgradeComponent = args;
+			UpgradeSlotViewModel.SelectedUpgradeComponent = args.Selected;
 			Customizing = false;
 			_eventAggregator.Publish(new UpgradeSlotChanged());
 		}

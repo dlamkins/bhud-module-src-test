@@ -20,8 +20,9 @@ namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 		public UpgradeSlot(UpgradeSlotViewModel viewModel)
 			: this()
 		{
+			ThrowHelper.ThrowIfNull(viewModel, "viewModel");
 			ViewModel = viewModel;
-			ViewModel.PropertyChanged += new PropertyChangedEventHandler(PropertyChanged);
+			viewModel.PropertyChanged += new PropertyChangedEventHandler(PropertyChanged);
 			_label = FormatSlot();
 			((Control)_label).set_Parent((Container)(object)this);
 		}

@@ -5,31 +5,36 @@ using System.Diagnostics;
 namespace Windows.Win32.Foundation
 {
 	[DebuggerDisplay("{Value}")]
-	[GeneratedCode("Microsoft.Windows.CsWin32", "0.3.106+a37a0b4b70")]
+	[GeneratedCode("Microsoft.Windows.CsWin32", "0.3.183+73e6125f79.RR")]
 	internal readonly struct HMODULE : IEquatable<HMODULE>
 	{
-		internal readonly IntPtr Value;
+		internal unsafe readonly void* Value;
 
 		internal static HMODULE Null => default(HMODULE);
 
-		internal bool IsNull => Value == (IntPtr)0;
+		internal unsafe bool IsNull => Value == null;
 
-		internal HMODULE(IntPtr value)
+		internal unsafe HMODULE(void* value)
 		{
 			Value = value;
 		}
 
-		public static implicit operator IntPtr(HMODULE value)
+		internal unsafe HMODULE(IntPtr value)
+			: this((void*)value)
+		{
+		}
+
+		public unsafe static implicit operator void*(HMODULE value)
 		{
 			return value.Value;
 		}
 
-		public static explicit operator HMODULE(IntPtr value)
+		public unsafe static explicit operator HMODULE(void* value)
 		{
 			return new HMODULE(value);
 		}
 
-		public static bool operator ==(HMODULE left, HMODULE right)
+		public unsafe static bool operator ==(HMODULE left, HMODULE right)
 		{
 			return left.Value == right.Value;
 		}
@@ -39,7 +44,7 @@ namespace Windows.Win32.Foundation
 			return !(left == right);
 		}
 
-		public bool Equals(HMODULE other)
+		public unsafe bool Equals(HMODULE other)
 		{
 			return Value == other.Value;
 		}
@@ -54,17 +59,32 @@ namespace Windows.Win32.Foundation
 			return false;
 		}
 
-		public override int GetHashCode()
+		public unsafe override int GetHashCode()
 		{
-			return Value.GetHashCode();
+			return (int)Value;
 		}
 
-		public override string ToString()
+		public unsafe override string ToString()
 		{
-			return $"0x{Value:x}";
+			return $"0x{(nuint)Value:x}";
 		}
 
-		public static implicit operator HINSTANCE(HMODULE value)
+		public unsafe static implicit operator IntPtr(HMODULE value)
+		{
+			return new IntPtr(value.Value);
+		}
+
+		public unsafe static explicit operator HMODULE(IntPtr value)
+		{
+			return new HMODULE(value.ToPointer());
+		}
+
+		public unsafe static explicit operator HMODULE(UIntPtr value)
+		{
+			return new HMODULE(value.ToPointer());
+		}
+
+		public unsafe static implicit operator HINSTANCE(HMODULE value)
 		{
 			return new HINSTANCE(value.Value);
 		}

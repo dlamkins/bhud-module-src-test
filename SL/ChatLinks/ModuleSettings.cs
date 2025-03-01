@@ -5,12 +5,13 @@ using Blish_HUD.Settings;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using SL.ChatLinks.UI.Tabs.Items;
+using SL.Common;
 
 namespace SL.ChatLinks
 {
-	public class ModuleSettings : IConfigureOptions<ChatLinkOptions>, IOptionsChangeTokenSource<ChatLinkOptions>
+	public sealed class ModuleSettings : IConfigureOptions<ChatLinkOptions>, IOptionsChangeTokenSource<ChatLinkOptions>, IDisposable
 	{
-		private class ChangeTokenSource
+		private sealed class ChangeTokenSource : IDisposable
 		{
 			private CancellationTokenSource _cts = new CancellationTokenSource();
 
@@ -21,6 +22,12 @@ namespace SL.ChatLinks
 				CancellationTokenSource cancellationTokenSource = Interlocked.Exchange(ref _cts, new CancellationTokenSource());
 				cancellationTokenSource.Cancel();
 				cancellationTokenSource.Dispose();
+			}
+
+			public void Dispose()
+			{
+				_cts.Dispose();
+				GC.SuppressFinalize(this);
 			}
 		}
 
@@ -72,6 +79,7 @@ namespace SL.ChatLinks
 
 		public ModuleSettings(SettingCollection settings)
 		{
+			ThrowHelper.ThrowIfNull(settings, "settings");
 			_bananaMode = settings.DefineSetting<bool>("BananaMode", false, (Func<string>)(() => "Banana of Imagination-mode"), (Func<string>)(() => "When enabled, you can add an upgrade component to any item."));
 			_bananaMode.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)delegate
 			{
@@ -92,6 +100,7 @@ namespace SL.ChatLinks
 
 		public void Configure(ChatLinkOptions options)
 		{
+			ThrowHelper.ThrowIfNull(options, "options");
 			options.RaiseStackSize = RaiseStackSize;
 			options.BananaMode = BananaMode;
 			options.MaxResultCount = MaxResultCount;
@@ -100,6 +109,12 @@ namespace SL.ChatLinks
 		public IChangeToken GetChangeToken()
 		{
 			return _changeTokenSource.Token;
+		}
+
+		public void Dispose()
+		{
+			_changeTokenSource.Dispose();
+			GC.SuppressFinalize(this);
 		}
 	}
 }

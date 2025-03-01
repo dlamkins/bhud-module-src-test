@@ -6,6 +6,7 @@ using System.Linq;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using SL.ChatLinks.UI.Tabs.Items.Collections;
+using SL.Common;
 using SL.Common.Controls;
 
 namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
@@ -19,6 +20,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 		public UpgradeSelector(UpgradeSelectorViewModel viewModel)
 			: this()
 		{
+			ThrowHelper.ThrowIfNull(viewModel, "viewModel");
 			ViewModel = viewModel;
 			((Container)this).set_WidthSizingMode((SizingMode)2);
 			((Container)this).set_HeightSizingMode((SizingMode)1);
@@ -33,17 +35,16 @@ namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 		{
 			foreach (IGrouping<string, ItemsListViewModel> group in ViewModel.Options)
 			{
-				ItemsList itemsList = new ItemsList();
-				ItemsList itemsList2 = itemsList;
+				ItemsList list = new ItemsList();
+				ItemsList itemsList = list;
 				ObservableCollection<ItemsListViewModel> observableCollection = new ObservableCollection<ItemsListViewModel>();
 				foreach (ItemsListViewModel item in group)
 				{
 					observableCollection.Add(item);
 				}
-				itemsList2.Entries = observableCollection;
-				ItemsList list = itemsList;
+				itemsList.SetEntries(observableCollection);
 				_accordion.AddSection(group.Key, (Control)(object)list);
-				list.SelectionChanged += new Action<ListBox<ItemsListViewModel>, ListBoxSelectionChangedEventArgs<ItemsListViewModel>>(SelectionChanged);
+				list.SelectionChanged += new EventHandler<ListBoxSelectionChangedEventArgs<ItemsListViewModel>>(SelectionChanged);
 				((Control)list).add_MouseEntered((EventHandler<MouseEventArgs>)MouseEnteredUpgradeSelectorCommand);
 				((Control)list).add_MouseLeft((EventHandler<MouseEventArgs>)MouseLeftUpgradeSelectorCommand);
 			}
@@ -61,7 +62,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 			}
 		}
 
-		private void SelectionChanged(ListBox<ItemsListViewModel> sender, ListBoxSelectionChangedEventArgs<ItemsListViewModel> args)
+		private void SelectionChanged(object sender, ListBoxSelectionChangedEventArgs<ItemsListViewModel> args)
 		{
 			IList<ListItem<ItemsListViewModel>> addedItems = args.AddedItems;
 			if (addedItems != null && addedItems.Count == 1)

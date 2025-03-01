@@ -17,7 +17,7 @@ using SL.Common.ModelBinding;
 
 namespace SL.ChatLinks.UI
 {
-	public class MainIconViewModel : ViewModel
+	public sealed class MainIconViewModel : ViewModel
 	{
 		[CompilerGenerated]
 		private ILogger<MainIconViewModel> _003Clogger_003EP;
@@ -117,18 +117,19 @@ namespace SL.ChatLinks.UI
 
 		public AsyncRelayCommand ClickCommand => new AsyncRelayCommand(async delegate
 		{
-			await _003CeventAggregator_003EP.PublishAsync(new MainIconClicked(), CancellationToken.None);
+			await _003CeventAggregator_003EP.PublishAsync(new MainIconClicked(), CancellationToken.None).ConfigureAwait(continueOnCapturedContext: false);
 		});
 
 		public AsyncRelayCommand SyncCommand => new AsyncRelayCommand(async delegate
 		{
-			_ = 1;
 			try
 			{
-				await (await Task.Factory.StartNew((Func<Task>)async delegate
+				await Task.Run(async delegate
 				{
-					await _003Cseeder_003EP.Sync(_003Clocale_003EP.Current, CancellationToken.None);
-				}, TaskCreationOptions.LongRunning));
+					await _003Cseeder_003EP.Sync(_003Clocale_003EP.Current, CancellationToken.None).ConfigureAwait(continueOnCapturedContext: false);
+					await _003Cseeder_003EP.Vacuum(_003Clocale_003EP.Current, CancellationToken.None).ConfigureAwait(continueOnCapturedContext: false);
+					await _003Cseeder_003EP.Optimize(_003Clocale_003EP.Current, CancellationToken.None).ConfigureAwait(continueOnCapturedContext: false);
+				}).ConfigureAwait(continueOnCapturedContext: false);
 				ScreenNotification.ShowNotification((string)_003Clocalizer_003EP["Chat Links database is up-to-date"], (NotificationType)5, (Texture2D)null, 4);
 			}
 			catch (Exception reason)
@@ -215,27 +216,28 @@ namespace SL.ChatLinks.UI
 
 		public IEnumerable<ContextMenuStripItem> ContextMenuItems()
 		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000c: Expected O, but got Unknown
-			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003d: Expected O, but got Unknown
-			ContextMenuStripItem bananaModeItem = new ContextMenuStripItem(BananaModeLabel);
-			bananaModeItem.set_CanCheck(true);
-			bananaModeItem.set_Checked(BananaMode);
+			ContextMenuStripItem val = new ContextMenuStripItem(BananaModeLabel);
+			val.set_CanCheck(true);
+			val.set_Checked(BananaMode);
+			ContextMenuStripItem bananaModeItem = val;
 			bananaModeItem.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate(object sender, CheckChangedEvent args)
 			{
 				BananaMode = args.get_Checked();
 			});
-			ContextMenuStripItem raiseStackSizeItem = new ContextMenuStripItem(RaiseStackSizeLabel);
-			raiseStackSizeItem.set_CanCheck(true);
-			raiseStackSizeItem.set_Checked(RaiseStackSize);
+			ContextMenuStripItem val2 = new ContextMenuStripItem(RaiseStackSizeLabel);
+			val2.set_CanCheck(true);
+			val2.set_Checked(RaiseStackSize);
+			ContextMenuStripItem raiseStackSizeItem = val2;
 			raiseStackSizeItem.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate(object sender, CheckChangedEvent args)
 			{
 				RaiseStackSize = args.get_Checked();
 			});
 			ContextMenuStripItem syncItem = SyncCommand.ToMenuItem(() => SyncLabel);
 			ContextMenuStripItem koFiItem = KoFiCommand.ToMenuItem(() => KoFiLabel);
-			return new _003C_003Ez__ReadOnlyArray<ContextMenuStripItem>((ContextMenuStripItem[])(object)new ContextMenuStripItem[4] { bananaModeItem, raiseStackSizeItem, syncItem, koFiItem });
+			yield return bananaModeItem;
+			yield return raiseStackSizeItem;
+			yield return syncItem;
+			yield return koFiItem;
 		}
 	}
 }

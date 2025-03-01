@@ -6,7 +6,7 @@ using Windows.Win32.Foundation;
 
 namespace Windows.Win32
 {
-	[GeneratedCode("Microsoft.Windows.CsWin32", "0.3.106+a37a0b4b70")]
+	[GeneratedCode("Microsoft.Windows.CsWin32", "0.3.183+73e6125f79.RR")]
 	internal static class PInvoke
 	{
 		[DllImport("KERNEL32.dll", ExactSpelling = true, SetLastError = true)]

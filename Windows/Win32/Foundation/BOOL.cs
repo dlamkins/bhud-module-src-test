@@ -5,7 +5,7 @@ using System.Diagnostics;
 namespace Windows.Win32.Foundation
 {
 	[DebuggerDisplay("{Value}")]
-	[GeneratedCode("Microsoft.Windows.CsWin32", "0.3.106+a37a0b4b70")]
+	[GeneratedCode("Microsoft.Windows.CsWin32", "0.3.183+73e6125f79.RR")]
 	internal readonly struct BOOL : IEquatable<BOOL>
 	{
 		internal readonly int Value;

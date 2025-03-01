@@ -10,12 +10,13 @@ using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Microsoft.Xna.Framework;
 using SL.ChatLinks.UI.Tabs.Items.Collections;
+using SL.Common;
 using SL.Common.Controls;
 using SL.Common.ModelBinding;
 
 namespace SL.ChatLinks.UI.Tabs.Items
 {
-	public class ItemsTabView : View
+	public sealed class ItemsTabView : View, IDisposable
 	{
 		private readonly FlowPanel _layout;
 
@@ -26,40 +27,41 @@ namespace SL.ChatLinks.UI.Tabs.Items
 		public ItemsTabView(ItemsTabViewModel viewModel)
 			: this()
 		{
-			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0045: Expected O, but got Unknown
-			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0050: Expected O, but got Unknown
+			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0070: Expected O, but got Unknown
-			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008b: Expected O, but got Unknown
-			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007b: Expected O, but got Unknown
+			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0087: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0096: Expected O, but got Unknown
+			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b4: Expected O, but got Unknown
-			//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0105: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0111: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012d: Expected O, but got Unknown
-			//IL_0181: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0186: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0192: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b0: Expected O, but got Unknown
+			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bf: Expected O, but got Unknown
+			//IL_0104: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0109: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0110: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0126: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0138: Expected O, but got Unknown
+			//IL_0191: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0196: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c0: Expected O, but got Unknown
 			ItemsTabView itemsTabView = this;
+			ThrowHelper.ThrowIfNull(viewModel, "viewModel");
 			ViewModel = viewModel;
 			ViewModel.Initialize();
 			FlowPanel val = new FlowPanel();
@@ -107,9 +109,9 @@ namespace SL.ChatLinks.UI.Tabs.Items
 			((Container)itemsList).set_WidthSizingMode((SizingMode)0);
 			((Control)itemsList).set_Width(400);
 			((Container)itemsList).set_HeightSizingMode((SizingMode)2);
-			itemsList.Entries = ViewModel.SearchResults;
 			ItemsList searchResults = itemsList;
-			searchResults.SelectionChanged += new Action<ListBox<ItemsListViewModel>, ListBoxSelectionChangedEventArgs<ItemsListViewModel>>(SelectionChanged);
+			searchResults.SetEntries(ViewModel.SearchResults);
+			searchResults.SelectionChanged += new EventHandler<ListBoxSelectionChangedEventArgs<ItemsListViewModel>>(SelectionChanged);
 			ViewContainer val6 = new ViewContainer();
 			((Control)val6).set_Parent((Container)(object)_layout);
 			((Control)val6).set_Width(450);
@@ -126,7 +128,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 				{
 					if (propertyName == "SearchResults")
 					{
-						searchResults.Entries = itemsTabView.ViewModel.SearchResults;
+						searchResults.SetEntries(itemsTabView.ViewModel.SearchResults);
 					}
 				}
 				else
@@ -136,7 +138,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 			};
 		}
 
-		private void SelectionChanged(ListBox<ItemsListViewModel> sender, ListBoxSelectionChangedEventArgs<ItemsListViewModel> args)
+		private void SelectionChanged(object sender, ListBoxSelectionChangedEventArgs<ItemsListViewModel> args)
 		{
 			IList<ListItem<ItemsListViewModel>> addedItems = args.AddedItems;
 			if (addedItems != null && addedItems.Count == 1)
@@ -148,7 +150,8 @@ namespace SL.ChatLinks.UI.Tabs.Items
 					if (listItem != null)
 					{
 						ViewModel.SelectedItem = listItem.Item;
-						_editor.Show((IView)(object)new ChatLinkEditorView(ViewModel.CreateChatLinkEditorViewModel(listItem.Item)));
+						ChatLinkEditorView view = new ChatLinkEditorView(ViewModel.CreateChatLinkEditorViewModel(listItem.Item));
+						_editor.Show((IView)(object)view);
 						return;
 					}
 				}
@@ -159,7 +162,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 
 		protected override async Task<bool> Load(IProgress<string> progress)
 		{
-			await ViewModel.LoadAsync();
+			await ViewModel.LoadAsync().ConfigureAwait(continueOnCapturedContext: false);
 			return true;
 		}
 
@@ -170,7 +173,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 
 		protected override void Unload()
 		{
-			ViewModel.Unload();
+			Dispose();
 		}
 
 		private void SearchTextChanged(object sender, EventArgs e)
@@ -181,6 +184,13 @@ namespace SL.ChatLinks.UI.Tabs.Items
 		private void SearchEnterPressed(object sender, EventArgs e)
 		{
 			ViewModel.SearchCommand.Execute(null);
+		}
+
+		public void Dispose()
+		{
+			((Control)_layout).Dispose();
+			((Control)_editor).Dispose();
+			ViewModel.Dispose();
 		}
 	}
 }

@@ -14,6 +14,8 @@ using SL.ChatLinks.Integrations;
 using SL.ChatLinks.Logging;
 using SL.ChatLinks.Storage;
 using SL.ChatLinks.UI;
+using SL.ChatLinks.UI.Tabs.Achievements;
+using SL.ChatLinks.UI.Tabs.Achievements.Tooltips;
 using SL.ChatLinks.UI.Tabs.Items;
 using SL.ChatLinks.UI.Tabs.Items.Collections;
 using SL.ChatLinks.UI.Tabs.Items.Tooltips;
@@ -24,7 +26,7 @@ using SQLitePCL;
 namespace SL.ChatLinks
 {
 	[Export(typeof(Module))]
-	public class Module : Module
+	public class ChatLinksModule : Module
 	{
 		private IEventAggregator? _eventAggregator;
 
@@ -32,8 +34,10 @@ namespace SL.ChatLinks
 
 		private ModuleSettings? _moduleSettings;
 
+		private readonly Clock _clock = new Clock();
+
 		[ImportingConstructor]
-		public Module([Import("ModuleParameters")] ModuleParameters parameters)
+		public ChatLinksModule([Import("ModuleParameters")] ModuleParameters parameters)
 			: this(parameters)
 		{
 		}
@@ -54,34 +58,24 @@ namespace SL.ChatLinks
 			services.AddSingleton(_moduleSettings);
 			services.ConfigureOptions(_moduleSettings);
 			((IServiceCollection)services).AddSingleton((IOptionsChangeTokenSource<ChatLinkOptions>)_moduleSettings);
-			services.AddSingleton<ILocale, OverlayLocale>();
-			services.AddSingleton<IIntrospection, ModuleIntrospection>();
-			services.AddGw2Client();
-			services.AddStaticDataClient();
 			services.AddDatabase(delegate(DatabaseOptions options)
 			{
 				options.Directory = base.ModuleParameters.get_DirectoriesManager().GetFullDirectoryPath("chat-links-data");
 			});
 			services.AddSingleton<DatabaseSeeder>();
+			services.AddSingleton<ILocale, OverlayLocale>();
+			services.AddLocalization(delegate(LocalizationOptions options)
+			{
+				options.ResourcesPath = "Resources";
+			});
+			services.AddGw2Client();
+			services.AddStaticDataClient();
+			services.AddSingleton<ITokenProvider, Gw2SharpTokenProvider>();
 			services.AddSingleton<IEventAggregator, DefaultEventAggregator>();
-			services.AddTransient<MainIcon>();
-			services.AddTransient<MainIconViewModel>();
-			services.AddTransient<MainWindow>();
-			services.AddTransient<MainWindowViewModel>();
-			services.AddTransient<ItemsTabViewModelFactory>();
-			services.AddTransient<ItemsListViewModelFactory>();
-			services.AddTransient<ItemTooltipViewModelFactory>();
-			services.AddTransient<ChatLinkEditorViewModelFactory>();
-			services.AddTransient<UpgradeEditorViewModelFactory>();
-			services.AddTransient<UpgradeSelectorViewModelFactory>();
-			services.AddTransient<ItemSearch>();
-			services.AddSingleton<Customizer>();
-			services.AddSingleton<Hero>();
-			services.AddHttpClient<ItemIcons>();
 			services.AddTransient<IClipBoard, WpfClipboard>();
 			services.AddLogging(delegate(ILoggingBuilder builder)
 			{
-				builder.Services.AddSingleton<ILoggerProvider, LoggingAdapterProvider<Module>>();
+				builder.Services.AddSingleton<ILoggerProvider, LoggingAdapterProvider<ChatLinksModule>>();
 				if (ApplicationSettings.get_Instance().get_DebugEnabled() || GameService.Debug.get_EnableDebugLogging().get_Value())
 				{
 					builder.SetMinimumLevel(LogLevel.Debug);
@@ -96,11 +90,23 @@ namespace SL.ChatLinks
 					builder.AddFilter("Microsoft.EntityFrameworkCore.Query", LogLevel.Critical);
 				}
 			});
-			services.AddSingleton<ITokenProvider, Gw2SharpTokenProvider>();
-			services.AddLocalization(delegate(LocalizationOptions options)
-			{
-				options.ResourcesPath = "Resources";
-			});
+			services.AddTransient<MainIcon>();
+			services.AddTransient<MainIconViewModel>();
+			services.AddTransient<MainWindow>();
+			services.AddTransient<MainWindowViewModel>();
+			services.AddTransient<ItemsTabViewModelFactory>();
+			services.AddTransient<ItemsListViewModelFactory>();
+			services.AddTransient<ItemTooltipViewModelFactory>();
+			services.AddTransient<ChatLinkEditorViewModelFactory>();
+			services.AddTransient<UpgradeEditorViewModelFactory>();
+			services.AddTransient<UpgradeSelectorViewModelFactory>();
+			services.AddTransient<ItemSearch>();
+			services.AddSingleton<Customizer>();
+			services.AddSingleton<AccountUnlocks>();
+			services.AddHttpClient<ItemIcons>();
+			services.AddTransient<AchievementsTabViewModelFactory>();
+			services.AddTransient<AchievementTileViewModelFactory>();
+			services.AddTransient<AchievementTooltipViewModelFactory>();
 			_serviceProvider = services.BuildServiceProvider();
 			_eventAggregator = _serviceProvider.GetRequiredService<IEventAggregator>();
 			SetupSqlite3();
@@ -108,12 +114,12 @@ namespace SL.ChatLinks
 
 		protected override async Task LoadAsync()
 		{
-			ILogger<Module> logger = _serviceProvider.GetRequiredService<ILogger<Module>>();
+			ILogger<ChatLinksModule> logger = _serviceProvider.GetRequiredService<ILogger<ChatLinksModule>>();
 			ILocale locale = _serviceProvider.GetRequiredService<ILocale>();
 			DatabaseSeeder seeder = _serviceProvider.GetRequiredService<DatabaseSeeder>();
 			try
 			{
-				await seeder.Migrate(locale.Current);
+				await seeder.Migrate(locale.Current).ConfigureAwait(continueOnCapturedContext: false);
 			}
 			catch (Exception reason2)
 			{
@@ -123,12 +129,19 @@ namespace SL.ChatLinks
 			_serviceProvider.GetRequiredService<MainWindow>();
 			try
 			{
-				await seeder.Sync(locale.Current, CancellationToken.None);
+				await seeder.Sync(locale.Current, CancellationToken.None).ConfigureAwait(continueOnCapturedContext: false);
+				await seeder.Optimize(locale.Current, CancellationToken.None).ConfigureAwait(continueOnCapturedContext: false);
 			}
 			catch (Exception reason)
 			{
 				logger.LogWarning(reason, "Database sync failed, starting with potentially stale data.");
 			}
+			_clock.HourStarted += new EventHandler(OnHourStarted);
+		}
+
+		private void OnHourStarted(object sender, EventArgs e)
+		{
+			_eventAggregator?.Publish(new HourStarted());
 		}
 
 		private static void SetupSqlite3()
@@ -140,7 +153,17 @@ namespace SL.ChatLinks
 		protected override void Unload()
 		{
 			_eventAggregator?.Publish(new ModuleUnloading());
-			_serviceProvider?.Dispose();
+		}
+
+		protected override void Dispose(bool disposing)
+		{
+			if (disposing)
+			{
+				_clock.Dispose();
+				_serviceProvider?.Dispose();
+				_moduleSettings?.Dispose();
+			}
+			((Module)this).Dispose(disposing);
 		}
 	}
 }

@@ -51,12 +51,13 @@ namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 
 		public RelayCommand MouseLeftUpgradeSelectorCommand => new RelayCommand(new Action(OnMouseLeftUpgradeSelector));
 
-		public event EventHandler<UpgradeComponent>? Selected;
+		public event EventHandler<UpgradeSelectedEventArgs>? Selected;
 
 		public event EventHandler? Deselected;
 
 		public UpgradeSelectorViewModel(IStringLocalizer<UpgradeSelector> localizer, Customizer customizer, ItemsListViewModelFactory itemsListViewModelFactory, Item target, UpgradeSlotType slotType, UpgradeComponent? selectedUpgradeComponent, IEventAggregator eventAggregator)
 		{
+			ThrowHelper.ThrowIfNull(eventAggregator, "eventAggregator");
 			_localizer = localizer;
 			_customizer = customizer;
 			_itemsListViewModelFactory = itemsListViewModelFactory;
@@ -78,7 +79,10 @@ namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 			{
 				item.IsSelected = item == selection;
 			}
-			this.Selected?.Invoke(this, (UpgradeComponent)selection.Item);
+			this.Selected?.Invoke(this, new UpgradeSelectedEventArgs
+			{
+				Selected = (UpgradeComponent)selection.Item
+			});
 		}
 
 		private void OnRemove()

@@ -2,6 +2,7 @@ using System;
 using System.Runtime.CompilerServices;
 using Blish_HUD.Content;
 using Microsoft.Extensions.Localization;
+using SL.ChatLinks.UI.Tabs.Achievements;
 using SL.ChatLinks.UI.Tabs.Items;
 using SL.Common;
 
@@ -14,6 +15,9 @@ namespace SL.ChatLinks.UI
 
 		[CompilerGenerated]
 		private ItemsTabViewModelFactory _003CitemsTabViewModelFactory_003EP;
+
+		[CompilerGenerated]
+		private AchievementsTabViewModelFactory _003CachievementsTabViewModelFactory_003EP;
 
 		[CompilerGenerated]
 		private IStringLocalizer<MainWindow> _003Clocalizer_003EP;
@@ -38,14 +42,17 @@ namespace SL.ChatLinks.UI
 
 		public string ItemsTabName => (string)_003Clocalizer_003EP["Items"];
 
+		public string AchievementsTabName => (string)_003Clocalizer_003EP["Achievements"];
+
 		public AsyncTexture2D BackgroundTexture => AsyncTexture2D.FromAssetId(155985);
 
 		public AsyncTexture2D EmblemTexture => AsyncTexture2D.FromAssetId(2237584);
 
-		public MainWindowViewModel(IEventAggregator eventAggregator, ItemsTabViewModelFactory itemsTabViewModelFactory, IStringLocalizer<MainWindow> localizer)
+		public MainWindowViewModel(IEventAggregator eventAggregator, ItemsTabViewModelFactory itemsTabViewModelFactory, AchievementsTabViewModelFactory achievementsTabViewModelFactory, IStringLocalizer<MainWindow> localizer)
 		{
 			_003CeventAggregator_003EP = eventAggregator;
 			_003CitemsTabViewModelFactory_003EP = itemsTabViewModelFactory;
+			_003CachievementsTabViewModelFactory_003EP = achievementsTabViewModelFactory;
 			_003Clocalizer_003EP = localizer;
 			base._002Ector();
 		}
@@ -61,6 +68,7 @@ namespace SL.ChatLinks.UI
 		{
 			OnPropertyChanged("Title");
 			OnPropertyChanged("ItemsTabName");
+			OnPropertyChanged("AchievementsTabName");
 		}
 
 		private void MainIconClicked(MainIconClicked obj)
@@ -71,6 +79,11 @@ namespace SL.ChatLinks.UI
 		public ItemsTabViewModel CreateItemsTabViewModel()
 		{
 			return _003CitemsTabViewModelFactory_003EP.Create();
+		}
+
+		public AchievementsTabViewModel CreateAchievementsTabViewModel()
+		{
+			return _003CachievementsTabViewModelFactory_003EP.Create();
 		}
 
 		private void ModuleUnloading(ModuleUnloading obj)

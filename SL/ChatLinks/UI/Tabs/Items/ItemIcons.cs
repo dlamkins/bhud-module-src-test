@@ -27,6 +27,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 
 		public AsyncTexture2D? GetIcon(Item item)
 		{
+			ThrowHelper.ThrowIfNull(item, "item");
 			if (item.IconHref == null)
 			{
 				return null;
@@ -36,7 +37,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0011: Expected O, but got Unknown
 				AsyncTexture2D newTexture = new AsyncTexture2D();
-				_003ChttpClient_003EP.GetStreamAsync(url).ContinueWith(delegate(Task<Stream> task)
+				_003ChttpClient_003EP.GetStreamAsync(new Uri(url)).ContinueWith(delegate(Task<Stream> task)
 				{
 					if (task.Status == TaskStatus.RanToCompletion)
 					{
@@ -44,7 +45,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 						Texture2D val = TextureUtil.FromStreamPremultiplied(stream);
 						newTexture.SwapTexture(val);
 					}
-				});
+				}, TaskScheduler.Default);
 				return newTexture;
 			})).Duplicate();
 		}

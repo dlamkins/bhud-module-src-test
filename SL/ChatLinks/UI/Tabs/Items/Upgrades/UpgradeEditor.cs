@@ -25,9 +25,10 @@ namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 		public UpgradeEditor(UpgradeEditorViewModel viewModel)
 			: this()
 		{
-			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0087: Expected O, but got Unknown
+			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0092: Expected O, but got Unknown
+			ThrowHelper.ThrowIfNull(viewModel, "viewModel");
 			((FlowPanel)this).set_FlowDirection((ControlFlowDirection)3);
 			((Control)this).set_Width(350);
 			((Container)this).set_HeightSizingMode((SizingMode)1);
