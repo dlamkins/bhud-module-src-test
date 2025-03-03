@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
@@ -14,13 +15,11 @@ using Blish_HUD.Graphics.UI;
 using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
-using HsAPI;
 using Ideka.BHUDCommon;
 using Ideka.CustomCombatText.Bridge;
 using Ideka.NetCommon;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Newtonsoft.Json;
 
 namespace Ideka.CustomCombatText
 {
@@ -30,6 +29,8 @@ namespace Ideka.CustomCombatText
 		private static readonly Logger Logger = Logger.GetLogger<CTextModule>();
 
 		private readonly DisposableCollection _dc = new DisposableCollection();
+
+		private HttpClient _httpClient;
 
 		private ModuleSettings _settings;
 
@@ -41,9 +42,9 @@ namespace Ideka.CustomCombatText
 
 		private SpecializationData _specData;
 
-		private readonly Dictionary<int, Skill> _hsSkills = new Dictionary<int, Skill>();
+		private HsSkillData _hsSkillData;
 
-		private readonly Dictionary<int, Palette> _hsPalettes = new Dictionary<int, Palette>();
+		private HsPaletteData _hsPaletteData;
 
 		private ConfirmationModal _confirmationModal;
 
@@ -94,6 +95,8 @@ namespace Ideka.CustomCombatText
 
 		internal static string ViewsDataPath => "Views.json";
 
+		internal static HttpClient HttpClient => Instance._httpClient;
+
 		internal static ModuleSettings Settings => Instance._settings;
 
 		internal static StyleSettings Style => Instance._style;
@@ -104,9 +107,9 @@ namespace Ideka.CustomCombatText
 
 		internal static SpecializationData SpecData => Instance._specData;
 
-		internal static IReadOnlyDictionary<int, Skill> HsSkills => Instance._hsSkills;
+		internal static HsSkillData HsSkillData => Instance._hsSkillData;
 
-		internal static IReadOnlyDictionary<int, Palette> HsPalettes => Instance._hsPalettes;
+		internal static HsPaletteData HsPaletteData => Instance._hsPaletteData;
 
 		internal static ConfirmationModal ConfirmationModal => Instance._confirmationModal;
 
@@ -166,35 +169,21 @@ namespace Ideka.CustomCombatText
 
 		protected override void Initialize()
 		{
+			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0024: Expected O, but got Unknown
 			((Module)this).Initialize();
+			_httpClient = _dc.Add<HttpClient>(new HttpClient());
 			CancellationTokenSource cts = new CancellationTokenSource();
 			_dc.Add(new WhenDisposed(new Action(cts.Cancel)));
 			_skillData = _dc.Add(new SkillData());
 			_traitData = _dc.Add(new TraitData());
 			_specData = _dc.Add(new SpecializationData());
+			_hsSkillData = _dc.Add(new HsSkillData(_httpClient));
+			_hsPaletteData = _dc.Add(new HsPaletteData(_httpClient));
 			Task.Run(async delegate
 			{
-				await Task.WhenAll(_skillData.StartLoad(Path.Combine(BasePath, SkillCachePath), ContentsManager, SkillCachePath, cts.Token), _traitData.StartLoad(Path.Combine(BasePath, TraitCachePath), ContentsManager, TraitCachePath, cts.Token), _specData.StartLoad(Path.Combine(BasePath, SpecCachePath), ContentsManager, SpecCachePath, cts.Token), loadHsCache<Skill>(HsSkillCachePath, _hsSkills, (Skill x) => x.Id, cts.Token), loadHsCache<Palette>(HsPaletteCachePath, _hsPalettes, (Palette x) => x.Id, cts.Token));
+				await Task.WhenAll<Task>(_skillData.StartLoad(Path.Combine(BasePath, SkillCachePath), ContentsManager, SkillCachePath, cts.Token), _traitData.StartLoad(Path.Combine(BasePath, TraitCachePath), ContentsManager, TraitCachePath, cts.Token), _specData.StartLoad(Path.Combine(BasePath, SpecCachePath), ContentsManager, SpecCachePath, cts.Token), _hsSkillData.StartLoad(Path.Combine(BasePath, HsSkillCachePath), ContentsManager, HsSkillCachePath, cts.Token), _hsPaletteData.StartLoad(Path.Combine(BasePath, HsPaletteCachePath), ContentsManager, HsPaletteCachePath, cts.Token));
 			}, cts.Token);
-			static async Task loadHsCache<T>(string path, Dictionary<int, T> dict, Func<T, int> idGetter, CancellationToken ct) where T : notnull
-			{
-				try
-				{
-					using Stream file = ContentsManager.GetFileStream(path);
-					using StreamReader reader = new StreamReader(file);
-					List<T>? obj = JsonConvert.DeserializeObject<List<T>>(await reader.ReadToEndAsync()) ?? throw new Exception("Hs cache load resulted in null.");
-					ct.ThrowIfCancellationRequested();
-					dict.Clear();
-					foreach (T item in obj!)
-					{
-						dict[idGetter(item)] = item;
-					}
-				}
-				catch (Exception e)
-				{
-					Logger.Warn(e, "Exception when loading Hs cache.");
-				}
-			}
 		}
 
 		protected override void OnModuleLoaded(EventArgs e)

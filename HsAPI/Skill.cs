@@ -1,14 +1,15 @@
 using System;
 using System.Collections.Generic;
+using Gw2Sharp.WebApi.V2.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
 namespace HsAPI
 {
 	[JsonObject(NamingStrategyType = typeof(SnakeCaseNamingStrategy))]
-	public class Skill
+	public class Skill : IIdentifiable<int>
 	{
-		public int Id { get; init; }
+		public int Id { get; set; }
 
 		public string Name { get; init; } = "";
 

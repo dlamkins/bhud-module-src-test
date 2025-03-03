@@ -136,7 +136,7 @@ namespace Ideka.CustomCombatText
 
 		public Message(CombatEvent cbt, MessageContext ctx)
 		{
-			//IL_0359: Unknown result type (might be due to invalid IL or missing references)
+			//IL_035e: Unknown result type (might be due to invalid IL or missing references)
 			CombatEvent cbt2 = cbt;
 			base._002Ector();
 			Message message = this;
@@ -145,8 +145,8 @@ namespace Ideka.CustomCombatText
 			Dst = cbt2.get_Dst();
 			SkillId = (StaticData.SkillRedirects.TryGetValue((int)Ev.get_SkillId(), out var id) ? id : ((int)Ev.get_SkillId()));
 			Skill = (CTextModule.SkillData.Items.TryGetValue(SkillId, out var x4) ? x4 : null);
-			HsSkill = (CTextModule.HsSkills.TryGetValue(SkillId, out var x3) ? x3 : null);
-			HsInfo = HsSkill?.Palettes.SelectMany((int paletteId) => (!CTextModule.HsPalettes.TryGetValue(paletteId, out var palette)) ? Array.Empty<(Palette, SlotGroup, SkillInfo)>() : palette.Groups.SelectMany((SlotGroup group) => from info in @group.Candidates
+			HsSkill = (CTextModule.HsSkillData.Items.TryGetValue(SkillId, out var x3) ? x3 : null);
+			HsInfo = HsSkill?.Palettes.SelectMany((int paletteId) => (!CTextModule.HsPaletteData.Items.TryGetValue(paletteId, out var palette)) ? Array.Empty<(Palette, SlotGroup, SkillInfo)>() : palette.Groups.SelectMany((SlotGroup group) => from info in @group.Candidates
 				where info.Skill == message.SkillId
 				select (palette, @group, info))).ToArray() ?? Array.Empty<(Palette, SlotGroup, SkillInfo)>();
 			PreviousSkillChainIds = new HashSet<uint>(((IEnumerable<(Palette, SlotGroup, SkillInfo)>)HsInfo).Select((Func<(Palette, SlotGroup, SkillInfo), uint?>)delegate((Palette palette, SlotGroup group, SkillInfo info) x)

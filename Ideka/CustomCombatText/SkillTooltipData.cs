@@ -46,7 +46,7 @@ namespace Ideka.CustomCombatText
 			IconId = iconId ?? skill2.Icon;
 			Title = TooltipUtils.ResolveInflections(skill2.Name, context2.CharacterGender);
 			Palette palette2;
-			(Palette, SlotGroup, SkillInfo)[] infos = skill2.Palettes.SelectMany((int paletteId) => (!CTextModule.HsPalettes.TryGetValue(paletteId, out palette2)) ? Array.Empty<(Palette, SlotGroup, SkillInfo)>() : palette2.Groups.SelectMany((SlotGroup group) => from info in @group.Candidates
+			(Palette, SlotGroup, SkillInfo)[] infos = skill2.Palettes.SelectMany((int paletteId) => (!CTextModule.HsPaletteData.Items.TryGetValue(paletteId, out palette2)) ? Array.Empty<(Palette, SlotGroup, SkillInfo)>() : palette2.Groups.SelectMany((SlotGroup group) => from info in @group.Candidates
 				where info.Skill == skill2.Id
 				select (palette2, @group, info))).ToArray() ?? Array.Empty<(Palette, SlotGroup, SkillInfo)>();
 			Skill = (skill2 = TooltipUtils.ResolveOverrides(skill2, context2));

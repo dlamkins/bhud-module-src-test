@@ -94,6 +94,14 @@ namespace Ideka.CustomCombatText
 
 		internal static string SettingPetToMasterIsSelfText => ResourceManager.GetString("SettingPetToMasterIsSelfText", resourceCulture);
 
+		internal static string SettingToggleVisible => ResourceManager.GetString("SettingToggleVisible", resourceCulture);
+
+		internal static string SettingToggleVisibleText => ResourceManager.GetString("SettingToggleVisibleText", resourceCulture);
+
+		internal static string SettingVisible => ResourceManager.GetString("SettingVisible", resourceCulture);
+
+		internal static string SettingVisibleText => ResourceManager.GetString("SettingVisibleText", resourceCulture);
+
 		internal Strings()
 		{
 		}

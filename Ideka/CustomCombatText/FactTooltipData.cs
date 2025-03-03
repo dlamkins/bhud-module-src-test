@@ -223,7 +223,7 @@ namespace Ideka.CustomCombatText
 			Text = text3;
 			static Skill getBuffOrFallback(int buffId)
 			{
-				if (!CTextModule.HsSkills.TryGetValue(buffId, out var buff5))
+				if (!CTextModule.HsSkillData.Items.TryGetValue(buffId, out var buff5))
 				{
 					return MissingBuff;
 				}

@@ -1,4 +1,5 @@
 using System;
+using Blish_HUD.Input;
 using Blish_HUD.Settings;
 using Ideka.BHUDCommon;
 using Ideka.NetCommon;
@@ -8,6 +9,10 @@ namespace Ideka.CustomCombatText
 	public class ModuleSettings : IDisposable
 	{
 		private readonly DisposableCollection _dc = new DisposableCollection();
+
+		public GenericSetting<bool> Visible { get; }
+
+		public KeyBindingSetting ToggleVisible { get; }
 
 		public GenericSetting<string> FontName { get; }
 
@@ -45,6 +50,14 @@ namespace Ideka.CustomCombatText
 
 		public ModuleSettings(SettingCollection settings)
 		{
+			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c1: Expected O, but got Unknown
+			Visible = _dc.Add(settings.Generic("Visible", defaultValue: true, () => Strings.SettingVisible, () => Strings.SettingVisibleText));
+			ToggleVisible = _dc.Add(settings.KeyBinding("ToggleVisible", new KeyBinding(), () => Strings.SettingToggleVisible, () => Strings.SettingToggleVisibleText));
+			_dc.Add(ToggleVisible.OnActivated(delegate
+			{
+				Visible.Value = !Visible.Value;
+			}));
 			FontName = _dc.Add(settings.Generic("FontName", "", () => Strings.SettingFontName, () => Strings.SettingFontNameText));
 			FontSize = _dc.Add(settings.Slider("FontSize", 32, 1, 100, () => Strings.SettingFontSize, () => Strings.SettingFontSizeText));
 			MessageHeightDelta = _dc.Add(settings.Slider("MessageHeightDelta", 0, -25, 25, () => Strings.SettingMessageHeightDelta, () => Strings.SettingMessageHeightDeltaText));
