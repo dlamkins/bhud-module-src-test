@@ -21,62 +21,140 @@ namespace Ideka.RacingMeter
 
 		private readonly IMeasurer _measurer;
 
-		private readonly AnchoredRect _meterContainer;
+		private readonly AnchoredRect _mainContainer;
 
 		private AnchoredRect? _currentMeter;
 
-		private float AnchorY
+		private readonly AnchoredRect _simpleContainer;
+
+		private float MainAnchorX
 		{
+			get
+			{
+				//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+				return _mainContainer.Pivot.X;
+			}
 			set
 			{
-				//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-				//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-				AnchoredRect meterContainer = _meterContainer;
-				AnchoredRect meterContainer2 = _meterContainer;
+				//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+				AnchoredRect mainContainer = _mainContainer;
+				AnchoredRect mainContainer2 = _mainContainer;
 				Vector2 val = default(Vector2);
-				((Vector2)(ref val))._002Ector(0.5f, value);
-				meterContainer2.Pivot = val;
-				meterContainer.Anchor = val;
+				((Vector2)(ref val))._002Ector(value, MainAnchorY);
+				mainContainer2.Pivot = val;
+				mainContainer.Anchor = val;
+			}
+		}
+
+		private float MainAnchorY
+		{
+			get
+			{
+				//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+				return _mainContainer.Pivot.Y;
+			}
+			set
+			{
+				//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+				AnchoredRect mainContainer = _mainContainer;
+				AnchoredRect mainContainer2 = _mainContainer;
+				Vector2 val = default(Vector2);
+				((Vector2)(ref val))._002Ector(MainAnchorX, value);
+				mainContainer2.Pivot = val;
+				mainContainer.Anchor = val;
+			}
+		}
+
+		private float SimpleAnchorX
+		{
+			get
+			{
+				//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+				return _simpleContainer.Pivot.X;
+			}
+			set
+			{
+				//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+				AnchoredRect simpleContainer = _simpleContainer;
+				AnchoredRect simpleContainer2 = _simpleContainer;
+				Vector2 val = default(Vector2);
+				((Vector2)(ref val))._002Ector(value, SimpleAnchorY);
+				simpleContainer2.Pivot = val;
+				simpleContainer.Anchor = val;
+			}
+		}
+
+		private float SimpleAnchorY
+		{
+			get
+			{
+				//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+				return _simpleContainer.Pivot.Y;
+			}
+			set
+			{
+				//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+				AnchoredRect simpleContainer = _simpleContainer;
+				AnchoredRect simpleContainer2 = _simpleContainer;
+				Vector2 val = default(Vector2);
+				((Vector2)(ref val))._002Ector(SimpleAnchorX, value);
+				simpleContainer2.Pivot = val;
+				simpleContainer.Anchor = val;
 			}
 		}
 
 		public bool Debug { get; set; }
 
 		public Speedometer(IMeasurer measurer)
-			: this()
 		{
-			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0169: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0175: Unknown result type (might be due to invalid IL or missing references)
-			_measurer = measurer;
+			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01df: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02e6: Unknown result type (might be due to invalid IL or missing references)
+			IMeasurer measurer2 = measurer;
+			((Control)this)._002Ector();
+			Speedometer speedometer = this;
+			_measurer = measurer2;
 			((Control)this).set_ClipsBounds(false);
-			_meterContainer = new AnchoredRect
+			_mainContainer = new AnchoredRect
 			{
-				SizeDelta = new Vector2(400f, 100f),
-				Anchor = new Vector2(0.5f, 0.5f)
+				SizeDelta = new Vector2(400f, 100f)
 			};
+			_simpleContainer = new AnchoredRect
+			{
+				SizeDelta = new Vector2(100f, 100f)
+			};
+			_dc.Add(RacingModule.Settings.SpeedometerAnchorX.OnChangedAndNow(delegate(float v)
+			{
+				speedometer.MainAnchorX = v;
+			}));
 			_dc.Add(RacingModule.Settings.SpeedometerAnchorY.OnChangedAndNow(delegate(float v)
 			{
-				AnchorY = v;
+				speedometer.MainAnchorY = v;
 			}));
 			_dc.Add(RacingModule.Settings.ShowSpeedometer.OnChangedAndNow(delegate(bool v)
 			{
-				((Control)this).set_Visible(v);
+				((Control)speedometer).set_Visible(v);
 			}));
 			_dc.Add(RacingModule.Settings.ToggleDebug.OnActivated(delegate
 			{
-				Debug = !Debug;
+				speedometer.Debug = !speedometer.Debug;
 			}));
 			Dictionary<MountType, AnchoredRect> meters = new Dictionary<MountType, AnchoredRect>
 			{
-				[(MountType)4] = SkimmerMeter.Construct(measurer),
-				[(MountType)2] = GriffonMeter.Construct(measurer),
-				[(MountType)6] = BeetleMeter.Construct(measurer, new Func<bool?>(RacingModule.Settings.IsDriftKeyDown)),
-				[(MountType)7] = WarclawMeter.Construct(measurer),
-				[(MountType)9] = SkiffMeter.Construct(measurer),
-				[(MountType)10] = SiegeTurtleMeter.Construct(measurer)
+				[(MountType)4] = SkimmerMeter.Construct(measurer2),
+				[(MountType)2] = GriffonMeter.Construct(measurer2),
+				[(MountType)6] = BeetleMeter.Construct(measurer2, new Func<bool?>(RacingModule.Settings.IsDriftKeyDown)),
+				[(MountType)7] = WarclawMeter.Construct(measurer2),
+				[(MountType)9] = SkiffMeter.Construct(measurer2),
+				[(MountType)10] = SiegeTurtleMeter.Construct(measurer2)
 			};
 			foreach (KeyValuePair<MountType, GenericSetting<bool>> meter2 in RacingModule.Settings.Meters)
 			{
@@ -85,12 +163,36 @@ namespace Ideka.RacingMeter
 				{
 					_dc.Add(setting.OnChangedAndNow(delegate(bool v)
 					{
-						//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-						SetMeter(mountType, v ? meter : null);
+						//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+						speedometer.SetMeter(mountType, v ? meter : null);
 					}));
 				}
 			}
 			GameService.Gw2Mumble.get_PlayerCharacter().add_CurrentMountChanged((EventHandler<ValueEventArgs<MountType>>)MountChanged);
+			_dc.Add(RacingModule.Settings.SimpleSpeedometerAnchorX.OnChangedAndNow(delegate(float v)
+			{
+				speedometer.SimpleAnchorX = v;
+			}));
+			_dc.Add(RacingModule.Settings.SimpleSpeedometerAnchorY.OnChangedAndNow(delegate(float v)
+			{
+				speedometer.SimpleAnchorY = v;
+			}));
+			_dc.Add(RacingModule.Settings.EnableSimpleSpeedometer.OnChangedAndNow(delegate(bool v)
+			{
+				speedometer._simpleContainer.Visible = v;
+			}));
+			_simpleContainer.AddChild(new SizedTextLabel
+			{
+				AnchorMinX = 0.5f,
+				AnchorMax = Vector2.get_One(),
+				Font = GameService.Content.get_DefaultFont32(),
+				Color = Color.get_White(),
+				Stroke = true,
+				StrokeDistance = 1
+			}).WithUpdate(delegate(SizedTextLabel x)
+			{
+				x.Text = $"{Math.Round(measurer2.Speed.Speed3D)}";
+			});
 		}
 
 		protected override CaptureType CapturesInput()
@@ -113,18 +215,19 @@ namespace Ideka.RacingMeter
 		private void UpdateMeter()
 		{
 			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-			_meterContainer.ClearChildren();
+			_mainContainer.ClearChildren();
 			_currentMeter = null;
 			if (_meters.TryGetValue(GameService.Gw2Mumble.get_PlayerCharacter().get_CurrentMount(), out _currentMeter) && _currentMeter != null)
 			{
-				_meterContainer.AddChild(_currentMeter);
+				_mainContainer.AddChild(_currentMeter);
 			}
 		}
 
 		public override void DoUpdate(GameTime gameTime)
 		{
 			((Control)this).DoUpdate(gameTime);
-			_meterContainer.Update(gameTime);
+			_simpleContainer.Update(gameTime);
+			_mainContainer.Update(gameTime);
 		}
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
@@ -134,11 +237,24 @@ namespace Ideka.RacingMeter
 			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
 			if (!GameService.Gw2Mumble.get_UI().get_IsMapOpen() && GameService.GameIntegration.get_Gw2Instance().get_IsInGame())
 			{
-				RectangleF rect = _meterContainer.Target(RectangleF.op_Implicit(((Control)Control.get_Graphics().get_SpriteScreen()).get_AbsoluteBounds()));
-				_meterContainer.Draw(spriteBatch, (Control)(object)this, rect);
+				RectangleF rect2 = _simpleContainer.Target(RectangleF.op_Implicit(((Control)Control.get_Graphics().get_SpriteScreen()).get_AbsoluteBounds()));
+				_simpleContainer.Draw(spriteBatch, (Control)(object)this, rect2);
+				if (Debug)
+				{
+					ShapeExtensions.DrawRectangle(spriteBatch, rect2, Color.get_Black(), 1f, 0f);
+				}
+				RectangleF rect = _mainContainer.Target(RectangleF.op_Implicit(((Control)Control.get_Graphics().get_SpriteScreen()).get_AbsoluteBounds()));
+				_mainContainer.Draw(spriteBatch, (Control)(object)this, rect);
 				if (Debug)
 				{
 					DrawDebug(spriteBatch, rect);

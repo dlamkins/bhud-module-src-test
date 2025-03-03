@@ -75,10 +75,6 @@ namespace Ideka.RacingMeter
 			//IL_0103: Unknown result type (might be due to invalid IL or missing references)
 			//IL_010a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_011a: Expected O, but got Unknown
-			//IL_011b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0120: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0127: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0137: Expected O, but got Unknown
 			_editor = editor;
 			Panel val = new Panel();
 			((Control)val).set_Parent((Container)(object)this);
@@ -112,10 +108,10 @@ namespace Ideka.RacingMeter
 			((Control)val7).set_Parent((Container)(object)this);
 			val7.set_Text(Strings.InsertBefore);
 			_insertBeforeButton = val7;
-			StandardButton val8 = new StandardButton();
-			((Control)val8).set_Parent((Container)(object)this);
-			val8.set_Text(Strings.InsertAfter);
-			_insertAfterButton = val8;
+			KeyboundButton keyboundButton = new KeyboundButton(RacingModule.Settings.EditorInsertPointAfter.Value);
+			((Control)keyboundButton).set_Parent((Container)(object)this);
+			((StandardButton)keyboundButton).set_Text(Strings.InsertAfter);
+			_insertAfterButton = (StandardButton)(object)keyboundButton;
 			UpdateLayout();
 			((Control)_nearestButton).add_Click((EventHandler<MouseEventArgs>)delegate
 			{

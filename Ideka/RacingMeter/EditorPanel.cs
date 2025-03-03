@@ -9,7 +9,6 @@ using Ideka.NetCommon;
 using Ideka.RacingMeter.Lib;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 
 namespace Ideka.RacingMeter
 {
@@ -75,20 +74,14 @@ namespace Ideka.RacingMeter
 			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00b9: Expected O, but got Unknown
-			//IL_010b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0115: Expected O, but got Unknown
-			//IL_013b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0145: Expected O, but got Unknown
-			//IL_016b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0175: Expected O, but got Unknown
-			//IL_0192: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0197: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ae: Expected O, but got Unknown
-			//IL_01af: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cb: Expected O, but got Unknown
+			//IL_01a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c3: Expected O, but got Unknown
+			//IL_01c4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e0: Expected O, but got Unknown
 			_panelStack = panelStack;
 			_editor = _dc.Add<RaceEditor>(new RaceEditor(measurer, fullRace));
 			StandardButton val = new StandardButton();
@@ -117,17 +110,17 @@ namespace Ideka.RacingMeter
 			((Control)racePointEditPanel).set_Parent((Container)(object)this);
 			_pointPanel = racePointEditPanel;
 			DisposableCollection dc = _dc;
-			KeyboundButton keyboundButton = new KeyboundButton(new KeyBinding((ModifierKeys)1, (Keys)90));
+			KeyboundButton keyboundButton = new KeyboundButton(RacingModule.Settings.EditorUndo.Value);
 			((Control)keyboundButton).set_Parent((Container)(object)this);
 			((StandardButton)keyboundButton).set_Text(Strings.Undo);
 			_undoButton = (StandardButton)(object)dc.Add<KeyboundButton>(keyboundButton);
 			DisposableCollection dc2 = _dc;
-			KeyboundButton keyboundButton2 = new KeyboundButton(new KeyBinding((ModifierKeys)1, (Keys)89));
+			KeyboundButton keyboundButton2 = new KeyboundButton(RacingModule.Settings.EditorRedo.Value);
 			((Control)keyboundButton2).set_Parent((Container)(object)this);
 			((StandardButton)keyboundButton2).set_Text(Strings.Redo);
 			_redoButton = (StandardButton)(object)dc2.Add<KeyboundButton>(keyboundButton2);
 			DisposableCollection dc3 = _dc;
-			KeyboundButton keyboundButton3 = new KeyboundButton(new KeyBinding((ModifierKeys)1, (Keys)83));
+			KeyboundButton keyboundButton3 = new KeyboundButton(RacingModule.Settings.EditorSave.Value);
 			((Control)keyboundButton3).set_Parent((Container)(object)this);
 			((StandardButton)keyboundButton3).set_Text(Strings.Save);
 			_saveButton = (StandardButton)(object)dc3.Add<KeyboundButton>(keyboundButton3);

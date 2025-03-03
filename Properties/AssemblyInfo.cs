@@ -6,7 +6,7 @@ using System.Runtime.Versioning;
 [assembly: AssemblyCompany("RacingMeter")]
 [assembly: AssemblyConfiguration("Release")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
-[assembly: AssemblyInformationalVersion("1.0.0+559d7410f37a045b03440399d49c7ea4826ba2c1")]
+[assembly: AssemblyInformationalVersion("1.0.0+4949b5bb8a7e22c3cc850b358049cda19e6ab22e")]
 [assembly: AssemblyProduct("RacingMeter")]
 [assembly: AssemblyTitle("RacingMeter")]
 [assembly: AssemblyVersion("1.0.0.0")]

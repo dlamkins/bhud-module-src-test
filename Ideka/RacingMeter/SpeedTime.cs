@@ -52,7 +52,7 @@ namespace Ideka.RacingMeter
 
 		public static bool IsDoubling(SpeedTime a, SpeedTime b)
 		{
-			return GetDoubledDiff(a, b) < 0.1f;
+			return GetDoubledDiff(a, b) < 0.03f;
 		}
 
 		public void Update()

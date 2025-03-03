@@ -380,6 +380,26 @@ namespace Ideka.RacingMeter
 
 		internal static string SettingCheckpointLineThicknessText => ResourceManager.GetString("SettingCheckpointLineThicknessText", resourceCulture);
 
+		internal static string SettingEditorInsertPointAfter => ResourceManager.GetString("SettingEditorInsertPointAfter", resourceCulture);
+
+		internal static string SettingEditorInsertPointAfterText => ResourceManager.GetString("SettingEditorInsertPointAfterText", resourceCulture);
+
+		internal static string SettingEditorRedo => ResourceManager.GetString("SettingEditorRedo", resourceCulture);
+
+		internal static string SettingEditorRedoText => ResourceManager.GetString("SettingEditorRedoText", resourceCulture);
+
+		internal static string SettingEditorSave => ResourceManager.GetString("SettingEditorSave", resourceCulture);
+
+		internal static string SettingEditorSaveText => ResourceManager.GetString("SettingEditorSaveText", resourceCulture);
+
+		internal static string SettingEditorUndo => ResourceManager.GetString("SettingEditorUndo", resourceCulture);
+
+		internal static string SettingEditorUndoText => ResourceManager.GetString("SettingEditorUndoText", resourceCulture);
+
+		internal static string SettingEnableSimpleSpeedometer => ResourceManager.GetString("SettingEnableSimpleSpeedometer", resourceCulture);
+
+		internal static string SettingEnableSimpleSpeedometerText => ResourceManager.GetString("SettingEnableSimpleSpeedometerText", resourceCulture);
+
 		internal static string SettingGriffonMeter => ResourceManager.GetString("SettingGriffonMeter", resourceCulture);
 
 		internal static string SettingMaxGhostData => ResourceManager.GetString("SettingMaxGhostData", resourceCulture);
@@ -442,9 +462,21 @@ namespace Ideka.RacingMeter
 
 		internal static string SettingSiegeTurtleMeter => ResourceManager.GetString("SettingSiegeTurtleMeter", resourceCulture);
 
+		internal static string SettingSimpleSpeedometerAnchorX => ResourceManager.GetString("SettingSimpleSpeedometerAnchorX", resourceCulture);
+
+		internal static string SettingSimpleSpeedometerAnchorXText => ResourceManager.GetString("SettingSimpleSpeedometerAnchorXText", resourceCulture);
+
+		internal static string SettingSimpleSpeedometerAnchorY => ResourceManager.GetString("SettingSimpleSpeedometerAnchorY", resourceCulture);
+
+		internal static string SettingSimpleSpeedometerAnchorYText => ResourceManager.GetString("SettingSimpleSpeedometerAnchorYText", resourceCulture);
+
 		internal static string SettingSkiffMeter => ResourceManager.GetString("SettingSkiffMeter", resourceCulture);
 
 		internal static string SettingSkimmerMeter => ResourceManager.GetString("SettingSkimmerMeter", resourceCulture);
+
+		internal static string SettingSpeedometerAnchorX => ResourceManager.GetString("SettingSpeedometerAnchorX", resourceCulture);
+
+		internal static string SettingSpeedometerAnchorXText => ResourceManager.GetString("SettingSpeedometerAnchorXText", resourceCulture);
 
 		internal static string SettingSpeedometerAnchorY => ResourceManager.GetString("SettingSpeedometerAnchorY", resourceCulture);
 
