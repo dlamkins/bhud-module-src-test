@@ -73,6 +73,9 @@ namespace SL.ChatLinks
 			services.AddSingleton<ITokenProvider, Gw2SharpTokenProvider>();
 			services.AddSingleton<IEventAggregator, DefaultEventAggregator>();
 			services.AddTransient<IClipBoard, WpfClipboard>();
+			services.AddSingleton<AccountUnlocks>();
+			services.AddHttpClient<IconsService>();
+			services.AddSingleton<IconsCache>();
 			services.AddLogging(delegate(ILoggingBuilder builder)
 			{
 				builder.Services.AddSingleton<ILoggerProvider, LoggingAdapterProvider<ChatLinksModule>>();
@@ -102,8 +105,6 @@ namespace SL.ChatLinks
 			services.AddTransient<UpgradeSelectorViewModelFactory>();
 			services.AddTransient<ItemSearch>();
 			services.AddSingleton<Customizer>();
-			services.AddSingleton<AccountUnlocks>();
-			services.AddHttpClient<ItemIcons>();
 			services.AddTransient<AchievementsTabViewModelFactory>();
 			services.AddTransient<AchievementTileViewModelFactory>();
 			services.AddTransient<AchievementTooltipViewModelFactory>();

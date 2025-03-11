@@ -21,7 +21,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 		private IClipBoard _003Cclipboard_003EP;
 
 		[CompilerGenerated]
-		private ItemIcons _003Cicons_003EP;
+		private IconsService _003Cicons_003EP;
 
 		[CompilerGenerated]
 		private Customizer _003Ccustomizer_003EP;
@@ -32,7 +32,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 		[CompilerGenerated]
 		private ItemTooltipViewModelFactory _003CitemTooltipViewModelFactory_003EP;
 
-		public UpgradeEditorViewModelFactory(IStringLocalizer<UpgradeEditor> localizer, IStringLocalizer<UpgradeSlot> localizer2, IEventAggregator eventAggregator, IClipBoard clipboard, ItemIcons icons, Customizer customizer, UpgradeSelectorViewModelFactory upgradeComponentListViewModelFactory, ItemTooltipViewModelFactory itemTooltipViewModelFactory)
+		public UpgradeEditorViewModelFactory(IStringLocalizer<UpgradeEditor> localizer, IStringLocalizer<UpgradeSlot> localizer2, IEventAggregator eventAggregator, IClipBoard clipboard, IconsService icons, Customizer customizer, UpgradeSelectorViewModelFactory upgradeComponentListViewModelFactory, ItemTooltipViewModelFactory itemTooltipViewModelFactory)
 		{
 			_003Clocalizer_003EP = localizer;
 			_003Clocalizer2_003EP = localizer2;

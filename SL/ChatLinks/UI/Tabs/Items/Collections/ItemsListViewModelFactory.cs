@@ -18,7 +18,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Collections
 		private IClipBoard _003Cclipboard_003EP;
 
 		[CompilerGenerated]
-		private ItemIcons _003Cicons_003EP;
+		private IconsService _003Cicons_003EP;
 
 		[CompilerGenerated]
 		private Customizer _003Ccustomizer_003EP;
@@ -26,7 +26,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Collections
 		[CompilerGenerated]
 		private ItemTooltipViewModelFactory _003CtooltipViewModelFactory_003EP;
 
-		public ItemsListViewModelFactory(IStringLocalizer<ItemsList> localizer, IEventAggregator eventAggregator, IClipBoard clipboard, ItemIcons icons, Customizer customizer, ItemTooltipViewModelFactory tooltipViewModelFactory)
+		public ItemsListViewModelFactory(IStringLocalizer<ItemsList> localizer, IEventAggregator eventAggregator, IClipBoard clipboard, IconsService icons, Customizer customizer, ItemTooltipViewModelFactory tooltipViewModelFactory)
 		{
 			_003Clocalizer_003EP = localizer;
 			_003CeventAggregator_003EP = eventAggregator;

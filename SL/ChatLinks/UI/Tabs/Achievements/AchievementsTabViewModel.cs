@@ -40,6 +40,9 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 		[CompilerGenerated]
 		private AccountUnlocks _003Cunlocks_003EP;
 
+		[CompilerGenerated]
+		private IconsService _003Cicons_003EP;
+
 		private ObservableCollection<AchievementGroupMenuItem> _groups;
 
 		private ObservableCollection<AchievementTileViewModel> _achievements;
@@ -133,7 +136,7 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 			}
 		}
 
-		public AchievementsTabViewModel(IEventAggregator eventAggregator, IDbContextFactory contextFactory, IStringLocalizer<AchievementsTabView> localizer, ILocale locale, AchievementTileViewModelFactory achievementTileViewModelFactory, AccountUnlocks unlocks)
+		public AchievementsTabViewModel(IEventAggregator eventAggregator, IDbContextFactory contextFactory, IStringLocalizer<AchievementsTabView> localizer, ILocale locale, AchievementTileViewModelFactory achievementTileViewModelFactory, AccountUnlocks unlocks, IconsService icons)
 		{
 			_003CeventAggregator_003EP = eventAggregator;
 			_003CcontextFactory_003EP = contextFactory;
@@ -141,6 +144,7 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 			_003Clocale_003EP = locale;
 			_003CachievementTileViewModelFactory_003EP = achievementTileViewModelFactory;
 			_003Cunlocks_003EP = unlocks;
+			_003Cicons_003EP = icons;
 			_groups = new ObservableCollection<AchievementGroupMenuItem>();
 			_achievements = new ObservableCollection<AchievementTileViewModel>();
 			_searchText = "";
@@ -374,6 +378,11 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 				orderby hidden, locked, @group?.Order ?? int.MaxValue, category?.Order ?? int.MaxValue, achievement.Flags.CategoryDisplay descending, achievement.Flags.MoveToTop descending
 				select achievement);
 			return list;
+		}
+
+		public AsyncTexture2D GetIcon(string iconUrl)
+		{
+			return _003Cicons_003EP.GetIcon(iconUrl) ?? AsyncTexture2D.FromAssetId(155865).Duplicate();
 		}
 
 		public void Dispose()

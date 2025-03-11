@@ -1,7 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Microsoft.Xna.Framework;
@@ -22,11 +21,6 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 			_003Cachievements_003EP = achievements;
 			_achievementsPanel = new FlowPanel();
 			((View)this)._002Ector();
-		}
-
-		protected override Task<bool> Load(IProgress<string> progress)
-		{
-			return ((View<IPresenter>)this).Load(progress);
 		}
 
 		protected override void Build(Container buildPanel)

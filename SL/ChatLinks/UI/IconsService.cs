@@ -1,38 +1,37 @@
 using System;
-using System.Collections.Concurrent;
 using System.IO;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Content;
-using GuildWars2.Items;
 using Microsoft.Xna.Framework.Graphics;
 using SL.Common;
 
-namespace SL.ChatLinks.UI.Tabs.Items
+namespace SL.ChatLinks.UI
 {
-	public class ItemIcons
+	public sealed class IconsService
 	{
 		[CompilerGenerated]
 		private HttpClient _003ChttpClient_003EP;
 
-		private static readonly ConcurrentDictionary<string, AsyncTexture2D> WebCache = new ConcurrentDictionary<string, AsyncTexture2D>();
+		[CompilerGenerated]
+		private IconsCache _003Ccache_003EP;
 
-		public ItemIcons(HttpClient httpClient)
+		public IconsService(HttpClient httpClient, IconsCache cache)
 		{
 			_003ChttpClient_003EP = httpClient;
+			_003Ccache_003EP = cache;
 			base._002Ector();
 		}
 
-		public AsyncTexture2D? GetIcon(Item item)
+		public AsyncTexture2D? GetIcon(string? iconUrl)
 		{
-			ThrowHelper.ThrowIfNull(item, "item");
-			if (item.IconHref == null)
+			if (string.IsNullOrWhiteSpace(iconUrl))
 			{
 				return null;
 			}
-			return (GameService.Content.GetRenderServiceTexture(item.IconHref) ?? WebCache.GetOrAdd(item.IconHref, (Func<string, AsyncTexture2D>)delegate(string url)
+			return (GameService.Content.GetRenderServiceTexture(iconUrl) ?? _003Ccache_003EP.GetOrAdd(iconUrl, delegate(string url)
 			{
 				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0011: Expected O, but got Unknown

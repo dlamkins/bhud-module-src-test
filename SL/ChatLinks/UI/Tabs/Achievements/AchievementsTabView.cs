@@ -2,7 +2,6 @@ using System;
 using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
@@ -122,17 +121,17 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 
 		private void AddAchievementCategories()
 		{
-			//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e2: Expected O, but got Unknown
+			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ba: Expected O, but got Unknown
 			foreach (AchievementGroupMenuItem menuItem in ViewModel.MenuItems)
 			{
 				MenuItem groupMenuItem = _menu.AddMenuItem(menuItem.Group.Name, (Texture2D)null);
 				((Control)groupMenuItem).set_BasicTooltipText(menuItem.Group.Description);
 				foreach (AchievementCategory category in menuItem.Categories)
 				{
-					AsyncTexture2D icon = ((!string.IsNullOrEmpty(category.IconHref)) ? GameService.Content.GetRenderServiceTexture(category.IconHref).Duplicate() : AsyncTexture2D.FromAssetId(155865).Duplicate());
+					AsyncTexture2D icon = ViewModel.GetIcon(category.IconHref);
 					MenuItem val = new MenuItem(category.Name, icon);
 					((Control)val).set_Parent((Container)(object)groupMenuItem);
 					((Control)val).set_BasicTooltipText(category.Description);

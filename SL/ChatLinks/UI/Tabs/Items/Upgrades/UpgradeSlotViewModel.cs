@@ -16,7 +16,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 
 		private UpgradeComponent? _defaultUpgradeComponent;
 
-		private readonly ItemIcons _icons;
+		private readonly IconsService _icons;
 
 		private readonly IStringLocalizer<UpgradeSlot> _localizer;
 
@@ -70,7 +70,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 
 		public string UnusedEnrichmenSlotLabel => (string)_localizer["Unused enrichment slot"];
 
-		public UpgradeSlotViewModel(UpgradeSlotType type, ItemIcons icons, IStringLocalizer<UpgradeSlot> localizer, ItemTooltipViewModelFactory itemTooltipViewModelFactory, IEventAggregator eventAggregator, Customizer customizer)
+		public UpgradeSlotViewModel(UpgradeSlotType type, IconsService icons, IStringLocalizer<UpgradeSlot> localizer, ItemTooltipViewModelFactory itemTooltipViewModelFactory, IEventAggregator eventAggregator, Customizer customizer)
 		{
 			ThrowHelper.ThrowIfNull(eventAggregator, "eventAggregator");
 			_icons = icons;
@@ -103,7 +103,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 
 		public AsyncTexture2D? GetIcon(UpgradeComponent item)
 		{
-			return _icons.GetIcon(item);
+			return _icons.GetIcon(item.IconHref);
 		}
 
 		public ItemTooltipViewModel CreateTooltipViewModel(UpgradeComponent item)

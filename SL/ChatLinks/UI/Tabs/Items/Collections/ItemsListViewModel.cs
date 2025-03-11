@@ -21,7 +21,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Collections
 
 		private readonly IClipBoard _clipboard;
 
-		private readonly ItemIcons _icons;
+		private readonly IconsService _icons;
 
 		private readonly Customizer _customizer;
 
@@ -82,7 +82,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Collections
 			Process.Start(_localizer["Item API", new object[1] { Item.Id }]);
 		});
 
-		public ItemsListViewModel(IStringLocalizer<ItemsList> localizer, IEventAggregator eventAggregator, IClipBoard clipboard, ItemIcons icons, Customizer customizer, Item item, ItemTooltipViewModelFactory tooltipViewModelFactory, bool isSelected)
+		public ItemsListViewModel(IStringLocalizer<ItemsList> localizer, IEventAggregator eventAggregator, IClipBoard clipboard, IconsService icons, Customizer customizer, Item item, ItemTooltipViewModelFactory tooltipViewModelFactory, bool isSelected)
 		{
 			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
@@ -110,7 +110,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Collections
 
 		public AsyncTexture2D? GetIcon()
 		{
-			return _icons.GetIcon(Item);
+			return _icons.GetIcon(Item.IconHref);
 		}
 
 		public ItemTooltipViewModel CreateTooltipViewModel()

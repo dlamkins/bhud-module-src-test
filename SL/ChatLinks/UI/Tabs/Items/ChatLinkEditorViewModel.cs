@@ -47,7 +47,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 
 		private readonly UpgradeEditorViewModelFactory _upgradeEditorViewModelFactory;
 
-		private readonly ItemIcons _icons;
+		private readonly IconsService _icons;
 
 		private readonly Customizer _customizer;
 
@@ -265,7 +265,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 
 		public string InfusionWarning => (string)_localizer["Infusion warning"];
 
-		public ChatLinkEditorViewModel(IOptionsMonitor<ChatLinkOptions> options, IStringLocalizer<ChatLinkEditor> localizer, IEventAggregator eventAggregator, IDbContextFactory contextFactory, ItemTooltipViewModelFactory tooltipViewModelFactory, UpgradeEditorViewModelFactory upgradeEditorViewModelFactory, ItemIcons icons, Customizer customizer, IClipBoard clipboard, Item item)
+		public ChatLinkEditorViewModel(IOptionsMonitor<ChatLinkOptions> options, IStringLocalizer<ChatLinkEditor> localizer, IEventAggregator eventAggregator, IDbContextFactory contextFactory, ItemTooltipViewModelFactory tooltipViewModelFactory, UpgradeEditorViewModelFactory upgradeEditorViewModelFactory, IconsService icons, Customizer customizer, IClipBoard clipboard, Item item)
 		{
 			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
@@ -378,7 +378,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 
 		public AsyncTexture2D? GetIcon()
 		{
-			return _icons.GetIcon(Item);
+			return _icons.GetIcon(Item.IconHref);
 		}
 
 		private IEnumerable<UpgradeEditorViewModel> CreateUpgradeEditorViewModels()

@@ -24,7 +24,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 		private IStringLocalizer<ChatLinkEditor> _003Clocalizer_003EP;
 
 		[CompilerGenerated]
-		private ItemIcons _003Cicons_003EP;
+		private IconsService _003Cicons_003EP;
 
 		[CompilerGenerated]
 		private Customizer _003Ccustomizer_003EP;
@@ -38,7 +38,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 		[CompilerGenerated]
 		private IDbContextFactory _003CcontextFactory_003EP;
 
-		public ChatLinkEditorViewModelFactory(ItemTooltipViewModelFactory itemTooltipViewModelFactory, UpgradeEditorViewModelFactory upgradeEditorViewModelFactory, IOptionsMonitor<ChatLinkOptions> options, IStringLocalizer<ChatLinkEditor> localizer, ItemIcons icons, Customizer customizer, IClipBoard clipboard, IEventAggregator eventAggregator, IDbContextFactory contextFactory)
+		public ChatLinkEditorViewModelFactory(ItemTooltipViewModelFactory itemTooltipViewModelFactory, UpgradeEditorViewModelFactory upgradeEditorViewModelFactory, IOptionsMonitor<ChatLinkOptions> options, IStringLocalizer<ChatLinkEditor> localizer, IconsService icons, Customizer customizer, IClipBoard clipboard, IEventAggregator eventAggregator, IDbContextFactory contextFactory)
 		{
 			_003CitemTooltipViewModelFactory_003EP = itemTooltipViewModelFactory;
 			_003CupgradeEditorViewModelFactory_003EP = upgradeEditorViewModelFactory;
