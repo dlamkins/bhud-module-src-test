@@ -152,6 +152,16 @@ namespace EmoteTome
 
 		public static readonly List<string> BOOGIE = new List<string> { "Boogie", "Boogie", "Boogie", "Boogie" };
 
+		public static readonly List<string> POSECOVER = new List<string> { "PoseCover", "PoseCover", "SchuechternePose", "PoseCover" };
+
+		public static readonly List<string> POSEHIGH = new List<string> { "PoseHigh", "PoseHigh", "StolzePose", "PoseHigh" };
+
+		public static readonly List<string> POSELOW = new List<string> { "PoseLow", "PoseLow", "UeberraschtePose", "PoseLow" };
+
+		public static readonly List<string> POSETWIST = new List<string> { "PoseTwist", "PoseTwist", "HalbherzigePost", "BoPoseTwistogie" };
+
+		public static readonly List<string> BLOWKISS = new List<string> { "BlowKiss", "BlowKiss", "LuftkussZuwerfen", "BlowKiss" };
+
 		public static readonly List<string> BEAR = new List<string> { "Bear", "Ours", "Baer", "Osa" };
 
 		public static readonly List<string> DEER = new List<string> { "Deer", "Daim", "Hirsch", "Ciervo" };

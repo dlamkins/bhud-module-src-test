@@ -186,6 +186,16 @@ namespace EmoteTome
 
 		private SettingEntry<bool> _showBoogie;
 
+		private SettingEntry<bool> _showPoseCover;
+
+		private SettingEntry<bool> _showPoseHigh;
+
+		private SettingEntry<bool> _showPoseLow;
+
+		private SettingEntry<bool> _showPoseTwist;
+
+		private SettingEntry<bool> _showBlowKiss;
+
 		private List<Tuple<SettingEntry<bool>, Emote>> unlockEmoteSettingMap = new List<Tuple<SettingEntry<bool>, Emote>>();
 
 		private SettingEntry<string> _rankEmoteSeparator;
@@ -298,6 +308,11 @@ namespace EmoteTome
 			_showPetalthrow = settings.DefineSetting<bool>("Show Petalthrow", true, (Func<string>)(() => BadLocalization.PETALTHROW[language]), (Func<string>)(() => BadLocalization.EMOTETEXT[language]));
 			_showBreakdance = settings.DefineSetting<bool>("Show Breakdance", true, (Func<string>)(() => BadLocalization.BREAKDANCE[language]), (Func<string>)(() => BadLocalization.EMOTETEXT[language]));
 			_showBoogie = settings.DefineSetting<bool>("Show Boogie", true, (Func<string>)(() => BadLocalization.BOOGIE[language]), (Func<string>)(() => BadLocalization.EMOTETEXT[language]));
+			_showPoseCover = settings.DefineSetting<bool>("Show PoseCover", true, (Func<string>)(() => BadLocalization.POSECOVER[language]), (Func<string>)(() => BadLocalization.EMOTETEXT[language]));
+			_showPoseHigh = settings.DefineSetting<bool>("Show PoseHigh", true, (Func<string>)(() => BadLocalization.POSEHIGH[language]), (Func<string>)(() => BadLocalization.EMOTETEXT[language]));
+			_showPoseLow = settings.DefineSetting<bool>("Show PoseLow", true, (Func<string>)(() => BadLocalization.POSELOW[language]), (Func<string>)(() => BadLocalization.EMOTETEXT[language]));
+			_showPoseTwist = settings.DefineSetting<bool>("Show PoseTwist", true, (Func<string>)(() => BadLocalization.POSETWIST[language]), (Func<string>)(() => BadLocalization.EMOTETEXT[language]));
+			_showBlowKiss = settings.DefineSetting<bool>("Show BlowKiss", true, (Func<string>)(() => BadLocalization.BLOWKISS[language]), (Func<string>)(() => BadLocalization.EMOTETEXT[language]));
 			_rankEmoteSeparator = settings.DefineSetting<string>("Rank Separator", "", (Func<string>)(() => BadLocalization.RANKPANELTITLE[language]), (Func<string>)(() => ""));
 			_showYourRank = settings.DefineSetting<bool>("Show Your Rank", true, (Func<string>)(() => BadLocalization.YOURRANK[language]), (Func<string>)(() => BadLocalization.EMOTETEXT[language]));
 			_showRankRabbit = settings.DefineSetting<bool>("Show Rank Rabbit", true, (Func<string>)(() => BadLocalization.RABBIT[language]), (Func<string>)(() => BadLocalization.EMOTETEXT[language]));
@@ -647,6 +662,11 @@ namespace EmoteTome
 			unlockSettingList.Add(_showPetalthrow);
 			unlockSettingList.Add(_showBreakdance);
 			unlockSettingList.Add(_showBoogie);
+			unlockSettingList.Add(_showPoseCover);
+			unlockSettingList.Add(_showPoseHigh);
+			unlockSettingList.Add(_showPoseLow);
+			unlockSettingList.Add(_showPoseTwist);
+			unlockSettingList.Add(_showBlowKiss);
 			try
 			{
 				for (int j = 0; j < unlockEmoteList.Count; j++)
@@ -1227,7 +1247,7 @@ namespace EmoteTome
 					unlockedEmotes = unlockedEmotes.ConvertAll((string d) => d.ToLower());
 					foreach (Emote emote6 in unlockEmoteList)
 					{
-						if (emote6.getChatCode().Equals("hiss") || emote6.getChatCode().Equals("magicjuggle") || emote6.getChatCode().Equals("possessed") || emote6.getChatCode().Equals("readbook") || emote6.getChatCode().Equals("serve") || emote6.getChatCode().Equals("sipcoffee") || emote6.getChatCode().Equals("unleash") || emote6.getChatCode().Equals("petalthrow") || emote6.getChatCode().Equals("breakdance") || emote6.getChatCode().Equals("boogie"))
+						if (emote6.getChatCode().Equals("hiss") || emote6.getChatCode().Equals("magicjuggle") || emote6.getChatCode().Equals("possessed") || emote6.getChatCode().Equals("readbook") || emote6.getChatCode().Equals("serve") || emote6.getChatCode().Equals("sipcoffee") || emote6.getChatCode().Equals("unleash") || emote6.getChatCode().Equals("petalthrow") || emote6.getChatCode().Equals("breakdance") || emote6.getChatCode().Equals("boogie") || emote6.getChatCode().Equals("posecover") || emote6.getChatCode().Equals("posehigh") || emote6.getChatCode().Equals("poselow") || emote6.getChatCode().Equals("posetwist") || emote6.getChatCode().Equals("blowkiss"))
 						{
 							((Control)emote6.getContainer()).set_Enabled(true);
 							emote6.getContainer().getImage().set_Tint(activatedColor);
