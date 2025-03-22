@@ -22,6 +22,8 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 {
 	public sealed class AchievementsTabViewModel : ViewModel, IDisposable
 	{
+		public delegate AchievementsTabViewModel Factory();
+
 		[CompilerGenerated]
 		private IEventAggregator _003CeventAggregator_003EP;
 
@@ -35,7 +37,7 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 		private ILocale _003Clocale_003EP;
 
 		[CompilerGenerated]
-		private AchievementTileViewModelFactory _003CachievementTileViewModelFactory_003EP;
+		private AchievementTileViewModel.Factory _003CachievementTileViewModelFactory_003EP;
 
 		[CompilerGenerated]
 		private AccountUnlocks _003Cunlocks_003EP;
@@ -136,7 +138,7 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 			}
 		}
 
-		public AchievementsTabViewModel(IEventAggregator eventAggregator, IDbContextFactory contextFactory, IStringLocalizer<AchievementsTabView> localizer, ILocale locale, AchievementTileViewModelFactory achievementTileViewModelFactory, AccountUnlocks unlocks, IconsService icons)
+		public AchievementsTabViewModel(IEventAggregator eventAggregator, IDbContextFactory contextFactory, IStringLocalizer<AchievementsTabView> localizer, ILocale locale, AchievementTileViewModel.Factory achievementTileViewModelFactory, AccountUnlocks unlocks, IconsService icons)
 		{
 			_003CeventAggregator_003EP = eventAggregator;
 			_003CcontextFactory_003EP = contextFactory;
@@ -284,7 +286,7 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 							List<AccountAchievement> progression = null;
 							if (_003Cunlocks_003EP.HasPermission(Permission.Progression))
 							{
-								IReadOnlyList<AccountAchievement> readOnlyList = await _003Cunlocks_003EP.GetAccountAchievements(CancellationToken.None).ConfigureAwait(continueOnCapturedContext: false);
+								IReadOnlyList<AccountAchievement> readOnlyList = await _003Cunlocks_003EP.GetAchievementProgress(CancellationToken.None).ConfigureAwait(continueOnCapturedContext: false);
 								List<AccountAchievement> list = new List<AccountAchievement>(readOnlyList.Count);
 								list.AddRange(readOnlyList);
 								progression = list;
@@ -298,7 +300,7 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 								{
 									group2 = groups.FirstOrDefault((AchievementGroup group) => group.Categories.Contains(category2.Id));
 								}
-								AchievementTileViewModel achievementTileViewModel = _003CachievementTileViewModelFactory_003EP.Create(achievement2, category2, group2, progression);
+								AchievementTileViewModel achievementTileViewModel = _003CachievementTileViewModelFactory_003EP(achievement2, category2, group2, progression);
 								results.Add(achievementTileViewModel);
 							}
 						}
@@ -339,7 +341,7 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 				List<AccountAchievement> progression = null;
 				if (_003Cunlocks_003EP.HasPermission(Permission.Progression))
 				{
-					IReadOnlyList<AccountAchievement> readOnlyList = await _003Cunlocks_003EP.GetAccountAchievements(CancellationToken.None).ConfigureAwait(continueOnCapturedContext: false);
+					IReadOnlyList<AccountAchievement> readOnlyList = await _003Cunlocks_003EP.GetAchievementProgress(CancellationToken.None).ConfigureAwait(continueOnCapturedContext: false);
 					List<AccountAchievement> list2 = new List<AccountAchievement>(readOnlyList.Count);
 					list2.AddRange(readOnlyList);
 					progression = list2;
@@ -348,7 +350,7 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 				HeaderText = ((!string.IsNullOrEmpty(category2.Name)) ? category2.Name : null);
 				HeaderIcon = ((!string.IsNullOrEmpty(category2.IconHref)) ? GameService.Content.GetRenderServiceTexture(category2.IconHref) : null);
 				ObservableCollection<AchievementTileViewModel> observableCollection = new ObservableCollection<AchievementTileViewModel>();
-				foreach (AchievementTileViewModel item in achievements2.Select((Achievement achievement) => _003CachievementTileViewModelFactory_003EP.Create(achievement, category2, groups.FirstOrDefault(), progression)))
+				foreach (AchievementTileViewModel item in achievements2.Select((Achievement achievement) => _003CachievementTileViewModelFactory_003EP(achievement, category2, groups.FirstOrDefault(), progression)))
 				{
 					observableCollection.Add(item);
 				}

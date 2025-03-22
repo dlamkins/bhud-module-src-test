@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Modules;
 using Blish_HUD.Settings;
+using GuildWars2;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
@@ -33,6 +34,8 @@ namespace SL.ChatLinks
 		private ServiceProvider? _serviceProvider;
 
 		private ModuleSettings? _moduleSettings;
+
+		private MumbleListener? _listener;
 
 		private readonly Clock _clock = new Clock();
 
@@ -76,6 +79,13 @@ namespace SL.ChatLinks
 			services.AddSingleton<AccountUnlocks>();
 			services.AddHttpClient<IconsService>();
 			services.AddSingleton<IconsCache>();
+			services.AddMemoryCache();
+			services.AddTransient(delegate
+			{
+				string currentMumbleMapName = GameService.Gw2Mumble.get_CurrentMumbleMapName();
+				return GameLink.Open(default(TimeSpan), currentMumbleMapName);
+			});
+			services.AddTransient<MumbleListener>();
 			services.AddLogging(delegate(ILoggingBuilder builder)
 			{
 				builder.Services.AddSingleton<ILoggerProvider, LoggingAdapterProvider<ChatLinksModule>>();
@@ -97,17 +107,19 @@ namespace SL.ChatLinks
 			services.AddTransient<MainIconViewModel>();
 			services.AddTransient<MainWindow>();
 			services.AddTransient<MainWindowViewModel>();
-			services.AddTransient<ItemsTabViewModelFactory>();
-			services.AddTransient<ItemsListViewModelFactory>();
-			services.AddTransient<ItemTooltipViewModelFactory>();
-			services.AddTransient<ChatLinkEditorViewModelFactory>();
-			services.AddTransient<UpgradeEditorViewModelFactory>();
-			services.AddTransient<UpgradeSelectorViewModelFactory>();
+			services.AddFactoryDelegate<ItemsTabViewModel.Factory>();
+			services.AddFactoryDelegate<ItemsTabViewModel.Factory>();
+			services.AddFactoryDelegate<ItemsListViewModel.Factory>();
+			services.AddFactoryDelegate<ItemTooltipViewModel.Factory>();
+			services.AddFactoryDelegate<ChatLinkEditorViewModel.Factory>();
+			services.AddFactoryDelegate<UpgradeEditorViewModel.Factory>();
+			services.AddFactoryDelegate<UpgradeSelectorViewModel.Factory>();
+			services.AddFactoryDelegate<UpgradeSlotViewModel.Factory>();
 			services.AddTransient<ItemSearch>();
 			services.AddSingleton<Customizer>();
-			services.AddTransient<AchievementsTabViewModelFactory>();
-			services.AddTransient<AchievementTileViewModelFactory>();
-			services.AddTransient<AchievementTooltipViewModelFactory>();
+			services.AddFactoryDelegate<AchievementsTabViewModel.Factory>();
+			services.AddFactoryDelegate<AchievementTileViewModel.Factory>();
+			services.AddFactoryDelegate<AchievementTooltipViewModel.Factory>();
 			_serviceProvider = services.BuildServiceProvider();
 			_eventAggregator = _serviceProvider.GetRequiredService<IEventAggregator>();
 			SetupSqlite3();
@@ -138,6 +150,8 @@ namespace SL.ChatLinks
 				logger.LogWarning(reason, "Database sync failed, starting with potentially stale data.");
 			}
 			_clock.HourStarted += new EventHandler(OnHourStarted);
+			_listener = _serviceProvider.GetRequiredService<MumbleListener>();
+			_listener!.Start();
 		}
 
 		private void OnHourStarted(object sender, EventArgs e)
@@ -163,6 +177,7 @@ namespace SL.ChatLinks
 				_clock.Dispose();
 				_serviceProvider?.Dispose();
 				_moduleSettings?.Dispose();
+				_listener?.Dispose();
 			}
 			((Module)this).Dispose(disposing);
 		}

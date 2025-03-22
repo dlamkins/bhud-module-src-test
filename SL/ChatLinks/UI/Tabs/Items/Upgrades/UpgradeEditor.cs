@@ -50,7 +50,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 
 		private void UpgradeSlotClicked(object sender, MouseEventArgs e)
 		{
-			Soundboard.Click.Play();
+			Soundboard.Click();
 			ViewModel.CustomizeCommand.Execute();
 		}
 

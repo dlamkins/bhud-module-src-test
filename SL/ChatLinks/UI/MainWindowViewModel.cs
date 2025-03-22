@@ -14,10 +14,10 @@ namespace SL.ChatLinks.UI
 		private IEventAggregator _003CeventAggregator_003EP;
 
 		[CompilerGenerated]
-		private ItemsTabViewModelFactory _003CitemsTabViewModelFactory_003EP;
+		private ItemsTabViewModel.Factory _003CitemsTabViewModelFactory_003EP;
 
 		[CompilerGenerated]
-		private AchievementsTabViewModelFactory _003CachievementsTabViewModelFactory_003EP;
+		private AchievementsTabViewModel.Factory _003CachievementsTabViewModelFactory_003EP;
 
 		[CompilerGenerated]
 		private IStringLocalizer<MainWindow> _003Clocalizer_003EP;
@@ -48,7 +48,7 @@ namespace SL.ChatLinks.UI
 
 		public AsyncTexture2D EmblemTexture => AsyncTexture2D.FromAssetId(2237584);
 
-		public MainWindowViewModel(IEventAggregator eventAggregator, ItemsTabViewModelFactory itemsTabViewModelFactory, AchievementsTabViewModelFactory achievementsTabViewModelFactory, IStringLocalizer<MainWindow> localizer)
+		public MainWindowViewModel(IEventAggregator eventAggregator, ItemsTabViewModel.Factory itemsTabViewModelFactory, AchievementsTabViewModel.Factory achievementsTabViewModelFactory, IStringLocalizer<MainWindow> localizer)
 		{
 			_003CeventAggregator_003EP = eventAggregator;
 			_003CitemsTabViewModelFactory_003EP = itemsTabViewModelFactory;
@@ -78,12 +78,12 @@ namespace SL.ChatLinks.UI
 
 		public ItemsTabViewModel CreateItemsTabViewModel()
 		{
-			return _003CitemsTabViewModelFactory_003EP.Create();
+			return _003CitemsTabViewModelFactory_003EP();
 		}
 
 		public AchievementsTabViewModel CreateAchievementsTabViewModel()
 		{
-			return _003CachievementsTabViewModelFactory_003EP.Create();
+			return _003CachievementsTabViewModelFactory_003EP();
 		}
 
 		private void ModuleUnloading(ModuleUnloading obj)

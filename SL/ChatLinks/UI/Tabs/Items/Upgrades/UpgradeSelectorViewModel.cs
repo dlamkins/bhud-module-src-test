@@ -13,13 +13,15 @@ namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 {
 	public sealed class UpgradeSelectorViewModel : ViewModel, IDisposable
 	{
+		public delegate UpgradeSelectorViewModel Factory(Item target, UpgradeSlotType slotType, UpgradeComponent? selectedUpgradeComponent);
+
 		private ObservableCollection<IGrouping<string, ItemsListViewModel>>? _options;
 
 		private readonly IStringLocalizer<UpgradeSelector> _localizer;
 
 		private readonly Customizer _customizer;
 
-		private readonly ItemsListViewModelFactory _itemsListViewModelFactory;
+		private readonly ItemsListViewModel.Factory _itemsListViewModelFactory;
 
 		private readonly Item _target;
 
@@ -55,7 +57,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 
 		public event EventHandler? Deselected;
 
-		public UpgradeSelectorViewModel(IStringLocalizer<UpgradeSelector> localizer, Customizer customizer, ItemsListViewModelFactory itemsListViewModelFactory, Item target, UpgradeSlotType slotType, UpgradeComponent? selectedUpgradeComponent, IEventAggregator eventAggregator)
+		public UpgradeSelectorViewModel(IStringLocalizer<UpgradeSelector> localizer, Customizer customizer, ItemsListViewModel.Factory itemsListViewModelFactory, Item target, UpgradeSlotType slotType, UpgradeComponent? selectedUpgradeComponent, IEventAggregator eventAggregator)
 		{
 			ThrowHelper.ThrowIfNull(eventAggregator, "eventAggregator");
 			_localizer = localizer;
@@ -153,7 +155,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 						}));
 						return new { upgrade, rank };
 					})
-					let vm = _itemsListViewModelFactory.Create(upgrade, upgrade.Id == _selectedUpgradeComponent?.Id)
+					let vm = _itemsListViewModelFactory(upgrade, upgrade.Id == _selectedUpgradeComponent?.Id)
 					orderby rank, upgrade.Level, upgrade.Name
 					select _003C_003Eh__TransparentIdentifier1).GroupBy(_003C_003Eh__TransparentIdentifier1 =>
 				{

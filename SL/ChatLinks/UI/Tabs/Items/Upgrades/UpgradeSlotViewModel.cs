@@ -10,6 +10,8 @@ namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 {
 	public sealed class UpgradeSlotViewModel : ViewModel, IDisposable
 	{
+		public delegate UpgradeSlotViewModel Factory(UpgradeSlotType type, UpgradeComponent? defaultUpgradeComponent);
+
 		private UpgradeSlotType _type;
 
 		private UpgradeComponent? _selectedUpgradeComponent;
@@ -20,7 +22,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 
 		private readonly IStringLocalizer<UpgradeSlot> _localizer;
 
-		private readonly ItemTooltipViewModelFactory _itemTooltipViewModelFactory;
+		private readonly ItemTooltipViewModel.Factory _itemTooltipViewModelFactory;
 
 		private readonly IEventAggregator _eventAggregator;
 
@@ -70,7 +72,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 
 		public string UnusedEnrichmenSlotLabel => (string)_localizer["Unused enrichment slot"];
 
-		public UpgradeSlotViewModel(UpgradeSlotType type, IconsService icons, IStringLocalizer<UpgradeSlot> localizer, ItemTooltipViewModelFactory itemTooltipViewModelFactory, IEventAggregator eventAggregator, Customizer customizer)
+		public UpgradeSlotViewModel(IconsService icons, IStringLocalizer<UpgradeSlot> localizer, ItemTooltipViewModel.Factory itemTooltipViewModelFactory, IEventAggregator eventAggregator, Customizer customizer, UpgradeSlotType type, UpgradeComponent? defaultUpgradeComponent)
 		{
 			ThrowHelper.ThrowIfNull(eventAggregator, "eventAggregator");
 			_icons = icons;
@@ -79,6 +81,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 			_eventAggregator = eventAggregator;
 			_customizer = customizer;
 			_type = type;
+			_defaultUpgradeComponent = defaultUpgradeComponent;
 			eventAggregator.Subscribe(new Func<LocaleChanged, Task>(OnLocaleChanged));
 		}
 
@@ -108,7 +111,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 
 		public ItemTooltipViewModel CreateTooltipViewModel(UpgradeComponent item)
 		{
-			return _itemTooltipViewModelFactory.Create(item, 1, Array.Empty<SL.ChatLinks.UI.Tabs.Items.Tooltips.UpgradeSlot>());
+			return _itemTooltipViewModelFactory(item, 1, Array.Empty<SL.ChatLinks.UI.Tabs.Items.Tooltips.UpgradeSlot>());
 		}
 
 		public void Dispose()

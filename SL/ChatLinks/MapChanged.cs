@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
 
-namespace SL.ChatLinks.Storage
+namespace SL.ChatLinks
 {
-	public record DatabaseDownloaded
+	public record MapChanged(int mapId)
 	{
 		[CompilerGenerated]
 		protected virtual Type EqualityContract
@@ -13,15 +13,21 @@ namespace SL.ChatLinks.Storage
 			[CompilerGenerated]
 			get
 			{
-				return typeof(DatabaseDownloaded);
+				return typeof(MapChanged);
 			}
+		}
+
+		public MapChanged(int mapId)
+		{
+			this.mapId = ;
+			base._002Ector();
 		}
 
 		[CompilerGenerated]
 		public override string ToString()
 		{
 			StringBuilder stringBuilder = new StringBuilder();
-			stringBuilder.Append("DatabaseDownloaded");
+			stringBuilder.Append("MapChanged");
 			stringBuilder.Append(" { ");
 			if (PrintMembers(stringBuilder))
 			{
@@ -34,23 +40,26 @@ namespace SL.ChatLinks.Storage
 		[CompilerGenerated]
 		protected virtual bool PrintMembers(StringBuilder builder)
 		{
-			return false;
+			RuntimeHelpers.EnsureSufficientExecutionStack();
+			builder.Append("mapId = ");
+			builder.Append(mapId.ToString());
+			return true;
 		}
 
 		[CompilerGenerated]
 		public override int GetHashCode()
 		{
-			return EqualityComparer<Type>.Default.GetHashCode(EqualityContract);
+			return EqualityComparer<Type>.Default.GetHashCode(EqualityContract) * -1521134295 + EqualityComparer<int>.Default.GetHashCode(mapId);
 		}
 
 		[CompilerGenerated]
-		public virtual bool Equals(DatabaseDownloaded? other)
+		public virtual bool Equals(MapChanged? other)
 		{
 			if ((object)this != other)
 			{
-				if ((object)other != null)
+				if ((object)other != null && EqualityContract == other!.EqualityContract)
 				{
-					return EqualityContract == other!.EqualityContract;
+					return EqualityComparer<int>.Default.Equals(mapId, other!.mapId);
 				}
 				return false;
 			}
@@ -58,12 +67,9 @@ namespace SL.ChatLinks.Storage
 		}
 
 		[CompilerGenerated]
-		protected DatabaseDownloaded(DatabaseDownloaded original)
+		protected MapChanged(MapChanged original)
 		{
-		}
-
-		public DatabaseDownloaded()
-		{
+			mapId = original.mapId;
 		}
 	}
 }

@@ -23,6 +23,8 @@ namespace SL.ChatLinks.UI.Tabs.Items
 {
 	public sealed class ChatLinkEditorViewModel : ViewModel, IDisposable
 	{
+		public delegate ChatLinkEditorViewModel Factory(Item item);
+
 		private readonly IOptionsMonitor<ChatLinkOptions> _options;
 
 		private readonly IStringLocalizer<ChatLinkEditor> _localizer;
@@ -43,9 +45,9 @@ namespace SL.ChatLinks.UI.Tabs.Items
 
 		private readonly List<UpgradeEditorViewModel> _upgradeEditorViewModels;
 
-		private readonly ItemTooltipViewModelFactory _tooltipViewModelFactory;
+		private readonly ItemTooltipViewModel.Factory _tooltipViewModelFactory;
 
-		private readonly UpgradeEditorViewModelFactory _upgradeEditorViewModelFactory;
+		private readonly UpgradeEditorViewModel.Factory _upgradeEditorViewModelFactory;
 
 		private readonly IconsService _icons;
 
@@ -265,7 +267,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 
 		public string InfusionWarning => (string)_localizer["Infusion warning"];
 
-		public ChatLinkEditorViewModel(IOptionsMonitor<ChatLinkOptions> options, IStringLocalizer<ChatLinkEditor> localizer, IEventAggregator eventAggregator, IDbContextFactory contextFactory, ItemTooltipViewModelFactory tooltipViewModelFactory, UpgradeEditorViewModelFactory upgradeEditorViewModelFactory, IconsService icons, Customizer customizer, IClipBoard clipboard, Item item)
+		public ChatLinkEditorViewModel(IOptionsMonitor<ChatLinkOptions> options, IStringLocalizer<ChatLinkEditor> localizer, IEventAggregator eventAggregator, IDbContextFactory contextFactory, ItemTooltipViewModel.Factory tooltipViewModelFactory, UpgradeEditorViewModel.Factory upgradeEditorViewModelFactory, IconsService icons, Customizer customizer, IClipBoard clipboard, Item item)
 		{
 			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
@@ -373,7 +375,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 				Type = vm.UpgradeSlotType,
 				UpgradeComponent = vm.EffectiveUpgradeComponent
 			});
-			return _tooltipViewModelFactory.Create(Item, Quantity, upgrades);
+			return _tooltipViewModelFactory(Item, Quantity, upgrades);
 		}
 
 		public AsyncTexture2D? GetIcon()
@@ -389,17 +391,17 @@ namespace SL.ChatLinks.UI.Tabs.Items
 			{
 				if (_options.CurrentValue.BananaMode)
 				{
-					yield return _upgradeEditorViewModelFactory.Create(Item, UpgradeSlotType.Default, null);
+					yield return _upgradeEditorViewModelFactory(Item, UpgradeSlotType.Default, null);
 				}
 				yield break;
 			}
 			foreach (int? defaultUpgradeComponentId in upgradable.UpgradeSlots)
 			{
-				yield return _upgradeEditorViewModelFactory.Create(Item, UpgradeSlotType.Default, _customizer.GetUpgradeComponent(defaultUpgradeComponentId));
+				yield return _upgradeEditorViewModelFactory(Item, UpgradeSlotType.Default, _customizer.GetUpgradeComponent(defaultUpgradeComponentId));
 			}
 			foreach (InfusionSlot infusionSlot in upgradable.InfusionSlots)
 			{
-				UpgradeEditorViewModelFactory upgradeEditorViewModelFactory = _upgradeEditorViewModelFactory;
+				UpgradeEditorViewModel.Factory upgradeEditorViewModelFactory = _upgradeEditorViewModelFactory;
 				item = Item;
 				InfusionSlotFlags flags = infusionSlot.Flags;
 				if ((object)flags == null)
@@ -424,7 +426,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 				slotType = UpgradeSlotType.Default;
 				goto IL_0180;
 				IL_0180:
-				yield return upgradeEditorViewModelFactory.Create(item, slotType, _customizer.GetUpgradeComponent(infusionSlot.ItemId));
+				yield return upgradeEditorViewModelFactory(item, slotType, _customizer.GetUpgradeComponent(infusionSlot.ItemId));
 			}
 		}
 

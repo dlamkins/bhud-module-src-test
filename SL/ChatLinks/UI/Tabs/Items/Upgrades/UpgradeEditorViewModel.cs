@@ -11,6 +11,8 @@ namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 {
 	public sealed class UpgradeEditorViewModel : ViewModel, IDisposable
 	{
+		public delegate UpgradeEditorViewModel Factory(Item targetItem, UpgradeSlotType slotType, UpgradeComponent? defaultUpgradeComponent);
+
 		private bool _customizing;
 
 		private readonly IStringLocalizer<UpgradeEditor> _localizer;
@@ -19,7 +21,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 
 		private readonly IClipBoard _clipboard;
 
-		private readonly UpgradeSelectorViewModelFactory _upgradeComponentListViewModelFactory;
+		private readonly UpgradeSelectorViewModel.Factory _upgradeComponentListViewModelFactory;
 
 		public bool Customizing
 		{
@@ -138,18 +140,18 @@ namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 
 		public UpgradeSlotType UpgradeSlotType => UpgradeSlotViewModel.Type;
 
-		public UpgradeEditorViewModel(IStringLocalizer<UpgradeEditor> localizer, IEventAggregator eventAggregator, IClipBoard clipboard, UpgradeSlotViewModel upgradeSlotViewModel, UpgradeSelectorViewModelFactory upgradeComponentListViewModelFactory, Item target)
+		public UpgradeEditorViewModel(IStringLocalizer<UpgradeEditor> localizer, IEventAggregator eventAggregator, IClipBoard clipboard, UpgradeSlotViewModel.Factory upgradeSlotViewModelFactory, UpgradeSelectorViewModel.Factory upgradeComponentListViewModelFactory, Item targetItem, UpgradeSlotType slotType, UpgradeComponent? defaultUpgradeComponent)
 		{
 			ThrowHelper.ThrowIfNull(eventAggregator, "eventAggregator");
-			ThrowHelper.ThrowIfNull(upgradeSlotViewModel, "upgradeSlotViewModel");
+			ThrowHelper.ThrowIfNull(upgradeSlotViewModelFactory, "upgradeSlotViewModelFactory");
 			_localizer = localizer;
 			_eventAggregator = eventAggregator;
 			_clipboard = clipboard;
 			_upgradeComponentListViewModelFactory = upgradeComponentListViewModelFactory;
-			UpgradeSlotViewModel = upgradeSlotViewModel;
-			TargetItem = target;
+			UpgradeSlotViewModel = upgradeSlotViewModelFactory(slotType, defaultUpgradeComponent);
+			TargetItem = targetItem;
 			eventAggregator.Subscribe(new Action<LocaleChanged>(OnLocaleChanged));
-			upgradeSlotViewModel.PropertyChanged += delegate(object sender, PropertyChangedEventArgs args)
+			UpgradeSlotViewModel.PropertyChanged += delegate(object sender, PropertyChangedEventArgs args)
 			{
 				string propertyName = args.PropertyName;
 				if (propertyName == "DefaultUpgradeComponent" || propertyName == "SelectedUpgradeComponent")
@@ -172,7 +174,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 
 		public UpgradeSelectorViewModel CreateUpgradeComponentListViewModel()
 		{
-			UpgradeSelectorViewModel upgradeSelectorViewModel = _upgradeComponentListViewModelFactory.Create(TargetItem, UpgradeSlotViewModel.Type, UpgradeSlotViewModel.SelectedUpgradeComponent);
+			UpgradeSelectorViewModel upgradeSelectorViewModel = _upgradeComponentListViewModelFactory(TargetItem, UpgradeSlotViewModel.Type, UpgradeSlotViewModel.SelectedUpgradeComponent);
 			upgradeSelectorViewModel.Selected += new EventHandler<UpgradeSelectedEventArgs>(Selected);
 			upgradeSelectorViewModel.Deselected += new EventHandler(Deselected);
 			return upgradeSelectorViewModel;

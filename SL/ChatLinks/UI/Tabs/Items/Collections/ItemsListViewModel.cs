@@ -15,6 +15,8 @@ namespace SL.ChatLinks.UI.Tabs.Items.Collections
 {
 	public sealed class ItemsListViewModel : ViewModel, IDisposable
 	{
+		public delegate ItemsListViewModel Factory(Item item, bool isSelected);
+
 		private readonly IStringLocalizer<ItemsList> _localizer;
 
 		private readonly IEventAggregator _eventAggregator;
@@ -25,7 +27,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Collections
 
 		private readonly Customizer _customizer;
 
-		private readonly ItemTooltipViewModelFactory _tooltipViewModelFactory;
+		private readonly ItemTooltipViewModel.Factory _tooltipViewModelFactory;
 
 		private bool _isSelected;
 
@@ -82,7 +84,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Collections
 			Process.Start(_localizer["Item API", new object[1] { Item.Id }]);
 		});
 
-		public ItemsListViewModel(IStringLocalizer<ItemsList> localizer, IEventAggregator eventAggregator, IClipBoard clipboard, IconsService icons, Customizer customizer, Item item, ItemTooltipViewModelFactory tooltipViewModelFactory, bool isSelected)
+		public ItemsListViewModel(IStringLocalizer<ItemsList> localizer, IEventAggregator eventAggregator, IClipBoard clipboard, IconsService icons, Customizer customizer, Item item, ItemTooltipViewModel.Factory tooltipViewModelFactory, bool isSelected)
 		{
 			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
@@ -122,7 +124,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Collections
 				upgrades.AddRange(UpgradeSlots(upgradable));
 				upgrades.AddRange(InfusionSlots(upgradable));
 			}
-			return _tooltipViewModelFactory.Create(Item, 1, upgrades);
+			return _tooltipViewModelFactory(Item, 1, upgrades);
 		}
 
 		private IEnumerable<UpgradeSlot> UpgradeSlots(IUpgradable upgradable)
