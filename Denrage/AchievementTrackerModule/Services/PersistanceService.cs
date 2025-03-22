@@ -123,7 +123,8 @@ namespace Denrage.AchievementTrackerModule.Services
 					Index = item.Value.ItemIndex,
 					Name = item.Value.Name,
 					PositionX = ((Control)item.Value.Window).get_Location().X,
-					PositionY = ((Control)item.Value.Window).get_Location().Y
+					PositionY = ((Control)item.Value.Window).get_Location().Y,
+					Identifier = item.Value.Identifier
 				};
 			}
 			storage.ManualCompletedAchievements = achievementService.ManualCompletedAchievements;

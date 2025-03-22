@@ -52,7 +52,7 @@ namespace Denrage.AchievementTrackerModule.Services
 
 		public void Load(IPersistanceService persistanceService)
 		{
-			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0130: Unknown result type (might be due to invalid IL or missing references)
 			try
 			{
 				foreach (KeyValuePair<int, Dictionary<int, ItemInformation>> achievement in persistanceService.Get().ItemInformation)
@@ -61,7 +61,11 @@ namespace Denrage.AchievementTrackerModule.Services
 					foreach (KeyValuePair<int, ItemInformation> item in achievement.Value)
 					{
 						CreateAndShowWindow(item.Value.Name, achievementDetail.ColumnNames, achievementDetail.Entries[item.Value.Index], achievementDetail.Link, item.Value.AchievementId, item.Value.Index);
-						((Control)Windows[item.Value.Name].Window).set_Location(new Point(item.Value.PositionX, item.Value.PositionY));
+						if (string.IsNullOrEmpty(item.Value.Identifier))
+						{
+							item.Value.Identifier = item.Value.Name + "_" + item.Value.Index;
+						}
+						((Control)Windows[item.Value.Identifier].Window).set_Location(new Point(item.Value.PositionX, item.Value.PositionY));
 					}
 				}
 			}
@@ -73,26 +77,28 @@ namespace Denrage.AchievementTrackerModule.Services
 
 		public void CreateAndShowWindow(string name, string[] columns, List<CollectionAchievementTable.CollectionAchievementTableEntry> item, string achievementLink, int achievementId, int itemIndex)
 		{
-			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-			if (!ShowWindow(name))
+			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0069: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
+			string windowIdentifier = name + "_" + itemIndex;
+			if (!ShowWindow(windowIdentifier))
 			{
 				ItemDetailWindow window = itemDetailWindowFactory.Create(name, columns, item, achievementLink);
 				((Control)window).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 				((Control)window).set_Location(((Control)GameService.Graphics.get_SpriteScreen()).get_Size() / new Point(2) - new Point(256, 178) / new Point(2));
-				Windows[name] = new ItemDetailWindowInformation
+				Windows[windowIdentifier] = new ItemDetailWindowInformation
 				{
 					Window = window,
 					AchievementId = achievementId,
 					ItemIndex = itemIndex,
-					Name = name
+					Name = name,
+					Identifier = windowIdentifier
 				};
-				ShowWindow(name);
+				ShowWindow(windowIdentifier);
 			}
 		}
 

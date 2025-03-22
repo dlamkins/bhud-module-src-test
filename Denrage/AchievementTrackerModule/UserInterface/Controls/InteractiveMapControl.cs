@@ -485,6 +485,7 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Controls
 				return Array.Empty<List<double>>().ToList();
 			}
 			List<List<double>> result = new List<List<double>>();
+			input = new string(input.Skip(1).Take(input.Length - 2).ToArray());
 			if (!input.Contains('['))
 			{
 				string[] array = input.Split(new string[1] { "," }, StringSplitOptions.RemoveEmptyEntries);
