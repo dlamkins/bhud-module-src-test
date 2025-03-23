@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,10 +23,9 @@ namespace Ideka.CustomCombatText
 				HttpResponseMessage response = await ((HttpMessageInvoker)Client).SendAsync(request, ct);
 				try
 				{
-					string text = await response.get_Content().ReadAsStringAsync();
+					string value = await response.get_Content().ReadAsStringAsync();
 					ct.ThrowIfCancellationRequested();
-					File.WriteAllText("C:/Users/x/Desktop/out.json", text);
-					return JsonConvert.DeserializeObject<List<TItem>>(text) ?? throw new Exception("Hs api request deserialize resulted in null.");
+					return JsonConvert.DeserializeObject<List<TItem>>(value) ?? throw new Exception("Hs api request deserialize resulted in null.");
 				}
 				finally
 				{
