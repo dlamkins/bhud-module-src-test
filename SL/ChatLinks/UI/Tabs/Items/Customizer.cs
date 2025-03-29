@@ -74,6 +74,9 @@ namespace SL.ChatLinks.UI.Tabs.Items
 			IQueryable<UpgradeComponent> queryable;
 			switch (slotType)
 			{
+			case UpgradeSlotType.Banana:
+				queryable = context.Set<UpgradeComponent>();
+				break;
 			case UpgradeSlotType.Infusion:
 				queryable = context.Set<UpgradeComponent>().FromSqlRaw("SELECT *\r\nFROM Items\r\nWHERE Type = 'upgrade_component'\r\n  AND InfusionUpgradeFlags -> '$.infusion' = 'true'");
 				break;

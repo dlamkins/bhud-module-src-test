@@ -414,7 +414,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 				new ItemCategoryMenuItem
 				{
 					Label = (string)_003Clocalizer_003EP["Upgrade Components"],
-					Subcategories = new List<ItemCategoryMenuItem>(4)
+					Subcategories = new List<ItemCategoryMenuItem>(10)
 					{
 						new ItemCategoryMenuItem
 						{
@@ -423,8 +423,18 @@ namespace SL.ChatLinks.UI.Tabs.Items
 						},
 						new ItemCategoryMenuItem
 						{
-							Id = "universal_upgrade",
-							Label = (string)_003Clocalizer_003EP["Universal Upgrades"]
+							Id = "infusion",
+							Label = (string)_003Clocalizer_003EP["Infusions"]
+						},
+						new ItemCategoryMenuItem
+						{
+							Id = "enrichment",
+							Label = (string)_003Clocalizer_003EP["Enrichments"]
+						},
+						new ItemCategoryMenuItem
+						{
+							Id = "glyph",
+							Label = (string)_003Clocalizer_003EP["Glyphs"]
 						},
 						new ItemCategoryMenuItem
 						{
@@ -433,8 +443,28 @@ namespace SL.ChatLinks.UI.Tabs.Items
 						},
 						new ItemCategoryMenuItem
 						{
+							Id = "rune_pvp",
+							Label = (string)_003Clocalizer_003EP["Runes (PvP)"]
+						},
+						new ItemCategoryMenuItem
+						{
 							Id = "sigil",
 							Label = (string)_003Clocalizer_003EP["Sigils"]
+						},
+						new ItemCategoryMenuItem
+						{
+							Id = "sigil_pvp",
+							Label = (string)_003Clocalizer_003EP["Sigils (PvP)"]
+						},
+						new ItemCategoryMenuItem
+						{
+							Id = "jewel",
+							Label = (string)_003Clocalizer_003EP["Jewels"]
+						},
+						new ItemCategoryMenuItem
+						{
+							Id = "universal_upgrade",
+							Label = (string)_003Clocalizer_003EP["Universal Upgrades"]
 						}
 					}
 				},
@@ -525,7 +555,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 				new ItemCategoryMenuItem
 				{
 					Label = (string)_003Clocalizer_003EP["Consumables"],
-					Subcategories = new List<ItemCategoryMenuItem>(30)
+					Subcategories = new List<ItemCategoryMenuItem>(24)
 					{
 						new ItemCategoryMenuItem
 						{
@@ -609,38 +639,8 @@ namespace SL.ChatLinks.UI.Tabs.Items
 						},
 						new ItemCategoryMenuItem
 						{
-							Id = "bank_tab_expansion",
-							Label = (string)_003Clocalizer_003EP["Bank Tab Expansions"]
-						},
-						new ItemCategoryMenuItem
-						{
-							Id = "storage_expander",
-							Label = (string)_003Clocalizer_003EP["Storage Expanders"]
-						},
-						new ItemCategoryMenuItem
-						{
-							Id = "bag_slot_expansion",
-							Label = (string)_003Clocalizer_003EP["Bag Slot Expansions"]
-						},
-						new ItemCategoryMenuItem
-						{
-							Id = "shared_inventory_slot",
-							Label = (string)_003Clocalizer_003EP["Shared Inventory Slots"]
-						},
-						new ItemCategoryMenuItem
-						{
-							Id = "equipment_template_expansion",
-							Label = (string)_003Clocalizer_003EP["Equipment Template Expansions"]
-						},
-						new ItemCategoryMenuItem
-						{
-							Id = "build_template_expansion",
-							Label = (string)_003Clocalizer_003EP["Build Template Expansions"]
-						},
-						new ItemCategoryMenuItem
-						{
-							Id = "build_storage_expansion",
-							Label = (string)_003Clocalizer_003EP["Build Storage Expansions"]
+							Id = "expansions",
+							Label = (string)_003Clocalizer_003EP["Expansions"]
 						},
 						new ItemCategoryMenuItem
 						{
@@ -692,7 +692,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 				new ItemCategoryMenuItem
 				{
 					Label = (string)_003Clocalizer_003EP["Containers"],
-					Subcategories = new List<ItemCategoryMenuItem>(4)
+					Subcategories = new List<ItemCategoryMenuItem>(5)
 					{
 						new ItemCategoryMenuItem
 						{
@@ -701,8 +701,8 @@ namespace SL.ChatLinks.UI.Tabs.Items
 						},
 						new ItemCategoryMenuItem
 						{
-							Id = "black_lion_chest",
-							Label = (string)_003Clocalizer_003EP["Black Lion Chests"]
+							Id = "default_container",
+							Label = (string)_003Clocalizer_003EP["Normal Containers"]
 						},
 						new ItemCategoryMenuItem
 						{
@@ -713,6 +713,11 @@ namespace SL.ChatLinks.UI.Tabs.Items
 						{
 							Id = "immediate_container",
 							Label = (string)_003Clocalizer_003EP["Immediate Containers"]
+						},
+						new ItemCategoryMenuItem
+						{
+							Id = "black_lion_chest",
+							Label = (string)_003Clocalizer_003EP["Black Lion Chests"]
 						}
 					}
 				},

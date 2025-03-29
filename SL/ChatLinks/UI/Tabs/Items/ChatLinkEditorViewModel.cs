@@ -157,9 +157,13 @@ namespace SL.ChatLinks.UI.Tabs.Items
 			if (u != null)
 			{
 				UpgradeSlotViewModel upgradeSlotViewModel = u.UpgradeSlotViewModel;
-				if (upgradeSlotViewModel != null && upgradeSlotViewModel.Type == UpgradeSlotType.Default)
+				if (upgradeSlotViewModel != null)
 				{
-					return (object)upgradeSlotViewModel.SelectedUpgradeComponent != null;
+					UpgradeSlotType type = upgradeSlotViewModel.Type;
+					if ((type == UpgradeSlotType.Default || type == UpgradeSlotType.Banana) && (object)upgradeSlotViewModel.SelectedUpgradeComponent != null)
+					{
+						return true;
+					}
 				}
 			}
 			return false;
@@ -303,16 +307,20 @@ namespace SL.ChatLinks.UI.Tabs.Items
 				};
 				vm2.UpgradeSlotViewModel.PropertyChanged += delegate(object _, PropertyChangedEventArgs args)
 				{
-					if (args.PropertyName == "SelectedUpgradeComponent" && vm2.UpgradeSlotViewModel.Type == UpgradeSlotType.Default)
+					if (args.PropertyName == "SelectedUpgradeComponent")
 					{
-						switch (slot)
+						UpgradeSlotType type = vm2.UpgradeSlotViewModel.Type;
+						if ((type == UpgradeSlotType.Default || type == UpgradeSlotType.Banana) ? true : false)
 						{
-						case 1:
-							SuffixItem = vm2.UpgradeSlotViewModel.SelectedUpgradeComponent;
-							break;
-						case 2:
-							SecondarySuffixItem = vm2.UpgradeSlotViewModel.SelectedUpgradeComponent;
-							break;
+							switch (slot)
+							{
+							case 1:
+								SuffixItem = vm2.UpgradeSlotViewModel.SelectedUpgradeComponent;
+								break;
+							case 2:
+								SecondarySuffixItem = vm2.UpgradeSlotViewModel.SelectedUpgradeComponent;
+								break;
+							}
 						}
 					}
 				};
@@ -355,7 +363,11 @@ namespace SL.ChatLinks.UI.Tabs.Items
 
 		private void OnUpgradeSlotChanged(UpgradeSlotChanged obj)
 		{
-			ShowInfusionWarning = UpgradeEditorViewModels.Where((UpgradeEditorViewModel editor) => editor.UpgradeSlotType != UpgradeSlotType.Default).Any((UpgradeEditorViewModel editor) => (object)editor.UpgradeSlotViewModel.SelectedUpgradeComponent != null);
+			ShowInfusionWarning = UpgradeEditorViewModels.Where(delegate(UpgradeEditorViewModel editor)
+			{
+				UpgradeSlotType upgradeSlotType = editor.UpgradeSlotType;
+				return ((uint)(upgradeSlotType - 1) <= 1u) ? true : false;
+			}).Any((UpgradeEditorViewModel editor) => (object)editor.UpgradeSlotViewModel.SelectedUpgradeComponent != null);
 		}
 
 		private void OnMouseEnteredUpgradeSelector(MouseEnteredUpgradeSelector obj)
@@ -391,7 +403,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 			{
 				if (_options.CurrentValue.BananaMode)
 				{
-					yield return _upgradeEditorViewModelFactory(Item, UpgradeSlotType.Default, null);
+					yield return _upgradeEditorViewModelFactory(Item, UpgradeSlotType.Banana, null);
 				}
 				yield break;
 			}

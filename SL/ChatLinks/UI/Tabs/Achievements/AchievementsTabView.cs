@@ -18,11 +18,13 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 
 		private readonly Panel _categoriesPanel;
 
-		private readonly Menu _menu;
+		private readonly Menu _sidebar;
 
 		private readonly ViewContainer _selectedCategoryView;
 
 		public AchievementsTabViewModel ViewModel { get; }
+
+		private event EventHandler<EventArgs>? _menuItemExpanded;
 
 		public AchievementsTabView(AchievementsTabViewModel viewModel)
 			: this()
@@ -67,7 +69,7 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 			((Control)val3).set_Parent((Container)(object)_categoriesPanel);
 			((Control)val3).set_Size(((DesignStandard)(ref Panel.MenuStandard)).get_Size());
 			val3.set_CanSelect(true);
-			_menu = val3;
+			_sidebar = val3;
 			ViewContainer val4 = new ViewContainer();
 			((Panel)val4).set_CanScroll(true);
 			_selectedCategoryView = val4;
@@ -112,22 +114,23 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 
 		private void ReloadMenuItems()
 		{
-			while (((Container)_menu).get_Children().get_Count() > 0)
+			this._menuItemExpanded = null;
+			while (((Container)_sidebar).get_Children().get_Count() > 0)
 			{
-				((Container)_menu).get_Children().get_Item(0).Dispose();
+				((Container)_sidebar).get_Children().get_Item(0).Dispose();
 			}
 			AddAchievementCategories();
 		}
 
 		private void AddAchievementCategories()
 		{
-			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ba: Expected O, but got Unknown
+			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00dc: Expected O, but got Unknown
 			foreach (AchievementGroupMenuItem menuItem in ViewModel.MenuItems)
 			{
-				MenuItem groupMenuItem = _menu.AddMenuItem(menuItem.Group.Name, (Texture2D)null);
+				MenuItem groupMenuItem = _sidebar.AddMenuItem(menuItem.Group.Name, (Texture2D)null);
 				((Control)groupMenuItem).set_BasicTooltipText(menuItem.Group.Description);
 				foreach (AchievementCategory category in menuItem.Categories)
 				{
@@ -145,12 +148,26 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 						categoryItem.Select();
 					}
 				}
+				((Control)groupMenuItem).add_PropertyChanged((PropertyChangedEventHandler)delegate(object sender, PropertyChangedEventArgs args)
+				{
+					if (args.PropertyName == "Expand")
+					{
+						this._menuItemExpanded?.Invoke(sender, EventArgs.Empty);
+					}
+				});
+				_menuItemExpanded += delegate(object sender, EventArgs args)
+				{
+					if (sender != groupMenuItem)
+					{
+						groupMenuItem.Collapse();
+					}
+				};
 			}
 		}
 
 		private void SearchTextChanged(object sender, EventArgs e)
 		{
-			MenuItem selectedMenuItem = _menu.get_SelectedMenuItem();
+			MenuItem selectedMenuItem = _sidebar.get_SelectedMenuItem();
 			if (selectedMenuItem != null)
 			{
 				selectedMenuItem.Deselect();
@@ -160,7 +177,7 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 
 		private void SearchEnterPressed(object sender, EventArgs e)
 		{
-			MenuItem selectedMenuItem = _menu.get_SelectedMenuItem();
+			MenuItem selectedMenuItem = _sidebar.get_SelectedMenuItem();
 			if (selectedMenuItem != null)
 			{
 				selectedMenuItem.Deselect();
@@ -172,7 +189,7 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 		{
 			((Control)_searchBox).Dispose();
 			((Control)_categoriesPanel).Dispose();
-			((Control)_menu).Dispose();
+			((Control)_sidebar).Dispose();
 			((Control)_selectedCategoryView).Dispose();
 			ViewModel.Dispose();
 		}

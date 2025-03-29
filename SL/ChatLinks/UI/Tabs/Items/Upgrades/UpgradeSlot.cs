@@ -128,37 +128,30 @@ namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 		{
 			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
 			FormattedLabelBuilder builder = new FormattedLabelBuilder().AutoSizeWidth().AutoSizeHeight();
-			switch (ViewModel.Type)
+			return ((FormattedLabelBuilder)(ViewModel.Type switch
 			{
-			case UpgradeSlotType.Default:
-				builder.CreatePart(" " + ViewModel.UnusedUpgradeSlotLabel, (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder part)
-				{
-					//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-					part.SetPrefixImage(AsyncTexture2D.op_Implicit(EmbeddedResources.Texture("unused_upgrade_slot.png")));
-					part.SetPrefixImageSize(new Point(16));
-					part.SetFontSize((FontSize)16);
-				});
-				break;
-			case UpgradeSlotType.Infusion:
-				builder.CreatePart(" " + ViewModel.UnusedInfusionSlotLabel, (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder part)
+				UpgradeSlotType.Infusion => builder.CreatePart(" " + ViewModel.UnusedInfusionSlotLabel, (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder part)
 				{
 					//IL_0019: Unknown result type (might be due to invalid IL or missing references)
 					part.SetPrefixImage(AsyncTexture2D.op_Implicit(EmbeddedResources.Texture("unused_infusion_slot.png")));
 					part.SetPrefixImageSize(new Point(16));
 					part.SetFontSize((FontSize)16);
-				});
-				break;
-			case UpgradeSlotType.Enrichment:
-				builder.CreatePart(" " + ViewModel.UnusedEnrichmenSlotLabel, (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder part)
+				}), 
+				UpgradeSlotType.Enrichment => builder.CreatePart(" " + ViewModel.UnusedEnrichmenSlotLabel, (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder part)
 				{
 					//IL_0019: Unknown result type (might be due to invalid IL or missing references)
 					part.SetPrefixImage(AsyncTexture2D.op_Implicit(EmbeddedResources.Texture("unused_enrichment_slot.png")));
 					part.SetPrefixImageSize(new Point(16));
 					part.SetFontSize((FontSize)16);
-				});
-				break;
-			}
-			return builder.Build();
+				}), 
+				_ => builder.CreatePart(" " + ViewModel.UnusedUpgradeSlotLabel, (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder part)
+				{
+					//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+					part.SetPrefixImage(AsyncTexture2D.op_Implicit(EmbeddedResources.Texture("unused_upgrade_slot.png")));
+					part.SetPrefixImageSize(new Point(16));
+					part.SetFontSize((FontSize)16);
+				}), 
+			})).Build();
 		}
 
 		protected override void DisposeControl()

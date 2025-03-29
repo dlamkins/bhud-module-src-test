@@ -111,11 +111,11 @@ namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 					1
 				},
 				{
-					_localizer["Sigils"],
+					_localizer["Runes (PvP)"],
 					1
 				},
 				{
-					_localizer["Runes (PvP)"],
+					_localizer["Sigils"],
 					2
 				},
 				{
@@ -131,12 +131,20 @@ namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 					3
 				},
 				{
-					_localizer["Universal Upgrades"],
+					_localizer["Glyphs"],
 					4
 				},
 				{
-					_localizer["Uncategorized"],
+					_localizer["Jewels"],
 					5
+				},
+				{
+					_localizer["Universal Upgrades"],
+					6
+				},
+				{
+					_localizer["Uncategorized"],
+					7
 				}
 			};
 			IOrderedEnumerable<IGrouping<string, ItemsListViewModel>> orderedEnumerable = from grouped in (from _003C_003Eh__TransparentIdentifier0 in _customizer.GetUpgradeComponents(_target, _slotType).Select(delegate(UpgradeComponent upgrade)
@@ -160,57 +168,89 @@ namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 					select _003C_003Eh__TransparentIdentifier1).GroupBy(_003C_003Eh__TransparentIdentifier1 =>
 				{
 					UpgradeComponent upgrade2 = _003C_003Eh__TransparentIdentifier1._003C_003Eh__TransparentIdentifier0.upgrade;
-					LocalizedString localizedString = ((upgrade2 is Gem) ? _localizer["Universal Upgrades"] : ((!(upgrade2 is Rune)) ? ((!(upgrade2 is Sigil)) ? (_003C_003Eh__TransparentIdentifier1._003C_003Eh__TransparentIdentifier0.upgrade.InfusionUpgradeFlags.Infusion ? _localizer["Infusions"] : ((!_003C_003Eh__TransparentIdentifier1._003C_003Eh__TransparentIdentifier0.upgrade.InfusionUpgradeFlags.Enrichment) ? _localizer["Uncategorized"] : _localizer["Enrichments"])) : ((!_003C_003Eh__TransparentIdentifier1._003C_003Eh__TransparentIdentifier0.upgrade.GameTypes.All(delegate(Extensible<GameType> type)
+					LocalizedString localizedString;
+					if (!(upgrade2 is Gem))
 					{
-						bool flag3 = type.IsDefined();
-						bool flag4;
-						if (flag3)
+						if (upgrade2 is Rune)
 						{
-							GameType? gameType2 = type.ToEnum();
-							if (gameType2.HasValue)
+							localizedString = ((!_003C_003Eh__TransparentIdentifier1._003C_003Eh__TransparentIdentifier0.upgrade.GameTypes.All(delegate(Extensible<GameType> type)
 							{
-								GameType valueOrDefault2 = gameType2.GetValueOrDefault();
-								if ((uint)(valueOrDefault2 - 4) <= 1u)
+								bool flag3 = type.IsDefined();
+								bool flag4;
+								if (flag3)
 								{
-									flag4 = true;
+									GameType? gameType2 = type.ToEnum();
+									if (gameType2.HasValue)
+									{
+										GameType valueOrDefault2 = gameType2.GetValueOrDefault();
+										if ((uint)(valueOrDefault2 - 4) <= 1u)
+										{
+											flag4 = true;
+											goto IL_0030;
+										}
+									}
+									flag4 = false;
 									goto IL_0030;
 								}
-							}
-							flag4 = false;
-							goto IL_0030;
+								goto IL_0032;
+								IL_0032:
+								return flag3;
+								IL_0030:
+								flag3 = flag4;
+								goto IL_0032;
+							})) ? _localizer["Runes"] : _localizer["Runes (PvP)"]);
 						}
-						goto IL_0032;
-						IL_0032:
-						return flag3;
-						IL_0030:
-						flag3 = flag4;
-						goto IL_0032;
-					})) ? _localizer["Sigils"] : _localizer["Sigils (PvP)"])) : ((!_003C_003Eh__TransparentIdentifier1._003C_003Eh__TransparentIdentifier0.upgrade.GameTypes.All(delegate(Extensible<GameType> type)
-					{
-						bool flag = type.IsDefined();
-						bool flag2;
-						if (flag)
+						else if (upgrade2 is Sigil)
 						{
-							GameType? gameType = type.ToEnum();
-							if (gameType.HasValue)
+							localizedString = ((!_003C_003Eh__TransparentIdentifier1._003C_003Eh__TransparentIdentifier0.upgrade.GameTypes.All(delegate(Extensible<GameType> type)
 							{
-								GameType valueOrDefault = gameType.GetValueOrDefault();
-								if ((uint)(valueOrDefault - 4) <= 1u)
+								bool flag = type.IsDefined();
+								bool flag2;
+								if (flag)
 								{
-									flag2 = true;
+									GameType? gameType = type.ToEnum();
+									if (gameType.HasValue)
+									{
+										GameType valueOrDefault = gameType.GetValueOrDefault();
+										if ((uint)(valueOrDefault - 4) <= 1u)
+										{
+											flag2 = true;
+											goto IL_0030;
+										}
+									}
+									flag2 = false;
 									goto IL_0030;
 								}
-							}
-							flag2 = false;
-							goto IL_0030;
+								goto IL_0032;
+								IL_0032:
+								return flag;
+								IL_0030:
+								flag = flag2;
+								goto IL_0032;
+							})) ? _localizer["Sigils"] : _localizer["Sigils (PvP)"]);
 						}
-						goto IL_0032;
-						IL_0032:
-						return flag;
-						IL_0030:
-						flag = flag2;
-						goto IL_0032;
-					})) ? _localizer["Runes"] : _localizer["Runes (PvP)"])));
+						else if (_003C_003Eh__TransparentIdentifier1._003C_003Eh__TransparentIdentifier0.upgrade.InfusionUpgradeFlags.Infusion)
+						{
+							localizedString = _localizer["Infusions"];
+						}
+						else if (_003C_003Eh__TransparentIdentifier1._003C_003Eh__TransparentIdentifier0.upgrade.InfusionUpgradeFlags.Enrichment)
+						{
+							localizedString = _localizer["Enrichments"];
+						}
+						else if (_003C_003Eh__TransparentIdentifier1._003C_003Eh__TransparentIdentifier0.upgrade.UpgradeComponentFlags.Trinket)
+						{
+							localizedString = _localizer["Jewels"];
+						}
+						else
+						{
+							UpgradeComponentFlags upgradeComponentFlags = _003C_003Eh__TransparentIdentifier1._003C_003Eh__TransparentIdentifier0.upgrade.UpgradeComponentFlags;
+							localizedString = (((object)upgradeComponentFlags == null || upgradeComponentFlags.LightArmor || upgradeComponentFlags.MediumArmor || upgradeComponentFlags.HeavyArmor || upgradeComponentFlags.Axe || upgradeComponentFlags.Trinket) ? _localizer["Uncategorized"] : _localizer["Glyphs"]);
+						}
+					}
+					else
+					{
+						localizedString = _localizer["Universal Upgrades"];
+					}
 					return (string)localizedString;
 				}, _003C_003Eh__TransparentIdentifier1 => _003C_003Eh__TransparentIdentifier1.vm)
 				orderby groupOrder[grouped.Key]

@@ -154,14 +154,14 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 			//IL_05f7: Unknown result type (might be due to invalid IL or missing references)
 			//IL_061e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_064f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06ed: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0714: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0745: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0803: Unknown result type (might be due to invalid IL or missing references)
-			//IL_082a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_085b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0931: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0962: Unknown result type (might be due to invalid IL or missing references)
+			//IL_070d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0734: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0765: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0823: Unknown result type (might be due to invalid IL or missing references)
+			//IL_084a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_087b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0951: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0982: Unknown result type (might be due to invalid IL or missing references)
 			PrintHeader();
 			if (consumable is Currency || consumable is Service)
 			{
@@ -309,7 +309,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 												{
 													if (ViewModel.Unlocked.Value)
 													{
-														PrintPlainText("You have already unlocked this outfit!\r\n", Color.get_Red());
+														PrintPlainText(string.Format("{0}\r\n", ViewModel.Localizer["You have already unlocked this outfit"]), Color.get_Red());
 													}
 												}
 												else
@@ -1056,7 +1056,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 						part.SetFontSize((FontSize)16);
 					});
 					break;
-				case UpgradeSlotType.Default:
+				default:
 					builder.CreatePart("\r\n", (Action<FormattedLabelPartBuilder>)delegate
 					{
 					}).CreatePart(" " + ViewModel.Localizer["Unused upgrade slot"], (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder part)

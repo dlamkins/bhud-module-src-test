@@ -36,6 +36,8 @@ namespace SL.ChatLinks.UI.Tabs.Items
 
 		private Container? _selection;
 
+		private event EventHandler<EventArgs>? _menuItemExpanded;
+
 		public ItemsTabView(ItemsTabViewModel viewModel)
 		{
 			_003CviewModel_003EP = viewModel;
@@ -198,6 +200,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 		{
 			if (_sidebar != null)
 			{
+				this._menuItemExpanded = null;
 				while (((Container)_sidebar).get_Children().get_Count() > 0)
 				{
 					((Container)_sidebar).get_Children().get_Item(0).Dispose();
@@ -236,16 +239,40 @@ namespace SL.ChatLinks.UI.Tabs.Items
 						}
 					});
 				}
-				WireUp((Container)(object)menuItem, category.Subcategories);
+				else
+				{
+					WireUp((Container)(object)menuItem, category.Subcategories);
+					((Control)menuItem).add_PropertyChanged((PropertyChangedEventHandler)delegate(object sender, PropertyChangedEventArgs args)
+					{
+						if (args.PropertyName == "Expand")
+						{
+							this._menuItemExpanded?.Invoke(sender, EventArgs.Empty);
+						}
+					});
+					_menuItemExpanded += delegate(object sender, EventArgs args)
+					{
+						if (sender != menuItem)
+						{
+							menuItem.Collapse();
+						}
+					};
+				}
 				if (category.Id == _003CviewModel_003EP.SelectedCategory)
 				{
 					menuItem.Select();
 				}
 				_003CviewModel_003EP.PropertyChanged += delegate(object sender, PropertyChangedEventArgs args)
 				{
-					if (args.PropertyName == "SelectedCategory" && _003CviewModel_003EP.SelectedCategory == category.Id)
+					if (args.PropertyName == "SelectedCategory")
 					{
-						menuItem.Select();
+						if (_003CviewModel_003EP.SelectedCategory == category.Id)
+						{
+							menuItem.Select();
+						}
+						else if (!category.CanSelect)
+						{
+							menuItem.Collapse();
+						}
 					}
 				};
 			}
@@ -291,6 +318,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 
 		public void Dispose()
 		{
+			this._menuItemExpanded = null;
 			Panel? sidePanel = _sidePanel;
 			if (sidePanel != null)
 			{

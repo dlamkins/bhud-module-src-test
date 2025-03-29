@@ -4,6 +4,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 	{
 		Default,
 		Infusion,
-		Enrichment
+		Enrichment,
+		Banana
 	}
 }
