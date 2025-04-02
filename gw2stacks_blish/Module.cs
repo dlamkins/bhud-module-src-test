@@ -29,6 +29,8 @@ namespace gw2stacks_blish
 
 		private TabbedWindow2 gw2stacks_root;
 
+		private TabbedWindow2 ignoredItems;
+
 		private CornerIcon icon;
 
 		private LoadingSpinner loadingSpinner;
@@ -47,21 +49,33 @@ namespace gw2stacks_blish
 
 		private bool hasLut;
 
+		private bool ignoreItemsFlag;
+
 		private SettingEntry<bool> includeConsumableSetting;
 
 		private SettingEntry<bool> localJson;
 
-		private Dictionary<int, AsyncTexture2D> itemTextures;
+		private SettingEntry<bool> ignoreItemsFeature;
+
+		private Dictionary<int, AsyncTexture2D> itemTextures = new Dictionary<int, AsyncTexture2D>();
 
 		private Model model;
 
 		private Gw2Api api;
 
-		private Dictionary<string, List<ItemForDisplay>> adviceDictionary;
+		private Dictionary<string, List<ItemForDisplay>> adviceDictionary = new Dictionary<string, List<ItemForDisplay>>();
 
 		private AdviceTabView adviceView;
 
+		private IgnoredView ignoredView;
+
 		private Dictionary<Tab, string> tabNameMapping;
+
+		private Tab ignoredItemsTab;
+
+		private List<int> ignoredItemList = new List<int>();
+
+		private List<int> excludedItemIds = new List<int>();
 
 		internal SettingsManager SettingsManager => ModuleParameters.SettingsManager;
 
@@ -82,51 +96,51 @@ namespace gw2stacks_blish
 			tabNameMapping = new Dictionary<Tab, string>
 			{
 				{
-					new Tab(GameService.Content.GetTexture("155052"), () => adviceView, Magic.adviceTypeNameMapping[Magic.AdviceType.stackAdvice]),
+					new Tab(AsyncTexture2D.FromAssetId(358447), () => adviceView, Magic.adviceTypeNameMapping[Magic.AdviceType.stackAdvice]),
 					Magic.adviceTypeNameMapping[Magic.AdviceType.stackAdvice]
 				},
 				{
-					new Tab(GameService.Content.GetTexture("155052"), () => adviceView, Magic.adviceTypeNameMapping[Magic.AdviceType.vendorAdvice]),
+					new Tab(AsyncTexture2D.FromAssetId(255379), () => adviceView, Magic.adviceTypeNameMapping[Magic.AdviceType.vendorAdvice]),
 					Magic.adviceTypeNameMapping[Magic.AdviceType.vendorAdvice]
 				},
 				{
-					new Tab(GameService.Content.GetTexture("155052"), () => adviceView, Magic.adviceTypeNameMapping[Magic.AdviceType.rareSalvageAdvice]),
+					new Tab(AsyncTexture2D.FromAssetId(157091), () => adviceView, Magic.adviceTypeNameMapping[Magic.AdviceType.rareSalvageAdvice]),
 					Magic.adviceTypeNameMapping[Magic.AdviceType.rareSalvageAdvice]
 				},
 				{
-					new Tab(GameService.Content.GetTexture("155052"), () => adviceView, Magic.adviceTypeNameMapping[Magic.AdviceType.craftLuckAdvice]),
+					new Tab(AsyncTexture2D.FromAssetId(536054), () => adviceView, Magic.adviceTypeNameMapping[Magic.AdviceType.craftLuckAdvice]),
 					Magic.adviceTypeNameMapping[Magic.AdviceType.craftLuckAdvice]
 				},
 				{
-					new Tab(GameService.Content.GetTexture("155052"), () => adviceView, Magic.adviceTypeNameMapping[Magic.AdviceType.deletableAdvice]),
+					new Tab(AsyncTexture2D.FromAssetId(102597), () => adviceView, Magic.adviceTypeNameMapping[Magic.AdviceType.deletableAdvice]),
 					Magic.adviceTypeNameMapping[Magic.AdviceType.deletableAdvice]
 				},
 				{
-					new Tab(GameService.Content.GetTexture("155052"), () => adviceView, Magic.adviceTypeNameMapping[Magic.AdviceType.salvageAdvice]),
+					new Tab(AsyncTexture2D.FromAssetId(156660), () => adviceView, Magic.adviceTypeNameMapping[Magic.AdviceType.salvageAdvice]),
 					Magic.adviceTypeNameMapping[Magic.AdviceType.salvageAdvice]
 				},
 				{
-					new Tab(GameService.Content.GetTexture("155052"), () => adviceView, Magic.adviceTypeNameMapping[Magic.AdviceType.consumableAdvice]),
+					new Tab(AsyncTexture2D.FromAssetId(157123), () => adviceView, Magic.adviceTypeNameMapping[Magic.AdviceType.consumableAdvice]),
 					Magic.adviceTypeNameMapping[Magic.AdviceType.consumableAdvice]
 				},
 				{
-					new Tab(GameService.Content.GetTexture("155052"), () => adviceView, Magic.adviceTypeNameMapping[Magic.AdviceType.gobblerAdvice]),
+					new Tab(AsyncTexture2D.FromAssetId(156658), () => adviceView, Magic.adviceTypeNameMapping[Magic.AdviceType.gobblerAdvice]),
 					Magic.adviceTypeNameMapping[Magic.AdviceType.gobblerAdvice]
 				},
 				{
-					new Tab(GameService.Content.GetTexture("155052"), () => adviceView, Magic.adviceTypeNameMapping[Magic.AdviceType.karmaAdvice]),
+					new Tab(AsyncTexture2D.FromAssetId(1494404), () => adviceView, Magic.adviceTypeNameMapping[Magic.AdviceType.karmaAdvice]),
 					Magic.adviceTypeNameMapping[Magic.AdviceType.karmaAdvice]
 				},
 				{
-					new Tab(GameService.Content.GetTexture("155052"), () => adviceView, Magic.adviceTypeNameMapping[Magic.AdviceType.craftingAdvice]),
+					new Tab(AsyncTexture2D.FromAssetId(156685), () => adviceView, Magic.adviceTypeNameMapping[Magic.AdviceType.craftingAdvice]),
 					Magic.adviceTypeNameMapping[Magic.AdviceType.craftingAdvice]
 				},
 				{
-					new Tab(GameService.Content.GetTexture("155052"), () => adviceView, Magic.adviceTypeNameMapping[Magic.AdviceType.lwsAdvice]),
+					new Tab(AsyncTexture2D.FromAssetId(156722), () => adviceView, Magic.adviceTypeNameMapping[Magic.AdviceType.lwsAdvice]),
 					Magic.adviceTypeNameMapping[Magic.AdviceType.lwsAdvice]
 				},
 				{
-					new Tab(GameService.Content.GetTexture("155052"), () => adviceView, Magic.adviceTypeNameMapping[Magic.AdviceType.miscAdvice]),
+					new Tab(AsyncTexture2D.FromAssetId(157099), () => adviceView, Magic.adviceTypeNameMapping[Magic.AdviceType.miscAdvice]),
 					Magic.adviceTypeNameMapping[Magic.AdviceType.miscAdvice]
 				}
 			};
@@ -143,13 +157,15 @@ namespace gw2stacks_blish
 				{
 					path = DirectoryUtil.RegisterDirectory("gw2stacks");
 				}
-				else
+				DirectoryReader dir = new DirectoryReader(path);
+				if (!dir.FileExists("LUT.json") || !dir.FileExists("localeItemLUT.json") || !dir.FileExists("chineseLocal.json") || !dir.FileExists("englishLocal.json") || !dir.FileExists("germanLocal.json") || !dir.FileExists("koreanLocal.json") || !dir.FileExists("spanishLocal.json") || !dir.FileExists("frenchLocal.json"))
 				{
-					DirectoryReader dir = new DirectoryReader(path);
-					if (!dir.FileExists("LUT.json") || !dir.FileExists("localeItemLUT.json") || !dir.FileExists("chineseLocal.json") || !dir.FileExists("englishLocal.json") || !dir.FileExists("germanLocal.json") || !dir.FileExists("koreanLocal.json") || !dir.FileExists("spanishLocal.json") || !dir.FileExists("frenchLocal.json"))
-					{
-						local = false;
-					}
+					local = false;
+				}
+				if (new DirectoryReader(path).FileExists("ignoredItemsList.json"))
+				{
+					string input = System.IO.File.ReadAllText(path + "/ignoredItemsList.json");
+					ignoredItemList = JsonConvert.DeserializeObject<List<int>>(input);
 				}
 				if (local)
 				{
@@ -182,7 +198,7 @@ namespace gw2stacks_blish
 			{
 				fatalError = true;
 				hasLut = false;
-				Logger.Fatal("Unexpected exception: " + e_.Message + " @" + e_.StackTrace);
+				Logger.Warn("Unexpected exception: can't create LUT @" + e_.StackTrace);
 			}
 		}
 
@@ -190,13 +206,27 @@ namespace gw2stacks_blish
 		{
 			includeConsumableSetting = settings.DefineSetting("includeConsumables", defaultValue: true, () => " include consumables", () => "toggle to include food and utility");
 			localJson = settings.DefineSetting("localLut", defaultValue: false, () => "use a local item json", () => "will only have an effect if a LUT exists inside the gw2stacks folder");
+			ignoreItemsFeature = settings.DefineSetting("ignoreItems", defaultValue: false, () => "blacklist", () => "enable the blacklist feature for item advice");
 		}
 
 		private void create_window()
 		{
 			gw2stacks_root = new TabbedWindow2(AsyncTexture2D.FromAssetId(155997), new Microsoft.Xna.Framework.Rectangle(24, 30, 565, 630), new Microsoft.Xna.Framework.Rectangle(82, 30, 467, 600));
+			gw2stacks_root.Location = new Point(GameService.Graphics.SpriteScreen.Width / 4, GameService.Graphics.SpriteScreen.Height / 4);
+			gw2stacks_root.Hidden += delegate
+			{
+				ignoredItems?.Hide();
+			};
+			ignoredItems = new TabbedWindow2(AsyncTexture2D.FromAssetId(155997), new Microsoft.Xna.Framework.Rectangle(24, 30, 565, 630), new Microsoft.Xna.Framework.Rectangle(82, 30, 467, 600));
+			ignoredItems.Location = new Point(GameService.Graphics.SpriteScreen.Width / 4 * 2, GameService.Graphics.SpriteScreen.Height / 4);
+			ignoredView = new IgnoredView();
+			ignoredItemsTab = new Tab(GameService.Content.GetTexture("155052"), () => ignoredView, Magic.adviceTypeNameMapping[Magic.AdviceType.stackAdvice]);
+			ignoredItems.Tabs.Add(ignoredItemsTab);
+			ignoredItems.Parent = GameService.Graphics.SpriteScreen;
+			ignoredView.set_values(itemTextures, refresh_views, excludedItemIds);
 			gw2stacks_root.Parent = GameService.Graphics.SpriteScreen;
 			adviceView = new AdviceTabView();
+			adviceView.set_values(itemTextures, refresh_views, excludedItemIds);
 			gw2stacks_root.Tabs.Clear();
 			create_name_tab_mapping();
 			foreach (Tab tab in tabNameMapping.Keys)
@@ -208,8 +238,6 @@ namespace gw2stacks_blish
 
 		private void create_values()
 		{
-			itemTextures = new Dictionary<int, AsyncTexture2D>();
-			adviceDictionary = new Dictionary<string, List<ItemForDisplay>>();
 			icon = new CornerIcon(AsyncTexture2D.FromAssetId(155052), "gw2stacks");
 			icon.Parent = GameService.Graphics.SpriteScreen;
 			icon.Click += async delegate
@@ -235,6 +263,22 @@ namespace gw2stacks_blish
 			{
 				tab.Name = Magic.get_current_translated_string(tabNameMapping[tab]);
 			}
+			ignoredItemsTab.Name = Magic.get_current_translated_string("Ignored Items");
+		}
+
+		private void refresh_views(int id_, bool mainWindow_)
+		{
+			if (ignoredItemList.Contains(id_))
+			{
+				ignoredItemList.Remove(id_);
+			}
+			else if (mainWindow_)
+			{
+				ignoredItemList.Add(id_);
+			}
+			update_excluded();
+			ignoredView.refresh();
+			adviceView.refresh();
 		}
 
 		private void update_advice()
@@ -274,34 +318,34 @@ namespace gw2stacks_blish
 					else
 					{
 						fatalError = true;
-						Logger.Fatal("Missing Permissions");
+						Logger.Warn("Missing Permissions");
 					}
 				}
 				else
 				{
 					fatalError = true;
-					Logger.Fatal("No subtoken supplied");
+					Logger.Warn("No subtoken supplied");
 				}
 			}
 			catch (InvalidAccessTokenException e_4)
 			{
 				fatalError = true;
-				Logger.Fatal("Invalid access token: " + e_4.Message);
+				Logger.Warn("Invalid access token: " + e_4.Message);
 			}
 			catch (MissingScopesException e_3)
 			{
 				fatalError = true;
-				Logger.Fatal("Missing scopes: " + e_3.Message);
+				Logger.Warn("Missing scopes: " + e_3.Message);
 			}
 			catch (RequestException e_2)
 			{
 				fatalError = true;
-				Logger.Fatal("Request exception: " + e_2.Message);
+				Logger.Warn("Request exception: " + e_2.Message);
 			}
 			catch (Exception e_)
 			{
 				fatalError = true;
-				Logger.Fatal("Unexpected exception: " + e_.Message + " @" + e_.StackTrace);
+				Logger.Warn("Unexpected exception: " + e_.Message + " @" + e_.StackTrace);
 			}
 		}
 
@@ -312,6 +356,7 @@ namespace gw2stacks_blish
 				icon.Enabled = false;
 				validData = false;
 				gw2stacks_root.Hide();
+				ignoredItems.Hide();
 				loadingSpinner.Location = icon.Location;
 				Logger.Info("starting setup");
 				model.includeConsumables = includeConsumableSetting.Value;
@@ -341,7 +386,7 @@ namespace gw2stacks_blish
 				catch (Exception e_)
 				{
 					fatalError = true;
-					Logger.Fatal("Unexpected exception: " + e_.Message + " @" + e_.StackTrace);
+					Logger.Warn("Unexpected exception: " + e_.Message + " @" + e_.StackTrace);
 				}
 			}
 		}
@@ -349,7 +394,9 @@ namespace gw2stacks_blish
 		private void update_views(string tabName_)
 		{
 			gw2stacks_root.Title = tabName_;
-			adviceView.update(adviceDictionary[tabName_], tabName_, itemTextures);
+			adviceView.update(adviceDictionary[tabName_], tabName_, ignoreItemsFlag);
+			ignoredItems.Title = Magic.get_current_translated_string("Ignored Items");
+			ignoredView.update(Magic.get_current_translated_string("Ignored Items"));
 		}
 
 		private void on_tab_change(object sender_, ValueChangedEventArgs<Tab> event_)
@@ -364,7 +411,19 @@ namespace gw2stacks_blish
 				catch (Exception e_)
 				{
 					fatalError = true;
-					Logger.Fatal("Unexpected exception: " + e_.Message + " @" + e_.StackTrace);
+					Logger.Warn("Unexpected exception: " + e_.Message + " @" + e_.StackTrace);
+				}
+			}
+		}
+
+		private void update_excluded()
+		{
+			if (hasLut)
+			{
+				excludedItemIds.Clear();
+				if (ignoreItemsFeature.Value)
+				{
+					excludedItemIds.AddRange(ignoredItemList);
 				}
 			}
 		}
@@ -385,11 +444,12 @@ namespace gw2stacks_blish
 			{
 				create_window();
 				create_values();
+				Magic.log = Logger;
 			}
 			catch (Exception e_2)
 			{
 				fatalError = true;
-				Logger.Fatal("Unexpected exception: " + e_2.Message + " @" + e_2.StackTrace);
+				Logger.Warn("Unexpected exception: " + e_2.Message + " @" + e_2.StackTrace);
 			}
 			validate_api();
 			Gw2ApiManager.SubtokenUpdated += delegate
@@ -424,11 +484,17 @@ namespace gw2stacks_blish
 					model.includeConsumables = includeConsumableSetting.Value;
 					update_tab_locale();
 					update_advice();
+					update_excluded();
+					ignoreItemsFlag = ignoreItemsFeature.Value;
 					validData = true;
 					update_views(gw2stacks_root.SelectedTab.Name);
 					loadingSpinner.Hide();
 					icon.Enabled = true;
 					gw2stacks_root.Show();
+					if (ignoreItemsFlag)
+					{
+						ignoredItems.Show();
+					}
 					if (!isOnCooldown)
 					{
 						isOnCooldown = true;
@@ -438,12 +504,13 @@ namespace gw2stacks_blish
 				catch (Exception e_)
 				{
 					fatalError = true;
-					Logger.Fatal("Unexpected exception: " + e_.Message + " @" + e_.StackTrace);
+					Logger.Warn("Unexpected exception: " + e_.Message + " @" + e_.StackTrace);
 				}
 			}
 			if (fatalError)
 			{
 				gw2stacks_root?.Hide();
+				ignoredItems?.Hide();
 				icon?.Hide();
 				loadingSpinner?.Hide();
 			}
@@ -453,8 +520,18 @@ namespace gw2stacks_blish
 		protected override void Unload()
 		{
 			gw2stacks_root?.Dispose();
+			ignoredItems?.Hide();
 			icon?.Dispose();
 			loadingSpinner?.Dispose();
+			try
+			{
+				string text = DirectoryUtil.RegisterDirectory("gw2stacks");
+				System.IO.File.WriteAllText(contents: JsonConvert.SerializeObject(ignoredItemList), path: text + "/ignoredItemsList.json");
+			}
+			catch (Exception e_)
+			{
+				Logger.Warn("Unexpected exception: can't save ignored items @" + e_.StackTrace);
+			}
 		}
 	}
 }

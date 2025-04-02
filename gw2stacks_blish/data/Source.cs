@@ -6,10 +6,13 @@ namespace gw2stacks_blish.data
 
 		public string place;
 
+		public ulong stacks;
+
 		public Source(ulong count_, string place_)
 		{
 			count = count_;
 			place = place_;
+			stacks = 1uL;
 		}
 
 		public override string ToString()

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Gw2Sharp.WebApi.V2.Models;
 
 namespace gw2stacks_blish.data
@@ -37,22 +36,103 @@ namespace gw2stacks_blish.data
 
 		public bool hasInformation;
 
-		public Item(int id_)
+		public int VendorValue;
+
+		public bool isSellable;
+
+		public bool isSalvagable;
+
+		public Item(int id_, bool isCharacterBound_, bool isAccountBound_, bool delayedCreate = false)
 		{
 			itemId = id_;
 			sources = new List<Source>();
 			isFoodOrUtility = false;
-			isCharacterBound = false;
-			isAccountBound = false;
+			isCharacterBound = isCharacterBound_;
+			isAccountBound = isAccountBound_;
 			name = null;
 			description = null;
 			iconId = 63369;
 			rarity = null;
-			isStackable = false;
+			isStackable = true;
 			isDeletable = false;
 			isRareForSalvage = false;
 			price = 0;
 			hasInformation = false;
+			VendorValue = 0;
+			isSellable = true;
+			isSalvagable = true;
+			if (!delayedCreate)
+			{
+				build_basic_item_info();
+			}
+		}
+
+		public void build_basic_item_info()
+		{
+			ItemInfo info_;
+			if (Magic.jsonLut.itemLut.ContainsKey(itemId))
+			{
+				info_ = Magic.jsonLut.itemLut[itemId];
+			}
+			else
+			{
+				info_ = Magic.unknown;
+				info_.Id = itemId;
+			}
+			if (Magic.is_luck_essence(itemId))
+			{
+				name = Magic.get_local_name(itemId);
+			}
+			else
+			{
+				name = info_.Name;
+			}
+			iconId = info_.IconId;
+			rarity = (ApiEnum<ItemRarity>)(ItemRarity)info_.Rarity;
+			description = info_.Description;
+			isFoodOrUtility = info_.isFoodOrUtility;
+			VendorValue = info_.VendorValue;
+			string urlName = name.Replace(" ", "_");
+			wikiLink = "wiki.guildwars2.com/wiki/" + urlName;
+			bool salvagable = true;
+			if (Magic.is_non_stackable_type((ItemType)info_.Type))
+			{
+				isStackable = false;
+			}
+			foreach (int flag in info_.Flags)
+			{
+				if (flag == 10)
+				{
+					salvagable = false;
+				}
+				if (flag == 14)
+				{
+					isAccountBound = true;
+					isCharacterBound = true;
+					isStackable = false;
+				}
+				if (flag == 2)
+				{
+					isAccountBound = true;
+				}
+				if (flag == 10)
+				{
+					isSalvagable = false;
+				}
+				if (flag == 11)
+				{
+					isSellable = false;
+				}
+			}
+			if (Magic.collectionOnlyIds.Contains(info_.Id))
+			{
+				isDeletable = true;
+			}
+			if (Magic.is_salvagable_equipment((ItemType)info_.Type) && info_.Rarity == 5 && salvagable && info_.Level > 67)
+			{
+				isRareForSalvage = true;
+			}
+			hasInformation = true;
 		}
 
 		public void add_source(Source source_)
@@ -62,6 +142,7 @@ namespace gw2stacks_blish.data
 				if (source.place == source_.place)
 				{
 					source.count += source_.count;
+					source.stacks++;
 					return;
 				}
 			}
@@ -74,15 +155,20 @@ namespace gw2stacks_blish.data
 			{
 				return new List<Source>();
 			}
-			List<Source> stackableSources = new List<Source>();
-			List<Source> stackableSource = get_partial_stacks(materialStorageSize_);
-			ulong numberOfPartialStacks = Convert.ToUInt64(stackableSource.Count());
-			ulong numberOfConsolidatedStacks = Convert.ToUInt64(Math.Ceiling(Convert.ToDouble(total_count() / 250uL)));
-			if (isStackable && numberOfPartialStacks > 1 && numberOfPartialStacks > numberOfConsolidatedStacks)
+			List<Source> stackableSources = get_partial_stacks(materialStorageSize_);
+			ulong numberOfPartialStacks = 0uL;
+			ulong partialStackAmount = 0uL;
+			foreach (Source source in stackableSources)
 			{
-				stackableSources.AddRange(stackableSource);
+				numberOfPartialStacks += source.stacks;
+				partialStackAmount += source.count;
 			}
-			return stackableSources;
+			ulong numberOfConsolidatedStacks = Convert.ToUInt64(Math.Ceiling(Convert.ToDouble(partialStackAmount / 250uL)));
+			if (numberOfPartialStacks > 1 && numberOfPartialStacks > numberOfConsolidatedStacks)
+			{
+				return stackableSources;
+			}
+			return new List<Source>();
 		}
 
 		public List<Source> get_partial_stacks(int materialStorageSize_)
@@ -90,7 +176,7 @@ namespace gw2stacks_blish.data
 			List<Source> partialStacks = new List<Source>();
 			foreach (Source currentSource in sources)
 			{
-				if (currentSource.count % 250uL != 0L || (currentSource.place == "Material Storage" && currentSource.count < Convert.ToUInt64(materialStorageSize_)))
+				if (currentSource.count % Convert.ToUInt64(250) != Convert.ToUInt64(0) || (currentSource.place == "Material Storage" && currentSource.count < Convert.ToUInt64(materialStorageSize_)))
 				{
 					partialStacks.Add(currentSource);
 				}

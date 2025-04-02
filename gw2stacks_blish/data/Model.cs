@@ -28,6 +28,8 @@ namespace gw2stacks_blish.data
 
 		private Logger log;
 
+		private Dictionary<int, List<Source>> upgradableBags;
+
 		public void reset_state()
 		{
 			foreach (KeyValuePair<int, Item> item in items)
@@ -40,6 +42,7 @@ namespace gw2stacks_blish.data
 			appraisedItemIds = new List<int>();
 			includeConsumables = true;
 			ectoSalvagePrice = 0;
+			upgradableBags = new Dictionary<int, List<Source>>();
 			validData = false;
 		}
 
@@ -53,10 +56,15 @@ namespace gw2stacks_blish.data
 		public async Task setup(Gw2Api api_)
 		{
 			validData = false;
+			log.Info("started building ecto price");
 			await build_ecto_price(api_);
+			log.Info("started building inventory");
 			await build_inventory(api_);
+			log.Info("started building recipes");
 			await build_recipe_info();
+			log.Info("started building prices");
 			await build_item_prices(api_);
+			Magic.inventoryBag.build_basic_item_info();
 			validData = true;
 		}
 
@@ -64,16 +72,17 @@ namespace gw2stacks_blish.data
 		{
 			if (!items.ContainsKey(id_))
 			{
-				items.Add(id_, new Item(id_));
+				items.Add(id_, new Item(id_, isCharacterBound_, isAccountBound_));
 			}
 			items[id_].add_source(source_);
-			items[id_].isAccountBound = isAccountBound_;
-			items[id_].isCharacterBound = isCharacterBound_;
-			if (!Magic.jsonLut.itemLut.ContainsKey(id_))
+			if (items[id_].isRareForSalvage)
 			{
-				log.Warn("id not in json lut error" + id_);
+				appraisedItemIds.Add(id_);
 			}
-			build_basic_item_info(items[id_]);
+			else
+			{
+				items[id_].price = 0;
+			}
 		}
 
 		public bool has_item(int id_)
@@ -101,7 +110,6 @@ namespace gw2stacks_blish.data
 
 		public async Task build_inventory(Gw2Api api_)
 		{
-			log.Info("started building inventory");
 			ulong emptySlots = 0uL;
 			foreach (Character character in await api_.characters())
 			{
@@ -110,6 +118,32 @@ namespace gw2stacks_blish.data
 					if (bag == null)
 					{
 						continue;
+					}
+					if (bag.Size < 32)
+					{
+						if (upgradableBags.ContainsKey(bag.Size))
+						{
+							bool found = false;
+							foreach (Source source in upgradableBags[bag.Size])
+							{
+								if (source.place == character.Name)
+								{
+									source.count++;
+									found = true;
+								}
+							}
+							if (!found)
+							{
+								upgradableBags[bag.Size].Add(new Source(1uL, character.Name));
+							}
+						}
+						else
+						{
+							upgradableBags.Add(bag.Size, new List<Source>
+							{
+								new Source(1uL, character.Name)
+							});
+						}
 					}
 					foreach (AccountItem item4 in bag?.Inventory)
 					{
@@ -205,73 +239,6 @@ namespace gw2stacks_blish.data
 			}
 		}
 
-		public void build_basic_item_info(Item item_)
-		{
-			ItemInfo info_;
-			if (Magic.jsonLut.itemLut.ContainsKey(item_.itemId))
-			{
-				info_ = Magic.jsonLut.itemLut[item_.itemId];
-			}
-			else
-			{
-				info_ = Magic.unknown;
-				info_.Id = item_.itemId;
-			}
-			if (Magic.is_luck_essence(item_.itemId))
-			{
-				item_.name = Magic.get_local_name(item_.itemId);
-			}
-			else
-			{
-				item_.name = info_.Name;
-			}
-			item_.iconId = info_.IconId;
-			item_.rarity = (ApiEnum<ItemRarity>)(ItemRarity)info_.Rarity;
-			item_.description = info_.Description;
-			item_.isFoodOrUtility = info_.isFoodOrUtility;
-			string urlName = item_.name.Replace(" ", "_");
-			item_.wikiLink = "wiki.guildwars2.com/wiki/" + urlName;
-			bool salvagable = true;
-			if (!Magic.is_non_stackable_type((ItemType)info_.Type))
-			{
-				item_.isStackable = true;
-			}
-			if (item_.isFoodOrUtility)
-			{
-				item_.isStackable = true;
-			}
-			foreach (int flag in info_.Flags)
-			{
-				if (flag == 10)
-				{
-					salvagable = false;
-				}
-				if (flag == 14)
-				{
-					item_.isAccountBound = true;
-					item_.isCharacterBound = true;
-					item_.isStackable = false;
-				}
-			}
-			if (Magic.collectionOnlyIds.Contains(info_.Id))
-			{
-				item_.isDeletable = true;
-			}
-			if (Magic.is_salvagable_equipment((ItemType)info_.Type) && info_.Rarity == 5 && salvagable && info_.Level > 67)
-			{
-				item_.isRareForSalvage = true;
-				if (!item_.isAccountBound)
-				{
-					appraisedItemIds.Add(item_.itemId);
-				}
-				else
-				{
-					item_.price = 0;
-				}
-			}
-			item_.hasInformation = true;
-		}
-
 		public async Task build_item_prices(Gw2Api api_)
 		{
 			List<int> fullIds = appraisedItemIds.Distinct().ToList();
@@ -335,8 +302,7 @@ namespace gw2stacks_blish.data
 			recipeResults = new Dictionary<int, Item>();
 			foreach (int item3 in outputItemIds)
 			{
-				Item item = new Item(item3);
-				build_basic_item_info(item);
+				Item item = new Item(item3, isCharacterBound_: false, isAccountBound_: false);
 				if (!recipeResults.ContainsKey(item.itemId))
 				{
 					recipeResults.Add(item.itemId, item);
@@ -353,14 +319,7 @@ namespace gw2stacks_blish.data
 			List<ItemForDisplay> result = new List<ItemForDisplay>();
 			foreach (Item item in items.Values.Where((Item list_item) => list_item.get_advice_stacks(materialStorageSize).Count > 0))
 			{
-				if (includeConsumables)
-				{
-					result.Add(new ItemForDisplay(item, item.get_advice_stacks(materialStorageSize), "Combine these items into stacks"));
-				}
-				else if (!item.isFoodOrUtility)
-				{
-					result.Add(new ItemForDisplay(item, item.get_advice_stacks(materialStorageSize), "Combine these items into stacks"));
-				}
+				result.Add(new ItemForDisplay(item, item.get_advice_stacks(materialStorageSize), "Combine these items into stacks"));
 			}
 			return result;
 		}
@@ -368,7 +327,7 @@ namespace gw2stacks_blish.data
 		public List<ItemForDisplay> get_vendor_advice()
 		{
 			List<ItemForDisplay> result = new List<ItemForDisplay>();
-			foreach (Item item in items.Values.Where((Item list_item) => list_item.rarity == ItemRarity.Junk))
+			foreach (Item item in items.Values.Where((Item list_item) => list_item.rarity == ItemRarity.Junk || (list_item.isSellable && !list_item.isSalvagable && list_item.isDeletable)))
 			{
 				result.Add(new ItemForDisplay(item, null, "Sell these items to a vendor"));
 			}
@@ -408,7 +367,7 @@ namespace gw2stacks_blish.data
 		public List<ItemForDisplay> get_just_delete_advice()
 		{
 			List<ItemForDisplay> result = new List<ItemForDisplay>();
-			foreach (Item item in items.Values.Where((Item list_item) => list_item.isDeletable))
+			foreach (Item item in items.Values.Where((Item list_item) => list_item.isDeletable && !list_item.isSellable && !list_item.isSalvagable))
 			{
 				result.Add(new ItemForDisplay(item, null, "Delete these items"));
 			}
@@ -418,7 +377,7 @@ namespace gw2stacks_blish.data
 		public List<ItemForDisplay> get_just_salvage_advice()
 		{
 			List<ItemForDisplay> result = new List<ItemForDisplay>();
-			foreach (Item item in items.Values.Where((Item list_item) => Magic.salvageIds.Contains(list_item.itemId) && list_item.itemId != Magic.ectoId))
+			foreach (Item item in items.Values.Where((Item list_item) => (Magic.salvageIds.Contains(list_item.itemId) && list_item.itemId != Magic.ectoId) || (list_item.isDeletable && list_item.isSalvagable)))
 			{
 				result.Add(new ItemForDisplay(item, null, "Salvage these items"));
 			}
@@ -451,7 +410,7 @@ namespace gw2stacks_blish.data
 				{
 					if (items[food].total_count() > Convert.ToUInt64(materialStorageSize))
 					{
-						result.Add(new ItemForDisplay(items[food], items[food].sources, "Feed these items to gobblers (" + gobbler.name + ")"));
+						result.Add(new ItemForDisplay(items[food], items[food].sources, "Feed these items to gobblers", gobbler.itemId));
 					}
 				}
 			}
@@ -466,6 +425,17 @@ namespace gw2stacks_blish.data
 				if (has_item(advice.itemId) && items[advice.itemId].total_count() >= Convert.ToUInt64(advice.minCount))
 				{
 					result.Add(new ItemForDisplay(items[advice.itemId], null, advice.advice));
+				}
+			}
+			foreach (KeyValuePair<int, List<Source>> slots in upgradableBags)
+			{
+				if (slots.Key < 18)
+				{
+					result.Add(new ItemForDisplay(Magic.inventoryBag, slots.Value, "Upgrade these bags to 18 slots"));
+				}
+				if (has_item(83410) && slots.Key < 32 && items[83410].total_count() >= 12)
+				{
+					result.Add(new ItemForDisplay(Magic.inventoryBag, slots.Value, "Potentially replace these bags with boreal trunks"));
 				}
 			}
 			return result;

@@ -9,10 +9,8 @@ using gw2stacks_blish.data;
 
 namespace views
 {
-	internal class AdviceTabView : View
+	internal class IgnoredView : View
 	{
-		private List<ItemForDisplay> adviceList = new List<ItemForDisplay>();
-
 		private FlowPanel panel = new FlowPanel
 		{
 			WidthSizingMode = SizingMode.Fill,
@@ -22,8 +20,6 @@ namespace views
 		};
 
 		private Dictionary<int, AsyncTexture2D> itemTextures;
-
-		private bool ignoredItemsFlag;
 
 		private Action<int, bool> callback;
 
@@ -47,7 +43,7 @@ namespace views
 
 		public void refresh()
 		{
-			update(adviceList, panel.Title, ignoredItemsFlag);
+			update(panel.Title);
 		}
 
 		private ViewContainer GetStandardPanel(Panel rootPanel, string title, int id_)
@@ -63,49 +59,34 @@ namespace views
 			};
 		}
 
-		private void build_item_panels(Panel rootPanel)
+		private void build_ignored_panels(Panel rootPanel)
 		{
 			search.Parent = rootPanel;
 			search.TextChanged += handle_text_input;
-			search.Show();
-			foreach (ItemForDisplay item in adviceList)
+			foreach (int item in excludedItemIds)
 			{
-				if (!itemTextures.ContainsKey(item.item.itemId))
+				if (string.IsNullOrEmpty(hunt) || Magic.get_local_name(item).ToLower().Contains(hunt.ToLower()))
 				{
-					itemTextures.Add(item.item.itemId, AsyncTexture2D.FromAssetId(item.item.iconId));
-				}
-				if ((!string.IsNullOrEmpty(hunt) && !Magic.get_local_name(item.item.itemId).ToLower().Contains(hunt.ToLower())) || excludedItemIds.Contains(item.item.itemId))
-				{
-					continue;
-				}
-				ViewContainer container = GetStandardPanel(rootPanel, Magic.get_local_name(item.item.itemId), item.item.itemId);
-				if (item.gobblerId == 0)
-				{
-					container.BasicTooltipText = Magic.get_current_translated_string(item.advice) + "\n" + item.get_source_string();
-				}
-				else
-				{
-					container.BasicTooltipText = Magic.get_current_translated_string(item.advice) + " (" + Magic.get_local_name(item.gobblerId) + ")\n" + item.get_source_string();
-				}
-				if (ignoredItemsFlag)
-				{
-					container.Click += delegate
+					if (!itemTextures.ContainsKey(item))
 					{
-						callback(item.item.itemId, arg2: true);
+						itemTextures.Add(item, AsyncTexture2D.FromAssetId(Magic.jsonLut.itemLut[item].IconId));
+					}
+					ViewContainer standardPanel = GetStandardPanel(rootPanel, Magic.get_local_name(item), item);
+					standardPanel.Click += delegate
+					{
+						callback(item, arg2: false);
 					};
+					standardPanel.Show();
 				}
-				container.Show();
 			}
 		}
 
-		public void update(List<ItemForDisplay> items_, string title_, bool ignoredItemsFlag_)
+		public void update(string title_)
 		{
 			search.Parent = null;
 			search.TextChanged -= handle_text_input;
 			panel.ClearChildren();
-			ignoredItemsFlag = ignoredItemsFlag_;
-			adviceList = items_;
-			build_item_panels(panel);
+			build_ignored_panels(panel);
 			panel.Title = title_;
 		}
 
@@ -119,7 +100,7 @@ namespace views
 		protected override void Build(Container buildPanel)
 		{
 			panel.Parent = buildPanel;
-			build_item_panels(panel);
+			build_ignored_panels(panel);
 		}
 	}
 }

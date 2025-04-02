@@ -22,6 +22,8 @@ namespace gw2stacks_blish.data
 
 		public int Level;
 
+		public int VendorValue;
+
 		public ItemInfo()
 		{
 			Id = 0;
@@ -33,6 +35,7 @@ namespace gw2stacks_blish.data
 			isFoodOrUtility = false;
 			Flags = new List<int>();
 			Level = 0;
+			VendorValue = 0;
 		}
 	}
 }
