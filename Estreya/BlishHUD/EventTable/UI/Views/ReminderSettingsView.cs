@@ -26,6 +26,7 @@ using Humanizer;
 using Humanizer.Localisation;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using NodaTime;
 
 namespace Estreya.BlishHUD.EventTable.UI.Views
 {
@@ -62,7 +63,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			{
 				throw new NotImplementedException();
 			});
-			_globalChangeTempEvent.UpdateReminderTimes(new TimeSpan[1] { TimeSpan.Zero });
+			_globalChangeTempEvent.UpdateReminderTimes(new Duration[1] { Duration.Zero });
 		}
 
 		public ReminderSettingsView(ModuleSettings moduleSettings, Func<List<EventCategory>> getEvents, Func<List<string>> getAreaNames, AccountService accountService, AudioService audioService, Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, SettingEventService settingEventService)
@@ -206,13 +207,13 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			((Container)val3).set_HeightSizingMode((SizingMode)1);
 			val3.set_FlowDirection((ControlFlowDirection)2);
 			FlowPanel changeTimesFlowPanel = val3;
-			RenderButton((Panel)(object)changeTimesFlowPanel, base.TranslationService.GetTranslation("reminderSettingsView-btn-changeAllTimes", "Change all Reminder Times"), delegate
+			RenderButtonAsync((Panel)(object)changeTimesFlowPanel, base.TranslationService.GetTranslation("reminderSettingsView-btn-changeAllTimes", "Change all Reminder Times"), async delegate
 			{
-				ManageReminderTimes(_globalChangeTempEvent);
+				await ManageReminderTimes(_globalChangeTempEvent);
 			});
 			RenderButton((Panel)(object)changeTimesFlowPanel, base.TranslationService.GetTranslation("reminderSettingsView-btn-resetAllTimes", "Reset all Reminder Times"), delegate
 			{
-				ManageReminderTimesView_SaveClicked(this, (_globalChangeTempEvent, new List<TimeSpan> { TimeSpan.FromMinutes(10.0) }, false));
+				ManageReminderTimesView_SaveClicked(this, (_globalChangeTempEvent, new List<Duration> { Duration.FromMinutes(10L) }, false));
 			});
 			RenderButtonAsync((Panel)(object)parent, base.TranslationService.GetTranslation("reminderSettingsView-btn-syncEnabledEventsToAreas", "Sync enabled Events to Areas"), async delegate
 			{
@@ -226,50 +227,238 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 				}
 			});
 			RenderEmptyLine((Panel)(object)parent);
-			RenderBoolSetting((Panel)(object)parent, _moduleSettings.RemindersEnabled);
-			RenderBoolSetting((Panel)(object)parent, _moduleSettings.DisableRemindersWhenEventFinished);
+			RenderGeneralSettings(parent);
 			RenderEmptyLine((Panel)(object)parent);
-			RenderDisableRemindersWhenEventFinishedArea(parent);
+			RenderLocationAndSizeSettings(parent);
 			RenderEmptyLine((Panel)(object)parent);
-			RenderIntSetting((Panel)(object)parent, _moduleSettings.ReminderPosition.X);
-			RenderIntSetting((Panel)(object)parent, _moduleSettings.ReminderPosition.Y);
+			RenderLayoutSettings(parent);
 			RenderEmptyLine((Panel)(object)parent);
-			RenderIntSetting((Panel)(object)parent, _moduleSettings.ReminderSize.X);
-			RenderIntSetting((Panel)(object)parent, _moduleSettings.ReminderSize.Y);
-			RenderIntSetting((Panel)(object)parent, _moduleSettings.ReminderSize.Icon);
+			RenderVisibilitySettings(parent);
 			RenderEmptyLine((Panel)(object)parent);
-			RenderFloatSetting((Panel)(object)parent, _moduleSettings.ReminderDuration);
-			RenderEnumSetting<EventReminderStackDirection>((Panel)(object)parent, _moduleSettings.ReminderStackDirection);
-			RenderEnumSetting<EventReminderStackDirection>((Panel)(object)parent, _moduleSettings.ReminderOverflowStackDirection);
+			RenderTextAndColorSettings(parent);
 			RenderEmptyLine((Panel)(object)parent);
-			base.RenderEnumSetting<FontSize>((Panel)(object)parent, _moduleSettings.ReminderFonts.TitleSize);
-			base.RenderEnumSetting<FontSize>((Panel)(object)parent, _moduleSettings.ReminderFonts.MessageSize);
-			RenderEmptyLine((Panel)(object)parent);
-			RenderColorSetting((Panel)(object)parent, _moduleSettings.ReminderColors.Background);
-			RenderColorSetting((Panel)(object)parent, _moduleSettings.ReminderColors.TitleText);
-			RenderColorSetting((Panel)(object)parent, _moduleSettings.ReminderColors.MessageText);
-			RenderFloatSetting((Panel)(object)parent, _moduleSettings.ReminderBackgroundOpacity);
-			RenderFloatSetting((Panel)(object)parent, _moduleSettings.ReminderTitleOpacity);
-			RenderFloatSetting((Panel)(object)parent, _moduleSettings.ReminderMessageOpacity);
-			RenderEmptyLine((Panel)(object)parent);
-			RenderEnumSetting<TimeUnit>((Panel)(object)parent, _moduleSettings.ReminderMinTimeUnit);
-			RenderEmptyLine((Panel)(object)parent);
-			RenderEnumSetting<ReminderType>((Panel)(object)parent, _moduleSettings.ReminderType);
-			RenderEmptyLine((Panel)(object)parent);
-			RenderEnumSetting<LeftClickAction>((Panel)(object)parent, _moduleSettings.ReminderLeftClickAction);
-			RenderBoolSetting((Panel)(object)parent, _moduleSettings.AcceptWaypointPrompt);
-			RenderEnumSetting<EventReminderRightClickAction>((Panel)(object)parent, _moduleSettings.ReminderRightClickAction);
-			RenderEnumSetting<ChatChannel>((Panel)(object)parent, _moduleSettings.ReminderWaypointSendingChannel);
-			RenderEnumSetting<GuildNumber>((Panel)(object)parent, _moduleSettings.ReminderWaypointSendingGuild);
-			RenderEnumSetting<EventChatFormat>((Panel)(object)parent, _moduleSettings.ReminderEventChatFormat);
-			RenderEmptyLine((Panel)(object)parent);
-			RenderBoolSetting((Panel)(object)parent, _moduleSettings.HideRemindersOnMissingMumbleTicks);
-			RenderBoolSetting((Panel)(object)parent, _moduleSettings.HideRemindersOnOpenMap);
-			RenderBoolSetting((Panel)(object)parent, _moduleSettings.HideRemindersInCombat);
-			RenderBoolSetting((Panel)(object)parent, _moduleSettings.HideRemindersInPvE_OpenWorld);
-			RenderBoolSetting((Panel)(object)parent, _moduleSettings.HideRemindersInPvE_Competetive);
-			RenderBoolSetting((Panel)(object)parent, _moduleSettings.HideRemindersInWvW);
-			RenderBoolSetting((Panel)(object)parent, _moduleSettings.HideRemindersInPvP);
+			RenderBehaviorSettings(parent);
+		}
+
+		private void RenderGeneralSettings(FlowPanel parent)
+		{
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0084: Expected O, but got Unknown
+			FlowPanel val = new FlowPanel();
+			((Control)val).set_Parent((Container)(object)parent);
+			((Container)val).set_HeightSizingMode((SizingMode)1);
+			((Control)val).set_Width(((Container)parent).get_ContentRegion().Width - (int)(parent.get_OuterControlPadding().X * 2f));
+			val.set_FlowDirection((ControlFlowDirection)3);
+			val.set_OuterControlPadding(new Vector2(20f, 20f));
+			((Panel)val).set_ShowBorder(true);
+			((Panel)val).set_CanCollapse(true);
+			((Panel)val).set_Collapsed(false);
+			((Panel)val).set_Title(base.TranslationService.GetTranslation("reminderSettingsView-group-general", "General"));
+			FlowPanel groupPanel = val;
+			RenderBoolSetting((Panel)(object)groupPanel, _moduleSettings.RemindersEnabled);
+			RenderEmptyLine((Panel)(object)groupPanel, 20);
+		}
+
+		private void RenderLocationAndSizeSettings(FlowPanel parent)
+		{
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0084: Expected O, but got Unknown
+			FlowPanel val = new FlowPanel();
+			((Control)val).set_Parent((Container)(object)parent);
+			((Container)val).set_HeightSizingMode((SizingMode)1);
+			((Control)val).set_Width(((Container)parent).get_ContentRegion().Width - (int)(parent.get_OuterControlPadding().X * 2f));
+			val.set_FlowDirection((ControlFlowDirection)3);
+			val.set_OuterControlPadding(new Vector2(20f, 20f));
+			((Panel)val).set_ShowBorder(true);
+			((Panel)val).set_CanCollapse(true);
+			((Panel)val).set_Collapsed(true);
+			((Panel)val).set_Title(base.TranslationService.GetTranslation("reminderSettingsView-group-locationAndSize", "Location & Size"));
+			FlowPanel groupPanel = val;
+			RenderIntSetting((Panel)(object)groupPanel, _moduleSettings.ReminderPosition.X);
+			RenderIntSetting((Panel)(object)groupPanel, _moduleSettings.ReminderPosition.Y);
+			RenderEmptyLine((Panel)(object)groupPanel);
+			RenderIntSetting((Panel)(object)groupPanel, _moduleSettings.ReminderSize.X);
+			RenderIntSetting((Panel)(object)groupPanel, _moduleSettings.ReminderSize.Y);
+			RenderIntSetting((Panel)(object)groupPanel, _moduleSettings.ReminderSize.Icon);
+			RenderEmptyLine((Panel)(object)groupPanel, 20);
+		}
+
+		private void RenderLayoutSettings(FlowPanel parent)
+		{
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0084: Expected O, but got Unknown
+			FlowPanel val = new FlowPanel();
+			((Control)val).set_Parent((Container)(object)parent);
+			((Container)val).set_HeightSizingMode((SizingMode)1);
+			((Control)val).set_Width(((Container)parent).get_ContentRegion().Width - (int)(parent.get_OuterControlPadding().X * 2f));
+			val.set_FlowDirection((ControlFlowDirection)3);
+			val.set_OuterControlPadding(new Vector2(20f, 20f));
+			((Panel)val).set_ShowBorder(true);
+			((Panel)val).set_CanCollapse(true);
+			((Panel)val).set_Collapsed(true);
+			((Panel)val).set_Title(base.TranslationService.GetTranslation("reminderSettingsView-group-layout", "Layout"));
+			FlowPanel groupPanel = val;
+			RenderEnumSetting<EventReminderStackDirection>((Panel)(object)groupPanel, _moduleSettings.ReminderStackDirection);
+			RenderEnumSetting<EventReminderStackDirection>((Panel)(object)groupPanel, _moduleSettings.ReminderOverflowStackDirection);
+			RenderEmptyLine((Panel)(object)groupPanel);
+			RenderEnumSetting<TimeUnit>((Panel)(object)groupPanel, _moduleSettings.ReminderMinTimeUnit);
+			RenderEmptyLine((Panel)(object)groupPanel, 20);
+		}
+
+		private void RenderVisibilitySettings(FlowPanel parent)
+		{
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0084: Expected O, but got Unknown
+			FlowPanel val = new FlowPanel();
+			((Control)val).set_Parent((Container)(object)parent);
+			((Container)val).set_HeightSizingMode((SizingMode)1);
+			((Control)val).set_Width(((Container)parent).get_ContentRegion().Width - (int)(parent.get_OuterControlPadding().X * 2f));
+			val.set_FlowDirection((ControlFlowDirection)3);
+			val.set_OuterControlPadding(new Vector2(20f, 20f));
+			((Panel)val).set_ShowBorder(true);
+			((Panel)val).set_CanCollapse(true);
+			((Panel)val).set_Collapsed(true);
+			((Panel)val).set_Title(base.TranslationService.GetTranslation("reminderSettingsView-group-visibility", "Visibility"));
+			FlowPanel groupPanel = val;
+			RenderBoolSetting((Panel)(object)groupPanel, _moduleSettings.HideRemindersOnMissingMumbleTicks);
+			RenderBoolSetting((Panel)(object)groupPanel, _moduleSettings.HideRemindersOnOpenMap);
+			RenderBoolSetting((Panel)(object)groupPanel, _moduleSettings.HideRemindersInCombat);
+			RenderBoolSetting((Panel)(object)groupPanel, _moduleSettings.HideRemindersInPvE_OpenWorld);
+			RenderBoolSetting((Panel)(object)groupPanel, _moduleSettings.HideRemindersInPvE_Competetive);
+			RenderBoolSetting((Panel)(object)groupPanel, _moduleSettings.HideRemindersInWvW);
+			RenderBoolSetting((Panel)(object)groupPanel, _moduleSettings.HideRemindersInPvP);
+			RenderEmptyLine((Panel)(object)groupPanel, 20);
+		}
+
+		private void RenderTextAndColorSettings(FlowPanel parent)
+		{
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0084: Expected O, but got Unknown
+			FlowPanel val = new FlowPanel();
+			((Control)val).set_Parent((Container)(object)parent);
+			((Container)val).set_HeightSizingMode((SizingMode)1);
+			((Control)val).set_Width(((Container)parent).get_ContentRegion().Width - (int)(parent.get_OuterControlPadding().X * 2f));
+			val.set_FlowDirection((ControlFlowDirection)3);
+			val.set_OuterControlPadding(new Vector2(20f, 20f));
+			((Panel)val).set_ShowBorder(true);
+			((Panel)val).set_CanCollapse(true);
+			((Panel)val).set_Collapsed(true);
+			((Panel)val).set_Title(base.TranslationService.GetTranslation("reminderSettingsView-group-textAndColor", "Text & Color"));
+			FlowPanel groupPanel = val;
+			base.RenderEnumSetting<FontSize>((Panel)(object)groupPanel, _moduleSettings.ReminderFonts.TitleSize);
+			base.RenderEnumSetting<FontSize>((Panel)(object)groupPanel, _moduleSettings.ReminderFonts.MessageSize);
+			RenderEmptyLine((Panel)(object)groupPanel);
+			RenderColorSetting((Panel)(object)groupPanel, _moduleSettings.ReminderColors.Background);
+			RenderColorSetting((Panel)(object)groupPanel, _moduleSettings.ReminderColors.TitleText);
+			RenderColorSetting((Panel)(object)groupPanel, _moduleSettings.ReminderColors.MessageText);
+			RenderFloatSetting((Panel)(object)groupPanel, _moduleSettings.ReminderBackgroundOpacity);
+			RenderFloatSetting((Panel)(object)groupPanel, _moduleSettings.ReminderTitleOpacity);
+			RenderFloatSetting((Panel)(object)groupPanel, _moduleSettings.ReminderMessageOpacity);
+			RenderEmptyLine((Panel)(object)groupPanel, 20);
+		}
+
+		private void RenderBehaviorSettings(FlowPanel parent)
+		{
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0084: Expected O, but got Unknown
+			FlowPanel val = new FlowPanel();
+			((Control)val).set_Parent((Container)(object)parent);
+			((Container)val).set_HeightSizingMode((SizingMode)1);
+			((Control)val).set_Width(((Container)parent).get_ContentRegion().Width - (int)(parent.get_OuterControlPadding().X * 2f));
+			val.set_FlowDirection((ControlFlowDirection)3);
+			val.set_OuterControlPadding(new Vector2(20f, 20f));
+			((Panel)val).set_ShowBorder(true);
+			((Panel)val).set_CanCollapse(true);
+			((Panel)val).set_Collapsed(true);
+			((Panel)val).set_Title(base.TranslationService.GetTranslation("reminderSettingsView-group-behaviors", "Behaviors"));
+			FlowPanel groupPanel = val;
+			RenderFloatSetting((Panel)(object)groupPanel, _moduleSettings.ReminderDuration);
+			RenderEmptyLine((Panel)(object)groupPanel);
+			RenderEnumSetting<ReminderType>((Panel)(object)groupPanel, _moduleSettings.ReminderType);
+			RenderEmptyLine((Panel)(object)groupPanel);
+			RenderBoolSetting((Panel)(object)groupPanel, _moduleSettings.DisableRemindersWhenEventFinished);
+			RenderEmptyLine((Panel)(object)groupPanel);
+			RenderDisableRemindersWhenEventFinishedArea(groupPanel);
+			RenderEmptyLine((Panel)(object)groupPanel);
+			RenderEnumSetting<LeftClickAction>((Panel)(object)groupPanel, _moduleSettings.ReminderLeftClickAction);
+			RenderBoolSetting((Panel)(object)groupPanel, _moduleSettings.AcceptWaypointPrompt);
+			RenderEnumSetting<EventReminderRightClickAction>((Panel)(object)groupPanel, _moduleSettings.ReminderRightClickAction);
+			RenderEnumSetting<ChatChannel>((Panel)(object)groupPanel, _moduleSettings.ReminderWaypointSendingChannel);
+			RenderEnumSetting<GuildNumber>((Panel)(object)groupPanel, _moduleSettings.ReminderWaypointSendingGuild);
+			RenderEnumSetting<EventChatFormat>((Panel)(object)groupPanel, _moduleSettings.ReminderEventChatFormat);
+			RenderEmptyLine((Panel)(object)groupPanel, 20);
 		}
 
 		private void RenderDisableRemindersWhenEventFinishedArea(FlowPanel parent)
@@ -323,9 +512,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			}
 		}
 
-		private Task ManageReminderTimes(Estreya.BlishHUD.EventTable.Models.Event ev)
+		private async Task ManageReminderTimes(Estreya.BlishHUD.EventTable.Models.Event ev)
 		{
-			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
 			if (_manageReminderTimesWindow == null)
 			{
 				_manageReminderTimesWindow = WindowUtil.CreateStandardWindow(_moduleSettings, "Manage Reminder Times", ((object)this).GetType(), Guid.Parse("930702ac-bf87-416c-b5ba-cdf9e0266bf7"), base.IconService, base.IconService.GetIcon("1466345.png"));
@@ -335,16 +523,15 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			if (mrtv != null)
 			{
 				mrtv.CancelClicked -= ManageReminderTimesView_CancelClicked;
-				mrtv.SaveClicked -= new EventHandler<(Estreya.BlishHUD.EventTable.Models.Event, List<TimeSpan>, bool)>(ManageReminderTimesView_SaveClicked);
+				mrtv.SaveClicked -= new EventHandler<(Estreya.BlishHUD.EventTable.Models.Event, List<Duration>, bool)>(ManageReminderTimesView_SaveClicked);
 			}
 			ManageReminderTimesView view = new ManageReminderTimesView(ev, ev == _globalChangeTempEvent, base.APIManager, base.IconService, base.TranslationService);
 			view.CancelClicked += ManageReminderTimesView_CancelClicked;
-			view.SaveClicked += new EventHandler<(Estreya.BlishHUD.EventTable.Models.Event, List<TimeSpan>, bool)>(ManageReminderTimesView_SaveClicked);
-			_manageReminderTimesWindow.Show((IView)(object)view);
-			return Task.CompletedTask;
+			view.SaveClicked += new EventHandler<(Estreya.BlishHUD.EventTable.Models.Event, List<Duration>, bool)>(ManageReminderTimesView_SaveClicked);
+			await _manageReminderTimesWindow.Show((IView)(object)view);
 		}
 
-		private void ManageReminderTimesView_SaveClicked(object sender, (Estreya.BlishHUD.EventTable.Models.Event Event, List<TimeSpan> ReminderTimes, bool KeepCustomized) e)
+		private void ManageReminderTimesView_SaveClicked(object sender, (Estreya.BlishHUD.EventTable.Models.Event Event, List<Duration> ReminderTimes, bool KeepCustomized) e)
 		{
 			if (e.Event == _globalChangeTempEvent)
 			{
@@ -354,7 +541,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 				{
 					if (!_moduleSettings.ReminderTimesOverride.get_Value().ContainsKey(ev2.SettingKey) || !e.KeepCustomized)
 					{
-						_moduleSettings.ReminderTimesOverride.get_Value()[ev2.SettingKey] = e.ReminderTimes;
+						_moduleSettings.ReminderTimesOverride.get_Value()[ev2.SettingKey] = e.ReminderTimes.Select((Duration x) => x.ToTimeSpan()).ToList();
 						ev2.UpdateReminderTimes(e.ReminderTimes.ToArray());
 					}
 				}
@@ -363,7 +550,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			}
 			else
 			{
-				_moduleSettings.ReminderTimesOverride.get_Value()[e.Event.SettingKey] = e.ReminderTimes;
+				_moduleSettings.ReminderTimesOverride.get_Value()[e.Event.SettingKey] = e.ReminderTimes.Select((Duration x) => x.ToTimeSpan()).ToList();
 				_moduleSettings.ReminderTimesOverride.set_Value(new Dictionary<string, List<TimeSpan>>(_moduleSettings.ReminderTimesOverride.get_Value()));
 				e.Event.UpdateReminderTimes(e.ReminderTimes.ToArray());
 			}
@@ -415,7 +602,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			if (mrtv != null)
 			{
 				mrtv.CancelClicked -= ManageReminderTimesView_CancelClicked;
-				mrtv.SaveClicked -= new EventHandler<(Estreya.BlishHUD.EventTable.Models.Event, List<TimeSpan>, bool)>(ManageReminderTimesView_SaveClicked);
+				mrtv.SaveClicked -= new EventHandler<(Estreya.BlishHUD.EventTable.Models.Event, List<Duration>, bool)>(ManageReminderTimesView_SaveClicked);
 			}
 			StandardWindow manageReminderTimesWindow = _manageReminderTimesWindow;
 			if (manageReminderTimesWindow != null)

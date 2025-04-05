@@ -6,6 +6,7 @@ using Estreya.BlishHUD.Shared.Attributes;
 using Estreya.BlishHUD.Shared.Services;
 using Estreya.BlishHUD.Shared.Utils;
 using Newtonsoft.Json;
+using NodaTime;
 
 namespace Estreya.BlishHUD.EventTable.Models
 {
@@ -68,7 +69,7 @@ namespace Estreya.BlishHUD.EventTable.Models
 			}
 		}
 
-		public void Load(Func<DateTime> getNowAction, TranslationService translationService = null)
+		public void Load(Func<Instant> getNowAction, TranslationService translationService = null)
 		{
 			if (translationService != null)
 			{

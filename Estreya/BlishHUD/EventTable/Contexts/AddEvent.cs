@@ -55,7 +55,7 @@ namespace Estreya.BlishHUD.EventTable.Contexts
 			StartingDate = null;
 			Location = null;
 			MapIds = null;
-			Waypoints = default(EventWaypoints);
+			Waypoints = new EventWaypoints();
 			Wiki = null;
 			Duration = 0;
 			BackgroundColorCode = null;

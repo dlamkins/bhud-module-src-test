@@ -59,6 +59,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderColorSetting((Panel)(object)parent, _moduleSettings.EventTimersStartsInTextColor);
 			RenderColorSetting((Panel)(object)parent, _moduleSettings.EventTimersNameTextColor);
 			RenderColorSetting((Panel)(object)parent, _moduleSettings.EventTimersRemainingTextColor);
+			RenderColorSetting((Panel)(object)parent, _moduleSettings.EventTimersDurationTextColor);
 			RenderColorSetting((Panel)(object)parent, _moduleSettings.EventTimersNextOccurenceTextColor);
 			RenderColorSetting((Panel)(object)parent, _moduleSettings.EventTimersRepeatTextColor);
 			RenderEmptyLine((Panel)(object)parent);

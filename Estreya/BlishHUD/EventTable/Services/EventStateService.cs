@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,6 +11,7 @@ using Estreya.BlishHUD.Shared.Utils;
 using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using NodaTime;
 
 namespace Estreya.BlishHUD.EventTable.Services
 {
@@ -30,14 +32,14 @@ namespace Estreya.BlishHUD.EventTable.Services
 			[JsonConverter(typeof(StringEnumConverter))]
 			public EventStates State;
 
-			public DateTime Until;
+			public Instant Until;
 		}
 
 		private const string DATE_TIME_FORMAT = "yyyy-MM-ddTHH:mm:ss";
 
 		private const string FILE_NAME = "event_states.json";
 
-		private readonly Func<DateTime> _getNowAction;
+		private readonly Func<Instant> _getNowAction;
 
 		private string _path;
 
@@ -64,7 +66,7 @@ namespace Estreya.BlishHUD.EventTable.Services
 
 		public event EventHandler<ValueEventArgs<VisibleStateInfo>> StateRemoved;
 
-		public EventStateService(ServiceConfiguration configuration, string basePath, Func<DateTime> getNowAction)
+		public EventStateService(ServiceConfiguration configuration, string basePath, Func<Instant> getNowAction)
 			: base(configuration)
 		{
 			_basePath = basePath;
@@ -78,7 +80,7 @@ namespace Estreya.BlishHUD.EventTable.Services
 
 		protected override void InternalUpdate(GameTime gameTime)
 		{
-			DateTime now = _getNowAction().ToUniversalTime();
+			Instant now = _getNowAction();
 			lock (Instances)
 			{
 				for (int i = Instances.Count - 1; i >= 0; i--)
@@ -92,14 +94,13 @@ namespace Estreya.BlishHUD.EventTable.Services
 			}
 		}
 
-		public void Add(string areaName, string eventKey, DateTime until, EventStates state)
+		public void Add(string areaName, string eventKey, Instant until, EventStates state)
 		{
 			lock (Instances)
 			{
 				Remove(areaName, eventKey);
-				until = until.ToUniversalTime();
 				string name = GetName(areaName, eventKey);
-				Logger.Info(string.Format("Add event state for \"{0}\" with \"{1}\" until \"{2}\" UTC.", name, state, until.ToString("yyyy-MM-ddTHH:mm:ss")));
+				Logger.Info(string.Format("Add event state for \"{0}\" with \"{1}\" until \"{2}\" UTC.", name, state, until.ToString("yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture)));
 				VisibleStateInfo visibleStateInfo = default(VisibleStateInfo);
 				visibleStateInfo.AreaName = areaName;
 				visibleStateInfo.EventKey = eventKey;

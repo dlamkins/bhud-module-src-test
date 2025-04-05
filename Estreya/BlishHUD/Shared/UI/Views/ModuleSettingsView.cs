@@ -56,18 +56,12 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			//IL_00b4: Expected O, but got Unknown
 			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
 			//IL_010d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0141: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0146: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0157: Expected O, but got Unknown
-			//IL_0161: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0196: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ca: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e0: Expected O, but got Unknown
-			//IL_01ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_021f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0157: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0163: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016d: Expected O, but got Unknown
+			//IL_0177: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ac: Unknown result type (might be due to invalid IL or missing references)
 			Rectangle bounds = ((Container)parent).get_ContentRegion();
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Size(((Rectangle)(ref bounds)).get_Size());
@@ -99,30 +93,17 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			{
 				this.OpenClicked?.Invoke(this, EventArgs.Empty);
 			});
-			string githubIssueText = base.TranslationService.GetTranslation("moduleSettingsView-createGitHubIssueBtn", "Create Bug/Feature Issue");
+			base.TranslationService.GetTranslation("moduleSettingsView-createGitHubIssueBtn", "Create Bug/Feature Issue");
+			string openMessageLogText = base.TranslationService.GetTranslation("moduleSettingsView-openMessageLogBtn", "Open Message Log");
 			StandardButton val4 = new StandardButton();
 			((Control)val4).set_Parent((Container)(object)settingContainer);
-			val4.set_Text(githubIssueText);
-			StandardButton createGithubIssue = val4;
-			if (font != null)
-			{
-				((Control)createGithubIssue).set_Width((int)font.MeasureString(githubIssueText).Width);
-			}
-			((Control)createGithubIssue).set_Location(new Point(Math.Max(((Control)parentPanel).get_Width() / 2 - ((Control)createGithubIssue).get_Width() / 2, 20), ((Control)openSettingsButton).get_Bottom() + 10));
-			((Control)createGithubIssue).add_Click((EventHandler<MouseEventArgs>)delegate
-			{
-				this.CreateGithubIssueClicked?.Invoke(this, EventArgs.Empty);
-			});
-			string openMessageLogText = base.TranslationService.GetTranslation("moduleSettingsView-openMessageLogBtn", "Open Message Log");
-			StandardButton val5 = new StandardButton();
-			((Control)val5).set_Parent((Container)(object)settingContainer);
-			val5.set_Text(openMessageLogText);
-			StandardButton openMessageLog = val5;
+			val4.set_Text(openMessageLogText);
+			StandardButton openMessageLog = val4;
 			if (font != null)
 			{
 				((Control)openMessageLog).set_Width((int)font.MeasureString(openMessageLogText).Width);
 			}
-			((Control)openMessageLog).set_Location(new Point(Math.Max(((Control)parentPanel).get_Width() / 2 - ((Control)openMessageLog).get_Width() / 2, 20), ((Control)createGithubIssue).get_Bottom() + 10));
+			((Control)openMessageLog).set_Location(new Point(Math.Max(((Control)parentPanel).get_Width() / 2 - ((Control)openMessageLog).get_Width() / 2, 20), ((Control)openSettingsButton).get_Bottom() + 10));
 			((Control)openMessageLog).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				this.OpenMessageLogClicked?.Invoke(this, EventArgs.Empty);

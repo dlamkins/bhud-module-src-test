@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 
 namespace Estreya.BlishHUD.EventTable.Models
 {
-	public struct EventWaypoints
+	public class EventWaypoints
 	{
 		[JsonProperty("EU")]
 		public string EU;

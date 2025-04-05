@@ -25,6 +25,7 @@ using Estreya.BlishHUD.EventTable.Models;
 using Estreya.BlishHUD.EventTable.Models.Reminders;
 using Estreya.BlishHUD.EventTable.Services;
 using Estreya.BlishHUD.EventTable.UI.Views;
+using Estreya.BlishHUD.EventTable.UI.Views.Wizard;
 using Estreya.BlishHUD.Shared.Controls;
 using Estreya.BlishHUD.Shared.Extensions;
 using Estreya.BlishHUD.Shared.Helpers;
@@ -42,7 +43,10 @@ using Gw2Sharp.Models;
 using Humanizer;
 using Humanizer.Localisation;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended.BitmapFonts;
+using NodaTime;
+using NodaTime.Extensions;
 
 namespace Estreya.BlishHUD.EventTable
 {
@@ -75,15 +79,15 @@ namespace Estreya.BlishHUD.EventTable
 
 		protected override bool NeedsBackend => true;
 
-		protected override bool EnableMetrics => true;
+		protected override bool EnableMetrics => false;
 
-		private DateTime NowUTC => DateTime.UtcNow;
+		private Instant NowUTC => SystemClock.Instance.GetCurrentInstant();
 
 		private MapUtil MapUtil { get; set; }
 
 		private DynamicEventHandler DynamicEventHandler { get; set; }
 
-		protected override string API_VERSION_NO => "1";
+		protected override string API_VERSION_NO => "2";
 
 		protected override BitmapFont Font
 		{
@@ -236,7 +240,7 @@ namespace Estreya.BlishHUD.EventTable
 						SetAreaEvents();
 						return;
 					}
-					IFlurlRequest request = GetFlurlClient().Request(base.MODULE_API_URL, "events");
+					IFlurlRequest request = GetFlurlClient().Request(base.MODULE_API_URL);
 					if (!string.IsNullOrWhiteSpace(base.BlishHUDAPIService.AccessToken))
 					{
 						base.Logger.Info("Include custom events...");
@@ -291,7 +295,7 @@ namespace Estreya.BlishHUD.EventTable
 			{
 				if (base.ModuleSettings.ReminderTimesOverride.get_Value().ContainsKey(ev2.SettingKey))
 				{
-					List<TimeSpan> times = base.ModuleSettings.ReminderTimesOverride.get_Value()[ev2.SettingKey];
+					List<Duration> times = base.ModuleSettings.ReminderTimesOverride.get_Value()[ev2.SettingKey].Select((TimeSpan x) => x.ToDuration()).ToList();
 					ev2.UpdateReminderTimes(times.ToArray());
 				}
 			}
@@ -421,7 +425,7 @@ namespace Estreya.BlishHUD.EventTable
 			ev.Reminder -= Ev_Reminder;
 		}
 
-		private async void Ev_Reminder(object sender, TimeSpan e)
+		private async void Ev_Reminder(object sender, Duration e)
 		{
 			Estreya.BlishHUD.EventTable.Models.Event ev = sender as Estreya.BlishHUD.EventTable.Models.Event;
 			if (!base.ModuleSettings.RemindersEnabled.get_Value() || base.ModuleSettings.ReminderDisabledForEvents.get_Value().Contains(ev.SettingKey))
@@ -446,7 +450,7 @@ namespace Estreya.BlishHUD.EventTable
 			{
 				string translation = base.TranslationService.GetTranslation("reminder-startsIn", "Starts in");
 				string title = ev.Name;
-				string message = translation + " " + e.Humanize(6, null, TimeUnit.Week, base.ModuleSettings.ReminderMinTimeUnit.get_Value()) + "!";
+				string message = translation + " " + e.ToTimeSpan().Humanize(6, null, TimeUnit.Week, base.ModuleSettings.ReminderMinTimeUnit.get_Value()) + "!";
 				AsyncTexture2D icon = (AsyncTexture2D)(string.IsNullOrWhiteSpace(ev.Icon) ? ((object)new AsyncTexture2D()) : ((object)base.IconService.GetIcon(ev.Icon)));
 				ReminderType value = base.ModuleSettings.ReminderType.get_Value();
 				if ((value == ReminderType.Control || value == ReminderType.Both) ? true : false)
@@ -552,9 +556,12 @@ namespace Estreya.BlishHUD.EventTable
 
 		private void AddAllAreas()
 		{
+			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002a: Expected O, but got Unknown
 			if (base.ModuleSettings.EventAreaNames.get_Value().Count == 0)
 			{
-				base.ModuleSettings.EventAreaNames.get_Value().Add("Main");
+				AddArea("Main", new KeyBinding((ModifierKeys)2, (Keys)69));
+				return;
 			}
 			foreach (string areaName in base.ModuleSettings.EventAreaNames.get_Value())
 			{
@@ -562,9 +569,9 @@ namespace Estreya.BlishHUD.EventTable
 			}
 		}
 
-		private EventAreaConfiguration AddArea(string name)
+		private EventAreaConfiguration AddArea(string name, KeyBinding enabledKeybinding = null)
 		{
-			EventAreaConfiguration config = base.ModuleSettings.AddDrawer(name, _eventCategories);
+			EventAreaConfiguration config = base.ModuleSettings.AddDrawer(name, _eventCategories, enabledKeybinding);
 			AddArea(config);
 			return config;
 		}
@@ -638,7 +645,7 @@ namespace Estreya.BlishHUD.EventTable
 
 		protected override BaseModuleSettings DefineModuleSettings(SettingCollection settings)
 		{
-			return new ModuleSettings(settings);
+			return new ModuleSettings(settings, ((Module)this).get_Version());
 		}
 
 		protected override void OnSettingWindowBuild(TabbedWindow settingWindow)
@@ -744,7 +751,7 @@ namespace Estreya.BlishHUD.EventTable
 			{
 				DefaultColor = base.ModuleSettings.DefaultGW2Color
 			}), base.TranslationService.GetTranslation("selfHostingEventsSettingsView-title", "Self Hosting Events"), (int?)null));
-			base.SettingsWindow.Tabs.Add(new Tab(base.IconService.GetIcon("156764.png"), (Func<IView>)(() => (IView)(object)new BlishHUDAPIView(base.Gw2ApiManager, base.IconService, base.TranslationService, base.BlishHUDAPIService, GetFlurlClient())
+			base.SettingsWindow.Tabs.Add(new Tab(base.IconService.GetIcon("156764.png"), (Func<IView>)(() => (IView)(object)new EventTableBlishHUDAPIView(base.Gw2ApiManager, base.IconService, base.TranslationService, base.BlishHUDAPIService, GetFlurlClient())
 			{
 				DefaultColor = base.ModuleSettings.DefaultGW2Color
 			}), "Estreya BlishHUD", (int?)null));
@@ -799,7 +806,7 @@ namespace Estreya.BlishHUD.EventTable
 				AwaitLoading = false,
 				Enabled = true,
 				SaveInterval = Timeout.InfiniteTimeSpan
-			}, base.Gw2ApiManager, GetFlurlClient(), base.API_ROOT_URL, directoryPath);
+			}, base.Gw2ApiManager, GetFlurlClient(), base.MODULE_API_URL, directoryPath);
 			SelfHostingEventService = new SelfHostingEventService(new APIServiceConfiguration
 			{
 				AwaitLoading = true,
@@ -826,6 +833,16 @@ namespace Estreya.BlishHUD.EventTable
 		protected override AsyncTexture2D GetErrorCornerIcon()
 		{
 			return base.IconService.GetIcon("textures/event_boss_grey_error.png");
+		}
+
+		protected override List<WizardView> GetWizardViews()
+		{
+			return new List<WizardView>
+			{
+				new WizardWelcomeView(base.Gw2ApiManager, base.IconService, base.TranslationService),
+				new WizardAreasView(_areas.Values.Select((EventArea area) => area.Configuration).ToList(), base.Gw2ApiManager, base.IconService, base.TranslationService),
+				new WizardRemindersView(base.ModuleSettings, base.AudioService, base.Gw2ApiManager, base.IconService, base.TranslationService)
+			};
 		}
 
 		private void UnloadContext()

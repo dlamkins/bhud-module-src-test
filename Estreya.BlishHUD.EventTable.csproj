@@ -41,6 +41,9 @@
     </Reference>
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="NodaTime">
+      <HintPath>..\..\working\NodaTime.dll</HintPath>
+    </Reference>
     <Reference Include="Windows.Foundation.UniversalApiContract">
       <HintPath>C:\Program Files (x86)\Windows Kits\10\References\10.0.19041.0\Windows.Foundation.UniversalApiContract\10.0.0.0\Windows.Foundation.UniversalApiContract.winmd</HintPath>
     </Reference>
@@ -56,6 +59,9 @@
     <Reference Include="NAudio.Wasapi" />
     <Reference Include="Flurl">
       <HintPath>..\..\working\Flurl.dll</HintPath>
+    </Reference>
+    <Reference Include="NodaTime.Serialization.JsonNet">
+      <HintPath>..\..\working\NodaTime.Serialization.JsonNet.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>

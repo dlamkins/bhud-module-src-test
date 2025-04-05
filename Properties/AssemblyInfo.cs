@@ -7,7 +7,7 @@ using System.Runtime.Versioning;
 [assembly: AssemblyCompany("Estreya.BlishHUD.EventTable")]
 [assembly: AssemblyConfiguration("Release")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
-[assembly: AssemblyInformationalVersion("1.0.0+828166749129ff64d64c9bdcddbabcda3d978b0e")]
+[assembly: AssemblyInformationalVersion("1.0.0+edb18059b818d594ba9dd54ad397acd1635aab5c")]
 [assembly: AssemblyProduct("Estreya.BlishHUD.EventTable")]
 [assembly: AssemblyTitle("Estreya.BlishHUD.EventTable")]
 [assembly: NeutralResourcesLanguage("en")]

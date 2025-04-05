@@ -1,5 +1,5 @@
-using System;
 using Newtonsoft.Json;
+using NodaTime;
 
 namespace Estreya.BlishHUD.EventTable.Models
 {
@@ -12,9 +12,9 @@ namespace Estreya.BlishHUD.EventTable.Models
 		public string Name { get; set; }
 
 		[JsonProperty("duration")]
-		public int Duration { get; set; }
+		public Duration Duration { get; set; }
 
-		[JsonProperty("occurences")]
-		public DateTimeOffset[] Occurences { get; set; }
+		[JsonProperty("occurrences")]
+		public Instant[] Occurences { get; set; }
 	}
 }

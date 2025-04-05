@@ -7,6 +7,7 @@ using Blish_HUD.Settings;
 using Estreya.BlishHUD.EventTable.Models;
 using Estreya.BlishHUD.EventTable.Models.Reminders;
 using Estreya.BlishHUD.Shared.Extensions;
+using Estreya.BlishHUD.Shared.Models;
 using Estreya.BlishHUD.Shared.Models.Drawers;
 using Estreya.BlishHUD.Shared.Models.GameIntegration.Chat;
 using Estreya.BlishHUD.Shared.Models.GameIntegration.Guild;
@@ -15,6 +16,7 @@ using Estreya.BlishHUD.Shared.Settings;
 using Gw2Sharp.WebApi.V2.Models;
 using Humanizer.Localisation;
 using Microsoft.Xna.Framework.Input;
+using SemVer;
 
 namespace Estreya.BlishHUD.EventTable
 {
@@ -132,11 +134,11 @@ namespace Estreya.BlishHUD.EventTable
 
 		public SettingEntry<bool> HideRemindersInPvP { get; private set; }
 
-		public ModuleSettings(SettingCollection settings)
-			: base(settings, new KeyBinding((ModifierKeys)2, (Keys)69))
+		public ModuleSettings(SettingCollection settings, Version moduleVersion)
+			: base(settings, moduleVersion, new KeyBinding())
 		{
-		}//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000f: Expected O, but got Unknown
+		}//IL_0003: Unknown result type (might be due to invalid IL or missing references)
+		//IL_000d: Expected O, but got Unknown
 
 
 		protected override void InitializeAdditionalSettings(SettingCollection settings)
@@ -148,16 +150,18 @@ namespace Estreya.BlishHUD.EventTable
 
 		protected override void DoInitializeGlobalSettings(SettingCollection globalSettingCollection)
 		{
-			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0056: Expected O, but got Unknown
-			//IL_0baa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0bf2: Expected O, but got Unknown
-			//IL_0c41: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c89: Expected O, but got Unknown
-			//IL_11fb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1243: Expected O, but got Unknown
-			//IL_1292: Unknown result type (might be due to invalid IL or missing references)
-			//IL_12da: Expected O, but got Unknown
+			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00aa: Expected O, but got Unknown
+			//IL_0bfe: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0c46: Expected O, but got Unknown
+			//IL_0c95: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0cdd: Expected O, but got Unknown
+			//IL_124f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1297: Expected O, but got Unknown
+			//IL_12e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_132e: Expected O, but got Unknown
+			((SettingEntry)base.RegisterContext).set_GetDisplayNameFunc((Func<string>)(() => "Allow Cross Module Interaction"));
+			((SettingEntry)base.RegisterContext).set_GetDescriptionFunc((Func<string>)(() => "Allow other BlishHUD modules to add certain elements to this module (events, reminders, ...). Requires a restart."));
 			MapKeybinding = base.GlobalSettings.DefineSetting<KeyBinding>("MapKeybinding", new KeyBinding((Keys)77), (Func<string>)(() => "Open Map Hotkey"), (Func<string>)(() => "Defines the key used to open the fullscreen map."));
 			MapKeybinding.get_Value().set_Enabled(true);
 			MapKeybinding.get_Value().set_BlockSequenceFromGw2(false);
@@ -185,7 +189,7 @@ namespace Estreya.BlishHUD.EventTable
 				MessageText = base.GlobalSettings.DefineSetting<Color>("ReminderColorsMessageText", base.DefaultGW2Color, (Func<string>)(() => "Message Text Color"), (Func<string>)(() => "Defines the text color in which the messages are drawn."))
 			};
 			int reminderDurationMin = 1;
-			int reminderDurationMax = 15;
+			int reminderDurationMax = 30;
 			ReminderDuration = base.GlobalSettings.DefineSetting<float>("ReminderDuration", 5f, (Func<string>)(() => "Reminder Duration"), (Func<string>)(() => "Defines the reminder duration."));
 			SettingComplianceExtensions.SetRange(ReminderDuration, (float)reminderDurationMin, (float)reminderDurationMax);
 			ReminderDisabledForEvents = base.GlobalSettings.DefineSetting<List<string>>("ReminderDisabledForEvents", new List<string>(), (Func<string>)(() => "Reminder disabled for Events"), (Func<string>)(() => "Defines the events for which NO reminder should be displayed."));
@@ -250,7 +254,7 @@ namespace Estreya.BlishHUD.EventTable
 			ShowDynamicEventsInWorldKeybinding.get_Value().set_Enabled(true);
 			ShowDynamicEventsInWorldKeybinding.get_Value().set_BlockSequenceFromGw2(true);
 			ShowDynamicEventsInWorldKeybinding.get_Value().add_Activated((EventHandler<EventArgs>)ShowDynamicEventInWorldKeybinding_Activated);
-			MenuEventSortMode = base.GlobalSettings.DefineSetting<MenuEventSortMode>("MenuEventSortMode", Estreya.BlishHUD.EventTable.Models.MenuEventSortMode.Default, (Func<string>)(() => "Menu Event Sort Mode"), (Func<string>)(() => "Defines the mode by which the events in menu views are sorted by."));
+			MenuEventSortMode = base.GlobalSettings.DefineSetting<MenuEventSortMode>("MenuEventSortMode", Estreya.BlishHUD.EventTable.Models.MenuEventSortMode.Default, (Func<string>)(() => "Menu Event Sort Mode"), (Func<string>)(() => "Defines the mode by which the events are sorted by when displayed inside different settings windows/tabs. (e.g. Event Areas -> Manage Events)"));
 			HideRemindersOnOpenMap = base.GlobalSettings.DefineSetting<bool>("HideRemindersOnOpenMap", false, (Func<string>)(() => "Hide Reminders on open Map"), (Func<string>)(() => "Whether the reminders should hide when the map is open."));
 			HideRemindersOnMissingMumbleTicks = base.GlobalSettings.DefineSetting<bool>("HideRemindersOnMissingMumbleTicks", true, (Func<string>)(() => "Hide Reminders on Cutscenes"), (Func<string>)(() => "Whether the reminders should hide when cutscenes are played."));
 			HideRemindersInCombat = base.GlobalSettings.DefineSetting<bool>("HideRemindersInCombat", false, (Func<string>)(() => "Hide Reminders in Combat"), (Func<string>)(() => "Whether the reminders should hide when in combat."));
@@ -349,9 +353,9 @@ namespace Estreya.BlishHUD.EventTable
 			}
 		}
 
-		public EventAreaConfiguration AddDrawer(string name, List<EventCategory> eventCategories)
+		public EventAreaConfiguration AddDrawer(string name, List<EventCategory> eventCategories, KeyBinding enabledKeybinding = null)
 		{
-			DrawerConfiguration drawer = AddDrawer(name);
+			DrawerConfiguration drawer = AddDrawer(name, BuildDirection.Top, enabledKeybinding);
 			SettingEntry<LeftClickAction> leftClickAction = base.DrawerSettings.DefineSetting<LeftClickAction>(name + "-leftClickAction", LeftClickAction.CopyWaypoint, (Func<string>)(() => "Left Click Action"), (Func<string>)(() => "Defines the action which is executed when left clicking."));
 			SettingEntry<bool> showTooltips = base.DrawerSettings.DefineSetting<bool>(name + "-showTooltips", true, (Func<string>)(() => "Show Tooltips"), (Func<string>)(() => "Whether a tooltip should be displayed when hovering."));
 			SettingEntry<int> timespan = base.DrawerSettings.DefineSetting<int>(name + "-timespan", 120, (Func<string>)(() => "Timespan"), (Func<string>)(() => "Defines the timespan the event drawer covers."));
@@ -373,7 +377,7 @@ namespace Estreya.BlishHUD.EventTable
 			SettingEntry<bool> enableLinkedCompletion = base.DrawerSettings.DefineSetting<bool>(name + "-enableLinkedCompletion", true, (Func<string>)(() => "Enable Linked Completion"), (Func<string>)(() => "Enables the completion of events that are linked to the completed event. (e.g. Auric Basin)"));
 			SettingEntry<List<string>> disabledEventKeys = base.DrawerSettings.DefineSetting<List<string>>(name + "-disabledEventKeys", new List<string>(), (Func<string>)(() => "Active Event Keys"), (Func<string>)(() => "Defines the active event keys."));
 			SettingEntry<int> eventHeight = base.DrawerSettings.DefineSetting<int>(name + "-eventHeight", 30, (Func<string>)(() => "Event Height"), (Func<string>)(() => "Defines the height of the individual event rows."));
-			SettingComplianceExtensions.SetRange(eventHeight, 5, 30);
+			SettingComplianceExtensions.SetRange(eventHeight, 5, 70);
 			SettingEntry<List<string>> eventOrder = base.DrawerSettings.DefineSetting<List<string>>(name + "-eventOrder", new List<string>(eventCategories.Select((EventCategory x) => x.Key)), (Func<string>)(() => "Event Order"), (Func<string>)(() => "Defines the order of events."));
 			SettingEntry<float> eventBackgroundOpacity = base.DrawerSettings.DefineSetting<float>(name + "-eventBackgroundOpacity", 1f, (Func<string>)(() => "Event Background Opacity"), (Func<string>)(() => "Defines the opacity of the individual event backgrounds."));
 			SettingComplianceExtensions.SetRange(eventBackgroundOpacity, 0.1f, 1f);
@@ -409,7 +413,7 @@ namespace Estreya.BlishHUD.EventTable
 			SettingEntry<bool> showCategoryNames = base.DrawerSettings.DefineSetting<bool>(name + "-showCategoryNames", false, (Func<string>)(() => "Show Category Names"), (Func<string>)(() => "Defines if the category names should be shown before the event bars."));
 			SettingEntry<Color> categoryNameColor = base.DrawerSettings.DefineSetting<Color>(name + "-categoryNameColor", base.DefaultGW2Color, (Func<string>)(() => "Category Name Color"), (Func<string>)(() => "Defines the color of the category names."));
 			SettingEntry<bool> enableColorGradients = base.DrawerSettings.DefineSetting<bool>(name + "-enableColorGradients", false, (Func<string>)(() => "Enable Color Gradients"), (Func<string>)(() => "Defines if supported events should have a smoother color gradient from and to the next event."));
-			SettingEntry<string> eventTimespanDaysFormatString = base.DrawerSettings.DefineSetting<string>(name + "-eventTimespanDaysFormatString", "dd\\.hh\\:mm\\:ss", (Func<string>)(() => "Days Format String"), (Func<string>)(() => "Defines the format strings for timespans over 1 day."));
+			SettingEntry<string> eventTimespanDaysFormatString = base.DrawerSettings.DefineSetting<string>(name + "-eventTimespanDaysFormatString", "DD\\.hh\\:mm\\:ss", (Func<string>)(() => "Days Format String"), (Func<string>)(() => "Defines the format strings for timespans over 1 day."));
 			SettingEntry<string> eventTimespanHoursFormatString = base.DrawerSettings.DefineSetting<string>(name + "-eventTimespanHoursFormatString", "hh\\:mm\\:ss", (Func<string>)(() => "Hours Format String"), (Func<string>)(() => "Defines the format strings for timespans over 1 hours."));
 			SettingEntry<string> eventTimespanMinutesFormatString = base.DrawerSettings.DefineSetting<string>(name + "-eventTimespanMinutesFormatString", "mm\\:ss", (Func<string>)(() => "Minutes Format String"), (Func<string>)(() => "Defines the fallback format strings for timespans."));
 			SettingEntry<string> eventAbsoluteTimeFormatString = base.DrawerSettings.DefineSetting<string>(name + "-eventAbsoluteTimeFormatString", "HH\\:mm", (Func<string>)(() => "Absolute Time Format String"), (Func<string>)(() => "Defines the format strings for absolute time."));
@@ -826,6 +830,26 @@ namespace Estreya.BlishHUD.EventTable
 			{
 				Logger.Warn("Setting \"DisableRemindersWhenEventFinishedArea\" has the invalid area \"" + disableRemindersWhenEventFinishedArea + "\" set and will be reset to \"Any\".");
 				DisableRemindersWhenEventFinishedArea.set_Value("Any");
+			}
+		}
+
+		protected override void PerformMigration(Version? lastModuleVersion, Version currentModuleVersion)
+		{
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001a: Expected O, but got Unknown
+			if (!(lastModuleVersion == (Version)null) && !(lastModuleVersion <= new Version("3.15.0", false)))
+			{
+				return;
+			}
+			foreach (string item in EventAreaNames.get_Value())
+			{
+				string entryKey = item + "-eventTimespanDaysFormatString";
+				SettingEntry<string> daysFormatStringSetting = base.DrawerSettings.get_Item(entryKey) as SettingEntry<string>;
+				if (daysFormatStringSetting != null && daysFormatStringSetting.get_Value() == "dd\\.hh\\:mm\\:ss")
+				{
+					daysFormatStringSetting.set_Value("DD\\.hh\\:mm\\:ss");
+					Logger.Info("Performed migration of " + entryKey);
+				}
 			}
 		}
 

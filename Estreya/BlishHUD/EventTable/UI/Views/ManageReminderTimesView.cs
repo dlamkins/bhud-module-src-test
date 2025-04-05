@@ -10,6 +10,8 @@ using Estreya.BlishHUD.Shared.Controls;
 using Estreya.BlishHUD.Shared.Services;
 using Estreya.BlishHUD.Shared.UI.Views;
 using Microsoft.Xna.Framework;
+using NodaTime;
+using NodaTime.Extensions;
 
 namespace Estreya.BlishHUD.EventTable.UI.Views
 {
@@ -19,9 +21,9 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		private readonly bool _showKeepCustomizedQuestion;
 
-		private readonly List<TimeSpan> _reminderTimes = new List<TimeSpan>();
+		private readonly List<Duration> _reminderTimes = new List<Duration>();
 
-		public event EventHandler<(Event Event, List<TimeSpan> ReminderTimes, bool KeepCustomized)> SaveClicked;
+		public event EventHandler<(Event Event, List<Duration> ReminderTimes, bool KeepCustomized)> SaveClicked;
 
 		public event EventHandler CancelClicked;
 
@@ -107,12 +109,12 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			});
 			RenderButton((Panel)(object)buttonGroup, base.TranslationService.GetTranslation("manageReminderTimesView-btn-save", "Save"), delegate
 			{
-				EventHandler<(Event Event, List<TimeSpan> ReminderTimes, bool KeepCustomized)> saveClicked = this.SaveClicked;
+				EventHandler<(Event Event, List<Duration> ReminderTimes, bool KeepCustomized)> saveClicked = this.SaveClicked;
 				if (saveClicked != null)
 				{
 					ManageReminderTimesView sender = this;
 					Event ev = _ev;
-					List<TimeSpan> reminderTimes = _reminderTimes;
+					List<Duration> reminderTimes = _reminderTimes;
 					Checkbox obj = keepCustomizedCheckBox;
 					saveClicked(sender, (ev, reminderTimes, obj != null && obj.get_Checked()));
 				}
@@ -128,7 +130,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			//IL_00d0: Expected O, but got Unknown
 			((Container)parent).ClearChildren();
 			Panel lastTimeSection = null;
-			foreach (TimeSpan reminderTime in _reminderTimes)
+			foreach (Duration reminderTime in _reminderTimes)
 			{
 				lastTimeSection = AddTimeSection(parent, reminderTime, _reminderTimes.Count == 1);
 			}
@@ -151,7 +153,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			Panel addButtonPanel = val;
 			Button button = RenderButton(addButtonPanel, base.TranslationService.GetTranslation("manageReminderTimesView-btn-add", "Add"), delegate
 			{
-				_reminderTimes.Add(TimeSpan.Zero);
+				_reminderTimes.Add(Duration.Zero);
 				RenderTimes(parent);
 			});
 			((Control)button).set_Left(x);
@@ -160,7 +162,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			button.ResizeIcon = false;
 		}
 
-		private Panel AddTimeSection(Panel parent, TimeSpan time, bool disableRemove)
+		private Panel AddTimeSection(Panel parent, Duration time, bool disableRemove)
 		{
 			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
@@ -192,10 +194,10 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			{
 				try
 				{
-					TimeSpan timeSpan3 = new TimeSpan(int.Parse(e.get_NewValue()), time.Minutes, time.Seconds) { };
-					int index3;
-					_reminderTimes[index3] = timeSpan3;
-					time = timeSpan3;
+					Duration duration3 = new TimeSpan(int.Parse(e.get_NewValue()), time.Minutes, time.Seconds).ToDuration();
+					int index3 = _reminderTimes.IndexOf(time);
+					_reminderTimes[index3] = duration3;
+					time = duration3;
 				}
 				catch (Exception ex3)
 				{
@@ -219,10 +221,10 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			{
 				try
 				{
-					TimeSpan timeSpan2 = new TimeSpan(time.Hours, int.Parse(e.get_NewValue()), time.Seconds) { };
-					int index2;
-					_reminderTimes[index2] = timeSpan2;
-					time = timeSpan2;
+					Duration duration2 = new TimeSpan(time.Hours, int.Parse(e.get_NewValue()), time.Seconds).ToDuration();
+					int index2 = _reminderTimes.IndexOf(time);
+					_reminderTimes[index2] = duration2;
+					time = duration2;
 				}
 				catch (Exception ex2)
 				{
@@ -246,10 +248,10 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			{
 				try
 				{
-					TimeSpan timeSpan = new TimeSpan(time.Hours, time.Minutes, int.Parse(e.get_NewValue())) { };
-					int index;
-					_reminderTimes[index] = timeSpan;
-					time = timeSpan;
+					Duration duration = new TimeSpan(time.Hours, time.Minutes, int.Parse(e.get_NewValue())).ToDuration();
+					int index = _reminderTimes.IndexOf(time);
+					_reminderTimes[index] = duration;
+					time = duration;
 				}
 				catch (Exception ex)
 				{

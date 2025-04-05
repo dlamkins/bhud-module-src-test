@@ -15,6 +15,8 @@ using Estreya.BlishHUD.Shared.Services.Audio;
 using Estreya.BlishHUD.Shared.Threading.Events;
 using Estreya.BlishHUD.Shared.Utils;
 using Microsoft.Xna.Framework;
+using NodaTime;
+using NodaTime.Extensions;
 
 namespace Estreya.BlishHUD.EventTable.Managers
 {
@@ -97,7 +99,7 @@ namespace Estreya.BlishHUD.EventTable.Managers
 
 		private Task RequestAddEventState(object sender, ContextEventArgs<AddEventState> e)
 		{
-			_eventStateService.Add(e.Content.AreaName, e.Content.EventKey, e.Content.Until, e.Content.State);
+			_eventStateService.Add(e.Content.AreaName, e.Content.EventKey, e.Content.Until.ToUniversalTime().ToInstant(), e.Content.State);
 			return Task.CompletedTask;
 		}
 
@@ -229,24 +231,24 @@ namespace Estreya.BlishHUD.EventTable.Managers
 					APICodeType = eArgsContent.APICodeType,
 					BackgroundColorCode = eArgsContent.BackgroundColorCode,
 					BackgroundColorGradientCodes = eArgsContent.BackgroundColorGradientCodes,
-					Duration = eArgsContent.Duration,
+					Duration = Duration.FromMinutes(eArgsContent.Duration),
 					Filler = eArgsContent.Filler,
 					Icon = eArgsContent.Icon,
 					Location = eArgsContent.Location,
 					MapIds = eArgsContent.MapIds,
-					Offset = eArgsContent.Offset,
-					Repeat = eArgsContent.Repeat,
-					StartingDate = eArgsContent.StartingDate,
+					Offset = eArgsContent.Offset.ToDuration(),
+					Repeat = eArgsContent.Repeat.ToDuration(),
+					StartingDate = (eArgsContent.StartingDate.HasValue ? new LocalDate?(LocalDate.FromDateTime(eArgsContent.StartingDate.Value)) : null),
 					Waypoints = eArgsContent.Waypoints,
 					Wiki = eArgsContent.Wiki
 				};
 				if (eArgsContent.Occurences != null)
 				{
-					newEvent.Occurences.AddRange(eArgsContent.Occurences);
+					newEvent.Occurences.AddRange(eArgsContent.Occurences.Select((DateTime x) => x.ToUniversalTime().ToInstant()));
 				}
 				if (eArgsContent.ReminderTimes != null)
 				{
-					newEvent.UpdateReminderTimes(eArgsContent.ReminderTimes);
+					newEvent.UpdateReminderTimes(eArgsContent.ReminderTimes.Select((TimeSpan x) => x.ToDuration()).ToArray());
 				}
 				if (newEvent.Filler)
 				{

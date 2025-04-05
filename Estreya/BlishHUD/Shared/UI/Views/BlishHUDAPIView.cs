@@ -30,7 +30,7 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 
 		private readonly IFlurlClient _flurlClient;
 
-		private KofiStatus _kofiStatus;
+		protected KofiStatus _kofiStatus;
 
 		private FlowPanel _mainParent;
 
@@ -39,6 +39,8 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 		private Texture2D _kofiLogo;
 
 		protected BlishHudApiService BlishHUDAPIService { get; }
+
+		protected virtual bool DrawKofiStatus => false;
 
 		public BlishHUDAPIView(Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, BlishHudApiService blishHudApiService, IFlurlClient flurlClient)
 			: base(apiManager, iconService, translationService)
@@ -60,6 +62,8 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
 			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_007b: Expected O, but got Unknown
+			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Parent((Container)(object)parent);
 			((Control)val).set_Width(((Container)parent).get_ContentRegion().Width - PADDING.X * 2);
@@ -69,6 +73,29 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			val.set_FlowDirection((ControlFlowDirection)3);
 			_mainParent = val;
 			BuildLoginSection(_mainParent);
+			FormattedLabelBuilder description = GetDescriptionBuilder();
+			if (description != null)
+			{
+				RenderEmptyLine((Panel)(object)_mainParent);
+				((Control)description.SetWidth(((Container)_mainParent).get_ContentRegion().Width - (int)_mainParent.get_OuterControlPadding().X * 2).Wrap().AutoSizeHeight()
+					.Build()).set_Parent((Container)(object)_mainParent);
+			}
+			if (DrawKofiStatus)
+			{
+				RenderEmptyLine((Panel)(object)_mainParent);
+				RenderKofiStatus(_mainParent);
+				if (BlishHUDAPIService != null)
+				{
+					BlishHUDAPIService.NewLogin += RedrawKofiStatusGroup;
+					BlishHUDAPIService.RefreshedLogin += RedrawKofiStatusGroup;
+					BlishHUDAPIService.LoggedOut += RedrawKofiStatusGroup;
+				}
+			}
+		}
+
+		protected virtual FormattedLabelBuilder GetDescriptionBuilder()
+		{
+			return null;
 		}
 
 		private void RenderKofiStatus(FlowPanel flowPanel)
@@ -80,9 +107,12 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0048: Expected O, but got Unknown
-			//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0064: Expected O, but got Unknown
+			//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
 			if (_kofiStatusGroup == null)
 			{
 				FlowPanel val = new FlowPanel();
@@ -90,6 +120,8 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 				((Control)val).set_Width(((Container)flowPanel).get_ContentRegion().Width - (int)flowPanel.get_OuterControlPadding().X * 2);
 				((Container)val).set_HeightSizingMode((SizingMode)1);
 				val.set_FlowDirection((ControlFlowDirection)3);
+				((Panel)val).set_ShowBorder(true);
+				val.set_OuterControlPadding(new Vector2(20f, 20f));
 				_kofiStatusGroup = val;
 			}
 			bool subscriptionActive = _kofiStatus?.Active ?? false;
@@ -155,6 +187,7 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 				{
 				});
 			((Control)labelBuilder2.Build()).set_Parent((Container)(object)_kofiStatusGroup);
+			RenderEmptyLine((Panel)(object)_kofiStatusGroup, 20);
 		}
 
 		private async void RedrawKofiStatusGroup(object sender, EventArgs e)
@@ -242,8 +275,11 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 
 		protected override async Task<bool> InternalLoad(IProgress<string> progress)
 		{
-			await LoadKofiStatus();
-			await LoadKofiLogo();
+			if (DrawKofiStatus)
+			{
+				await LoadKofiStatus();
+				await LoadKofiLogo();
+			}
 			return true;
 		}
 

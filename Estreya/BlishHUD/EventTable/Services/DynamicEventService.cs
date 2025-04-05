@@ -17,7 +17,7 @@ namespace Estreya.BlishHUD.EventTable.Services
 {
 	public class DynamicEventService : APIService<DynamicEvent>
 	{
-		private readonly string _apiBaseUrl;
+		private readonly string _moduleApiUrl;
 
 		private readonly string _directoryBasePath;
 
@@ -31,17 +31,17 @@ namespace Estreya.BlishHUD.EventTable.Services
 
 		private const string FILE_NAME = "custom.json";
 
-		private string API_URL => _apiBaseUrl.TrimEnd('/') + "/v1/gw2/dynamicEvents";
+		private string API_URL => _moduleApiUrl.TrimEnd('/') + "/dynamic-events";
 
 		public List<DynamicEvent> Events => base.APIObjectList.Concat(_customEvents).ToList();
 
 		public event AsyncEventHandler CustomEventsUpdated;
 
-		public DynamicEventService(APIServiceConfiguration configuration, Gw2ApiManager apiManager, IFlurlClient flurlClient, string apiBaseUrl, string directoryBasePath)
+		public DynamicEventService(APIServiceConfiguration configuration, Gw2ApiManager apiManager, IFlurlClient flurlClient, string moduleApiUrl, string directoryBasePath)
 			: base(apiManager, configuration)
 		{
 			_flurlClient = flurlClient;
-			_apiBaseUrl = apiBaseUrl;
+			_moduleApiUrl = moduleApiUrl;
 			_directoryBasePath = directoryBasePath;
 		}
 

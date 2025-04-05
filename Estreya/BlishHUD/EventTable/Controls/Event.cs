@@ -13,6 +13,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
 using MonoGame.Extended.BitmapFonts;
+using NodaTime;
 
 namespace Estreya.BlishHUD.EventTable.Controls
 {
@@ -20,7 +21,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 	{
 		private static Logger logger = Logger.GetLogger<Event>();
 
-		private readonly DateTime _endTime;
+		private readonly Instant _endTime;
 
 		private readonly Func<Color[]> _getColorAction;
 
@@ -32,7 +33,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		private readonly Func<BitmapFont> _getFontAction;
 
-		private readonly Func<DateTime> _getNowAction;
+		private readonly Func<Instant> _getNowAction;
 
 		private readonly Func<Color> _getShadowColor;
 
@@ -48,7 +49,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		private TranslationService _translationService;
 
-		public DateTime StartTime { get; private set; }
+		public Instant StartTime { get; private set; }
 
 		public Estreya.BlishHUD.EventTable.Models.Event Model { get; private set; }
 
@@ -66,7 +67,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		public event EventHandler DisableReminderClicked;
 
-		public Event(Estreya.BlishHUD.EventTable.Models.Event ev, IconService iconService, TranslationService translationService, Func<DateTime> getNowAction, DateTime startTime, DateTime endTime, Func<BitmapFont> getFontAction, Func<bool> getDrawBorders, Func<bool> getDrawCrossout, Func<Color> getTextColor, Func<Color[]> getColorAction, Func<bool> getDrawShadowAction, Func<Color> getShadowColor, Func<string> getDateTimeFormatString, Func<(string DaysFormat, string HoursFormat, string MinutesFormat)> getTimespanFormatStrings)
+		public Event(Estreya.BlishHUD.EventTable.Models.Event ev, IconService iconService, TranslationService translationService, Func<Instant> getNowAction, Instant startTime, Instant endTime, Func<BitmapFont> getFontAction, Func<bool> getDrawBorders, Func<bool> getDrawCrossout, Func<Color> getTextColor, Func<Color[]> getColorAction, Func<bool> getDrawShadowAction, Func<Color> getShadowColor, Func<string> getDateTimeFormatString, Func<(string DaysFormat, string HoursFormat, string MinutesFormat)> getTimespanFormatStrings)
 		{
 			Model = ev;
 			_iconService = iconService;
@@ -218,27 +219,27 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		public Tooltip BuildTooltip()
 		{
-			//IL_01be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c4: Expected O, but got Unknown
-			DateTime now = _getNowAction();
-			bool num = StartTime.AddMinutes(Model.Duration) < now;
+			//IL_01bc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c2: Expected O, but got Unknown
+			Instant now = _getNowAction();
+			bool num = StartTime.Plus(Model.Duration) < now;
 			bool isNext = !num && StartTime > now;
 			bool isCurrent = !num && !isNext;
 			string description = Model.Location + ((!string.IsNullOrWhiteSpace(Model.Location)) ? "\n" : string.Empty) + "\n";
 			if (num)
 			{
-				TimeSpan finishedSince = now - StartTime.AddMinutes(Model.Duration);
-				description = description + _translationService.GetTranslation("event-tooltip-finishedSince", "Finished since") + ": " + FormatTimespan(finishedSince);
+				Duration finishedSince = now - StartTime.Plus(Model.Duration);
+				description = description + _translationService.GetTranslation("event-tooltip-finishedSince", "Finished since") + ": " + FormatDuration(finishedSince);
 			}
 			else if (isNext)
 			{
-				TimeSpan startsIn = StartTime - now;
-				description = description + _translationService.GetTranslation("event-tooltip-startsIn", "Starts in") + ": " + FormatTimespan(startsIn);
+				Duration startsIn = StartTime - now;
+				description = description + _translationService.GetTranslation("event-tooltip-startsIn", "Starts in") + ": " + FormatDuration(startsIn);
 			}
 			else if (isCurrent)
 			{
-				TimeSpan remaining = GetTimeRemaining(now);
-				description = description + _translationService.GetTranslation("event-tooltip-remaining", "Remaining") + ": " + FormatTimespan(remaining);
+				Duration remaining = GetTimeRemaining(now);
+				description = description + _translationService.GetTranslation("event-tooltip-remaining", "Remaining") + ": " + FormatDuration(remaining);
 			}
 			description = description + " (" + _translationService.GetTranslation("event-tooltip-startsAt", "Starts at") + ": " + FormatAbsoluteTime(StartTime) + ")";
 			return new Tooltip((ITooltipView)(object)new TooltipView(Model.Name, description, _iconService.GetIcon(Model.Icon), _translationService));
@@ -339,10 +340,10 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			{
 				return;
 			}
-			TimeSpan remainingTime = GetTimeRemaining(_getNowAction());
-			if (!(remainingTime == TimeSpan.Zero))
+			Duration remainingTime = GetTimeRemaining(_getNowAction());
+			if (!(remainingTime == Duration.Zero))
 			{
-				string remainingTimeString = FormatTimespan(remainingTime);
+				string remainingTimeString = FormatDuration(remainingTime);
 				float timeWidth = (float)Math.Ceiling(font.MeasureString(remainingTimeString).Width);
 				float maxWidth = bounds.Width - nameWidth;
 				float centerX = maxWidth / 2f - timeWidth / 2f;
@@ -360,13 +361,13 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			}
 		}
 
-		private TimeSpan GetTimeRemaining(DateTime now)
+		private Duration GetTimeRemaining(Instant now)
 		{
 			if (!(now <= StartTime) && !(now >= _endTime))
 			{
-				return StartTime.AddMinutes(Model.Duration) - now;
+				return StartTime.Plus(Model.Duration) - now;
 			}
-			return TimeSpan.Zero;
+			return Duration.Zero;
 		}
 
 		private void DrawCrossout(SpriteBatch spriteBatch, RectangleF bounds)
@@ -379,7 +380,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			}
 		}
 
-		private string FormatTimespan(TimeSpan ts)
+		private string FormatDuration(Duration ts)
 		{
 			(string, string, string) formatStrings = _getTimespanFormatStrings();
 			try
@@ -401,11 +402,11 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			}
 		}
 
-		private string FormatAbsoluteTime(DateTime dt)
+		private string FormatAbsoluteTime(Instant dt)
 		{
 			try
 			{
-				return dt.ToLocalTime().ToString(_getAbsoluteTimeFormatStrings(), CultureInfo.InvariantCulture);
+				return dt.ToDateTimeUtc().ToLocalTime().ToString(_getAbsoluteTimeFormatStrings(), CultureInfo.InvariantCulture);
 			}
 			catch (Exception ex)
 			{

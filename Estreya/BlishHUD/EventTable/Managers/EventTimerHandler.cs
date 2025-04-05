@@ -21,6 +21,7 @@ using Humanizer.Localisation;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended;
 using MonoGame.Extended.BitmapFonts;
+using NodaTime;
 
 namespace Estreya.BlishHUD.EventTable.Managers
 {
@@ -44,7 +45,7 @@ namespace Estreya.BlishHUD.EventTable.Managers
 
 		private readonly Func<Task<List<Event>>> _getEvents;
 
-		private readonly Func<DateTime> _getNow;
+		private readonly Func<Instant> _getNow;
 
 		private readonly MapUtil _mapUtil;
 
@@ -62,7 +63,7 @@ namespace Estreya.BlishHUD.EventTable.Managers
 
 		public event EventHandler FoundLostEntities;
 
-		public EventTimerHandler(Func<Task<List<Event>>> getEvents, Func<DateTime> getNow, MapUtil mapUtil, Gw2ApiManager apiManager, ModuleSettings moduleSettings, TranslationService translationService, IconService iconService)
+		public EventTimerHandler(Func<Task<List<Event>>> getEvents, Func<Instant> getNow, MapUtil mapUtil, Gw2ApiManager apiManager, ModuleSettings moduleSettings, TranslationService translationService, IconService iconService)
 		{
 			_getEvents = getEvents;
 			_getNow = getNow;
@@ -337,11 +338,11 @@ namespace Estreya.BlishHUD.EventTable.Managers
 					new Size(128, 128);
 					Func<string> remainingText = delegate
 					{
-						DateTime currentOccurrence = ev.GetCurrentOccurrence();
+						Instant currentOccurrence = ev.GetCurrentOccurrence();
 						string text = "---";
-						if (currentOccurrence != default(DateTime))
+						if (currentOccurrence != default(Instant))
 						{
-							text = (currentOccurrence.AddMinutes(ev.Duration) - _getNow()).Humanize(2, null, TimeUnit.Week, TimeUnit.Second);
+							text = (currentOccurrence.Plus(ev.Duration) - _getNow()).ToTimeSpan().Humanize(2, null, TimeUnit.Week, TimeUnit.Second);
 						}
 						return "Current remaining: " + text;
 					};
@@ -349,14 +350,14 @@ namespace Estreya.BlishHUD.EventTable.Managers
 					float remainingScale = 0.4f;
 					float remainingScaleWidth = 2.75f;
 					Color remainingColor = ColorExtensions.ToXnaColor(_moduleSettings.EventTimersRemainingTextColor.get_Value().get_Cloth());
-					Func<string> startsInText = () => "Next in: " + (ev.GetNextOccurrence() - _getNow()).Humanize(2, null, TimeUnit.Week, TimeUnit.Second);
+					Func<string> startsInText = () => "Next in: " + (ev.GetNextOccurrence() - _getNow()).ToTimeSpan().Humanize(2, null, TimeUnit.Week, TimeUnit.Second);
 					BitmapFont startsInFont = GetFont((FontSize)36);
 					float startsInScale = 0.4f;
 					float startsInScaleWidth = 2.5f;
 					Color startsInColor = ColorExtensions.ToXnaColor(_moduleSettings.EventTimersStartsInTextColor.get_Value().get_Cloth());
 					float nextOccurrenceScale = 0.4f;
 					float nextOccurrenceScaleWidth = 2f;
-					Func<string> nextOccurrenceText = () => ev.GetNextOccurrence().ToLocalTime().ToString();
+					Func<string> nextOccurrenceText = () => ev.GetNextOccurrence().InZone(DateTimeZoneProviders.Tzdb.GetSystemDefault()).ToString();
 					Color nextOccurrenceColor = ColorExtensions.ToXnaColor(_moduleSettings.EventTimersNextOccurenceTextColor.get_Value().get_Cloth());
 					BitmapFont nextOccurrenceFont = GetFont((FontSize)36);
 					Func<string> nameText = () => ev.Name ?? "";
@@ -369,7 +370,7 @@ namespace Estreya.BlishHUD.EventTable.Managers
 					float durationScale = 0.4f;
 					float durationScaleWidth = 2f;
 					Color durationColor = ColorExtensions.ToXnaColor(_moduleSettings.EventTimersDurationTextColor.get_Value().get_Cloth());
-					Func<string> repeatText = () => "Repeats every: " + ev.Repeat.Humanize();
+					Func<string> repeatText = () => "Repeats every: " + ev.Repeat.ToTimeSpan().Humanize();
 					BitmapFont repeatFont = GetFont((FontSize)36);
 					float repeatScale = 0.4f;
 					float repeatScaleWidth = 2f;

@@ -2,10 +2,10 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using Blish_HUD;
 using Estreya.BlishHUD.Shared.Attributes;
-using Estreya.BlishHUD.Shared.Json.Converter;
 using Estreya.BlishHUD.Shared.Services;
 using Estreya.BlishHUD.Shared.Utils;
 using Gw2Sharp.WebApi.V2.Models;
@@ -13,6 +13,7 @@ using Humanizer;
 using Humanizer.Localisation;
 using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
+using NodaTime;
 
 namespace Estreya.BlishHUD.EventTable.Models
 {
@@ -23,11 +24,11 @@ namespace Estreya.BlishHUD.EventTable.Models
 		private static readonly Logger Logger = Logger.GetLogger<Event>();
 
 		[IgnoreCopy]
-		private static TimeSpan _checkForRemindersInterval = TimeSpan.FromMilliseconds(5000.0);
+		private static Duration _checkForRemindersInterval = Duration.FromMilliseconds(5000L);
 
 		[JsonIgnore]
 		[IgnoreCopy]
-		private Func<DateTime> _getNowAction;
+		private Func<Instant> _getNowAction;
 
 		[JsonIgnore]
 		[IgnoreCopy]
@@ -37,7 +38,7 @@ namespace Estreya.BlishHUD.EventTable.Models
 		private double _lastCheckForReminders;
 
 		[JsonIgnore]
-		private ConcurrentDictionary<DateTime, List<TimeSpan>> _remindedFor = new ConcurrentDictionary<DateTime, List<TimeSpan>>();
+		private ConcurrentDictionary<Instant, List<Duration>> _remindedFor = new ConcurrentDictionary<Instant, List<Duration>>();
 
 		[Description("Specifies the key of the event. Should be unique for a event category. Avoid changing it, as it resets saved settings and states.")]
 		[JsonProperty("key")]
@@ -47,24 +48,13 @@ namespace Estreya.BlishHUD.EventTable.Models
 		public string Name { get; set; }
 
 		[JsonProperty("offset")]
-		[JsonConverter(typeof(TimeSpanJsonConverter), new object[]
-		{
-			"dd\\.hh\\:mm\\:ss",
-			new string[] { "dd\\.hh\\:mm\\:ss", "hh\\:mm\\:ss" }
-		})]
-		public TimeSpan Offset { get; set; }
+		public Duration Offset { get; set; }
 
 		[JsonProperty("repeat")]
-		[JsonConverter(typeof(TimeSpanJsonConverter), new object[]
-		{
-			"dd\\.hh\\:mm\\:ss",
-			new string[] { "dd\\.hh\\:mm\\:ss", "hh\\:mm\\:ss" }
-		})]
-		public TimeSpan Repeat { get; set; }
+		public Duration Repeat { get; set; }
 
 		[JsonProperty("startingDate")]
-		[JsonConverter(typeof(DateJsonConverter))]
-		public DateTime? StartingDate { get; set; }
+		public LocalDate? StartingDate { get; set; }
 
 		[JsonProperty("location")]
 		public string Location { get; set; }
@@ -82,7 +72,7 @@ namespace Estreya.BlishHUD.EventTable.Models
 		public string Wiki { get; set; }
 
 		[JsonProperty("duration")]
-		public int Duration { get; set; }
+		public Duration Duration { get; set; }
 
 		[JsonProperty("icon")]
 		public string Icon { get; set; }
@@ -108,8 +98,8 @@ namespace Estreya.BlishHUD.EventTable.Models
 		[JsonProperty("filler")]
 		public bool Filler { get; set; }
 
-		[JsonProperty("occurences")]
-		public List<DateTime> Occurences { get; set; } = new List<DateTime>();
+		[JsonProperty("occurrences")]
+		public List<Instant> Occurences { get; set; } = new List<Instant>();
 
 
 		[JsonIgnore]
@@ -119,30 +109,24 @@ namespace Estreya.BlishHUD.EventTable.Models
 		public WeakReference<EventCategory> Category { get; private set; }
 
 		[JsonProperty("reminderTimes")]
-		[JsonConverter(typeof(TimeSpanArrayJsonConverter), new object[]
-		{
-			"hh\\:mm\\:ss",
-			new string[] { "hh\\:mm", "hh\\:mm\\:ss" },
-			true
-		})]
-		public TimeSpan[] ReminderTimes { get; private set; } = new TimeSpan[1] { TimeSpan.FromMinutes(10.0) };
+		public Duration[] ReminderTimes { get; private set; } = new Duration[1] { Duration.FromMinutes(10L) };
 
 
-		public event EventHandler<TimeSpan> Reminder;
+		public event EventHandler<Duration> Reminder;
 
 		public void Update(GameTime gameTime)
 		{
 			UpdateUtil.Update(CheckForReminder, gameTime, _checkForRemindersInterval.TotalMilliseconds, ref _lastCheckForReminders);
 		}
 
-		public double CalculateXPosition(DateTime start, DateTime min, double pixelPerMinute)
+		public double CalculateXPosition(Instant start, Instant min, double pixelPerMinute)
 		{
-			return start.Subtract(min).TotalMinutes * pixelPerMinute;
+			return start.Minus(min).TotalMinutes * pixelPerMinute;
 		}
 
-		public double CalculateWidth(DateTime eventOccurence, DateTime min, int maxWidth, double pixelPerMinute)
+		public double CalculateWidth(Instant eventOccurence, Instant min, int maxWidth, double pixelPerMinute)
 		{
-			double eventWidth = (double)Duration * pixelPerMinute;
+			double eventWidth = Duration.TotalMinutes * pixelPerMinute;
 			double x = CalculateXPosition(eventOccurence, min, pixelPerMinute);
 			if (x < 0.0)
 			{
@@ -155,7 +139,7 @@ namespace Estreya.BlishHUD.EventTable.Models
 			return eventWidth;
 		}
 
-		public void Load(EventCategory ec, Func<DateTime> getNowAction, TranslationService translationService = null)
+		public void Load(EventCategory ec, Func<Instant> getNowAction, TranslationService translationService = null)
 		{
 			if (string.IsNullOrWhiteSpace(Key))
 			{
@@ -181,18 +165,18 @@ namespace Estreya.BlishHUD.EventTable.Models
 			{
 				return;
 			}
-			DateTime nowUTC = _getNowAction();
-			foreach (DateTime occurence in Occurences.Where((DateTime o) => o >= nowUTC))
+			Instant nowUTC = _getNowAction();
+			foreach (Instant occurence in Occurences.Where((Instant o) => o >= nowUTC))
 			{
-				List<TimeSpan> alreadyRemindedTimes = _remindedFor.GetOrAdd(occurence, (DateTime o) => new List<TimeSpan>());
-				List<(TimeSpan, TimeSpan)> eligableTimes = new List<(TimeSpan, TimeSpan)>();
-				TimeSpan[] reminderTimes = ReminderTimes;
-				foreach (TimeSpan time in reminderTimes)
+				List<Duration> alreadyRemindedTimes = _remindedFor.GetOrAdd(occurence, (Instant o) => new List<Duration>());
+				List<(Duration, Duration)> eligableTimes = new List<(Duration, Duration)>();
+				Duration[] reminderTimes = ReminderTimes;
+				foreach (Duration time in reminderTimes)
 				{
 					if (!alreadyRemindedTimes.Contains(time))
 					{
-						DateTime remindAt = occurence - time;
-						TimeSpan diff = remindAt - nowUTC;
+						Instant remindAt = occurence - time;
+						Duration diff = remindAt - nowUTC;
 						if (remindAt < nowUTC || (remindAt >= nowUTC && diff.TotalSeconds <= 0.0))
 						{
 							eligableTimes.Add((time, occurence - nowUTC));
@@ -201,31 +185,31 @@ namespace Estreya.BlishHUD.EventTable.Models
 				}
 				if (eligableTimes.Count > 0)
 				{
-					eligableTimes.ForEach(delegate((TimeSpan reminderTime, TimeSpan timeLeft) et)
+					eligableTimes.ForEach(delegate((Duration reminderTime, Duration timeLeft) et)
 					{
 						alreadyRemindedTimes.Add(et.reminderTime);
 					});
-					this.Reminder?.Invoke(this, eligableTimes.OrderBy<(TimeSpan, TimeSpan), TimeSpan>(((TimeSpan reminderTime, TimeSpan timeLeft) et) => et.reminderTime).First().Item2);
+					this.Reminder?.Invoke(this, eligableTimes.OrderBy<(Duration, Duration), Duration>(((Duration reminderTime, Duration timeLeft) et) => et.reminderTime).First().Item2);
 				}
 			}
 		}
 
-		public void UpdateReminderTimes(TimeSpan[] reminderTimes)
+		public void UpdateReminderTimes(Duration[] reminderTimes)
 		{
 			ReminderTimes = reminderTimes;
 			_remindedFor.Clear();
 		}
 
-		public DateTime GetCurrentOccurrence()
+		public Instant GetCurrentOccurrence()
 		{
-			DateTime now = _getNowAction();
-			return Occurences.OrderBy((DateTime x) => x).FirstOrDefault((DateTime x) => x <= now && x.AddMinutes(Duration) >= now);
+			Instant now = _getNowAction();
+			return Occurences.OrderBy((Instant x) => x).FirstOrDefault((Instant x) => x <= now && x.Plus(Duration) >= now);
 		}
 
-		public DateTime GetNextOccurrence()
+		public Instant GetNextOccurrence()
 		{
-			DateTime now = _getNowAction();
-			return Occurences.OrderBy((DateTime x) => x).FirstOrDefault((DateTime x) => x >= now);
+			Instant now = _getNowAction();
+			return Occurences.OrderBy((Instant x) => x).FirstOrDefault((Instant x) => x >= now);
 		}
 
 		public string GetWaypoint(Account account)
@@ -242,29 +226,28 @@ namespace Estreya.BlishHUD.EventTable.Models
 			return Waypoints.EU;
 		}
 
-		public string GetChatText(EventChatFormat format, DateTime occurence, Account account)
+		public string GetChatText(EventChatFormat format, Instant occurence, Account account)
 		{
-			DateTime now = _getNowAction();
-			DateTime occurenceLocal = occurence.ToLocalTime();
-			DateTime endTime = occurence.AddMinutes(Duration);
+			Instant now = _getNowAction();
+			Instant endTime = occurence.Plus(Duration);
 			bool num = endTime < now;
 			bool isNext = !num && occurence > now;
 			bool isCurrent = !num && !isNext;
-			string timeString = occurenceLocal.ToString("HH:mm zzz");
+			string timeString = occurence.InZone(DateTimeZoneProviders.Tzdb.GetSystemDefault()).ToString("HH:mm zzz", CultureInfo.CurrentUICulture);
 			if (num)
 			{
-				TimeSpan finishedSince = now - occurence.AddMinutes(Duration);
-				timeString = _translationService.GetTranslation("event-chatText-finishedXAgo", "finished {0} ago").FormatWith(finishedSince.Humanize(2, null, TimeUnit.Week, TimeUnit.Second)) ?? "";
+				Duration finishedSince = now - occurence.Plus(Duration);
+				timeString = _translationService.GetTranslation("event-chatText-finishedXAgo", "finished {0} ago").FormatWith(finishedSince.ToTimeSpan().Humanize(2, null, TimeUnit.Week, TimeUnit.Second)) ?? "";
 			}
 			else if (isNext)
 			{
-				TimeSpan startsIn = occurence - now;
-				timeString = _translationService.GetTranslation("event-chatText-startsInX", "starts in {0}").FormatWith(startsIn.Humanize(2, null, TimeUnit.Week, TimeUnit.Second)) ?? "";
+				Duration startsIn = occurence - now;
+				timeString = _translationService.GetTranslation("event-chatText-startsInX", "starts in {0}").FormatWith(startsIn.ToTimeSpan().Humanize(2, null, TimeUnit.Week, TimeUnit.Second)) ?? "";
 			}
 			else if (isCurrent)
 			{
-				TimeSpan remaining = endTime - now;
-				timeString = _translationService.GetTranslation("event-chatText-hasXRemaining", "has {0} remaining").FormatWith(remaining.Humanize(2, null, TimeUnit.Week, TimeUnit.Second)) ?? "";
+				Duration remaining = endTime - now;
+				timeString = _translationService.GetTranslation("event-chatText-hasXRemaining", "has {0} remaining").FormatWith(remaining.ToTimeSpan().Humanize(2, null, TimeUnit.Week, TimeUnit.Second)) ?? "";
 			}
 			string waypoint = GetWaypoint(account);
 			return format switch

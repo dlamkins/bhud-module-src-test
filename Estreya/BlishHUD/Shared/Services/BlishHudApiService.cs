@@ -19,9 +19,9 @@ namespace Estreya.BlishHUD.Shared.Services
 	{
 		private const string API_PASSWORD_KEY = "estreyaBlishHudAPI";
 
-		private const int API_VERSION_AUTH = 1;
+		private const int API_VERSION_AUTH = 2;
 
-		private const int API_VERSION_KOFI = 1;
+		private const int API_VERSION_KOFI = 2;
 
 		private static TimeSpan _checkAPITokenInterval = TimeSpan.FromMinutes(5.0);
 
@@ -165,7 +165,11 @@ namespace Estreya.BlishHUD.Shared.Services
 					}
 					return;
 				}
-				APITokens tokens = JsonConvert.DeserializeObject<APITokens>(await (await _flurlClient.Request(_apiRootUrl, $"v{1}", "auth", "login").PostJsonAsync(new { username, password }, default(CancellationToken), (HttpCompletionOption)0)).get_Content().ReadAsStringAsync());
+				APITokens tokens = JsonConvert.DeserializeObject<APITokens>(await (await _flurlClient.Request(_apiRootUrl, $"v{2}", "auth", "login").PostJsonAsync(new
+				{
+					name = username,
+					password = password
+				}, default(CancellationToken), (HttpCompletionOption)0)).get_Content().ReadAsStringAsync());
 				if (!dryRun)
 				{
 					ApiJwtPayload? priorPayload = GetTokenPayload();
@@ -208,7 +212,7 @@ namespace Estreya.BlishHUD.Shared.Services
 				{
 					throw new ArgumentNullException("Refresh API Token");
 				}
-				APITokens tokens = JsonConvert.DeserializeObject<APITokens>(await (await _flurlClient.Request(_apiRootUrl, $"v{1}", "auth", "refresh").PostJsonAsync(new
+				APITokens tokens = JsonConvert.DeserializeObject<APITokens>(await (await _flurlClient.Request(_apiRootUrl, $"v{2}", "auth", "refresh").PostJsonAsync(new
 				{
 					refreshToken = APITokens.Value.RefreshToken
 				}, default(CancellationToken), (HttpCompletionOption)0)).get_Content().ReadAsStringAsync());
@@ -267,7 +271,7 @@ namespace Estreya.BlishHUD.Shared.Services
 			{
 				throw new ArgumentNullException("AccessToken", "No access token available.");
 			}
-			return await _flurlClient.Request(_apiRootUrl, $"v{1}", "ko-fi", "status").WithOAuthBearerToken(AccessToken).GetJsonAsync<KofiStatus>(default(CancellationToken), (HttpCompletionOption)0);
+			return await _flurlClient.Request(_apiRootUrl, $"v{2}", "ko-fi", "status").WithOAuthBearerToken(AccessToken).GetJsonAsync<KofiStatus>(default(CancellationToken), (HttpCompletionOption)0);
 		}
 
 		public async Task<bool> IsSubscriptionActive()
