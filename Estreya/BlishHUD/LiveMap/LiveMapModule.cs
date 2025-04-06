@@ -4,7 +4,6 @@ using System.ComponentModel.Composition;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,6 +14,7 @@ using Blish_HUD.Graphics.UI;
 using Blish_HUD.Modules;
 using Blish_HUD.Settings;
 using Estreya.BlishHUD.LiveMap.Models.Player;
+using Estreya.BlishHUD.LiveMap.SignalR;
 using Estreya.BlishHUD.LiveMap.UI.Views;
 using Estreya.BlishHUD.Shared.Extensions;
 using Estreya.BlishHUD.Shared.Helpers;
@@ -26,9 +26,12 @@ using Flurl.Util;
 using Gw2Sharp.WebApi.V2;
 using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Xna.Framework;
 using SocketIOClient;
-using SocketIOClient.Transport;
 
 namespace Estreya.BlishHUD.LiveMap
 {
@@ -57,15 +60,15 @@ namespace Estreya.BlishHUD.LiveMap
 
 		private TimeSpan _wvwFetchInterval = TimeSpan.FromHours(1.0);
 
-		private SocketIO GlobalSocket;
+		private HubConnection _hubConnection;
 
-		private string LIVE_MAP_API_URL => base.MODULE_API_URL + "/write";
+		private string LIVE_MAP_API_URL => base.MODULE_API_URL + "/writer";
 
 		public string GuildId { get; private set; }
 
 		protected override string UrlModuleName => "live-map";
 
-		protected override string API_VERSION_NO => "1";
+		protected override string API_VERSION_NO => "2";
 
 		protected override bool NeedsBackend => true;
 
@@ -80,11 +83,16 @@ namespace Estreya.BlishHUD.LiveMap
 		protected override void Initialize()
 		{
 			base.Initialize();
-			GlobalSocket = new SocketIO(LIVE_MAP_API_URL, new SocketIOOptions
+			_hubConnection = new HubConnectionBuilder().WithUrl(LIVE_MAP_API_URL).ConfigureLogging(delegate(ILoggingBuilder options)
 			{
-				Path = "/blish-hud/socket.io",
-				Transport = TransportProtocol.WebSocket
-			});
+				options.SetMinimumLevel(LogLevel.Debug);
+				options.AddProvider(new LoggerProvider());
+			}).WithAutomaticReconnect(new UnlimitedRetryPolicy(TimeSpan.FromSeconds(5.0)))
+				.AddJsonProtocol(delegate(JsonHubProtocolOptions options)
+				{
+					options.PayloadSerializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.General);
+				})
+				.Build();
 			base.Gw2ApiManager.add_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)Gw2ApiManager_SubtokenUpdated);
 			GameService.Gw2Mumble.get_PlayerCharacter().add_NameChanged((EventHandler<ValueEventArgs<string>>)PlayerCharacter_NameChanged);
 			GameService.Gw2Mumble.get_CurrentMap().add_MapChanged((EventHandler<ValueEventArgs<int>>)CurrentMap_MapChanged);
@@ -104,24 +112,58 @@ namespace Estreya.BlishHUD.LiveMap
 			});
 		}
 
+		private async Task<bool> ConnectWithRetryAsync(CancellationToken token)
+		{
+			while (true)
+			{
+				try
+				{
+					await _hubConnection.StartAsync(token);
+					return true;
+				}
+				catch when (token.IsCancellationRequested)
+				{
+					return false;
+				}
+				catch
+				{
+					await Task.Delay(5000);
+				}
+			}
+		}
+
 		protected override async Task LoadAsync()
 		{
 			await base.LoadAsync();
-			GlobalSocket.OnConnected += GlobalSocket_OnConnected;
-			GlobalSocket.OnDisconnected += GlobalSocket_OnDisconnected;
-			GlobalSocket.OnError += GlobalSocket_OnError;
-			GlobalSocket.OnReconnectAttempt += GlobalSocket_OnReconnectAttempt;
-			GlobalSocket.OnReconnectFailed += GlobalSocket_OnReconnectFailed;
-			GlobalSocket.OnReconnectError += GlobalSocket_OnReconnectError;
-			GlobalSocket.On("interval", delegate(SocketIOResponse resp)
+			_hubConnection.Closed += HubConnection_Closed;
+			_hubConnection.Reconnecting += HubConnection_Reconnecting;
+			_hubConnection.Reconnected += HubConnection_Reconnected;
+			_hubConnection.On("SetSendingInterval", delegate(int intervalMs)
 			{
-				int value = resp.GetValue<int>();
-				_sendInterval = TimeSpan.FromMilliseconds(value);
+				_sendInterval = TimeSpan.FromMilliseconds(intervalMs);
 			});
-			Task.Run((Func<Task>)GlobalSocket.ConnectAsync);
+			await ConnectWithRetryAsync(default(CancellationToken));
 			await FetchAccountName();
 			await FetchGuildId();
 			await FetchWvW();
+		}
+
+		private Task HubConnection_Reconnected(string arg)
+		{
+			base.Logger.Info("Reconnected.");
+			return Task.CompletedTask;
+		}
+
+		private Task HubConnection_Reconnecting(Exception ex)
+		{
+			base.Logger.Info("Attempt reconnect: " + ex.Message);
+			return Task.CompletedTask;
+		}
+
+		private Task HubConnection_Closed(Exception ex)
+		{
+			base.Logger.Warn("Disconnected: " + ex.Message);
+			return Task.CompletedTask;
 		}
 
 		private void GlobalSocket_OnConnected(object sender, EventArgs e)
@@ -135,7 +177,6 @@ namespace Estreya.BlishHUD.LiveMap
 			if (e == DisconnectReason.IOServerDisconnect)
 			{
 				base.Logger.Info("Trying to reconnect...");
-				GlobalSocket.ConnectAsync();
 			}
 		}
 
@@ -260,11 +301,10 @@ namespace Estreya.BlishHUD.LiveMap
 			Player player = GetPlayer();
 			if (_lastSendPlayer == null || !player.Equals(_lastSendPlayer))
 			{
-				_lastSendPlayer = player;
 				try
 				{
-					byte[] compressed = Compress(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(player)));
-					await PublishToGlobal(compressed);
+					await PublishToGlobal(player);
+					_lastSendPlayer = player;
 				}
 				catch (Exception ex)
 				{
@@ -273,11 +313,11 @@ namespace Estreya.BlishHUD.LiveMap
 			}
 		}
 
-		private async Task PublishToGlobal(byte[] data)
+		private async Task PublishToGlobal(Player player)
 		{
-			if (GlobalSocket.Connected)
+			if (_hubConnection.State == HubConnectionState.Connected)
 			{
-				await GlobalSocket.EmitAsync("update", data);
+				await _hubConnection.InvokeAsync("UpdatePlayer", player);
 			}
 		}
 
@@ -293,13 +333,14 @@ namespace Estreya.BlishHUD.LiveMap
 			base.Unload();
 			base.Gw2ApiManager.remove_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)Gw2ApiManager_SubtokenUpdated);
 			GameService.Gw2Mumble.get_PlayerCharacter().remove_NameChanged((EventHandler<ValueEventArgs<string>>)PlayerCharacter_NameChanged);
-			GlobalSocket.OnConnected -= GlobalSocket_OnConnected;
-			GlobalSocket.OnDisconnected -= GlobalSocket_OnDisconnected;
-			GlobalSocket.OnError -= GlobalSocket_OnError;
-			GlobalSocket.OnReconnectAttempt -= GlobalSocket_OnReconnectAttempt;
-			GlobalSocket.OnReconnectFailed -= GlobalSocket_OnReconnectFailed;
-			GlobalSocket.OnReconnectError -= GlobalSocket_OnReconnectError;
-			AsyncHelper.RunSync(GlobalSocket.DisconnectAsync);
+			_hubConnection.Closed -= HubConnection_Closed;
+			_hubConnection.Reconnecting -= HubConnection_Reconnecting;
+			_hubConnection.Reconnected -= HubConnection_Reconnected;
+			AsyncHelper.RunSync(async delegate
+			{
+				await _hubConnection.StopAsync();
+				await _hubConnection.DisposeAsync();
+			});
 		}
 
 		public Player GetPlayer()
@@ -312,8 +353,8 @@ namespace Estreya.BlishHUD.LiveMap
 			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0102: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00df: Unknown result type (might be due to invalid IL or missing references)
 			Vector2 position = _map?.WorldMeterCoordsToMapCoords(GameService.Gw2Mumble.get_PlayerCharacter().get_Position()) ?? Vector2.get_Zero();
 			Vector3 forward = GameService.Gw2Mumble.get_PlayerCharacter().get_Forward();
 			double angle = Math.Atan2(forward.X, forward.Y) * 180.0 / Math.PI;
@@ -321,43 +362,37 @@ namespace Estreya.BlishHUD.LiveMap
 			{
 				angle += 360.0;
 			}
-			Player obj = new Player
+			return new Player
 			{
 				Identification = new PlayerIdentification
 				{
 					Account = _accountName,
 					Character = GameService.Gw2Mumble.get_PlayerCharacter().get_Name(),
 					GuildId = GuildId
-				}
+				},
+				Map = new PlayerMap
+				{
+					Continent = GetContinentId(_map),
+					Position = new PlayerPosition
+					{
+						X = position.X,
+						Y = position.Y
+					}
+				},
+				Facing = new PlayerFacing
+				{
+					Angle = angle
+				},
+				WvW = _wvw,
+				Group = new PlayerGroup
+				{
+					Squad = (base.ModuleSettings.SendGroupInformation.get_Value() ? (from p in GameService.ArcDps.get_Common().get_PlayersInSquad().Values
+						select ((Player)(ref p)).get_AccountName().Trim(':') into p
+						where p != _accountName
+						select p).ToArray() : null)
+				},
+				Commander = (!base.ModuleSettings.HideCommander.get_Value() && GameService.Gw2Mumble.get_PlayerCharacter().get_IsCommander())
 			};
-			PlayerMap obj2 = new PlayerMap
-			{
-				Continent = GetContinentId(_map)
-			};
-			Map map = _map;
-			obj2.Name = ((map != null) ? map.get_Name() : null);
-			Map map2 = _map;
-			obj2.ID = ((map2 != null) ? map2.get_Id() : (-1));
-			obj2.Position = new PlayerPosition
-			{
-				X = position.X,
-				Y = position.Y
-			};
-			obj.Map = obj2;
-			obj.Facing = new PlayerFacing
-			{
-				Angle = angle
-			};
-			obj.WvW = _wvw;
-			obj.Group = new PlayerGroup
-			{
-				Squad = (base.ModuleSettings.SendGroupInformation.get_Value() ? (from p in GameService.ArcDps.get_Common().get_PlayersInSquad().Values
-					select ((Player)(ref p)).get_AccountName().Trim(':') into p
-					where p != _accountName
-					select p).ToArray() : null)
-			};
-			obj.Commander = !base.ModuleSettings.HideCommander.get_Value() && GameService.Gw2Mumble.get_PlayerCharacter().get_IsCommander();
-			return obj;
 		}
 
 		private int GetContinentId(Map map)
@@ -431,7 +466,7 @@ namespace Estreya.BlishHUD.LiveMap
 
 		protected override BaseModuleSettings DefineModuleSettings(SettingCollection settings)
 		{
-			return new ModuleSettings(settings);
+			return new ModuleSettings(settings, ((Module)this).get_Version());
 		}
 
 		protected override string GetDirectoryName()

@@ -20,11 +20,17 @@ namespace Estreya.BlishHUD.Shared.Settings
 
 		protected readonly Logger Logger;
 
+		private const string MIGRATION_SETTINGS = "migration-settings";
+
 		private const string GLOBAL_SETTINGS = "global-settings";
 
 		private const string DRAWER_SETTINGS = "drawer-settings";
 
 		public Color DefaultGW2Color { get; private set; }
+
+		public SettingCollection MigrationSettings { get; private set; }
+
+		public SettingEntry<Version> LastMigrationVersion { get; private set; }
 
 		public SettingCollection GlobalSettings { get; private set; }
 
@@ -68,15 +74,41 @@ namespace Estreya.BlishHUD.Shared.Settings
 
 		public SettingCollection DrawerSettings { get; private set; }
 
-		protected BaseModuleSettings(SettingCollection settings, KeyBinding globalEnabledKeybinding)
+		protected BaseModuleSettings(SettingCollection settings, Version moduleVersion, KeyBinding globalEnabledKeybinding)
 		{
 			Logger = Logger.GetLogger(GetType());
 			_settings = settings;
 			_globalEnabledKeybinding = globalEnabledKeybinding;
 			BuildDefaultColor();
+			(bool, Version) initMigrationResult = InitalizeMigrationSettings(_settings, moduleVersion);
 			InitializeGlobalSettings(_settings);
 			InitializeDrawerSettings(_settings);
 			InitializeAdditionalSettings(_settings);
+			if (initMigrationResult.Item1)
+			{
+				InternalPerformMigration(initMigrationResult.Item2, moduleVersion);
+			}
+		}
+
+		private (bool PerformMigration, Version? LastMigrationVersion) InitalizeMigrationSettings(SettingCollection settings, Version moduleVersion)
+		{
+			MigrationSettings = settings.AddSubCollection("migration-settings", false);
+			string lastMigrationKey = "last-migration-version";
+			SettingEntry val = default(SettingEntry);
+			bool existed = MigrationSettings.TryGetSetting(lastMigrationKey, ref val);
+			LastMigrationVersion = MigrationSettings.DefineSetting<Version>(lastMigrationKey, moduleVersion, (Func<string>)null, (Func<string>)null);
+			MigrationSettings.AddLoggingEvents();
+			return (!existed || LastMigrationVersion.get_Value() < moduleVersion, existed ? LastMigrationVersion.get_Value() : null);
+		}
+
+		private void InternalPerformMigration(Version? lastModuleVersion, Version currentModuleVersion)
+		{
+			PerformMigration(lastModuleVersion, currentModuleVersion);
+			LastMigrationVersion.set_Value(currentModuleVersion);
+		}
+
+		protected virtual void PerformMigration(Version? lastModuleVersion, Version currentModuleVersion)
+		{
 		}
 
 		private void InitializeDrawerSettings(SettingCollection settings)
@@ -232,14 +264,13 @@ namespace Estreya.BlishHUD.Shared.Settings
 		{
 		}
 
-		public DrawerConfiguration AddDrawer(string name, BuildDirection defaultBuildDirection = BuildDirection.Top)
+		public DrawerConfiguration AddDrawer(string name, BuildDirection defaultBuildDirection = BuildDirection.Top, KeyBinding enabledKeybindingDefault = null)
 		{
-			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bb: Expected O, but got Unknown
+			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
 			int maxHeight = 1080;
 			int maxWidth = 1920;
 			SettingEntry<bool> enabled = DrawerSettings.DefineSetting<bool>(name + "-enabled", true, (Func<string>)(() => "Enabled"), (Func<string>)(() => "Whether the drawer is enabled."));
-			SettingEntry<KeyBinding> enabledKeybinding = DrawerSettings.DefineSetting<KeyBinding>(name + "-enabledKeybinding", new KeyBinding(), (Func<string>)(() => "Enabled Keybinding"), (Func<string>)(() => "Defines the keybinding to toggle this drawer on and off."));
+			SettingEntry<KeyBinding> enabledKeybinding = DrawerSettings.DefineSetting<KeyBinding>(name + "-enabledKeybinding", (KeyBinding)(((object)enabledKeybindingDefault) ?? ((object)new KeyBinding())), (Func<string>)(() => "Enabled Keybinding"), (Func<string>)(() => "Defines the keybinding to toggle this drawer on and off."));
 			enabledKeybinding.get_Value().set_Enabled(true);
 			enabledKeybinding.get_Value().set_IgnoreWhenInTextField(true);
 			enabledKeybinding.get_Value().set_BlockSequenceFromGw2(true);
@@ -447,6 +478,7 @@ namespace Estreya.BlishHUD.Shared.Settings
 		public virtual void Unload()
 		{
 			GlobalSettings.RemoveLoggingEvents();
+			MigrationSettings.RemoveLoggingEvents();
 			DrawerSettings.RemoveLoggingEvents();
 		}
 	}

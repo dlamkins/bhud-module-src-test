@@ -7,7 +7,7 @@ using System.Runtime.Versioning;
 [assembly: AssemblyCompany("Estreya.BlishHUD.LiveMap")]
 [assembly: AssemblyConfiguration("Release")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
-[assembly: AssemblyInformationalVersion("1.0.0+0f2b6c4adccd8bee763a0c959851ecb193ff6386")]
+[assembly: AssemblyInformationalVersion("1.0.0+fa2f8a1a8ab334ee2b6b2c78cabdb884ab37cd36")]
 [assembly: AssemblyProduct("Estreya.BlishHUD.LiveMap")]
 [assembly: AssemblyTitle("Estreya.BlishHUD.LiveMap")]
 [assembly: NeutralResourcesLanguage("en")]

@@ -44,19 +44,40 @@
       <HintPath>..\..\working\Octokit.dll</HintPath>
     </Reference>
     <Reference Include="System.IO.Compression" />
+    <Reference Include="Microsoft.Extensions.Logging.Abstractions">
+      <HintPath>..\..\working\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
+    </Reference>
     <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="SocketIOClient">
-      <HintPath>..\..\working\SocketIOClient.dll</HintPath>
+    <Reference Include="Microsoft.AspNetCore.SignalR.Client.Core">
+      <HintPath>..\..\working\Microsoft.AspNetCore.SignalR.Client.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.SignalR.Protocols.Json">
+      <HintPath>..\..\working\Microsoft.AspNetCore.SignalR.Protocols.Json.dll</HintPath>
     </Reference>
     <Reference Include="jose-jwt">
       <HintPath>..\..\working\jose-jwt.dll</HintPath>
     </Reference>
     <Reference Include="System.Security" />
     <Reference Include="System.IO.Compression.FileSystem" />
+    <Reference Include="Microsoft.AspNetCore.SignalR.Client">
+      <HintPath>..\..\working\Microsoft.AspNetCore.SignalR.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="SocketIOClient">
+      <HintPath>..\..\working\SocketIOClient.dll</HintPath>
+    </Reference>
     <Reference Include="Flurl">
       <HintPath>..\..\working\Flurl.dll</HintPath>
     </Reference>
     <Reference Include="AsyncClipboardService" />
     <Reference Include="NAudio.Wasapi" />
+    <Reference Include="NodaTime">
+      <HintPath>..\..\working\NodaTime.dll</HintPath>
+    </Reference>
+    <Reference Include="NodaTime.Serialization.JsonNet">
+      <HintPath>..\..\working\NodaTime.Serialization.JsonNet.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Logging">
+      <HintPath>..\..\working\Microsoft.Extensions.Logging.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>

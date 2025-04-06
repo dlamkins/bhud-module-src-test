@@ -43,6 +43,9 @@ using Flurl.Http.Configuration;
 using Gw2Sharp.Models;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended.BitmapFonts;
+using Newtonsoft.Json;
+using NodaTime;
+using NodaTime.Serialization.JsonNet;
 using SemVer;
 
 namespace Estreya.BlishHUD.Shared.Modules
@@ -71,6 +74,8 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		private ModuleSettingsView _defaultSettingView;
 
+		private StandardWindow _wizardWindow;
+
 		private FlurlClient _flurlClient;
 
 		private readonly ConcurrentDictionary<string, string> _loadingTexts = new ConcurrentDictionary<string, string>();
@@ -95,7 +100,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		protected string API_ROOT_URL => "https://" + (ModuleSettings.UseDevelopmentAPI.get_Value() ? "api.estreya.dev" : "api.estreya.de") + "/blish-hud";
 
-		private string API_HEALTH_URL => API_ROOT_URL + "/health";
+		private string API_HEALTH_URL => API_ROOT_URL + "/_health";
 
 		protected string MODULE_API_URL => API_ROOT_URL + "/v" + API_VERSION_NO + "/" + UrlModuleName;
 
@@ -242,7 +247,9 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		protected override void Initialize()
 		{
+			Logger.Info("Running in normal mode.");
 			_cancellationTokenSource = new CancellationTokenSource();
+			JsonConvert.DefaultSettings = () => new JsonSerializerSettings().ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
 			TEMP_FIX_SetTacOAsActive();
 			string directoryName = GetDirectoryName();
 			if (!string.IsNullOrWhiteSpace(directoryName))
@@ -822,6 +829,93 @@ namespace Estreya.BlishHUD.Shared.Modules
 		{
 		}
 
+		protected virtual List<WizardView> GetWizardViews()
+		{
+			return null;
+		}
+
+		private async Task ExecuteWizard()
+		{
+			if (1 == 0)
+			{
+				return;
+			}
+			List<WizardView> views = GetWizardViews();
+			if (views != null && views.Count != 0)
+			{
+				StandardWindow wizardWindow = _wizardWindow;
+				if (wizardWindow != null)
+				{
+					((Control)wizardWindow).Dispose();
+				}
+				_wizardWindow = WindowUtil.CreateStandardWindow(ModuleSettings, ((Module)this).get_Name() + " - Setup Wizard", ((object)this).GetType(), Guid.Parse("0f4654eb-2853-4299-85f4-bacf2ae2d8e6"), IconService);
+				_wizardWindow.CanClose = false;
+				_wizardWindow.CanCloseWithEscape = false;
+				_wizardWindow.CanResize = false;
+				int viewIndex = 0;
+				WizardView view = views[0];
+				await ShowWizardView(_wizardWindow, view, viewIndex, views);
+			}
+		}
+
+		private async Task ShowWizardView(StandardWindow window, WizardView wizardView, int viewIndex, List<WizardView> allViews)
+		{
+			wizardView.NextClicked += async delegate
+			{
+				viewIndex++;
+				if (viewIndex > allViews.Count - 1)
+				{
+					throw new ArgumentOutOfRangeException("viewIndex", "No next view available.");
+				}
+				WizardView nextView = allViews[viewIndex];
+				await ShowWizardView(window, nextView, viewIndex, allViews);
+			};
+			wizardView.PreviousClicked += async delegate
+			{
+				viewIndex--;
+				if (viewIndex < 0)
+				{
+					throw new ArgumentOutOfRangeException("viewIndex", "No previous view available.");
+				}
+				WizardView prevView = allViews[viewIndex];
+				await ShowWizardView(window, prevView, viewIndex, allViews);
+			};
+			wizardView.CancelClicked += delegate
+			{
+				StandardWindow standardWindow3 = window;
+				if (standardWindow3 != null)
+				{
+					((Control)standardWindow3).Hide();
+				}
+				StandardWindow standardWindow4 = window;
+				if (standardWindow4 != null)
+				{
+					((Control)standardWindow4).Dispose();
+				}
+				Logger.Info("Cancelled setup wizard.");
+				return Task.CompletedTask;
+			};
+			wizardView.FinishClicked += delegate
+			{
+				StandardWindow standardWindow = window;
+				if (standardWindow != null)
+				{
+					((Control)standardWindow).Hide();
+				}
+				StandardWindow standardWindow2 = window;
+				if (standardWindow2 != null)
+				{
+					((Control)standardWindow2).Dispose();
+				}
+				Logger.Info("Completed setup wizard.");
+				return Task.CompletedTask;
+			};
+			wizardView.PreviousAvailable = viewIndex - 1 >= 0;
+			wizardView.NextIsFinish = viewIndex == allViews.Count - 1;
+			wizardView.NextAvailable = wizardView.NextIsFinish || viewIndex + 1 <= allViews.Count - 1;
+			await window.Show((IView)(object)wizardView);
+		}
+
 		protected override void Update(GameTime gameTime)
 		{
 			UpdateUtil.UpdateAsync(CheckBackendHealth, gameTime, _checkBackendInterval.TotalMilliseconds, _lastBackendCheck, doLogging: false);
@@ -1004,7 +1098,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 				_defaultSettingView = null;
 			}
 			Logger.Debug("Unloaded default settings view.");
-			Logger.Debug("Unload settings window...");
+			Logger.Debug("Unload windows...");
 			TabbedWindow settingsWindow = SettingsWindow;
 			if (settingsWindow != null)
 			{
@@ -1016,7 +1110,18 @@ namespace Estreya.BlishHUD.Shared.Modules
 				((Control)settingsWindow2).Dispose();
 			}
 			SettingsWindow = null;
-			Logger.Debug("Unloaded settings window.");
+			StandardWindow wizardWindow = _wizardWindow;
+			if (wizardWindow != null)
+			{
+				((Control)wizardWindow).Hide();
+			}
+			StandardWindow wizardWindow2 = _wizardWindow;
+			if (wizardWindow2 != null)
+			{
+				((Control)wizardWindow2).Dispose();
+			}
+			_wizardWindow = null;
+			Logger.Debug("Unloaded windows.");
 			Logger.Debug("Unloading states...");
 			using (_servicesLock.Lock())
 			{

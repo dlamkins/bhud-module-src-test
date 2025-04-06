@@ -7,12 +7,6 @@ namespace Estreya.BlishHUD.LiveMap.Models.Player
 		[JsonPropertyName("continent")]
 		public int Continent { get; set; }
 
-		[JsonPropertyName("id")]
-		public int ID { get; set; }
-
-		[JsonPropertyName("name")]
-		public string Name { get; set; }
-
 		[JsonPropertyName("position")]
 		public PlayerPosition Position { get; set; }
 
@@ -23,7 +17,7 @@ namespace Estreya.BlishHUD.LiveMap.Models.Player
 				PlayerMap playerMap = obj as PlayerMap;
 				if (playerMap != null)
 				{
-					return true & Continent.Equals(playerMap.Continent) & ID.Equals(playerMap.ID) & (Name?.Equals(playerMap.Name) ?? (Name == null && playerMap.Name == null)) & (Position?.Equals(playerMap.Position) ?? (Position == null && playerMap.Position == null));
+					return true & Continent.Equals(playerMap.Continent) & (Position?.Equals(playerMap.Position) ?? (Position == null && playerMap.Position == null));
 				}
 			}
 			return false;
