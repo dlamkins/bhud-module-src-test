@@ -11,6 +11,10 @@ namespace Estreya.BlishHUD.Shared.Extensions
 	{
 		public static Task WaitUntilSwappedAsync(this AsyncTexture2D texture, TimeSpan timeout)
 		{
+			if (texture.get_HasSwapped())
+			{
+				return Task.CompletedTask;
+			}
 			TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
 			CancellationTokenSource ct = new CancellationTokenSource((int)timeout.TotalMilliseconds);
 			CancellationTokenRegistration cancelAction = ct.Token.Register(delegate

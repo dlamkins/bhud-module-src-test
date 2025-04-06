@@ -65,6 +65,14 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			await (this.CancelClicked?.Invoke(this) ?? Task.CompletedTask);
 		}
 
+		internal void ClearEventHandlers()
+		{
+			this.NextClicked = null;
+			this.PreviousClicked = null;
+			this.CancelClicked = null;
+			this.FinishClicked = null;
+		}
+
 		public FlowPanel GetButtonPanel(Panel parent)
 		{
 			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
@@ -92,6 +100,7 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 				((Control)RenderButtonAsync((Panel)(object)panel, "Test Configurations", async delegate
 				{
 					await ApplyConfigurations();
+					ShowInfo("Applied configurations.");
 				})).set_BasicTooltipText("Applies all options on the current page to the module.");
 			}
 			((Control)RenderButtonAsync((Panel)(object)panel, (!NextIsFinish) ? "Next" : "Finish", async delegate

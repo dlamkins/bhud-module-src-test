@@ -4,10 +4,10 @@ namespace Estreya.BlishHUD.Shared.Models.BlishHudAPI
 {
 	public struct APITokens
 	{
-		[JsonProperty("accessToken")]
+		[JsonProperty("access_token")]
 		public string AccessToken { get; set; }
 
-		[JsonProperty("refreshToken")]
+		[JsonProperty("refresh_token")]
 		public string RefreshToken { get; set; }
 	}
 }

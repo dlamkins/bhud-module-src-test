@@ -72,6 +72,8 @@ namespace Estreya.BlishHUD.Shared.Settings
 
 		public SettingEntry<Version> MetricsConsentGivenVersion { get; private set; }
 
+		public SettingEntry<bool> WizardCompleted { get; private set; }
+
 		public SettingCollection DrawerSettings { get; private set; }
 
 		protected BaseModuleSettings(SettingCollection settings, Version moduleVersion, KeyBinding globalEnabledKeybinding)
@@ -239,6 +241,7 @@ namespace Estreya.BlishHUD.Shared.Settings
 			SendMetrics = GlobalSettings.DefineSetting<bool>("SendMetrics", false, (Func<string>)(() => "Send Anonymous Metrics"), (Func<string>)(() => "Allows the module to send anonymous metric data to a backend server to view advanced usage statistics."));
 			AskedMetricsConsent = GlobalSettings.DefineSetting<bool>("AskedMetricsConsent", false, (Func<string>)(() => "Asked Metrics Consent"), (Func<string>)(() => "Whether the module asked for metric consent."));
 			MetricsConsentGivenVersion = GlobalSettings.DefineSetting<Version>("MetricsConsentGivenVersion", new Version("0.0.0", false), (Func<string>)(() => "Metrics Consent Version"), (Func<string>)(() => "Defines the version at which point a metric consent was given."));
+			WizardCompleted = GlobalSettings.DefineSetting<bool>("WizardCompleted", false, (Func<string>)(() => "Wizard completed"), (Func<string>)(() => "Whether the setup wizard has been finished before."));
 			HandleEnabledStates();
 			DoInitializeGlobalSettings(GlobalSettings);
 			GlobalSettings.AddLoggingEvents();

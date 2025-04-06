@@ -214,6 +214,10 @@ namespace Estreya.BlishHUD.EventTable.Models
 
 		public string GetWaypoint(Account account)
 		{
+			if (Waypoints == null)
+			{
+				return null;
+			}
 			if (account == null)
 			{
 				Logger.Warn("Account is null. Returning EU waypoint.");

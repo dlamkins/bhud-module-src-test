@@ -30,14 +30,14 @@ namespace Estreya.BlishHUD.EventTable.UI.Views.Wizard
 
 		protected override void InternalBuild(Panel parent)
 		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_028a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0107: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_029f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02e2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02fe: Unknown result type (might be due to invalid IL or missing references)
 			FormattedLabel welcomeLbl = new FormattedLabelBuilder().SetWidth(((Container)parent).get_ContentRegion().Width).Wrap().AutoSizeHeight()
 				.SetHorizontalAlignment((HorizontalAlignment)1)
 				.CreatePart("Event Areas", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder b)
@@ -68,9 +68,14 @@ namespace Estreya.BlishHUD.EventTable.UI.Views.Wizard
 			((Control)useAreasLbl).set_Top(((Control)welcomeLbl).get_Bottom() + 100);
 			((Control)useAreasLbl).set_Left(150);
 			_useAreas = _allAreas.Any((EventAreaConfiguration a) => a.Enabled.get_Value());
+			Checkbox useFillersCheckbox = null;
 			((Control)RenderCheckbox(parent, new Point(((Control)useAreasLbl).get_Right() + 20, ((Control)useAreasLbl).get_Top()), _useAreas, delegate(bool val)
 			{
 				_useAreas = val;
+				if (useFillersCheckbox != null)
+				{
+					((Control)useFillersCheckbox).set_Enabled(_useAreas);
+				}
 			})).set_BasicTooltipText("Check this option if you would like to keep the already created area.\nUncheck this option, if you only want to use the reminder feature of this module.");
 			Label useFillersLbl = RenderLabel(parent, "Use Filler Events:").TitleLabel;
 			((Control)useFillersLbl).set_Parent((Container)(object)parent);
@@ -79,10 +84,11 @@ namespace Estreya.BlishHUD.EventTable.UI.Views.Wizard
 			((Control)useFillersLbl).set_Top(((Control)useAreasLbl).get_Bottom() + 5);
 			((Control)useFillersLbl).set_Left(150);
 			_useFillers = _allAreas.Any((EventAreaConfiguration a) => a.UseFiller.get_Value());
-			((Control)RenderCheckbox(parent, new Point(((Control)useFillersLbl).get_Right() + 20, ((Control)useFillersLbl).get_Top()), _useFillers, delegate(bool val)
+			useFillersCheckbox = RenderCheckbox(parent, new Point(((Control)useFillersLbl).get_Right() + 20, ((Control)useFillersLbl).get_Top()), _useFillers, delegate(bool val)
 			{
 				_useFillers = val;
-			})).set_BasicTooltipText("Check this option if you would like to have events fill in the gaps between regular events and show the remaining time until they start.");
+			});
+			((Control)useFillersCheckbox).set_BasicTooltipText("Check this option if you would like to have events fill in the gaps between regular events and show the remaining time until they start.");
 			FlowPanel buttons = GetButtonPanel(parent);
 			Rectangle contentRegion = ((Container)parent).get_ContentRegion();
 			((Control)buttons).set_Top(((Rectangle)(ref contentRegion)).get_Bottom() - 20 - ((Control)buttons).get_Height());

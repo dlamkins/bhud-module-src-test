@@ -63,6 +63,5 @@
     <Reference Include="NodaTime.Serialization.JsonNet">
       <HintPath>..\..\working\NodaTime.Serialization.JsonNet.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
 </Project>

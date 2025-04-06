@@ -14,6 +14,7 @@ using Estreya.BlishHUD.Shared.Utils;
 using Flurl.Http;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
+using NodaTime;
 
 namespace Estreya.BlishHUD.EventTable.Services
 {
@@ -87,9 +88,9 @@ namespace Estreya.BlishHUD.EventTable.Services
 			return await _flurlClient.Request(_apiBaseUrl, "/self-hosting").GetJsonAsync<List<SelfHostingEventEntry>>(default(CancellationToken), (HttpCompletionOption)0);
 		}
 
-		public async Task<double> GetMaxHostingDuration()
+		public async Task<Duration> GetMaxHostingDuration()
 		{
-			return (double)((dynamic)(await _flurlClient.Request(_apiBaseUrl, "/self-hosting/duration").GetJsonAsync(default(CancellationToken), (HttpCompletionOption)0))).duration;
+			return await _flurlClient.Request(_apiBaseUrl, "/self-hosting/duration").GetJsonAsync<Duration>(default(CancellationToken), (HttpCompletionOption)0);
 		}
 
 		public async Task<List<SelfHostingCategoryDefinition>> GetDefinitions()
@@ -97,24 +98,24 @@ namespace Estreya.BlishHUD.EventTable.Services
 			return await _flurlClient.Request(_apiBaseUrl, "/self-hosting/definitions").GetJsonAsync<List<SelfHostingCategoryDefinition>>(default(CancellationToken), (HttpCompletionOption)0);
 		}
 
-		public async Task<List<SelfHostingCategoryDefinition>> GetCategories()
+		public async Task<List<KeyValuePair<string, string>>> GetCategories()
 		{
-			return await _flurlClient.Request(_apiBaseUrl, "/self-hosting/categories").GetJsonAsync<List<SelfHostingCategoryDefinition>>(default(CancellationToken), (HttpCompletionOption)0);
+			return await _flurlClient.Request(_apiBaseUrl, "/self-hosting/categories").GetJsonAsync<List<KeyValuePair<string, string>>>(default(CancellationToken), (HttpCompletionOption)0);
 		}
 
-		public async Task<SelfHostingCategoryDefinition> GetCategory(string categoryKey)
+		public async Task<KeyValuePair<string, string>> GetCategory(string categoryKey)
 		{
-			return await _flurlClient.Request(_apiBaseUrl, "/self-hosting/categories/" + categoryKey).GetJsonAsync<SelfHostingCategoryDefinition>(default(CancellationToken), (HttpCompletionOption)0);
+			return await _flurlClient.Request(_apiBaseUrl, "/self-hosting/categories/" + categoryKey).GetJsonAsync<KeyValuePair<string, string>>(default(CancellationToken), (HttpCompletionOption)0);
 		}
 
-		public async Task<List<SelfHostingZoneDefinition>> GetCategoryZones(string categoryKey)
+		public async Task<List<KeyValuePair<string, string>>> GetCategoryZones(string categoryKey)
 		{
-			return await _flurlClient.Request(_apiBaseUrl, "/self-hosting/categories/" + categoryKey + "/zones").GetJsonAsync<List<SelfHostingZoneDefinition>>(default(CancellationToken), (HttpCompletionOption)0);
+			return await _flurlClient.Request(_apiBaseUrl, "/self-hosting/categories/" + categoryKey + "/zones").GetJsonAsync<List<KeyValuePair<string, string>>>(default(CancellationToken), (HttpCompletionOption)0);
 		}
 
-		public async Task<List<SelfHostingEventDefinition>> GetCategoryZoneEvents(string categoryKey, string zoneKey)
+		public async Task<List<KeyValuePair<string, string>>> GetCategoryZoneEvents(string categoryKey, string zoneKey)
 		{
-			return await _flurlClient.Request(_apiBaseUrl, "/self-hosting/categories/" + categoryKey + "/zones/" + zoneKey + "/events").GetJsonAsync<List<SelfHostingEventDefinition>>(default(CancellationToken), (HttpCompletionOption)0);
+			return await _flurlClient.Request(_apiBaseUrl, "/self-hosting/categories/" + categoryKey + "/zones/" + zoneKey + "/events").GetJsonAsync<List<KeyValuePair<string, string>>>(default(CancellationToken), (HttpCompletionOption)0);
 		}
 
 		public bool HasSelfHostingEntry()

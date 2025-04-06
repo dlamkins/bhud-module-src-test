@@ -809,6 +809,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 			}
 			Logger.Debug("Finished building settings window.");
 			HandleCornerIcon(ModuleSettings.RegisterCornerIcon.get_Value());
+			Task.Factory.StartNew((Func<Task>)ExecuteWizard, TaskCreationOptions.LongRunning).Unwrap();
 		}
 
 		protected abstract AsyncTexture2D GetEmblem();
@@ -836,8 +837,9 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		private async Task ExecuteWizard()
 		{
-			if (1 == 0)
+			if (ModuleSettings.WizardCompleted.get_Value())
 			{
+				Logger.Debug("Wizard already completed before. Skipping.");
 				return;
 			}
 			List<WizardView> views = GetWizardViews();
@@ -862,6 +864,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 		{
 			wizardView.NextClicked += async delegate
 			{
+				allViews[viewIndex].ClearEventHandlers();
 				viewIndex++;
 				if (viewIndex > allViews.Count - 1)
 				{
@@ -872,6 +875,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 			};
 			wizardView.PreviousClicked += async delegate
 			{
+				allViews[viewIndex].ClearEventHandlers();
 				viewIndex--;
 				if (viewIndex < 0)
 				{
@@ -907,6 +911,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 				{
 					((Control)standardWindow2).Dispose();
 				}
+				ModuleSettings.WizardCompleted.set_Value(true);
 				Logger.Info("Completed setup wizard.");
 				return Task.CompletedTask;
 			};

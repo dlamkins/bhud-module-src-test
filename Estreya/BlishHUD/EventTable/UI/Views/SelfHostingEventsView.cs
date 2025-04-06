@@ -26,6 +26,7 @@ using Flurl.Http;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using NodaTime;
 using SemVer;
 
 namespace Estreya.BlishHUD.EventTable.UI.Views
@@ -101,9 +102,9 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		private FlowPanel _activeEventsGroup;
 
-		private TimeSpan _maxHostingDuration;
+		private Duration _maxHostingDuration;
 
-		private List<SelfHostingCategoryDefinition> _definitions;
+		private List<SelfHostingCategoryDefinition> _categories;
 
 		public Panel Panel { get; private set; }
 
@@ -236,7 +237,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			//IL_04b2: Unknown result type (might be due to invalid IL or missing references)
 			ClearPanel();
 			Rectangle contentRegion = ((Container)Panel).get_ContentRegion();
-			List<SelfHostingCategoryDefinition> categories = _definitions ?? new List<SelfHostingCategoryDefinition>();
+			List<SelfHostingCategoryDefinition> categories = _categories ?? new List<SelfHostingCategoryDefinition>();
 			TextBox val = new TextBox();
 			((Control)val).set_Parent((Container)(object)Panel);
 			((Control)val).set_Width(((DesignStandard)(ref Panel.MenuStandard)).get_Size().X);
@@ -463,7 +464,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			((Control)val).set_Width(((Container)Panel).get_ContentRegion().Width);
 			((Control)val).set_Height(((Container)Panel).get_ContentRegion().Height);
 			Panel addPanel = val;
-			List<AddCategoryDropdown> parsedCategories = _definitions?.Select((SelfHostingCategoryDefinition c) => new AddCategoryDropdown
+			List<AddCategoryDropdown> parsedCategories = _categories?.Select((SelfHostingCategoryDefinition c) => new AddCategoryDropdown
 			{
 				Key = c.Key,
 				Name = c.Name
@@ -486,15 +487,15 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			{
 				if (zoneDropdown != null && newVal != null)
 				{
-					List<SelfHostingZoneDefinition> obj2 = await _selfHostingEventService.GetCategoryZones(newVal.Key);
+					List<KeyValuePair<string, string>> obj2 = await _selfHostingEventService.GetCategoryZones(newVal.Key);
 					zoneDropdown.Items.Clear();
-					foreach (SelfHostingZoneDefinition z in obj2)
+					foreach (KeyValuePair<string, string> z in obj2)
 					{
 						zoneDropdown.Items.Add(new AddZoneDropdown
 						{
 							CategoryKey = newVal.Key,
 							Key = z.Key,
-							Name = z.Name
+							Name = z.Value
 						});
 					}
 					zoneDropdown.SelectedItem = null;
@@ -522,16 +523,16 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			{
 				if (eventDropdown != null && newVal != null)
 				{
-					List<SelfHostingEventDefinition> source = await _selfHostingEventService.GetCategoryZoneEvents(newVal.CategoryKey, newVal.Key);
+					List<KeyValuePair<string, string>> source = await _selfHostingEventService.GetCategoryZoneEvents(newVal.CategoryKey, newVal.Key);
 					eventDropdown.Items.Clear();
-					foreach (SelfHostingEventDefinition e2 in source.OrderBy((SelfHostingEventDefinition e) => e.Name))
+					foreach (KeyValuePair<string, string> e2 in source.OrderBy((KeyValuePair<string, string> e) => e.Value))
 					{
 						eventDropdown.Items.Add(new AddEventDropdown
 						{
 							CategoryKey = newVal.CategoryKey,
 							ZoneKey = newVal.Key,
 							Key = e2.Key,
-							Name = e2.Name
+							Name = e2.Value
 						});
 					}
 					eventDropdown.SelectedItem = null;
@@ -685,7 +686,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			{
 				bool isMyHosting = ev.AccountName == currentAccountName;
 				TimeSpan runningDuration = DateTimeOffset.UtcNow - ev.StartTime;
-				SelfHostingCategoryDefinition obj = _definitions?.FirstOrDefault((SelfHostingCategoryDefinition c) => c.Key == ev.CategoryKey);
+				SelfHostingCategoryDefinition obj = _categories?.FirstOrDefault((SelfHostingCategoryDefinition c) => c.Key == ev.CategoryKey);
 				string categoryName = obj?.Name ?? ev.CategoryKey;
 				SelfHostingZoneDefinition zoneDef = obj?.Zones?.FirstOrDefault((SelfHostingZoneDefinition z) => z.Key == ev.ZoneKey);
 				string zoneName = zoneDef?.Name ?? ev.ZoneKey;
@@ -861,11 +862,11 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 		{
 			try
 			{
-				_definitions = await _selfHostingEventService.GetDefinitions();
+				_categories = await _selfHostingEventService.GetDefinitions();
 			}
 			catch (Exception ex)
 			{
-				_logger.Warn(ex, "Failed to load definitions.");
+				_logger.Warn(ex, "Failed to load categories.");
 			}
 		}
 
@@ -873,7 +874,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 		{
 			try
 			{
-				_maxHostingDuration = TimeSpan.FromSeconds(await _selfHostingEventService.GetMaxHostingDuration());
+				_maxHostingDuration = await _selfHostingEventService.GetMaxHostingDuration();
 			}
 			catch (Exception ex)
 			{
