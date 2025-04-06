@@ -11,8 +11,8 @@ using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SL.Adapters;
+using SL.Adapters.Logging;
 using SL.ChatLinks.Integrations;
-using SL.ChatLinks.Logging;
 using SL.ChatLinks.Storage;
 using SL.ChatLinks.UI;
 using SL.ChatLinks.UI.Tabs.Achievements;
@@ -22,6 +22,7 @@ using SL.ChatLinks.UI.Tabs.Items.Collections;
 using SL.ChatLinks.UI.Tabs.Items.Tooltips;
 using SL.ChatLinks.UI.Tabs.Items.Upgrades;
 using SL.Common;
+using SL.Common.Progression;
 using SQLitePCL;
 
 namespace SL.ChatLinks
@@ -76,7 +77,21 @@ namespace SL.ChatLinks
 			services.AddSingleton<ITokenProvider, Gw2SharpTokenProvider>();
 			services.AddSingleton<IEventAggregator, DefaultEventAggregator>();
 			services.AddTransient<IClipBoard, WpfClipboard>();
-			services.AddSingleton<AccountUnlocks>();
+			services.AddSingleton<CurrentAccount>();
+			services.AddSingleton<AchievementsProgress>();
+			services.AddSingleton<AccountBank>();
+			services.AddSingleton<AccountMaterialStorage>();
+			services.AddSingleton<UnlockedDyes>();
+			services.AddSingleton<UnlockedFinishers>();
+			services.AddSingleton<UnlockedGliderSkins>();
+			services.AddSingleton<UnlockedJadeBotSkins>();
+			services.AddSingleton<UnlockedMailCarriers>();
+			services.AddSingleton<UnlockedMiniatures>();
+			services.AddSingleton<UnlockedMistChampionSkins>();
+			services.AddSingleton<UnlockedNovelties>();
+			services.AddSingleton<UnlockedOutfits>();
+			services.AddSingleton<UnlockedRecipes>();
+			services.AddSingleton<UnlockedWardrobe>();
 			services.AddHttpClient<IconsService>();
 			services.AddSingleton<IconsCache>();
 			services.AddMemoryCache();
@@ -130,13 +145,14 @@ namespace SL.ChatLinks
 			ILogger<ChatLinksModule> logger = _serviceProvider.GetRequiredService<ILogger<ChatLinksModule>>();
 			ILocale locale = _serviceProvider.GetRequiredService<ILocale>();
 			DatabaseSeeder seeder = _serviceProvider.GetRequiredService<DatabaseSeeder>();
+			CurrentAccount account = _serviceProvider.GetRequiredService<CurrentAccount>();
 			try
 			{
 				await seeder.Migrate(locale.Current).ConfigureAwait(continueOnCapturedContext: false);
 			}
-			catch (Exception reason2)
+			catch (Exception reason3)
 			{
-				logger.LogWarning(reason2, "Database migration failed, starting with potentially invalid database schema.");
+				logger.LogWarning(reason3, "Database migration failed, starting with potentially invalid database schema.");
 			}
 			_serviceProvider.GetRequiredService<MainIcon>();
 			_serviceProvider.GetRequiredService<MainWindow>();
@@ -145,9 +161,17 @@ namespace SL.ChatLinks
 				await seeder.Sync(locale.Current, CancellationToken.None).ConfigureAwait(continueOnCapturedContext: false);
 				await seeder.Optimize(locale.Current, CancellationToken.None).ConfigureAwait(continueOnCapturedContext: false);
 			}
+			catch (Exception reason2)
+			{
+				logger.LogWarning(reason2, "Database sync failed, starting with potentially stale data.");
+			}
+			try
+			{
+				await account.Validate(force: false, CancellationToken.None).ConfigureAwait(continueOnCapturedContext: false);
+			}
 			catch (Exception reason)
 			{
-				logger.LogWarning(reason, "Database sync failed, starting with potentially stale data.");
+				logger.LogWarning(reason, "One or more account details could not be validated.");
 			}
 			_clock.HourStarted += new EventHandler(OnHourStarted);
 			_listener = _serviceProvider.GetRequiredService<MumbleListener>();

@@ -1181,6 +1181,21 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 
 		private void PrintInBank()
 		{
+			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
+			ItemTooltipViewModel viewModel = ViewModel;
+			if (viewModel == null || viewModel.InBank != 0 || viewModel.InMaterialStorage != 0)
+			{
+				StringBuilder text = new StringBuilder("\r\n");
+				if (ViewModel.InBank > 0)
+				{
+					text.AppendLine(ViewModel.Localizer["Count in bank", new object[1] { ViewModel.InBank }]);
+				}
+				if (ViewModel.InMaterialStorage > 0)
+				{
+					text.AppendLine(ViewModel.Localizer["Count in material storage", new object[1] { ViewModel.InMaterialStorage }]);
+				}
+				PrintPlainText(text.ToString(), Gray);
+			}
 		}
 
 		private void PrintItemBinding(Item item)
@@ -1210,11 +1225,11 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 		{
 			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
 			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0132: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0138: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0169: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0201: Unknown result type (might be due to invalid IL or missing references)
 			Coin totalValue = ViewModel.TotalVendorValue;
 			if (!(totalValue == Coin.Zero) && !ViewModel.Item.Flags.NoSell)
 			{
@@ -1224,7 +1239,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 					FormattedLabelPartBuilder gold = builder.CreatePart(totalValue.Gold.ToString("N0", CultureInfo.CurrentCulture));
 					gold.SetTextColor(new Color(221, 187, 68));
 					gold.SetFontSize((FontSize)16);
-					gold.SetSuffixImage(AsyncTexture2D.FromAssetId(156904));
+					gold.SetSuffixImage(ViewModel.GetIcon(156904));
 					gold.SetSuffixImageSize(new Point(20));
 					builder.CreatePart(gold);
 					builder.CreatePart("  ", (Action<FormattedLabelPartBuilder>)delegate
@@ -1236,7 +1251,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 					FormattedLabelPartBuilder silver = builder.CreatePart(totalValue.Silver.ToString("N0", CultureInfo.CurrentCulture));
 					silver.SetTextColor(new Color(192, 192, 192));
 					silver.SetFontSize((FontSize)16);
-					silver.SetSuffixImage(AsyncTexture2D.FromAssetId(156907));
+					silver.SetSuffixImage(ViewModel.GetIcon(156907));
 					silver.SetSuffixImageSize(new Point(20));
 					builder.CreatePart(silver);
 					builder.CreatePart("  ", (Action<FormattedLabelPartBuilder>)delegate
@@ -1246,7 +1261,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 				FormattedLabelPartBuilder copper = builder.CreatePart(totalValue.Copper.ToString("N0", CultureInfo.CurrentCulture));
 				copper.SetTextColor(new Color(205, 127, 50));
 				copper.SetFontSize((FontSize)16);
-				copper.SetSuffixImage(AsyncTexture2D.FromAssetId(156902));
+				copper.SetSuffixImage(ViewModel.GetIcon(156902));
 				copper.SetSuffixImageSize(new Point(20));
 				builder.CreatePart(copper);
 				FormattedLabel obj = builder.Build();
@@ -1265,18 +1280,18 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0041: Expected O, but got Unknown
-			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0120: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0125: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0142: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0149: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0155: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0165: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0121: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0128: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0137: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0145: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0151: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0161: Unknown result type (might be due to invalid IL or missing references)
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Parent((Container)(object)_layout);
 			val.set_FlowDirection((ControlFlowDirection)2);
@@ -1284,11 +1299,12 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 			((Container)val).set_HeightSizingMode((SizingMode)1);
 			val.set_ControlPadding(new Vector2(5f));
 			FlowPanel panel = val;
-			if (!string.IsNullOrEmpty(effect.IconHref))
+			Uri iconUrl = effect.IconUrl();
+			if ((object)iconUrl != null)
 			{
 				Image val2 = new Image();
 				((Control)val2).set_Parent((Container)(object)panel);
-				val2.set_Texture(GameService.Content.GetRenderServiceTexture(effect.IconHref));
+				val2.set_Texture(ViewModel.GetIcon(iconUrl));
 				((Control)val2).set_Size(new Point(32));
 			}
 			StringBuilder builder = new StringBuilder();

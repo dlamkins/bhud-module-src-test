@@ -24,7 +24,7 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 
 		public AchievementsTabViewModel ViewModel { get; }
 
-		private event EventHandler<EventArgs>? _menuItemExpanded;
+		private event EventHandler<EventArgs>? MenuItemExpanded;
 
 		public AchievementsTabView(AchievementsTabViewModel viewModel)
 			: this()
@@ -114,7 +114,7 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 
 		private void ReloadMenuItems()
 		{
-			this._menuItemExpanded = null;
+			this.MenuItemExpanded = null;
 			while (((Container)_sidebar).get_Children().get_Count() > 0)
 			{
 				((Container)_sidebar).get_Children().get_Item(0).Dispose();
@@ -134,7 +134,7 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 				((Control)groupMenuItem).set_BasicTooltipText(menuItem.Group.Description);
 				foreach (AchievementCategory category in menuItem.Categories)
 				{
-					AsyncTexture2D icon = ViewModel.GetIcon(category.IconHref);
+					AsyncTexture2D icon = ViewModel.GetIcon(category.IconUrl());
 					MenuItem val = new MenuItem(category.Name, icon);
 					((Control)val).set_Parent((Container)(object)groupMenuItem);
 					((Control)val).set_BasicTooltipText(category.Description);
@@ -152,10 +152,10 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 				{
 					if (args.PropertyName == "Expand")
 					{
-						this._menuItemExpanded?.Invoke(sender, EventArgs.Empty);
+						this.MenuItemExpanded?.Invoke(sender, EventArgs.Empty);
 					}
 				});
-				_menuItemExpanded += delegate(object sender, EventArgs args)
+				MenuItemExpanded += delegate(object sender, EventArgs args)
 				{
 					if (sender != groupMenuItem)
 					{

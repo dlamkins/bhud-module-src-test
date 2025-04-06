@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using SL.Common;
 
 namespace SL.ChatLinks.UI.Tabs.Items
 {
@@ -10,15 +11,11 @@ namespace SL.ChatLinks.UI.Tabs.Items
 		[CompilerGenerated]
 		private string _003CsearchText_003EP;
 
-		[CompilerGenerated]
-		private ContentArea _003Cprevious_003EP;
-
 		public SearchCategoryContentArea(string label, string searchText, ContentArea previous)
 		{
 			_003Clabel_003EP = label;
 			_003CsearchText_003EP = searchText;
-			_003Cprevious_003EP = previous;
-			base._002Ector(_003Cprevious_003EP);
+			base._002Ector(previous);
 		}
 
 		public override string GetTitle()
@@ -28,16 +25,12 @@ namespace SL.ChatLinks.UI.Tabs.Items
 
 		public override ContentArea Search(string text)
 		{
-			if (string.IsNullOrWhiteSpace(text))
+			ThrowHelper.ThrowIfNull(base.Previous, "Previous");
+			if (!string.IsNullOrWhiteSpace(text))
 			{
-				return _003Cprevious_003EP;
+				return new SearchCategoryContentArea(_003Clabel_003EP, text, base.Previous);
 			}
-			return new SearchCategoryContentArea(_003Clabel_003EP, text, _003Cprevious_003EP);
-		}
-
-		public override ContentArea Back()
-		{
-			return _003Cprevious_003EP;
+			return base.Previous;
 		}
 	}
 }

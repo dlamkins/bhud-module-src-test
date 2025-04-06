@@ -23,11 +23,11 @@ namespace SL.ChatLinks.UI.Tabs.Items
 
 		public override ContentArea Search(string text)
 		{
-			if (string.IsNullOrWhiteSpace(text))
+			if (!string.IsNullOrWhiteSpace(text))
 			{
-				return new RecentlyAddedContentArea();
+				return new SearchEverywhereContentArea(text, _previous);
 			}
-			return new SearchEverywhereContentArea(text, _previous);
+			return new RecentlyAddedContentArea();
 		}
 
 		public override ContentArea Back()

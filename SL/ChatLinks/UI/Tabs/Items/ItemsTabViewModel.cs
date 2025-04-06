@@ -240,7 +240,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 				new ItemCategoryMenuItem
 				{
 					Label = (string)_003Clocalizer_003EP["Armor"],
-					Subcategories = new List<ItemCategoryMenuItem>(8)
+					Subcategories = new Collection<ItemCategoryMenuItem>
 					{
 						new ItemCategoryMenuItem
 						{
@@ -287,7 +287,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 				new ItemCategoryMenuItem
 				{
 					Label = (string)_003Clocalizer_003EP["Weapons"],
-					Subcategories = new List<ItemCategoryMenuItem>(24)
+					Subcategories = new Collection<ItemCategoryMenuItem>
 					{
 						new ItemCategoryMenuItem
 						{
@@ -414,7 +414,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 				new ItemCategoryMenuItem
 				{
 					Label = (string)_003Clocalizer_003EP["Upgrade Components"],
-					Subcategories = new List<ItemCategoryMenuItem>(10)
+					Subcategories = new Collection<ItemCategoryMenuItem>
 					{
 						new ItemCategoryMenuItem
 						{
@@ -471,7 +471,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 				new ItemCategoryMenuItem
 				{
 					Label = (string)_003Clocalizer_003EP["Trinkets"],
-					Subcategories = new List<ItemCategoryMenuItem>(4)
+					Subcategories = new Collection<ItemCategoryMenuItem>
 					{
 						new ItemCategoryMenuItem
 						{
@@ -518,7 +518,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 				new ItemCategoryMenuItem
 				{
 					Label = (string)_003Clocalizer_003EP["Gathering Tools"],
-					Subcategories = new List<ItemCategoryMenuItem>(6)
+					Subcategories = new Collection<ItemCategoryMenuItem>
 					{
 						new ItemCategoryMenuItem
 						{
@@ -555,7 +555,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 				new ItemCategoryMenuItem
 				{
 					Label = (string)_003Clocalizer_003EP["Consumables"],
-					Subcategories = new List<ItemCategoryMenuItem>(24)
+					Subcategories = new Collection<ItemCategoryMenuItem>
 					{
 						new ItemCategoryMenuItem
 						{
@@ -692,7 +692,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 				new ItemCategoryMenuItem
 				{
 					Label = (string)_003Clocalizer_003EP["Containers"],
-					Subcategories = new List<ItemCategoryMenuItem>(5)
+					Subcategories = new Collection<ItemCategoryMenuItem>
 					{
 						new ItemCategoryMenuItem
 						{
@@ -756,7 +756,12 @@ namespace SL.ChatLinks.UI.Tabs.Items
 
 		public Task Load()
 		{
-			MenuItems = new ObservableCollection<ItemCategoryMenuItem>(GetCategories());
+			ObservableCollection<ItemCategoryMenuItem> observableCollection = new ObservableCollection<ItemCategoryMenuItem>();
+			foreach (ItemCategoryMenuItem category in GetCategories())
+			{
+				observableCollection.Add(category);
+			}
+			MenuItems = observableCollection;
 			_003CeventAggregator_003EP.Subscribe(new Func<LocaleChanged, Task>(OnLocaleChanged));
 			_003CeventAggregator_003EP.Subscribe(new Func<DatabaseDownloaded, Task>(OnDatabaseDownloaded));
 			_003CeventAggregator_003EP.Subscribe(new Func<DatabaseSeeded, Task>(OnDatabaseSeeded));
@@ -766,7 +771,12 @@ namespace SL.ChatLinks.UI.Tabs.Items
 		private async Task OnLocaleChanged(LocaleChanged args)
 		{
 			OnPropertyChanged("SearchPlaceholder");
-			MenuItems = new ObservableCollection<ItemCategoryMenuItem>(GetCategories());
+			ObservableCollection<ItemCategoryMenuItem> observableCollection = new ObservableCollection<ItemCategoryMenuItem>();
+			foreach (ItemCategoryMenuItem category in GetCategories())
+			{
+				observableCollection.Add(category);
+			}
+			MenuItems = observableCollection;
 			await Task.Run((Func<Task>)OnSearch).ConfigureAwait(continueOnCapturedContext: false);
 		}
 

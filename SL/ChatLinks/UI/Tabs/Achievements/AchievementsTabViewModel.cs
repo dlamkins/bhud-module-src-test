@@ -17,6 +17,7 @@ using Microsoft.Extensions.Localization;
 using SL.ChatLinks.Storage;
 using SL.Common;
 using SL.Common.ModelBinding;
+using SL.Common.Progression;
 
 namespace SL.ChatLinks.UI.Tabs.Achievements
 {
@@ -40,7 +41,7 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 		private AchievementTileViewModel.Factory _003CachievementTileViewModelFactory_003EP;
 
 		[CompilerGenerated]
-		private AccountUnlocks _003Cunlocks_003EP;
+		private CurrentAccount _003Caccount_003EP;
 
 		[CompilerGenerated]
 		private IconsService _003Cicons_003EP;
@@ -138,14 +139,14 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 			}
 		}
 
-		public AchievementsTabViewModel(IEventAggregator eventAggregator, IDbContextFactory contextFactory, IStringLocalizer<AchievementsTabView> localizer, ILocale locale, AchievementTileViewModel.Factory achievementTileViewModelFactory, AccountUnlocks unlocks, IconsService icons)
+		public AchievementsTabViewModel(IEventAggregator eventAggregator, IDbContextFactory contextFactory, IStringLocalizer<AchievementsTabView> localizer, ILocale locale, AchievementTileViewModel.Factory achievementTileViewModelFactory, CurrentAccount account, IconsService icons)
 		{
 			_003CeventAggregator_003EP = eventAggregator;
 			_003CcontextFactory_003EP = contextFactory;
 			_003Clocalizer_003EP = localizer;
 			_003Clocale_003EP = locale;
 			_003CachievementTileViewModelFactory_003EP = achievementTileViewModelFactory;
-			_003Cunlocks_003EP = unlocks;
+			_003Caccount_003EP = account;
 			_003Cicons_003EP = icons;
 			_groups = new ObservableCollection<AchievementGroupMenuItem>();
 			_achievements = new ObservableCollection<AchievementTileViewModel>();
@@ -284,9 +285,9 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 							List<AchievementCategory> categories = await context.AchievementCategories.ToListAsync().ConfigureAwait(continueOnCapturedContext: false);
 							List<AchievementGroup> groups = await context.AchievementGroups.ToListAsync().ConfigureAwait(continueOnCapturedContext: false);
 							List<AccountAchievement> progression = null;
-							if (_003Cunlocks_003EP.HasPermission(Permission.Progression))
+							if (_003Caccount_003EP.HasPermission(Permission.Progression))
 							{
-								IReadOnlyList<AccountAchievement> readOnlyList = await _003Cunlocks_003EP.GetAchievementProgress(CancellationToken.None).ConfigureAwait(continueOnCapturedContext: false);
+								IReadOnlyList<AccountAchievement> readOnlyList = await _003Caccount_003EP.GetAchievementProgress(CancellationToken.None).ConfigureAwait(continueOnCapturedContext: false);
 								List<AccountAchievement> list = new List<AccountAchievement>(readOnlyList.Count);
 								list.AddRange(readOnlyList);
 								progression = list;
@@ -339,9 +340,9 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 					orderby achievement.Name
 					select achievement).ToListAsync().ConfigureAwait(continueOnCapturedContext: false);
 				List<AccountAchievement> progression = null;
-				if (_003Cunlocks_003EP.HasPermission(Permission.Progression))
+				if (_003Caccount_003EP.HasPermission(Permission.Progression))
 				{
-					IReadOnlyList<AccountAchievement> readOnlyList = await _003Cunlocks_003EP.GetAchievementProgress(CancellationToken.None).ConfigureAwait(continueOnCapturedContext: false);
+					IReadOnlyList<AccountAchievement> readOnlyList = await _003Caccount_003EP.GetAchievementProgress(CancellationToken.None).ConfigureAwait(continueOnCapturedContext: false);
 					List<AccountAchievement> list2 = new List<AccountAchievement>(readOnlyList.Count);
 					list2.AddRange(readOnlyList);
 					progression = list2;
@@ -382,7 +383,7 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 			return list;
 		}
 
-		public AsyncTexture2D GetIcon(string iconUrl)
+		public AsyncTexture2D GetIcon(Uri? iconUrl)
 		{
 			return _003Cicons_003EP.GetIcon(iconUrl) ?? AsyncTexture2D.FromAssetId(155865).Duplicate();
 		}

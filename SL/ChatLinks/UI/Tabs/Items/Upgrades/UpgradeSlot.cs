@@ -54,40 +54,48 @@ namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0092: Expected O, but got Unknown
 			//IL_0097: Expected O, but got Unknown
-			if (!((Control)this).get_MouseOver())
+			if (((Control)this).get_MouseOver())
 			{
-				return;
-			}
-			if ((object)ViewModel.SelectedUpgradeComponent != null)
-			{
-				FormattedLabel label = _label;
-				if (((Control)label).get_Tooltip() == null)
+				if ((object)ViewModel.SelectedUpgradeComponent != null)
 				{
-					FormattedLabel obj = label;
-					Tooltip val = new Tooltip((ITooltipView)(object)new ItemTooltipView(ViewModel.CreateTooltipViewModel(ViewModel.SelectedUpgradeComponent)));
-					Tooltip val2 = val;
-					((Control)obj).set_Tooltip(val);
+					FormattedLabel label = _label;
+					if (((Control)label).get_Tooltip() == null)
+					{
+						FormattedLabel obj = label;
+						Tooltip val = new Tooltip((ITooltipView)(object)new ItemTooltipView(ViewModel.CreateTooltipViewModel(ViewModel.SelectedUpgradeComponent)));
+						Tooltip val2 = val;
+						((Control)obj).set_Tooltip(val);
+					}
 				}
-			}
-			else if ((object)ViewModel.DefaultUpgradeComponent != null)
-			{
-				FormattedLabel label = _label;
-				if (((Control)label).get_Tooltip() == null)
+				else if ((object)ViewModel.DefaultUpgradeComponent != null)
 				{
-					FormattedLabel obj2 = label;
-					Tooltip val3 = new Tooltip((ITooltipView)(object)new ItemTooltipView(ViewModel.CreateTooltipViewModel(ViewModel.DefaultUpgradeComponent)));
-					Tooltip val2 = val3;
-					((Control)obj2).set_Tooltip(val3);
+					FormattedLabel label = _label;
+					if (((Control)label).get_Tooltip() == null)
+					{
+						FormattedLabel obj2 = label;
+						Tooltip val3 = new Tooltip((ITooltipView)(object)new ItemTooltipView(ViewModel.CreateTooltipViewModel(ViewModel.DefaultUpgradeComponent)));
+						Tooltip val2 = val3;
+						((Control)obj2).set_Tooltip(val3);
+					}
+				}
+				else
+				{
+					FormattedLabel label = _label;
+					if (((Control)label).get_BasicTooltipText() == null)
+					{
+						string emptySlotTooltip;
+						((Control)label).set_BasicTooltipText(emptySlotTooltip = ViewModel.EmptySlotTooltip);
+					}
 				}
 			}
 			else
 			{
-				FormattedLabel label = _label;
-				if (((Control)label).get_BasicTooltipText() == null)
+				Tooltip tooltip = ((Control)_label).get_Tooltip();
+				if (tooltip != null)
 				{
-					string emptySlotTooltip;
-					((Control)label).set_BasicTooltipText(emptySlotTooltip = ViewModel.EmptySlotTooltip);
+					((Control)tooltip).Dispose();
 				}
+				((Control)_label).set_Tooltip((Tooltip)null);
 			}
 		}
 

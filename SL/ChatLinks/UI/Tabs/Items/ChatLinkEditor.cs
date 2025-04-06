@@ -55,81 +55,81 @@ namespace SL.ChatLinks.UI.Tabs.Items
 			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0121: Expected O, but got Unknown
 			//IL_0126: Expected O, but got Unknown
-			//IL_013e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0143: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0156: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0160: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0127: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0133: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0149: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0154: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0163: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0173: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0196: Expected O, but got Unknown
-			//IL_0263: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0268: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017f: Expected O, but got Unknown
+			//IL_0216: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0222: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0229: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0230: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0237: Unknown result type (might be due to invalid IL or missing references)
+			//IL_023d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0248: Expected O, but got Unknown
+			//IL_0248: Unknown result type (might be due to invalid IL or missing references)
+			//IL_024d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0254: Unknown result type (might be due to invalid IL or missing references)
+			//IL_025b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0262: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0269: Unknown result type (might be due to invalid IL or missing references)
 			//IL_026f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0276: Unknown result type (might be due to invalid IL or missing references)
-			//IL_027d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0284: Unknown result type (might be due to invalid IL or missing references)
-			//IL_028a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0295: Expected O, but got Unknown
-			//IL_0295: Unknown result type (might be due to invalid IL or missing references)
-			//IL_029a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02af: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c8: Expected O, but got Unknown
-			//IL_02c8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02d4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02e5: Expected O, but got Unknown
-			//IL_0439: Unknown result type (might be due to invalid IL or missing references)
-			//IL_043e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0445: Unknown result type (might be due to invalid IL or missing references)
-			//IL_044d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0457: Expected O, but got Unknown
-			//IL_0458: Unknown result type (might be due to invalid IL or missing references)
-			//IL_045d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0465: Unknown result type (might be due to invalid IL or missing references)
-			//IL_046d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0474: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0484: Expected O, but got Unknown
+			//IL_027b: Expected O, but got Unknown
+			//IL_027b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0280: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0287: Unknown result type (might be due to invalid IL or missing references)
+			//IL_028e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0298: Expected O, but got Unknown
+			//IL_03ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03f8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0400: Unknown result type (might be due to invalid IL or missing references)
+			//IL_040a: Expected O, but got Unknown
+			//IL_040b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0410: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0418: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0420: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0427: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0437: Expected O, but got Unknown
+			//IL_0575: Unknown result type (might be due to invalid IL or missing references)
+			//IL_057a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0581: Unknown result type (might be due to invalid IL or missing references)
+			//IL_058c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0594: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05ae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05ba: Unknown result type (might be due to invalid IL or missing references)
 			//IL_05c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05d9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05e1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05fb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0600: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0607: Unknown result type (might be due to invalid IL or missing references)
-			//IL_060f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0617: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0627: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0637: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0652: Expected O, but got Unknown
-			//IL_0681: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0686: Unknown result type (might be due to invalid IL or missing references)
-			//IL_068e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0699: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06a6: Expected O, but got Unknown
-			//IL_0723: Unknown result type (might be due to invalid IL or missing references)
-			//IL_072d: Expected O, but got Unknown
-			//IL_072d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0732: Unknown result type (might be due to invalid IL or missing references)
-			//IL_073a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_074a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_076c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0771: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0778: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0783: Unknown result type (might be due to invalid IL or missing references)
-			//IL_078a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0791: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0792: Unknown result type (might be due to invalid IL or missing references)
-			//IL_079c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07b2: Expected O, but got Unknown
+			//IL_05ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0605: Expected O, but got Unknown
+			//IL_0634: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0639: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0641: Unknown result type (might be due to invalid IL or missing references)
+			//IL_064c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0659: Expected O, but got Unknown
+			//IL_06d6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06e0: Expected O, but got Unknown
+			//IL_06e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06ed: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06fd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_071f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0724: Unknown result type (might be due to invalid IL or missing references)
+			//IL_072b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0736: Unknown result type (might be due to invalid IL or missing references)
+			//IL_073d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0744: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0745: Unknown result type (might be due to invalid IL or missing references)
+			//IL_074f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0765: Expected O, but got Unknown
 			ChatLinkEditorViewModel viewModel2 = viewModel;
 			((FlowPanel)this)._002Ector();
 			ChatLinkEditor chatLinkEditor = this;
@@ -162,7 +162,6 @@ namespace SL.ChatLinks.UI.Tabs.Items
 				chatLinkEditor.ViewModel.OpenApiCommand.ToMenuItem(() => viewModel2.OpenApiLabel)
 			}))));
 			_itemIcon = val2;
-			((Control)_itemIcon).add_MouseEntered((EventHandler<MouseEventArgs>)IconMouseEntered);
 			Label val3 = new Label();
 			((Control)val3).set_Parent((Container)(object)header);
 			val3.set_TextColor(viewModel2.ItemNameColor);
@@ -176,13 +175,6 @@ namespace SL.ChatLinks.UI.Tabs.Items
 			foreach (UpgradeEditorViewModel upgradeEditorViewModel in viewModel2.UpgradeEditorViewModels)
 			{
 				((Control)new UpgradeEditor(upgradeEditorViewModel)).set_Parent((Container)(object)this);
-				upgradeEditorViewModel.PropertyChanged += delegate(object _, PropertyChangedEventArgs args)
-				{
-					if (args.PropertyName == "EffectiveUpgradeComponent")
-					{
-						((Control)chatLinkEditor._itemIcon).set_Tooltip((Tooltip)null);
-					}
-				};
 			}
 			FlowPanel val4 = new FlowPanel();
 			((Control)val4).set_Parent((Container)(object)this);
@@ -268,7 +260,6 @@ namespace SL.ChatLinks.UI.Tabs.Items
 			((Control)val13).set_Visible(ViewModel.ShowInfusionWarning);
 			_infusionWarning = val13;
 			Binder.Bind(viewModel2, (ChatLinkEditorViewModel vm) => vm.InfusionWarning, _infusionWarning);
-			viewModel2.PropertyChanged += new PropertyChangedEventHandler(PropertyChanged);
 			Control.get_Input().get_Mouse().add_MouseWheelScrolled((EventHandler<MouseEventArgs>)OnGlobalMouseWheelScrolled);
 		}
 
@@ -302,15 +293,30 @@ namespace SL.ChatLinks.UI.Tabs.Items
 
 		public override void UpdateContainer(GameTime gameTime)
 		{
-			((Control)_infusionWarning).set_Visible(ViewModel.ShowInfusionWarning);
-		}
-
-		private void PropertyChanged(object sender, PropertyChangedEventArgs args)
-		{
-			if (args.PropertyName == "Quantity")
+			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0034: Expected O, but got Unknown
+			//IL_0039: Expected O, but got Unknown
+			if (((Control)_itemIcon).get_MouseOver())
 			{
+				Image itemIcon = _itemIcon;
+				if (((Control)itemIcon).get_Tooltip() == null)
+				{
+					Tooltip val = new Tooltip((ITooltipView)(object)new ItemTooltipView(ViewModel.CreateTooltipViewModel()));
+					Tooltip val2 = val;
+					((Control)itemIcon).set_Tooltip(val);
+				}
+			}
+			else
+			{
+				Tooltip tooltip = ((Control)_itemIcon).get_Tooltip();
+				if (tooltip != null)
+				{
+					((Control)tooltip).Dispose();
+				}
 				((Control)_itemIcon).set_Tooltip((Tooltip)null);
 			}
+			((Control)_infusionWarning).set_Visible(ViewModel.ShowInfusionWarning);
 		}
 
 		protected override void OnMouseWheelScrolled(MouseEventArgs e)
@@ -331,21 +337,6 @@ namespace SL.ChatLinks.UI.Tabs.Items
 		{
 			Soundboard.Click();
 			ViewModel.MinQuantityCommand.Execute();
-		}
-
-		private void IconMouseEntered(object sender, MouseEventArgs e)
-		{
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0027: Expected O, but got Unknown
-			//IL_002c: Expected O, but got Unknown
-			Image itemIcon = _itemIcon;
-			if (((Control)itemIcon).get_Tooltip() == null)
-			{
-				Tooltip val = new Tooltip((ITooltipView)(object)new ItemTooltipView(ViewModel.CreateTooltipViewModel()));
-				Tooltip val2 = val;
-				((Control)itemIcon).set_Tooltip(val);
-			}
 		}
 
 		private void ChatLinkClicked(object sender, MouseEventArgs e)

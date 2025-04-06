@@ -4,10 +4,11 @@ using System.Runtime.CompilerServices;
 using GuildWars2;
 using GuildWars2.Mumble;
 using SL.Common;
+using SL.Common.Exploration;
 
 namespace SL.ChatLinks
 {
-	internal sealed class MumbleListener : IObserver<GameTick>, IDisposable
+	public sealed class MumbleListener : IObserver<GameTick>, IDisposable
 	{
 		[CompilerGenerated]
 		private GameLink _003Clink_003EP;

@@ -25,13 +25,13 @@ namespace SL.ChatLinks.UI
 			base._002Ector();
 		}
 
-		public AsyncTexture2D? GetIcon(string? iconUrl)
+		public AsyncTexture2D? GetIcon(Uri? iconUrl)
 		{
-			if (string.IsNullOrWhiteSpace(iconUrl))
+			if ((object)iconUrl == null)
 			{
 				return null;
 			}
-			return (GameService.Content.GetRenderServiceTexture(iconUrl) ?? _003Ccache_003EP.GetOrAdd(iconUrl, delegate(string url)
+			return (GameService.Content.GetRenderServiceTexture(iconUrl!.ToString()) ?? _003Ccache_003EP.GetOrAdd(iconUrl!.ToString(), delegate(string url)
 			{
 				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0011: Expected O, but got Unknown

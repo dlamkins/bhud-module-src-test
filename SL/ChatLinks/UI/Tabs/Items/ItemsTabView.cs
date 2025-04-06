@@ -36,7 +36,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 
 		private Container? _selection;
 
-		private event EventHandler<EventArgs>? _menuItemExpanded;
+		private event EventHandler<EventArgs>? MenuItemExpanded;
 
 		public ItemsTabView(ItemsTabViewModel viewModel)
 		{
@@ -200,7 +200,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 		{
 			if (_sidebar != null)
 			{
-				this._menuItemExpanded = null;
+				this.MenuItemExpanded = null;
 				while (((Container)_sidebar).get_Children().get_Count() > 0)
 				{
 					((Container)_sidebar).get_Children().get_Item(0).Dispose();
@@ -246,10 +246,10 @@ namespace SL.ChatLinks.UI.Tabs.Items
 					{
 						if (args.PropertyName == "Expand")
 						{
-							this._menuItemExpanded?.Invoke(sender, EventArgs.Empty);
+							this.MenuItemExpanded?.Invoke(sender, EventArgs.Empty);
 						}
 					});
-					_menuItemExpanded += delegate(object sender, EventArgs args)
+					MenuItemExpanded += delegate(object sender, EventArgs args)
 					{
 						if (sender != menuItem)
 						{
@@ -318,7 +318,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 
 		public void Dispose()
 		{
-			this._menuItemExpanded = null;
+			this.MenuItemExpanded = null;
 			Panel? sidePanel = _sidePanel;
 			if (sidePanel != null)
 			{

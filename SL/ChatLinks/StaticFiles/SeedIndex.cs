@@ -2,32 +2,30 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.Json.Serialization;
 
-namespace SL.ChatLinks
+namespace SL.ChatLinks.StaticFiles
 {
-	public record MapChanged(int mapId)
+	[JsonConverter(typeof(SeedIndexJsonConverter))]
+	public sealed record SeedIndex
 	{
 		[CompilerGenerated]
-		protected virtual Type EqualityContract
+		private Type EqualityContract
 		{
 			[CompilerGenerated]
 			get
 			{
-				return typeof(MapChanged);
+				return typeof(SeedIndex);
 			}
 		}
 
-		public MapChanged(int mapId)
-		{
-			this.mapId = ;
-			base._002Ector();
-		}
+		public IReadOnlyList<SeedDatabase> Databases { get; init; }
 
 		[CompilerGenerated]
 		public override string ToString()
 		{
 			StringBuilder stringBuilder = new StringBuilder();
-			stringBuilder.Append("MapChanged");
+			stringBuilder.Append("SeedIndex");
 			stringBuilder.Append(" { ");
 			if (PrintMembers(stringBuilder))
 			{
@@ -38,28 +36,28 @@ namespace SL.ChatLinks
 		}
 
 		[CompilerGenerated]
-		protected virtual bool PrintMembers(StringBuilder builder)
+		private bool PrintMembers(StringBuilder builder)
 		{
 			RuntimeHelpers.EnsureSufficientExecutionStack();
-			builder.Append("mapId = ");
-			builder.Append(mapId.ToString());
+			builder.Append("Databases = ");
+			builder.Append(Databases);
 			return true;
 		}
 
 		[CompilerGenerated]
 		public override int GetHashCode()
 		{
-			return EqualityComparer<Type>.Default.GetHashCode(EqualityContract) * -1521134295 + EqualityComparer<int>.Default.GetHashCode(mapId);
+			return EqualityComparer<Type>.Default.GetHashCode(EqualityContract) * -1521134295 + EqualityComparer<IReadOnlyList<SeedDatabase>>.Default.GetHashCode(Databases);
 		}
 
 		[CompilerGenerated]
-		public virtual bool Equals(MapChanged? other)
+		public bool Equals(SeedIndex? other)
 		{
 			if ((object)this != other)
 			{
 				if ((object)other != null && EqualityContract == other!.EqualityContract)
 				{
-					return EqualityComparer<int>.Default.Equals(mapId, other!.mapId);
+					return EqualityComparer<IReadOnlyList<SeedDatabase>>.Default.Equals(Databases, other!.Databases);
 				}
 				return false;
 			}
@@ -67,9 +65,15 @@ namespace SL.ChatLinks
 		}
 
 		[CompilerGenerated]
-		protected MapChanged(MapChanged original)
+		private SeedIndex(SeedIndex original)
 		{
-			mapId = original.mapId;
+			Databases = original.Databases;
+		}
+
+		public SeedIndex()
+		{
+			Databases = Array.Empty<SeedDatabase>();
+			base._002Ector();
 		}
 	}
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -24,7 +25,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 		[System.Runtime.CompilerServices.RequiredMember]
 		public string Label { get; init; }
 
-		public List<ItemCategoryMenuItem> Subcategories { get; init; }
+		public Collection<ItemCategoryMenuItem> Subcategories { get; init; }
 
 		public bool CanSelect
 		{
@@ -70,7 +71,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 		[CompilerGenerated]
 		public override int GetHashCode()
 		{
-			return ((EqualityComparer<Type>.Default.GetHashCode(EqualityContract) * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Id)) * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Label)) * -1521134295 + EqualityComparer<List<ItemCategoryMenuItem>>.Default.GetHashCode(Subcategories);
+			return ((EqualityComparer<Type>.Default.GetHashCode(EqualityContract) * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Id)) * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Label)) * -1521134295 + EqualityComparer<Collection<ItemCategoryMenuItem>>.Default.GetHashCode(Subcategories);
 		}
 
 		[CompilerGenerated]
@@ -80,7 +81,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 			{
 				if ((object)other != null && EqualityContract == other!.EqualityContract && EqualityComparer<string>.Default.Equals(Id, other!.Id) && EqualityComparer<string>.Default.Equals(Label, other!.Label))
 				{
-					return EqualityComparer<List<ItemCategoryMenuItem>>.Default.Equals(Subcategories, other!.Subcategories);
+					return EqualityComparer<Collection<ItemCategoryMenuItem>>.Default.Equals(Subcategories, other!.Subcategories);
 				}
 				return false;
 			}
@@ -100,7 +101,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 		[System.Runtime.CompilerServices.CompilerFeatureRequired("RequiredMembers")]
 		public ItemCategoryMenuItem()
 		{
-			Subcategories = new List<ItemCategoryMenuItem>();
+			Subcategories = new Collection<ItemCategoryMenuItem>();
 			base._002Ector();
 		}
 	}
