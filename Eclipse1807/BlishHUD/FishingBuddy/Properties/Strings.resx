@@ -30,6 +30,7 @@
 <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="RarityDescription"><value>Display fish rarity border</value></data>
   <data name="Wreckage Site"><value>Wreckage Site</value></data>
   <data name="Used as bait"><value>Used as bait</value></data>
+  <data name="Fractured Desert Fish"><value>Fractured Desert Fish</value></data>
   <data name="Exotic"><value>Exotic</value></data>
   <data name="Top-left"><value>Top-left</value></data>
   <data name="Cavern Fish"><value>Cavern Fish</value></data>
@@ -40,12 +41,14 @@
   <data name="Saltwater Fish"><value>Saltwater Fish</value></data>
   <data name="Scorpions"><value>Scorpions</value></data>
   <data name="TimeOfDayHideDescription"><value>Option to hide time display</value></data>
+  <data name="Nayosian Fish"><value>Nayosian Fish</value></data>
   <data name="Direction"><value>Direction</value></data>
   <data name="Deep Fishing Hole"><value>Deep Fishing Hole</value></data>
   <data name="River Fish"><value>River Fish</value></data>
   <data name="Specialization Collection: Purifier"><value>Specialization Collection: Purifier</value></data>
   <data name="Glow Worms"><value>Glow Worms</value></data>
   <data name="Lightning Bugs"><value>Lightning Bugs</value></data>
+  <data name="Freshwater / Brackish Water"><value>Freshwater / Brackish Water</value></data>
   <data name="Shore Fish"><value>Shore Fish</value></data>
   <data name="Sparkfly Larvae"><value>Sparkfly Larvae</value></data>
   <data name="BaitPanelDrag"><value>Drag Bait</value></data>
@@ -59,6 +62,7 @@
   <data name="TimeOfDayPanelLoc"><value>Time of Day Details Location</value></data>
   <data name="TimeOfDayHideLabelDescription"><value>Show/Hide clock time label display</value></data>
   <data name="Vertical"><value>Vertical</value></data>
+  <data name="Fractured Channel Fish"><value>Fractured Channel Fish</value></data>
   <data name="Rarity"><value>Rarity</value></data>
   <data name="Special Fishing Hole"><value>Special Fishing Hole</value></data>
   <data name="Release for 350 karma"><value>Release for 350 karma</value></data>
@@ -72,6 +76,7 @@
   <data name="SettingsDisplayWorldClassDescription"><value>Include World Class Fisher fish</value></data>
   <data name="Lava Beetles"><value>Lava Beetles</value></data>
   <data name="FishFavoredBait"><value>Favored Bait</value></data>
+  <data name="Dream Fish"><value>Dream Fish</value></data>
   <data name="FishPanelDrag"><value>Drag Fish</value></data>
   <data name="FishPanelSize"><value>Fish Size</value></data>
   <data name="Achievement"><value>Achievement</value></data>
@@ -79,7 +84,9 @@
   <data name="Specialization Collection: Gravity"><value>Specialization Collection: Gravity</value></data>
   <data name="Boreal Fish"><value>Boreal Fish</value></data>
   <data name="FishTimeOfDay"><value>Time of Day</value></data>
+  <data name="Spire Fish"><value>Spire Fish</value></data>
   <data name="Release for 1500 karma"><value>Release for 1500 karma</value></data>
+  <data name="Saltwater / Brackish Water"><value>Saltwater / Brackish Water</value></data>
   <data name="Default"><value>Default</value></data>
   <data name="Fish Eggs"><value>Fish Eggs</value></data>
   <data name="Desert Fish"><value>Desert Fish</value></data>
@@ -111,6 +118,7 @@
   <data name="CompactTooltip"><value>Compact: #1 [#6]\\nBait: #2\\nHole: #4 (#3)\\n@7\n</value></data>
   <data name="SettingsIgnoreCaught"><value>Ignore Caught</value></data>
   <data name="FishPanelTooltipDescription"><value>@number uses default string, #number allows for more customization\n</value></data>
+  <data name="Astral Fish"><value>Astral Fish</value></data>
   <data name="TimeOfDayHideLabel"><value>Hide Time Label</value></data>
   <data name="TimeOfDayLabelPositionDescription"><value>Clock display label alignment</value></data>
   <data name="SettingsDisplaySaltwaterDescription"><value>Include Saltwater Fisher fish</value></data>
@@ -121,6 +129,8 @@
   <data name="Ramshorn Snails"><value>Ramshorn Snails</value></data>
   <data name="Sardines"><value>Sardines</value></data>
   <data name="Specialization Collection: Percussive Maintenance"><value>Specialization Collection: Percussive Maintenance</value></data>
+  <data name="Fractured Freshwater Fish"><value>Fractured Freshwater Fish</value></data>
+  <data name="Saltwater"><value>Saltwater</value></data>
   <data name="Quarry Fish"><value>Quarry Fish</value></data>
   <data name="Orientation"><value>Orientation</value></data>
   <data name="Specialization Collection: Dichotomy"><value>Specialization Collection: Dichotomy</value></data>
