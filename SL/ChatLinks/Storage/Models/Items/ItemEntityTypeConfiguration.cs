@@ -75,6 +75,7 @@ namespace SL.ChatLinks.Storage.Models.Items
 				.HasValue<Axe>("axe")
 				.HasValue<Shield>("shield")
 				.HasValue<GatheringTool>("gathering_tool")
+				.HasValue<FishingRod>("fishing_rod")
 				.HasValue<Lure>("lure")
 				.HasValue<Bait>("bait")
 				.HasValue<MiningPick>("mining_pick")

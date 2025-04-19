@@ -17,7 +17,7 @@ using SL.Common.ModelBinding;
 
 namespace SL.ChatLinks.UI
 {
-	public sealed class MainIconViewModel : ViewModel
+	public sealed class MainIconViewModel : ViewModel, IDisposable
 	{
 		[CompilerGenerated]
 		private ILogger<MainIconViewModel> _003Clogger_003EP;
@@ -170,20 +170,11 @@ namespace SL.ChatLinks.UI
 			_003CeventAggregator_003EP.Subscribe(new Action<DatabaseSyncProgress>(OnDatabaseSyncProgress));
 			_003CeventAggregator_003EP.Subscribe(new Action<DatabaseSyncCompleted>(OnDatabaseSyncCompleted));
 			_003CeventAggregator_003EP.Subscribe(new Action<LocaleChanged>(OnLocaleChanged));
-			_003CeventAggregator_003EP.Subscribe(new Action<ModuleUnloading>(OnModuleUnloading));
 			ChangeToken.OnChange(_003Csettings_003EP.GetChangeToken, delegate(ModuleSettings moduleSettings)
 			{
 				BananaMode = moduleSettings.BananaMode;
 				RaiseStackSize = moduleSettings.RaiseStackSize;
 			}, _003Csettings_003EP);
-		}
-
-		private void OnModuleUnloading(ModuleUnloading unloading)
-		{
-			_003CeventAggregator_003EP.Unsubscribe<DatabaseSyncProgress>(new Action<DatabaseSyncProgress>(OnDatabaseSyncProgress));
-			_003CeventAggregator_003EP.Unsubscribe<DatabaseSyncCompleted>(new Action<DatabaseSyncCompleted>(OnDatabaseSyncCompleted));
-			_003CeventAggregator_003EP.Unsubscribe<LocaleChanged>(new Action<LocaleChanged>(OnLocaleChanged));
-			_003CeventAggregator_003EP.Unsubscribe<ModuleUnloading>(new Action<ModuleUnloading>(OnModuleUnloading));
 		}
 
 		private void OnDatabaseSyncProgress(DatabaseSyncProgress args)
@@ -238,6 +229,13 @@ namespace SL.ChatLinks.UI
 			yield return raiseStackSizeItem;
 			yield return syncItem;
 			yield return koFiItem;
+		}
+
+		public void Dispose()
+		{
+			_003CeventAggregator_003EP.Unsubscribe<DatabaseSyncProgress>(new Action<DatabaseSyncProgress>(OnDatabaseSyncProgress));
+			_003CeventAggregator_003EP.Unsubscribe<DatabaseSyncCompleted>(new Action<DatabaseSyncCompleted>(OnDatabaseSyncCompleted));
+			_003CeventAggregator_003EP.Unsubscribe<LocaleChanged>(new Action<LocaleChanged>(OnLocaleChanged));
 		}
 	}
 }

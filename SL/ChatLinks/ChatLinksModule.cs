@@ -23,7 +23,6 @@ using SL.ChatLinks.UI.Tabs.Items.Tooltips;
 using SL.ChatLinks.UI.Tabs.Items.Upgrades;
 using SL.Common;
 using SL.Common.Progression;
-using SQLitePCL;
 
 namespace SL.ChatLinks
 {
@@ -137,7 +136,7 @@ namespace SL.ChatLinks
 			services.AddFactoryDelegate<AchievementTooltipViewModel.Factory>();
 			_serviceProvider = services.BuildServiceProvider();
 			_eventAggregator = _serviceProvider.GetRequiredService<IEventAggregator>();
-			SetupSqlite3();
+			Sqlite3Setup.Run();
 		}
 
 		protected override async Task LoadAsync()
@@ -181,12 +180,6 @@ namespace SL.ChatLinks
 		private void OnHourStarted(object sender, EventArgs e)
 		{
 			_eventAggregator?.Publish(new HourStarted());
-		}
-
-		private static void SetupSqlite3()
-		{
-			SQLite3Provider_dynamic_cdecl.Setup("e_sqlite3", new ModuleGetFunctionPointer("sliekens.e_sqlite3"));
-			raw.SetProvider(new SQLite3Provider_dynamic_cdecl());
 		}
 
 		protected override void Unload()

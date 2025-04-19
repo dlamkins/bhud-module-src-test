@@ -64,22 +64,29 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 			//IL_0270: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0280: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0293: Expected O, but got Unknown
-			//IL_03a1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03fc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0416: Unknown result type (might be due to invalid IL or missing references)
-			//IL_041b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0422: Unknown result type (might be due to invalid IL or missing references)
-			//IL_042a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0431: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0442: Unknown result type (might be due to invalid IL or missing references)
-			//IL_044e: Expected O, but got Unknown
-			//IL_0465: Unknown result type (might be due to invalid IL or missing references)
-			//IL_046a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0471: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0481: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04af: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04b9: Expected O, but got Unknown
+			//IL_02af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02eb: Expected O, but got Unknown
+			//IL_03f9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0427: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0454: Unknown result type (might be due to invalid IL or missing references)
+			//IL_046e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0473: Unknown result type (might be due to invalid IL or missing references)
+			//IL_047a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0482: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0489: Unknown result type (might be due to invalid IL or missing references)
+			//IL_049a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04a6: Expected O, but got Unknown
+			//IL_04bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04c2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04c9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0507: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0511: Expected O, but got Unknown
 			AchievementTileViewModel viewModel2 = viewModel;
 			((Container)this)._002Ector();
 			AchievementTile achievementTile = this;
@@ -108,8 +115,8 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 				((Control)val3).set_Size(new Point(32));
 				val3.set_Texture(AsyncTexture2D.FromAssetId(1508665));
 				((Control)val3).set_BasicTooltipText(ViewModel.AchievementProgressUnavailable);
-				Image info4 = val3;
-				chatLinkWidth -= ((Control)info4).get_Width();
+				Image info5 = val3;
+				chatLinkWidth -= ((Control)info5).get_Width();
 				if (!viewModel2.Locked)
 				{
 					_detailsButton.set_MaxFill(viewModel2.Achievement.Tiers[0].Count);
@@ -125,8 +132,8 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 					((Control)val4).set_Size(new Point(32));
 					val4.set_Texture(AsyncTexture2D.FromAssetId(1508665));
 					((Control)val4).set_BasicTooltipText(ViewModel.DailyAchievementProgressUnavailable);
-					Image info3 = val4;
-					chatLinkWidth -= ((Control)info3).get_Width();
+					Image info4 = val4;
+					chatLinkWidth -= ((Control)info4).get_Width();
 				}
 				else if (viewModel2.IsWeekly)
 				{
@@ -135,17 +142,27 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 					((Control)val5).set_Size(new Point(32));
 					val5.set_Texture(AsyncTexture2D.FromAssetId(1508665));
 					((Control)val5).set_BasicTooltipText(ViewModel.WeeklyAchievementProgressUnavailable);
-					Image info2 = val5;
-					chatLinkWidth -= ((Control)info2).get_Width();
+					Image info3 = val5;
+					chatLinkWidth -= ((Control)info3).get_Width();
 				}
-				else if (viewModel2.IsPerCharacter)
+				else if (viewModel2.IsMonthly)
 				{
 					Image val6 = new Image();
 					((Control)val6).set_Parent((Container)(object)toolbar);
 					((Control)val6).set_Size(new Point(32));
 					val6.set_Texture(AsyncTexture2D.FromAssetId(1508665));
-					((Control)val6).set_BasicTooltipText(ViewModel.PerCharacterAchievementProgressUnavailable);
-					Image info = val6;
+					((Control)val6).set_BasicTooltipText(ViewModel.MonthlyAchievementProgressUnavailable);
+					Image info2 = val6;
+					chatLinkWidth -= ((Control)info2).get_Width();
+				}
+				else if (viewModel2.IsPerCharacter)
+				{
+					Image val7 = new Image();
+					((Control)val7).set_Parent((Container)(object)toolbar);
+					((Control)val7).set_Size(new Point(32));
+					val7.set_Texture(AsyncTexture2D.FromAssetId(1508665));
+					((Control)val7).set_BasicTooltipText(ViewModel.PerCharacterAchievementProgressUnavailable);
+					Image info = val7;
 					chatLinkWidth -= ((Control)info).get_Width();
 				}
 				else if (!viewModel2.Locked)
@@ -179,19 +196,19 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 				}
 				chatLinkWidth -= ((Control)eye).get_Width();
 			}
-			TextBox val7 = new TextBox();
-			((Control)val7).set_Parent((Container)(object)toolbar);
-			((Control)val7).set_Height(35);
-			((Control)val7).set_Width(chatLinkWidth);
-			((TextInputBase)val7).set_Text(viewModel2.ChatLink);
-			val7.set_HideBackground(true);
-			_chatLink = val7;
-			((TextInputBase)_chatLink).add_InputFocusChanged((EventHandler<ValueEventArgs<bool>>)ChatLinkFocusChanged);
-			GlowButton val8 = new GlowButton();
+			TextBox val8 = new TextBox();
 			((Control)val8).set_Parent((Container)(object)toolbar);
-			val8.set_Icon(AsyncTexture2D.FromAssetId(2208345));
-			val8.set_ActiveIcon(AsyncTexture2D.FromAssetId(2208347));
-			((Control)val8).add_Click((EventHandler<MouseEventArgs>)OnCopyClicked);
+			((Control)val8).set_Height(35);
+			((Control)val8).set_Width(chatLinkWidth);
+			((TextInputBase)val8).set_Text(viewModel2.ChatLink);
+			val8.set_HideBackground(true);
+			_chatLink = val8;
+			((TextInputBase)_chatLink).add_InputFocusChanged((EventHandler<ValueEventArgs<bool>>)ChatLinkFocusChanged);
+			GlowButton val9 = new GlowButton();
+			((Control)val9).set_Parent((Container)(object)toolbar);
+			val9.set_Icon(AsyncTexture2D.FromAssetId(2208345));
+			val9.set_ActiveIcon(AsyncTexture2D.FromAssetId(2208347));
+			((Control)val9).add_Click((EventHandler<MouseEventArgs>)OnCopyClicked);
 			((Control)this).set_Menu(new ContextMenuStrip((Func<IEnumerable<ContextMenuStripItem>>)(() => new _003C_003Ez__ReadOnlyArray<ContextMenuStripItem>((ContextMenuStripItem[])(object)new ContextMenuStripItem[4]
 			{
 				achievementTile.ViewModel.CopyNameCommand.ToMenuItem(() => achievementTile.ViewModel.CopyNameLabel),

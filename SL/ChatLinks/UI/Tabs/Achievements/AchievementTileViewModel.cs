@@ -136,6 +136,8 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 
 		public string WeeklyAchievementProgressUnavailable => (string)_localizer["Weekly achievement progress unavailable"];
 
+		public string MonthlyAchievementProgressUnavailable => (string)_localizer["Monthly achievement progress unavailable"];
+
 		public string PerCharacterAchievementProgressUnavailable => (string)_localizer["Per-character achievement progress unavailable"];
 
 		public bool IsPerCharacter => Group?.IsPerCharacter() ?? false;
@@ -143,6 +145,8 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 		public bool IsDaily => Achievement.Flags.Daily;
 
 		public bool IsWeekly => Achievement.Flags.Weekly;
+
+		public bool IsMonthly => Achievement.Flags.Monthly;
 
 		public string HiddenLabel => (string)_localizer["Hidden achievement"];
 

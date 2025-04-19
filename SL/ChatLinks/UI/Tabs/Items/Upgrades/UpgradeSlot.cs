@@ -164,8 +164,8 @@ namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 
 		protected override void DisposeControl()
 		{
-			((Container)this).DisposeControl();
 			ViewModel.Dispose();
+			((Container)this).DisposeControl();
 		}
 	}
 }

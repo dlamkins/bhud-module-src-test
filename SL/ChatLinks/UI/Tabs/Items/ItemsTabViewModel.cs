@@ -542,6 +542,11 @@ namespace SL.ChatLinks.UI.Tabs.Items
 						},
 						new ItemCategoryMenuItem
 						{
+							Id = "fishing_rod",
+							Label = (string)_003Clocalizer_003EP["Fishing Rods"]
+						},
+						new ItemCategoryMenuItem
+						{
 							Id = "bait",
 							Label = (string)_003Clocalizer_003EP["Bait"]
 						},

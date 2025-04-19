@@ -102,204 +102,229 @@ namespace SL.ChatLinks.UI.Tabs.Items
 					case 11:
 						goto IL_0445;
 					case 14:
-						goto IL_046f;
+						goto IL_0483;
 					case 18:
-						goto IL_0490;
+						goto IL_04a4;
 					case 20:
-						goto IL_04d7;
+						goto IL_04eb;
 					case 13:
-						goto IL_04f8;
+						goto IL_050c;
 					case 15:
-						goto IL_0519;
+						goto IL_052d;
 					case 16:
-						goto IL_053a;
+						goto IL_054e;
 					case 19:
-						goto IL_0578;
+						goto IL_058c;
 					case 17:
-						goto IL_0599;
+						goto IL_05ad;
 					case 23:
-						goto IL_0ccc;
+						goto IL_0cf6;
 					case 24:
-						goto IL_0ce2;
+						goto IL_0d0c;
 					case 28:
-						goto IL_0d50;
+						goto IL_0d7a;
 					case 22:
-						goto IL_0d66;
+						goto IL_0d90;
 					case 27:
-						goto IL_0d7c;
+						goto IL_0da6;
 					case 21:
-						goto IL_0dbe;
+						goto IL_0de8;
 					default:
-						goto IL_16cc;
+						goto IL_1708;
 					}
 					switch (category[3])
 					{
 					case 'o':
 						break;
 					case 's':
-						goto IL_0600;
+						goto IL_0614;
 					case 't':
-						goto IL_0616;
+						goto IL_062a;
 					case 'u':
-						goto IL_062c;
+						goto IL_0640;
 					case 'l':
-						goto IL_0642;
+						goto IL_0656;
 					case 'a':
-						goto IL_0658;
+						goto IL_066c;
 					case 'f':
-						goto IL_066e;
+						goto IL_0682;
 					case 'r':
-						goto IL_0684;
+						goto IL_0698;
 					case 'c':
-						goto IL_069a;
+						goto IL_06ae;
 					case 'z':
-						goto IL_06b0;
+						goto IL_06c4;
 					case 'm':
-						goto IL_06c6;
+						goto IL_06da;
 					case 'i':
-						goto IL_06dc;
+						goto IL_06f0;
 					case 'e':
-						goto IL_0703;
+						goto IL_0717;
 					case 'p':
-						goto IL_0719;
+						goto IL_072d;
 					default:
-						goto IL_16cc;
+						goto IL_1708;
 					}
 					if (category == "armor")
 					{
 						queryable = context.Items.OfType<Armor>();
-						goto IL_16d4;
+						goto IL_1710;
 					}
 				}
-				goto IL_16cc;
-				IL_02fa:
+				goto IL_1708;
+				IL_1710:
+				IQueryable<Item> query2 = queryable;
+				query2 = ((!string.IsNullOrWhiteSpace(filter2.Text)) ? (from item in query2
+					where EF.Functions.Like(item.Name, $"%{filter2.Text}%")
+					orderby Levenshtein.LevenshteinDistance(filter2.Text, item.Name)
+					select item) : query2.OrderByDescending((Item item) => item.Id));
+				resultContext.ResultTotal = await query2.CountAsync(cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
+				await foreach (Item item in query2.Take(limit).AsAsyncEnumerable().WithCancellation(cancellationToken)
+					.ConfigureAwait(continueOnCapturedContext: false))
+				{
+					yield return item;
+				}
+				goto end_IL_00d7;
+				IL_0de8:
+				if (!(category == "shared_inventory_slot"))
+				{
+					goto IL_1708;
+				}
+				queryable = context.Items.OfType<SharedInventorySlot>();
+				goto IL_1710;
+				IL_0717:
+				if (!(category == "jewel"))
+				{
+					goto IL_1708;
+				}
+				queryable = context.Items.FromSqlRaw("SELECT *\r\nFROM Items\r\nWHERE Type = 'upgrade_component'\r\nAND UpgradeComponentFlags -> '$.Trinket' = 'true'\r\nAND InfusionUpgradeFlags -> '$.infusion' = 'false'\r\nAND InfusionUpgradeFlags -> '$.enrichment' = 'false'");
+				goto IL_1710;
+				IL_0da6:
+				if (!(category == "mist_champion_skin_unlocker"))
+				{
+					goto IL_1708;
+				}
+				queryable = context.Items.OfType<MistChampionSkinUnlocker>();
+				goto IL_1710;
+				IL_0445:
+				char c = category[0];
+				if ((uint)c <= 104u)
+				{
+					if (c != 'f')
+					{
+						if (c != 'h' || !(category == "harpoon_gun"))
+						{
+							goto IL_1708;
+						}
+						queryable = context.Items.OfType<HarpoonGun>();
+					}
+					else
+					{
+						if (!(category == "fishing_rod"))
+						{
+							goto IL_1708;
+						}
+						queryable = context.Items.OfType<FishingRod>();
+					}
+				}
+				else if (c != 'l')
+				{
+					if (c != 'm' || !(category == "mining_pick"))
+					{
+						goto IL_1708;
+					}
+					queryable = context.Items.OfType<MiningPick>();
+				}
+				else
+				{
+					if (!(category == "logging_axe"))
+					{
+						goto IL_1708;
+					}
+					queryable = context.Items.OfType<LoggingAxe>();
+				}
+				goto IL_1710;
+				IL_0d90:
+				if (!(category == "jade_bot_skin_unlocker"))
+				{
+					goto IL_1708;
+				}
+				queryable = context.Items.OfType<JadeBotSkinUnlocker>();
+				goto IL_1710;
+				IL_02ab:
 				switch (category[3])
 				{
 				case 'm':
 					break;
+				case 'k':
+					goto IL_08a3;
 				case 'g':
-					goto IL_0935;
-				case 'l':
-					goto IL_094b;
+					goto IL_08b9;
+				case 'e':
+					goto IL_08cf;
+				case 'd':
+					goto IL_0907;
 				case 't':
-					goto IL_0961;
-				case 'i':
-					goto IL_0977;
-				case 'v':
-					goto IL_098d;
+					goto IL_091d;
 				default:
-					goto IL_16cc;
+					goto IL_1708;
 				}
-				if (!(category == "helm_aquatic"))
+				if (!(category == "helm"))
 				{
-					goto IL_16cc;
+					goto IL_1708;
 				}
-				queryable = context.Items.OfType<HelmAquatic>();
-				goto IL_16d4;
-				IL_0dbe:
-				if (!(category == "shared_inventory_slot"))
-				{
-					goto IL_16cc;
-				}
-				queryable = context.Items.OfType<SharedInventorySlot>();
-				goto IL_16d4;
-				IL_08f3:
-				if (!(category == "food"))
-				{
-					goto IL_16cc;
-				}
-				queryable = context.Items.OfType<Food>();
-				goto IL_16d4;
-				IL_0d7c:
-				if (!(category == "mist_champion_skin_unlocker"))
-				{
-					goto IL_16cc;
-				}
-				queryable = context.Items.OfType<MistChampionSkinUnlocker>();
-				goto IL_16d4;
-				IL_0445:
-				char c = category[0];
-				if (c != 'h')
-				{
-					if (c != 'l')
-					{
-						if (c != 'm' || !(category == "mining_pick"))
-						{
-							goto IL_16cc;
-						}
-						queryable = context.Items.OfType<MiningPick>();
-					}
-					else
-					{
-						if (!(category == "logging_axe"))
-						{
-							goto IL_16cc;
-						}
-						queryable = context.Items.OfType<LoggingAxe>();
-					}
-				}
-				else
-				{
-					if (!(category == "harpoon_gun"))
-					{
-						goto IL_16cc;
-					}
-					queryable = context.Items.OfType<HarpoonGun>();
-				}
-				goto IL_16d4;
-				IL_0d66:
-				if (!(category == "jade_bot_skin_unlocker"))
-				{
-					goto IL_16cc;
-				}
-				queryable = context.Items.OfType<JadeBotSkinUnlocker>();
-				goto IL_16d4;
-				IL_094b:
-				if (!(category == "small_bundle"))
-				{
-					goto IL_16cc;
-				}
-				queryable = context.Items.OfType<SmallBundle>();
-				goto IL_16d4;
-				IL_0d50:
+				queryable = context.Items.OfType<Helm>();
+				goto IL_1710;
+				IL_0d7a:
 				if (!(category == "equipment_template_expansion"))
 				{
-					goto IL_16cc;
+					goto IL_1708;
 				}
 				queryable = context.Items.OfType<EquipmentTemplateExpansion>();
-				goto IL_16d4;
-				IL_1522:
-				queryable = context.Items.FromSqlRaw("SELECT *\r\nFROM Items item\r\nWHERE item.Type = 'rune'\r\nAND NOT EXISTS (\r\n\tSELECT 1\r\n\tFROM json_each(GameTypes)\r\n\tWHERE json_each.value = 'Pvp'\r\n)");
-				goto IL_16d4;
-				IL_0ce2:
+				goto IL_1710;
+				IL_06c4:
+				if (!(category == "booze"))
+				{
+					goto IL_1708;
+				}
+				queryable = context.Items.OfType<Booze>();
+				goto IL_1710;
+				IL_0d0c:
 				if (!(category == "build_template_expansion"))
 				{
-					goto IL_16cc;
+					goto IL_1708;
 				}
 				queryable = context.Items.OfType<BuildTemplateExpansion>();
-				goto IL_16d4;
-				IL_069a:
-				if (!(category == "torch"))
+				goto IL_1710;
+				IL_098b:
+				if (!(category == "recipe_sheet"))
 				{
-					goto IL_16cc;
+					goto IL_1708;
 				}
-				queryable = context.Items.OfType<Torch>();
-				goto IL_16d4;
-				IL_0ccc:
+				queryable = context.Items.OfType<RecipeSheet>();
+				goto IL_1710;
+				IL_0cf6:
 				if (!(category == "build_storage_expansion"))
 				{
-					goto IL_16cc;
+					goto IL_1708;
 				}
 				queryable = context.Items.OfType<BuildStorageExpansion>();
-				goto IL_16d4;
-				IL_08a5:
-				if (!(category == "ring"))
+				goto IL_1710;
+				IL_08cf:
+				switch (category)
 				{
-					goto IL_16cc;
+				case "mace":
+					break;
+				case "lure":
+					goto IL_1498;
+				case "rune":
+					goto IL_155e;
+				default:
+					goto IL_1708;
 				}
-				queryable = context.Items.OfType<Ring>();
-				goto IL_16d4;
-				IL_0599:
+				queryable = context.Items.OfType<Mace>();
+				goto IL_1710;
+				IL_05ad:
 				c = category[10];
 				if ((uint)c <= 109u)
 				{
@@ -309,7 +334,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 						{
 							if (c != 'm' || !(category == "upgrade_component"))
 							{
-								goto IL_16cc;
+								goto IL_1708;
 							}
 							queryable = context.Items.OfType<UpgradeComponent>();
 						}
@@ -317,7 +342,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 						{
 							if (!(category == "crafting_material"))
 							{
-								goto IL_16cc;
+								goto IL_1708;
 							}
 							queryable = context.Items.OfType<CraftingMaterial>();
 						}
@@ -326,7 +351,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 					{
 						if (!(category == "harvesting_sickle"))
 						{
-							goto IL_16cc;
+							goto IL_1708;
 						}
 						queryable = context.Items.OfType<HarvestingSickle>();
 					}
@@ -337,7 +362,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 					{
 						if (c != 'u' || !(category == "universal_upgrade"))
 						{
-							goto IL_16cc;
+							goto IL_1708;
 						}
 						queryable = context.Items.OfType<Gem>();
 					}
@@ -345,7 +370,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 					{
 						if (!(category == "upgrade_extractor"))
 						{
-							goto IL_16cc;
+							goto IL_1708;
 						}
 						queryable = context.Items.OfType<UpgradeExtractor>();
 					}
@@ -354,148 +379,222 @@ namespace SL.ChatLinks.UI.Tabs.Items
 				{
 					if (!(category == "default_container"))
 					{
-						goto IL_16cc;
+						goto IL_1708;
 					}
 					queryable = context.Items.Where((Item item) => EF.Property<string>(item, "Type") == "container");
 				}
-				goto IL_16d4;
-				IL_145c:
-				queryable = context.Items.OfType<Lure>();
-				goto IL_16d4;
-				IL_08bb:
-				switch (category)
+				goto IL_1710;
+				IL_0907:
+				if (!(category == "food"))
 				{
-				case "mace":
-					break;
-				case "lure":
-					goto IL_145c;
-				case "rune":
-					goto IL_1522;
-				default:
-					goto IL_16cc;
+					goto IL_1708;
 				}
-				queryable = context.Items.OfType<Mace>();
-				goto IL_16d4;
+				queryable = context.Items.OfType<Food>();
+				goto IL_1710;
+				IL_091d:
+				if (!(category == "bait"))
+				{
+					goto IL_1708;
+				}
+				queryable = context.Items.OfType<Bait>();
+				goto IL_1710;
+				IL_08b9:
+				if (!(category == "ring"))
+				{
+					goto IL_1708;
+				}
+				queryable = context.Items.OfType<Ring>();
+				goto IL_1710;
+				IL_06ae:
+				if (!(category == "torch"))
+				{
+					goto IL_1708;
+				}
+				queryable = context.Items.OfType<Torch>();
+				goto IL_1710;
+				IL_08a3:
+				if (!(category == "back"))
+				{
+					goto IL_1708;
+				}
+				queryable = context.Items.OfType<Backpack>();
+				goto IL_1710;
+				IL_02fa:
+				switch (category[3])
+				{
+				case 'm':
+					break;
+				case 'g':
+					goto IL_0949;
+				case 'l':
+					goto IL_095f;
+				case 't':
+					goto IL_0975;
+				case 'i':
+					goto IL_098b;
+				case 'v':
+					goto IL_09a1;
+				default:
+					goto IL_1708;
+				}
+				if (!(category == "helm_aquatic"))
+				{
+					goto IL_1708;
+				}
+				queryable = context.Items.OfType<HelmAquatic>();
+				goto IL_1710;
 				IL_0406:
 				switch (category[2])
 				{
 				case 'e':
 					break;
 				case 'n':
-					goto IL_0b03;
+					goto IL_0b17;
 				case 'w':
-					goto IL_0b19;
+					goto IL_0b2d;
 				case 'r':
-					goto IL_0b2f;
+					goto IL_0b43;
 				case 'p':
-					goto IL_0b45;
+					goto IL_0b59;
 				default:
-					goto IL_16cc;
+					goto IL_1708;
 				}
 				if (!(category == "greatsword"))
 				{
-					goto IL_16cc;
+					goto IL_1708;
 				}
 				queryable = context.Items.OfType<Greatsword>();
-				goto IL_16d4;
-				IL_0935:
-				if (!(category == "large_bundle"))
-				{
-					goto IL_16cc;
-				}
-				queryable = context.Items.OfType<LargeBundle>();
-				goto IL_16d4;
-				IL_0b2f:
-				if (!(category == "enrichment"))
-				{
-					goto IL_16cc;
-				}
-				queryable = context.Items.FromSqlRaw("SELECT *\r\nFROM Items\r\nWHERE Type = 'upgrade_component'\r\nAND InfusionUpgradeFlags -> '$.enrichment' = 'true'");
-				goto IL_16d4;
-				IL_0b45:
+				goto IL_1710;
+				IL_1498:
+				queryable = context.Items.OfType<Lure>();
+				goto IL_1710;
+				IL_0b59:
 				if (!(category == "expansions"))
 				{
-					goto IL_16cc;
+					goto IL_1708;
 				}
 				queryable = context.Items.Where((Item item) => item is BagSlotExpansion || item is BankTabExpansion || item is StorageExpander || item is BuildStorageExpansion || item is BuildTemplateExpansion || item is EquipmentTemplateExpansion || item is SharedInventorySlot);
-				goto IL_16d4;
+				goto IL_1710;
+				IL_155e:
+				queryable = context.Items.FromSqlRaw("SELECT *\r\nFROM Items item\r\nWHERE item.Type = 'rune'\r\nAND NOT EXISTS (\r\n\tSELECT 1\r\n\tFROM json_each(GameTypes)\r\n\tWHERE json_each.value = 'Pvp'\r\n)");
+				goto IL_1710;
+				IL_0975:
+				if (!(category == "contract_npc"))
+				{
+					goto IL_1708;
+				}
+				queryable = context.Items.OfType<ContractNpc>();
+				goto IL_1710;
 				IL_0243:
 				switch (category[0])
 				{
 				case 'g':
 					break;
 				case 'a':
-					goto IL_07df;
+					goto IL_07f3;
 				case 'w':
-					goto IL_07f5;
+					goto IL_0809;
 				case 'd':
-					goto IL_080b;
+					goto IL_081f;
 				case 'h':
-					goto IL_0821;
+					goto IL_0835;
 				case 'p':
-					goto IL_0837;
+					goto IL_084b;
 				case 's':
-					goto IL_084d;
+					goto IL_0861;
 				case 't':
-					goto IL_0863;
+					goto IL_0877;
 				default:
-					goto IL_16cc;
+					goto IL_1708;
 				}
 				if (!(category == "gloves"))
 				{
-					goto IL_16cc;
+					goto IL_1708;
 				}
 				queryable = context.Items.OfType<Gloves>();
-				goto IL_16d4;
-				IL_088f:
-				if (!(category == "back"))
+				goto IL_1710;
+				IL_0877:
+				if (!(category == "trophy"))
 				{
-					goto IL_16cc;
+					goto IL_1708;
 				}
-				queryable = context.Items.OfType<Backpack>();
-				goto IL_16d4;
-				IL_0b19:
+				queryable = context.Items.OfType<Trophy>();
+				goto IL_1710;
+				IL_0b17:
+				if (!(category == "consumable"))
+				{
+					goto IL_1708;
+				}
+				queryable = context.Items.OfType<Consumable>();
+				goto IL_1710;
+				IL_0b2d:
 				if (!(category == "power_core"))
 				{
-					goto IL_16cc;
+					goto IL_1708;
 				}
 				queryable = context.Items.OfType<PowerCore>();
-				goto IL_16d4;
-				IL_06dc:
-				if (!(category == "relic"))
+				goto IL_1710;
+				IL_095f:
+				if (!(category == "small_bundle"))
 				{
-					if (!(category == "sigil"))
+					goto IL_1708;
+				}
+				queryable = context.Items.OfType<SmallBundle>();
+				goto IL_1710;
+				IL_0b43:
+				if (!(category == "enrichment"))
+				{
+					goto IL_1708;
+				}
+				queryable = context.Items.FromSqlRaw("SELECT *\r\nFROM Items\r\nWHERE Type = 'upgrade_component'\r\nAND InfusionUpgradeFlags -> '$.enrichment' = 'true'");
+				goto IL_1710;
+				IL_0698:
+				if (!(category == "sword"))
+				{
+					goto IL_1708;
+				}
+				queryable = context.Items.OfType<Sword>();
+				goto IL_1710;
+				IL_058c:
+				c = category[0];
+				if (c != 'i')
+				{
+					if (c != 'm' || !(category == "mount_skin_unlocker"))
 					{
-						goto IL_16cc;
+						goto IL_1708;
 					}
-					queryable = context.Items.FromSqlRaw("SELECT *\r\nFROM Items item\r\nWHERE item.Type = 'sigil'\r\nAND NOT EXISTS (\r\n\tSELECT 1\r\n\tFROM json_each(GameTypes)\r\n\tWHERE json_each.value = 'Pvp'\r\n)");
+					queryable = context.Items.OfType<MountSkinUnlocker>();
 				}
 				else
 				{
-					queryable = context.Items.OfType<Relic>();
+					if (!(category == "immediate_container"))
+					{
+						goto IL_1708;
+					}
+					queryable = context.Items.OfType<ImmediateContainer>();
 				}
-				goto IL_16d4;
-				IL_0863:
-				if (!(category == "trophy"))
-				{
-					goto IL_16cc;
-				}
-				queryable = context.Items.OfType<Trophy>();
-				goto IL_16d4;
-				IL_0977:
-				if (!(category == "recipe_sheet"))
-				{
-					goto IL_16cc;
-				}
-				queryable = context.Items.OfType<RecipeSheet>();
-				goto IL_16d4;
-				IL_06c6:
+				goto IL_1710;
+				IL_06da:
 				if (!(category == "gizmo"))
 				{
-					goto IL_16cc;
+					goto IL_1708;
 				}
 				queryable = context.Items.OfType<Gizmo>();
-				goto IL_16d4;
+				goto IL_1710;
+				IL_0861:
+				if (!(category == "shield"))
+				{
+					goto IL_1708;
+				}
+				queryable = context.Items.OfType<Shield>();
+				goto IL_1710;
+				IL_084b:
+				if (!(category == "pistol"))
+				{
+					goto IL_1708;
+				}
+				queryable = context.Items.OfType<Pistol>();
+				goto IL_1710;
 				IL_03dc:
 				c = category[0];
 				if (c != 'a')
@@ -504,7 +603,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 					{
 						if (c != 't' || !(category == "toy"))
 						{
-							goto IL_16cc;
+							goto IL_1708;
 						}
 						queryable = context.Items.OfType<Toy>();
 					}
@@ -512,7 +611,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 					{
 						if (!(category == "dye"))
 						{
-							goto IL_16cc;
+							goto IL_1708;
 						}
 						queryable = context.Items.OfType<Dye>();
 					}
@@ -521,106 +620,19 @@ namespace SL.ChatLinks.UI.Tabs.Items
 				{
 					if (!(category == "axe"))
 					{
-						goto IL_16cc;
+						goto IL_1708;
 					}
 					queryable = context.Items.OfType<Axe>();
 				}
-				goto IL_16d4;
-				IL_0684:
-				if (!(category == "sword"))
-				{
-					goto IL_16cc;
-				}
-				queryable = context.Items.OfType<Sword>();
-				goto IL_16d4;
-				IL_084d:
-				if (!(category == "shield"))
-				{
-					goto IL_16cc;
-				}
-				queryable = context.Items.OfType<Shield>();
-				goto IL_16d4;
-				IL_0b03:
-				if (!(category == "consumable"))
-				{
-					goto IL_16cc;
-				}
-				queryable = context.Items.OfType<Consumable>();
-				goto IL_16d4;
-				IL_0837:
-				if (!(category == "pistol"))
-				{
-					goto IL_16cc;
-				}
-				queryable = context.Items.OfType<Pistol>();
-				goto IL_16d4;
-				IL_0578:
-				c = category[0];
-				if (c != 'i')
-				{
-					if (c != 'm' || !(category == "mount_skin_unlocker"))
-					{
-						goto IL_16cc;
-					}
-					queryable = context.Items.OfType<MountSkinUnlocker>();
-				}
-				else
-				{
-					if (!(category == "immediate_container"))
-					{
-						goto IL_16cc;
-					}
-					queryable = context.Items.OfType<ImmediateContainer>();
-				}
-				goto IL_16d4;
-				IL_0821:
+				goto IL_1710;
+				IL_0835:
 				if (!(category == "hammer"))
 				{
-					goto IL_16cc;
+					goto IL_1708;
 				}
 				queryable = context.Items.OfType<Hammer>();
-				goto IL_16d4;
-				IL_046f:
-				c = category[0];
-				if (c != 'g')
-				{
-					if (c != 't' || !(category == "toy_two_handed"))
-					{
-						goto IL_16cc;
-					}
-					queryable = context.Items.OfType<ToyTwoHanded>();
-				}
-				else
-				{
-					if (!(category == "gathering_tool"))
-					{
-						goto IL_16cc;
-					}
-					queryable = context.Items.OfType<GatheringTool>();
-				}
-				goto IL_16d4;
-				IL_080b:
-				if (!(category == "dagger"))
-				{
-					goto IL_16cc;
-				}
-				queryable = context.Items.OfType<Dagger>();
-				goto IL_16d4;
-				IL_0642:
-				if (!(category == "rifle"))
-				{
-					goto IL_16cc;
-				}
-				queryable = context.Items.OfType<Rifle>();
-				goto IL_16d4;
-				IL_0658:
-				if (!(category == "spear"))
-				{
-					goto IL_16cc;
-				}
-				queryable = context.Items.OfType<Spear>();
-				goto IL_16d4;
-				IL_053a:
+				goto IL_1710;
+				IL_054e:
 				c = category[0];
 				if ((uint)c <= 99u)
 				{
@@ -628,7 +640,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 					{
 						if (c != 'c' || !(category == "content_unlocker"))
 						{
-							goto IL_16cc;
+							goto IL_1708;
 						}
 						queryable = context.Items.OfType<ContentUnlocker>();
 					}
@@ -636,7 +648,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 					{
 						if (!(category == "black_lion_chest"))
 						{
-							goto IL_16cc;
+							goto IL_1708;
 						}
 						queryable = context.Items.OfType<BlackLionChest>();
 					}
@@ -645,7 +657,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 				{
 					if (c != 's' || !(category == "storage_expander"))
 					{
-						goto IL_16cc;
+						goto IL_1708;
 					}
 					queryable = context.Items.OfType<StorageExpander>();
 				}
@@ -653,140 +665,140 @@ namespace SL.ChatLinks.UI.Tabs.Items
 				{
 					if (!(category == "jade_tech_module"))
 					{
-						goto IL_16cc;
+						goto IL_1708;
 					}
 					queryable = context.Items.OfType<JadeTechModule>();
 				}
-				goto IL_16d4;
-				IL_0703:
-				if (!(category == "jewel"))
+				goto IL_1710;
+				IL_0656:
+				if (!(category == "rifle"))
 				{
-					goto IL_16cc;
+					goto IL_1708;
 				}
-				queryable = context.Items.FromSqlRaw("SELECT *\r\nFROM Items\r\nWHERE Type = 'upgrade_component'\r\nAND UpgradeComponentFlags -> '$.Trinket' = 'true'\r\nAND InfusionUpgradeFlags -> '$.infusion' = 'false'\r\nAND InfusionUpgradeFlags -> '$.enrichment' = 'false'");
-				goto IL_16d4;
-				IL_0a95:
-				if (!(category == "utility"))
+				queryable = context.Items.OfType<Rifle>();
+				goto IL_1710;
+				IL_081f:
+				if (!(category == "dagger"))
 				{
-					goto IL_16cc;
+					goto IL_1708;
 				}
-				queryable = context.Items.OfType<Utility>();
-				goto IL_16d4;
-				IL_0a7f:
-				if (!(category == "service"))
+				queryable = context.Items.OfType<Dagger>();
+				goto IL_1710;
+				IL_06f0:
+				if (!(category == "relic"))
 				{
-					goto IL_16cc;
+					if (!(category == "sigil"))
+					{
+						goto IL_1708;
+					}
+					queryable = context.Items.FromSqlRaw("SELECT *\r\nFROM Items item\r\nWHERE item.Type = 'sigil'\r\nAND NOT EXISTS (\r\n\tSELECT 1\r\n\tFROM json_each(GameTypes)\r\n\tWHERE json_each.value = 'Pvp'\r\n)");
 				}
-				queryable = context.Items.OfType<Service>();
-				goto IL_16d4;
-				IL_0909:
-				if (!(category == "bait"))
+				else
 				{
-					goto IL_16cc;
+					queryable = context.Items.OfType<Relic>();
 				}
-				queryable = context.Items.OfType<Bait>();
-				goto IL_16d4;
-				IL_07df:
-				if (!(category == "amulet"))
-				{
-					goto IL_16cc;
-				}
-				queryable = context.Items.OfType<Amulet>();
-				goto IL_16d4;
-				IL_0a69:
-				if (!(category == "warhorn"))
-				{
-					goto IL_16cc;
-				}
-				queryable = context.Items.OfType<Warhorn>();
-				goto IL_16d4;
+				goto IL_1710;
 				IL_0388:
 				switch (category[3])
 				{
 				case 'n':
 					break;
 				case 'g':
-					goto IL_0a27;
+					goto IL_0a3b;
 				case 'p':
-					goto IL_0a3d;
+					goto IL_0a51;
 				case 'd':
-					goto IL_0a53;
+					goto IL_0a67;
 				case 'h':
-					goto IL_0a69;
+					goto IL_0a7d;
 				case 'v':
-					goto IL_0a7f;
+					goto IL_0a93;
 				case 'l':
-					goto IL_0a95;
+					goto IL_0aa9;
 				default:
-					goto IL_16cc;
+					goto IL_1708;
 				}
 				if (!(category == "trinket"))
 				{
-					goto IL_16cc;
+					goto IL_1708;
 				}
 				queryable = context.Items.OfType<Trinket>();
-				goto IL_16d4;
-				IL_0961:
-				if (!(category == "contract_npc"))
+				goto IL_1710;
+				IL_066c:
+				if (!(category == "spear"))
 				{
-					goto IL_16cc;
+					goto IL_1708;
 				}
-				queryable = context.Items.OfType<ContractNpc>();
-				goto IL_16d4;
-				IL_066e:
-				if (!(category == "staff"))
+				queryable = context.Items.OfType<Spear>();
+				goto IL_1710;
+				IL_0aa9:
+				if (!(category == "utility"))
 				{
-					goto IL_16cc;
+					goto IL_1708;
 				}
-				queryable = context.Items.OfType<Staff>();
-				goto IL_16d4;
-				IL_0a3d:
-				if (!(category == "scepter"))
+				queryable = context.Items.OfType<Utility>();
+				goto IL_1710;
+				IL_0483:
+				c = category[0];
+				if (c != 'g')
 				{
-					goto IL_16cc;
+					if (c != 't' || !(category == "toy_two_handed"))
+					{
+						goto IL_1708;
+					}
+					queryable = context.Items.OfType<ToyTwoHanded>();
 				}
-				queryable = context.Items.OfType<Scepter>();
-				goto IL_16d4;
-				IL_0a53:
-				if (!(category == "trident"))
+				else
 				{
-					goto IL_16cc;
+					if (!(category == "gathering_tool"))
+					{
+						goto IL_1708;
+					}
+					queryable = context.Items.OfType<GatheringTool>();
 				}
-				queryable = context.Items.OfType<Trident>();
-				goto IL_16d4;
-				IL_01eb:
-				switch (category[0])
+				goto IL_1710;
+				IL_07f3:
+				if (!(category == "amulet"))
 				{
-				case 'l':
-					break;
-				case 's':
-					goto IL_0745;
-				case 'c':
-					goto IL_075b;
-				case 'u':
-					goto IL_0771;
-				case 'g':
-					goto IL_0787;
-				case 'r':
-					goto IL_079d;
-				case 'i':
-					goto IL_07b3;
-				default:
-					goto IL_16cc;
+					goto IL_1708;
 				}
-				if (!(category == "leggings"))
+				queryable = context.Items.OfType<Amulet>();
+				goto IL_1710;
+				IL_076f:
+				if (!(category == "currency"))
 				{
-					goto IL_16cc;
+					goto IL_1708;
 				}
-				queryable = context.Items.OfType<Leggings>();
-				goto IL_16d4;
-				IL_0519:
+				queryable = context.Items.OfType<Currency>();
+				goto IL_1710;
+				IL_0a7d:
+				if (!(category == "warhorn"))
+				{
+					goto IL_1708;
+				}
+				queryable = context.Items.OfType<Warhorn>();
+				goto IL_1710;
+				IL_0a93:
+				if (!(category == "service"))
+				{
+					goto IL_1708;
+				}
+				queryable = context.Items.OfType<Service>();
+				goto IL_1710;
+				IL_09a1:
+				if (!(category == "salvage_tool"))
+				{
+					goto IL_1708;
+				}
+				queryable = context.Items.OfType<SalvageTool>();
+				goto IL_1710;
+				IL_052d:
 				c = category[0];
 				if (c != 'o')
 				{
 					if (c != 'r' || !(category == "random_unlocker"))
 					{
-						goto IL_16cc;
+						goto IL_1708;
 					}
 					queryable = context.Items.OfType<RandomUnlocker>();
 				}
@@ -794,39 +806,98 @@ namespace SL.ChatLinks.UI.Tabs.Items
 				{
 					if (!(category == "outfit_unlocker"))
 					{
-						goto IL_16cc;
+						goto IL_1708;
 					}
 					queryable = context.Items.OfType<OutfitUnlocker>();
 				}
-				goto IL_16d4;
-				IL_0a27:
+				goto IL_1710;
+				IL_0a67:
+				if (!(category == "trident"))
+				{
+					goto IL_1708;
+				}
+				queryable = context.Items.OfType<Trident>();
+				goto IL_1710;
+				IL_0a51:
+				if (!(category == "scepter"))
+				{
+					goto IL_1708;
+				}
+				queryable = context.Items.OfType<Scepter>();
+				goto IL_1710;
+				IL_01eb:
+				switch (category[0])
+				{
+				case 'l':
+					break;
+				case 's':
+					goto IL_0759;
+				case 'c':
+					goto IL_076f;
+				case 'u':
+					goto IL_0785;
+				case 'g':
+					goto IL_079b;
+				case 'r':
+					goto IL_07b1;
+				case 'i':
+					goto IL_07c7;
+				default:
+					goto IL_1708;
+				}
+				if (!(category == "leggings"))
+				{
+					goto IL_1708;
+				}
+				queryable = context.Items.OfType<Leggings>();
+				goto IL_1710;
+				IL_0682:
+				if (!(category == "staff"))
+				{
+					goto IL_1708;
+				}
+				queryable = context.Items.OfType<Staff>();
+				goto IL_1710;
+				IL_0a3b:
 				if (!(category == "longbow"))
 				{
-					goto IL_16cc;
+					goto IL_1708;
 				}
 				queryable = context.Items.OfType<Longbow>();
-				goto IL_16d4;
-				IL_07f5:
-				if (!(category == "weapon"))
+				goto IL_1710;
+				IL_050c:
+				c = category[0];
+				if (c != 'm')
 				{
-					goto IL_16cc;
+					if (c != 't' || !(category == "transmutation"))
+					{
+						goto IL_1708;
+					}
+					queryable = context.Items.OfType<Transmutation>();
 				}
-				queryable = context.Items.OfType<Weapon>();
-				goto IL_16d4;
-				IL_062c:
-				if (!(category == "focus"))
+				else
 				{
-					goto IL_16cc;
+					if (!(category == "mount_license"))
+					{
+						goto IL_1708;
+					}
+					queryable = context.Items.OfType<MountLicense>();
 				}
-				queryable = context.Items.OfType<Focus>();
-				goto IL_16d4;
-				IL_07b3:
+				goto IL_1710;
+				IL_07c7:
 				if (!(category == "infusion"))
 				{
-					goto IL_16cc;
+					goto IL_1708;
 				}
 				queryable = context.Items.FromSqlRaw("SELECT *\r\nFROM Items\r\nWHERE Type = 'upgrade_component'\r\nAND InfusionUpgradeFlags -> '$.infusion' = 'true'");
-				goto IL_16d4;
+				goto IL_1710;
+				IL_0640:
+				if (!(category == "focus"))
+				{
+					goto IL_1708;
+				}
+				queryable = context.Items.OfType<Focus>();
+				goto IL_1710;
 				IL_0341:
 				c = category[5];
 				if ((uint)c <= 100u)
@@ -835,7 +906,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 					{
 						if (c != 'd' || !(category == "shoulders"))
 						{
-							goto IL_16cc;
+							goto IL_1708;
 						}
 						queryable = context.Items.OfType<Shoulders>();
 					}
@@ -843,7 +914,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 					{
 						if (!(category == "sigil_pvp"))
 						{
-							goto IL_16cc;
+							goto IL_1708;
 						}
 						queryable = context.Items.FromSqlRaw("SELECT *\r\nFROM Items item\r\nWHERE item.Type = 'sigil'\r\nAND EXISTS (\r\n\tSELECT 1\r\n\tFROM json_each(GameTypes)\r\n\tWHERE json_each.value = 'Pvp'\r\n)");
 					}
@@ -854,7 +925,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 					{
 						if (c != 't' || !(category == "miniature"))
 						{
-							goto IL_16cc;
+							goto IL_1708;
 						}
 						queryable = context.Items.OfType<Miniature>();
 					}
@@ -862,7 +933,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 					{
 						if (!(category == "accessory"))
 						{
-							goto IL_16cc;
+							goto IL_1708;
 						}
 						queryable = context.Items.OfType<Accessory>();
 					}
@@ -871,89 +942,32 @@ namespace SL.ChatLinks.UI.Tabs.Items
 				{
 					if (!(category == "container"))
 					{
-						goto IL_16cc;
+						goto IL_1708;
 					}
 					queryable = context.Items.OfType<Container>();
 				}
-				goto IL_16d4;
-				IL_04f8:
-				c = category[0];
-				if (c != 'm')
+				goto IL_1710;
+				IL_0809:
+				if (!(category == "weapon"))
 				{
-					if (c != 't' || !(category == "transmutation"))
-					{
-						goto IL_16cc;
-					}
-					queryable = context.Items.OfType<Transmutation>();
+					goto IL_1708;
 				}
-				else
-				{
-					if (!(category == "mount_license"))
-					{
-						goto IL_16cc;
-					}
-					queryable = context.Items.OfType<MountLicense>();
-				}
-				goto IL_16d4;
-				IL_0600:
+				queryable = context.Items.OfType<Weapon>();
+				goto IL_1710;
+				IL_0614:
 				if (!(category == "chest"))
 				{
-					goto IL_16cc;
+					goto IL_1708;
 				}
 				queryable = context.Items.OfType<Coat>();
-				goto IL_16d4;
-				IL_098d:
-				if (!(category == "salvage_tool"))
-				{
-					goto IL_16cc;
-				}
-				queryable = context.Items.OfType<SalvageTool>();
-				goto IL_16d4;
-				IL_0771:
-				if (!(category == "unlocker"))
-				{
-					goto IL_16cc;
-				}
-				queryable = context.Items.OfType<Unlocker>();
-				goto IL_16d4;
-				IL_02ab:
-				switch (category[3])
-				{
-				case 'm':
-					break;
-				case 'k':
-					goto IL_088f;
-				case 'g':
-					goto IL_08a5;
-				case 'e':
-					goto IL_08bb;
-				case 'd':
-					goto IL_08f3;
-				case 't':
-					goto IL_0909;
-				default:
-					goto IL_16cc;
-				}
-				if (!(category == "helm"))
-				{
-					goto IL_16cc;
-				}
-				queryable = context.Items.OfType<Helm>();
-				goto IL_16d4;
-				IL_0787:
-				if (!(category == "gift_box"))
-				{
-					goto IL_16cc;
-				}
-				queryable = context.Items.OfType<GiftBox>();
-				goto IL_16d4;
-				IL_04d7:
+				goto IL_1710;
+				IL_04eb:
 				c = category[0];
 				if (c != 'g')
 				{
 					if (c != 'h' || !(category == "halloween_consumable"))
 					{
-						goto IL_16cc;
+						goto IL_1708;
 					}
 					queryable = context.Items.OfType<HalloweenConsumable>();
 				}
@@ -961,43 +975,43 @@ namespace SL.ChatLinks.UI.Tabs.Items
 				{
 					if (!(category == "glider_skin_unlocker"))
 					{
-						goto IL_16cc;
+						goto IL_1708;
 					}
 					queryable = context.Items.OfType<GliderSkinUnlocker>();
 				}
-				goto IL_16d4;
-				IL_16cc:
+				goto IL_1710;
+				IL_0949:
+				if (!(category == "large_bundle"))
+				{
+					goto IL_1708;
+				}
+				queryable = context.Items.OfType<LargeBundle>();
+				goto IL_1710;
+				IL_0785:
+				if (!(category == "unlocker"))
+				{
+					goto IL_1708;
+				}
+				queryable = context.Items.OfType<Unlocker>();
+				goto IL_1710;
+				IL_079b:
+				if (!(category == "gift_box"))
+				{
+					goto IL_1708;
+				}
+				queryable = context.Items.OfType<GiftBox>();
+				goto IL_1710;
+				IL_1708:
 				queryable = context.Items;
-				goto IL_16d4;
-				IL_075b:
-				if (!(category == "currency"))
-				{
-					goto IL_16cc;
-				}
-				queryable = context.Items.OfType<Currency>();
-				goto IL_16d4;
-				IL_0745:
-				if (!(category == "shortbow"))
-				{
-					goto IL_16cc;
-				}
-				queryable = context.Items.OfType<Shortbow>();
-				goto IL_16d4;
-				IL_079d:
-				if (!(category == "rune_pvp"))
-				{
-					goto IL_16cc;
-				}
-				queryable = context.Items.FromSqlRaw("SELECT *\r\nFROM Items item\r\nWHERE item.Type = 'rune'\r\nAND EXISTS (\r\n\tSELECT 1\r\n\tFROM json_each(GameTypes)\r\n\tWHERE json_each.value = 'Pvp'\r\n)");
-				goto IL_16d4;
-				IL_0616:
+				goto IL_1710;
+				IL_062a:
 				if (!(category == "boots"))
 				{
-					goto IL_16cc;
+					goto IL_1708;
 				}
 				queryable = context.Items.OfType<Boots>();
-				goto IL_16d4;
-				IL_0490:
+				goto IL_1710;
+				IL_04a4:
 				c = category[0];
 				if ((uint)c <= 98u)
 				{
@@ -1005,13 +1019,13 @@ namespace SL.ChatLinks.UI.Tabs.Items
 					{
 						if (c != 'b')
 						{
-							goto IL_16cc;
+							goto IL_1708;
 						}
 						if (!(category == "bag_slot_expansion"))
 						{
 							if (!(category == "bank_tab_expansion"))
 							{
-								goto IL_16cc;
+								goto IL_1708;
 							}
 							queryable = context.Items.OfType<BankTabExpansion>();
 						}
@@ -1024,7 +1038,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 					{
 						if (!(category == "appearance_changer"))
 						{
-							goto IL_16cc;
+							goto IL_1708;
 						}
 						queryable = context.Items.OfType<AppearanceChanger>();
 					}
@@ -1035,7 +1049,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 					{
 						if (c != 't' || !(category == "teleport_to_friend"))
 						{
-							goto IL_16cc;
+							goto IL_1708;
 						}
 						queryable = context.Items.OfType<TeleportToFriend>();
 					}
@@ -1043,7 +1057,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 					{
 						if (!(category == "miniature_unlocker"))
 						{
-							goto IL_16cc;
+							goto IL_1708;
 						}
 						queryable = context.Items.OfType<MiniatureUnlocker>();
 					}
@@ -1052,38 +1066,32 @@ namespace SL.ChatLinks.UI.Tabs.Items
 				{
 					if (!(category == "generic_consumable"))
 					{
-						goto IL_16cc;
+						goto IL_1708;
 					}
 					queryable = context.Items.OfType<GenericConsumable>();
 				}
-				goto IL_16d4;
-				IL_06b0:
-				if (!(category == "booze"))
+				goto IL_1710;
+				IL_07b1:
+				if (!(category == "rune_pvp"))
 				{
-					goto IL_16cc;
+					goto IL_1708;
 				}
-				queryable = context.Items.OfType<Booze>();
-				goto IL_16d4;
-				IL_16d4:
-				IQueryable<Item> query2 = queryable;
-				query2 = (string.IsNullOrWhiteSpace(filter2.Text) ? query2.OrderByDescending((Item item) => item.Id) : (from item in query2
-					where EF.Functions.Like(item.Name, $"%{filter2.Text}%")
-					orderby Levenshtein.LevenshteinDistance(filter2.Text, item.Name)
-					select item));
-				resultContext.ResultTotal = await query2.CountAsync(cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
-				await foreach (Item item in query2.Take(limit).AsAsyncEnumerable().WithCancellation(cancellationToken)
-					.ConfigureAwait(continueOnCapturedContext: false))
+				queryable = context.Items.FromSqlRaw("SELECT *\r\nFROM Items item\r\nWHERE item.Type = 'rune'\r\nAND EXISTS (\r\n\tSELECT 1\r\n\tFROM json_each(GameTypes)\r\n\tWHERE json_each.value = 'Pvp'\r\n)");
+				goto IL_1710;
+				IL_0759:
+				if (!(category == "shortbow"))
 				{
-					yield return item;
+					goto IL_1708;
 				}
-				goto end_IL_00d7;
-				IL_0719:
+				queryable = context.Items.OfType<Shortbow>();
+				goto IL_1710;
+				IL_072d:
 				if (!(category == "glyph"))
 				{
-					goto IL_16cc;
+					goto IL_1708;
 				}
 				queryable = context.Items.FromSqlRaw("SELECT *\r\nFROM Items\r\nWHERE Type = 'upgrade_component'\r\nAND UpgradeComponentFlags -> '$.Axe' = 'false'\r\nAND UpgradeComponentFlags -> '$.Trinket' = 'false'\r\nAND UpgradeComponentFlags -> '$.MediumArmor' = 'false'\r\nAND InfusionUpgradeFlags -> '$.infusion' = 'false'\r\nAND InfusionUpgradeFlags -> '$.enrichment' = 'false'");
-				goto IL_16d4;
+				goto IL_1710;
 				end_IL_00d7:;
 			}
 			finally

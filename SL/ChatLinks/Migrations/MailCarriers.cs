@@ -9,30 +9,30 @@ using SL.ChatLinks.Storage;
 namespace SL.ChatLinks.Migrations
 {
 	[DbContext(typeof(ChatLinksContext))]
-	[Migration("20250201215406_Finishers")]
-	public class Finishers : Migration
+	[Migration("20250201230057_MailCarriers")]
+	public class MailCarriers : Migration
 	{
 		protected override void Up(MigrationBuilder migrationBuilder)
 		{
-			migrationBuilder.CreateTable("Finishers", (ColumnsBuilder table) => new
+			migrationBuilder.CreateTable("MailCarriers", (ColumnsBuilder table) => new
 			{
 				Id = table.Column<int>().Annotation("Sqlite:Autoincrement", true),
-				LockedText = table.Column<string>(),
 				UnlockItemIds = table.Column<string>(),
 				Order = table.Column<int>(),
 				IconHref = table.Column<string>(),
-				Name = table.Column<string>()
+				Name = table.Column<string>(),
+				Flags = table.Column<string>()
 			}, null, table =>
 			{
-				table.PrimaryKey("PK_Finishers", x => x.Id);
+				table.PrimaryKey("PK_MailCarriers", x => x.Id);
 			});
-			migrationBuilder.CreateIndex("IX_Finishers_Name", "Finishers", "Name");
-			migrationBuilder.CreateIndex("IX_Finishers_Order", "Finishers", "Order");
+			migrationBuilder.CreateIndex("IX_MailCarriers_Name", "MailCarriers", "Name");
+			migrationBuilder.CreateIndex("IX_MailCarriers_Order", "MailCarriers", "Order");
 		}
 
 		protected override void Down(MigrationBuilder migrationBuilder)
 		{
-			migrationBuilder.DropTable("Finishers");
+			migrationBuilder.DropTable("MailCarriers");
 		}
 
 		protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -89,6 +89,44 @@ namespace SL.ChatLinks.Migrations
 				b.HasIndex("Name");
 				b.HasIndex("Order");
 				b.ToTable("Finishers");
+			});
+			modelBuilder.Entity("GuildWars2.Hero.Equipment.Gliders.GliderSkin", delegate(EntityTypeBuilder b)
+			{
+				b.Property<int>("Id").ValueGeneratedOnAdd().HasColumnType("INTEGER");
+				b.Property<string>("DefaultDyeColorIds").IsRequired().HasColumnType("TEXT");
+				b.Property<string>("Description").IsRequired().HasColumnType("TEXT");
+				b.Property<string>("IconHref").IsRequired().HasColumnType("TEXT");
+				b.Property<string>("Name").IsRequired().HasColumnType("TEXT");
+				b.Property<int>("Order").HasColumnType("INTEGER");
+				b.Property<string>("UnlockItemIds").IsRequired().HasColumnType("TEXT");
+				b.HasKey("Id");
+				b.HasIndex("Name");
+				b.HasIndex("Order");
+				b.ToTable("Gliders");
+			});
+			modelBuilder.Entity("GuildWars2.Hero.Equipment.JadeBots.JadeBotSkin", delegate(EntityTypeBuilder b)
+			{
+				b.Property<int>("Id").ValueGeneratedOnAdd().HasColumnType("INTEGER");
+				b.Property<string>("Description").IsRequired().HasColumnType("TEXT");
+				b.Property<string>("Name").IsRequired().HasColumnType("TEXT");
+				b.Property<int>("UnlockItemId").HasColumnType("INTEGER");
+				b.HasKey("Id");
+				b.HasIndex("Name");
+				b.HasIndex("UnlockItemId");
+				b.ToTable("JadeBots");
+			});
+			modelBuilder.Entity("GuildWars2.Hero.Equipment.MailCarriers.MailCarrier", delegate(EntityTypeBuilder b)
+			{
+				b.Property<int>("Id").ValueGeneratedOnAdd().HasColumnType("INTEGER");
+				b.Property<string>("Flags").IsRequired().HasColumnType("TEXT");
+				b.Property<string>("IconHref").IsRequired().HasColumnType("TEXT");
+				b.Property<string>("Name").IsRequired().HasColumnType("TEXT");
+				b.Property<int>("Order").HasColumnType("INTEGER");
+				b.Property<string>("UnlockItemIds").IsRequired().HasColumnType("TEXT");
+				b.HasKey("Id");
+				b.HasIndex("Name");
+				b.HasIndex("Order");
+				b.ToTable("MailCarriers");
 			});
 			modelBuilder.Entity("GuildWars2.Hero.Equipment.Wardrobe.EquipmentSkin", delegate(EntityTypeBuilder b)
 			{

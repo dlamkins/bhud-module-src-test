@@ -230,6 +230,13 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 					observableCollection.Add(item);
 				}
 				MenuItems = observableCollection;
+				var newestAchievement = achievements.Where(a =>
+				{
+					GuildWars2.Hero.Achievements.AchievementFlags flags = a.Flags;
+					return (object)flags != null && !flags.Daily && !flags.Weekly;
+				}).Aggregate((left, right) => (left.Id < right.Id) ? right : left);
+				AchievementCategory newestCategory = categories.Single((AchievementCategory c) => c.Achievements.Any((AchievementRef aref) => aref.Id == newestAchievement.Id));
+				await SelectCategory(newestCategory).ConfigureAwait(continueOnCapturedContext: false);
 			}
 			finally
 			{

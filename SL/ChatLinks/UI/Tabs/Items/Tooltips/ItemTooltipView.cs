@@ -1188,11 +1188,11 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 				StringBuilder text = new StringBuilder("\r\n");
 				if (ViewModel.InBank > 0)
 				{
-					text.AppendLine(ViewModel.Localizer["Count in bank", new object[1] { ViewModel.InBank }]);
+					text = text.AppendLine(ViewModel.Localizer["Count in bank", new object[1] { ViewModel.InBank }]);
 				}
 				if (ViewModel.InMaterialStorage > 0)
 				{
-					text.AppendLine(ViewModel.Localizer["Count in material storage", new object[1] { ViewModel.InMaterialStorage }]);
+					text = text.AppendLine(ViewModel.Localizer["Count in material storage", new object[1] { ViewModel.InMaterialStorage }]);
 				}
 				PrintPlainText(text.ToString(), Gray);
 			}

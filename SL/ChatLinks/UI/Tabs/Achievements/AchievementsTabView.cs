@@ -37,19 +37,20 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00df: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fa: Expected O, but got Unknown
-			//IL_017b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0180: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0192: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a8: Expected O, but got Unknown
-			//IL_01a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ba: Expected O, but got Unknown
+			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0108: Expected O, but got Unknown
+			//IL_0189: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b6: Expected O, but got Unknown
+			//IL_01b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01bc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c8: Expected O, but got Unknown
 			ThrowHelper.ThrowIfNull(viewModel, "viewModel");
 			ViewModel = viewModel;
 			TextBox val = new TextBox();
@@ -59,7 +60,7 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 			Binder.Bind<AchievementsTabViewModel, TextBox, string>(viewModel, (Expression<Func<AchievementsTabViewModel, string>>)((AchievementsTabViewModel vm) => vm.SearchPlaceholder), _searchBox, (Expression<Func<TextBox, string>>)((TextBox searchBox) => ((TextInputBase)searchBox).get_PlaceholderText()), BindingMode.ToView);
 			Panel val2 = new Panel();
 			((Control)val2).set_Top(((Control)_searchBox).get_Height() + 9);
-			((Container)val2).set_WidthSizingMode((SizingMode)1);
+			((Control)val2).set_Width(((DesignStandard)(ref Panel.MenuStandard)).get_Size().X);
 			((Container)val2).set_HeightSizingMode((SizingMode)2);
 			val2.set_CanScroll(true);
 			val2.set_ShowBorder(true);
@@ -102,7 +103,6 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 		{
 			((Control)_searchBox).set_Parent(buildPanel);
 			((Control)_categoriesPanel).set_Parent(buildPanel);
-			AddAchievementCategories();
 			((Control)_selectedCategoryView).set_Parent(buildPanel);
 			((Control)_selectedCategoryView).set_Left(((Control)_categoriesPanel).get_Right() + 9);
 			((Control)_selectedCategoryView).set_Width(650);

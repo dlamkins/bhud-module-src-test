@@ -120,8 +120,8 @@ namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 
 		protected override void DisposeControl()
 		{
-			((FlowPanel)this).DisposeControl();
 			ViewModel.Dispose();
+			((FlowPanel)this).DisposeControl();
 		}
 	}
 }

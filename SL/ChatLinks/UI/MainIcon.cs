@@ -46,5 +46,11 @@ namespace SL.ChatLinks.UI
 			ViewModel.ClickCommand.Execute();
 			((CornerIcon)this).OnClick(e);
 		}
+
+		protected override void DisposeControl()
+		{
+			ViewModel.Dispose();
+			((CornerIcon)this).DisposeControl();
+		}
 	}
 }
