@@ -22,16 +22,20 @@
     <Reference Include="MonoGame.Framework">
       <HintPath>..\..\working\MonoGame.Framework.dll</HintPath>
     </Reference>
+    <Reference Include="System.Reflection.Metadata">
+      <HintPath>..\..\working\System.Reflection.Metadata.dll</HintPath>
+    </Reference>
     <Reference Include="MonoGame.Extended">
       <HintPath>..\..\working\MonoGame.Extended.dll</HintPath>
     </Reference>
+    <Reference Include="System.Core" />
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\working\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="System.Core" />
     <Reference Include="Flurl.Http">
       <HintPath>..\..\working\Flurl.Http.dll</HintPath>
     </Reference>
     <Reference Include="System.Net.Http" />
+    <Reference Include="AsyncClipboardService" />
   </ItemGroup>
 </Project>

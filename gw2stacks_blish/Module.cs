@@ -2,12 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
+using Blish_HUD.Controls.Extern;
+using Blish_HUD.Controls.Intern;
+using Blish_HUD.Input;
 using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
@@ -15,6 +19,7 @@ using Flurl.Http;
 using Gw2Sharp.WebApi.Exceptions;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using Newtonsoft.Json;
 using gw2stacks_blish.data;
 using gw2stacks_blish.reader;
@@ -27,9 +32,11 @@ namespace gw2stacks_blish
 	{
 		private static readonly Logger Logger = Logger.GetLogger<Module>();
 
-		private TabbedWindow2 gw2stacks_root;
+		private TabbedWindow2 gw2stacksWindow;
 
-		private TabbedWindow2 ignoredItems;
+		private TabbedWindow2 ignoredItemsWindow;
+
+		private StandardWindow characterBasedWindow;
 
 		private CornerIcon icon;
 
@@ -57,6 +64,8 @@ namespace gw2stacks_blish
 
 		private SettingEntry<bool> ignoreItemsFeature;
 
+		private SettingEntry<string> displayType;
+
 		private Dictionary<int, AsyncTexture2D> itemTextures = new Dictionary<int, AsyncTexture2D>();
 
 		private Model model;
@@ -65,9 +74,15 @@ namespace gw2stacks_blish
 
 		private Dictionary<string, List<ItemForDisplay>> adviceDictionary = new Dictionary<string, List<ItemForDisplay>>();
 
+		private List<ItemForDisplay> combinedAdvice = new List<ItemForDisplay>();
+
 		private AdviceTabView adviceView;
 
 		private IgnoredView ignoredView;
+
+		private CharacterView characterBasedView;
+
+		private ItemView itemView;
 
 		private Dictionary<Tab, string> tabNameMapping;
 
@@ -207,33 +222,78 @@ namespace gw2stacks_blish
 			includeConsumableSetting = settings.DefineSetting("includeConsumables", defaultValue: true, () => " include consumables", () => "toggle to include food and utility");
 			localJson = settings.DefineSetting("localLut", defaultValue: false, () => "use a local item json", () => "will only have an effect if a LUT exists inside the gw2stacks folder");
 			ignoreItemsFeature = settings.DefineSetting("ignoreItems", defaultValue: false, () => "blacklist", () => "enable the blacklist feature for item advice");
+			displayType = settings.DefineSetting("UI version", "0", () => "", () => "Choose the UI version\n0 for classic gw2stacks\n1 for character based advice\n2 for item specific advice ");
 		}
 
 		private void create_window()
 		{
-			gw2stacks_root = new TabbedWindow2(AsyncTexture2D.FromAssetId(155997), new Microsoft.Xna.Framework.Rectangle(24, 30, 565, 630), new Microsoft.Xna.Framework.Rectangle(82, 30, 467, 600));
-			gw2stacks_root.Location = new Point(GameService.Graphics.SpriteScreen.Width / 4, GameService.Graphics.SpriteScreen.Height / 4);
-			gw2stacks_root.Hidden += delegate
+			gw2stacksWindow = new TabbedWindow2(AsyncTexture2D.FromAssetId(155997), new Microsoft.Xna.Framework.Rectangle(24, 30, 565, 630), new Microsoft.Xna.Framework.Rectangle(82, 30, 467, 600));
+			gw2stacksWindow.Location = new Point(GameService.Graphics.SpriteScreen.Width / 4, GameService.Graphics.SpriteScreen.Height / 4);
+			gw2stacksWindow.Hidden += delegate
 			{
-				ignoredItems?.Hide();
+				ignoredItemsWindow?.Hide();
 			};
-			ignoredItems = new TabbedWindow2(AsyncTexture2D.FromAssetId(155997), new Microsoft.Xna.Framework.Rectangle(24, 30, 565, 630), new Microsoft.Xna.Framework.Rectangle(82, 30, 467, 600));
-			ignoredItems.Location = new Point(GameService.Graphics.SpriteScreen.Width / 4 * 2, GameService.Graphics.SpriteScreen.Height / 4);
+			ignoredItemsWindow = new TabbedWindow2(AsyncTexture2D.FromAssetId(155997), new Microsoft.Xna.Framework.Rectangle(24, 30, 565, 630), new Microsoft.Xna.Framework.Rectangle(82, 30, 467, 600));
+			ignoredItemsWindow.Location = new Point(GameService.Graphics.SpriteScreen.Width / 4 * 2, GameService.Graphics.SpriteScreen.Height / 4);
 			ignoredView = new IgnoredView();
 			ignoredItemsTab = new Tab(GameService.Content.GetTexture("155052"), () => ignoredView, Magic.adviceTypeNameMapping[Magic.AdviceType.stackAdvice]);
-			ignoredItems.Tabs.Add(ignoredItemsTab);
-			ignoredItems.Parent = GameService.Graphics.SpriteScreen;
+			ignoredItemsWindow.Tabs.Add(ignoredItemsTab);
+			ignoredItemsWindow.Parent = GameService.Graphics.SpriteScreen;
 			ignoredView.set_values(itemTextures, refresh_views, excludedItemIds);
-			gw2stacks_root.Parent = GameService.Graphics.SpriteScreen;
+			gw2stacksWindow.Parent = GameService.Graphics.SpriteScreen;
 			adviceView = new AdviceTabView();
 			adviceView.set_values(itemTextures, refresh_views, excludedItemIds);
-			gw2stacks_root.Tabs.Clear();
+			gw2stacksWindow.Tabs.Clear();
 			create_name_tab_mapping();
 			foreach (Tab tab in tabNameMapping.Keys)
 			{
-				gw2stacks_root.Tabs.Add(tab);
+				gw2stacksWindow.Tabs.Add(tab);
 			}
-			gw2stacks_root.TabChanged += on_tab_change;
+			gw2stacksWindow.TabChanged += on_tab_change;
+			characterBasedWindow = new StandardWindow(AsyncTexture2D.FromAssetId(155985), new Microsoft.Xna.Framework.Rectangle(40, 26, 913, 691), new Microsoft.Xna.Framework.Rectangle(70, 71, 839, 605));
+			characterBasedWindow.Hide();
+			characterBasedView = new CharacterView();
+			characterBasedWindow.Parent = GameService.Graphics.SpriteScreen;
+			characterBasedWindow.Title = "Gw2stacks";
+			GameService.Gw2Mumble.PlayerCharacter.NameChanged += on_character_change;
+			itemView = new ItemView();
+			itemView.set_values(itemTextures, combinedAdvice);
+		}
+
+		private async void on_mouse_alt_click(object s = null, MouseEventArgs e = null)
+		{
+			if (GameService.Input.Keyboard.KeysDown.Contains(Keys.LeftAlt))
+			{
+				Logger.Warn("registered click combo");
+				Point position = GameService.Input.Mouse.Position;
+				Blish_HUD.Controls.Intern.Mouse.Release(MouseButton.LEFT, -1, -1, sendToSystem: true);
+				Blish_HUD.Controls.Intern.Keyboard.Release(VirtualKeyShort.LMENU, sendToSystem: true);
+				await Task.Delay(50);
+				Blish_HUD.Controls.Intern.Keyboard.Press(VirtualKeyShort.LSHIFT, sendToSystem: true);
+				await Task.Delay(50);
+				Blish_HUD.Controls.Intern.Mouse.Click(MouseButton.LEFT, -1, -1, sendToSystem: true);
+				await Task.Delay(50);
+				Blish_HUD.Controls.Intern.Keyboard.Release(VirtualKeyShort.LSHIFT, sendToSystem: true);
+				await Task.Delay(50);
+				Blish_HUD.Controls.Intern.Keyboard.Press(VirtualKeyShort.LCONTROL, sendToSystem: true);
+				await Task.Delay(50);
+				Blish_HUD.Controls.Intern.Keyboard.Stroke(VirtualKeyShort.KEY_C, sendToSystem: true);
+				await Task.Delay(50);
+				Blish_HUD.Controls.Intern.Keyboard.Release(VirtualKeyShort.LCONTROL, sendToSystem: true);
+				await Task.Delay(50);
+				Blish_HUD.Controls.Intern.Keyboard.Stroke(VirtualKeyShort.BACK, sendToSystem: true);
+				Blish_HUD.Controls.Intern.Keyboard.Stroke(VirtualKeyShort.RETURN, sendToSystem: true);
+				string entry = await ClipboardUtil.WindowsClipboardService.GetTextAsync();
+				Logger.Info("Found entry: " + entry);
+				new Label
+				{
+					Text = "I'm just a Label\nMultiline works too!",
+					Size = new Point(300, 100),
+					Location = position,
+					Parent = GameService.Graphics.SpriteScreen,
+					Enabled = false
+				};
+			}
 		}
 
 		private void create_values()
@@ -259,7 +319,7 @@ namespace gw2stacks_blish
 		private void update_tab_locale()
 		{
 			Magic.set_locale(GameService.Overlay.UserLocale.Value);
-			foreach (Tab tab in gw2stacks_root.Tabs)
+			foreach (Tab tab in gw2stacksWindow.Tabs)
 			{
 				tab.Name = Magic.get_current_translated_string(tabNameMapping[tab]);
 			}
@@ -296,9 +356,59 @@ namespace gw2stacks_blish
 			adviceDictionary.Add(Magic.get_local_advice(Magic.AdviceType.craftingAdvice), model.get_crafting_advice());
 			adviceDictionary.Add(Magic.get_local_advice(Magic.AdviceType.lwsAdvice), model.get_living_world_advice());
 			adviceDictionary.Add(Magic.get_local_advice(Magic.AdviceType.miscAdvice), model.get_misc_advice());
+			combinedAdvice.Clear();
+			foreach (List<ItemForDisplay> item in adviceDictionary.Values)
+			{
+				combinedAdvice.AddRange(item);
+			}
 		}
 
-		private void validate_api()
+		public void show_windows()
+		{
+			int mode = 0;
+			GameService.Input.Mouse.LeftMouseButtonPressed -= on_mouse_alt_click;
+			try
+			{
+				mode = Convert.ToInt32(displayType.Value);
+			}
+			catch (Exception)
+			{
+				Logger.Warn("Invalid mode selection. Defaulting to mode 0");
+				mode = 0;
+			}
+			switch (mode)
+			{
+			case 0:
+				gw2stacksWindow.Show();
+				if (ignoreItemsFlag)
+				{
+					ignoredItemsWindow.Show();
+				}
+				break;
+			case 1:
+				characterBasedWindow.Show(characterBasedView);
+				break;
+			case 2:
+				characterBasedWindow.Show(itemView);
+				break;
+			default:
+				gw2stacksWindow.Show();
+				if (ignoreItemsFlag)
+				{
+					ignoredItemsWindow.Show();
+				}
+				break;
+			}
+		}
+
+		public void hide_windows()
+		{
+			characterBasedWindow?.Hide();
+			ignoredItemsWindow?.Hide();
+			gw2stacksWindow?.Hide();
+		}
+
+		private void validate_api(object s = null, ValueEventArgs<IEnumerable<TokenPermission>> e = null)
 		{
 			try
 			{
@@ -355,8 +465,7 @@ namespace gw2stacks_blish
 			{
 				icon.Enabled = false;
 				validData = false;
-				gw2stacks_root.Hide();
-				ignoredItems.Hide();
+				hide_windows();
 				loadingSpinner.Location = icon.Location;
 				Logger.Info("starting setup");
 				model.includeConsumables = includeConsumableSetting.Value;
@@ -393,10 +502,17 @@ namespace gw2stacks_blish
 
 		private void update_views(string tabName_)
 		{
-			gw2stacks_root.Title = tabName_;
+			gw2stacksWindow.Title = tabName_;
 			adviceView.update(adviceDictionary[tabName_], tabName_, ignoreItemsFlag);
-			ignoredItems.Title = Magic.get_current_translated_string("Ignored Items");
+			ignoredItemsWindow.Title = Magic.get_current_translated_string("Ignored Items");
 			ignoredView.update(Magic.get_current_translated_string("Ignored Items"));
+			characterBasedView.update(itemTextures, combinedAdvice, GameService.Gw2Mumble.PlayerCharacter.Name);
+			itemView.update();
+		}
+
+		private void on_character_change(object sender_, ValueEventArgs<string> e_)
+		{
+			characterBasedView.update(itemTextures, combinedAdvice, e_.Value ?? "invalid name");
 		}
 
 		private void on_tab_change(object sender_, ValueChangedEventArgs<Tab> event_)
@@ -446,16 +562,13 @@ namespace gw2stacks_blish
 				create_values();
 				Magic.log = Logger;
 			}
-			catch (Exception e_2)
+			catch (Exception e_)
 			{
 				fatalError = true;
-				Logger.Warn("Unexpected exception: " + e_2.Message + " @" + e_2.StackTrace);
+				Logger.Warn("Unexpected exception: " + e_.Message + " @" + e_.StackTrace);
 			}
 			validate_api();
-			Gw2ApiManager.SubtokenUpdated += delegate
-			{
-				validate_api();
-			};
+			Gw2ApiManager.SubtokenUpdated += validate_api;
 		}
 
 		protected override void Update(GameTime gameTime)
@@ -487,14 +600,10 @@ namespace gw2stacks_blish
 					update_excluded();
 					ignoreItemsFlag = ignoreItemsFeature.Value;
 					validData = true;
-					update_views(gw2stacks_root.SelectedTab.Name);
+					update_views(gw2stacksWindow.SelectedTab.Name);
 					loadingSpinner.Hide();
 					icon.Enabled = true;
-					gw2stacks_root.Show();
-					if (ignoreItemsFlag)
-					{
-						ignoredItems.Show();
-					}
+					show_windows();
 					if (!isOnCooldown)
 					{
 						isOnCooldown = true;
@@ -509,8 +618,7 @@ namespace gw2stacks_blish
 			}
 			if (fatalError)
 			{
-				gw2stacks_root?.Hide();
-				ignoredItems?.Hide();
+				hide_windows();
 				icon?.Hide();
 				loadingSpinner?.Hide();
 			}
@@ -519,8 +627,9 @@ namespace gw2stacks_blish
 
 		protected override void Unload()
 		{
-			gw2stacks_root?.Dispose();
-			ignoredItems?.Hide();
+			gw2stacksWindow?.Dispose();
+			ignoredItemsWindow?.Hide();
+			characterBasedWindow?.Dispose();
 			icon?.Dispose();
 			loadingSpinner?.Dispose();
 			try
@@ -532,6 +641,9 @@ namespace gw2stacks_blish
 			{
 				Logger.Warn("Unexpected exception: can't save ignored items @" + e_.StackTrace);
 			}
+			Gw2ApiManager.SubtokenUpdated -= validate_api;
+			GameService.Input.Mouse.LeftMouseButtonPressed -= on_mouse_alt_click;
+			GameService.Gw2Mumble.PlayerCharacter.NameChanged -= on_character_change;
 		}
 	}
 }

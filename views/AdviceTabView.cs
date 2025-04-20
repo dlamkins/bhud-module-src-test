@@ -70,28 +70,21 @@ namespace views
 			search.Show();
 			foreach (ItemForDisplay item in adviceList)
 			{
-				if (!itemTextures.ContainsKey(item.item.itemId))
+				if (!itemTextures.ContainsKey(item.get_id()))
 				{
-					itemTextures.Add(item.item.itemId, AsyncTexture2D.FromAssetId(item.item.iconId));
+					itemTextures.Add(item.get_id(), AsyncTexture2D.FromAssetId(item.get_iconId()));
 				}
-				if ((!string.IsNullOrEmpty(hunt) && !Magic.get_local_name(item.item.itemId).ToLower().Contains(hunt.ToLower())) || excludedItemIds.Contains(item.item.itemId))
+				if ((!string.IsNullOrEmpty(hunt) && !Magic.get_local_name(item.get_id()).ToLower().Contains(hunt.ToLower())) || excludedItemIds.Contains(item.get_id()))
 				{
 					continue;
 				}
-				ViewContainer container = GetStandardPanel(rootPanel, Magic.get_local_name(item.item.itemId), item.item.itemId);
-				if (item.gobblerId == 0)
-				{
-					container.BasicTooltipText = Magic.get_current_translated_string(item.advice) + "\n" + item.get_source_string();
-				}
-				else
-				{
-					container.BasicTooltipText = Magic.get_current_translated_string(item.advice) + " (" + Magic.get_local_name(item.gobblerId) + ")\n" + item.get_source_string();
-				}
+				ViewContainer container = GetStandardPanel(rootPanel, Magic.get_local_name(item.get_id()), item.get_id());
+				container.BasicTooltipText = item.ToString();
 				if (ignoredItemsFlag)
 				{
 					container.Click += delegate
 					{
-						callback(item.item.itemId, arg2: true);
+						callback(item.get_id(), arg2: true);
 					};
 				}
 				container.Show();

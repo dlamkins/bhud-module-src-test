@@ -15,6 +15,8 @@ namespace gw2stacks_blish.data
 
 		public List<int> Disciplines;
 
+		public string chatLink;
+
 		public RecipeInfo()
 		{
 			Id = 0;
@@ -22,6 +24,7 @@ namespace gw2stacks_blish.data
 			Ingredients = null;
 			OutputItemId = 0;
 			Disciplines = new List<int>();
+			chatLink = "";
 		}
 	}
 }

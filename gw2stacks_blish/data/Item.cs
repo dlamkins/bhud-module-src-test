@@ -42,6 +42,8 @@ namespace gw2stacks_blish.data
 
 		public bool isSalvagable;
 
+		public string chatLink;
+
 		public Item(int id_, bool isCharacterBound_, bool isAccountBound_, bool delayedCreate = false)
 		{
 			itemId = id_;
@@ -61,6 +63,7 @@ namespace gw2stacks_blish.data
 			VendorValue = 0;
 			isSellable = true;
 			isSalvagable = true;
+			chatLink = "";
 			if (!delayedCreate)
 			{
 				build_basic_item_info();
@@ -156,14 +159,19 @@ namespace gw2stacks_blish.data
 				return new List<Source>();
 			}
 			List<Source> stackableSources = get_partial_stacks(materialStorageSize_);
-			ulong numberOfPartialStacks = 0uL;
-			ulong partialStackAmount = 0uL;
+			int numberOfPartialStacks = 0;
+			int partialStackAmount = 0;
 			foreach (Source source in stackableSources)
 			{
-				numberOfPartialStacks += source.stacks;
-				partialStackAmount += source.count;
+				numberOfPartialStacks++;
+				partialStackAmount += Convert.ToInt32(source.count % 250uL);
 			}
-			ulong numberOfConsolidatedStacks = Convert.ToUInt64(Math.Ceiling(Convert.ToDouble(partialStackAmount / 250uL)));
+			int remainder = 0;
+			int numberOfConsolidatedStacks = Math.DivRem(partialStackAmount, 250, out remainder);
+			if (remainder != 0)
+			{
+				numberOfConsolidatedStacks++;
+			}
 			if (numberOfPartialStacks > 1 && numberOfPartialStacks > numberOfConsolidatedStacks)
 			{
 				return stackableSources;

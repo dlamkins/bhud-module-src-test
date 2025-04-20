@@ -30,6 +30,8 @@ namespace gw2stacks_blish.data
 
 		private Dictionary<int, List<Source>> upgradableBags;
 
+		public List<string> characterNames = new List<string>();
+
 		public void reset_state()
 		{
 			foreach (KeyValuePair<int, Item> item in items)
@@ -43,6 +45,7 @@ namespace gw2stacks_blish.data
 			includeConsumables = true;
 			ectoSalvagePrice = 0;
 			upgradableBags = new Dictionary<int, List<Source>>();
+			characterNames = new List<string>();
 			validData = false;
 		}
 
@@ -64,7 +67,8 @@ namespace gw2stacks_blish.data
 			await build_recipe_info();
 			log.Info("started building prices");
 			await build_item_prices(api_);
-			Magic.inventoryBag.build_basic_item_info();
+			Magic.silkBag.build_basic_item_info();
+			Magic.borealTrunk.build_basic_item_info();
 			validData = true;
 		}
 
@@ -113,6 +117,7 @@ namespace gw2stacks_blish.data
 			ulong emptySlots = 0uL;
 			foreach (Character character in await api_.characters())
 			{
+				characterNames.Add(character.Name);
 				foreach (CharacterInventoryBag bag in character.Bags!)
 				{
 					if (bag == null)
@@ -410,7 +415,7 @@ namespace gw2stacks_blish.data
 				{
 					if (items[food].total_count() > Convert.ToUInt64(materialStorageSize))
 					{
-						result.Add(new ItemForDisplay(items[food], items[food].sources, "Feed these items to gobblers", gobbler.itemId));
+						result.Add(new GobblerItemForDisplay(items[food], items[food].sources, "Feed these items to gobblers", gobbler.itemId));
 					}
 				}
 			}
@@ -420,23 +425,48 @@ namespace gw2stacks_blish.data
 		public List<ItemForDisplay> get_misc_advice()
 		{
 			List<ItemForDisplay> result = new List<ItemForDisplay>();
-			foreach (MiscAdvice advice in Magic.miscAdvices)
+			foreach (MiscAdvice advice2 in Magic.miscAdvices)
 			{
-				if (has_item(advice.itemId) && items[advice.itemId].total_count() >= Convert.ToUInt64(advice.minCount))
+				if (has_item(advice2.itemId) && items[advice2.itemId].total_count() >= Convert.ToUInt64(advice2.minCount))
 				{
-					result.Add(new ItemForDisplay(items[advice.itemId], null, advice.advice));
+					result.Add(new ItemForDisplay(items[advice2.itemId], null, advice2.advice));
 				}
 			}
+			foreach (CraftingMiscAdvice advice in Magic.craftingMiscAdvices.Values)
+			{
+				List<Source> ingredients = new List<Source>();
+				foreach (KeyValuePair<int, int> item in advice.idCountMapping)
+				{
+					if (has_item(item.Key) && items[item.Key].total_count() >= Convert.ToUInt64(item.Value))
+					{
+						ingredients.AddRange(items[item.Key].sources);
+					}
+				}
+				if (ingredients.Any())
+				{
+					result.Add(new MiscCraftingItemForDisplay(null, ingredients, advice.advice, advice.outputId));
+				}
+			}
+			List<Source> upgradeTo18 = new List<Source>();
+			List<Source> upgradeTo19 = new List<Source>();
 			foreach (KeyValuePair<int, List<Source>> slots in upgradableBags)
 			{
 				if (slots.Key < 18)
 				{
-					result.Add(new ItemForDisplay(Magic.inventoryBag, slots.Value, "Upgrade these bags to 18 slots"));
+					upgradeTo18.AddRange(slots.Value);
 				}
 				if (has_item(83410) && slots.Key < 32 && items[83410].total_count() >= 12)
 				{
-					result.Add(new ItemForDisplay(Magic.inventoryBag, slots.Value, "Potentially replace these bags with boreal trunks"));
+					upgradeTo19.AddRange(slots.Value);
 				}
+			}
+			if (upgradeTo18.Any())
+			{
+				result.Add(new ItemForDisplay(Magic.silkBag, upgradeTo18, "Upgrade these bags to 18 slots"));
+			}
+			if (upgradeTo19.Any())
+			{
+				result.Add(new ItemForDisplay(Magic.borealTrunk, upgradeTo19, "Potentially replace these bags with boreal trunks"));
 			}
 			return result;
 		}

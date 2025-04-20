@@ -9,7 +9,7 @@ using gw2stacks_blish.data;
 
 namespace views
 {
-	internal class IgnoredView : View
+	internal class ItemView : View
 	{
 		private FlowPanel panel = new FlowPanel
 		{
@@ -21,14 +21,12 @@ namespace views
 
 		private Dictionary<int, AsyncTexture2D> itemTextures;
 
-		private Action<int, bool> callback;
-
-		public List<int> excludedItemIds = new List<int>();
+		public List<ItemForDisplay> combinedAdvice = new List<ItemForDisplay>();
 
 		private TextBox search = new TextBox
 		{
 			PlaceholderText = "Enter item name here ...",
-			Size = new Point(358, 43),
+			Size = new Point(830, 43),
 			Font = GameService.Content.DefaultFont16,
 			Location = new Point(0, 0)
 		};
@@ -38,12 +36,7 @@ namespace views
 		private void handle_text_input(object s_, EventArgs e_)
 		{
 			hunt = search.Text;
-			refresh();
-		}
-
-		public void refresh()
-		{
-			update(panel.Title);
+			update();
 		}
 
 		private ViewContainer GetStandardPanel(Panel rootPanel, string title, int id_)
@@ -51,7 +44,7 @@ namespace views
 			return new ViewContainer
 			{
 				Icon = itemTextures[id_],
-				WidthSizingMode = SizingMode.Fill,
+				Width = 830,
 				HeightSizingMode = SizingMode.AutoSize,
 				Title = title,
 				ShowBorder = true,
@@ -59,56 +52,44 @@ namespace views
 			};
 		}
 
-		private void build_ignored_panels(Panel rootPanel)
+		private void build_item_panels(Panel rootPanel)
 		{
 			search.Parent = rootPanel;
 			search.TextChanged += handle_text_input;
-			foreach (int item in excludedItemIds)
+			foreach (ItemForDisplay item in combinedAdvice)
 			{
-				if (!string.IsNullOrEmpty(hunt) && !Magic.get_local_name(item).ToLower().Contains(hunt.ToLower()))
+				if (string.IsNullOrEmpty(hunt) || Magic.get_local_name(item.get_id()).ToLower().Contains(hunt.ToLower()))
 				{
-					continue;
-				}
-				if (!itemTextures.ContainsKey(item))
-				{
-					if (Magic.jsonLut.itemLut.ContainsKey(item))
+					if (!itemTextures.ContainsKey(item.get_id()))
 					{
-						itemTextures.Add(item, AsyncTexture2D.FromAssetId(Magic.jsonLut.itemLut[item].IconId));
+						itemTextures.Add(item.get_id(), AsyncTexture2D.FromAssetId(item.get_iconId()));
 					}
-					else
-					{
-						itemTextures.Add(item, AsyncTexture2D.FromAssetId(Magic.unknown.IconId));
-					}
+					ViewContainer standardPanel = GetStandardPanel(rootPanel, Magic.get_local_name(item.get_id()), item.get_id());
+					standardPanel.BasicTooltipText = item.ToString();
+					standardPanel.Show();
 				}
-				ViewContainer standardPanel = GetStandardPanel(rootPanel, Magic.get_local_name(item), item);
-				standardPanel.Click += delegate
-				{
-					callback(item, arg2: false);
-				};
-				standardPanel.Show();
 			}
 		}
 
-		public void update(string title_)
+		public void update()
 		{
 			search.Parent = null;
-			search.TextChanged -= handle_text_input;
 			panel.ClearChildren();
-			build_ignored_panels(panel);
-			panel.Title = title_;
+			search.TextChanged -= handle_text_input;
+			build_item_panels(panel);
+			panel.Title = "Gw2stacks";
 		}
 
-		public void set_values(Dictionary<int, AsyncTexture2D> itemTextures_, Action<int, bool> callback_, List<int> excludedItemIds_)
+		public void set_values(Dictionary<int, AsyncTexture2D> itemTextures_, List<ItemForDisplay> excludedItemIds_)
 		{
 			itemTextures = itemTextures_;
-			callback = callback_;
-			excludedItemIds = excludedItemIds_;
+			combinedAdvice = excludedItemIds_;
 		}
 
 		protected override void Build(Container buildPanel)
 		{
 			panel.Parent = buildPanel;
-			build_ignored_panels(panel);
+			build_item_panels(panel);
 		}
 	}
 }

@@ -61,7 +61,9 @@ namespace gw2stacks_blish.data
 			Level = 0
 		};
 
-		public static Item inventoryBag = new Item(8932, isCharacterBound_: false, isAccountBound_: false, delayedCreate: true);
+		public static Item silkBag = new Item(9566, isCharacterBound_: false, isAccountBound_: false, delayedCreate: true);
+
+		public static Item borealTrunk = new Item(92292, isCharacterBound_: false, isAccountBound_: false, delayedCreate: true);
 
 		private static Dictionary<int, string> luckNameMapping = new Dictionary<int, string>
 		{
@@ -785,6 +787,37 @@ namespace gw2stacks_blish.data
 			82592, 83105, 83125, 83580, 83982, 84165, 84797, 95694, 95735, 95806,
 			96440, 96460, 96584, 96622, 96767, 96859, 96956, 96963, 97090, 97224,
 			97381, 97455, 97585, 97641, 97718, 100277, 100735
+		};
+
+		public static Dictionary<int, CraftingMiscAdvice> craftingMiscAdvices = new Dictionary<int, CraftingMiscAdvice>
+		{
+			{
+				9251,
+				new CraftingMiscAdvice(new Dictionary<int, int>
+				{
+					{ 20008, 1 },
+					{ 8439, 1 },
+					{ 19997, 1 },
+					{ 49871, 1 },
+					{ 48951, 1 },
+					{ 37214, 1 },
+					{ 20001, 1 },
+					{ 19999, 1 },
+					{ 49872, 1 },
+					{ 20006, 1 },
+					{ 8446, 1 }
+				}, "Craft: ", 9251)
+			},
+			{
+				38050,
+				new CraftingMiscAdvice(new Dictionary<int, int>
+				{
+					{ 20016, 1 },
+					{ 20010, 1 },
+					{ 20015, 1 },
+					{ 20013, 1 }
+				}, "Craft: ", 38050)
+			}
 		};
 
 		public static void set_locale(Locale newLocale_)

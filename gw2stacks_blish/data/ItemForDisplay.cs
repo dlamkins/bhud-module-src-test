@@ -4,15 +4,13 @@ namespace gw2stacks_blish.data
 {
 	internal class ItemForDisplay
 	{
-		public Item item;
+		private Item item;
 
 		public List<Source> sources;
 
 		public string advice;
 
-		public int gobblerId;
-
-		public ItemForDisplay(Item item_, List<Source> sources_ = null, string advice_ = null, int id_ = 0)
+		public ItemForDisplay(Item item_, List<Source> sources_ = null, string advice_ = null)
 		{
 			item = item_;
 			if (sources_ == null)
@@ -24,17 +22,31 @@ namespace gw2stacks_blish.data
 				sources = sources_;
 			}
 			advice = advice_;
-			gobblerId = id_;
 		}
 
-		public string get_source_string()
+		public virtual string get_source_string()
 		{
 			return "Sources:\n" + string.Join("\n", sources);
 		}
 
+		public virtual int get_id()
+		{
+			return item.itemId;
+		}
+
+		public virtual string get_chatlink()
+		{
+			return item.chatLink;
+		}
+
+		public virtual int get_iconId()
+		{
+			return item.iconId;
+		}
+
 		public override string ToString()
 		{
-			return (item?.ToString() ?? " ") + " " + (advice?.ToString() ?? " ") + " " + string.Join(", ", sources);
+			return item.total_count() + "x\n" + Magic.get_current_translated_string(advice) + "\n" + get_source_string();
 		}
 	}
 }

@@ -24,6 +24,8 @@ namespace gw2stacks_blish.data
 
 		public int VendorValue;
 
+		public string chatLink;
+
 		public ItemInfo()
 		{
 			Id = 0;
@@ -36,6 +38,7 @@ namespace gw2stacks_blish.data
 			Flags = new List<int>();
 			Level = 0;
 			VendorValue = 0;
+			chatLink = "";
 		}
 	}
 }
