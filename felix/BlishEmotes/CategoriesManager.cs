@@ -291,8 +291,8 @@ namespace felix.BlishEmotes
 			CreateCategory("Fun", null, new List<string> { "cheer", "laugh", "paper", "rock", "rockout", "scissors" }, null, isFavourite: false, saveToFile: false);
 			CreateCategory("Pose", null, new List<string>
 			{
-				"bless", "crossarms", "heroic", "kneel", "magicjuggle", "playdead", "point", "serve", "sit", "sleep",
-				"stretch", "threaten", "unleash"
+				"bless", "blowkiss", "crossarms", "heroic", "kneel", "magicjuggle", "magictrick", "playdead", "point", "serve",
+				"sit", "sleep", "stretch", "threaten", "unleash"
 			}, null, isFavourite: false, saveToFile: false);
 			CreateCategory("Dance", null, new List<string> { "boogie", "breakdance", "dance", "geargrind", "shuffle", "step" }, null, isFavourite: false, saveToFile: false);
 			CreateCategory("Miscellaneous", null, new List<string> { "petalthrow", "ponder", "possessed", "rank", "readbook", "sipcoffee", "talk" }, null, isFavourite: false, saveToFile: false);

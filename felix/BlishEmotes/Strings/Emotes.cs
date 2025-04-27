@@ -46,6 +46,8 @@ namespace felix.BlishEmotes.Strings
 
 		internal static string bless => ResourceManager.GetString("bless", resourceCulture);
 
+		internal static string blowkiss => ResourceManager.GetString("blowkiss", resourceCulture);
+
 		internal static string boogie => ResourceManager.GetString("boogie", resourceCulture);
 
 		internal static string bow => ResourceManager.GetString("bow", resourceCulture);
@@ -75,6 +77,8 @@ namespace felix.BlishEmotes.Strings
 		internal static string laugh => ResourceManager.GetString("laugh", resourceCulture);
 
 		internal static string magicjuggle => ResourceManager.GetString("magicjuggle", resourceCulture);
+
+		internal static string magictrick => ResourceManager.GetString("magictrick", resourceCulture);
 
 		internal static string no => ResourceManager.GetString("no", resourceCulture);
 
