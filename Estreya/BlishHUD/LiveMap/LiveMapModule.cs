@@ -31,7 +31,6 @@ using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Xna.Framework;
-using SocketIOClient;
 
 namespace Estreya.BlishHUD.LiveMap
 {
@@ -164,40 +163,6 @@ namespace Estreya.BlishHUD.LiveMap
 		{
 			base.Logger.Warn("Disconnected: " + ex.Message);
 			return Task.CompletedTask;
-		}
-
-		private void GlobalSocket_OnConnected(object sender, EventArgs e)
-		{
-			base.Logger.Info("Connected.");
-		}
-
-		private void GlobalSocket_OnDisconnected(object sender, string e)
-		{
-			base.Logger.Warn("Disconnected: " + e);
-			if (e == DisconnectReason.IOServerDisconnect)
-			{
-				base.Logger.Info("Trying to reconnect...");
-			}
-		}
-
-		private void GlobalSocket_OnError(object sender, string e)
-		{
-			base.Logger.Warn("Error: " + e);
-		}
-
-		private void GlobalSocket_OnReconnectAttempt(object sender, int e)
-		{
-			base.Logger.Info($"Attempt reconnect: {e}");
-		}
-
-		private void GlobalSocket_OnReconnectFailed(object sender, EventArgs e)
-		{
-			base.Logger.Warn("Reconnect failed.");
-		}
-
-		private void GlobalSocket_OnReconnectError(object sender, Exception e)
-		{
-			base.Logger.Warn(e, "Could not reconnect");
 		}
 
 		public static byte[] Compress(byte[] bytes)
@@ -333,14 +298,17 @@ namespace Estreya.BlishHUD.LiveMap
 			base.Unload();
 			base.Gw2ApiManager.remove_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)Gw2ApiManager_SubtokenUpdated);
 			GameService.Gw2Mumble.get_PlayerCharacter().remove_NameChanged((EventHandler<ValueEventArgs<string>>)PlayerCharacter_NameChanged);
-			_hubConnection.Closed -= HubConnection_Closed;
-			_hubConnection.Reconnecting -= HubConnection_Reconnecting;
-			_hubConnection.Reconnected -= HubConnection_Reconnected;
-			AsyncHelper.RunSync(async delegate
+			if (_hubConnection != null)
 			{
-				await _hubConnection.StopAsync();
-				await _hubConnection.DisposeAsync();
-			});
+				_hubConnection.Closed -= HubConnection_Closed;
+				_hubConnection.Reconnecting -= HubConnection_Reconnecting;
+				_hubConnection.Reconnected -= HubConnection_Reconnected;
+				AsyncHelper.RunSync(async delegate
+				{
+					await _hubConnection.StopAsync();
+					await _hubConnection.DisposeAsync();
+				});
+			}
 		}
 
 		public Player GetPlayer()
