@@ -237,7 +237,7 @@ namespace Estreya.BlishHUD.EventTable.Models
 			bool num = endTime < now;
 			bool isNext = !num && occurence > now;
 			bool isCurrent = !num && !isNext;
-			string timeString = occurence.InZone(DateTimeZoneProviders.Tzdb.GetSystemDefault()).ToString("HH:mm zzz", CultureInfo.CurrentUICulture);
+			string timeString = occurence.InZone(DateTimeZoneProviders.Tzdb.GetSystemDefault()).ToString("HH:mm", CultureInfo.CurrentUICulture);
 			if (num)
 			{
 				Duration finishedSince = now - occurence.Plus(Duration);

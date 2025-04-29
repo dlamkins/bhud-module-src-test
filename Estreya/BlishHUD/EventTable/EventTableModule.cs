@@ -483,74 +483,88 @@ namespace Estreya.BlishHUD.EventTable
 
 		private async void EventNotification_Click(object sender, MouseEventArgs e)
 		{
-			Estreya.BlishHUD.EventTable.Models.Event model = (sender as EventNotification)?.Model;
-			string waypoint = model?.GetWaypoint(base.AccountService?.Account);
-			switch (base.ModuleSettings.ReminderLeftClickAction.get_Value())
+			try
 			{
-			case LeftClickAction.CopyWaypoint:
-			{
-				if (model == null || string.IsNullOrWhiteSpace(waypoint))
+				Estreya.BlishHUD.EventTable.Models.Event model = (sender as EventNotification)?.Model;
+				string waypoint = model?.GetWaypoint(base.AccountService?.Account);
+				switch (base.ModuleSettings.ReminderLeftClickAction.get_Value())
 				{
+				case LeftClickAction.CopyWaypoint:
+				{
+					if (model == null || string.IsNullOrWhiteSpace(waypoint))
+					{
+						break;
+					}
+					string eventChatFormat = model.GetChatText(base.ModuleSettings.ReminderEventChatFormat.get_Value(), model.GetNextOccurrence(), base.AccountService?.Account);
+					if ((int)GameService.Input.get_Keyboard().get_ActiveModifiers() == 1)
+					{
+						try
+						{
+							await base.ChatService.ChangeChannel(ChatChannel.Squad);
+							await base.ChatService.ChangeChannel(base.ModuleSettings.ReminderWaypointSendingChannel.get_Value(), base.ModuleSettings.ReminderWaypointSendingGuild.get_Value(), GameService.Gw2Mumble.get_PlayerCharacter().get_Name());
+							await base.ChatService.Send(eventChatFormat);
+						}
+						catch (Exception ex2)
+						{
+							base.Logger.Warn(ex2, "Could not paste waypoint into chat. Event: " + model.SettingKey);
+							ScreenNotification.ShowNotification(new string[2] { "Waypoint could not be pasted in chat.", "See log for more information." }, ScreenNotification.NotificationType.Error, null, 5);
+						}
+					}
+					else
+					{
+						await ClipboardUtil.get_WindowsClipboardService().SetTextAsync(eventChatFormat);
+						ScreenNotification.ShowNotification(new string[2] { model.Name, "Copied to clipboard!" });
+					}
 					break;
 				}
-				string eventChatFormat = model.GetChatText(base.ModuleSettings.ReminderEventChatFormat.get_Value(), model.GetNextOccurrence(), base.AccountService?.Account);
-				if ((int)GameService.Input.get_Keyboard().get_ActiveModifiers() == 1)
+				case LeftClickAction.NavigateToWaypoint:
 				{
-					try
+					if (string.IsNullOrWhiteSpace(waypoint) || base.PointOfInterestService == null)
 					{
-						await base.ChatService.ChangeChannel(ChatChannel.Squad);
-						await base.ChatService.ChangeChannel(base.ModuleSettings.ReminderWaypointSendingChannel.get_Value(), base.ModuleSettings.ReminderWaypointSendingGuild.get_Value(), GameService.Gw2Mumble.get_PlayerCharacter().get_Name());
-						await base.ChatService.Send(eventChatFormat);
+						break;
 					}
-					catch (Exception ex)
+					if (base.PointOfInterestService.Loading)
 					{
-						base.Logger.Warn(ex, "Could not paste waypoint into chat. Event: " + model.SettingKey);
-						ScreenNotification.ShowNotification(new string[2] { "Waypoint could not be pasted in chat.", "See log for more information." }, ScreenNotification.NotificationType.Error, null, 5);
+						ScreenNotification.ShowNotification("PointOfInterestService is still loading!", ScreenNotification.NotificationType.Error);
+						break;
 					}
+					PointOfInterest poi = base.PointOfInterestService.GetPointOfInterest(waypoint);
+					if (poi == null)
+					{
+						ScreenNotification.ShowNotification(waypoint + " not found!", ScreenNotification.NotificationType.Error);
+						break;
+					}
+					Task.Run(async delegate
+					{
+						MapUtil.NavigationResult result = await (MapUtil?.NavigateToPosition(poi, base.ModuleSettings.AcceptWaypointPrompt.get_Value()) ?? Task.FromResult(new MapUtil.NavigationResult(success: false, "Variable null.")));
+						if (!result.Success)
+						{
+							ScreenNotification.ShowNotification("Navigation failed: " + (result.Message ?? "Unknown"), ScreenNotification.NotificationType.Error);
+						}
+					});
+					break;
 				}
-				else
-				{
-					await ClipboardUtil.get_WindowsClipboardService().SetTextAsync(eventChatFormat);
-					ScreenNotification.ShowNotification(new string[2] { model.Name, "Copied to clipboard!" });
 				}
-				break;
 			}
-			case LeftClickAction.NavigateToWaypoint:
+			catch (Exception ex)
 			{
-				if (string.IsNullOrWhiteSpace(waypoint) || base.PointOfInterestService == null)
-				{
-					break;
-				}
-				if (base.PointOfInterestService.Loading)
-				{
-					ScreenNotification.ShowNotification("PointOfInterestService is still loading!", ScreenNotification.NotificationType.Error);
-					break;
-				}
-				PointOfInterest poi = base.PointOfInterestService.GetPointOfInterest(waypoint);
-				if (poi == null)
-				{
-					ScreenNotification.ShowNotification(waypoint + " not found!", ScreenNotification.NotificationType.Error);
-					break;
-				}
-				Task.Run(async delegate
-				{
-					MapUtil.NavigationResult result = await (MapUtil?.NavigateToPosition(poi, base.ModuleSettings.AcceptWaypointPrompt.get_Value()) ?? Task.FromResult(new MapUtil.NavigationResult(success: false, "Variable null.")));
-					if (!result.Success)
-					{
-						ScreenNotification.ShowNotification("Navigation failed: " + (result.Message ?? "Unknown"), ScreenNotification.NotificationType.Error);
-					}
-				});
-				break;
-			}
+				base.Logger.Warn(ex, "Could not handle reminder left click.");
 			}
 		}
 
 		private void EventNotification_RightMouseButtonPressed(object sender, MouseEventArgs e)
 		{
-			EventNotification notification = sender as EventNotification;
-			if (base.ModuleSettings.ReminderRightClickAction.get_Value() == EventReminderRightClickAction.Dismiss && notification != null)
+			try
 			{
-				((Control)notification).Dispose();
+				EventNotification notification = sender as EventNotification;
+				if (base.ModuleSettings.ReminderRightClickAction.get_Value() == EventReminderRightClickAction.Dismiss && notification != null)
+				{
+					((Control)notification).Dispose();
+				}
+			}
+			catch (Exception ex)
+			{
+				base.Logger.Warn(ex, "Could not handle reminder right click.");
 			}
 		}
 

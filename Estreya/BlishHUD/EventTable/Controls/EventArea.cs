@@ -1008,80 +1008,87 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		private async void OnLeftMouseButtonPressed(object sender, MouseEventArgs e)
 		{
-			Event currentEvent = _activeEvent;
-			if (currentEvent == null || currentEvent.Model.Filler)
+			try
 			{
-				return;
-			}
-			string waypoint = currentEvent.Model?.GetWaypoint(_accountService.Account);
-			switch (Configuration.LeftClickAction.get_Value())
-			{
-			case LeftClickAction.CopyWaypoint:
-			{
-				if (string.IsNullOrWhiteSpace(waypoint))
+				Event currentEvent = _activeEvent;
+				if (currentEvent == null || currentEvent.Model.Filler)
 				{
-					break;
+					return;
 				}
-				string eventChatFormat = currentEvent.Model.GetChatText(Configuration.EventChatFormat.get_Value(), currentEvent.StartTime, _accountService.Account);
-				if ((int)GameService.Input.get_Keyboard().get_ActiveModifiers() == 1)
+				string waypoint = currentEvent.Model?.GetWaypoint(_accountService.Account);
+				switch (Configuration.LeftClickAction.get_Value())
 				{
-					try
+				case LeftClickAction.CopyWaypoint:
+				{
+					if (string.IsNullOrWhiteSpace(waypoint))
 					{
-						await _chatService.ChangeChannel(ChatChannel.Squad);
-						await _chatService.ChangeChannel(Configuration.WaypointSendingChannel.get_Value(), Configuration.WaypointSendingGuild.get_Value(), GameService.Gw2Mumble.get_PlayerCharacter().get_Name());
-						await _chatService.Send(eventChatFormat);
+						break;
 					}
-					catch (Exception ex)
+					string eventChatFormat = currentEvent.Model.GetChatText(Configuration.EventChatFormat.get_Value(), currentEvent.StartTime, _accountService.Account);
+					if ((int)GameService.Input.get_Keyboard().get_ActiveModifiers() == 1)
 					{
-						_logger.Warn(ex, "Could not paste waypoint into chat. Event: " + currentEvent.Model.SettingKey);
-						ScreenNotification.ShowNotification(new string[2] { "Waypoint could not be pasted in chat.", "See log for more information." }, ScreenNotification.NotificationType.Error, null, 5);
-					}
-				}
-				else
-				{
-					await ClipboardUtil.get_WindowsClipboardService().SetTextAsync(eventChatFormat);
-					ScreenNotification.ShowNotification(new string[2]
-					{
-						currentEvent.Model.Name,
-						"Copied to clipboard!"
-					});
-				}
-				break;
-			}
-			case LeftClickAction.NavigateToWaypoint:
-			{
-				if (string.IsNullOrWhiteSpace(waypoint))
-				{
-					break;
-				}
-				if (_pointOfInterestService.Loading)
-				{
-					ScreenNotification.ShowNotification("PointOfInterestService is still loading!", ScreenNotification.NotificationType.Error);
-					break;
-				}
-				PointOfInterest poi = _pointOfInterestService.GetPointOfInterest(waypoint);
-				if (poi == null)
-				{
-					ScreenNotification.ShowNotification(waypoint + " not found!", ScreenNotification.NotificationType.Error);
-					break;
-				}
-				Task.Run(async delegate
-				{
-					MapUtil.NavigationResult result = await (_mapUtil?.NavigateToPosition(poi, Configuration.AcceptWaypointPrompt.get_Value()) ?? Task.FromResult(new MapUtil.NavigationResult(success: false, "Variable null.")));
-					if (result.Success)
-					{
-						if (Configuration.HideAfterWaypointNavigation.get_Value())
+						try
 						{
-							Configuration.Enabled.set_Value(false);
+							await _chatService.ChangeChannel(ChatChannel.Squad);
+							await _chatService.ChangeChannel(Configuration.WaypointSendingChannel.get_Value(), Configuration.WaypointSendingGuild.get_Value(), GameService.Gw2Mumble.get_PlayerCharacter().get_Name());
+							await _chatService.Send(eventChatFormat);
+						}
+						catch (Exception ex2)
+						{
+							_logger.Warn(ex2, "Could not paste waypoint into chat. Event: " + currentEvent.Model.SettingKey);
+							ScreenNotification.ShowNotification(new string[2] { "Waypoint could not be pasted in chat.", "See log for more information." }, ScreenNotification.NotificationType.Error, null, 5);
 						}
 					}
 					else
 					{
-						ScreenNotification.ShowNotification("Navigation failed: " + (result.Message ?? "Unknown"), ScreenNotification.NotificationType.Error);
+						await ClipboardUtil.get_WindowsClipboardService().SetTextAsync(eventChatFormat);
+						ScreenNotification.ShowNotification(new string[2]
+						{
+							currentEvent.Model.Name,
+							"Copied to clipboard!"
+						});
 					}
-				});
-				break;
+					break;
+				}
+				case LeftClickAction.NavigateToWaypoint:
+				{
+					if (string.IsNullOrWhiteSpace(waypoint))
+					{
+						break;
+					}
+					if (_pointOfInterestService.Loading)
+					{
+						ScreenNotification.ShowNotification("PointOfInterestService is still loading!", ScreenNotification.NotificationType.Error);
+						break;
+					}
+					PointOfInterest poi = _pointOfInterestService.GetPointOfInterest(waypoint);
+					if (poi == null)
+					{
+						ScreenNotification.ShowNotification(waypoint + " not found!", ScreenNotification.NotificationType.Error);
+						break;
+					}
+					Task.Run(async delegate
+					{
+						MapUtil.NavigationResult result = await (_mapUtil?.NavigateToPosition(poi, Configuration.AcceptWaypointPrompt.get_Value()) ?? Task.FromResult(new MapUtil.NavigationResult(success: false, "Variable null.")));
+						if (result.Success)
+						{
+							if (Configuration.HideAfterWaypointNavigation.get_Value())
+							{
+								Configuration.Enabled.set_Value(false);
+							}
+						}
+						else
+						{
+							ScreenNotification.ShowNotification("Navigation failed: " + (result.Message ?? "Unknown"), ScreenNotification.NotificationType.Error);
+						}
+					});
+					break;
+				}
+				}
 			}
+			catch (Exception ex)
+			{
+				_logger.Warn(ex, "Could not handle left mouse click.");
 			}
 		}
 

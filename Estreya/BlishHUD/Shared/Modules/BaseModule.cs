@@ -896,6 +896,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 				{
 					((Control)standardWindow4).Dispose();
 				}
+				ModuleSettings.WizardCompleted.set_Value(true);
 				Logger.Info("Cancelled setup wizard.");
 				return Task.CompletedTask;
 			};
