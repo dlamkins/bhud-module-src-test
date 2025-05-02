@@ -203,7 +203,21 @@ namespace TargetYourFeet.Features.TargetYourFeet.Services
 
 		private void MoveMouseToHealthGlobe()
 		{
-			MoveMouse(GameService.Graphics.get_WindowWidth() / 2, GameService.Graphics.get_WindowHeight() - 50);
+			if (_setting.CustomCursorPosition.get_Value())
+			{
+				if (int.TryParse(_setting.CustomCursorPositionX.get_Value(), out var x) && int.TryParse(_setting.CustomCursorPositionY.get_Value(), out var y))
+				{
+					MoveMouse(x, y);
+				}
+				else
+				{
+					MoveMouse(GameService.Graphics.get_WindowWidth() / 2, GameService.Graphics.get_WindowHeight() - 50);
+				}
+			}
+			else
+			{
+				MoveMouse(GameService.Graphics.get_WindowWidth() / 2, GameService.Graphics.get_WindowHeight() - 50);
+			}
 		}
 
 		private void SetKeysFromKeyBinding(KeyBinding keybind)
