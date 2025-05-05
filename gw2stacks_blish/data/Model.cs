@@ -28,9 +28,13 @@ namespace gw2stacks_blish.data
 
 		private Logger log;
 
-		private Dictionary<int, List<Source>> upgradableBags;
+		public Dictionary<string, List<int?>> characterInventory;
+
+		public List<int?> sharedInventory;
 
 		public List<string> characterNames = new List<string>();
+
+		public Dictionary<string, List<InventoryBagSlot>> inventoryBags = new Dictionary<string, List<InventoryBagSlot>>();
 
 		public void reset_state()
 		{
@@ -44,8 +48,10 @@ namespace gw2stacks_blish.data
 			appraisedItemIds = new List<int>();
 			includeConsumables = true;
 			ectoSalvagePrice = 0;
-			upgradableBags = new Dictionary<int, List<Source>>();
 			characterNames = new List<string>();
+			characterInventory = new Dictionary<string, List<int?>>();
+			sharedInventory = new List<int?>();
+			inventoryBags = new Dictionary<string, List<InventoryBagSlot>>();
 			validData = false;
 		}
 
@@ -59,13 +65,13 @@ namespace gw2stacks_blish.data
 		public async Task setup(Gw2Api api_)
 		{
 			validData = false;
-			log.Info("started building ecto price");
+			log.Debug("started building ecto price");
 			await build_ecto_price(api_);
-			log.Info("started building inventory");
+			log.Debug("started building inventory");
 			await build_inventory(api_);
-			log.Info("started building recipes");
+			log.Debug("started building recipes");
 			await build_recipe_info();
-			log.Info("started building prices");
+			log.Debug("started building prices");
 			await build_item_prices(api_);
 			Magic.silkBag.build_basic_item_info();
 			Magic.borealTrunk.build_basic_item_info();
@@ -118,62 +124,50 @@ namespace gw2stacks_blish.data
 			foreach (Character character in await api_.characters())
 			{
 				characterNames.Add(character.Name);
+				if (!characterInventory.ContainsKey(character.Name))
+				{
+					characterInventory.Add(character.Name, new List<int?>());
+				}
+				List<int?> inventory = new List<int?>();
+				List<InventoryBagSlot> slots = new List<InventoryBagSlot>();
 				foreach (CharacterInventoryBag bag in character.Bags!)
 				{
-					if (bag == null)
+					if (bag != null)
 					{
-						continue;
-					}
-					if (bag.Size < 32)
-					{
-						if (upgradableBags.ContainsKey(bag.Size))
+						slots.Add(new InventoryBagSlot(bag.Id, bag.Size));
+						foreach (AccountItem item4 in bag?.Inventory)
 						{
-							bool found = false;
-							foreach (Source source in upgradableBags[bag.Size])
+							if (item4 == null)
 							{
-								if (source.place == character.Name)
+								emptySlots++;
+								inventory.Add(null);
+								continue;
+							}
+							inventory.Add(item4.Id);
+							bool accountBound4 = false;
+							bool characterBound4 = false;
+							if (item4.Binding != null)
+							{
+								if (item4.Binding == ItemBinding.Account)
 								{
-									source.count++;
-									found = true;
+									accountBound4 = true;
+								}
+								if (item4.Binding == ItemBinding.Character)
+								{
+									accountBound4 = true;
+									characterBound4 = true;
 								}
 							}
-							if (!found)
-							{
-								upgradableBags[bag.Size].Add(new Source(1uL, character.Name));
-							}
-						}
-						else
-						{
-							upgradableBags.Add(bag.Size, new List<Source>
-							{
-								new Source(1uL, character.Name)
-							});
+							add_item(item4.Id, accountBound4, characterBound4, new Source(Convert.ToUInt64(item4.Count), character.Name));
 						}
 					}
-					foreach (AccountItem item4 in bag?.Inventory)
+					else
 					{
-						if (item4 == null)
-						{
-							emptySlots++;
-							continue;
-						}
-						bool accountBound4 = false;
-						bool characterBound4 = false;
-						if (item4.Binding != null)
-						{
-							if (item4.Binding == ItemBinding.Account)
-							{
-								accountBound4 = true;
-							}
-							if (item4.Binding == ItemBinding.Character)
-							{
-								accountBound4 = true;
-								characterBound4 = true;
-							}
-						}
-						add_item(item4.Id, accountBound4, characterBound4, new Source(Convert.ToUInt64(item4.Count), character.Name));
+						slots.Add(new InventoryBagSlot(0));
 					}
 				}
+				characterInventory[character.Name] = inventory;
+				inventoryBags.Add(character.Name, slots);
 			}
 			ulong maxCount = 0uL;
 			foreach (AccountMaterial item3 in await api_.material_storage())
@@ -224,8 +218,10 @@ namespace gw2stacks_blish.data
 				if (item == null)
 				{
 					emptySlots++;
+					sharedInventory.Add(null);
 					continue;
 				}
+				sharedInventory.Add(item.Id);
 				bool accountBound = false;
 				bool characterBound = false;
 				if (item.Binding != null)
@@ -434,39 +430,53 @@ namespace gw2stacks_blish.data
 			}
 			foreach (CraftingMiscAdvice advice in Magic.craftingMiscAdvices.Values)
 			{
-				List<Source> ingredients = new List<Source>();
 				foreach (KeyValuePair<int, int> item in advice.idCountMapping)
 				{
 					if (has_item(item.Key) && items[item.Key].total_count() >= Convert.ToUInt64(item.Value))
 					{
-						ingredients.AddRange(items[item.Key].sources);
+						Item output = new Item(advice.outputId, isCharacterBound_: false, isAccountBound_: false);
+						result.Add(new MiscCraftingItemForDisplay(items[item.Key], output, "Craft: "));
 					}
 				}
-				if (ingredients.Any())
+			}
+			Dictionary<int, List<string>> bagIds = new Dictionary<int, List<string>>();
+			Dictionary<int, int> bagSize = new Dictionary<int, int>();
+			foreach (KeyValuePair<string, List<InventoryBagSlot>> entry2 in inventoryBags)
+			{
+				foreach (InventoryBagSlot bag3 in entry2.Value)
 				{
-					result.Add(new MiscCraftingItemForDisplay(null, ingredients, advice.advice, advice.outputId));
+					if (!bagIds.ContainsKey(bag3.get_id()))
+					{
+						bagIds.Add(bag3.get_id(), new List<string>());
+					}
+					bagIds[bag3.get_id()].Add(entry2.Key);
+					if (!bagSize.ContainsKey(bag3.get_id()))
+					{
+						bagSize.Add(bag3.get_id(), bag3.get_size());
+					}
 				}
 			}
-			List<Source> upgradeTo18 = new List<Source>();
-			List<Source> upgradeTo19 = new List<Source>();
-			foreach (KeyValuePair<int, List<Source>> slots in upgradableBags)
+			foreach (KeyValuePair<int, int> entry in bagSize)
 			{
-				if (slots.Key < 18)
+				if (entry.Value < 18 && entry.Value != 0)
 				{
-					upgradeTo18.AddRange(slots.Value);
+					Item bag2 = new Item(entry.Key, isCharacterBound_: false, isAccountBound_: false);
+					foreach (string source2 in bagIds[entry.Key])
+					{
+						bag2.add_source(new Source(1uL, source2));
+					}
+					result.Add(new MiscCraftingItemForDisplay(bag2, Magic.silkBag, "Upgrade these bags to"));
 				}
-				if (has_item(83410) && slots.Key < 32 && items[83410].total_count() >= 12)
+				if (entry.Value >= 32 || entry.Value == 0 || !has_item(83410) || items[83410].total_count() < 12)
 				{
-					upgradeTo19.AddRange(slots.Value);
+					continue;
 				}
-			}
-			if (upgradeTo18.Any())
-			{
-				result.Add(new ItemForDisplay(Magic.silkBag, upgradeTo18, "Upgrade these bags to 18 slots"));
-			}
-			if (upgradeTo19.Any())
-			{
-				result.Add(new ItemForDisplay(Magic.borealTrunk, upgradeTo19, "Potentially replace these bags with boreal trunks"));
+				Item bag = new Item(entry.Key, isCharacterBound_: false, isAccountBound_: false);
+				foreach (string source in bagIds[entry.Key])
+				{
+					bag.add_source(new Source(1uL, source));
+				}
+				result.Add(new MiscCraftingItemForDisplay(bag, Magic.silkBag, "Potentially replace these bags with"));
 			}
 			return result;
 		}
@@ -522,7 +532,7 @@ namespace gw2stacks_blish.data
 				}
 				bool canCraft = true;
 				bool hasMoreThanStackIngredient = false;
-				List<IngredientSource> parsedIngredients = new List<IngredientSource>();
+				Dictionary<RecipeIngredient, List<Source>> parsedIngredients = new Dictionary<RecipeIngredient, List<Source>>();
 				List<string> parsedDisciplines = new List<string>();
 				int cost = 0;
 				int value = recipeResults[recipe.OutputItemId].price;
@@ -537,7 +547,7 @@ namespace gw2stacks_blish.data
 						hasMoreThanStackIngredient = true;
 					}
 					cost += ingredient.Count * items[ingredient.ItemId].price;
-					parsedIngredients.Add(new IngredientSource(Convert.ToUInt64(ingredient.Count), ingredient.ItemId));
+					parsedIngredients.Add(ingredient, items[ingredient.ItemId].sources);
 				}
 				foreach (int discipline in recipe.Disciplines)
 				{
@@ -545,10 +555,7 @@ namespace gw2stacks_blish.data
 				}
 				if (canCraft && hasMoreThanStackIngredient && cost < value)
 				{
-					result.Add(new ItemForDisplay(recipeResults[recipe.OutputItemId], new List<Source>
-					{
-						new RecipeSource(parsedIngredients, parsedDisciplines)
-					}, "Craft these items"));
+					result.Add(new CraftingItemForDisplay(recipeResults[recipe.OutputItemId], parsedIngredients, "Craft these items", recipe.OutputItemId));
 				}
 			}
 			return result;

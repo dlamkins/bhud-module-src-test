@@ -33,6 +33,13 @@ namespace views
 
 		private string hunt = "";
 
+		public void set_search_string(string input_)
+		{
+			string sanitized = input_.Trim('[', ']', ' ', '\t', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9').TrimEnd('s');
+			search.Text = sanitized;
+			update(chatCode: true);
+		}
+
 		private void handle_text_input(object s_, EventArgs e_)
 		{
 			hunt = search.Text;
@@ -52,31 +59,31 @@ namespace views
 			};
 		}
 
-		private void build_item_panels(Panel rootPanel)
+		private void build_item_panels(Panel rootPanel, bool chatCode)
 		{
 			search.Parent = rootPanel;
 			search.TextChanged += handle_text_input;
 			foreach (ItemForDisplay item in combinedAdvice)
 			{
-				if (string.IsNullOrEmpty(hunt) || Magic.get_local_name(item.get_id()).ToLower().Contains(hunt.ToLower()))
+				if (string.IsNullOrEmpty(hunt) || Magic.get_local_name(item.get_id()).ToLower().Contains(hunt.ToLower()) || (chatCode && Magic.string_similar(hunt.ToLower(), Magic.get_local_name(item.get_id()).ToLower())))
 				{
-					if (!itemTextures.ContainsKey(item.get_id()))
+					if (!itemTextures.ContainsKey(item.get_iconId()))
 					{
-						itemTextures.Add(item.get_id(), AsyncTexture2D.FromAssetId(item.get_iconId()));
+						itemTextures.Add(item.get_iconId(), AsyncTexture2D.FromAssetId(item.get_iconId()));
 					}
-					ViewContainer standardPanel = GetStandardPanel(rootPanel, Magic.get_local_name(item.get_id()), item.get_id());
+					ViewContainer standardPanel = GetStandardPanel(rootPanel, Magic.get_local_name(item.get_id()), item.get_iconId());
 					standardPanel.BasicTooltipText = item.ToString();
 					standardPanel.Show();
 				}
 			}
 		}
 
-		public void update()
+		public void update(bool chatCode = false)
 		{
 			search.Parent = null;
 			panel.ClearChildren();
 			search.TextChanged -= handle_text_input;
-			build_item_panels(panel);
+			build_item_panels(panel, chatCode);
 			panel.Title = "Gw2stacks";
 		}
 
@@ -89,7 +96,8 @@ namespace views
 		protected override void Build(Container buildPanel)
 		{
 			panel.Parent = buildPanel;
-			build_item_panels(panel);
+			panel.ClearChildren();
+			build_item_panels(panel, chatCode: false);
 		}
 	}
 }

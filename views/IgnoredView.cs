@@ -65,6 +65,7 @@ namespace views
 			search.TextChanged += handle_text_input;
 			foreach (int item in excludedItemIds)
 			{
+				int icon = 0;
 				if (!string.IsNullOrEmpty(hunt) && !Magic.get_local_name(item).ToLower().Contains(hunt.ToLower()))
 				{
 					continue;
@@ -73,14 +74,16 @@ namespace views
 				{
 					if (Magic.jsonLut.itemLut.ContainsKey(item))
 					{
-						itemTextures.Add(item, AsyncTexture2D.FromAssetId(Magic.jsonLut.itemLut[item].IconId));
+						icon = Magic.jsonLut.itemLut[item].IconId;
+						itemTextures.Add(icon, AsyncTexture2D.FromAssetId(icon));
 					}
 					else
 					{
-						itemTextures.Add(item, AsyncTexture2D.FromAssetId(Magic.unknown.IconId));
+						icon = Magic.unknown.IconId;
+						itemTextures.Add(icon, AsyncTexture2D.FromAssetId(icon));
 					}
 				}
-				ViewContainer standardPanel = GetStandardPanel(rootPanel, Magic.get_local_name(item), item);
+				ViewContainer standardPanel = GetStandardPanel(rootPanel, Magic.get_local_name(item), icon);
 				standardPanel.Click += delegate
 				{
 					callback(item, arg2: false);

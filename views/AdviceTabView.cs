@@ -70,15 +70,15 @@ namespace views
 			search.Show();
 			foreach (ItemForDisplay item in adviceList)
 			{
-				if (!itemTextures.ContainsKey(item.get_id()))
+				if (!itemTextures.ContainsKey(item.get_iconId()))
 				{
-					itemTextures.Add(item.get_id(), AsyncTexture2D.FromAssetId(item.get_iconId()));
+					itemTextures.Add(item.get_iconId(), AsyncTexture2D.FromAssetId(item.get_iconId()));
 				}
 				if ((!string.IsNullOrEmpty(hunt) && !Magic.get_local_name(item.get_id()).ToLower().Contains(hunt.ToLower())) || excludedItemIds.Contains(item.get_id()))
 				{
 					continue;
 				}
-				ViewContainer container = GetStandardPanel(rootPanel, Magic.get_local_name(item.get_id()), item.get_id());
+				ViewContainer container = GetStandardPanel(rootPanel, Magic.get_local_name(item.get_id()), item.get_iconId());
 				container.BasicTooltipText = item.ToString();
 				if (ignoredItemsFlag)
 				{

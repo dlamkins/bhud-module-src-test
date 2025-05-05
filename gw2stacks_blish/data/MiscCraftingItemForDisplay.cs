@@ -1,54 +1,33 @@
-using System.Collections.Generic;
-
 namespace gw2stacks_blish.data
 {
 	internal class MiscCraftingItemForDisplay : ItemForDisplay
 	{
-		public int outputId;
+		private Item output;
 
-		public MiscCraftingItemForDisplay(Item item_, List<Source> sources_ = null, string advice_ = null, int outputId_ = 0)
-			: base(item_, sources_, advice_)
+		public MiscCraftingItemForDisplay(Item input_, Item output_, string advice_)
+			: base(input_, null, advice_)
 		{
-			outputId = outputId_;
+			output = output_;
 		}
 
-		private string get_ingredient_names()
+		public override bool applicable_to_id(int id_)
 		{
-			string output = "";
-			foreach (KeyValuePair<int, int> item in Magic.craftingMiscAdvices[outputId].idCountMapping)
-			{
-				output = output + "0-" + item.Value + "x " + Magic.get_local_name(item.Key) + "\n";
-			}
-			return output;
+			return item.itemId == id_;
 		}
 
-		public override string get_source_string()
+		protected override string get_source_string()
 		{
-			return "Sources:\n" + string.Join("\n", sources);
+			return "Sources:\n" + string.Join("\n", item.sources);
 		}
 
-		public override int get_id()
+		public override string print(string name = null)
 		{
-			return outputId;
-		}
-
-		public override int get_iconId()
-		{
-			if (Magic.jsonLut.itemLut.ContainsKey(outputId))
-			{
-				return Magic.jsonLut.itemLut[outputId].IconId;
-			}
-			return Magic.unknown.IconId;
-		}
-
-		public override string get_chatlink()
-		{
-			return Magic.jsonLut.itemLut[outputId].chatLink;
+			return Magic.get_local_name(get_id()) + "\n" + Magic.get_current_translated_string(advice) + " (" + Magic.get_local_name(output.itemId) + ")\n" + get_source_string();
 		}
 
 		public override string ToString()
 		{
-			return Magic.get_current_translated_string(advice) + " (" + Magic.get_local_name(outputId) + ")\n" + get_ingredient_names() + get_source_string();
+			return print();
 		}
 	}
 }
