@@ -979,9 +979,9 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 					{
 					}).CreatePart(" " + slot.UpgradeComponent!.Name, (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder part)
 					{
-						//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-						//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-						if (!string.IsNullOrEmpty(slot.UpgradeComponent!.IconHref))
+						//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+						//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+						if ((object)slot.UpgradeComponent!.IconUrl != null)
 						{
 							part.SetPrefixImage(ViewModel.GetIcon(slot.UpgradeComponent));
 							part.SetPrefixImageSize(new Point(16));
@@ -1280,10 +1280,10 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0041: Expected O, but got Unknown
-			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_011c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0121: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0128: Unknown result type (might be due to invalid IL or missing references)
@@ -1299,12 +1299,11 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 			((Container)val).set_HeightSizingMode((SizingMode)1);
 			val.set_ControlPadding(new Vector2(5f));
 			FlowPanel panel = val;
-			Uri iconUrl = effect.IconUrl();
-			if ((object)iconUrl != null)
+			if ((object)effect.IconUrl != null)
 			{
 				Image val2 = new Image();
 				((Control)val2).set_Parent((Container)(object)panel);
-				val2.set_Texture(ViewModel.GetIcon(iconUrl));
+				val2.set_Texture(ViewModel.GetIcon(effect.IconUrl));
 				((Control)val2).set_Size(new Point(32));
 			}
 			StringBuilder builder = new StringBuilder();

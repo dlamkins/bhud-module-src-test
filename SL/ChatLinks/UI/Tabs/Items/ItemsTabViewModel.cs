@@ -768,7 +768,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 			}
 			MenuItems = observableCollection;
 			_003CeventAggregator_003EP.Subscribe(new Func<LocaleChanged, Task>(OnLocaleChanged));
-			_003CeventAggregator_003EP.Subscribe(new Func<DatabaseDownloaded, Task>(OnDatabaseDownloaded));
+			_003CeventAggregator_003EP.Subscribe(new Func<DatabaseMigrated, Task>(OnDatabaseMigrated));
 			_003CeventAggregator_003EP.Subscribe(new Func<DatabaseSeeded, Task>(OnDatabaseSeeded));
 			return Task.CompletedTask;
 		}
@@ -785,7 +785,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 			await Task.Run((Func<Task>)OnSearch).ConfigureAwait(continueOnCapturedContext: false);
 		}
 
-		private async Task OnDatabaseDownloaded(DatabaseDownloaded downloaded)
+		private async Task OnDatabaseMigrated(DatabaseMigrated downloaded)
 		{
 			await Task.Run((Func<Task>)OnSearch).ConfigureAwait(continueOnCapturedContext: false);
 		}
@@ -878,7 +878,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 		public void Dispose()
 		{
 			_003CeventAggregator_003EP.Unsubscribe<LocaleChanged>(new Func<LocaleChanged, Task>(OnLocaleChanged));
-			_003CeventAggregator_003EP.Unsubscribe<DatabaseDownloaded>(new Func<DatabaseDownloaded, Task>(OnDatabaseDownloaded));
+			_003CeventAggregator_003EP.Unsubscribe<DatabaseMigrated>(new Func<DatabaseMigrated, Task>(OnDatabaseMigrated));
 			_003CeventAggregator_003EP.Unsubscribe<DatabaseSeeded>(new Func<DatabaseSeeded, Task>(OnDatabaseSeeded));
 		}
 	}

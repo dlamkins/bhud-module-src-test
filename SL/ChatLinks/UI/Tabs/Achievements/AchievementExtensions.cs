@@ -1,35 +1,12 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using GuildWars2.Hero.Achievements;
-using GuildWars2.Hero.Achievements.Categories;
 using GuildWars2.Hero.Achievements.Groups;
-using SL.Common;
 
 namespace SL.ChatLinks.UI.Tabs.Achievements
 {
 	internal static class AchievementExtensions
 	{
-		public static Uri? IconUrl(this Achievement achievement)
-		{
-			ThrowHelper.ThrowIfNull(achievement, "achievement");
-			if (string.IsNullOrEmpty(achievement.IconHref))
-			{
-				return null;
-			}
-			return new Uri(achievement.IconHref);
-		}
-
-		public static Uri? IconUrl(this AchievementCategory category)
-		{
-			ThrowHelper.ThrowIfNull(category, "category");
-			if (string.IsNullOrEmpty(category.IconHref))
-			{
-				return null;
-			}
-			return new Uri(category.IconHref);
-		}
-
 		public static bool IsLocked(this Achievement achievement, AchievementGroup? group, IReadOnlyList<AccountAchievement>? progression)
 		{
 			Achievement achievement2 = achievement;

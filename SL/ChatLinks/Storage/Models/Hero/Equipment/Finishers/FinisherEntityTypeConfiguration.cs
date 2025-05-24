@@ -17,6 +17,7 @@ namespace SL.ChatLinks.Storage.Models.Hero.Equipment.Finishers
 			builder.HasIndex((Finisher finisher) => finisher.Name);
 			builder.HasIndex((Finisher finisher) => finisher.Order);
 			builder.Property((Finisher finisher) => finisher.UnlockItemIds).HasJsonValueConversion().Metadata.SetValueComparer(new CollectionComparer<int>());
+			builder.Ignore((Finisher finisher) => finisher.IconHref);
 		}
 	}
 }

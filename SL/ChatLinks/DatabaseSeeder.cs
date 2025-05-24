@@ -156,13 +156,12 @@ namespace SL.ChatLinks
 			};
 			if (!currentDataManifest.Databases.TryGetValue(language.Alpha2Code, out var currentDatabase) || currentDatabase.SchemaVersion != ChatLinksContext.SchemaVersion || IsEmpty(currentDatabase))
 			{
-				Database seedDatabase = await DownloadDatabase(language).ConfigureAwait(continueOnCapturedContext: false);
+				Database seedDatabase = await DownloadDatabase(language, currentDatabase).ConfigureAwait(continueOnCapturedContext: false);
 				if ((object)seedDatabase != null)
 				{
 					currentDatabase = seedDatabase;
 					currentDataManifest.Databases[language.Alpha2Code] = seedDatabase;
 					await SaveManifest(currentDataManifest).ConfigureAwait(continueOnCapturedContext: false);
-					await _eventAggregator.PublishAsync(new DatabaseDownloaded()).ConfigureAwait(continueOnCapturedContext: false);
 				}
 			}
 			if ((object)currentDatabase == null)
@@ -171,26 +170,39 @@ namespace SL.ChatLinks
 				return;
 			}
 			ChatLinksContext context = _contextFactory.CreateDbContext(currentDatabase.Name);
-			ConfiguredAsyncDisposable configuredAsyncDisposable = context.ConfigureAwait(continueOnCapturedContext: false);
-			try
+			if (await HasPendingMigrations(context).ConfigureAwait(continueOnCapturedContext: false))
 			{
-				await context.Database.MigrateAsync().ConfigureAwait(continueOnCapturedContext: false);
-			}
-			finally
-			{
-				IAsyncDisposable asyncDisposable = configuredAsyncDisposable as IAsyncDisposable;
-				if (asyncDisposable != null)
 				{
-					await asyncDisposable.DisposeAsync();
+					ConfiguredAsyncDisposable configuredAsyncDisposable = context.ConfigureAwait(continueOnCapturedContext: false);
+					try
+					{
+						await context.Database.MigrateAsync().ConfigureAwait(continueOnCapturedContext: false);
+					}
+					finally
+					{
+						IAsyncDisposable asyncDisposable = configuredAsyncDisposable as IAsyncDisposable;
+						if (asyncDisposable != null)
+						{
+							await asyncDisposable.DisposeAsync();
+						}
+					}
 				}
+				currentDatabase.SchemaVersion = ChatLinksContext.SchemaVersion;
+				await SaveManifest(currentDataManifest).ConfigureAwait(continueOnCapturedContext: false);
+				await _eventAggregator.PublishAsync(new DatabaseMigrated()).ConfigureAwait(continueOnCapturedContext: false);
 			}
 		}
 
-		private async Task<Database?> DownloadDatabase(Language language)
+		private static async Task<bool> HasPendingMigrations(ChatLinksContext context)
+		{
+			return (await context.Database.GetPendingMigrationsAsync().ConfigureAwait(continueOnCapturedContext: false)).Any();
+		}
+
+		private async Task<Database?> DownloadDatabase(Language language, Database? currentDatabase)
 		{
 			Language language2 = language;
-			SeedDatabase seedDatabase = (await _staticDataClient.GetSeedIndex(CancellationToken.None).ConfigureAwait(continueOnCapturedContext: false)).Databases.SingleOrDefault((SeedDatabase seed) => seed.SchemaVersion == ChatLinksContext.SchemaVersion && seed.Language == language2.Alpha2Code);
-			if ((object)seedDatabase == null)
+			SeedDatabase seedDatabase = (await _staticDataClient.GetSeedIndex(CancellationToken.None).ConfigureAwait(continueOnCapturedContext: false)).Databases.OrderByDescending((SeedDatabase seed) => seed.SchemaVersion).FirstOrDefault((SeedDatabase seed) => seed.SchemaVersion <= ChatLinksContext.SchemaVersion && seed.Language == language2.Alpha2Code);
+			if ((object)seedDatabase == null || seedDatabase.SchemaVersion == currentDatabase?.SchemaVersion)
 			{
 				return null;
 			}

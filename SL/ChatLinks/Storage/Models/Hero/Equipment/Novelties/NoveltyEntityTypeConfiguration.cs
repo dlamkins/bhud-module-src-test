@@ -17,6 +17,7 @@ namespace SL.ChatLinks.Storage.Models.Hero.Equipment.Novelties
 			builder.HasIndex((Novelty novelty) => novelty.Name);
 			builder.Property((Novelty novelty) => novelty.Slot).HasConversion(new ExtensibleEnumConverter<NoveltyKind>());
 			builder.Property((Novelty novelty) => novelty.UnlockItemIds).HasJsonValueConversion().Metadata.SetValueComparer(new CollectionComparer<int>());
+			builder.Ignore((Novelty novelty) => novelty.IconHref);
 		}
 	}
 }

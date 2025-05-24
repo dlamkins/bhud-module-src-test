@@ -5,7 +5,7 @@ using System.Text;
 
 namespace SL.ChatLinks.Storage
 {
-	public record DatabaseDownloaded
+	public record DatabaseMigrated
 	{
 		[CompilerGenerated]
 		protected virtual Type EqualityContract
@@ -13,7 +13,7 @@ namespace SL.ChatLinks.Storage
 			[CompilerGenerated]
 			get
 			{
-				return typeof(DatabaseDownloaded);
+				return typeof(DatabaseMigrated);
 			}
 		}
 
@@ -21,7 +21,7 @@ namespace SL.ChatLinks.Storage
 		public override string ToString()
 		{
 			StringBuilder stringBuilder = new StringBuilder();
-			stringBuilder.Append("DatabaseDownloaded");
+			stringBuilder.Append("DatabaseMigrated");
 			stringBuilder.Append(" { ");
 			if (PrintMembers(stringBuilder))
 			{
@@ -44,7 +44,7 @@ namespace SL.ChatLinks.Storage
 		}
 
 		[CompilerGenerated]
-		public virtual bool Equals(DatabaseDownloaded? other)
+		public virtual bool Equals(DatabaseMigrated? other)
 		{
 			if ((object)this != other)
 			{
@@ -58,11 +58,11 @@ namespace SL.ChatLinks.Storage
 		}
 
 		[CompilerGenerated]
-		protected DatabaseDownloaded(DatabaseDownloaded original)
+		protected DatabaseMigrated(DatabaseMigrated original)
 		{
 		}
 
-		public DatabaseDownloaded()
+		public DatabaseMigrated()
 		{
 		}
 	}

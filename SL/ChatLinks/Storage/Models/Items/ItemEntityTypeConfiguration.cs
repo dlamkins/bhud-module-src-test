@@ -21,6 +21,7 @@ namespace SL.ChatLinks.Storage.Models.Items
 			builder.Property((Item item) => item.GameTypes).HasJsonValueConversion().Metadata.SetValueComparer(new CollectionComparer<Extensible<GameType>>());
 			builder.Property((Item item) => item.Flags).HasJsonValueConversion();
 			builder.Property((Item item) => item.Restrictions).HasJsonValueConversion();
+			builder.Ignore((Item item) => item.IconHref);
 			builder.HasDiscriminator<string>("Type").HasValue<Item>("item").HasValue<CraftingMaterial>("crafting_material")
 				.HasValue<JadeTechModule>("jade_tech_module")
 				.HasValue<PowerCore>("power_core")

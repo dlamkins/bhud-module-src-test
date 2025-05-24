@@ -15,6 +15,7 @@ namespace SL.ChatLinks.Storage.Models.Hero.Equipment.Outfits
 			builder.ToTable("Outfits");
 			builder.HasKey((Outfit outfit) => outfit.Id);
 			builder.HasIndex((Outfit outfit) => outfit.Name);
+			builder.Ignore((Outfit outfit) => outfit.IconHref);
 			builder.Property((Outfit outfit) => outfit.UnlockItemIds).HasJsonValueConversion().Metadata.SetValueComparer(new CollectionComparer<int>());
 		}
 	}

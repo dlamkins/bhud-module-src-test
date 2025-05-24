@@ -134,7 +134,7 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 				((Control)groupMenuItem).set_BasicTooltipText(menuItem.Group.Description);
 				foreach (AchievementCategory category in menuItem.Categories)
 				{
-					AsyncTexture2D icon = ViewModel.GetIcon(category.IconUrl());
+					AsyncTexture2D icon = ViewModel.GetIcon(category.IconUrl);
 					MenuItem val = new MenuItem(category.Name, icon);
 					((Control)val).set_Parent((Container)(object)groupMenuItem);
 					((Control)val).set_BasicTooltipText(category.Description);

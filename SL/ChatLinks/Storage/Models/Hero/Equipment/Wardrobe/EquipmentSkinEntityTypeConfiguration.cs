@@ -21,6 +21,7 @@ namespace SL.ChatLinks.Storage.Models.Hero.Equipment.Wardrobe
 			builder.Property((EquipmentSkin skin) => skin.Flags).HasJsonValueConversion();
 			builder.Property((EquipmentSkin skin) => skin.Races).HasJsonValueConversion().Metadata.SetValueComparer(new ListComparer<Extensible<RaceName>>());
 			builder.Property((EquipmentSkin skin) => skin.Rarity).HasConversion(new ExtensibleEnumConverter<Rarity>());
+			builder.Ignore((EquipmentSkin skin) => skin.IconHref);
 			DiscriminatorBuilder<string> discriminatorBuilder = builder.HasDiscriminator<string>("Type");
 			discriminatorBuilder.HasValue<EquipmentSkin>("skin");
 			discriminatorBuilder.HasValue<ArmorSkin>("armor").HasValue<BootsSkin>("boots").HasValue<CoatSkin>("coat")

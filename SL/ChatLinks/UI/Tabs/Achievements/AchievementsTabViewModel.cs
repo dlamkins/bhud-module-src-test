@@ -186,6 +186,7 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 					Id = -1,
 					Name = (string)_003Clocalizer_003EP["Uncategorized"],
 					Description = "",
+					IconUrl = null,
 					IconHref = "",
 					Order = int.MaxValue
 				};
@@ -356,7 +357,7 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 				}
 				achievements2 = SortAchievements(achievements2, new List<AchievementCategory>(1) { category2 }, groups, progression);
 				HeaderText = ((!string.IsNullOrEmpty(category2.Name)) ? category2.Name : null);
-				HeaderIcon = ((!string.IsNullOrEmpty(category2.IconHref)) ? GameService.Content.GetRenderServiceTexture(category2.IconHref) : null);
+				HeaderIcon = (((object)category2.IconUrl != null) ? GameService.Content.GetRenderServiceTexture(category2.IconUrl) : null);
 				ObservableCollection<AchievementTileViewModel> observableCollection = new ObservableCollection<AchievementTileViewModel>();
 				foreach (AchievementTileViewModel item in achievements2.Select((Achievement achievement) => _003CachievementTileViewModelFactory_003EP(achievement, category2, groups.FirstOrDefault(), progression)))
 				{

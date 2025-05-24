@@ -31,12 +31,12 @@ namespace SL.ChatLinks.UI
 			{
 				return null;
 			}
-			return (GameService.Content.GetRenderServiceTexture(iconUrl!.ToString()) ?? _003Ccache_003EP.GetOrAdd(iconUrl!.ToString(), delegate(string url)
+			return (GameService.Content.GetRenderServiceTexture(iconUrl) ?? _003Ccache_003EP.GetOrAdd(iconUrl, delegate(Uri url)
 			{
 				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0011: Expected O, but got Unknown
 				AsyncTexture2D newTexture = new AsyncTexture2D();
-				_003ChttpClient_003EP.GetStreamAsync(new Uri(url)).ContinueWith(delegate(Task<Stream> task)
+				_003ChttpClient_003EP.GetStreamAsync(url).ContinueWith(delegate(Task<Stream> task)
 				{
 					if (task.Status == TaskStatus.RanToCompletion)
 					{

@@ -17,6 +17,7 @@ namespace SL.ChatLinks.Storage.Models.Hero.Achievements
 			builder.Property((AchievementCategory achievementCategory) => achievementCategory.Tomorrow).HasJsonValueConversion().Metadata.SetValueComparer(new ListComparer<AchievementRef>());
 			builder.HasIndex((AchievementCategory achievementCategory) => achievementCategory.Name);
 			builder.HasIndex((AchievementCategory achievementCategory) => achievementCategory.Order);
+			builder.Ignore((AchievementCategory achievementCategory) => achievementCategory.IconHref);
 		}
 	}
 }

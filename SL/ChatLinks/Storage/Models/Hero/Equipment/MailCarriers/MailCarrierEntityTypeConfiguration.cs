@@ -18,6 +18,7 @@ namespace SL.ChatLinks.Storage.Models.Hero.Equipment.MailCarriers
 			builder.HasIndex((MailCarrier mailCarrier) => mailCarrier.Order);
 			builder.Property((MailCarrier mailCarrier) => mailCarrier.UnlockItemIds).HasJsonValueConversion().Metadata.SetValueComparer(new CollectionComparer<int>());
 			builder.Property((MailCarrier mailCarrier) => mailCarrier.Flags).HasJsonValueConversion();
+			builder.Ignore((MailCarrier mailCarrier) => mailCarrier.IconHref);
 		}
 	}
 }

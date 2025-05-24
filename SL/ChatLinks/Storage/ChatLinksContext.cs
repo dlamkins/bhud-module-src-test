@@ -43,7 +43,7 @@ namespace SL.ChatLinks.Storage
 {
 	public class ChatLinksContext : DbContext
 	{
-		public static int SchemaVersion => 5;
+		public static int SchemaVersion => 6;
 
 		public DbSet<Item> Items => Set<Item>();
 

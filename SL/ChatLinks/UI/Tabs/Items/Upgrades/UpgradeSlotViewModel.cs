@@ -106,7 +106,8 @@ namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 
 		public AsyncTexture2D? GetIcon(UpgradeComponent item)
 		{
-			return _icons.GetIcon(item.IconUrl());
+			ThrowHelper.ThrowIfNull(item, "item");
+			return _icons.GetIcon(item.IconUrl);
 		}
 
 		public ItemTooltipViewModel CreateTooltipViewModel(UpgradeComponent item)

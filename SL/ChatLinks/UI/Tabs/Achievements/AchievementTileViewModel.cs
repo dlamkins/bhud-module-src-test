@@ -132,12 +132,6 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 
 		public string AchievementProgressUnavailable => (string)_localizer["Achievement progress unavailable"];
 
-		public string DailyAchievementProgressUnavailable => (string)_localizer["Daily achievement progress unavailable"];
-
-		public string WeeklyAchievementProgressUnavailable => (string)_localizer["Weekly achievement progress unavailable"];
-
-		public string MonthlyAchievementProgressUnavailable => (string)_localizer["Monthly achievement progress unavailable"];
-
 		public string PerCharacterAchievementProgressUnavailable => (string)_localizer["Per-character achievement progress unavailable"];
 
 		public bool IsPerCharacter => Group?.IsPerCharacter() ?? false;
@@ -190,7 +184,7 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 
 		public AsyncTexture2D? GetIcon()
 		{
-			return _icons.GetIcon(Achievement.IconUrl()) ?? _icons.GetIcon(_category?.IconUrl());
+			return _icons.GetIcon(Achievement.IconUrl) ?? _icons.GetIcon(_category?.IconUrl);
 		}
 
 		public AchievementTooltipViewModel CreateAchievementTooltipViewModel()
