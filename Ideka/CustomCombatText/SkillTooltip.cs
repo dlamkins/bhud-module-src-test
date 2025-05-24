@@ -5,9 +5,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
+using FontStashSharp;
 using Ideka.BHUDCommon;
 using Microsoft.Xna.Framework;
-using MonoGame.Extended.BitmapFonts;
 
 namespace Ideka.CustomCombatText
 {
@@ -53,9 +53,9 @@ namespace Ideka.CustomCombatText
 
 		private readonly CancellationTokenSource _cts = new CancellationTokenSource();
 
-		private static BitmapFont TitleFont => CTextModule.FontAssets.Get(@internal: true, "trebuc.ttf", 19f);
+		private static SpriteFontBase TitleFont => CTextModule.FontAssets.Get(@internal: true, "trebuc.ttf").GetFont(19f);
 
-		private static BitmapFont BasicFont => CTextModule.FontAssets.Get(@internal: true, "trebuc.ttf", 17f);
+		private static SpriteFontBase BasicFont => CTextModule.FontAssets.Get(@internal: true, "trebuc.ttf").GetFont(17f);
 
 		public bool ShowIcon
 		{
@@ -104,10 +104,9 @@ namespace Ideka.CustomCombatText
 			//IL_0452: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0459: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0475: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0480: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0487: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04b4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04ce: Expected O, but got Unknown
+			//IL_047c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04a9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04b8: Expected O, but got Unknown
 			SkillTooltipData data2 = data;
 			((Container)this)._002Ector();
 			SkillTooltip skillTooltip = this;
@@ -182,13 +181,13 @@ namespace Ideka.CustomCombatText
 			markupLabel.RawText = data2.Title;
 			markupLabel.ShowShadow = true;
 			markupLabel.BaseColor = TitleColor;
-			markupLabel.Font = TitleFont;
+			markupLabel.SpriteFont = TitleFont;
 			_title = markupLabel;
 			MarkupLabel markupLabel2 = new MarkupLabel(Syntax);
 			((Control)markupLabel2).set_Parent((Container)(object)this);
 			markupLabel2.RawText = data2.Description;
 			markupLabel2.ShowShadow = true;
-			markupLabel2.Font = BasicFont;
+			markupLabel2.SpriteFont = BasicFont;
 			_description = markupLabel2;
 			if (_description.RawText == "")
 			{
@@ -233,7 +232,6 @@ namespace Ideka.CustomCombatText
 							item2 = (object)val5;
 							((Control)val5).set_Parent((Container)(object)this);
 							val5.set_Text($"{fact.BuffApplyCount}");
-							val5.set_Font(BasicFont);
 							val5.set_AutoSizeHeight(true);
 							val5.set_AutoSizeWidth(true);
 						}
@@ -242,7 +240,6 @@ namespace Ideka.CustomCombatText
 						markupLabel3.RawText = fact.Text;
 						markupLabel3.ShowShadow = true;
 						markupLabel3.BaseColor = FactTextColor;
-						markupLabel3.Font = BasicFont;
 						facts.Add(((Image)item, val4, (Label)item2, markupLabel3));
 					}
 				}
@@ -259,13 +256,12 @@ namespace Ideka.CustomCombatText
 				//IL_0031: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0038: Unknown result type (might be due to invalid IL or missing references)
 				//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-				//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-				//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-				//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-				//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-				//IL_007c: Expected O, but got Unknown
-				//IL_007c: Expected O, but got Unknown
+				//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0050: Unknown result type (might be due to invalid IL or missing references)
+				//IL_005c: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0071: Expected O, but got Unknown
+				//IL_0071: Expected O, but got Unknown
 				List<(Label label, Image icon)> topRightIcons = skillTooltip._topRightIcons;
 				Label val6 = new Label();
 				((Control)val6).set_Parent((Container)(object)skillTooltip);
@@ -274,7 +270,6 @@ namespace Ideka.CustomCombatText
 				val6.set_AutoSizeHeight(true);
 				val6.set_AutoSizeWidth(true);
 				val6.set_HorizontalAlignment((HorizontalAlignment)2);
-				val6.set_Font(BasicFont);
 				Image val7 = new Image();
 				((Control)val7).set_Parent((Container)(object)skillTooltip);
 				val7.set_Texture(AsyncTexture2D.FromAssetId(iconId));
@@ -293,7 +288,7 @@ namespace Ideka.CustomCombatText
 		private void UpdateLayout()
 		{
 			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0100: Unknown result type (might be due to invalid IL or missing references)
 			if (_iconContainer == null)
 			{
 				return;
@@ -306,7 +301,6 @@ namespace Ideka.CustomCombatText
 				x2 = ((label.get_Text() != "") ? ((Control)label).get_Left() : ((Control)icon2).get_Left()) - 10;
 				((Control)icon2).set_Top(1);
 				((Control)(object)label).MiddleWith((Control)(object)icon2);
-				((Control)label).set_Top(((Control)label).get_Top() - 3);
 			}
 			((Control)_iconContainer).set_Left(0);
 			((Control)_iconContainer).set_Top(0);

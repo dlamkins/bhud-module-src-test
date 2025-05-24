@@ -155,7 +155,7 @@ namespace Ideka.CustomCombatText
 				if (previousChainSkillIndex.HasValue)
 				{
 					int valueOrDefault = previousChainSkillIndex.GetValueOrDefault();
-					SkillInfo skillInfo = x.group.Candidates.Skip(valueOrDefault).FirstOrDefault();
+					SkillInfo skillInfo = x.group.Candidates.ElementAtOrDefault(valueOrDefault);
 					if (skillInfo != null)
 					{
 						return (uint)skillInfo.Skill;

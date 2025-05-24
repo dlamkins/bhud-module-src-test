@@ -9,7 +9,7 @@ namespace Ideka.CustomCombatText
 		[CompilerGenerated]
 		private HttpClient _003Cclient_003EP;
 
-		protected override string Endpoint => "traits";
+		protected override string Endpoint => "palettes";
 
 		protected override HttpClient Client => _003Cclient_003EP;
 

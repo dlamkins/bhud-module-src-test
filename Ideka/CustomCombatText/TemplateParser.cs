@@ -5,13 +5,13 @@ using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.ArcDps.Models;
 using Blish_HUD.Content;
+using FontStashSharp;
 using Gw2Sharp.Models;
 using Ideka.BHUDCommon.AnchoredRect;
 using Ideka.NetCommon;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
-using MonoGame.Extended.BitmapFonts;
 
 namespace Ideka.CustomCombatText
 {
@@ -31,30 +31,31 @@ namespace Ideka.CustomCombatText
 
 		public class StringFragment : Fragment
 		{
-			private (BitmapFont font, string text, Size2 size)? _cache;
+			private (SpriteFontBase font, string text, Size2 size)? _cache;
 
 			public string Text { get; set; } = "";
 
 
 			public Color Color { get; set; }
 
-			public BitmapFont Font { get; set; }
+			public SpriteFontBase Font { get; set; }
 
 			public override Size2 Size
 			{
 				get
 				{
-					//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0085: Unknown result type (might be due to invalid IL or missing references)
+					//IL_007b: Unknown result type (might be due to invalid IL or missing references)
+					//IL_0080: Unknown result type (might be due to invalid IL or missing references)
+					//IL_009f: Unknown result type (might be due to invalid IL or missing references)
 					if (_cache?.font != Font || _cache?.text != Text)
 					{
-						_cache = new(BitmapFont, string, Size2)?((Font, Text, Font.MeasureStringFixed(Text)));
+						_cache = new(SpriteFontBase, string, Size2)?((Font, Text, Size2.op_Implicit(Font.MeasureString(Text))));
 					}
 					return _cache.Value.size;
 				}
 			}
 
-			public StringFragment(BitmapFont font)
+			public StringFragment(SpriteFontBase font)
 			{
 				Font = font;
 				base._002Ector();
@@ -65,7 +66,9 @@ namespace Ideka.CustomCombatText
 			{
 				//IL_000d: Unknown result type (might be due to invalid IL or missing references)
 				//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-				BitmapFontExtensions.DrawString(spriteBatch, Font, Text, position, color, (Rectangle?)null);
+				//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+				//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+				spriteBatch.DrawString(Font, Text, position, color);
 			}
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -232,7 +235,7 @@ namespace Ideka.CustomCombatText
 			}
 		}
 
-		public const string Help = "Templates:\n%i - skill icon\n%v - damage taken/damage healed/barrier applied\n%b - barrier damage taken\n%r - result's associated text, if any (e.g. block, invuln)\n%f - message source\n%t - message target\n%s - skill name\n%n - number of messages (for combined messages)\n%m - mesage source elite spec icon\n%o - mesage target elite spec icon\n\n[col=XXXXXX][/col] tags can be used to override default colors.\n%c can be used in [col] tags to use the source profession's color.\nSquare brackets can be used around templates (e.g. [%b]) to mark them as \"optional\". The content of the brackets will only be shown if the template within is relevant to the current message.\nOptional brackets must contain exactly one template.\n[col] tags only work outside optional brackets (but can have optional brackets inside).";
+		public const string Help = "Templates:\n%i - skill icon\n%v - damage taken/damage healed/barrier applied\n%b - barrier damage taken\n%r - result's associated text, if any (e.g. block, invuln)\n%f - message source\n%t - message target\n%s - skill name\n%n - number of messages (for combined messages)\n%m - message source elite spec icon\n%o - message target elite spec icon\n\n[col=XXXXXX][/col] tags can be used to override default colors.\n%c can be used in [col] tags to use the source profession's color.\nSquare brackets can be used around templates (e.g. [%b]) to mark them as \"optional\". The content of the brackets will only be shown if the template within is relevant to the current message.\nOptional brackets must contain exactly one template.\n[col] tags only work outside optional brackets (but can have optional brackets inside).";
 
 		private static readonly MarkupParser.Syntax<MarkupFragment> BaseSyntax = new MarkupParser.Syntax<MarkupFragment>
 		{
@@ -343,9 +346,9 @@ namespace Ideka.CustomCombatText
 			return format;
 		}
 
-		public static IEnumerable<Fragment> FinalParse(IEnumerable<MarkupFragment> markupFrags, Color? receiverColor, BitmapFont font, Message lastMessage, IReadOnlyList<Message> allMessages)
+		public static IEnumerable<Fragment> FinalParse(IEnumerable<MarkupFragment> markupFrags, Color? receiverColor, SpriteFontBase font, Message lastMessage, IReadOnlyList<Message> allMessages)
 		{
-			BitmapFont font2 = font;
+			SpriteFontBase font2 = font;
 			List<List<Message>> resultGroups;
 			Style.ResultFormat x2;
 			Style.ResultFormat resultFormat = (byGroup<EventResult, Style.ResultFormat>(allMessages, (Message x) => x.Result, CTextModule.Style.ResultFormats, out resultGroups, out x2) ? x2 : null);
@@ -398,12 +401,12 @@ namespace Ideka.CustomCombatText
 			});
 			templates["%n"] = ((from x in parts.Skip(1)
 				select newString(x.text, x.color)).Cast<Fragment>().ToList(), allMessages.Skip(1).Any());
-			MultiIconFragment mi = new MultiIconFragment(font2.get_LineHeight())
+			MultiIconFragment mi = new MultiIconFragment(font2.LineHeight)
 			{
 				Inner = allMessages.DistinctBy((Message x) => x.SkillId).Select(delegate(Message message)
 				{
 					AsyncTexture2D icon3 = ((!message.SkillIconId.HasValue) ? null : AsyncTexture2D.FromAssetId(message.SkillIconId.Value));
-					return new IconFragment(font2.get_LineHeight())
+					return new IconFragment(font2.LineHeight)
 					{
 						Icon = icon3,
 						Autocropped = true,
@@ -507,7 +510,7 @@ namespace Ideka.CustomCombatText
 				AsyncTexture2D icon = ((!profIcon.HasValue) ? null : AsyncTexture2D.FromAssetId(profIcon.Value.Item1));
 				return (new List<Fragment>(1)
 				{
-					new IconFragment(font2.get_LineHeight())
+					new IconFragment(font2.LineHeight)
 					{
 						Icon = icon,
 						Autocropped = false,

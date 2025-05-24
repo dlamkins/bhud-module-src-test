@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
+using FontStashSharp;
 using Microsoft.Xna.Framework;
-using MonoGame.Extended.BitmapFonts;
 using Newtonsoft.Json;
 
 namespace Ideka.CustomCombatText
@@ -33,6 +33,8 @@ namespace Ideka.CustomCombatText
 
 		public int? FontSize { get; set; }
 
+		public SkillFilter? SkillFilter { get; set; }
+
 		[JsonIgnore]
 		public string Describe
 		{
@@ -47,7 +49,7 @@ namespace Ideka.CustomCombatText
 		}
 
 		[JsonIgnore]
-		public BitmapFont Font => CTextModule.FontAssets.Get(FontName, FontSize);
+		public SpriteFontBase Font => CTextModule.FontAssets.Get(FontName).GetFont(FontSize ?? CTextModule.Settings.FontSize.Value);
 
 		[JsonIgnore]
 		public IReadOnlyList<TemplateParser.MarkupFragment> MarkupFrags
@@ -64,13 +66,9 @@ namespace Ideka.CustomCombatText
 
 		public bool Matches(Message message)
 		{
-			if (Enabled && (!Categories.Any() || Categories.Contains(message.Category)) && (!Results.Any() || Results.Contains(message.Result)) && (EntityFilter != EntityFilter.TargetOnly || message.IsOnTarget || message.IsFromTarget))
+			if (Enabled && (!Categories.Any() || Categories.Contains(message.Category)) && (!Results.Any() || Results.Contains(message.Result)) && (EntityFilter != EntityFilter.TargetOnly || message.IsOnTarget || message.IsFromTarget) && (EntityFilter != EntityFilter.NonSelf || !message.IsSelf))
 			{
-				if (EntityFilter == EntityFilter.NonSelf)
-				{
-					return !message.IsSelf;
-				}
-				return true;
+				return SkillFilter?.Matches(message.SkillId) ?? true;
 			}
 			return false;
 		}
