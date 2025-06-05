@@ -43,6 +43,24 @@ namespace MysticCrafting.Module.Repositories
 				Id = 52345678,
 				RewardItemId = 102814,
 				Name = "Janthir Syntri Mastery"
+			},
+			new Achievement
+			{
+				Id = 62345678,
+				RewardItemId = 102367,
+				Name = "Mistburned Barrens Mastery"
+			},
+			new Achievement
+			{
+				Id = 72345678,
+				RewardItemId = 104704,
+				Name = "Askur Camping Cookout Backpiece"
+			},
+			new Achievement
+			{
+				Id = 82345678,
+				RewardItemId = 104777,
+				Name = "Unknown Nightmares: Experiments in the Shadows"
 			}
 		};
 

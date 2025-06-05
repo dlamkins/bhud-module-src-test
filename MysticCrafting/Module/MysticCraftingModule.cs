@@ -88,7 +88,8 @@ namespace MysticCrafting.Module
 		{
 			if (_cornerIcon != null)
 			{
-				_cornerIcon.set_IconName("Mystic Crafting [" + Settings.ToggleWindowSetting.get_Value().GetBindingDisplayText() + "]");
+				string keybinding = Settings.ToggleWindowSetting.get_Value().GetBindingDisplayText();
+				_cornerIcon.set_IconName(string.IsNullOrWhiteSpace(keybinding) ? "Mystic Crafting" : ("Mystic Crafting [" + keybinding + "]"));
 				((Control)_cornerIcon).set_BasicTooltipText(_cornerIcon.get_IconName());
 			}
 			if (_mainWindow != null)
