@@ -58,48 +58,48 @@ namespace MysticCrafting.Module.Discovery.ItemList
 			//IL_012e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_013d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0147: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0166: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0172: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0179: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_023f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0244: Unknown result type (might be due to invalid IL or missing references)
-			//IL_024b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_024d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_025e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_026d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0277: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0184: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0189: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0190: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0197: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0199: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_025d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0262: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0269: Unknown result type (might be due to invalid IL or missing references)
+			//IL_026b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_027c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0286: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02d1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02dd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02e4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_028b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0295: Unknown result type (might be due to invalid IL or missing references)
+			//IL_029a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ef: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02f4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0303: Unknown result type (might be due to invalid IL or missing references)
-			//IL_030d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_031d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02fb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0302: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0304: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0312: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0321: Unknown result type (might be due to invalid IL or missing references)
+			//IL_032b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_033b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0386: Unknown result type (might be due to invalid IL or missing references)
-			//IL_038b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0392: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0399: Unknown result type (might be due to invalid IL or missing references)
-			//IL_039b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0359: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03a4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_03a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03e9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03f4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0423: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0431: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0440: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03b0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03c7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03d6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03f0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0407: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0408: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0412: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0441: Unknown result type (might be due to invalid IL or missing references)
+			//IL_044f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_045e: Unknown result type (might be due to invalid IL or missing references)
 			if (Item == null)
 			{
 				return;
@@ -139,6 +139,10 @@ namespace MysticCrafting.Module.Discovery.ItemList
 			}
 			if (DisplayDetailsType)
 			{
+				if (Item.Type == ItemType.Back)
+				{
+					Item.DetailsType = "Backpiece";
+				}
 				Label val3 = new Label();
 				((Control)val3).set_Parent(buildPanel);
 				val3.set_AutoSizeWidth(true);
@@ -151,7 +155,7 @@ namespace MysticCrafting.Module.Discovery.ItemList
 			}
 			else if (!Item.IsDye())
 			{
-				goto IL_029c;
+				goto IL_02ba;
 			}
 			bool skinUnlocked = (Item.IsDye() ? ServiceContainer.PlayerUnlocksService.DyeUnlocked(Item.Id) : ServiceContainer.PlayerUnlocksService.ItemUnlocked(Item.DefaultSkin));
 			Image val4 = new Image(skinUnlocked ? ServiceContainer.TextureRepository.Textures.Checkmark : ServiceContainer.TextureRepository.Textures.Lock);
@@ -159,8 +163,8 @@ namespace MysticCrafting.Module.Discovery.ItemList
 			((Control)val4).set_Location(new Point(((Control)buildPanel).get_Size().X - 210, ((Control)buildPanel).get_Size().Y / 2 - 15));
 			((Control)val4).set_Size(new Point(30, 30));
 			((Control)val4).set_BasicTooltipText(skinUnlocked ? Common.SkinUnlocked : Common.SkinLocked);
-			goto IL_029c;
-			IL_029c:
+			goto IL_02ba;
+			IL_02ba:
 			if (Item.Rarity == ItemRarity.Legendary)
 			{
 				int unlockedCount2 = ServiceContainer.PlayerUnlocksService.LegendaryUnlockedCount(Item.Id);

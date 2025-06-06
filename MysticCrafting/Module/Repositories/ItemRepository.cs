@@ -60,7 +60,7 @@ namespace MysticCrafting.Module.Repositories
 			}
 			if (filter.Type != 0)
 			{
-				query += "Item.Type = ? AND ";
+				query = ((filter.Type != ItemType.Armor) ? (query + "Item.Type = ? AND ") : (query + "(Item.Type = ? OR Item.Type == 2) AND "));
 				parameters.Add((int)filter.Type);
 			}
 			if (filter.Types != null && filter.Types.Any())

@@ -1,4 +1,10 @@
-﻿#1.5.4 Absolution update
+﻿#1.5.5 Bug fixes
+- Fixed German & French translations
+- Fixed broken categories
+- Fixed issue with Backpieces not showing in Armor category
+- Fixed issue with type not displaying for Backpieces
+
+#1.5.4 Absolution update
 - New Legendary backpack "Orrax Manifested" has been added
 - New items from the Absolution update have been added
 - Legendary Weapon Starter Key has been updated to #8

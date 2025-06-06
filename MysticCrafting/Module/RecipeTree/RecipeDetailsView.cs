@@ -289,17 +289,17 @@ namespace MysticCrafting.Module.RecipeTree
 			//IL_01bb: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01c2: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01dd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ff: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0209: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0210: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0217: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0228: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0230: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01fb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0202: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0212: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0213: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0227: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0235: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0246: Unknown result type (might be due to invalid IL or missing references)
+			//IL_024e: Unknown result type (might be due to invalid IL or missing references)
 			Panel val = new Panel();
 			((Control)val).set_Parent((Container)(object)TreeViewFlowPanel);
 			val.set_ShowBorder(false);
@@ -345,6 +345,10 @@ namespace MysticCrafting.Module.RecipeTree
 			val5.set_AutoSizeWidth(true);
 			val5.set_Text(countText);
 			((Control)val5).set_Location(new Point(((Control)name).get_Right() + 15, 5));
+			if (Item.Type == ItemType.Back)
+			{
+				Item.DetailsType = "Backpiece";
+			}
 			Label val6 = new Label();
 			((Control)val6).set_Parent((Container)(object)container);
 			val6.set_Font(GameService.Content.get_DefaultFont18());
