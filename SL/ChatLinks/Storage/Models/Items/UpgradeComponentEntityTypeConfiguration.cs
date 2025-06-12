@@ -23,11 +23,15 @@ namespace SL.ChatLinks.Storage.Models.Items
 		[CompilerGenerated]
 		private ValueComparer<Buff> _003CbuffComparer_003EP;
 
-		public UpgradeComponentEntityTypeConfiguration(ValueConverter<IDictionary<Extensible<AttributeName>, int>, string> attributesConverter, ValueComparer<IDictionary<Extensible<AttributeName>, int>> attributesComparer, ValueComparer<Buff> buffComparer)
+		[CompilerGenerated]
+		private ValueComparer<IReadOnlyCollection<InfusionSlotUpgradePath>> _003CupgradePathComparer_003EP;
+
+		public UpgradeComponentEntityTypeConfiguration(ValueConverter<IDictionary<Extensible<AttributeName>, int>, string> attributesConverter, ValueComparer<IDictionary<Extensible<AttributeName>, int>> attributesComparer, ValueComparer<Buff> buffComparer, ValueComparer<IReadOnlyCollection<InfusionSlotUpgradePath>> upgradePathComparer)
 		{
 			_003CattributesConverter_003EP = attributesConverter;
 			_003CattributesComparer_003EP = attributesComparer;
 			_003CbuffComparer_003EP = buffComparer;
+			_003CupgradePathComparer_003EP = upgradePathComparer;
 			base._002Ector();
 		}
 
@@ -42,6 +46,8 @@ namespace SL.ChatLinks.Storage.Models.Items
 			builder.Property((UpgradeComponent upgradeComponent) => upgradeComponent.InfusionUpgradeFlags).HasConversion(new JsonValueConverter<InfusionSlotFlags>());
 			builder.Property((UpgradeComponent upgradeComponent) => upgradeComponent.Buff).HasColumnName("Buff").HasJsonValueConversion()
 				.Metadata.SetValueComparer(_003CbuffComparer_003EP);
+			builder.Property((UpgradeComponent upgradeComponent) => upgradeComponent.UpgradesInto).HasColumnName("UpgradesInto").HasJsonValueConversion()
+				.Metadata.SetValueComparer(_003CupgradePathComparer_003EP);
 		}
 	}
 }

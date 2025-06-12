@@ -120,7 +120,7 @@ namespace SL.ChatLinks.Storage
 			modelBuilder.ApplyConfiguration(new WeaponEntityTypeConfiguration(attributesConverter, attributesComparer, buffComparer, infusionSlotsComparer));
 			modelBuilder.ApplyConfiguration(new WeaponEntityTypeConfiguration(attributesConverter, attributesComparer, buffComparer, infusionSlotsComparer));
 			modelBuilder.ApplyConfiguration(new BackItemEntityTypeConfiguration(attributesConverter, attributesComparer, buffComparer, infusionSlotsComparer, upgradeSourceComparer, upgradePathComparer));
-			modelBuilder.ApplyConfiguration(new UpgradeComponentEntityTypeConfiguration(attributesConverter, attributesComparer, buffComparer));
+			modelBuilder.ApplyConfiguration(new UpgradeComponentEntityTypeConfiguration(attributesConverter, attributesComparer, buffComparer, upgradePathComparer));
 			modelBuilder.ApplyConfiguration(new RuneEntityTypeConfiguration());
 			modelBuilder.ApplyConfiguration(new CraftingMaterialEntityTypeConfiguration(upgradePathComparer));
 			modelBuilder.ApplyConfiguration(new RecipeSheetEntityTypeConfiguration());
