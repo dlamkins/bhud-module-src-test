@@ -41,5 +41,10 @@ namespace Kenedia.Modules.Core.Structs
 			Right = right;
 			Bottom = bottom;
 		}
+
+		public override string ToString()
+		{
+			return $"Left: {Left}, Top: {Top}, Right: {Right}, Bottom: {Bottom}, Vertical: {Vertical}, Horizontal: {Horizontal}";
+		}
 	}
 }

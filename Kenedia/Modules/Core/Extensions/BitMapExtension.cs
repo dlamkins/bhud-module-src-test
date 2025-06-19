@@ -7,6 +7,9 @@ namespace Kenedia.Modules.Core.Extensions
 {
 	public static class BitMapExtension
 	{
+		public static Rectangle SinglePixelRectangle { get; } = new Rectangle(0, 0, 1, 1);
+
+
 		public static Bitmap ToBlackWhite(this Bitmap b, float colorThreshold = 0.5f)
 		{
 			Color black = Color.FromArgb(255, 0, 0, 0);
@@ -229,6 +232,16 @@ namespace Kenedia.Modules.Core.Extensions
 				}
 			}
 			return (b, filled / total >= threshold, filled / total);
+		}
+
+		public static Color GetAverageColor(this Bitmap bitmap)
+		{
+			Bitmap bmp = new Bitmap(1, 1);
+			using (Graphics g = Graphics.FromImage(bmp))
+			{
+				g.DrawImage(bitmap, SinglePixelRectangle);
+			}
+			return bmp.GetPixel(0, 0);
 		}
 	}
 }

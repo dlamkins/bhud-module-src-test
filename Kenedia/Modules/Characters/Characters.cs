@@ -33,6 +33,7 @@ using Kenedia.Modules.Core.Extensions;
 using Kenedia.Modules.Core.Models;
 using Kenedia.Modules.Core.Res;
 using Kenedia.Modules.Core.Structs;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -65,6 +66,8 @@ namespace Kenedia.Modules.Characters
 		private Character_Model _currentCharacterModel;
 
 		private CancellationTokenSource _characterFileTokenSource;
+
+		private CharactersApiService CharactersApiService;
 
 		public SearchFilterCollection SearchFilters { get; } = new SearchFilterCollection();
 
@@ -136,6 +139,17 @@ namespace Kenedia.Modules.Characters
 			: base(moduleParameters)
 		{
 			HasGUI = true;
+		}
+
+		protected override ServiceCollection DefineServices(ServiceCollection services)
+		{
+			services.AddSingleton<CharactersApiService>();
+			services.AddSingleton<ContextManager>();
+			services.AddSingleton<CharactersContext>();
+			services.AddSingleton<CharacterSwapping>();
+			services.AddSingleton<CharacterSorting>();
+			services.AddSingleton(CharacterModels);
+			return base.DefineServices(services);
 		}
 
 		public override IView GetSettingsView()
@@ -210,8 +224,11 @@ namespace Kenedia.Modules.Characters
 		protected override async Task LoadAsync()
 		{
 			await base.LoadAsync();
-			CharacterSwapping = new CharacterSwapping(base.Settings, base.CoreServices.GameStateDetectionService, CharacterModels);
-			CharacterSorting = new CharacterSorting(base.Settings, base.CoreServices.GameStateDetectionService, CharacterModels);
+			GameService.Contexts.RegisterContext(ServiceProviderServiceExtensions.GetRequiredService<CharactersContext>(base.ServiceProvider));
+			CharactersApiService = new CharactersApiService();
+			CharactersApiService.Start();
+			CharacterSwapping = ServiceProviderServiceExtensions.GetRequiredService<CharacterSwapping>(base.ServiceProvider);
+			CharacterSorting = ServiceProviderServiceExtensions.GetRequiredService<CharacterSorting>(base.ServiceProvider);
 			CharacterSwapping.CharacterSorting = CharacterSorting;
 			CharacterSorting.CharacterSwapping = CharacterSwapping;
 			TextureManager = new TextureManager();
@@ -486,11 +503,6 @@ namespace Kenedia.Modules.Characters
 		protected override void ReloadKey_Activated(object sender, EventArgs e)
 		{
 			BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Debug("ReloadKey_Activated: " + base.Name);
-			base.ReloadKey_Activated(sender, e);
-			CreateCornerIcons();
-			GameService.Graphics.SpriteScreen.Visible = true;
-			base.MainWindow?.ToggleWindow();
-			base.SettingsWindow?.ToggleWindow();
 		}
 
 		private void OnCharacterCollectionChanged(object sender, EventArgs e)

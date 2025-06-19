@@ -1243,7 +1243,7 @@ namespace Kenedia.Modules.Characters.Views
 				_tick = gameTime.get_TotalGameTime().TotalMilliseconds;
 				if (GameService.GameIntegration.Gw2Instance.Gw2HasFocus)
 				{
-					_sharedSettingsView?.UpdateOffset();
+					_sharedSettingsView?.SetWindowOffsetImages();
 				}
 			}
 		}

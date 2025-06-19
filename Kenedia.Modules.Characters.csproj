@@ -35,5 +35,8 @@
     <Reference Include="Microsoft.Extensions.DependencyInjection">
       <HintPath>..\..\working\Microsoft.Extensions.DependencyInjection.dll</HintPath>
     </Reference>
+    <Reference Include="System.Text.Json">
+      <HintPath>..\..\working\System.Text.Json.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>
