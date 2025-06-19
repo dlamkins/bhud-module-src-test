@@ -34,7 +34,7 @@ namespace Kenedia.Modules.Core.Controls
 			set
 			{
 				_setLocalizedTooltip = value;
-				((Control)this).set_BasicTooltipText(value?.Invoke());
+				base.BasicTooltipText = value?.Invoke();
 			}
 		}
 
@@ -86,7 +86,6 @@ namespace Kenedia.Modules.Core.Controls
 		public event EventHandler<CheckChangedEvent> CheckedChanged;
 
 		public ImageToggle()
-			: this()
 		{
 		}//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
@@ -101,8 +100,6 @@ namespace Kenedia.Modules.Core.Controls
 
 		private void OnCheckedChanged()
 		{
-			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001c: Expected O, but got Unknown
 			this.CheckedChanged?.Invoke(this, new CheckChangedEvent(_checked));
 		}
 
@@ -112,7 +109,7 @@ namespace Kenedia.Modules.Core.Controls
 			{
 				if (!Checked || ActiveTexture == null)
 				{
-					if (!((Control)this).get_MouseOver() || HoveredTexture == null)
+					if (!base.MouseOver || HoveredTexture == null)
 					{
 						return Texture;
 					}
@@ -144,12 +141,12 @@ namespace Kenedia.Modules.Core.Controls
 			AsyncTexture2D texture = GetTexture();
 			if (texture != null)
 			{
-				_clicked = _clicked && ((Control)this).get_MouseOver();
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(texture), (SizeRectangle != Rectangle.get_Empty()) ? SizeRectangle : bounds, (Rectangle?)((TextureRectangle == Rectangle.get_Empty()) ? texture.get_Bounds() : TextureRectangle), (Color)((!Checked) ? ImageColor : (((_003F?)ActiveColor) ?? ImageColor)), 0f, default(Vector2), (SpriteEffects)0);
+				_clicked = _clicked && base.MouseOver;
+				spriteBatch.DrawOnCtrl(this, texture, (SizeRectangle != Rectangle.get_Empty()) ? SizeRectangle : bounds, (TextureRectangle == Rectangle.get_Empty()) ? texture.Bounds : TextureRectangle, (Color)((!Checked) ? ImageColor : (((_003F?)ActiveColor) ?? ImageColor)), 0f, default(Vector2), (SpriteEffects)0);
 			}
 			if (ShowX && !Checked)
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_exTexture), _xDrawRectangle, (Rectangle?)_xTextureRectangle, Color.get_White());
+				spriteBatch.DrawOnCtrl(this, _exTexture, _xDrawRectangle, _xTextureRectangle, Color.get_White());
 			}
 		}
 
@@ -159,17 +156,15 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-			((Control)this).RecalculateLayout();
-			int size = Math.Min(((Control)this).get_Width() / 2, ((Control)this).get_Height() / 2);
-			_xDrawRectangle = new Rectangle(((Control)this).get_Width() - size, ((Control)this).get_Height() - size, size, size);
+			base.RecalculateLayout();
+			int size = Math.Min(base.Width / 2, base.Height / 2);
+			_xDrawRectangle = new Rectangle(base.Width - size, base.Height - size, size, size);
 			_xTextureRectangle = new Rectangle(4, 4, 28, 28);
 		}
 
 		protected override void OnClick(MouseEventArgs e)
 		{
-			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0049: Expected O, but got Unknown
-			((Control)this).OnClick(e);
+			base.OnClick(e);
 			Checked = !Checked;
 			OnCheckChanged?.Invoke(Checked);
 			this.CheckedChanged?.Invoke(this, new CheckChangedEvent(Checked));
@@ -177,13 +172,13 @@ namespace Kenedia.Modules.Core.Controls
 
 		protected override void OnLeftMouseButtonPressed(MouseEventArgs e)
 		{
-			((Control)this).OnLeftMouseButtonPressed(e);
+			base.OnLeftMouseButtonPressed(e);
 			_clicked = true;
 		}
 
 		protected override void OnLeftMouseButtonReleased(MouseEventArgs e)
 		{
-			((Control)this).OnLeftMouseButtonReleased(e);
+			base.OnLeftMouseButtonReleased(e);
 			_clicked = false;
 		}
 	}

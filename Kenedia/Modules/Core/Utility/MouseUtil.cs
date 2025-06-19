@@ -246,7 +246,7 @@ namespace Kenedia.Modules.Core.Utility
 				xPos = pos.X;
 				yPos = pos.Y;
 			}
-			if (!GameService.GameIntegration.get_Gw2Instance().get_Gw2IsRunning() || sendToSystem)
+			if (!GameService.GameIntegration.Gw2Instance.Gw2IsRunning || sendToSystem)
 			{
 				Kenedia.Modules.Core.Utility.WinApi.Input[] nInputs = new Kenedia.Modules.Core.Utility.WinApi.Input[1]
 				{
@@ -272,7 +272,7 @@ namespace Kenedia.Modules.Core.Utility
 			{
 				uint wParam = (uint)VirtualButtonShort[button];
 				int lParam = xPos | (yPos << 16);
-				PostMessage(GameService.GameIntegration.get_Gw2Instance().get_Gw2WindowHandle(), WM_BUTTONDOWN[button], wParam, lParam);
+				PostMessage(GameService.GameIntegration.Gw2Instance.Gw2WindowHandle, WM_BUTTONDOWN[button], wParam, lParam);
 			}
 		}
 
@@ -284,7 +284,7 @@ namespace Kenedia.Modules.Core.Utility
 				xPos = pos.X;
 				yPos = pos.Y;
 			}
-			if (!GameService.GameIntegration.get_Gw2Instance().get_Gw2IsRunning() || sendToSystem)
+			if (!GameService.GameIntegration.Gw2Instance.Gw2IsRunning || sendToSystem)
 			{
 				Kenedia.Modules.Core.Utility.WinApi.Input[] nInputs = new Kenedia.Modules.Core.Utility.WinApi.Input[1]
 				{
@@ -310,7 +310,7 @@ namespace Kenedia.Modules.Core.Utility
 			{
 				uint wParam = (uint)VirtualButtonShort[button];
 				int lParam = xPos | (yPos << 16);
-				PostMessage(GameService.GameIntegration.get_Gw2Instance().get_Gw2WindowHandle(), WM_BUTTONUP[button], wParam, lParam);
+				PostMessage(GameService.GameIntegration.Gw2Instance.Gw2WindowHandle, WM_BUTTONUP[button], wParam, lParam);
 			}
 		}
 
@@ -325,7 +325,7 @@ namespace Kenedia.Modules.Core.Utility
 					xPos = pos.X;
 					yPos = pos.Y;
 				}
-				if (!GameService.GameIntegration.get_Gw2Instance().get_Gw2IsRunning() || sendToSystem)
+				if (!GameService.GameIntegration.Gw2Instance.Gw2IsRunning || sendToSystem)
 				{
 					Kenedia.Modules.Core.Utility.WinApi.Input[] nInputs = new Kenedia.Modules.Core.Utility.WinApi.Input[1]
 					{
@@ -351,20 +351,20 @@ namespace Kenedia.Modules.Core.Utility
 				{
 					uint wParam = 0u | (uint)(wheelDistance << 16);
 					int lParam = xPos | (yPos << 16);
-					PostMessage(GameService.GameIntegration.get_Gw2Instance().get_Gw2WindowHandle(), horizontalWheel ? 526u : 522u, wParam, lParam);
+					PostMessage(GameService.GameIntegration.Gw2Instance.Gw2WindowHandle, horizontalWheel ? 526u : 522u, wParam, lParam);
 				}
 			}
 		}
 
 		public static void SetPosition(int xPos, int yPos, bool sendToSystem = false)
 		{
-			if (!GameService.GameIntegration.get_Gw2Instance().get_Gw2IsRunning() || sendToSystem)
+			if (!GameService.GameIntegration.Gw2Instance.Gw2IsRunning || sendToSystem)
 			{
 				SetCursorPos(xPos, yPos);
 				return;
 			}
 			int lParam = xPos | (yPos << 16);
-			PostMessage(GameService.GameIntegration.get_Gw2Instance().get_Gw2WindowHandle(), 512u, 0u, lParam);
+			PostMessage(GameService.GameIntegration.Gw2Instance.Gw2WindowHandle, 512u, 0u, lParam);
 		}
 
 		public static void SetPosition(Point point, bool sendToSystem = false)
@@ -376,7 +376,7 @@ namespace Kenedia.Modules.Core.Utility
 
 		public static Point GetPosition()
 		{
-			IntPtr hWnd = GameService.GameIntegration.get_Gw2Instance().get_Gw2WindowHandle();
+			IntPtr hWnd = GameService.GameIntegration.Gw2Instance.Gw2WindowHandle;
 			if (!GetCursorPos(out var pos) || !ScreenToClient(hWnd, ref pos) || !GetWindowRect(hWnd, out var wndBounds) || !GetClientRect(hWnd, out var clientBounds))
 			{
 				return Point.Empty;
@@ -407,7 +407,7 @@ namespace Kenedia.Modules.Core.Utility
 
 		public static void DoubleClick(MouseButton button, int xPos = -1, int yPos = -1, bool sendToSystem = false)
 		{
-			if (!GameService.GameIntegration.get_Gw2Instance().get_Gw2IsRunning() || sendToSystem)
+			if (!GameService.GameIntegration.Gw2Instance.Gw2IsRunning || sendToSystem)
 			{
 				for (int j = 0; j <= 1; j++)
 				{
@@ -429,7 +429,7 @@ namespace Kenedia.Modules.Core.Utility
 				Press(button, xPos, yPos);
 				Release(button, xPos, yPos);
 			}
-			PostMessage(GameService.GameIntegration.get_Gw2Instance().get_Gw2WindowHandle(), WM_BUTTONUP[button], wParam, lParam);
+			PostMessage(GameService.GameIntegration.Gw2Instance.Gw2WindowHandle, WM_BUTTONUP[button], wParam, lParam);
 		}
 
 		public static void DoubleClick(MouseButton button, Point point, bool sendToSystem)

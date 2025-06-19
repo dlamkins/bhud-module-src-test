@@ -44,11 +44,19 @@ namespace Kenedia.Modules.Core.Res
 			}
 		}
 
+		internal static string Add => ResourceManager.GetString("Add", resourceCulture);
+
+		internal static string AddItem => ResourceManager.GetString("AddItem", resourceCulture);
+
 		internal static string BottomLeftCorner => ResourceManager.GetString("BottomLeftCorner", resourceCulture);
 
 		internal static string BottomOffset => ResourceManager.GetString("BottomOffset", resourceCulture);
 
 		internal static string BottomRightCorner => ResourceManager.GetString("BottomRightCorner", resourceCulture);
+
+		internal static string Default => ResourceManager.GetString("Default", resourceCulture);
+
+		internal static string Delete => ResourceManager.GetString("Delete", resourceCulture);
 
 		internal static string DeleteX => ResourceManager.GetString("DeleteX", resourceCulture);
 
@@ -57,6 +65,8 @@ namespace Kenedia.Modules.Core.Res
 		internal static string EditItem => ResourceManager.GetString("EditItem", resourceCulture);
 
 		internal static string FetchingApiData => ResourceManager.GetString("FetchingApiData", resourceCulture);
+
+		internal static string General => ResourceManager.GetString("General", resourceCulture);
 
 		internal static string GeneralSettings => ResourceManager.GetString("GeneralSettings", resourceCulture);
 
@@ -93,6 +103,8 @@ namespace Kenedia.Modules.Core.Res
 		internal static string TopOffset => ResourceManager.GetString("TopOffset", resourceCulture);
 
 		internal static string TopRightCorner => ResourceManager.GetString("TopRightCorner", resourceCulture);
+
+		internal static string Window => ResourceManager.GetString("Window", resourceCulture);
 
 		internal static string WindowBorder_Tooltip => ResourceManager.GetString("WindowBorder_Tooltip", resourceCulture);
 

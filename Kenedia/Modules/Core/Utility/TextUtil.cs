@@ -41,10 +41,11 @@ namespace Kenedia.Modules.Core.Utility
 
 		public static string WrapText(BitmapFont spriteFont, string text, float maxLineWidth)
 		{
+			BitmapFont spriteFont2 = spriteFont;
 			if (!string.IsNullOrEmpty(text))
 			{
 				return string.Join("\n", from s in text.Split('\n')
-					select WrapTextSegment(spriteFont, s, maxLineWidth));
+					select WrapTextSegment(spriteFont2, s, maxLineWidth));
 			}
 			return string.Empty;
 		}

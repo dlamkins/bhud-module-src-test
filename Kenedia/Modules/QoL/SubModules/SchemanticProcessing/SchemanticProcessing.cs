@@ -50,7 +50,7 @@ namespace Kenedia.Modules.QoL.SubModules.SchemanticProcessing
 
 		private readonly List<ClickContainer> _slots = new List<ClickContainer>();
 
-		private readonly FlowPanel _slotGrid;
+		private readonly Kenedia.Modules.Core.Controls.FlowPanel _slotGrid;
 
 		public const int WM_LBUTTONDOWN = 513;
 
@@ -71,32 +71,33 @@ namespace Kenedia.Modules.QoL.SubModules.SchemanticProcessing
 			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
-			GameService.Gw2Mumble.get_UI().add_UISizeChanged((EventHandler<ValueEventArgs<UiSize>>)UI_UISizeChanged);
-			FlowPanel flowPanel = new FlowPanel();
-			((Control)flowPanel).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			((Control)flowPanel).set_Location(_clickContainerLocation.get_Value());
-			flowPanel.BorderColor = Color.get_Black();
-			flowPanel.CanDrag = true;
-			flowPanel.CaptureInput = false;
-			((Control)flowPanel).set_Visible(base.Enabled);
-			((FlowPanel)flowPanel).set_FlowDirection((ControlFlowDirection)0);
-			((Container)flowPanel).set_HeightSizingMode((SizingMode)1);
-			((Control)flowPanel).set_Width(_sizes[GameService.Gw2Mumble.get_UI().get_UISize()] * 4);
-			_slotGrid = flowPanel;
+			GameService.Gw2Mumble.UI.UISizeChanged += UI_UISizeChanged;
+			_slotGrid = new Kenedia.Modules.Core.Controls.FlowPanel
+			{
+				Parent = GameService.Graphics.SpriteScreen,
+				Location = _clickContainerLocation.Value,
+				BorderColor = Color.get_Black(),
+				CanDrag = true,
+				CaptureInput = false,
+				Visible = base.Enabled,
+				FlowDirection = ControlFlowDirection.LeftToRight,
+				HeightSizingMode = SizingMode.AutoSize,
+				Width = _sizes[GameService.Gw2Mumble.UI.UISize] * 4
+			};
 			for (int row = 0; row < 9; row++)
 			{
 				for (int col = 0; col < 4; col++)
 				{
-					List<ClickContainer> slots = _slots;
-					ClickContainer clickContainer = new ClickContainer();
-					((Control)clickContainer).set_Parent((Container)(object)_slotGrid);
-					clickContainer.CaptureInput = false;
-					slots.Add(clickContainer);
+					_slots.Add(new ClickContainer
+					{
+						Parent = _slotGrid,
+						CaptureInput = false
+					});
 				}
 			}
 			AdjustSizes();
-			((Control)_slotGrid).add_Moved((EventHandler<MovedEventArgs>)ResizeableContainer_Moved);
-			((Control)_slotGrid).add_Resized((EventHandler<ResizedEventArgs>)ResizeableContainer_Resized);
+			_slotGrid.Moved += ResizeableContainer_Moved;
+			_slotGrid.Resized += ResizeableContainer_Resized;
 		}
 
 		private void UI_UISizeChanged(object sender, ValueEventArgs<UiSize> e)
@@ -112,13 +113,13 @@ namespace Kenedia.Modules.QoL.SubModules.SchemanticProcessing
 			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
 			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
 			_sizes[(UiSize)2] = 56;
-			((FlowPanel)_slotGrid).set_ControlPadding(new Vector2(8f));
-			((Control)_slotGrid).set_Width((_sizes[GameService.Gw2Mumble.get_UI().get_UISize()] + (int)((FlowPanel)_slotGrid).get_ControlPadding().X) * 4);
+			_slotGrid.ControlPadding = new Vector2(8f);
+			_slotGrid.Width = (_sizes[GameService.Gw2Mumble.UI.UISize] + (int)_slotGrid.ControlPadding.X) * 4;
 			for (int row = 0; row < 9; row++)
 			{
 				for (int col = 0; col < 4; col++)
 				{
-					((Control)_slots[row * 4 + col]).set_Size(new Point(_sizes[GameService.Gw2Mumble.get_UI().get_UISize()]));
+					_slots[row * 4 + col].Size = new Point(_sizes[GameService.Gw2Mumble.UI.UISize]);
 					_slots[row * 4 + col].BorderWidth = new RectangleDimensions(2);
 				}
 			}
@@ -127,22 +128,20 @@ namespace Kenedia.Modules.QoL.SubModules.SchemanticProcessing
 		private void ResizeableContainer_Resized(object sender, ResizedEventArgs e)
 		{
 			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			_clickContainerSize.set_Value(((Control)_slotGrid).get_Size());
+			_clickContainerSize.Value = _slotGrid.Size;
 		}
 
 		private void ResizeableContainer_Moved(object sender, MovedEventArgs e)
 		{
 			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			_clickContainerLocation.set_Value(((Control)_slotGrid).get_Location());
+			_clickContainerLocation.Value = _slotGrid.Location;
 		}
 
 		public override void Update(GameTime gameTime)
 		{
-			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001e: Invalid comparison between Unknown and I4
 			if (base.Enabled)
 			{
-				_slotGrid.CaptureInput = (int)GameService.Input.get_Keyboard().get_ActiveModifiers() == 6;
+				_slotGrid.CaptureInput = GameService.Input.Keyboard.ActiveModifiers == (ModifierKeys.Alt | ModifierKeys.Shift);
 				if (Common.Now - _ticks > 10000.0 && !_slotGrid.CaptureInput)
 				{
 					_ticks = Common.Now;
@@ -158,12 +157,12 @@ namespace Kenedia.Modules.QoL.SubModules.SchemanticProcessing
 				ClickContainer slot = _slots[i];
 				if (slot.Selected)
 				{
-					Rectangle absoluteBounds = ((Control)slot).get_AbsoluteBounds();
-					Point p = PointExtensions.ScaleToUi(((Rectangle)(ref absoluteBounds)).get_Center());
-					absoluteBounds = ((Control)GameService.Graphics.get_SpriteScreen()).get_AbsoluteBounds();
-					Point okPos = PointExtensions.ScaleToUi(((Rectangle)(ref absoluteBounds)).get_Center().Add(new Point(0, 35)));
+					Rectangle absoluteBounds = slot.AbsoluteBounds;
+					Point p = ((Rectangle)(ref absoluteBounds)).get_Center().ScaleToUi();
+					absoluteBounds = GameService.Graphics.SpriteScreen.AbsoluteBounds;
+					Point okPos = ((Rectangle)(ref absoluteBounds)).get_Center().Add(new Point(0, 35)).ScaleToUi();
 					bool num = CanInteract(slot, i);
-					GameService.GameIntegration.get_Gw2Instance().get_Gw2HasFocus();
+					_ = GameService.GameIntegration.Gw2Instance.Gw2HasFocus;
 					if (num)
 					{
 						MouseUtil.DoubleClick(MouseUtil.MouseButton.LEFT, p, sendToSystem: false);
@@ -197,14 +196,14 @@ namespace Kenedia.Modules.QoL.SubModules.SchemanticProcessing
 			//IL_00af: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-			if (GameService.GameIntegration.get_Gw2Instance().get_Gw2HasFocus())
+			if (GameService.GameIntegration.Gw2Instance.Gw2HasFocus)
 			{
 				Rectangle val = c.MaskedRegion;
-				Point size = PointExtensions.ScaleToUi(((Rectangle)(ref val)).get_Size().Add(new Point(-c.BorderWidth.Horizontal, -c.BorderWidth.Vertical)));
+				Point size = ((Rectangle)(ref val)).get_Size().Add(new Point(-c.BorderWidth.Horizontal, -c.BorderWidth.Vertical)).ScaleToUi();
 				using Bitmap bitmap = new Bitmap(size.X, size.Y);
 				using (Graphics g = Graphics.FromImage(bitmap))
 				{
-					val = ((Control)c).get_AbsoluteBounds();
+					val = c.AbsoluteBounds;
 					Point p = ((Rectangle)(ref val)).get_Location().Add(new Point(c.BorderWidth.Horizontal, c.BorderWidth.Vertical)).ClientToScreenPos(scaleToUi: true);
 					g.CopyFromScreen(new Point(p.X, p.Y), Point.Empty, new Size(size.X, size.Y));
 				}
@@ -239,14 +238,12 @@ namespace Kenedia.Modules.QoL.SubModules.SchemanticProcessing
 		{
 			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0055: Expected O, but got Unknown
 			base.DefineSettings(settings);
-			_clickContainerLocation = settings.DefineSetting<Point>("_clickContainerLocation", new Point(50, 50), (Func<string>)null, (Func<string>)null);
-			_clickContainerSize = settings.DefineSetting<Point>("_clickContainerSize", new Point(64, 64), (Func<string>)null, (Func<string>)null);
-			_triggerClick = settings.DefineSetting<KeyBinding>("_triggerClick", new KeyBinding((ModifierKeys)2, (Keys)49), (Func<string>)null, (Func<string>)null);
-			_triggerClick.get_Value().set_Enabled(true);
-			_triggerClick.get_Value().add_Activated((EventHandler<EventArgs>)TriggerClick_Activated);
+			_clickContainerLocation = settings.DefineSetting<Point>("_clickContainerLocation", new Point(50, 50));
+			_clickContainerSize = settings.DefineSetting<Point>("_clickContainerSize", new Point(64, 64));
+			_triggerClick = settings.DefineSetting("_triggerClick", new KeyBinding(ModifierKeys.Alt, (Keys)49));
+			_triggerClick.Value.Enabled = true;
+			_triggerClick.Value.Activated += TriggerClick_Activated;
 		}
 
 		private void TriggerClick_Activated(object sender, EventArgs e)
@@ -255,53 +252,53 @@ namespace Kenedia.Modules.QoL.SubModules.SchemanticProcessing
 			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-			Rectangle absoluteBounds = ((Control)_slotGrid).get_AbsoluteBounds();
+			Rectangle absoluteBounds = _slotGrid.AbsoluteBounds;
 			((Rectangle)(ref absoluteBounds)).get_Center().ClientToScreenPos(scaleToUi: true);
 		}
 
 		protected override void Enable()
 		{
 			base.Enable();
-			((Control)_slotGrid).set_Visible(true);
+			_slotGrid.Visible = true;
 		}
 
 		protected override void Disable()
 		{
 			base.Disable();
-			((Control)_slotGrid).set_Visible(false);
+			_slotGrid.Visible = false;
 		}
 
-		public override void CreateSettingsPanel(FlowPanel flowPanel, int width)
+		public override void CreateSettingsPanel(Kenedia.Modules.Core.Controls.FlowPanel flowPanel, int width)
 		{
 			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-			Panel panel = new Panel();
-			((Control)panel).set_Parent((Container)(object)flowPanel);
-			((Control)panel).set_Width(width);
-			((Container)panel).set_HeightSizingMode((SizingMode)1);
-			((Panel)panel).set_ShowBorder(true);
-			((Panel)panel).set_CanCollapse(true);
-			panel.TitleIcon = base.Icon.Texture;
-			((Panel)panel).set_Title(SubModuleType.ToString());
-			Panel headerPanel = panel;
-			FlowPanel flowPanel2 = new FlowPanel();
-			((Control)flowPanel2).set_Parent((Container)(object)headerPanel);
-			((Container)flowPanel2).set_HeightSizingMode((SizingMode)1);
-			((Container)flowPanel2).set_WidthSizingMode((SizingMode)2);
-			((FlowPanel)flowPanel2).set_FlowDirection((ControlFlowDirection)3);
-			flowPanel2.ContentPadding = new RectangleDimensions(5, 2);
-			((FlowPanel)flowPanel2).set_ControlPadding(new Vector2(0f, 2f));
-			FlowPanel contentFlowPanel = flowPanel2;
-			Func<string> localizedLabelContent = () => string.Format(strings.ShowInHotbar_Name, base.Name);
-			Func<string> localizedTooltip = () => string.Format(strings.ShowInHotbar_Description, base.Name);
-			int width2 = width - 16;
-			Checkbox checkbox = new Checkbox();
-			((Control)checkbox).set_Height(20);
-			((Checkbox)checkbox).set_Checked(base.ShowInHotbar.get_Value());
-			checkbox.CheckedChangedAction = delegate(bool b)
+			Kenedia.Modules.Core.Controls.Panel headerPanel = new Kenedia.Modules.Core.Controls.Panel
 			{
-				base.ShowInHotbar.set_Value(b);
+				Parent = flowPanel,
+				Width = width,
+				HeightSizingMode = SizingMode.AutoSize,
+				ShowBorder = true,
+				CanCollapse = true,
+				TitleIcon = base.Icon.Texture,
+				Title = SubModuleType.ToString()
 			};
-			UI.WrapWithLabel(localizedLabelContent, localizedTooltip, (Container)(object)contentFlowPanel, width2, (Control)(object)checkbox);
+			Kenedia.Modules.Core.Controls.FlowPanel contentFlowPanel = new Kenedia.Modules.Core.Controls.FlowPanel
+			{
+				Parent = headerPanel,
+				HeightSizingMode = SizingMode.AutoSize,
+				WidthSizingMode = SizingMode.Fill,
+				FlowDirection = ControlFlowDirection.SingleTopToBottom,
+				ContentPadding = new RectangleDimensions(5, 2),
+				ControlPadding = new Vector2(0f, 2f)
+			};
+			UI.WrapWithLabel(() => string.Format(strings.ShowInHotbar_Name, base.Name), () => string.Format(strings.ShowInHotbar_Description, base.Name), contentFlowPanel, width - 16, new Kenedia.Modules.Core.Controls.Checkbox
+			{
+				Height = 20,
+				Checked = base.ShowInHotbar.Value,
+				CheckedChangedAction = delegate(bool b)
+				{
+					base.ShowInHotbar.Value = b;
+				}
+			});
 		}
 	}
 }

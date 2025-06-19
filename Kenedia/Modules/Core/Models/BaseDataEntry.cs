@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -36,7 +35,7 @@ namespace Kenedia.Modules.Core.Models
 			return new BaseDataEntry
 			{
 				Version = entry.Version,
-				Items = ((IEnumerable<KeyValuePair<Key, T>>)entry.Items).ToDictionary((Func<KeyValuePair<Key, T>, string>)((KeyValuePair<Key, T> kvp) => $"{kvp.Key}"), (Func<KeyValuePair<Key, T>, object>)((KeyValuePair<Key, T> kvp) => kvp.Value))
+				Items = entry.Items.ToDictionary<KeyValuePair<Key, T>, string, object>((KeyValuePair<Key, T> kvp) => $"{kvp.Key}", (KeyValuePair<Key, T> kvp) => kvp.Value)
 			};
 		}
 

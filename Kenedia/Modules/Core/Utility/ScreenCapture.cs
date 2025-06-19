@@ -27,7 +27,7 @@ namespace Kenedia.Modules.Core.Utility
 			int y = (int)((double)bounds.Y * factor);
 			g.CopyFromScreen(new Point(wndBounds.Left + p.X + x, wndBounds.Top + p.Y + y), Point.Empty, new Size(size.X, size.Y));
 			bitmap.Save(s, ImageFormat.Bmp);
-			return AsyncTexture2D.op_Implicit(s.CreateTexture2D());
+			return (AsyncTexture2D)s.CreateTexture2D();
 		}
 
 		public static AsyncTexture2D CaptureRegion(Rectangle window, Rectangle region)
@@ -41,7 +41,7 @@ namespace Kenedia.Modules.Core.Utility
 			using MemoryStream s = new MemoryStream();
 			g.CopyFromScreen(new Point(((Rectangle)(ref window)).get_Left() + ((Rectangle)(ref region)).get_Left(), ((Rectangle)(ref window)).get_Top() + ((Rectangle)(ref region)).get_Top()), Point.Empty, new Size(region.Width, region.Height));
 			bitmap.Save(s, ImageFormat.Bmp);
-			return AsyncTexture2D.op_Implicit(s.CreateTexture2D());
+			return (AsyncTexture2D)s.CreateTexture2D();
 		}
 
 		public static AsyncTexture2D CaptureRegion(User32Dll.RECT window, Rectangle region)
@@ -55,7 +55,7 @@ namespace Kenedia.Modules.Core.Utility
 			using MemoryStream s = new MemoryStream();
 			g.CopyFromScreen(new Point(window.Left + ((Rectangle)(ref region)).get_Left(), window.Top + ((Rectangle)(ref region)).get_Top()), Point.Empty, new Size(region.Width, region.Height));
 			bitmap.Save(s, ImageFormat.Bmp);
-			return AsyncTexture2D.op_Implicit(s.CreateTexture2D());
+			return (AsyncTexture2D)s.CreateTexture2D();
 		}
 	}
 }

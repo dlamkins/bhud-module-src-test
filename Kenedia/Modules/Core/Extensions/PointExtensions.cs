@@ -75,9 +75,9 @@ namespace Kenedia.Modules.Core.Extensions
 			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
 			if (scaleToUi)
 			{
-				p = PointExtensions.ScaleToUi(p);
+				p = p.ScaleToUi();
 			}
-			IntPtr gw2WindowHandle = GameService.GameIntegration.get_Gw2Instance().get_Gw2WindowHandle();
+			IntPtr gw2WindowHandle = GameService.GameIntegration.Gw2Instance.Gw2WindowHandle;
 			User32Dll.POINT point = new User32Dll.POINT
 			{
 				X = p.X,

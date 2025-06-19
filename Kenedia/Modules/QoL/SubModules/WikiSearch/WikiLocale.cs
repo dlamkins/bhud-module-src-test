@@ -50,7 +50,8 @@ namespace Kenedia.Modules.QoL.SubModules.WikiSearch
 
 		public static Locale FromDisplayString(string displayString)
 		{
-			return Locales.FirstOrDefault((KeyValuePair<Locale, string> x) => x.Value == displayString).Key;
+			string displayString2 = displayString;
+			return Locales.FirstOrDefault<KeyValuePair<Locale, string>>((KeyValuePair<Locale, string> x) => x.Value == displayString2).Key;
 		}
 	}
 }

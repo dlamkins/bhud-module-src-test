@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using Blish_HUD;
 using Blish_HUD.Content;
@@ -20,7 +19,7 @@ namespace Kenedia.Modules.QoL.SubModules.EnhancedCrosshair
 	{
 		private SettingEntry<Point> _crosshairSize;
 
-		private Image _crosshair;
+		private Kenedia.Modules.Core.Controls.Image _crosshair;
 
 		public override SubModuleType SubModuleType => SubModuleType.EnhancedCrosshair;
 
@@ -30,20 +29,22 @@ namespace Kenedia.Modules.QoL.SubModules.EnhancedCrosshair
 			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
 			EnhancedCrosshair enhancedCrosshair = this;
 			SubModuleUI uI_Elements = UI_Elements;
-			Image image = new Image();
-			((Control)image).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			((Control)image).set_Size(_crosshairSize.get_Value());
-			((Image)image).set_Texture(AsyncTexture2D.FromAssetId(1677342));
-			((Control)image).set_Enabled(false);
-			Image item = image;
-			_crosshair = image;
-			uI_Elements.Add((Control)(object)item);
+			Kenedia.Modules.Core.Controls.Image obj = new Kenedia.Modules.Core.Controls.Image
+			{
+				Parent = GameService.Graphics.SpriteScreen,
+				Size = _crosshairSize.Value,
+				Texture = AsyncTexture2D.FromAssetId(1677342),
+				Enabled = false
+			};
+			Kenedia.Modules.Core.Controls.Image item = obj;
+			_crosshair = obj;
+			uI_Elements.Add(item);
 			string path = BaseModule<QoL, StandardWindow, Kenedia.Modules.QoL.Services.Settings, PathCollection>.ModuleInstance.Paths.ModulePath + "crosshair.png";
 			if (File.Exists(path))
 			{
-				GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate(GraphicsDevice graphicsDevice)
+				GameService.Graphics.QueueMainThreadRender(delegate(GraphicsDevice graphicsDevice)
 				{
-					((Image)enhancedCrosshair._crosshair).set_Texture(AsyncTexture2D.op_Implicit(TextureUtil.FromStreamPremultiplied(graphicsDevice, (Stream)new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))));
+					enhancedCrosshair._crosshair.Texture = TextureUtil.FromStreamPremultiplied(graphicsDevice, new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
 				});
 			}
 		}
@@ -61,90 +62,85 @@ namespace Kenedia.Modules.QoL.SubModules.EnhancedCrosshair
 			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
 			if (base.Enabled)
 			{
-				_crosshairSize.set_Value(new Point(84));
-				((Image)_crosshair).set_Texture(AsyncTexture2D.FromAssetId(1058519));
-				((Control)_crosshair).set_Opacity(0.5f);
-				_ = BaseModule<QoL, StandardWindow, Kenedia.Modules.QoL.Services.Settings, PathCollection>.ModuleInstance.Services.ClientWindowService.WindowBounds;
-				Rectangle p = ((Control)GameService.Graphics.get_SpriteScreen()).get_AbsoluteBounds();
-				((Control)_crosshair).set_Size(_crosshairSize.get_Value());
-				((Control)_crosshair).set_Location(((Rectangle)(ref p)).get_Center().Add(new Point(-_crosshairSize.get_Value().X / 2, -_crosshairSize.get_Value().Y / 2)));
-				((Control)_crosshair).set_Visible(base.Enabled && GameService.GameIntegration.get_Gw2Instance().get_IsInGame() && !GameService.Gw2Mumble.get_UI().get_IsMapOpen());
+				_crosshairSize.Value = new Point(84);
+				_crosshair.Texture = AsyncTexture2D.FromAssetId(1058519);
+				_crosshair.Opacity = 0.5f;
+				_ = BaseModule<QoL, StandardWindow, Kenedia.Modules.QoL.Services.Settings, PathCollection>.ModuleInstance.CoreServices.ClientWindowService.WindowBounds;
+				Rectangle p = GameService.Graphics.SpriteScreen.AbsoluteBounds;
+				_crosshair.Size = _crosshairSize.Value;
+				_crosshair.Location = ((Rectangle)(ref p)).get_Center().Add(new Point(-_crosshairSize.Value.X / 2, -_crosshairSize.Value.Y / 2));
+				_crosshair.Visible = base.Enabled && GameService.GameIntegration.Gw2Instance.IsInGame && !GameService.Gw2Mumble.UI.IsMapOpen;
 			}
 		}
 
 		protected override void Enable()
 		{
 			base.Enable();
-			((Control)_crosshair).set_Visible(base.Enabled);
+			_crosshair.Visible = base.Enabled;
 		}
 
 		protected override void Disable()
 		{
 			base.Disable();
-			((Control)_crosshair).set_Visible(base.Enabled);
+			_crosshair.Visible = base.Enabled;
 		}
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
 			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
 			base.DefineSettings(settings);
-			_crosshairSize = settings.DefineSetting<Point>("_crosshairSize", new Point(48), (Func<string>)(() => strings.DisableOnSearch_Name), (Func<string>)(() => strings.DisableOnSearch_Tooltip));
+			_crosshairSize = settings.DefineSetting<Point>("_crosshairSize", new Point(48), () => strings.DisableOnSearch_Name, () => strings.DisableOnSearch_Tooltip);
 		}
 
-		public override void CreateSettingsPanel(FlowPanel flowPanel, int width)
+		public override void CreateSettingsPanel(Kenedia.Modules.Core.Controls.FlowPanel flowPanel, int width)
 		{
 			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-			Panel panel = new Panel();
-			((Control)panel).set_Parent((Container)(object)flowPanel);
-			((Control)panel).set_Width(width);
-			((Container)panel).set_HeightSizingMode((SizingMode)1);
-			((Panel)panel).set_ShowBorder(true);
-			((Panel)panel).set_CanCollapse(true);
-			panel.TitleIcon = base.Icon.Texture;
-			((Panel)panel).set_Title(SubModuleType.ToString());
-			Panel headerPanel = panel;
-			FlowPanel flowPanel2 = new FlowPanel();
-			((Control)flowPanel2).set_Parent((Container)(object)headerPanel);
-			((Container)flowPanel2).set_HeightSizingMode((SizingMode)1);
-			((Container)flowPanel2).set_WidthSizingMode((SizingMode)2);
-			((FlowPanel)flowPanel2).set_FlowDirection((ControlFlowDirection)3);
-			((FlowPanel)flowPanel2).set_ControlPadding(new Vector2(10f));
-			FlowPanel contentFlowPanel = flowPanel2;
-			Func<string> localizedLabelContent = () => string.Format(strings.ShowInHotbar_Name, $"{SubModuleType}");
-			Func<string> localizedTooltip = () => string.Format(strings.ShowInHotbar_Description, $"{SubModuleType}");
-			int width2 = width - 16;
-			Checkbox checkbox = new Checkbox();
-			((Control)checkbox).set_Height(20);
-			((Checkbox)checkbox).set_Checked(base.ShowInHotbar.get_Value());
-			checkbox.CheckedChangedAction = delegate(bool b)
+			Kenedia.Modules.Core.Controls.Panel headerPanel = new Kenedia.Modules.Core.Controls.Panel
 			{
-				base.ShowInHotbar.set_Value(b);
+				Parent = flowPanel,
+				Width = width,
+				HeightSizingMode = SizingMode.AutoSize,
+				ShowBorder = true,
+				CanCollapse = true,
+				TitleIcon = base.Icon.Texture,
+				Title = SubModuleType.ToString()
 			};
-			UI.WrapWithLabel(localizedLabelContent, localizedTooltip, (Container)(object)contentFlowPanel, width2, (Control)(object)checkbox);
-			KeybindingAssigner keybindingAssigner = new KeybindingAssigner();
-			((Control)keybindingAssigner).set_Parent((Container)(object)contentFlowPanel);
-			((Control)keybindingAssigner).set_Width(width);
-			((KeybindingAssigner)keybindingAssigner).set_KeyBinding(base.HotKey.get_Value());
-			keybindingAssigner.KeybindChangedAction = delegate(KeyBinding kb)
+			Kenedia.Modules.Core.Controls.FlowPanel contentFlowPanel = new Kenedia.Modules.Core.Controls.FlowPanel
 			{
-				//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-				//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-				//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-				//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-				//IL_003b: Expected O, but got Unknown
-				SettingEntry<KeyBinding> hotKey = base.HotKey;
-				KeyBinding val = new KeyBinding();
-				val.set_ModifierKeys(kb.get_ModifierKeys());
-				val.set_PrimaryKey(kb.get_PrimaryKey());
-				val.set_Enabled(kb.get_Enabled());
-				val.set_IgnoreWhenInTextField(true);
-				hotKey.set_Value(val);
+				Parent = headerPanel,
+				HeightSizingMode = SizingMode.AutoSize,
+				WidthSizingMode = SizingMode.Fill,
+				FlowDirection = ControlFlowDirection.SingleTopToBottom,
+				ControlPadding = new Vector2(10f)
 			};
-			keybindingAssigner.SetLocalizedKeyBindingName = () => string.Format(strings.HotkeyEntry_Name, $"{SubModuleType}");
-			keybindingAssigner.SetLocalizedTooltip = () => string.Format(strings.HotkeyEntry_Description, $"{SubModuleType}");
+			UI.WrapWithLabel(() => string.Format(strings.ShowInHotbar_Name, $"{SubModuleType}"), () => string.Format(strings.ShowInHotbar_Description, $"{SubModuleType}"), contentFlowPanel, width - 16, new Kenedia.Modules.Core.Controls.Checkbox
+			{
+				Height = 20,
+				Checked = base.ShowInHotbar.Value,
+				CheckedChangedAction = delegate(bool b)
+				{
+					base.ShowInHotbar.Value = b;
+				}
+			});
+			new Kenedia.Modules.Core.Controls.KeybindingAssigner
+			{
+				Parent = contentFlowPanel,
+				Width = width,
+				KeyBinding = base.HotKey.Value,
+				KeybindChangedAction = delegate(KeyBinding kb)
+				{
+					//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+					base.HotKey.Value = new KeyBinding
+					{
+						ModifierKeys = kb.ModifierKeys,
+						PrimaryKey = kb.PrimaryKey,
+						Enabled = kb.Enabled,
+						IgnoreWhenInTextField = true
+					};
+				},
+				SetLocalizedKeyBindingName = () => string.Format(strings.HotkeyEntry_Name, $"{SubModuleType}"),
+				SetLocalizedTooltip = () => string.Format(strings.HotkeyEntry_Description, $"{SubModuleType}")
+			};
 		}
 	}
 }

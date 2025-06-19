@@ -4,7 +4,6 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using Blish_HUD;
-using Blish_HUD.Controls;
 using Blish_HUD.GameIntegration.GfxSettings;
 using Kenedia.Modules.Core.Controls;
 using Kenedia.Modules.Core.Models;
@@ -67,41 +66,83 @@ namespace Kenedia.Modules.Core.Services
 			}
 		}
 
-		private readonly double _startingMumbleTick = GameService.Gw2Mumble.get_Tick();
+		private readonly double _startingMumbleTick = GameService.Gw2Mumble.Tick;
 
 		private bool _isDisposed;
 
 		private double _lastTick;
 
-		private readonly FramedMaskedRegion _spinnerMask;
+		private readonly FramedMaskedRegion _spinnerMask = new FramedMaskedRegion
+		{
+			Visible = false,
+			Parent = GameService.Graphics.SpriteScreen,
+			ZIndex = int.MaxValue,
+			BorderColor = Color.get_Transparent()
+		};
 
-		private readonly FramedMaskedRegion _topRightMask;
+		private readonly FramedMaskedRegion _topRightMask = new FramedMaskedRegion
+		{
+			Visible = false,
+			Parent = GameService.Graphics.SpriteScreen,
+			ZIndex = int.MaxValue,
+			BorderColor = Color.get_Red(),
+			BorderWidth = new RectangleDimensions(2)
+		};
 
-		private readonly FramedMaskedRegion _topLeftMask;
+		private readonly FramedMaskedRegion _topLeftMask = new FramedMaskedRegion
+		{
+			Visible = false,
+			Parent = GameService.Graphics.SpriteScreen,
+			ZIndex = int.MaxValue,
+			BorderColor = Color.get_Red(),
+			BorderWidth = new RectangleDimensions(2)
+		};
 
-		private readonly FramedMaskedRegion _bottomLeftMask;
+		private readonly FramedMaskedRegion _bottomLeftMask = new FramedMaskedRegion
+		{
+			Visible = false,
+			Parent = GameService.Graphics.SpriteScreen,
+			ZIndex = int.MaxValue,
+			BorderColor = Color.get_Red(),
+			BorderWidth = new RectangleDimensions(2)
+		};
 
-		private readonly FramedMaskedRegion _bottomRightMask;
+		private readonly FramedMaskedRegion _bottomRightMask = new FramedMaskedRegion
+		{
+			Visible = false,
+			Parent = GameService.Graphics.SpriteScreen,
+			ZIndex = int.MaxValue,
+			BorderColor = Color.get_Red(),
+			BorderWidth = new RectangleDimensions(2)
+		};
 
-		private readonly FramedMaskedRegion _centerMask;
+		private readonly FramedMaskedRegion _centerMask = new FramedMaskedRegion
+		{
+			Visible = false,
+			Parent = GameService.Graphics.SpriteScreen,
+			ZIndex = int.MaxValue,
+			BorderColor = Color.get_Red(),
+			BorderWidth = new RectangleDimensions(2)
+		};
 
-		private readonly List<GameStatusType> _gameStatuses;
+		private readonly List<GameStatusType> _gameStatuses = new List<GameStatusType>();
 
-		private GameStatusType _gameStatus;
+		private GameStatusType _gameStatus = GameStatusType.None;
 
-		private (Bitmap lastImage, Bitmap newImage) _bottomLeftImages;
+		private (Bitmap lastImage, Bitmap newImage) _bottomLeftImages = (null, null);
 
-		private (Bitmap lastImage, Bitmap newImage) _bottomRightImages;
+		private (Bitmap lastImage, Bitmap newImage) _bottomRightImages = (null, null);
 
-		private (Bitmap lastImage, Bitmap newImage) _topRightImages;
+		private (Bitmap lastImage, Bitmap newImage) _topRightImages = (null, null);
 
-		private (Bitmap lastImage, Bitmap newImage) _topLeftImages;
+		private (Bitmap lastImage, Bitmap newImage) _topLeftImages = (null, null);
 
-		private (Bitmap lastImage, Bitmap newImage) _centerImages;
+		private (Bitmap lastImage, Bitmap newImage) _centerImages = (null, null);
 
-		private (Bitmap lastImage, Bitmap newImage) _spinnerImages;
+		private (Bitmap lastImage, Bitmap newImage) _spinnerImages = (null, null);
 
-		public bool Enabled { get; set; }
+		public bool Enabled { get; set; } = true;
+
 
 		public ClientWindowService ClientWindowService { get; set; }
 
@@ -175,57 +216,6 @@ namespace Kenedia.Modules.Core.Services
 			//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
 			//IL_013e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0182: Unknown result type (might be due to invalid IL or missing references)
-			FramedMaskedRegion framedMaskedRegion = new FramedMaskedRegion();
-			((Control)framedMaskedRegion).set_Visible(false);
-			((Control)framedMaskedRegion).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			((Control)framedMaskedRegion).set_ZIndex(int.MaxValue);
-			framedMaskedRegion.BorderColor = Color.get_Transparent();
-			_spinnerMask = framedMaskedRegion;
-			FramedMaskedRegion framedMaskedRegion2 = new FramedMaskedRegion();
-			((Control)framedMaskedRegion2).set_Visible(false);
-			((Control)framedMaskedRegion2).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			((Control)framedMaskedRegion2).set_ZIndex(int.MaxValue);
-			framedMaskedRegion2.BorderColor = Color.get_Red();
-			framedMaskedRegion2.BorderWidth = new RectangleDimensions(2);
-			_topRightMask = framedMaskedRegion2;
-			FramedMaskedRegion framedMaskedRegion3 = new FramedMaskedRegion();
-			((Control)framedMaskedRegion3).set_Visible(false);
-			((Control)framedMaskedRegion3).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			((Control)framedMaskedRegion3).set_ZIndex(int.MaxValue);
-			framedMaskedRegion3.BorderColor = Color.get_Red();
-			framedMaskedRegion3.BorderWidth = new RectangleDimensions(2);
-			_topLeftMask = framedMaskedRegion3;
-			FramedMaskedRegion framedMaskedRegion4 = new FramedMaskedRegion();
-			((Control)framedMaskedRegion4).set_Visible(false);
-			((Control)framedMaskedRegion4).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			((Control)framedMaskedRegion4).set_ZIndex(int.MaxValue);
-			framedMaskedRegion4.BorderColor = Color.get_Red();
-			framedMaskedRegion4.BorderWidth = new RectangleDimensions(2);
-			_bottomLeftMask = framedMaskedRegion4;
-			FramedMaskedRegion framedMaskedRegion5 = new FramedMaskedRegion();
-			((Control)framedMaskedRegion5).set_Visible(false);
-			((Control)framedMaskedRegion5).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			((Control)framedMaskedRegion5).set_ZIndex(int.MaxValue);
-			framedMaskedRegion5.BorderColor = Color.get_Red();
-			framedMaskedRegion5.BorderWidth = new RectangleDimensions(2);
-			_bottomRightMask = framedMaskedRegion5;
-			FramedMaskedRegion framedMaskedRegion6 = new FramedMaskedRegion();
-			((Control)framedMaskedRegion6).set_Visible(false);
-			((Control)framedMaskedRegion6).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			((Control)framedMaskedRegion6).set_ZIndex(int.MaxValue);
-			framedMaskedRegion6.BorderColor = Color.get_Red();
-			framedMaskedRegion6.BorderWidth = new RectangleDimensions(2);
-			_centerMask = framedMaskedRegion6;
-			_gameStatuses = new List<GameStatusType>();
-			_gameStatus = GameStatusType.None;
-			_bottomLeftImages = (null, null);
-			_bottomRightImages = (null, null);
-			_topRightImages = (null, null);
-			_topLeftImages = (null, null);
-			_centerImages = (null, null);
-			_spinnerImages = (null, null);
-			Enabled = true;
-			base._002Ector();
 			ClientWindowService = clientWindowService;
 			SharedSettings = sharedSettings;
 		}
@@ -237,14 +227,14 @@ namespace Kenedia.Modules.Core.Services
 				return;
 			}
 			NewStatus = GameStatusType.Unknown;
-			if (GameService.Gw2Mumble.get_TimeSinceTick().TotalMilliseconds <= 500.0 && _startingMumbleTick != (double)GameService.Gw2Mumble.get_Tick())
+			if (GameService.Gw2Mumble.TimeSinceTick.TotalMilliseconds <= 500.0 && _startingMumbleTick != (double)GameService.Gw2Mumble.Tick)
 			{
 				NewStatus = GameStatusType.Ingame;
-				((Control)_topLeftMask).Hide();
-				((Control)_topRightMask).Hide();
-				((Control)_bottomLeftMask).Hide();
-				((Control)_bottomRightMask).Hide();
-				((Control)_spinnerMask).Hide();
+				_topLeftMask.Hide();
+				_topRightMask.Hide();
+				_bottomLeftMask.Hide();
+				_bottomRightMask.Hide();
+				_spinnerMask.Hide();
 			}
 			else
 			{
@@ -252,14 +242,14 @@ namespace Kenedia.Modules.Core.Services
 				{
 					return;
 				}
-				if (GameService.GameIntegration.get_Gw2Instance().get_Gw2HasFocus() && gameTime.get_TotalGameTime().TotalMilliseconds - _lastTick > 250.0)
+				if (GameService.GameIntegration.Gw2Instance.Gw2HasFocus && gameTime.get_TotalGameTime().TotalMilliseconds - _lastTick > 250.0)
 				{
 					ScreenChanging sC = IsScreenChanging();
-					((Control)_topLeftMask).Show();
-					((Control)_topRightMask).Show();
-					((Control)_bottomLeftMask).Show();
-					((Control)_bottomRightMask).Show();
-					((Control)_spinnerMask).Show();
+					_topLeftMask.Show();
+					_topRightMask.Show();
+					_bottomLeftMask.Show();
+					_bottomRightMask.Show();
+					_spinnerMask.Show();
 					_lastTick = gameTime.get_TotalGameTime().TotalMilliseconds;
 					bool vista = sC.AreAllChanging;
 					bool cutscene = !sC.AreCornersChanging && sC.IsCenterChanging && !sC.IsSpinnerChanging;
@@ -361,8 +351,6 @@ namespace Kenedia.Modules.Core.Services
 			//IL_017f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_018a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0191: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cd: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01f3: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01f9: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0234: Unknown result type (might be due to invalid IL or missing references)
@@ -371,7 +359,7 @@ namespace Kenedia.Modules.Core.Services
 			//IL_0270: Unknown result type (might be due to invalid IL or missing references)
 			images.lastImage?.Dispose();
 			images.lastImage = images.newImage;
-			Rectangle b = ((Control)GameService.Graphics.get_SpriteScreen()).get_LocalBounds();
+			Rectangle b = GameService.Graphics.SpriteScreen.LocalBounds;
 			Point maskSize = (Point)(t switch
 			{
 				ScreenRegionType.TopLeft => new Point(100, 25), 
@@ -393,18 +381,18 @@ namespace Kenedia.Modules.Core.Services
 				_ => Point.get_Zero(), 
 			});
 			region.BorderColor = Color.get_Transparent();
-			((Control)region).set_Location(maskPos);
-			((Control)region).set_Size(maskSize);
+			region.Location = maskPos;
+			region.Size = maskSize;
 			try
 			{
 				User32Dll.RECT wndBounds = ClientWindowService.WindowBounds;
-				ScreenModeSetting? screenMode = GameService.GameIntegration.get_GfxSettings().get_ScreenMode();
-				RectangleDimensions offset = (((screenMode.HasValue ? ScreenModeSetting.op_Implicit(screenMode.GetValueOrDefault()) : null) == ScreenModeSetting.op_Implicit(ScreenModeSetting.get_Windowed())) ? SharedSettings.WindowOffset : new RectangleDimensions(0));
+				ScreenModeSetting? screenMode = GameService.GameIntegration.GfxSettings.ScreenMode;
+				RectangleDimensions offset = (((screenMode.HasValue ? ((string)screenMode.GetValueOrDefault()) : null) == (string)ScreenModeSetting.Windowed) ? SharedSettings.WindowOffset : new RectangleDimensions(0));
 				Bitmap bitmap = new Bitmap(maskSize.X, maskSize.Y);
 				using Graphics g = Graphics.FromImage(bitmap);
 				using (new MemoryStream())
 				{
-					double factor = GameService.Graphics.get_UIScaleMultiplier();
+					double factor = GameService.Graphics.UIScaleMultiplier;
 					g.CopyFromScreen(new Point(wndBounds.Left + offset.Left + (int)((double)maskPos.X * factor), wndBounds.Top + offset.Top + (int)((double)maskPos.Y * factor)), Point.Empty, new Size((int)((double)maskSize.X * factor), (int)((double)maskSize.Y * factor)));
 					images.newImage = bitmap;
 					return images;
@@ -486,46 +474,22 @@ namespace Kenedia.Modules.Core.Services
 			if (!_isDisposed)
 			{
 				_isDisposed = true;
-				FramedMaskedRegion spinnerMask = _spinnerMask;
-				if (spinnerMask != null)
-				{
-					((Control)spinnerMask).Dispose();
-				}
+				_spinnerMask?.Dispose();
 				_spinnerImages.lastImage?.Dispose();
 				_spinnerImages.newImage?.Dispose();
-				FramedMaskedRegion centerMask = _centerMask;
-				if (centerMask != null)
-				{
-					((Control)centerMask).Dispose();
-				}
+				_centerMask?.Dispose();
 				_centerImages.lastImage?.Dispose();
 				_centerImages.newImage?.Dispose();
-				FramedMaskedRegion topLeftMask = _topLeftMask;
-				if (topLeftMask != null)
-				{
-					((Control)topLeftMask).Dispose();
-				}
+				_topLeftMask?.Dispose();
 				_topLeftImages.lastImage?.Dispose();
 				_topLeftImages.newImage?.Dispose();
-				FramedMaskedRegion topRightMask = _topRightMask;
-				if (topRightMask != null)
-				{
-					((Control)topRightMask).Dispose();
-				}
+				_topRightMask?.Dispose();
 				_topRightImages.lastImage?.Dispose();
 				_topRightImages.newImage?.Dispose();
-				FramedMaskedRegion bottomLeftMask = _bottomLeftMask;
-				if (bottomLeftMask != null)
-				{
-					((Control)bottomLeftMask).Dispose();
-				}
+				_bottomLeftMask?.Dispose();
 				_bottomLeftImages.lastImage?.Dispose();
 				_bottomLeftImages.newImage?.Dispose();
-				FramedMaskedRegion bottomRightMask = _bottomRightMask;
-				if (bottomRightMask != null)
-				{
-					((Control)bottomRightMask).Dispose();
-				}
+				_bottomRightMask?.Dispose();
 				_bottomRightImages.lastImage?.Dispose();
 				_bottomRightImages.newImage?.Dispose();
 			}

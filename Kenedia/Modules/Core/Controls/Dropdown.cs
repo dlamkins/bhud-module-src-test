@@ -9,7 +9,7 @@ using Kenedia.Modules.Core.Services;
 
 namespace Kenedia.Modules.Core.Controls
 {
-	public class Dropdown : Dropdown, ILocalizable
+	public class Dropdown : Blish_HUD.Controls.Dropdown, ILocalizable
 	{
 		private Func<List<string>> _setLocalizedItems;
 
@@ -37,16 +37,15 @@ namespace Kenedia.Modules.Core.Controls
 			set
 			{
 				_setLocalizedTooltip = value;
-				((Control)this).set_BasicTooltipText(value?.Invoke());
+				base.BasicTooltipText = value?.Invoke();
 			}
 		}
 
 		public Action<string> ValueChangedAction { get; set; }
 
 		public Dropdown()
-			: this()
 		{
-			LocalizingService.LocaleChanged += UserLocale_SettingChanged;
+			LocalizingService.LocaleChanged += new EventHandler<ValueChangedEventArgs<Locale>>(UserLocale_SettingChanged);
 			UserLocale_SettingChanged(null, null);
 		}
 
@@ -54,37 +53,37 @@ namespace Kenedia.Modules.Core.Controls
 		{
 			if (SetLocalizedItems != null)
 			{
-				int? index = ((Dropdown)this).get_Items()?.ToList().FindIndex((string a) => a == ((Dropdown)this).get_SelectedItem());
-				((Dropdown)this).get_Items().Clear();
+				int? index = base.Items?.ToList().FindIndex((string a) => a == base.SelectedItem);
+				base.Items.Clear();
 				List<string> items = SetLocalizedItems?.Invoke();
 				string selected = string.Empty;
 				for (int i = 0; i < items.Count; i++)
 				{
 					string item = items[i];
-					((Dropdown)this).get_Items().Add(item);
+					base.Items.Add(item);
 					if (index == i)
 					{
 						selected = item;
 					}
 				}
-				((Dropdown)this).set_SelectedItem(selected ?? ((Dropdown)this).get_SelectedItem());
+				base.SelectedItem = selected ?? base.SelectedItem;
 			}
 			if (SetLocalizedTooltip != null)
 			{
-				((Control)this).set_BasicTooltipText(SetLocalizedTooltip?.Invoke());
+				base.BasicTooltipText = SetLocalizedTooltip?.Invoke();
 			}
 		}
 
 		protected override void OnValueChanged(ValueChangedEventArgs e)
 		{
-			((Dropdown)this).OnValueChanged(e);
-			ValueChangedAction?.Invoke(((Dropdown)this).get_SelectedItem());
+			base.OnValueChanged(e);
+			ValueChangedAction?.Invoke(base.SelectedItem);
 		}
 
 		protected override void DisposeControl()
 		{
-			((Control)this).DisposeControl();
-			GameService.Overlay.get_UserLocale().remove_SettingChanged((EventHandler<ValueChangedEventArgs<Locale>>)UserLocale_SettingChanged);
+			base.DisposeControl();
+			GameService.Overlay.UserLocale.SettingChanged -= UserLocale_SettingChanged;
 		}
 	}
 }

@@ -1,8 +1,11 @@
+using System;
+using System.Collections.Generic;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Kenedia.Modules.Core.Structs;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended;
 
 namespace Kenedia.Modules.Core.Extensions
 {
@@ -81,7 +84,7 @@ namespace Kenedia.Modules.Core.Extensions
 			((Rectangle)(ref destination))._002Ector(rectangleAreaToDrawAt.X + rectangleAreaToDrawAt.Width / 2, rectangleAreaToDrawAt.Y + rectangleAreaToDrawAt.Height / 2, rectangleAreaToDrawAt.Width, rectangleAreaToDrawAt.Height);
 			Vector2 originOffset = default(Vector2);
 			((Vector2)(ref originOffset))._002Ector((float)(textureImage.get_Width() / 2), (float)(textureImage.get_Height() / 2));
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, ctrl, textureImage, destination, (Rectangle?)sourceRectangle, color, rotationInRadians, originOffset, seffects);
+			spriteBatch.DrawOnCtrl(ctrl, textureImage, destination, sourceRectangle, color, rotationInRadians, originOffset, seffects);
 		}
 
 		public static void DrawFrame(this SpriteBatch spriteBatch, Control ctrl, Rectangle _selectorBounds, Color borderColor, int width = 1)
@@ -106,10 +109,10 @@ namespace Kenedia.Modules.Core.Extensions
 			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, ctrl, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref _selectorBounds)).get_Left() + width, ((Rectangle)(ref _selectorBounds)).get_Top(), _selectorBounds.Width - width * 2, width), (Rectangle?)Rectangle.get_Empty(), borderColor * 0.8f);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, ctrl, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref _selectorBounds)).get_Left() + width, ((Rectangle)(ref _selectorBounds)).get_Bottom() - width, _selectorBounds.Width - width * 2, width), (Rectangle?)Rectangle.get_Empty(), borderColor * 0.8f);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, ctrl, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref _selectorBounds)).get_Left(), ((Rectangle)(ref _selectorBounds)).get_Top(), width, _selectorBounds.Height), (Rectangle?)Rectangle.get_Empty(), borderColor * 0.8f);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, ctrl, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref _selectorBounds)).get_Right() - width, ((Rectangle)(ref _selectorBounds)).get_Top(), width, _selectorBounds.Height), (Rectangle?)Rectangle.get_Empty(), borderColor * 0.8f);
+			spriteBatch.DrawOnCtrl(ctrl, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref _selectorBounds)).get_Left() + width, ((Rectangle)(ref _selectorBounds)).get_Top(), _selectorBounds.Width - width * 2, width), Rectangle.get_Empty(), borderColor * 0.8f);
+			spriteBatch.DrawOnCtrl(ctrl, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref _selectorBounds)).get_Left() + width, ((Rectangle)(ref _selectorBounds)).get_Bottom() - width, _selectorBounds.Width - width * 2, width), Rectangle.get_Empty(), borderColor * 0.8f);
+			spriteBatch.DrawOnCtrl(ctrl, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref _selectorBounds)).get_Left(), ((Rectangle)(ref _selectorBounds)).get_Top(), width, _selectorBounds.Height), Rectangle.get_Empty(), borderColor * 0.8f);
+			spriteBatch.DrawOnCtrl(ctrl, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref _selectorBounds)).get_Right() - width, ((Rectangle)(ref _selectorBounds)).get_Top(), width, _selectorBounds.Height), Rectangle.get_Empty(), borderColor * 0.8f);
 		}
 
 		public static void DrawFrame(this SpriteBatch spriteBatch, Control ctrl, Rectangle _selectorBounds, Color borderColor, RectangleDimensions? borderDimensions)
@@ -135,10 +138,39 @@ namespace Kenedia.Modules.Core.Extensions
 			//IL_0140: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0146: Unknown result type (might be due to invalid IL or missing references)
 			RectangleDimensions border = borderDimensions ?? new RectangleDimensions(2);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, ctrl, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref _selectorBounds)).get_Left() + border.Left, ((Rectangle)(ref _selectorBounds)).get_Top(), _selectorBounds.Width - border.Horizontal, border.Top), (Rectangle?)Rectangle.get_Empty(), borderColor * 0.8f);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, ctrl, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref _selectorBounds)).get_Left() + border.Left, ((Rectangle)(ref _selectorBounds)).get_Bottom() - border.Bottom, _selectorBounds.Width - border.Horizontal, border.Bottom), (Rectangle?)Rectangle.get_Empty(), borderColor * 0.8f);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, ctrl, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref _selectorBounds)).get_Left(), ((Rectangle)(ref _selectorBounds)).get_Top(), border.Left, _selectorBounds.Height), (Rectangle?)Rectangle.get_Empty(), borderColor * 0.8f);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, ctrl, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref _selectorBounds)).get_Right() - border.Right, ((Rectangle)(ref _selectorBounds)).get_Top(), border.Right, _selectorBounds.Height), (Rectangle?)Rectangle.get_Empty(), borderColor * 0.8f);
+			spriteBatch.DrawOnCtrl(ctrl, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref _selectorBounds)).get_Left() + border.Left, ((Rectangle)(ref _selectorBounds)).get_Top(), _selectorBounds.Width - border.Horizontal, border.Top), Rectangle.get_Empty(), borderColor * 0.8f);
+			spriteBatch.DrawOnCtrl(ctrl, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref _selectorBounds)).get_Left() + border.Left, ((Rectangle)(ref _selectorBounds)).get_Bottom() - border.Bottom, _selectorBounds.Width - border.Horizontal, border.Bottom), Rectangle.get_Empty(), borderColor * 0.8f);
+			spriteBatch.DrawOnCtrl(ctrl, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref _selectorBounds)).get_Left(), ((Rectangle)(ref _selectorBounds)).get_Top(), border.Left, _selectorBounds.Height), Rectangle.get_Empty(), borderColor * 0.8f);
+			spriteBatch.DrawOnCtrl(ctrl, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref _selectorBounds)).get_Right() - border.Right, ((Rectangle)(ref _selectorBounds)).get_Top(), border.Right, _selectorBounds.Height), Rectangle.get_Empty(), borderColor * 0.8f);
+		}
+
+		public static void DrawHalfCircleOnCtrl(this SpriteBatch spriteBatch, Control ctrl, Rectangle destinationRectangle, float radius, int sides, Color color, float thickness = 1f, float layerDepth = 0f)
+		{
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+			Rectangle tDest = destinationRectangle.ToBounds(ctrl.AbsoluteBounds);
+			ShapeExtensions.DrawPolygon(spriteBatch, new Vector2((float)tDest.X, (float)tDest.Y), (IReadOnlyList<Vector2>)CreateHalfCircle(radius, sides), color, thickness, layerDepth);
+		}
+
+		private static Vector2[] CreateHalfCircle(double radius, int sides, float rotation = 0f)
+		{
+			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+			Vector2[] halfCircle = (Vector2[])(object)new Vector2[sides + 1];
+			double angleStep = Math.PI / (double)sides;
+			double currentAngle = MathHelper.ToRadians(rotation);
+			for (int i = 0; i <= sides; i++)
+			{
+				halfCircle[i] = new Vector2((float)(radius * Math.Cos(currentAngle)), (float)(radius * Math.Sin(currentAngle)));
+				currentAngle += angleStep;
+			}
+			return halfCircle;
 		}
 	}
 }

@@ -23,13 +23,30 @@ namespace Kenedia.Modules.Core.Controls
 
 		private AsyncTexture2D _alertImage = AsyncTexture2D.FromAssetId(222246);
 
-		private readonly (Button Button, DialogResult Result)[] _buttons;
+		private readonly (Button Button, DialogResult Result)[] _buttons = new(Button, DialogResult)[2]
+		{
+			(new Button
+			{
+				Text = "OK",
+				SelectedTint = true
+			}, DialogResult.OK),
+			(new Button
+			{
+				Text = "Cancel",
+				SelectedTint = true
+			}, DialogResult.Cancel)
+		};
 
-		private readonly FlowPanel _buttonPanel;
+		private readonly FlowPanel _buttonPanel = new FlowPanel
+		{
+			FlowDirection = ControlFlowDirection.SingleLeftToRight,
+			WidthSizingMode = SizingMode.AutoSize,
+			HeightSizingMode = SizingMode.AutoSize
+		};
 
 		private DialogResult _dialogResult;
 
-		private readonly EventWaitHandle _waitHandle;
+		private readonly EventWaitHandle _waitHandle = new EventWaitHandle(initialState: false, EventResetMode.ManualReset);
 
 		private Rectangle _titleBounds;
 
@@ -45,17 +62,18 @@ namespace Kenedia.Modules.Core.Controls
 
 		public string Message { get; private set; }
 
-		private BitmapFont TitleFont { get; set; } = GameService.Content.get_DefaultFont32();
+		private BitmapFont TitleFont { get; set; } = GameService.Content.DefaultFont32;
 
 
-		private BitmapFont Font { get; set; } = GameService.Content.get_DefaultFont16();
+		private BitmapFont Font { get; set; } = GameService.Content.DefaultFont16;
 
 
 		public ButtonDefinition[] Buttons { get; }
 
 		public int SelectedButtonIndex { get; private set; }
 
-		public bool AutoSize { get; set; }
+		public bool AutoSize { get; set; } = true;
+
 
 		public Color? ModalColor
 		{
@@ -69,77 +87,58 @@ namespace Kenedia.Modules.Core.Controls
 			}
 		}
 
-		public int DesiredWidth { get; set; }
+		public int DesiredWidth { get; set; } = 300;
+
 
 		public BaseDialog(string title, string message, ButtonDefinition[] buttons = null)
 		{
 			//IL_0143: Unknown result type (might be due to invalid IL or missing references)
 			//IL_014d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_019e: Unknown result type (might be due to invalid IL or missing references)
-			(Button, DialogResult)[] array = new(Button, DialogResult)[2];
-			Button button = new Button();
-			((StandardButton)button).set_Text("OK");
-			button.SelectedTint = true;
-			array[0] = (button, DialogResult.OK);
-			Button button2 = new Button();
-			((StandardButton)button2).set_Text("Cancel");
-			button2.SelectedTint = true;
-			array[1] = (button2, DialogResult.Cancel);
-			_buttons = array;
-			FlowPanel flowPanel = new FlowPanel();
-			((FlowPanel)flowPanel).set_FlowDirection((ControlFlowDirection)2);
-			((Container)flowPanel).set_WidthSizingMode((SizingMode)1);
-			((Container)flowPanel).set_HeightSizingMode((SizingMode)1);
-			_buttonPanel = flowPanel;
-			_waitHandle = new EventWaitHandle(initialState: false, EventResetMode.ManualReset);
-			AutoSize = true;
-			DesiredWidth = 300;
-			base._002Ector();
 			Title = title;
 			Message = message;
 			Buttons = buttons;
 			if (buttons != null)
 			{
-				_buttons = buttons.Select(delegate(ButtonDefinition x)
+				_buttons = buttons.Select((ButtonDefinition x) => (new Button
 				{
-					Button button3 = new Button();
-					((StandardButton)button3).set_Text(x.Title);
-					return (button3, x.Result);
-				}).ToArray();
+					Text = x.Title
+				}, x.Result)).ToArray();
 			}
-			Panel panel = new Panel();
-			((Control)panel).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			((Control)panel).set_ZIndex(2147483646);
-			panel.BackgroundColor = Color.get_White() * 0.2f;
-			((Container)panel).set_WidthSizingMode((SizingMode)2);
-			((Container)panel).set_HeightSizingMode((SizingMode)2);
-			((Control)panel).set_Visible(false);
-			_modalBackground = panel;
+			_modalBackground = new Panel
+			{
+				Parent = GameService.Graphics.SpriteScreen,
+				ZIndex = 2147483646,
+				BackgroundColor = Color.get_White() * 0.2f,
+				WidthSizingMode = SizingMode.Fill,
+				HeightSizingMode = SizingMode.Fill,
+				Visible = false
+			};
 			base.BackgroundImage = _backgroundImage;
-			((Control)this).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			((Control)this).set_ZIndex(int.MaxValue);
+			base.Parent = GameService.Graphics.SpriteScreen;
+			ZIndex = int.MaxValue;
 			base.BorderColor = Color.get_Black();
 			base.BorderWidth = new RectangleDimensions(3);
 			base.ContentPadding = new RectangleDimensions(5);
-			((Control)this).set_Height(115);
-			((Control)this).set_Width(300);
-			((Control)this).set_Visible(false);
-			((Control)_buttonPanel).set_Parent((Container)(object)this);
-			((Control)_buttonPanel).add_Resized((EventHandler<ResizedEventArgs>)ButtonPanel_Resized);
+			base.Height = 115;
+			base.Width = 300;
+			base.Visible = false;
+			_buttonPanel.Parent = this;
+			_buttonPanel.Resized += ButtonPanel_Resized;
 			BuildButtons();
 			SelectButton();
-			GameService.Input.get_Keyboard().add_KeyPressed((EventHandler<KeyboardEventArgs>)Keyboard_KeyPressed);
-			((Control)((Control)this).get_Parent()).add_Resized((EventHandler<ResizedEventArgs>)Parent_Resized);
+			GameService.Input.Keyboard.KeyPressed += Keyboard_KeyPressed;
+			base.Parent.Resized += Parent_Resized;
 		}
 
 		private void ButtonPanel_Resized(object sender, ResizedEventArgs e)
 		{
-			((Control)this).RecalculateLayout();
+			RecalculateLayout();
 		}
 
 		private void Parent_Resized(object sender, ResizedEventArgs e)
 		{
-			((Control)this).RecalculateLayout();
+			RecalculateLayout();
 		}
 
 		private void SelectButton(int direction = 0)
@@ -172,7 +171,7 @@ namespace Kenedia.Modules.Core.Controls
 			for (int i = 0; i < buttons.Length; i++)
 			{
 				(Button Button, DialogResult Result) button = buttons[i];
-				((Control)button.Button).set_Parent((Container)(object)_buttonPanel);
+				button.Button.Parent = _buttonPanel;
 				button.Button.ClickAction = delegate
 				{
 					_dialogResult = _buttons.Where(delegate((Button Button, DialogResult Result) b)
@@ -202,7 +201,7 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_001f: Invalid comparison between Unknown and I4
 			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0024: Invalid comparison between Unknown and I4
-			Keys key = e.get_Key();
+			Keys key = e.Key;
 			if ((int)key <= 27)
 			{
 				if ((int)key != 13)
@@ -241,12 +240,12 @@ namespace Kenedia.Modules.Core.Controls
 
 		public async Task<DialogResult> ShowDialog(TimeSpan timeout, CancellationToken cancellationToken = default(CancellationToken))
 		{
-			((Control)this).Show();
+			Show();
 			if (!(await _waitHandle.WaitOneAsync(timeout, cancellationToken)))
 			{
 				_dialogResult = DialogResult.None;
 			}
-			((Control)this).Hide();
+			Hide();
 			return _dialogResult;
 		}
 
@@ -274,25 +273,25 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_0288: Unknown result type (might be due to invalid IL or missing references)
 			//IL_029e: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
-			if (((Control)this).get_Parent() != null)
+			if (base.Parent != null)
 			{
-				((Control)this).set_Location(new Point((((Control)((Control)this).get_Parent()).get_Width() - ((Control)this).get_Width()) / 2, (((Control)((Control)this).get_Parent()).get_Height() - ((Control)this).get_Height()) / 2));
+				base.Location = new Point((base.Parent.Width - base.Width) / 2, (base.Parent.Height - base.Height) / 2);
 			}
-			base.TextureRectangle = new Rectangle(30, 30, Math.Min(((Control)this).get_Width(), _backgroundImage.get_Width() - 60), Math.Min(((Control)this).get_Height(), _backgroundImage.get_Height() - 60));
-			Rectangle contentRegion = ((Container)this).get_ContentRegion();
+			base.TextureRectangle = new Rectangle(30, 30, Math.Min(base.Width, _backgroundImage.Width - 60), Math.Min(base.Height, _backgroundImage.Height - 60));
+			Rectangle contentRegion = base.ContentRegion;
 			int left = ((Rectangle)(ref contentRegion)).get_Left();
-			contentRegion = ((Container)this).get_ContentRegion();
-			_titleBounds = new Rectangle(left, ((Rectangle)(ref contentRegion)).get_Top(), ((Container)this).get_ContentRegion().Width, TitleFont.get_LineHeight() + 2);
+			contentRegion = base.ContentRegion;
+			_titleBounds = new Rectangle(left, ((Rectangle)(ref contentRegion)).get_Top(), base.ContentRegion.Width, TitleFont.get_LineHeight() + 2);
 			_alertBounds = new Rectangle(((Rectangle)(ref _titleBounds)).get_Left(), ((Rectangle)(ref _titleBounds)).get_Top(), _titleBounds.Height, _titleBounds.Height);
 			_titleTextBounds = new Rectangle(((Rectangle)(ref _titleBounds)).get_Left() + _alertBounds.Width + 10, ((Rectangle)(ref _alertBounds)).get_Top(), _titleBounds.Width - _alertBounds.Width * 2, _titleBounds.Height);
-			_messageTextBounds = new Rectangle(((Rectangle)(ref _titleBounds)).get_Left(), ((Rectangle)(ref _titleBounds)).get_Bottom() + 5, _titleBounds.Width, ((Control)_buttonPanel).get_Top() - ((Rectangle)(ref _titleBounds)).get_Bottom() + 5);
+			_messageTextBounds = new Rectangle(((Rectangle)(ref _titleBounds)).get_Left(), ((Rectangle)(ref _titleBounds)).get_Bottom() + 5, _titleBounds.Width, _buttonPanel.Top - ((Rectangle)(ref _titleBounds)).get_Bottom() + 5);
 			if (AutoSize)
 			{
-				_message = DrawUtil.WrapText(Font, Message, (float)((Container)this).get_ContentRegion().Width);
-				((Control)this).set_Height(base.BorderWidth.Vertical + TitleFont.get_LineHeight() + 2 + 5 + (int)Font.GetStringRectangle(_message).Height + 15 + ((Control)_buttonPanel).get_Height() + base.ContentPadding.Vertical);
-				((Control)this).set_Width(Math.Max(DesiredWidth, base.ContentPadding.Horizontal + _alertBounds.Width * 2 + 10 + (int)TitleFont.GetStringRectangle(Title).Width));
+				_message = DrawUtil.WrapText(Font, Message, base.ContentRegion.Width);
+				base.Height = base.BorderWidth.Vertical + TitleFont.get_LineHeight() + 2 + 5 + (int)Font.GetStringRectangle(_message).Height + 15 + _buttonPanel.Height + base.ContentPadding.Vertical;
+				base.Width = Math.Max(DesiredWidth, base.ContentPadding.Horizontal + _alertBounds.Width * 2 + 10 + (int)TitleFont.GetStringRectangle(Title).Width);
 			}
-			((Control)_buttonPanel).set_Location(new Point((((Container)this).get_ContentRegion().Width - ((Control)_buttonPanel).get_Width()) / 2, ((Container)this).get_ContentRegion().Height - ((Control)_buttonPanel).get_Height()));
+			_buttonPanel.Location = new Point((base.ContentRegion.Width - _buttonPanel.Width) / 2, base.ContentRegion.Height - _buttonPanel.Height);
 		}
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
@@ -305,29 +304,21 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
 			base.PaintBeforeChildren(spriteBatch, bounds);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, Title, TitleFont, _titleTextBounds, Colors.ColonialWhite, false, (HorizontalAlignment)1, (VerticalAlignment)0);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, _message, Font, _messageTextBounds, Color.get_White(), false, (HorizontalAlignment)1, (VerticalAlignment)0);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_alertImage), _alertBounds, (Rectangle?)_alertImage.get_Bounds());
+			spriteBatch.DrawStringOnCtrl(this, Title, TitleFont, _titleTextBounds, ContentService.Colors.ColonialWhite, wrap: false, HorizontalAlignment.Center, VerticalAlignment.Top);
+			spriteBatch.DrawStringOnCtrl(this, _message, Font, _messageTextBounds, Color.get_White(), wrap: false, HorizontalAlignment.Center, VerticalAlignment.Top);
+			spriteBatch.DrawOnCtrl((Control)this, (Texture2D)_alertImage, _alertBounds, (Rectangle?)_alertImage.Bounds);
 		}
 
 		protected override void OnHidden(EventArgs e)
 		{
 			base.OnHidden(e);
-			Panel modalBackground = _modalBackground;
-			if (modalBackground != null)
-			{
-				((Control)modalBackground).Hide();
-			}
+			_modalBackground?.Hide();
 		}
 
 		protected override void OnShown(EventArgs e)
 		{
 			base.OnShown(e);
-			Panel modalBackground = _modalBackground;
-			if (modalBackground != null)
-			{
-				((Control)modalBackground).Show();
-			}
+			_modalBackground?.Show();
 		}
 
 		protected override void DisposeControl()
@@ -335,12 +326,8 @@ namespace Kenedia.Modules.Core.Controls
 			base.DisposeControl();
 			_backgroundImage = null;
 			_alertImage = null;
-			Panel modalBackground = _modalBackground;
-			if (modalBackground != null)
-			{
-				((Control)modalBackground).Dispose();
-			}
-			GameService.Input.get_Keyboard().remove_KeyPressed((EventHandler<KeyboardEventArgs>)Keyboard_KeyPressed);
+			_modalBackground?.Dispose();
+			GameService.Input.Keyboard.KeyPressed -= Keyboard_KeyPressed;
 		}
 	}
 }

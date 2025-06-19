@@ -25,8 +25,8 @@ namespace Kenedia.Modules.Core.Controls
 			base.RecalculateLayout();
 			if (Background != null)
 			{
-				Background.Bounds = new Rectangle(0, 0, ((Control)this).get_Width(), ((Control)this).get_Height());
-				Background.TextureRegion = new Rectangle(TexturePadding.Left, TexturePadding.Top, Math.Min(Background.Texture.get_Width(), ((Control)this).get_Width()) - TexturePadding.Horizontal, Math.Min(Background.Texture.get_Height(), ((Control)this).get_Height()) - TexturePadding.Vertical);
+				Background.Bounds = new Rectangle(0, 0, base.Width, base.Height);
+				Background.TextureRegion = new Rectangle(TexturePadding.Left, TexturePadding.Top, Math.Min(Background.Texture.Width, base.Width) - TexturePadding.Horizontal, Math.Min(Background.Texture.Height, base.Height) - TexturePadding.Vertical);
 			}
 		}
 
@@ -35,15 +35,14 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-			((Container)this).UpdateContainer(gameTime);
-			((Control)this).set_Location(Control.get_Input().get_Mouse().get_Position()
-				.Add(MouseOffset));
+			base.UpdateContainer(gameTime);
+			base.Location = Control.Input.Mouse.Position.Add(MouseOffset);
 		}
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
 			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-			Background?.Draw((Control)(object)this, spriteBatch);
+			Background?.Draw(this, spriteBatch);
 			base.PaintBeforeChildren(spriteBatch, bounds);
 		}
 	}

@@ -39,28 +39,28 @@ namespace Kenedia.Modules.Core.Models
 			{
 				return;
 			}
-			TValue val;
+			TValue val2;
 			if (v != null)
 			{
-				ref TValue reference = ref v;
-				val = default(TValue);
-				if (val == null)
+				ref TValue val = ref v;
+				val2 = default(TValue);
+				if (val2 == null)
 				{
-					val = reference;
-					reference = ref val;
+					val2 = val;
+					val = ref val2;
 				}
-				reference.PropertyChanged -= ItemProperty_Changed;
+				val.PropertyChanged -= ItemProperty_Changed;
 			}
 			if (value != null)
 			{
-				ref TValue reference2 = ref value;
-				val = default(TValue);
-				if (val == null)
+				ref TValue val3 = ref value;
+				val2 = default(TValue);
+				if (val2 == null)
 				{
-					val = reference2;
-					reference2 = ref val;
+					val2 = val3;
+					val3 = ref val2;
 				}
-				reference2.PropertyChanged += ItemProperty_Changed;
+				val3.PropertyChanged += ItemProperty_Changed;
 			}
 			base[key] = value;
 			this.ValueChanged?.Invoke(this, new DictionaryItemChangedEventArgs<TKey, TValue>(key, v, value));
@@ -86,20 +86,20 @@ namespace Kenedia.Modules.Core.Models
 		{
 			if (!ContainsKey(key))
 			{
-				ref TValue reference = ref value;
-				TValue val = default(TValue);
-				if (val == null)
+				ref TValue val = ref value;
+				TValue val2 = default(TValue);
+				if (val2 == null)
 				{
-					val = reference;
-					reference = ref val;
+					val2 = val;
+					val = ref val2;
 				}
-				reference.PropertyChanged += ItemProperty_Changed;
+				val.PropertyChanged += ItemProperty_Changed;
 				base.Add(key, value);
 				EventHandler<DictionaryItemChangedEventArgs<TKey, TValue>> valueChanged = this.ValueChanged;
 				if (valueChanged != null)
 				{
-					val = default(TValue);
-					valueChanged(this, new DictionaryItemChangedEventArgs<TKey, TValue>(key, val, value));
+					val2 = default(TValue);
+					valueChanged(this, new DictionaryItemChangedEventArgs<TKey, TValue>(key, val2, value));
 				}
 				this.CollectionChanged?.Invoke(this, new PropertyChangedEventArgs("Items"));
 			}

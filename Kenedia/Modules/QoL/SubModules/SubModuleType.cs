@@ -11,6 +11,7 @@ namespace Kenedia.Modules.QoL.SubModules
 		WaypointPaste,
 		WikiSearch,
 		CopyItemName,
-		SchemanticProcessing
+		SchemanticProcessing,
+		AutoSniff
 	}
 }

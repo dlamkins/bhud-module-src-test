@@ -23,7 +23,7 @@ namespace Kenedia.Modules.Core.Controls
 			set
 			{
 				_setLocalizedTooltip = value;
-				((Control)this).set_BasicTooltipText(value?.Invoke());
+				base.BasicTooltipText = value?.Invoke();
 			}
 		}
 
@@ -36,16 +36,15 @@ namespace Kenedia.Modules.Core.Controls
 			set
 			{
 				_setLocalizedText = value;
-				((ContextMenuStripItem)this).set_Text(value?.Invoke());
+				base.Text = value?.Invoke();
 			}
 		}
 
 		public Action OnClickAction { get; set; }
 
 		public ContextMenuItem()
-			: this()
 		{
-			LocalizingService.LocaleChanged += UserLocale_SettingChanged;
+			LocalizingService.LocaleChanged += new EventHandler<ValueChangedEventArgs<Locale>>(UserLocale_SettingChanged);
 			UserLocale_SettingChanged(null, null);
 		}
 
@@ -74,24 +73,24 @@ namespace Kenedia.Modules.Core.Controls
 		{
 			if (SetLocalizedText != null)
 			{
-				((ContextMenuStripItem)this).set_Text(SetLocalizedText?.Invoke());
+				base.Text = SetLocalizedText?.Invoke();
 			}
 			if (SetLocalizedTooltip != null)
 			{
-				((Control)this).set_BasicTooltipText(SetLocalizedTooltip?.Invoke());
+				base.BasicTooltipText = SetLocalizedTooltip?.Invoke();
 			}
 		}
 
 		protected override void OnClick(MouseEventArgs e)
 		{
-			((ContextMenuStripItem)this).OnClick(e);
+			base.OnClick(e);
 			OnClickAction?.Invoke();
 		}
 
 		protected override void DisposeControl()
 		{
-			((Control)this).DisposeControl();
-			LocalizingService.LocaleChanged -= UserLocale_SettingChanged;
+			base.DisposeControl();
+			LocalizingService.LocaleChanged -= new EventHandler<ValueChangedEventArgs<Locale>>(UserLocale_SettingChanged);
 		}
 	}
 }

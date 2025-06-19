@@ -25,7 +25,7 @@ namespace Kenedia.Modules.Core.Controls
 
 		private bool _choyaTargeted;
 
-		private int ChoyaSize => Math.Min(((Control)this).get_Width(), ((Control)this).get_Height());
+		private int ChoyaSize => Math.Min(base.Width, base.Height);
 
 		public int Steps { get; set; } = 360;
 
@@ -101,7 +101,6 @@ namespace Kenedia.Modules.Core.Controls
 		public event EventHandler ChoyaLeftBounds;
 
 		public RollingChoya()
-			: this()
 		{
 		}//IL_0008: Unknown result type (might be due to invalid IL or missing references)
 		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
@@ -114,7 +113,6 @@ namespace Kenedia.Modules.Core.Controls
 
 
 		public RollingChoya(InputDetectionService inputDetectionService)
-			: this()
 		{
 			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
@@ -125,30 +123,29 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
 			InputDetectionService = inputDetectionService;
-			inputDetectionService.MouseClicked += InputDetectionService_MouseClicked;
+			inputDetectionService.MouseClicked += new EventHandler<double>(InputDetectionService_MouseClicked);
 		}
 
 		private void InputDetectionService_MouseClicked(object sender, double e)
 		{
 			if (ChoyaHunt && _choyaTargeted)
 			{
-				((Control)this).OnClick((MouseEventArgs)null);
+				OnClick(null);
 			}
 		}
 
 		protected override CaptureType CapturesInput()
 		{
-			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
 			if (!CaptureInput)
 			{
-				return (CaptureType)0;
+				return CaptureType.None;
 			}
-			return ((Control)this).CapturesInput();
+			return base.CapturesInput();
 		}
 
 		protected override void OnClick(MouseEventArgs e)
 		{
-			((Control)this).OnClick(e);
+			base.OnClick(e);
 		}
 
 		public void ResetPosition()
@@ -166,9 +163,9 @@ namespace Kenedia.Modules.Core.Controls
 			}
 			else
 			{
-				int size = Math.Min(((Control)this).get_Width(), ((Control)this).get_Height());
-				Rectangle movementBounds = ((((Control)this).get_Parent() != null) ? ((Control)((Control)this).get_Parent()).get_AbsoluteBounds() : Rectangle.get_Empty());
-				((Control)this).set_Location(new Point((movementBounds.Width - size) / 2, (movementBounds.Height - size) / 2));
+				int size = Math.Min(base.Width, base.Height);
+				Rectangle movementBounds = ((base.Parent != null) ? base.Parent.AbsoluteBounds : Rectangle.get_Empty());
+				base.Location = new Point((movementBounds.Width - size) / 2, (movementBounds.Height - size) / 2);
 			}
 		}
 
@@ -209,50 +206,50 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_02f3: Unknown result type (might be due to invalid IL or missing references)
 			if (ChoyaTexture != null)
 			{
-				float rotation = (float)((GameService.Overlay.get_CurrentGameTime().get_TotalGameTime().TotalMilliseconds - _start) / (double)Steps);
+				float rotation = (float)((GameService.Overlay.CurrentGameTime.get_TotalGameTime().TotalMilliseconds - _start) / (double)Steps);
 				int choyaTargeted;
 				if (ChoyaHunt)
 				{
-					Rectangle absoluteBounds = ((Control)this).get_AbsoluteBounds();
-					choyaTargeted = (((Rectangle)(ref absoluteBounds)).Contains(Control.get_Input().get_Mouse().get_Position()) ? 1 : 0);
+					Rectangle absoluteBounds = base.AbsoluteBounds;
+					choyaTargeted = (((Rectangle)(ref absoluteBounds)).Contains(Control.Input.Mouse.Position) ? 1 : 0);
 				}
 				else
 				{
 					choyaTargeted = 0;
 				}
 				_choyaTargeted = (byte)choyaTargeted != 0;
-				Rectangle movementBounds = ((((Control)this).get_Parent() != null) ? ((Control)this).get_Parent().get_ContentRegion() : Rectangle.get_Empty());
-				int size = Math.Min(((Control)this).get_Width(), ((Control)this).get_Height());
-				int choyaSize = Math.Min(ChoyaTexture.get_Bounds().Width, ChoyaTexture.get_Bounds().Height);
+				Rectangle movementBounds = ((base.Parent != null) ? base.Parent.ContentRegion : Rectangle.get_Empty());
+				int size = Math.Min(base.Width, base.Height);
+				int choyaSize = Math.Min(ChoyaTexture.Bounds.Width, ChoyaTexture.Bounds.Height);
 				_xOffset += (CanMove ? TravelDistance.X : 0f);
 				_yOffset += (CanMove ? TravelDistance.Y : 0f);
 				Rectangle choyaRect = default(Rectangle);
 				((Rectangle)(ref choyaRect))._002Ector(new Point(size / 2), new Point(size));
 				if (CanMove)
 				{
-					((Control)this).set_Location(new Point(movementBounds.X + (int)(CanMove ? _xOffset : 0f), movementBounds.Y + (int)(CanMove ? _yOffset : 0f)));
+					base.Location = new Point(movementBounds.X + (int)(CanMove ? _xOffset : 0f), movementBounds.Y + (int)(CanMove ? _yOffset : 0f));
 				}
-				((Control)this).set_Size(new Point(size));
+				base.Size = new Point(size);
 				if (ChoyaTexture != null)
 				{
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(ChoyaTexture), choyaRect, (Rectangle?)ChoyaTexture.get_Bounds(), _choyaTargeted ? Color.get_Red() : TextureColor, rotation, new Vector2((float)(choyaSize / 2)), (SpriteEffects)0);
+					spriteBatch.DrawOnCtrl(this, ChoyaTexture, choyaRect, ChoyaTexture.Bounds, _choyaTargeted ? Color.get_Red() : TextureColor, rotation, new Vector2((float)(choyaSize / 2)), (SpriteEffects)0);
 				}
-				if ((float)movementBounds.Width < (float)((Control)this).get_Location().X + TravelDistance.X + (float)(choyaSize / 20))
+				if ((float)movementBounds.Width < (float)base.Location.X + TravelDistance.X + (float)(choyaSize / 20))
 				{
 					this.ChoyaLeftBounds?.Invoke(this, null);
 					_xOffset = -(int)((double)choyaSize * 0.7);
 				}
-				else if ((float)((Control)this).get_Location().X + TravelDistance.X < (float)(-(int)((double)choyaSize * 0.7)))
+				else if ((float)base.Location.X + TravelDistance.X < (float)(-(int)((double)choyaSize * 0.7)))
 				{
 					this.ChoyaLeftBounds?.Invoke(this, null);
 					_xOffset = movementBounds.Width - (int)((double)choyaSize * 0.05);
 				}
-				if ((float)movementBounds.Height < (float)((Control)this).get_Location().Y + TravelDistance.Y + (float)(choyaSize / 20))
+				if ((float)movementBounds.Height < (float)base.Location.Y + TravelDistance.Y + (float)(choyaSize / 20))
 				{
 					this.ChoyaLeftBounds?.Invoke(this, null);
 					_yOffset = -(int)((double)choyaSize * 0.7);
 				}
-				else if ((float)((Control)this).get_Location().Y + TravelDistance.Y < (float)(-(int)((double)choyaSize * 0.7)))
+				else if ((float)base.Location.Y + TravelDistance.Y < (float)(-(int)((double)choyaSize * 0.7)))
 				{
 					this.ChoyaLeftBounds?.Invoke(this, null);
 					_yOffset = movementBounds.Height - (int)((double)choyaSize * 0.05);
@@ -262,17 +259,17 @@ namespace Kenedia.Modules.Core.Controls
 
 		protected override void OnShown(EventArgs e)
 		{
-			((Control)this).OnShown(e);
-			_start = GameService.Overlay.get_CurrentGameTime().get_TotalGameTime().TotalMilliseconds;
+			base.OnShown(e);
+			_start = GameService.Overlay.CurrentGameTime.get_TotalGameTime().TotalMilliseconds;
 		}
 
 		protected override void DisposeControl()
 		{
-			((Control)this).DisposeControl();
+			base.DisposeControl();
 			ChoyaTexture = null;
 			if (InputDetectionService != null)
 			{
-				InputDetectionService.MouseClicked -= InputDetectionService_MouseClicked;
+				InputDetectionService.MouseClicked -= new EventHandler<double>(InputDetectionService_MouseClicked);
 			}
 		}
 	}

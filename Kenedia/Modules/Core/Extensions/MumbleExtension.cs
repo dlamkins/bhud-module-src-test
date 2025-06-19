@@ -16,26 +16,37 @@ namespace Kenedia.Modules.Core.Extensions
 			//IL_000d: Invalid comparison between Unknown and I4
 			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0012: Invalid comparison between Unknown and I4
-			MapType type = map.get_Type();
-			if ((int)type == 5 || (int)type == 7 || (int)type == 16)
+			MapType type = map.Type;
+			if (((int)type != 5 && (int)type != 7 && (int)type != 16) || 1 == 0)
 			{
-				return true;
+				return map.IsHomesteadMap();
+			}
+			return true;
+		}
+
+		public static bool IsHomesteadMap(this CurrentMap map)
+		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0007: Invalid comparison between Unknown and I4
+			if ((int)map.Type == 4)
+			{
+				return map.Id == 1558;
 			}
 			return false;
 		}
 
 		public static bool IsPvpMap(this CurrentMap map)
 		{
-			return new List<int>
+			return new List<int>(15)
 			{
 				549, 1305, 1171, 554, 795, 1163, 900, 894, 875, 984,
 				1011, 1201, 1328, 1275, 1200
-			}.Contains(map.get_Id());
+			}.Contains(map.Id);
 		}
 
 		public static bool IsWvWMap(this CurrentMap map)
 		{
-			return new List<int> { 38, 95, 96, 1099, 899, 968 }.Contains(map.get_Id());
+			return new List<int>(6) { 38, 95, 96, 1099, 899, 968 }.Contains(map.Id);
 		}
 
 		public static bool IsCompetitiveMap(this CurrentMap map)

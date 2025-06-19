@@ -10,18 +10,21 @@ using Blish_HUD.Modules;
 using Blish_HUD.Settings;
 using Kenedia.Modules.Core.Controls;
 using Kenedia.Modules.Core.Models;
-using Kenedia.Modules.Core.Views;
+using Kenedia.Modules.Core.Services;
 using Kenedia.Modules.QoL.Controls;
 using Kenedia.Modules.QoL.Services;
 using Kenedia.Modules.QoL.SubModules;
+using Kenedia.Modules.QoL.SubModules.AutoSniff;
 using Kenedia.Modules.QoL.SubModules.CopyItemName;
 using Kenedia.Modules.QoL.SubModules.GameResets;
 using Kenedia.Modules.QoL.SubModules.ItemDestruction;
+using Kenedia.Modules.QoL.SubModules.SchemanticProcessing;
 using Kenedia.Modules.QoL.SubModules.SkipCutscenes;
 using Kenedia.Modules.QoL.SubModules.WaypointPaste;
 using Kenedia.Modules.QoL.SubModules.WikiSearch;
 using Kenedia.Modules.QoL.SubModules.ZoomOut;
 using Kenedia.Modules.QoL.Views;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -34,6 +37,9 @@ namespace Kenedia.Modules.QoL
 
 		public ModuleHotbar Hotbar { get; set; }
 
+		public ClientWindowService ClientWindowService { get; } = new ClientWindowService();
+
+
 		public Dictionary<SubModuleType, SubModule> SubModules { get; } = new Dictionary<SubModuleType, SubModule>();
 
 
@@ -41,7 +47,6 @@ namespace Kenedia.Modules.QoL
 		public QoL([Import("ModuleParameters")] ModuleParameters moduleParameters)
 			: base(moduleParameters)
 		{
-			BaseModule<QoL, StandardWindow, Settings, PathCollection>.ModuleInstance = this;
 			HasGUI = true;
 			AutoLoadGUI = true;
 		}
@@ -49,45 +54,54 @@ namespace Kenedia.Modules.QoL
 		protected override void DefineSettings(SettingCollection settings)
 		{
 			base.DefineSettings(settings);
-			base.Settings = new Settings(settings);
-			base.Settings.HotbarExpandDirection.add_SettingChanged((EventHandler<ValueChangedEventArgs<ExpandType>>)HotbarExpandDirection_SettingChanged);
-			base.Settings.HotbarButtonSorting.add_SettingChanged((EventHandler<ValueChangedEventArgs<SortType>>)HotbarButtonSorting_SettingChanged);
+			base.Settings.HotbarExpandDirection.SettingChanged += HotbarExpandDirection_SettingChanged;
+			base.Settings.HotbarButtonSorting.SettingChanged += HotbarButtonSorting_SettingChanged;
 		}
 
-		private void HotbarButtonSorting_SettingChanged(object sender, ValueChangedEventArgs<SortType> e)
+		private void HotbarButtonSorting_SettingChanged(object sender, Blish_HUD.ValueChangedEventArgs<SortType> e)
 		{
 			if (Hotbar != null)
 			{
-				Hotbar.SortType = e.get_NewValue();
+				Hotbar.SortType = e.NewValue;
 			}
 		}
 
-		private void HotbarExpandDirection_SettingChanged(object sender, ValueChangedEventArgs<ExpandType> e)
+		private void HotbarExpandDirection_SettingChanged(object sender, Blish_HUD.ValueChangedEventArgs<ExpandType> e)
 		{
 			if (Hotbar != null)
 			{
-				Hotbar.ExpandType = e.get_NewValue();
+				Hotbar.ExpandType = e.NewValue;
 			}
 		}
 
 		public override IView GetSettingsView()
 		{
-			return (IView)(object)new SettingsView(delegate
+			return new SettingsView(delegate
 			{
-				BaseSettingsWindow settingsWindow = base.SettingsWindow;
-				if (settingsWindow != null)
-				{
-					((WindowBase2)settingsWindow).ToggleWindow();
-				}
+				base.SettingsWindow?.ToggleWindow();
 			});
 		}
 
 		protected override void Initialize()
 		{
 			base.Initialize();
-			base.Paths = new PathCollection(base.DirectoriesManager, ((Module)this).get_Name());
-			BaseModule<QoL, StandardWindow, Settings, PathCollection>.Logger.Info("Starting " + ((Module)this).get_Name() + " v." + (object)((Module)this).get_Version().BaseVersion());
+			BaseModule<QoL, StandardWindow, Settings, PathCollection>.Logger.Info("Starting " + base.Name + " v." + (object)base.Version.BaseVersion());
 			LoadSubModules();
+		}
+
+		protected override ServiceCollection DefineServices(ServiceCollection services)
+		{
+			ServiceCollection result = base.DefineServices(services);
+			services.AddSingleton<GameResets>();
+			services.AddSingleton<ZoomOut>();
+			services.AddSingleton<SkipCutscenes>();
+			services.AddSingleton<ItemDestruction>();
+			services.AddSingleton<WikiSearch>();
+			services.AddSingleton<WaypointPaste>();
+			services.AddSingleton<CopyItemName>();
+			services.AddSingleton<SchemanticProcessing>();
+			services.AddSingleton<AutoSniff>();
+			return result;
 		}
 
 		protected override async Task LoadAsync()
@@ -105,7 +119,7 @@ namespace Kenedia.Modules.QoL
 			base.Update(gameTime);
 			if (Hotbar != null)
 			{
-				((Control)Hotbar).set_Visible(GameService.GameIntegration.get_Gw2Instance().get_IsInGame() && !GameService.Gw2Mumble.get_UI().get_IsMapOpen());
+				Hotbar.Visible = GameService.GameIntegration.Gw2Instance.IsInGame && !GameService.Gw2Mumble.UI.IsMapOpen;
 			}
 			foreach (KeyValuePair<SubModuleType, SubModule> subModule in SubModules)
 			{
@@ -122,60 +136,46 @@ namespace Kenedia.Modules.QoL
 			//IL_0148: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0162: Unknown result type (might be due to invalid IL or missing references)
 			base.LoadGUI();
-			ModuleHotbar hotbar = Hotbar;
-			if (hotbar != null)
+			Hotbar?.Dispose();
+			Hotbar = new ModuleHotbar
 			{
-				((Control)hotbar).Dispose();
-			}
-			ModuleHotbar moduleHotbar = new ModuleHotbar();
-			((Control)moduleHotbar).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			moduleHotbar.TextureRectangle = new Rectangle(new Point(50, 50), new Point(200, 50));
-			((Control)moduleHotbar).set_Location(base.Settings.HotbarPosition.get_Value());
-			moduleHotbar.ExpandType = base.Settings.HotbarExpandDirection.get_Value();
-			moduleHotbar.SortType = base.Settings.HotbarButtonSorting.get_Value();
-			moduleHotbar.OnMoveAction = delegate(Point p)
-			{
-				//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-				base.Settings.HotbarPosition.set_Value(p);
-			};
-			moduleHotbar.OpenSettingsAction = delegate
-			{
-				BaseSettingsWindow settingsWindow2 = base.SettingsWindow;
-				if (settingsWindow2 != null)
+				Parent = GameService.Graphics.SpriteScreen,
+				TextureRectangle = new Rectangle(new Point(50, 50), new Point(200, 50)),
+				Location = base.Settings.HotbarPosition.Value,
+				ExpandType = base.Settings.HotbarExpandDirection.Value,
+				SortType = base.Settings.HotbarButtonSorting.Value,
+				OnMoveAction = delegate(Point p)
 				{
-					((WindowBase2)settingsWindow2).ToggleWindow();
+					//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+					base.Settings.HotbarPosition.Value = p;
+				},
+				OpenSettingsAction = delegate
+				{
+					base.SettingsWindow?.ToggleWindow();
 				}
 			};
-			Hotbar = moduleHotbar;
 			foreach (SubModule subModule in SubModules.Values)
 			{
-				Hotbar.AddItem((ICheckable)(object)subModule.ToggleControl);
+				Hotbar.AddItem(subModule.ToggleControl);
 			}
 			AsyncTexture2D settingsBg = AsyncTexture2D.FromAssetId(155997);
-			Texture2D cutSettingsBg = Texture2DExtension.GetRegion(settingsBg.get_Texture(), 0, 0, settingsBg.get_Width() - 482, settingsBg.get_Height() - 390);
-			SettingsWindow settingsWindow = new SettingsWindow(settingsBg, new Rectangle(30, 30, cutSettingsBg.get_Width() + 10, cutSettingsBg.get_Height()), new Rectangle(30, 35, cutSettingsBg.get_Width() - 5, cutSettingsBg.get_Height() - 15), base.Settings, base.SharedSettingsView, SubModules);
-			((Control)settingsWindow).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			((WindowBase2)settingsWindow).set_Title("❤");
-			((WindowBase2)settingsWindow).set_Subtitle("❤");
-			((WindowBase2)settingsWindow).set_SavesPosition(true);
-			((WindowBase2)settingsWindow).set_Id(((Module)this).get_Name() + " SettingsWindow");
-			settingsWindow.Version = base.ModuleVersion;
-			base.SettingsWindow = settingsWindow;
+			Texture2D cutSettingsBg = settingsBg.Texture.GetRegion(0, 0, settingsBg.Width - 482, settingsBg.Height - 390);
+			base.SettingsWindow = new SettingsWindow(settingsBg, new Rectangle(30, 30, cutSettingsBg.get_Width() + 10, cutSettingsBg.get_Height()), new Rectangle(30, 35, cutSettingsBg.get_Width() - 5, cutSettingsBg.get_Height() - 15), base.Settings, base.SharedSettingsView, SubModules)
+			{
+				Parent = GameService.Graphics.SpriteScreen,
+				Title = "❤",
+				Subtitle = "❤",
+				SavesPosition = true,
+				Id = base.Name + " SettingsWindow",
+				Version = base.ModuleVersion
+			};
 		}
 
 		protected override void UnloadGUI()
 		{
 			base.UnloadGUI();
-			BaseSettingsWindow settingsWindow = base.SettingsWindow;
-			if (settingsWindow != null)
-			{
-				((Control)settingsWindow).Dispose();
-			}
-			ModuleHotbar hotbar = Hotbar;
-			if (hotbar != null)
-			{
-				((Control)hotbar).Dispose();
-			}
+			base.SettingsWindow?.Dispose();
+			Hotbar?.Dispose();
 		}
 
 		protected override void Unload()
@@ -186,13 +186,13 @@ namespace Kenedia.Modules.QoL
 				value?.Unload();
 			}
 			SubModules.Clear();
-			base.Settings.HotbarExpandDirection.remove_SettingChanged((EventHandler<ValueChangedEventArgs<ExpandType>>)HotbarExpandDirection_SettingChanged);
-			base.Settings.HotbarButtonSorting.remove_SettingChanged((EventHandler<ValueChangedEventArgs<SortType>>)HotbarButtonSorting_SettingChanged);
+			base.Settings.HotbarExpandDirection.SettingChanged -= HotbarExpandDirection_SettingChanged;
+			base.Settings.HotbarButtonSorting.SettingChanged -= HotbarButtonSorting_SettingChanged;
 		}
 
 		protected override void ReloadKey_Activated(object sender, EventArgs e)
 		{
-			BaseModule<QoL, StandardWindow, Settings, PathCollection>.Logger.Debug("ReloadKey_Activated: " + ((Module)this).get_Name());
+			BaseModule<QoL, StandardWindow, Settings, PathCollection>.Logger.Debug("ReloadKey_Activated: " + base.Name);
 			base.ReloadKey_Activated(sender, e);
 			foreach (SubModule value in SubModules.Values)
 			{
@@ -204,13 +204,15 @@ namespace Kenedia.Modules.QoL
 
 		private void LoadSubModules()
 		{
-			SubModules.Add(SubModuleType.GameResets, new GameResets(base.SettingCollection));
-			SubModules.Add(SubModuleType.ZoomOut, new ZoomOut(base.SettingCollection));
-			SubModules.Add(SubModuleType.SkipCutscenes, new SkipCutscenes(base.SettingCollection, base.Services.GameStateDetectionService));
-			SubModules.Add(SubModuleType.ItemDestruction, new ItemDestruction(base.SettingCollection));
-			SubModules.Add(SubModuleType.WikiSearch, new WikiSearch(base.SettingCollection));
-			SubModules.Add(SubModuleType.WaypointPaste, new WaypointPaste(base.SettingCollection));
-			SubModules.Add(SubModuleType.CopyItemName, new CopyItemName(base.SettingCollection));
+			SubModules.Add(SubModuleType.GameResets, ServiceProviderServiceExtensions.GetRequiredService<GameResets>(base.ServiceProvider));
+			SubModules.Add(SubModuleType.ZoomOut, ServiceProviderServiceExtensions.GetRequiredService<ZoomOut>(base.ServiceProvider));
+			SubModules.Add(SubModuleType.SkipCutscenes, ServiceProviderServiceExtensions.GetRequiredService<SkipCutscenes>(base.ServiceProvider));
+			SubModules.Add(SubModuleType.ItemDestruction, ServiceProviderServiceExtensions.GetRequiredService<ItemDestruction>(base.ServiceProvider));
+			SubModules.Add(SubModuleType.WikiSearch, ServiceProviderServiceExtensions.GetRequiredService<WikiSearch>(base.ServiceProvider));
+			SubModules.Add(SubModuleType.WaypointPaste, ServiceProviderServiceExtensions.GetRequiredService<WaypointPaste>(base.ServiceProvider));
+			SubModules.Add(SubModuleType.CopyItemName, ServiceProviderServiceExtensions.GetRequiredService<CopyItemName>(base.ServiceProvider));
+			SubModules.Add(SubModuleType.SchemanticProcessing, ServiceProviderServiceExtensions.GetRequiredService<SchemanticProcessing>(base.ServiceProvider));
+			SubModules.Add(SubModuleType.AutoSniff, ServiceProviderServiceExtensions.GetRequiredService<AutoSniff>(base.ServiceProvider));
 			foreach (SubModule value in SubModules.Values)
 			{
 				value?.Load();

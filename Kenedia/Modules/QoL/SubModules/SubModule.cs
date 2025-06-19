@@ -1,10 +1,10 @@
 using System;
-using System.Collections.Generic;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Blish_HUD.Settings;
+using Gw2Sharp.WebApi;
 using Kenedia.Modules.Core.Controls;
 using Kenedia.Modules.Core.Extensions;
 using Kenedia.Modules.Core.Models;
@@ -46,7 +46,7 @@ namespace Kenedia.Modules.QoL.SubModules
 			}
 			set
 			{
-				Common.SetProperty(ref _enabled, value, OnEnabledChanged);
+				Common.SetProperty(ref _enabled, value, new ValueChangedEventHandler<bool>(OnEnabledChanged));
 			}
 		}
 
@@ -96,47 +96,37 @@ namespace Kenedia.Modules.QoL.SubModules
 			Name = SubModuleType.ToString();
 			Icon = new DetailedTexture
 			{
-				Texture = AsyncTexture2D.op_Implicit(BaseModule<QoL, StandardWindow, Kenedia.Modules.QoL.Services.Settings, PathCollection>.ModuleInstance.ContentsManager.GetTexture($"textures\\{SubModuleType}.png")),
-				HoveredTexture = AsyncTexture2D.op_Implicit(BaseModule<QoL, StandardWindow, Kenedia.Modules.QoL.Services.Settings, PathCollection>.ModuleInstance.ContentsManager.GetTexture($"textures\\{SubModuleType}_Hovered.png"))
+				Texture = (AsyncTexture2D)BaseModule<QoL, StandardWindow, Kenedia.Modules.QoL.Services.Settings, PathCollection>.ModuleInstance.ContentsManager.GetTexture($"textures\\{SubModuleType}.png"),
+				HoveredTexture = (AsyncTexture2D)BaseModule<QoL, StandardWindow, Kenedia.Modules.QoL.Services.Settings, PathCollection>.ModuleInstance.ContentsManager.GetTexture($"textures\\{SubModuleType}_Hovered.png")
 			};
-			ModuleButton obj = new ModuleButton
+			ToggleControl = new ModuleButton
 			{
-				Icon = Icon
+				Icon = Icon,
+				BasicTooltipText = SubModuleType.ToString(),
+				Checked = EnabledSetting.Value,
+				Size = new Point(32),
+				Visible = EnabledSetting.Value,
+				OnCheckChanged = delegate(bool b)
+				{
+					Enabled = b;
+				},
+				Module = this
 			};
-			((Control)obj).set_BasicTooltipText(SubModuleType.ToString());
-			obj.Checked = EnabledSetting.get_Value();
-			((Control)obj).set_Size(new Point(32));
-			((Control)obj).set_Visible(EnabledSetting.get_Value());
-			obj.OnCheckChanged = delegate(bool b)
-			{
-				Enabled = b;
-			};
-			obj.Module = this;
-			ToggleControl = obj;
 		}
 
 		public abstract void Update(GameTime gameTime);
 
-		public abstract void CreateSettingsPanel(FlowPanel flowPanel, int width);
+		public abstract void CreateSettingsPanel(Kenedia.Modules.Core.Controls.FlowPanel flowPanel, int width);
 
-		private void OnEnabledChanged(object sender, ValueChangedEventArgs<bool> e)
+		private void OnEnabledChanged(object sender, Kenedia.Modules.Core.Models.ValueChangedEventArgs<bool> e)
 		{
 			(e.NewValue ? new Action(Enable) : new Action(Disable))();
-			EnabledSetting.set_Value((e.NewValue ? ((byte)1) : ((byte)0)) != 0);
+			EnabledSetting.Value = (e.NewValue ? ((byte)1) : ((byte)0)) != 0;
 			HotbarButton toggle = ToggleControl;
-			if (toggle == null)
+			if (toggle != null)
 			{
-				return;
-			}
-			toggle.Checked = Enabled;
-			ModuleButton toggleControl = ToggleControl;
-			if (toggleControl != null)
-			{
-				Container parent = ((Control)toggleControl).get_Parent();
-				if (parent != null)
-				{
-					((Control)parent).RecalculateLayout();
-				}
+				toggle.Checked = Enabled;
+				ToggleControl?.Parent?.RecalculateLayout();
 			}
 		}
 
@@ -163,38 +153,25 @@ namespace Kenedia.Modules.QoL.SubModules
 
 		protected virtual void DefineSettings(SettingCollection settings)
 		{
-			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0076: Expected O, but got Unknown
-			Settings = settings.AddSubCollection($"{SubModuleType}", true);
-			Settings.set_RenderInUi(false);
-			EnabledSetting = Settings.DefineSetting<bool>("EnabledSetting", false, (Func<string>)null, (Func<string>)null);
-			HotKey = Settings.DefineSetting<KeyBinding>("HotKey", new KeyBinding((Keys)0), (Func<string>)(() => string.Format(strings.HotkeyEntry_Name, $"{SubModuleType}")), (Func<string>)(() => string.Format(strings.HotkeyEntry_Description, $"{SubModuleType}")));
-			ShowInHotbar = Settings.DefineSetting<bool>("ShowInHotbar", true, (Func<string>)(() => string.Format(strings.ShowInHotbar_Name, $"{SubModuleType}")), (Func<string>)(() => string.Format(strings.ShowInHotbar_Description, $"{SubModuleType}")));
-			HotKey.get_Value().set_Enabled(true);
-			HotKey.get_Value().add_Activated((EventHandler<EventArgs>)HotKey_Activated);
-			ShowInHotbar.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowInHotbar_SettingChanged);
+			Settings = settings.AddSubCollection($"{SubModuleType}", lazyLoaded: true);
+			Settings.RenderInUi = false;
+			EnabledSetting = Settings.DefineSetting("EnabledSetting", defaultValue: false);
+			HotKey = Settings.DefineSetting("HotKey", new KeyBinding((Keys)0), () => string.Format(strings.HotkeyEntry_Name, $"{SubModuleType}"), () => string.Format(strings.HotkeyEntry_Description, $"{SubModuleType}"));
+			ShowInHotbar = Settings.DefineSetting("ShowInHotbar", defaultValue: true, () => string.Format(strings.ShowInHotbar_Name, $"{SubModuleType}"), () => string.Format(strings.ShowInHotbar_Description, $"{SubModuleType}"));
+			HotKey.Value.Enabled = true;
+			HotKey.Value.Activated += HotKey_Activated;
+			ShowInHotbar.SettingChanged += ShowInHotbar_SettingChanged;
 		}
 
-		private void ShowInHotbar_SettingChanged(object sender, ValueChangedEventArgs<bool> e)
+		private void ShowInHotbar_SettingChanged(object sender, Blish_HUD.ValueChangedEventArgs<bool> e)
 		{
 			if (ToggleControl != null)
 			{
-				ModuleButton toggleControl = ToggleControl;
-				object obj;
-				if (toggleControl == null)
-				{
-					obj = null;
-				}
-				else
-				{
-					Container parent = ((Control)toggleControl).get_Parent();
-					obj = ((parent != null) ? ((Control)parent).get_Parent() : null);
-				}
-				ModuleHotbar moduleHotbar = obj as ModuleHotbar;
+				ModuleHotbar moduleHotbar = ToggleControl?.Parent?.Parent as ModuleHotbar;
 				if (moduleHotbar != null)
 				{
 					moduleHotbar.SetButtonsExpanded();
-					((Control)moduleHotbar).RecalculateLayout();
+					moduleHotbar.RecalculateLayout();
 				}
 			}
 		}
@@ -209,9 +186,9 @@ namespace Kenedia.Modules.QoL.SubModules
 			if (!_loaded)
 			{
 				_loaded = true;
-				LocalizingService.LocaleChanged += LocalizingService_LocaleChanged;
+				LocalizingService.LocaleChanged += new EventHandler<Blish_HUD.ValueChangedEventArgs<Locale>>(LocalizingService_LocaleChanged);
 				LocalizingService_LocaleChanged();
-				Enabled = EnabledSetting.get_Value();
+				Enabled = EnabledSetting.Value;
 			}
 		}
 
@@ -220,14 +197,10 @@ namespace Kenedia.Modules.QoL.SubModules
 			if (!_unloaded)
 			{
 				_unloaded = true;
-				ModuleButton toggleControl = ToggleControl;
-				if (toggleControl != null)
-				{
-					((Control)toggleControl).Dispose();
-				}
-				((IEnumerable<IDisposable>)UI_Elements).DisposeAll();
-				HotKey.get_Value().remove_Activated((EventHandler<EventArgs>)HotKey_Activated);
-				LocalizingService.LocaleChanged -= LocalizingService_LocaleChanged;
+				ToggleControl?.Dispose();
+				UI_Elements.DisposeAll();
+				HotKey.Value.Activated -= HotKey_Activated;
+				LocalizingService.LocaleChanged -= new EventHandler<Blish_HUD.ValueChangedEventArgs<Locale>>(LocalizingService_LocaleChanged);
 			}
 		}
 	}

@@ -17,9 +17,9 @@ namespace Kenedia.Modules.Core.Views
 
 		private readonly AsyncTexture2D _textureSplitLine = AsyncTexture2D.FromAssetId(605024);
 
-		private readonly Texture2D _textureBlackFade = Control.get_Content().GetTexture("fade-down-46");
+		private readonly Texture2D _textureBlackFade = Control.Content.GetTexture("fade-down-46");
 
-		private readonly Texture2D _textureTabActive = Control.get_Content().GetTexture("window-tab-active");
+		private readonly Texture2D _textureTabActive = Control.Content.GetTexture("window-tab-active");
 
 		private readonly int _tabHeight = 52;
 
@@ -79,7 +79,7 @@ namespace Kenedia.Modules.Core.Views
 			}
 			set
 			{
-				if (((Control)this).SetProperty<int>(ref _selectedTabIndex, value, true, "SelectedTabIndex"))
+				if (SetProperty(ref _selectedTabIndex, value, invalidateLayout: true, "SelectedTabIndex"))
 				{
 					OnTabChanged();
 				}
@@ -94,26 +94,24 @@ namespace Kenedia.Modules.Core.Views
 			}
 			set
 			{
-				((Control)this).SetProperty<int>(ref _hoveredTabIndex, value, false, "HoveredTabIndex");
+				SetProperty(ref _hoveredTabIndex, value, invalidateLayout: false, "HoveredTabIndex");
 			}
 		}
 
 		public BaseTabbedWindow()
-			: this()
 		{
 			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
 			//IL_010b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0121: Unknown result type (might be due to invalid IL or missing references)
 			//IL_013a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0158: Unknown result type (might be due to invalid IL or missing references)
 			//IL_017c: Unknown result type (might be due to invalid IL or missing references)
 			_standardTabBounds = new Rectangle(_tabSectionWidth, 24, _tabWidth, _tabHeight);
-			_background = Texture2DExtension.GetRegion(_rawbackground.get_Texture(), 0, 0, _rawbackground.get_Width(), _rawbackground.get_Height());
-			_tabBarBackground = Texture2DExtension.SetRegion(Texture2DExtension.Duplicate(_background), 0, 0, 64, _background.get_Height(), Color.get_Transparent());
-			((WindowBase)this).ConstructWindow((Texture2D)null, new Vector2(0f), (Rectangle?)new Rectangle(0, 0, _windowContentWidth + 64, _windowContentHeight + 30), new Thickness(30f, 75f, 45f, 25f), 40, true);
-			((Container)this)._contentRegion = new Rectangle(_tabWidth / 2, 48, _windowContentWidth, _windowContentHeight);
-			_rawbackground.add_TextureSwapped((EventHandler<ValueChangedEventArgs<Texture2D>>)Background_TextureSwapped);
+			_background = _rawbackground.Texture.GetRegion(0, 0, _rawbackground.Width, _rawbackground.Height);
+			_tabBarBackground = _background.Duplicate().SetRegion(0, 0, 64, _background.get_Height(), Color.get_Transparent());
+			ConstructWindow((Texture2D)null, new Vector2(0f), (Rectangle?)new Rectangle(0, 0, _windowContentWidth + 64, _windowContentHeight + 30), new Thickness(30f, 75f, 45f, 25f), 40, standardWindow: true);
+			_contentRegion = new Rectangle(_tabWidth / 2, 48, _windowContentWidth, _windowContentHeight);
+			_rawbackground.TextureSwapped += Background_TextureSwapped;
 		}
 
 		private void Background_TextureSwapped(object sender, ValueChangedEventArgs<Texture2D> e)
@@ -124,8 +122,8 @@ namespace Kenedia.Modules.Core.Views
 		private void ApplyBackground()
 		{
 			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-			_background = Texture2DExtension.GetRegion(_rawbackground.get_Texture(), 0, 0, _rawbackground.get_Width(), _rawbackground.get_Height());
-			_tabBarBackground = Texture2DExtension.SetRegion(Texture2DExtension.Duplicate(_background), 0, 0, 64, _background.get_Height(), Color.get_Transparent());
+			_background = _rawbackground.Texture.GetRegion(0, 0, _rawbackground.Width, _rawbackground.Height);
+			_tabBarBackground = _background.Duplicate().SetRegion(0, 0, 64, _background.get_Height(), Color.get_Transparent());
 		}
 
 		public override void RecalculateLayout()
@@ -155,23 +153,23 @@ namespace Kenedia.Modules.Core.Views
 			//IL_0140: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0162: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0167: Unknown result type (might be due to invalid IL or missing references)
-			((WindowBase)this).RecalculateLayout();
+			base.RecalculateLayout();
 			if (_tabs.Count != 0)
 			{
 				Rectangle firstTabBounds = TabBoundsFromIndex(0);
 				Rectangle selectedTabBounds = _tabRegions[SelectedTab];
 				Rectangle lastTabBounds = TabBoundsFromIndex(_tabRegions.Count - 1);
 				_layoutTopTabBarBounds = new Rectangle(0, 0, _tabSectionWidth, ((Rectangle)(ref firstTabBounds)).get_Top());
-				_layoutBottomTabBarBounds = new Rectangle(0, ((Rectangle)(ref lastTabBounds)).get_Bottom(), _tabSectionWidth, ((Control)this)._size.Y - ((Rectangle)(ref lastTabBounds)).get_Bottom());
+				_layoutBottomTabBarBounds = new Rectangle(0, ((Rectangle)(ref lastTabBounds)).get_Bottom(), _tabSectionWidth, _size.Y - ((Rectangle)(ref lastTabBounds)).get_Bottom());
 				int top = ((Rectangle)(ref selectedTabBounds)).get_Top();
-				Rectangle contentRegion = ((Container)this).get_ContentRegion();
+				Rectangle contentRegion = base.ContentRegion;
 				int topSplitHeight = top - ((Rectangle)(ref contentRegion)).get_Top();
-				contentRegion = ((Container)this).get_ContentRegion();
+				contentRegion = base.ContentRegion;
 				int bottomSplitHeight = ((Rectangle)(ref contentRegion)).get_Bottom() - ((Rectangle)(ref selectedTabBounds)).get_Bottom();
-				_layoutTopSplitLineBounds = new Rectangle(((Container)this).get_ContentRegion().X - _textureSplitLine.get_Width() + 1, ((Container)this).get_ContentRegion().Y, _textureSplitLine.get_Width(), topSplitHeight);
-				_layoutTopSplitLineSourceBounds = new Rectangle(0, 0, _textureSplitLine.get_Width(), topSplitHeight);
-				_layoutBottomSplitLineBounds = new Rectangle(((Container)this).get_ContentRegion().X - _textureSplitLine.get_Width() + 1, ((Rectangle)(ref selectedTabBounds)).get_Bottom(), _textureSplitLine.get_Width(), bottomSplitHeight);
-				_layoutBottomSplitLineSourceBounds = new Rectangle(0, _textureSplitLine.get_Height() - bottomSplitHeight, _textureSplitLine.get_Width(), bottomSplitHeight);
+				_layoutTopSplitLineBounds = new Rectangle(base.ContentRegion.X - _textureSplitLine.Width + 1, base.ContentRegion.Y, _textureSplitLine.Width, topSplitHeight);
+				_layoutTopSplitLineSourceBounds = new Rectangle(0, 0, _textureSplitLine.Width, topSplitHeight);
+				_layoutBottomSplitLineBounds = new Rectangle(base.ContentRegion.X - _textureSplitLine.Width + 1, ((Rectangle)(ref selectedTabBounds)).get_Bottom(), _textureSplitLine.Width, bottomSplitHeight);
+				_layoutBottomSplitLineSourceBounds = new Rectangle(0, _textureSplitLine.Height - bottomSplitHeight, _textureSplitLine.Width, bottomSplitHeight);
 			}
 		}
 
@@ -214,10 +212,10 @@ namespace Kenedia.Modules.Core.Views
 			//IL_0201: Unknown result type (might be due to invalid IL or missing references)
 			//IL_021e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0224: Unknown result type (might be due to invalid IL or missing references)
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _tabBarBackground, RectangleExtension.Add(_tabBarBackground.get_Bounds(), -20, 5, 0, 0), (Rectangle?)_tabBarBackground.get_Bounds());
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), _layoutTopTabBarBounds, Color.get_Black());
-			((WindowBase)this).PaintBeforeChildren(spriteBatch, bounds);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _textureBlackFade, _layoutBottomTabBarBounds);
+			spriteBatch.DrawOnCtrl((Control)this, _tabBarBackground, _tabBarBackground.get_Bounds().Add(-20, 5, 0, 0), (Rectangle?)_tabBarBackground.get_Bounds());
+			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, _layoutTopTabBarBounds, Color.get_Black());
+			base.PaintBeforeChildren(spriteBatch, bounds);
+			spriteBatch.DrawOnCtrl(this, _textureBlackFade, _layoutBottomTabBarBounds);
 			int i = 0;
 			Rectangle subBounds = default(Rectangle);
 			foreach (BaseTab tab in _tabs)
@@ -228,18 +226,19 @@ namespace Kenedia.Modules.Core.Views
 				((Rectangle)(ref subBounds))._002Ector(tabBounds.X + tabBounds.Width / 2, tabBounds.Y, _tabWidth / 2, tabBounds.Height);
 				if (active)
 				{
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _background, tabBounds, (Rectangle?)RectangleExtension.Add(RectangleExtension.Add(RectangleExtension.OffsetBy(RectangleExtension.OffsetBy(tabBounds, ((Vector2)(ref base._windowBackgroundOrigin)).ToPoint()), 1, -5), 0, 0, 0, 0), tabBounds.Width / 3 + 20, 0, -tabBounds.Width / 3, 0), Color.get_White());
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _textureTabActive, tabBounds);
+					spriteBatch.DrawOnCtrl(this, _background, tabBounds, tabBounds.OffsetBy(((Vector2)(ref _windowBackgroundOrigin)).ToPoint()).OffsetBy(1, -5).Add(0, 0, 0, 0)
+						.Add(tabBounds.Width / 3 + 20, 0, -tabBounds.Width / 3, 0), Color.get_White());
+					spriteBatch.DrawOnCtrl(this, _textureTabActive, tabBounds);
 				}
 				else
 				{
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(0, tabBounds.Y, _tabSectionWidth, tabBounds.Height), Color.get_Black());
+					spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(0, tabBounds.Y, _tabSectionWidth, tabBounds.Height), Color.get_Black());
 				}
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(tab.Icon), RectangleExtension.OffsetBy(new Rectangle(_tabWidth / 4 - _tabIconSize / 2 + 2, _tabHeight / 2 - _tabIconSize / 2, _tabIconSize, _tabIconSize), ((Rectangle)(ref subBounds)).get_Location()), (active || hovered) ? Color.get_White() : Colors.DullColor);
+				spriteBatch.DrawOnCtrl((Control)this, (Texture2D)tab.Icon, RectangleExtension.OffsetBy(new Rectangle(_tabWidth / 4 - _tabIconSize / 2 + 2, _tabHeight / 2 - _tabIconSize / 2, _tabIconSize, _tabIconSize), ((Rectangle)(ref subBounds)).get_Location()), (active || hovered) ? Color.get_White() : ContentService.Colors.DullColor);
 				i++;
 			}
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_textureSplitLine), _layoutTopSplitLineBounds, (Rectangle?)_layoutTopSplitLineSourceBounds);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_textureSplitLine), _layoutBottomSplitLineBounds, (Rectangle?)_layoutBottomSplitLineSourceBounds);
+			spriteBatch.DrawOnCtrl((Control)this, (Texture2D)_textureSplitLine, _layoutTopSplitLineBounds, (Rectangle?)_layoutTopSplitLineSourceBounds);
+			spriteBatch.DrawOnCtrl((Control)this, (Texture2D)_textureSplitLine, _layoutBottomSplitLineBounds, (Rectangle?)_layoutBottomSplitLineSourceBounds);
 		}
 
 		public void AddTab(BaseTab tab)
@@ -249,7 +248,7 @@ namespace Kenedia.Modules.Core.Views
 			if (tab != null)
 			{
 				BaseTab prevTab = ((_tabs.Count > 0) ? _tabs[SelectedTabIndex] : tab);
-				tab.CreateLayout((Container)(object)this, _windowContentWidth - 20);
+				tab.CreateLayout(this, _windowContentWidth - 20);
 				_tabs.Add(tab);
 				_tabRegions.Add(tab, TabBoundsFromIndex(_tabRegions.Count));
 				_tabs = _tabs.OrderBy((BaseTab t) => t.Priority).ToList();
@@ -258,7 +257,7 @@ namespace Kenedia.Modules.Core.Views
 					_tabRegions[_tabs[i]] = TabBoundsFromIndex(i);
 				}
 				SwitchTab(prevTab);
-				((Control)this).Invalidate();
+				Invalidate();
 			}
 		}
 
@@ -270,9 +269,9 @@ namespace Kenedia.Modules.Core.Views
 		public void SwitchTab(BaseTab tab)
 		{
 			_selectedTabIndex = _tabs.IndexOf(tab);
-			base._subtitle = tab.Name;
-			((Control)this).RecalculateLayout();
-			((Control)this).Show();
+			_subtitle = tab.Name;
+			RecalculateLayout();
+			Show();
 		}
 
 		protected override void PaintWindowBackground(SpriteBatch spriteBatch, Rectangle bounds)
@@ -288,16 +287,16 @@ namespace Kenedia.Modules.Core.Views
 			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-			int x = ((Control)this).get_RelativeMousePosition().X;
+			int x = base.RelativeMousePosition.X;
 			Rectangle val = _standardTabBounds;
-			if (x < ((Rectangle)(ref val)).get_Right() && ((Control)this).get_RelativeMousePosition().Y > _standardTabBounds.Y)
+			if (x < ((Rectangle)(ref val)).get_Right() && base.RelativeMousePosition.Y > _standardTabBounds.Y)
 			{
 				List<BaseTab> tabList = _tabs.ToList();
 				for (int tabIndex = 0; tabIndex < _tabs.Count; tabIndex++)
 				{
 					BaseTab tab = tabList[tabIndex];
 					val = _tabRegions[tab];
-					if (((Rectangle)(ref val)).Contains(((Control)this).get_RelativeMousePosition()))
+					if (((Rectangle)(ref val)).Contains(base.RelativeMousePosition))
 					{
 						SwitchTab(tab);
 						break;
@@ -305,7 +304,7 @@ namespace Kenedia.Modules.Core.Views
 				}
 				tabList.Clear();
 			}
-			((WindowBase)this).OnLeftMouseButtonPressed(e);
+			base.OnLeftMouseButtonPressed(e);
 		}
 
 		protected virtual void OnTabChanged(ValueChangedEventArgs<BaseTab> tab)
@@ -321,7 +320,7 @@ namespace Kenedia.Modules.Core.Views
 			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			return RectangleExtension.OffsetBy(_standardTabBounds, -_tabWidth, ((Container)this).get_ContentRegion().Y + index * _tabHeight);
+			return _standardTabBounds.OffsetBy(-_tabWidth, base.ContentRegion.Y + index * _tabHeight);
 		}
 	}
 }

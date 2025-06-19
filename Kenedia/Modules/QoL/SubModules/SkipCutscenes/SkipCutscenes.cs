@@ -67,7 +67,7 @@ namespace Kenedia.Modules.QoL.SubModules.SkipCutscenes
 			: base(settings)
 		{
 			_gameStateDetectionService = gameStateDetectionService;
-			GameService.GameIntegration.get_Gw2Instance().add_Gw2LostFocus((EventHandler<EventArgs>)Gw2Instance_Gw2LostFocus);
+			GameService.GameIntegration.Gw2Instance.Gw2LostFocus += Gw2Instance_Gw2LostFocus;
 		}
 
 		private void Gw2Instance_Gw2LostFocus(object sender, EventArgs e)
@@ -84,12 +84,10 @@ namespace Kenedia.Modules.QoL.SubModules.SkipCutscenes
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
-			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001c: Expected O, but got Unknown
 			base.DefineSettings(settings);
-			Cancel_Key = settings.DefineSetting<KeyBinding>("Cancel_Key", new KeyBinding((Keys)27), (Func<string>)null, (Func<string>)null);
-			Cancel_Key.get_Value().set_Enabled(true);
-			Cancel_Key.get_Value().add_Activated((EventHandler<EventArgs>)Cancel_Key_Activated);
+			Cancel_Key = settings.DefineSetting("Cancel_Key", new KeyBinding((Keys)27));
+			Cancel_Key.Value.Enabled = true;
+			Cancel_Key.Value.Activated += Cancel_Key_Activated;
 		}
 
 		private void Cancel_Key_Activated(object sender, EventArgs e)
@@ -104,7 +102,7 @@ namespace Kenedia.Modules.QoL.SubModules.SkipCutscenes
 		public override void Load()
 		{
 			base.Load();
-			_gameStateDetectionService.GameStateChanged += On_GameStateChanged;
+			_gameStateDetectionService.GameStateChanged += new EventHandler<GameStateChangedEventArgs>(On_GameStateChanged);
 		}
 
 		protected override void Enable()
@@ -157,7 +155,7 @@ namespace Kenedia.Modules.QoL.SubModules.SkipCutscenes
 			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
 			if (_mousePosition != Point.get_Zero())
 			{
-				Mouse.SetPosition(_mousePosition.X, _mousePosition.Y, true);
+				Mouse.SetPosition(_mousePosition.X, _mousePosition.Y, sendToSystem: true);
 			}
 			_cts?.Cancel();
 			_cts = null;
@@ -167,8 +165,8 @@ namespace Kenedia.Modules.QoL.SubModules.SkipCutscenes
 		public override void Unload()
 		{
 			base.Unload();
-			_gameStateDetectionService.GameStateChanged -= On_GameStateChanged;
-			Cancel_Key.get_Value().remove_Activated((EventHandler<EventArgs>)Cancel_Key_Activated);
+			_gameStateDetectionService.GameStateChanged -= new EventHandler<GameStateChangedEventArgs>(On_GameStateChanged);
+			Cancel_Key.Value.Activated -= Cancel_Key_Activated;
 		}
 
 		private async Task SkipCutscene()
@@ -189,16 +187,16 @@ namespace Kenedia.Modules.QoL.SubModules.SkipCutscenes
 					return;
 				}
 				_logger.Info("We are still in the cutscene lets try with mouse.");
-				User32Dll.RECT pos = BaseModule<QoL, StandardWindow, Kenedia.Modules.QoL.Services.Settings, PathCollection>.ModuleInstance.Services.ClientWindowService.WindowBounds;
+				User32Dll.RECT pos = BaseModule<QoL, StandardWindow, Kenedia.Modules.QoL.Services.Settings, PathCollection>.ModuleInstance.CoreServices.ClientWindowService.WindowBounds;
 				Point p = new Point(pos.Right - 50, pos.Bottom - 35);
-				Point j = GameService.Input.get_Mouse().get_Position();
-				double factor = GameService.Graphics.get_UIScaleMultiplier();
-				ScreenModeSetting? screenMode = GameService.GameIntegration.get_GfxSettings().get_ScreenMode();
-				RectangleDimensions offset = (((screenMode.HasValue ? ScreenModeSetting.op_Implicit(screenMode.GetValueOrDefault()) : null) == ScreenModeSetting.op_Implicit(ScreenModeSetting.get_Windowed())) ? BaseModule<QoL, StandardWindow, Kenedia.Modules.QoL.Services.Settings, PathCollection>.ModuleInstance.Services.SharedSettings.WindowOffset : new RectangleDimensions(0));
+				Point j = GameService.Input.Mouse.Position;
+				double factor = GameService.Graphics.UIScaleMultiplier;
+				ScreenModeSetting? screenMode = GameService.GameIntegration.GfxSettings.ScreenMode;
+				RectangleDimensions offset = (((screenMode.HasValue ? ((string)screenMode.GetValueOrDefault()) : null) == (string)ScreenModeSetting.Windowed) ? BaseModule<QoL, StandardWindow, Kenedia.Modules.QoL.Services.Settings, PathCollection>.ModuleInstance.CoreServices.SharedSettings.WindowOffset : new RectangleDimensions(0));
 				_mousePosition = new Point(pos.Left + (int)((double)j.X * factor) + offset.Left, pos.Top + offset.Top + (int)((double)j.Y * factor));
 				for (int i = 0; i < 3; i++)
 				{
-					Mouse.SetPosition(p.X, p.Y, true);
+					Mouse.SetPosition(p.X, p.Y, sendToSystem: true);
 					if (_cts == null || _cts.Token.IsCancellationRequested)
 					{
 						break;
@@ -209,7 +207,7 @@ namespace Kenedia.Modules.QoL.SubModules.SkipCutscenes
 						break;
 					}
 					_logger.Info("Click with the mouse in the bottom right corner.");
-					Mouse.Click((MouseButton)0, p.X, p.Y, true);
+					Mouse.Click(MouseButton.LEFT, p.X, p.Y, sendToSystem: true);
 					if (_cts == null || _cts.Token.IsCancellationRequested)
 					{
 						break;
@@ -242,61 +240,56 @@ namespace Kenedia.Modules.QoL.SubModules.SkipCutscenes
 			}
 		}
 
-		public override void CreateSettingsPanel(FlowPanel flowPanel, int width)
+		public override void CreateSettingsPanel(Kenedia.Modules.Core.Controls.FlowPanel flowPanel, int width)
 		{
 			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-			Panel panel = new Panel();
-			((Control)panel).set_Parent((Container)(object)flowPanel);
-			((Control)panel).set_Width(width);
-			((Container)panel).set_HeightSizingMode((SizingMode)1);
-			((Panel)panel).set_ShowBorder(true);
-			((Panel)panel).set_CanCollapse(true);
-			panel.TitleIcon = base.Icon.Texture;
-			((Panel)panel).set_Title(SubModuleType.ToString());
-			Panel headerPanel = panel;
-			FlowPanel flowPanel2 = new FlowPanel();
-			((Control)flowPanel2).set_Parent((Container)(object)headerPanel);
-			((Container)flowPanel2).set_HeightSizingMode((SizingMode)1);
-			((Container)flowPanel2).set_WidthSizingMode((SizingMode)2);
-			((FlowPanel)flowPanel2).set_FlowDirection((ControlFlowDirection)3);
-			flowPanel2.ContentPadding = new RectangleDimensions(5, 2);
-			((FlowPanel)flowPanel2).set_ControlPadding(new Vector2(0f, 2f));
-			FlowPanel contentFlowPanel = flowPanel2;
-			Func<string> localizedLabelContent = () => string.Format(strings.ShowInHotbar_Name, $"{SubModuleType}");
-			Func<string> localizedTooltip = () => string.Format(strings.ShowInHotbar_Description, $"{SubModuleType}");
-			int width2 = width - 16;
-			Checkbox checkbox = new Checkbox();
-			((Control)checkbox).set_Height(20);
-			((Checkbox)checkbox).set_Checked(base.ShowInHotbar.get_Value());
-			checkbox.CheckedChangedAction = delegate(bool b)
+			Kenedia.Modules.Core.Controls.Panel headerPanel = new Kenedia.Modules.Core.Controls.Panel
 			{
-				base.ShowInHotbar.set_Value(b);
+				Parent = flowPanel,
+				Width = width,
+				HeightSizingMode = SizingMode.AutoSize,
+				ShowBorder = true,
+				CanCollapse = true,
+				TitleIcon = base.Icon.Texture,
+				Title = SubModuleType.ToString()
 			};
-			UI.WrapWithLabel(localizedLabelContent, localizedTooltip, (Container)(object)contentFlowPanel, width2, (Control)(object)checkbox);
-			KeybindingAssigner keybindingAssigner = new KeybindingAssigner();
-			((Control)keybindingAssigner).set_Parent((Container)(object)contentFlowPanel);
-			((Control)keybindingAssigner).set_Width(width - 16);
-			((KeybindingAssigner)keybindingAssigner).set_KeyBinding(base.HotKey.get_Value());
-			keybindingAssigner.KeybindChangedAction = delegate(KeyBinding kb)
+			Kenedia.Modules.Core.Controls.FlowPanel contentFlowPanel = new Kenedia.Modules.Core.Controls.FlowPanel
 			{
-				//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-				//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-				//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-				//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-				//IL_003b: Expected O, but got Unknown
-				SettingEntry<KeyBinding> hotKey = base.HotKey;
-				KeyBinding val = new KeyBinding();
-				val.set_ModifierKeys(kb.get_ModifierKeys());
-				val.set_PrimaryKey(kb.get_PrimaryKey());
-				val.set_Enabled(kb.get_Enabled());
-				val.set_IgnoreWhenInTextField(true);
-				hotKey.set_Value(val);
+				Parent = headerPanel,
+				HeightSizingMode = SizingMode.AutoSize,
+				WidthSizingMode = SizingMode.Fill,
+				FlowDirection = ControlFlowDirection.SingleTopToBottom,
+				ContentPadding = new RectangleDimensions(5, 2),
+				ControlPadding = new Vector2(0f, 2f)
 			};
-			keybindingAssigner.SetLocalizedKeyBindingName = () => string.Format(strings.HotkeyEntry_Name, $"{SubModuleType}");
-			keybindingAssigner.SetLocalizedTooltip = () => string.Format(strings.HotkeyEntry_Description, $"{SubModuleType}");
+			UI.WrapWithLabel(() => string.Format(strings.ShowInHotbar_Name, $"{SubModuleType}"), () => string.Format(strings.ShowInHotbar_Description, $"{SubModuleType}"), contentFlowPanel, width - 16, new Kenedia.Modules.Core.Controls.Checkbox
+			{
+				Height = 20,
+				Checked = base.ShowInHotbar.Value,
+				CheckedChangedAction = delegate(bool b)
+				{
+					base.ShowInHotbar.Value = b;
+				}
+			});
+			new Kenedia.Modules.Core.Controls.KeybindingAssigner
+			{
+				Parent = contentFlowPanel,
+				Width = width - 16,
+				KeyBinding = base.HotKey.Value,
+				KeybindChangedAction = delegate(KeyBinding kb)
+				{
+					//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+					base.HotKey.Value = new KeyBinding
+					{
+						ModifierKeys = kb.ModifierKeys,
+						PrimaryKey = kb.PrimaryKey,
+						Enabled = kb.Enabled,
+						IgnoreWhenInTextField = true
+					};
+				},
+				SetLocalizedKeyBindingName = () => string.Format(strings.HotkeyEntry_Name, $"{SubModuleType}"),
+				SetLocalizedTooltip = () => string.Format(strings.HotkeyEntry_Description, $"{SubModuleType}")
+			};
 		}
 	}
 }

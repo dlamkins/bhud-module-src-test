@@ -9,10 +9,5 @@ namespace Kenedia.Modules.Core.Controls
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
 		}
-
-		public Dummy()
-			: this()
-		{
-		}
 	}
 }

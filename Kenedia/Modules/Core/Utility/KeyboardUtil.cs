@@ -81,7 +81,7 @@ namespace Kenedia.Modules.Core.Utility
 
 		private const uint VK_SHIFT = 16u;
 
-		private static readonly List<int> s_extendedKeys = new List<int>
+		private static readonly List<int> s_extendedKeys = new List<int>(15)
 		{
 			45, 36, 34, 46, 35, 33, 165, 161, 163, 38,
 			40, 37, 39, 144, 42
@@ -153,7 +153,7 @@ namespace Kenedia.Modules.Core.Utility
 				lParam.PrevKeyState = 1;
 				lParam.TransitionState = 1;
 			}
-			return PostMessage(GameService.GameIntegration.get_Gw2Instance().get_Gw2WindowHandle(), msg, (uint)keyCode, lParam.GetInt());
+			return PostMessage(GameService.GameIntegration.Gw2Instance.Gw2WindowHandle, msg, (uint)keyCode, lParam.GetInt());
 		}
 
 		private static bool SendInput(int keyCode, bool pressed)

@@ -16,7 +16,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Kenedia.Modules.Core.Controls
 {
-	public class FlowPanel : FlowPanel, ILocalizable
+	public class FlowPanel : Blish_HUD.Controls.FlowPanel, ILocalizable
 	{
 		private readonly List<(Rectangle, float)> _leftBorders = new List<(Rectangle, float)>();
 
@@ -36,7 +36,12 @@ namespace Kenedia.Modules.Core.Controls
 
 		private readonly AsyncTexture2D _textureAccordionArrow = AsyncTexture2D.FromAssetId(155953);
 
-		private readonly BasicTooltip _tooltip;
+		private readonly BasicTooltip _tooltip = new BasicTooltip
+		{
+			Parent = Control.Graphics.SpriteScreen,
+			ZIndex = 1073741823,
+			Visible = false
+		};
 
 		private Func<string> _setLocalizedTitleTooltip;
 
@@ -64,15 +69,15 @@ namespace Kenedia.Modules.Core.Controls
 
 		private Rectangle _layoutAccordionArrowBounds;
 
-		private RectangleDimensions _contentPadding;
+		private RectangleDimensions _contentPadding = new RectangleDimensions(0);
 
-		private RectangleDimensions _borderWidth;
+		private RectangleDimensions _borderWidth = new RectangleDimensions(0);
 
 		private Rectangle _backgroundBounds;
 
-		private RectangleDimensions _titleIconPadding;
+		private RectangleDimensions _titleIconPadding = new RectangleDimensions(3, 3, 5, 3);
 
-		private int _titleBarHeight;
+		private int _titleBarHeight = 36;
 
 		private bool _resized;
 
@@ -95,7 +100,7 @@ namespace Kenedia.Modules.Core.Controls
 			set
 			{
 				_borderWidth = value;
-				((Control)this).RecalculateLayout();
+				RecalculateLayout();
 			}
 		}
 
@@ -108,7 +113,7 @@ namespace Kenedia.Modules.Core.Controls
 			set
 			{
 				_contentPadding = value;
-				((Control)this).RecalculateLayout();
+				RecalculateLayout();
 			}
 		}
 
@@ -121,7 +126,7 @@ namespace Kenedia.Modules.Core.Controls
 			set
 			{
 				_titleIconPadding = value;
-				((Control)this).RecalculateLayout();
+				RecalculateLayout();
 			}
 		}
 
@@ -134,7 +139,7 @@ namespace Kenedia.Modules.Core.Controls
 			set
 			{
 				_titleBarHeight = value;
-				((Control)this).RecalculateLayout();
+				RecalculateLayout();
 			}
 		}
 
@@ -146,11 +151,12 @@ namespace Kenedia.Modules.Core.Controls
 
 		public AsyncTexture2D TitleIcon { get; set; }
 
-		public Color? BackgroundImageColor { get; set; }
+		public Color? BackgroundImageColor { get; set; } = Color.get_White();
+
 
 		public Color? BackgroundImageHoveredColor { get; set; }
 
-		public Color? BackgroundColor { get; set; }
+		public new Color? BackgroundColor { get; set; }
 
 		public Color? BackgroundHoveredColor { get; set; }
 
@@ -177,7 +183,7 @@ namespace Kenedia.Modules.Core.Controls
 			set
 			{
 				_setLocalizedTooltip = value;
-				((Control)this).set_BasicTooltipText(value?.Invoke());
+				base.BasicTooltipText = value?.Invoke();
 			}
 		}
 
@@ -203,7 +209,7 @@ namespace Kenedia.Modules.Core.Controls
 			set
 			{
 				_setLocalizedTitle = value;
-				((Panel)this).set_Title(value?.Invoke());
+				base.Title = value?.Invoke();
 			}
 		}
 
@@ -211,7 +217,8 @@ namespace Kenedia.Modules.Core.Controls
 
 		public Action OnExpand { get; set; }
 
-		public bool CaptureInput { get; set; }
+		public bool CaptureInput { get; set; } = true;
+
 
 		public CaptureType? Capture { get; set; }
 
@@ -220,19 +227,7 @@ namespace Kenedia.Modules.Core.Controls
 		public FlowPanel()
 		{
 			//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
-			BasicTooltip basicTooltip = new BasicTooltip();
-			((Control)basicTooltip).set_Parent((Container)(object)Control.get_Graphics().get_SpriteScreen());
-			((Control)basicTooltip).set_ZIndex(1073741823);
-			((Control)basicTooltip).set_Visible(false);
-			_tooltip = basicTooltip;
-			_contentPadding = new RectangleDimensions(0);
-			_borderWidth = new RectangleDimensions(0);
-			_titleIconPadding = new RectangleDimensions(3, 3, 5, 3);
-			_titleBarHeight = 36;
-			BackgroundImageColor = Color.get_White();
-			CaptureInput = true;
-			((FlowPanel)this)._002Ector();
-			LocalizingService.LocaleChanged += UserLocale_SettingChanged;
+			LocalizingService.LocaleChanged += new EventHandler<ValueChangedEventArgs<Locale>>(UserLocale_SettingChanged);
 			UserLocale_SettingChanged(null, null);
 		}
 
@@ -241,11 +236,11 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-			bool collapsed = ((Panel)this).get_Collapsed();
-			((Panel)this).OnClick(e);
-			if (collapsed != ((Panel)this).get_Collapsed())
+			bool collapsed = base.Collapsed;
+			base.OnClick(e);
+			if (collapsed != base.Collapsed)
 			{
-				if (((Panel)this).get_Collapsed())
+				if (base.Collapsed)
 				{
 					OnCollapse?.Invoke();
 				}
@@ -256,7 +251,7 @@ namespace Kenedia.Modules.Core.Controls
 			}
 			if (CanDrag)
 			{
-				MouseState state = GameService.Input.get_Mouse().get_State();
+				MouseState state = GameService.Input.Mouse.State;
 				((MouseState)(ref state)).get_LeftButton();
 				_ = 1;
 			}
@@ -292,46 +287,46 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_033f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0344: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0349: Unknown result type (might be due to invalid IL or missing references)
-			((FlowPanel)this).RecalculateLayout();
-			_backgroundBounds = new Rectangle(Math.Max(BorderWidth.Left - 2, 0), Math.Max(BorderWidth.Top - 2, 0), ((Control)this).get_Width() - Math.Max(BorderWidth.Horizontal - 4, 0), ((Control)this).get_Height() - Math.Max(BorderWidth.Vertical - 4, 0));
-			int num = ((!string.IsNullOrEmpty(((Panel)this)._title)) ? _titleBarHeight : 0);
+			base.RecalculateLayout();
+			_backgroundBounds = new Rectangle(Math.Max(BorderWidth.Left - 2, 0), Math.Max(BorderWidth.Top - 2, 0), base.Width - Math.Max(BorderWidth.Horizontal - 4, 0), base.Height - Math.Max(BorderWidth.Vertical - 4, 0));
+			int num = ((!string.IsNullOrEmpty(_title)) ? _titleBarHeight : 0);
 			int num2 = 0;
 			int num3 = 0;
 			int num4 = 0;
-			if (((Panel)this).get_ShowBorder())
+			if (base.ShowBorder)
 			{
 				num = Math.Max(7, num);
 				num2 = 4;
 				num3 = 7;
 				num4 = 4;
-				int num5 = Math.Min(((Control)this)._size.X, 256);
-				_layoutTopLeftAccentBounds = new Rectangle(-2, num - 12, num5, _textureCornerAccent.get_Height());
-				_layoutBottomRightAccentBounds = new Rectangle(((Control)this)._size.X - num5 + 2, ((Control)this)._size.Y - 59, num5, _textureCornerAccent.get_Height());
-				_layoutCornerAccentSrc = new Rectangle(256 - num5, 0, num5, _textureCornerAccent.get_Height());
-				_layoutLeftAccentBounds = new Rectangle(num4 - 7, num, _textureLeftSideAccent.get_Width(), Math.Min(((Control)this)._size.Y - num - num3, _textureLeftSideAccent.get_Height()));
-				_layoutRightAccentBounds = new Rectangle(((Control)this)._size.X - 12, Math.Max(0, ((Control)this)._size.Y - _layoutLeftAccentBounds.Height), _textureLeftSideAccent.get_Width(), Math.Min(((Control)this)._size.Y - num - num3 - 10, _textureLeftSideAccent.get_Height() - 10));
-				_layoutLeftAccentSrc = new Rectangle(0, 0, _textureLeftSideAccent.get_Width(), _layoutLeftAccentBounds.Height);
+				int num5 = Math.Min(_size.X, 256);
+				_layoutTopLeftAccentBounds = new Rectangle(-2, num - 12, num5, _textureCornerAccent.Height);
+				_layoutBottomRightAccentBounds = new Rectangle(_size.X - num5 + 2, _size.Y - 59, num5, _textureCornerAccent.Height);
+				_layoutCornerAccentSrc = new Rectangle(256 - num5, 0, num5, _textureCornerAccent.Height);
+				_layoutLeftAccentBounds = new Rectangle(num4 - 7, num, _textureLeftSideAccent.Width, Math.Min(_size.Y - num - num3, _textureLeftSideAccent.Height));
+				_layoutRightAccentBounds = new Rectangle(_size.X - 12, Math.Max(0, _size.Y - _layoutLeftAccentBounds.Height), _textureLeftSideAccent.Width, Math.Min(_size.Y - num - num3 - 10, _textureLeftSideAccent.Height - 10));
+				_layoutLeftAccentSrc = new Rectangle(0, 0, _textureLeftSideAccent.Width, _layoutLeftAccentBounds.Height);
 			}
-			((Container)this).set_ContentRegion(new Rectangle(_contentPadding.Left + num4, _contentPadding.Top + num, ((Control)this)._size.X - num4 - num2 - _contentPadding.Horizontal, ((Control)this)._size.Y - num - num3 - _contentPadding.Vertical));
-			LayoutHeaderBounds = new Rectangle(num4, 0, ((Control)this).get_Width(), num);
+			base.ContentRegion = new Rectangle(_contentPadding.Left + num4, _contentPadding.Top + num, _size.X - num4 - num2 - _contentPadding.Horizontal, _size.Y - num - num3 - _contentPadding.Vertical);
+			LayoutHeaderBounds = new Rectangle(num4, 0, base.Width, num);
 			_layoutHeaderIconBounds = (Rectangle)((TitleIcon != null) ? new Rectangle(((Rectangle)(ref LayoutHeaderBounds)).get_Left() + _titleIconPadding.Left, _titleIconPadding.Top, num - _titleIconPadding.Vertical, num - _titleIconPadding.Vertical) : Rectangle.get_Empty());
 			_layoutHeaderTextBounds = new Rectangle(((Rectangle)(ref _layoutHeaderIconBounds)).get_Right() + _titleIconPadding.Right, 0, LayoutHeaderBounds.Width - _layoutHeaderIconBounds.Width, num);
 			int arrowSize = num - 4;
 			_layoutAccordionArrowOrigin = new Vector2(16f, 16f);
-			_layoutAccordionArrowBounds = RectangleExtension.OffsetBy(new Rectangle(((Rectangle)(ref LayoutHeaderBounds)).get_Right() - arrowSize, (num - arrowSize) / 2, arrowSize, arrowSize), new Point(arrowSize / 2, arrowSize / 2));
-			if (((Panel)this).get_Collapsed() && ((Control)this)._size.Y > LayoutHeaderBounds.Height && !_resized)
+			_layoutAccordionArrowBounds = Blish_HUD.RectangleExtension.OffsetBy(new Rectangle(((Rectangle)(ref LayoutHeaderBounds)).get_Right() - arrowSize, (num - arrowSize) / 2, arrowSize, arrowSize), new Point(arrowSize / 2, arrowSize / 2));
+			if (base.Collapsed && _size.Y > LayoutHeaderBounds.Height && !_resized)
 			{
 				_resized = true;
 				Task.Run(async delegate
 				{
 					await Task.Delay(125);
-					if (!((Panel)this).get_Collapsed())
+					if (!base.Collapsed)
 					{
 						_resized = false;
 					}
 					else
 					{
-						((Control)this).set_Size(new Point(((Control)this).get_Width(), LayoutHeaderBounds.Height));
+						base.Size = new Point(base.Width, LayoutHeaderBounds.Height);
 						_resized = false;
 					}
 				});
@@ -389,59 +384,59 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_0368: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0374: Unknown result type (might be due to invalid IL or missing references)
 			//IL_037a: Unknown result type (might be due to invalid IL or missing references)
-			((Control)_tooltip).set_Visible(false);
-			if (((Panel)this)._backgroundTexture != null)
+			_tooltip.Visible = false;
+			if (_backgroundTexture != null)
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(((Panel)this)._backgroundTexture), bounds);
+				spriteBatch.DrawOnCtrl((Control)this, (Texture2D)_backgroundTexture, bounds);
 			}
-			if (((Panel)this)._showTint)
+			if (_showTint)
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), ((Container)this).get_ContentRegion(), Color.get_Black() * 0.4f);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, base.ContentRegion, Color.get_Black() * 0.4f);
 			}
-			if (!string.IsNullOrEmpty(((Panel)this)._title))
+			if (!string.IsNullOrEmpty(_title))
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_texturePanelHeader), LayoutHeaderBounds);
-				if (((Panel)this)._canCollapse && ((Control)this)._mouseOver && ((Control)this).get_RelativeMousePosition().Y <= 36)
+				spriteBatch.DrawOnCtrl((Control)this, (Texture2D)_texturePanelHeader, LayoutHeaderBounds);
+				if (_canCollapse && _mouseOver && base.RelativeMousePosition.Y <= 36)
 				{
-					((Control)_tooltip).set_Visible(true);
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_texturePanelHeaderActive), LayoutHeaderBounds);
+					_tooltip.Visible = true;
+					spriteBatch.DrawOnCtrl((Control)this, (Texture2D)_texturePanelHeaderActive, LayoutHeaderBounds);
 				}
 				else
 				{
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_texturePanelHeader), LayoutHeaderBounds);
+					spriteBatch.DrawOnCtrl((Control)this, (Texture2D)_texturePanelHeader, LayoutHeaderBounds);
 				}
-				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, ((Panel)this)._title, Control.get_Content().get_DefaultFont16(), _layoutHeaderTextBounds, Color.get_White(), false, (HorizontalAlignment)0, (VerticalAlignment)1);
+				spriteBatch.DrawStringOnCtrl(this, _title, Control.Content.DefaultFont16, _layoutHeaderTextBounds, Color.get_White());
 				if (TitleIcon != null)
 				{
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(TitleIcon), _layoutHeaderIconBounds, (Rectangle?)TitleIcon.get_Bounds(), Color.get_White());
+					spriteBatch.DrawOnCtrl(this, TitleIcon, _layoutHeaderIconBounds, TitleIcon.Bounds, Color.get_White());
 				}
-				if (((Panel)this)._canCollapse)
+				if (_canCollapse)
 				{
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_textureAccordionArrow), _layoutAccordionArrowBounds, (Rectangle?)null, Color.get_White(), ((Panel)this).get_ArrowRotation(), _layoutAccordionArrowOrigin, (SpriteEffects)0);
+					spriteBatch.DrawOnCtrl(this, _textureAccordionArrow, _layoutAccordionArrowBounds, null, Color.get_White(), base.ArrowRotation, _layoutAccordionArrowOrigin, (SpriteEffects)0);
 				}
 			}
-			if (((Panel)this).get_ShowBorder())
+			if (base.ShowBorder)
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), ((Container)this).get_ContentRegion(), Color.get_Black() * (0.1f * ((Panel)this).get_AccentOpacity()));
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_textureLeftSideAccent), _layoutLeftAccentBounds, (Rectangle?)_layoutLeftAccentSrc, Color.get_Black() * ((Panel)this).get_AccentOpacity(), 0f, Vector2.get_Zero(), (SpriteEffects)2);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, base.ContentRegion, Color.get_Black() * (0.1f * base.AccentOpacity));
+				spriteBatch.DrawOnCtrl(this, _textureLeftSideAccent, _layoutLeftAccentBounds, _layoutLeftAccentSrc, Color.get_Black() * base.AccentOpacity, 0f, Vector2.get_Zero(), (SpriteEffects)2);
 				if (ShowRightBorder)
 				{
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_textureLeftSideAccent), _layoutRightAccentBounds, (Rectangle?)_layoutLeftAccentSrc, Color.get_Black() * ((Panel)this).get_AccentOpacity(), 0f, Vector2.get_Zero(), (SpriteEffects)0);
+					spriteBatch.DrawOnCtrl(this, _textureLeftSideAccent, _layoutRightAccentBounds, _layoutLeftAccentSrc, Color.get_Black() * base.AccentOpacity, 0f, Vector2.get_Zero(), (SpriteEffects)0);
 				}
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_textureCornerAccent), _layoutTopLeftAccentBounds, (Rectangle?)_layoutCornerAccentSrc, Color.get_White() * ((Panel)this).get_AccentOpacity(), 0f, Vector2.get_Zero(), (SpriteEffects)1);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_textureCornerAccent), _layoutBottomRightAccentBounds, (Rectangle?)_layoutCornerAccentSrc, Color.get_White() * ((Panel)this).get_AccentOpacity(), 0f, Vector2.get_Zero(), (SpriteEffects)2);
+				spriteBatch.DrawOnCtrl(this, _textureCornerAccent, _layoutTopLeftAccentBounds, _layoutCornerAccentSrc, Color.get_White() * base.AccentOpacity, 0f, Vector2.get_Zero(), (SpriteEffects)1);
+				spriteBatch.DrawOnCtrl(this, _textureCornerAccent, _layoutBottomRightAccentBounds, _layoutCornerAccentSrc, Color.get_White() * base.AccentOpacity, 0f, Vector2.get_Zero(), (SpriteEffects)2);
 			}
-			Color? backgroundColor = ((BackgroundHoveredColor.HasValue && ((Control)this).get_MouseOver()) ? BackgroundHoveredColor : BackgroundColor);
+			Color? backgroundColor = ((BackgroundHoveredColor.HasValue && base.MouseOver) ? BackgroundHoveredColor : BackgroundColor);
 			if (backgroundColor.HasValue)
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), _backgroundBounds, (Rectangle?)Rectangle.get_Empty(), backgroundColor.Value);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, _backgroundBounds, Rectangle.get_Empty(), backgroundColor.Value);
 			}
-			Color? backgroundImageColor = ((BackgroundImageHoveredColor.HasValue && ((Control)this).get_MouseOver()) ? BackgroundImageHoveredColor : BackgroundImageColor);
+			Color? backgroundImageColor = ((BackgroundImageHoveredColor.HasValue && base.MouseOver) ? BackgroundImageHoveredColor : BackgroundImageColor);
 			if (BackgroundImage != null && backgroundImageColor.HasValue)
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(BackgroundImage), _backgroundBounds, (Rectangle?)(Rectangle)(((_003F?)TextureRectangle) ?? BackgroundImage.get_Bounds()), backgroundImageColor.Value, 0f, default(Vector2), (SpriteEffects)0);
+				spriteBatch.DrawOnCtrl(this, BackgroundImage, _backgroundBounds, (Rectangle)(((_003F?)TextureRectangle) ?? BackgroundImage.Bounds), backgroundImageColor.Value, 0f, default(Vector2), (SpriteEffects)0);
 			}
-			if (((HoveredBorderColor.HasValue && ((Control)this).get_MouseOver()) ? HoveredBorderColor : BorderColor).HasValue)
+			if (((HoveredBorderColor.HasValue && base.MouseOver) ? HoveredBorderColor : BorderColor).HasValue)
 			{
 				DrawBorders(spriteBatch);
 			}
@@ -451,14 +446,14 @@ namespace Kenedia.Modules.Core.Controls
 		{
 			if (SetLocalizedTooltip != null)
 			{
-				((Control)this).set_BasicTooltipText(SetLocalizedTooltip?.Invoke());
+				base.BasicTooltipText = SetLocalizedTooltip?.Invoke();
 			}
 		}
 
 		protected override void DisposeControl()
 		{
-			((FlowPanel)this).DisposeControl();
-			GameService.Overlay.get_UserLocale().remove_SettingChanged((EventHandler<ValueChangedEventArgs<Locale>>)UserLocale_SettingChanged);
+			base.DisposeControl();
+			GameService.Overlay.UserLocale.SettingChanged -= UserLocale_SettingChanged;
 		}
 
 		private void CalculateBorders()
@@ -504,13 +499,13 @@ namespace Kenedia.Modules.Core.Controls
 			_bottomBorders.Clear();
 			_rightBorders.Clear();
 			Rectangle r = default(Rectangle);
-			((Rectangle)(ref r))._002Ector(-1, 0, ((Control)this).get_Width() + 2, 0);
+			((Rectangle)(ref r))._002Ector(-1, 0, base.Width + 2, 0);
 			int strength = BorderWidth.Top;
 			int fadeLines = Math.Max(0, Math.Min(strength - 1, 4));
 			if (fadeLines >= 1)
 			{
 				List<(Rectangle, float)> topBorders = _topBorders;
-				((Rectangle)(ref r))._002Ector(0, 0, ((Control)this).get_Width(), 1);
+				((Rectangle)(ref r))._002Ector(0, 0, base.Width, 1);
 				topBorders.Add((r, 0.5f));
 			}
 			if (fadeLines >= 3)
@@ -532,13 +527,13 @@ namespace Kenedia.Modules.Core.Controls
 			{
 				_topBorders.Add((new Rectangle(((Rectangle)(ref r)).get_Left() + 1, ((Rectangle)(ref r)).get_Bottom(), r.Width - 2, 1), 0.5f));
 			}
-			((Rectangle)(ref r))._002Ector(-1, -1, 0, ((Control)this).get_Height() + 2);
+			((Rectangle)(ref r))._002Ector(-1, -1, 0, base.Height + 2);
 			strength = BorderWidth.Left;
 			fadeLines = Math.Max(0, Math.Min(strength - 1, 4));
 			if (fadeLines >= 1)
 			{
 				List<(Rectangle, float)> leftBorders = _leftBorders;
-				((Rectangle)(ref r))._002Ector(0, 0, 1, ((Control)this).get_Height());
+				((Rectangle)(ref r))._002Ector(0, 0, 1, base.Height);
 				leftBorders.Add((r, 0.5f));
 			}
 			if (fadeLines >= 3)
@@ -560,13 +555,13 @@ namespace Kenedia.Modules.Core.Controls
 			{
 				_leftBorders.Add((new Rectangle(((Rectangle)(ref r)).get_Right(), ((Rectangle)(ref r)).get_Top() + 1, 1, r.Height - 2), 0.5f));
 			}
-			((Rectangle)(ref r))._002Ector(((Control)this).get_Width(), -1, 0, ((Control)this).get_Height() + 2);
+			((Rectangle)(ref r))._002Ector(base.Width, -1, 0, base.Height + 2);
 			strength = BorderWidth.Right;
 			fadeLines = Math.Max(0, Math.Min(strength - 1, 4));
 			if (fadeLines >= 1)
 			{
 				List<(Rectangle, float)> rightBorders = _rightBorders;
-				((Rectangle)(ref r))._002Ector(((Control)this).get_Width() - 1, 0, 1, ((Control)this).get_Height());
+				((Rectangle)(ref r))._002Ector(base.Width - 1, 0, 1, base.Height);
 				rightBorders.Add((r, 0.5f));
 			}
 			if (fadeLines >= 3)
@@ -588,13 +583,13 @@ namespace Kenedia.Modules.Core.Controls
 			{
 				_rightBorders.Add((new Rectangle(((Rectangle)(ref r)).get_Left() - 1, ((Rectangle)(ref r)).get_Top() + 1, 1, r.Height - 2), 0.5f));
 			}
-			((Rectangle)(ref r))._002Ector(-1, ((Control)this).get_Height(), ((Control)this).get_Width() + 2, 2);
+			((Rectangle)(ref r))._002Ector(-1, base.Height, base.Width + 2, 2);
 			strength = BorderWidth.Bottom;
 			fadeLines = Math.Max(0, Math.Min(strength - 1, 4));
 			if (fadeLines >= 1)
 			{
 				List<(Rectangle, float)> bottomBorders = _bottomBorders;
-				((Rectangle)(ref r))._002Ector(0, ((Control)this).get_Height() - 1, ((Control)this).get_Width(), 1);
+				((Rectangle)(ref r))._002Ector(0, base.Height - 1, base.Width, 1);
 				bottomBorders.Add((r, 0.5f));
 			}
 			if (fadeLines >= 3)
@@ -636,26 +631,26 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_0189: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0195: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01a1: Unknown result type (might be due to invalid IL or missing references)
-			Color? borderColor = ((HoveredBorderColor.HasValue && ((Control)this).get_MouseOver()) ? HoveredBorderColor : BorderColor);
+			Color? borderColor = ((HoveredBorderColor.HasValue && base.MouseOver) ? HoveredBorderColor : BorderColor);
 			if (!borderColor.HasValue)
 			{
 				return;
 			}
 			foreach (var r4 in new List<(Rectangle, float)>(_topBorders))
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), r4.Item1, (Rectangle?)Rectangle.get_Empty(), borderColor.Value * r4.Item2);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, r4.Item1, Rectangle.get_Empty(), borderColor.Value * r4.Item2);
 			}
 			foreach (var r3 in new List<(Rectangle, float)>(_leftBorders))
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), r3.Item1, (Rectangle?)Rectangle.get_Empty(), borderColor.Value * r3.Item2);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, r3.Item1, Rectangle.get_Empty(), borderColor.Value * r3.Item2);
 			}
 			foreach (var r2 in new List<(Rectangle, float)>(_bottomBorders))
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), r2.Item1, (Rectangle?)Rectangle.get_Empty(), borderColor.Value * r2.Item2);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, r2.Item1, Rectangle.get_Empty(), borderColor.Value * r2.Item2);
 			}
 			foreach (var r in new List<(Rectangle, float)>(_rightBorders))
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), r.Item1, (Rectangle?)Rectangle.get_Empty(), borderColor.Value * r.Item2);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, r.Item1, Rectangle.get_Empty(), borderColor.Value * r.Item2);
 			}
 		}
 
@@ -664,17 +659,17 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-			((Container)this).UpdateContainer(gameTime);
-			_dragging = CanDrag && _dragging && ((Control)this).get_MouseOver();
+			base.UpdateContainer(gameTime);
+			_dragging = CanDrag && _dragging && base.MouseOver;
 			if (_dragging)
 			{
-				((Control)this).set_Location(GameService.Input.get_Mouse().get_Position().Add(new Point(-_draggingStart.X, -_draggingStart.Y)));
+				base.Location = GameService.Input.Mouse.Position.Add(new Point(-_draggingStart.X, -_draggingStart.Y));
 			}
 		}
 
 		protected override void OnLeftMouseButtonReleased(MouseEventArgs e)
 		{
-			((Control)this).OnLeftMouseButtonReleased(e);
+			base.OnLeftMouseButtonReleased(e);
 			_dragging = false;
 		}
 
@@ -683,23 +678,21 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-			((Control)this).OnLeftMouseButtonPressed(e);
+			base.OnLeftMouseButtonPressed(e);
 			_dragging = CanDrag;
-			_draggingStart = (_dragging ? ((Control)this).get_RelativeMousePosition() : Point.get_Zero());
+			_draggingStart = (_dragging ? base.RelativeMousePosition : Point.get_Zero());
 		}
 
 		protected override CaptureType CapturesInput()
 		{
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
 			CaptureType? capture = Capture;
 			if (!capture.HasValue)
 			{
 				if (!CaptureInput)
 				{
-					return (CaptureType)0;
+					return CaptureType.None;
 				}
-				return ((Container)this).CapturesInput();
+				return base.CapturesInput();
 			}
 			return capture.GetValueOrDefault();
 		}

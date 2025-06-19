@@ -18,7 +18,8 @@ namespace Kenedia.Modules.Core.Models
 			}
 			set
 			{
-				SetLocalizedNotificationText = () => value;
+				string value2 = value;
+				SetLocalizedNotificationText = () => value2;
 			}
 		}
 

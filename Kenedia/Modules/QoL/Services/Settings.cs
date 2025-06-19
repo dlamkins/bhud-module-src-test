@@ -1,4 +1,3 @@
-using System;
 using Blish_HUD.Settings;
 using Kenedia.Modules.Core.Controls;
 using Kenedia.Modules.Core.Models;
@@ -20,15 +19,16 @@ namespace Kenedia.Modules.QoL.Services
 
 		public SettingEntry<Point> HotbarPosition { get; }
 
-		public Settings(SettingCollection settings)
+		public Settings(SettingCollection settingCollection)
+			: base(settingCollection)
 		{
-			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-			_settings = settings;
-			_internal_settings = _settings.AddSubCollection("Internal", false);
-			HotbarPosition = _internal_settings.DefineSetting<Point>("HotbarPosition", new Point(0, 32), (Func<string>)null, (Func<string>)null);
-			HotbarExpandDirection = _settings.DefineSetting<ExpandType>("HotbarExpandDirection", ExpandType.LeftToRight, (Func<string>)null, (Func<string>)null);
-			HotbarButtonSorting = _settings.DefineSetting<SortType>("HotbarButtonSorting", SortType.ActivesFirst, (Func<string>)null, (Func<string>)null);
-			KeyboardLayout = _settings.DefineSetting<KeyboardLayoutType>("KeyboardLayout", KeyboardLayoutType.QWERTZ, (Func<string>)null, (Func<string>)null);
+			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+			_settings = settingCollection;
+			_internal_settings = _settings.AddSubCollection("Internal");
+			HotbarPosition = _internal_settings.DefineSetting<Point>("HotbarPosition", new Point(0, 32));
+			HotbarExpandDirection = _settings.DefineSetting("HotbarExpandDirection", ExpandType.LeftToRight);
+			HotbarButtonSorting = _settings.DefineSetting("HotbarButtonSorting", SortType.ActivesFirst);
+			KeyboardLayout = _settings.DefineSetting("KeyboardLayout", KeyboardLayoutType.QWERTZ);
 		}
 	}
 }

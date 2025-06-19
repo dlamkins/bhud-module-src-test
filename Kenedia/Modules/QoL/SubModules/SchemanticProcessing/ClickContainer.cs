@@ -1,5 +1,4 @@
 using Blish_HUD;
-using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Kenedia.Modules.Core.Controls;
 using Kenedia.Modules.Core.Models;
@@ -7,6 +6,7 @@ using Kenedia.Modules.Core.Structs;
 using Kenedia.Modules.Core.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace Kenedia.Modules.QoL.SubModules.SchemanticProcessing
 {
@@ -25,11 +25,11 @@ namespace Kenedia.Modules.QoL.SubModules.SchemanticProcessing
 			}
 			set
 			{
-				Common.SetProperty(ref _selected, value, OnSelectedChanged);
+				Common.SetProperty(ref _selected, value, new ValueChangedEventHandler<bool>(OnSelectedChanged));
 			}
 		}
 
-		public Color CenterColor { get; private set; } = Colors.ColonialWhite * 0.5f;
+		public Color CenterColor { get; private set; } = ContentService.Colors.ColonialWhite * 0.5f;
 
 
 		public Rectangle MaskedRegion { get; private set; }
@@ -41,11 +41,11 @@ namespace Kenedia.Modules.QoL.SubModules.SchemanticProcessing
 			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			base.BorderColor = Colors.ColonialWhite * 0.5f;
+			base.BorderColor = ContentService.Colors.ColonialWhite * 0.5f;
 			base.BorderWidth = new RectangleDimensions(1);
 		}
 
-		private void OnSelectedChanged(object sender, ValueChangedEventArgs<bool> e)
+		private void OnSelectedChanged(object sender, Kenedia.Modules.Core.Models.ValueChangedEventArgs<bool> e)
 		{
 			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
@@ -53,7 +53,7 @@ namespace Kenedia.Modules.QoL.SubModules.SchemanticProcessing
 			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-			Color value = (CenterColor = (Selected ? Color.get_Lime() : (Colors.ColonialWhite * 0.5f)));
+			Color value = (CenterColor = (Selected ? Color.get_Lime() : (ContentService.Colors.ColonialWhite * 0.5f)));
 			base.BorderColor = value;
 		}
 
@@ -65,7 +65,7 @@ namespace Kenedia.Modules.QoL.SubModules.SchemanticProcessing
 			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
 			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
-			MaskedRegion = new Rectangle(((Control)this).get_Location().X + base.BorderWidth.Left, ((Control)this).get_Location().Y + base.BorderWidth.Top, ((Control)this).get_Size().X - base.BorderWidth.Horizontal, ((Control)this).get_Size().Y - base.BorderWidth.Vertical);
+			MaskedRegion = new Rectangle(base.Location.X + base.BorderWidth.Left, base.Location.Y + base.BorderWidth.Top, base.Size.X - base.BorderWidth.Horizontal, base.Size.Y - base.BorderWidth.Vertical);
 		}
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
@@ -79,16 +79,14 @@ namespace Kenedia.Modules.QoL.SubModules.SchemanticProcessing
 			base.PaintBeforeChildren(spriteBatch, bounds);
 			if (ShowCenter)
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Control)this).get_Width() / 2 - 2, ((Control)this).get_Height() / 2 - 2, 4, 4), (Rectangle?)Textures.get_Pixel().get_Bounds(), CenterColor, 0f, default(Vector2), (SpriteEffects)0);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(base.Width / 2 - 2, base.Height / 2 - 2, 4, 4), ContentService.Textures.Pixel.get_Bounds(), CenterColor, 0f, default(Vector2), (SpriteEffects)0);
 			}
 		}
 
 		public override void UpdateContainer(GameTime gameTime)
 		{
-			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0018: Invalid comparison between Unknown and I4
-			((Container)this).UpdateContainer(gameTime);
-			base.CaptureInput = (int)GameService.Input.get_Keyboard().get_ActiveModifiers() == 2;
+			base.UpdateContainer(gameTime);
+			base.CaptureInput = GameService.Input.Keyboard.ActiveModifiers == ModifierKeys.Alt;
 		}
 
 		protected override void OnClick(MouseEventArgs e)

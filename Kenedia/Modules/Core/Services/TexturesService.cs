@@ -26,7 +26,7 @@ namespace Kenedia.Modules.Core.Services
 		{
 			if (s_loadedTextures.Count > 0)
 			{
-				((IEnumerable<IDisposable>)s_loadedTextures.Select((KeyValuePair<string, Texture2D> e) => e.Value)).DisposeAll();
+				((IEnumerable<IDisposable>)s_loadedTextures.Select<KeyValuePair<string, Texture2D>, Texture2D>((KeyValuePair<string, Texture2D> e) => e.Value)).DisposeAll();
 			}
 			s_loadedTextures.Clear();
 		}
@@ -59,21 +59,44 @@ namespace Kenedia.Modules.Core.Services
 
 		public static AsyncTexture2D GetTextureFromDisk(string path)
 		{
-			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0040: Expected O, but got Unknown
-			if (s_loadedTextures.ContainsKey(path))
+			string path2 = path;
+			if (s_loadedTextures.ContainsKey(path2))
 			{
-				return AsyncTexture2D.op_Implicit(s_loadedTextures[path]);
+				return (AsyncTexture2D)s_loadedTextures[path2];
 			}
 			AsyncTexture2D texture = new AsyncTexture2D();
-			if (File.Exists(path))
+			if (File.Exists(path2))
 			{
-				GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate(GraphicsDevice graphicsDevice)
+				GameService.Graphics.QueueMainThreadRender(delegate(GraphicsDevice graphicsDevice)
 				{
-					texture.SwapTexture(TextureUtil.FromStreamPremultiplied(graphicsDevice, (Stream)new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)));
+					texture.SwapTexture(TextureUtil.FromStreamPremultiplied(graphicsDevice, new FileStream(path2, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)));
 				});
 			}
 			return texture;
+		}
+
+		public static AsyncTexture2D GetAsyncTexture(int? id = 0)
+		{
+			int assetId = id.GetValueOrDefault();
+			if (assetId != 0 && AsyncTexture2D.TryFromAssetId(assetId, out var texture))
+			{
+				return texture;
+			}
+			return null;
+		}
+
+		public static AsyncTexture2D GetTextureFromRef(string path)
+		{
+			if (string.IsNullOrEmpty(path))
+			{
+				return (AsyncTexture2D)ContentService.Textures.Error;
+			}
+			string key = Path.GetFileNameWithoutExtension(path);
+			if (string.IsNullOrEmpty(key))
+			{
+				return (AsyncTexture2D)ContentService.Textures.Error;
+			}
+			return (AsyncTexture2D)GetTextureFromRef(path, key);
 		}
 	}
 }

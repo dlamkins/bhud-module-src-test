@@ -12,23 +12,19 @@ namespace Kenedia.Modules.Core.Controls
 		public bool CaptureInput { get; set; }
 
 		public MaskedRegion()
-			: this()
 		{
-			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003b: Expected O, but got Unknown
-			((Control)this).set_ZIndex(int.MaxValue);
-			_batchParameters = ((Control)this).get_SpriteBatchParameters();
-			((Control)this).set_SpriteBatchParameters(new SpriteBatchParameters((SpriteSortMode)0, BlendState.Opaque, (SamplerState)null, (DepthStencilState)null, (RasterizerState)null, (Effect)null, (Matrix?)null));
+			ZIndex = int.MaxValue;
+			_batchParameters = base.SpriteBatchParameters;
+			base.SpriteBatchParameters = new SpriteBatchParameters((SpriteSortMode)0, BlendState.Opaque);
 		}
 
 		protected override CaptureType CapturesInput()
 		{
-			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
 			if (!CaptureInput)
 			{
-				return (CaptureType)0;
+				return CaptureType.None;
 			}
-			return ((Control)this).CapturesInput();
+			return base.CapturesInput();
 		}
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
@@ -38,10 +34,10 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
 			Rectangle b = default(Rectangle);
-			((Rectangle)(ref b))._002Ector(((Control)this).get_Location(), ((Control)this).get_Size());
-			spriteBatch.Draw(Textures.get_TransparentPixel(), b, Color.get_Transparent());
+			((Rectangle)(ref b))._002Ector(base.Location, base.Size);
+			spriteBatch.Draw(ContentService.Textures.TransparentPixel, b, Color.get_Transparent());
 			spriteBatch.End();
-			SpriteBatchExtensions.Begin(spriteBatch, _batchParameters);
+			spriteBatch.Begin(_batchParameters);
 		}
 	}
 }

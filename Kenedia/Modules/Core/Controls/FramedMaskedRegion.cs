@@ -10,7 +10,7 @@ namespace Kenedia.Modules.Core.Controls
 	{
 		public Rectangle MaskedRegion;
 
-		public Color BorderColor { get; set; } = Colors.ColonialWhite;
+		public Color BorderColor { get; set; } = ContentService.Colors.ColonialWhite;
 
 
 		public RectangleDimensions BorderWidth { get; set; } = new RectangleDimensions(2);
@@ -20,8 +20,8 @@ namespace Kenedia.Modules.Core.Controls
 		{
 			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			((Control)this).set_Parent((Container)(object)Control.get_Graphics().get_SpriteScreen());
-			((Control)this).set_ZIndex(int.MaxValue);
+			base.Parent = Control.Graphics.SpriteScreen;
+			ZIndex = int.MaxValue;
 		}
 
 		public override void RecalculateLayout()
@@ -32,14 +32,14 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
 			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-			((Control)this).RecalculateLayout();
-			MaskedRegion = new Rectangle(((Control)this).get_Location().X + BorderWidth.Left, ((Control)this).get_Location().Y + BorderWidth.Top, ((Control)this).get_Size().X - BorderWidth.Horizontal, ((Control)this).get_Size().Y - BorderWidth.Vertical);
+			base.RecalculateLayout();
+			MaskedRegion = new Rectangle(base.Location.X + BorderWidth.Left, base.Location.Y + BorderWidth.Top, base.Size.X - BorderWidth.Horizontal, base.Size.Y - BorderWidth.Vertical);
 		}
 
 		protected override void OnMoved(MovedEventArgs e)
 		{
-			((Control)this).OnMoved(e);
-			((Control)this).RecalculateLayout();
+			base.OnMoved(e);
+			RecalculateLayout();
 		}
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
@@ -90,14 +90,14 @@ namespace Kenedia.Modules.Core.Controls
 			Color? borderColor = BorderColor;
 			if (borderColor.HasValue)
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), bounds.Width, BorderWidth.Top), (Rectangle?)Rectangle.get_Empty(), borderColor.Value * 0.5f);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), bounds.Width, BorderWidth.Top / 2), (Rectangle?)Rectangle.get_Empty(), borderColor.Value * 0.6f);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Bottom() - 2, bounds.Width, BorderWidth.Bottom), (Rectangle?)Rectangle.get_Empty(), borderColor.Value * 0.5f);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Bottom() - 1, bounds.Width, BorderWidth.Bottom / 2), (Rectangle?)Rectangle.get_Empty(), borderColor.Value * 0.6f);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), BorderWidth.Left, bounds.Height), (Rectangle?)Rectangle.get_Empty(), borderColor.Value * 0.5f);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), BorderWidth.Left / 2, bounds.Height), (Rectangle?)Rectangle.get_Empty(), borderColor.Value * 0.6f);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Right() - 2, ((Rectangle)(ref bounds)).get_Top(), BorderWidth.Right, bounds.Height), (Rectangle?)Rectangle.get_Empty(), borderColor.Value * 0.5f);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(((Rectangle)(ref bounds)).get_Right() - 1, ((Rectangle)(ref bounds)).get_Top(), BorderWidth.Right / 2, bounds.Height), (Rectangle?)Rectangle.get_Empty(), borderColor.Value * 0.6f);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), bounds.Width, BorderWidth.Top), Rectangle.get_Empty(), borderColor.Value * 0.5f);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), bounds.Width, BorderWidth.Top / 2), Rectangle.get_Empty(), borderColor.Value * 0.6f);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Bottom() - 2, bounds.Width, BorderWidth.Bottom), Rectangle.get_Empty(), borderColor.Value * 0.5f);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Bottom() - 1, bounds.Width, BorderWidth.Bottom / 2), Rectangle.get_Empty(), borderColor.Value * 0.6f);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), BorderWidth.Left, bounds.Height), Rectangle.get_Empty(), borderColor.Value * 0.5f);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref bounds)).get_Left(), ((Rectangle)(ref bounds)).get_Top(), BorderWidth.Left / 2, bounds.Height), Rectangle.get_Empty(), borderColor.Value * 0.6f);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref bounds)).get_Right() - 2, ((Rectangle)(ref bounds)).get_Top(), BorderWidth.Right, bounds.Height), Rectangle.get_Empty(), borderColor.Value * 0.5f);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref bounds)).get_Right() - 1, ((Rectangle)(ref bounds)).get_Top(), BorderWidth.Right / 2, bounds.Height), Rectangle.get_Empty(), borderColor.Value * 0.6f);
 			}
 		}
 	}

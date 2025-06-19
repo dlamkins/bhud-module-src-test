@@ -28,7 +28,7 @@ namespace Kenedia.Modules.Core.Controls
 			}
 			set
 			{
-				Common.SetProperty(ref _checked, value, On_CheckChanged);
+				Common.SetProperty(ref _checked, value, new ValueChangedEventHandler<bool>(On_CheckChanged));
 			}
 		}
 
@@ -37,22 +37,19 @@ namespace Kenedia.Modules.Core.Controls
 		public event EventHandler<CheckChangedEvent> CheckedChanged;
 
 		public HotbarButton()
-			: this()
 		{
-			((Control)this).set_ClipsBounds(true);
+			base.ClipsBounds = true;
 		}
 
 		private void On_CheckChanged(object sender, ValueChangedEventArgs<bool> e)
 		{
-			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0033: Expected O, but got Unknown
 			OnCheckChanged?.Invoke((e.NewValue ? ((byte)1) : ((byte)0)) != 0);
 			this.CheckedChanged?.Invoke(this, new CheckChangedEvent((e.NewValue ? ((byte)1) : ((byte)0)) != 0));
 		}
 
 		protected override void OnClick(MouseEventArgs e)
 		{
-			((Control)this).OnClick(e);
+			base.OnClick(e);
 			Checked = !Checked;
 		}
 
@@ -61,27 +58,26 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
 			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-			((Control)this).RecalculateLayout();
+			base.RecalculateLayout();
 			if (Icon != null)
 			{
-				Icon.Bounds = new Rectangle(0, 0, ((Control)this).get_Width(), ((Control)this).get_Height());
+				Icon.Bounds = new Rectangle(0, 0, base.Width, base.Height);
 			}
 			double offset = 0.7;
-			_active.Bounds = new Rectangle(((Control)this).get_Width() - (int)((double)((Control)this).get_Width() * offset), ((Control)this).get_Height() - (int)((double)((Control)this).get_Height() * offset), ((Control)this).get_Width(), ((Control)this).get_Height());
-			_inactive.Bounds = new Rectangle(((Control)this).get_Width() - (int)((double)((Control)this).get_Width() * offset), ((Control)this).get_Height() - (int)((double)((Control)this).get_Height() * offset), ((Control)this).get_Width(), ((Control)this).get_Height());
+			_active.Bounds = new Rectangle(base.Width - (int)((double)base.Width * offset), base.Height - (int)((double)base.Height * offset), base.Width, base.Height);
+			_inactive.Bounds = new Rectangle(base.Width - (int)((double)base.Width * offset), base.Height - (int)((double)base.Height * offset), base.Width, base.Height);
 		}
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			((Control)this).RecalculateLayout();
-			Icon?.Draw((Control)(object)this, spriteBatch, ((Control)this).get_RelativeMousePosition());
-			(Checked ? _active : _inactive).Draw((Control)(object)this, spriteBatch);
+			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+			Icon?.Draw(this, spriteBatch, base.RelativeMousePosition);
+			(Checked ? _active : _inactive).Draw(this, spriteBatch);
 		}
 
 		protected override void DisposeControl()
 		{
-			((Control)this).DisposeControl();
+			base.DisposeControl();
 			if (Icon != null)
 			{
 				Icon.Texture = null;
