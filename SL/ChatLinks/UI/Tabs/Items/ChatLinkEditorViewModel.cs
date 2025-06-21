@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Blish_HUD.Content;
 using GuildWars2.Chat;
 using GuildWars2.Items;
+using GuildWars2.Markup;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using Microsoft.Xna.Framework;
@@ -127,7 +128,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 		{
 			get
 			{
-				string name = Item.Name;
+				string name = MarkupConverter.ToPlainText(Item.Name);
 				if (!Item.Flags.HideSuffix)
 				{
 					UpgradeComponent defaultSuffix = _customizer.DefaultSuffixItem(Item);

@@ -16,7 +16,6 @@ using GuildWars2.Items;
 using Microsoft.Xna.Framework;
 using SL.Common;
 using SL.Common.Controls;
-using SL.Common.ModelBinding;
 
 namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 {
@@ -901,18 +900,9 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d0: Expected O, but got Unknown
+			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00df: Unknown result type (might be due to invalid IL or missing references)
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Parent((Container)(object)_layout);
 			val.set_FlowDirection((ControlFlowDirection)2);
@@ -924,17 +914,13 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 			((Control)val2).set_Parent((Container)(object)header);
 			val2.set_Texture(ViewModel.GetIcon(ViewModel.Item));
 			((Control)val2).set_Size(new Point(50));
-			Label val3 = new Label();
-			((Control)val3).set_Parent((Container)(object)header);
-			val3.set_TextColor(ViewModel.ItemNameColor);
-			((Control)val3).set_Width(((Control)_layout).get_Width() - 55);
-			((Control)val3).set_Height(50);
-			val3.set_VerticalAlignment((VerticalAlignment)1);
-			val3.set_Font(GameService.Content.get_DefaultFont18());
-			val3.set_WrapText(true);
-			Label name = val3;
-			Binder.Bind(ViewModel, (ItemTooltipViewModel vm) => vm.ItemName, name);
-			name.set_Text(name.get_Text().Replace(" ", "  "));
+			((Control)new FormattedLabelBuilder().SetWidth(((Control)_layout).get_Width() - 55).SetHeight(50).Wrap()
+				.SetVerticalAlignment((VerticalAlignment)1)
+				.AddMarkup(ViewModel.ItemName.Replace(" ", "  "), delegate(FormattedLabelPartBuilder part)
+				{
+					part.SetFontSize((FontSize)18);
+				}, ViewModel.ItemNameColor)
+				.Build()).set_Parent((Container)(object)header);
 		}
 
 		private void PrintDefense(int defense)
