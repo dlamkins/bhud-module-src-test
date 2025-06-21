@@ -14,11 +14,9 @@ using Kenedia.Modules.Core.Services;
 using Kenedia.Modules.QoL.Controls;
 using Kenedia.Modules.QoL.Services;
 using Kenedia.Modules.QoL.SubModules;
-using Kenedia.Modules.QoL.SubModules.AutoSniff;
 using Kenedia.Modules.QoL.SubModules.CopyItemName;
 using Kenedia.Modules.QoL.SubModules.GameResets;
 using Kenedia.Modules.QoL.SubModules.ItemDestruction;
-using Kenedia.Modules.QoL.SubModules.SchemanticProcessing;
 using Kenedia.Modules.QoL.SubModules.SkipCutscenes;
 using Kenedia.Modules.QoL.SubModules.WaypointPaste;
 using Kenedia.Modules.QoL.SubModules.WikiSearch;
@@ -99,8 +97,6 @@ namespace Kenedia.Modules.QoL
 			services.AddSingleton<WikiSearch>();
 			services.AddSingleton<WaypointPaste>();
 			services.AddSingleton<CopyItemName>();
-			services.AddSingleton<SchemanticProcessing>();
-			services.AddSingleton<AutoSniff>();
 			return result;
 		}
 
@@ -211,8 +207,6 @@ namespace Kenedia.Modules.QoL
 			SubModules.Add(SubModuleType.WikiSearch, ServiceProviderServiceExtensions.GetRequiredService<WikiSearch>(base.ServiceProvider));
 			SubModules.Add(SubModuleType.WaypointPaste, ServiceProviderServiceExtensions.GetRequiredService<WaypointPaste>(base.ServiceProvider));
 			SubModules.Add(SubModuleType.CopyItemName, ServiceProviderServiceExtensions.GetRequiredService<CopyItemName>(base.ServiceProvider));
-			SubModules.Add(SubModuleType.SchemanticProcessing, ServiceProviderServiceExtensions.GetRequiredService<SchemanticProcessing>(base.ServiceProvider));
-			SubModules.Add(SubModuleType.AutoSniff, ServiceProviderServiceExtensions.GetRequiredService<AutoSniff>(base.ServiceProvider));
 			foreach (SubModule value in SubModules.Values)
 			{
 				value?.Load();
