@@ -19,6 +19,7 @@ using Flurl.Http;
 using Gw2Sharp.WebApi.Exceptions;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Newtonsoft.Json;
 using gw2stacks_blish.data;
@@ -72,7 +73,7 @@ namespace gw2stacks_blish
 
 		private Dictionary<int, AsyncTexture2D> itemTextures = new Dictionary<int, AsyncTexture2D>();
 
-		private Model model;
+		private gw2stacks_blish.data.Model model;
 
 		private Gw2Api api;
 
@@ -90,6 +91,8 @@ namespace gw2stacks_blish
 
 		private FullCharacterView fullCharacterView;
 
+		private FullCharacterBagView fullCharacterBagView;
+
 		private ItemView itemView;
 
 		private Dictionary<Tab, string> tabNameMapping;
@@ -99,6 +102,10 @@ namespace gw2stacks_blish
 		private List<int> ignoredItemList = new List<int>();
 
 		private List<int> excludedItemIds = new List<int>();
+
+		private Texture2D emptyTexture;
+
+		private Texture2D border;
 
 		internal SettingsManager SettingsManager => ModuleParameters.SettingsManager;
 
@@ -171,7 +178,7 @@ namespace gw2stacks_blish
 
 		private async Task load_LUT()
 		{
-			_ = 7;
+			_ = 3;
 			try
 			{
 				bool local = localJson.Value;
@@ -181,7 +188,7 @@ namespace gw2stacks_blish
 					path = DirectoryUtil.RegisterDirectory("gw2stacks");
 				}
 				DirectoryReader dir = new DirectoryReader(path);
-				if (!dir.FileExists("LUT.json") || !dir.FileExists("localeItemLUT.json") || !dir.FileExists("chineseLocal.json") || !dir.FileExists("englishLocal.json") || !dir.FileExists("germanLocal.json") || !dir.FileExists("koreanLocal.json") || !dir.FileExists("spanishLocal.json") || !dir.FileExists("frenchLocal.json"))
+				if (!dir.FileExists("LUT.json") || !dir.FileExists("localeItemLUT.json") || !dir.FileExists("translation.json"))
 				{
 					local = false;
 				}
@@ -190,29 +197,42 @@ namespace gw2stacks_blish
 					string input = System.IO.File.ReadAllText(path + "/ignoredItemsList.json");
 					ignoredItemList = JsonConvert.DeserializeObject<List<int>>(input);
 				}
+				if (dir.FileExists("version.json"))
+				{
+					int hostedVersion = await "https://bhm.blishhud.com/gw2stacks_blish/item_storage/version.json".WithHeader("User-Agent", "Blish-HUD").GetJsonAsync<int>(default(CancellationToken), (HttpCompletionOption)0);
+					int localVersion = JsonConvert.DeserializeObject<int>(System.IO.File.ReadAllText(path + "/version.json"));
+					if (hostedVersion > localVersion)
+					{
+						local = false;
+						string output2 = JsonConvert.SerializeObject(hostedVersion);
+						System.IO.File.WriteAllText(path + "/version.json", output2);
+					}
+				}
+				else
+				{
+					local = false;
+				}
 				if (local)
 				{
 					Logger.Debug("Loading local LUT");
-					Magic.jsonLut = JsonConvert.DeserializeObject<LUT>(System.IO.File.ReadAllText(path + "/LUT.json"));
+					string value = System.IO.File.ReadAllText(path + "/LUT.json");
+					Magic.jsonLut = JsonConvert.DeserializeObject<LUT>(value);
 					Magic.localeItemNamesLut = JsonConvert.DeserializeObject<localeLut>(System.IO.File.ReadAllText(path + "/localeItemLUT.json"));
-					Magic.englishToChinese = JsonConvert.DeserializeObject<Dictionary<string, string>>(System.IO.File.ReadAllText(path + "/chineseLocal.json"));
-					Magic.englishToEnglish = JsonConvert.DeserializeObject<Dictionary<string, string>>(System.IO.File.ReadAllText(path + "/englishLocal.json"));
-					Magic.englishToGerman = JsonConvert.DeserializeObject<Dictionary<string, string>>(System.IO.File.ReadAllText(path + "/germanLocal.json"));
-					Magic.englishToKorean = JsonConvert.DeserializeObject<Dictionary<string, string>>(System.IO.File.ReadAllText(path + "/koreanLocal.json"));
-					Magic.englishToSpanish = JsonConvert.DeserializeObject<Dictionary<string, string>>(System.IO.File.ReadAllText(path + "/spanishLocal.json"));
-					Magic.englishToFrench = JsonConvert.DeserializeObject<Dictionary<string, string>>(System.IO.File.ReadAllText(path + "/frenchLocal.json"));
+					System.IO.File.ReadAllText(path + "/translation.json");
+					Magic.translation = JsonConvert.DeserializeObject<Translation>(value);
 				}
 				else
 				{
 					Logger.Debug("Loading remote LUT");
 					Magic.jsonLut = await "https://bhm.blishhud.com/gw2stacks_blish/item_storage/LUT.json".WithHeader("User-Agent", "Blish-HUD").GetJsonAsync<LUT>(default(CancellationToken), (HttpCompletionOption)0);
 					Magic.localeItemNamesLut = await "https://bhm.blishhud.com/gw2stacks_blish/item_storage/localeItemLUT.json".WithHeader("User-Agent", "Blish-HUD").GetJsonAsync<localeLut>(default(CancellationToken), (HttpCompletionOption)0);
-					Magic.englishToChinese = await "https://bhm.blishhud.com/gw2stacks_blish/item_storage/chineseLocal.json".WithHeader("User-Agent", "Blish-HUD").GetJsonAsync<Dictionary<string, string>>(default(CancellationToken), (HttpCompletionOption)0);
-					Magic.englishToEnglish = await "https://bhm.blishhud.com/gw2stacks_blish/item_storage/englishLocal.json".WithHeader("User-Agent", "Blish-HUD").GetJsonAsync<Dictionary<string, string>>(default(CancellationToken), (HttpCompletionOption)0);
-					Magic.englishToGerman = await "https://bhm.blishhud.com/gw2stacks_blish/item_storage/germanLocal.json".WithHeader("User-Agent", "Blish-HUD").GetJsonAsync<Dictionary<string, string>>(default(CancellationToken), (HttpCompletionOption)0);
-					Magic.englishToKorean = await "https://bhm.blishhud.com/gw2stacks_blish/item_storage/koreanLocal.json".WithHeader("User-Agent", "Blish-HUD").GetJsonAsync<Dictionary<string, string>>(default(CancellationToken), (HttpCompletionOption)0);
-					Magic.englishToSpanish = await "https://bhm.blishhud.com/gw2stacks_blish/item_storage/spanishLocal.json".WithHeader("User-Agent", "Blish-HUD").GetJsonAsync<Dictionary<string, string>>(default(CancellationToken), (HttpCompletionOption)0);
-					Magic.englishToFrench = await "https://bhm.blishhud.com/gw2stacks_blish/item_storage/frenchLocal.json".WithHeader("User-Agent", "Blish-HUD").GetJsonAsync<Dictionary<string, string>>(default(CancellationToken), (HttpCompletionOption)0);
+					Magic.translation = await "https://bhm.blishhud.com/gw2stacks_blish/item_storage/translation.json".WithHeader("User-Agent", "Blish-HUD").GetJsonAsync<Translation>(default(CancellationToken), (HttpCompletionOption)0);
+					string output = JsonConvert.SerializeObject(Magic.jsonLut);
+					System.IO.File.WriteAllText(path + "/LUT.json", output);
+					output = JsonConvert.SerializeObject(Magic.localeItemNamesLut);
+					System.IO.File.WriteAllText(path + "/localeItemLUT.json", output);
+					output = JsonConvert.SerializeObject(Magic.translation);
+					System.IO.File.WriteAllText(path + "/translation.json", output);
 				}
 				hasLut = true;
 				Logger.Debug("Lut successfully parsed");
@@ -224,6 +244,11 @@ namespace gw2stacks_blish
 				handle_error("Error when creating LUTs");
 				Logger.Warn("Unexpected exception: can't create LUT @" + e_.StackTrace);
 			}
+		}
+
+		private async Task load_textures()
+		{
+			border = ContentsManager.GetTexture("Textures\\MasterworkBorder.png");
 		}
 
 		protected override void DefineSettings(SettingCollection settings)
@@ -240,10 +265,6 @@ namespace gw2stacks_blish
 				{
 					hide_windows();
 				}
-			};
-			showBag.SettingChanged += delegate(object s, ValueChangedEventArgs<bool> e)
-			{
-				fullCharacterView.set_bag_flag(e.NewValue);
 			};
 			itemShortcut.SettingChanged += delegate(object s, ValueChangedEventArgs<bool> e)
 			{
@@ -288,6 +309,20 @@ namespace gw2stacks_blish
 			itemView = new ItemView();
 			itemView.set_values(itemTextures, combinedAdvice);
 			fullCharacterView = new FullCharacterView();
+			fullCharacterView.set_values(itemTextures);
+			fullCharacterBagView = new FullCharacterBagView();
+			fullCharacterBagView.set_values(itemTextures);
+			showBag.SettingChanged += delegate(object s, ValueChangedEventArgs<bool> e)
+			{
+				if (e.NewValue)
+				{
+					characterBasedWindow.Show(fullCharacterBagView);
+				}
+				else
+				{
+					characterBasedWindow.Show(fullCharacterView);
+				}
+			};
 		}
 
 		private async void on_mouse_alt_click(object s_ = null, MouseEventArgs e_ = null)
@@ -330,7 +365,7 @@ namespace gw2stacks_blish
 			loadingSpinner.Parent = GameService.Graphics.SpriteScreen;
 			loadingSpinner.Hide();
 			loadingSpinner.Enabled = false;
-			model = new Model(Logger);
+			model = new gw2stacks_blish.data.Model(Logger);
 			api = new Gw2Api(Gw2ApiManager);
 			icon.Show();
 		}
@@ -391,10 +426,10 @@ namespace gw2stacks_blish
 				fullAdvice.AddRange(item2);
 			}
 			combinedAdvice.Clear();
-			foreach (KeyValuePair<int, gw2stacks_blish.data.Item> entry2 in model?.items)
+			foreach (KeyValuePair<int, gw2stacks_blish.data.Item> entry in model?.items)
 			{
-				IEnumerable<ItemForDisplay> applicable2 = fullAdvice.Where((ItemForDisplay itemForDisplay) => itemForDisplay.applicable_to_id(entry2.Key));
-				combinedAdvice.Add(new CombinedItemForDisplay(entry2.Value, applicable2.ToList()));
+				IEnumerable<ItemForDisplay> applicable2 = fullAdvice.Where((ItemForDisplay itemForDisplay) => itemForDisplay.applicable_to_id(entry.Key));
+				combinedAdvice.Add(new CombinedItemForDisplay(entry.Value, applicable2.ToList()));
 			}
 			fullCharacterInventories.Clear();
 			foreach (KeyValuePair<string, List<int?>> entry3 in model?.characterInventory)
@@ -415,12 +450,13 @@ namespace gw2stacks_blish
 					list.Add(applicable.First());
 				}
 				fullCharacterInventories.Add(entry3.Key, list);
+				Logger.Debug("Character: " + entry3.Key + " has " + list.Count + " items");
 			}
 			characterBags.Clear();
-			foreach (KeyValuePair<string, List<InventoryBagSlot>> entry in model?.inventoryBags)
+			foreach (KeyValuePair<string, List<InventoryBagSlot>> entry2 in model?.inventoryBags)
 			{
 				List<BagForDisplay> bagsForDisplay = new List<BagForDisplay>();
-				foreach (InventoryBagSlot bag in entry.Value)
+				foreach (InventoryBagSlot bag in entry2.Value)
 				{
 					if (bag.get_id() == 0)
 					{
@@ -431,7 +467,8 @@ namespace gw2stacks_blish
 						bagsForDisplay.Add(new BagForDisplay(bag.get_id(), bag.get_size()));
 					}
 				}
-				characterBags.Add(entry.Key, bagsForDisplay);
+				characterBags.Add(entry2.Key, bagsForDisplay);
+				Logger.Debug("Character: " + entry2.Key + " has " + bagsForDisplay.Count + " bag slots");
 			}
 		}
 
@@ -458,8 +495,14 @@ namespace gw2stacks_blish
 				}
 				break;
 			case 1:
-				characterBasedWindow.Show(fullCharacterView);
-				fullCharacterView.set_bag_flag(showBag.Value);
+				if (showBag.Value)
+				{
+					characterBasedWindow.Show(fullCharacterBagView);
+				}
+				else
+				{
+					characterBasedWindow.Show(fullCharacterView);
+				}
 				break;
 			case 2:
 				characterBasedWindow.Show(itemView);
@@ -495,7 +538,8 @@ namespace gw2stacks_blish
 					{
 						TokenPermission.Account,
 						TokenPermission.Characters,
-						TokenPermission.Inventories
+						TokenPermission.Inventories,
+						TokenPermission.Unlocks
 					}))
 					{
 						fatalError = false;
@@ -596,8 +640,9 @@ namespace gw2stacks_blish
 			Logger.Debug("update views name found " + GameService.Gw2Mumble.PlayerCharacter.Name);
 			if (fullCharacterInventories.ContainsKey(GameService.Gw2Mumble.PlayerCharacter.Name))
 			{
-				fullCharacterView.update(itemTextures, fullCharacterInventories[GameService.Gw2Mumble.PlayerCharacter.Name], GameService.Gw2Mumble.PlayerCharacter.Name, characterBags[GameService.Gw2Mumble.PlayerCharacter.Name]);
+				fullCharacterView.update(fullCharacterInventories[GameService.Gw2Mumble.PlayerCharacter.Name], GameService.Gw2Mumble.PlayerCharacter.Name, characterBags[GameService.Gw2Mumble.PlayerCharacter.Name]);
 			}
+			fullCharacterBagView.update(fullCharacterInventories[GameService.Gw2Mumble.PlayerCharacter.Name], GameService.Gw2Mumble.PlayerCharacter.Name, characterBags[GameService.Gw2Mumble.PlayerCharacter.Name]);
 		}
 
 		private void on_character_change(object sender_, ValueEventArgs<string> e_)
@@ -605,7 +650,8 @@ namespace gw2stacks_blish
 			string newName = e_.Value ?? "invalid name";
 			if (fullCharacterInventories.ContainsKey(newName))
 			{
-				fullCharacterView.update(itemTextures, fullCharacterInventories[newName], newName, characterBags[newName]);
+				fullCharacterView.update(fullCharacterInventories[newName], newName, characterBags[newName]);
+				fullCharacterBagView.update(fullCharacterInventories[newName], newName, characterBags[newName]);
 			}
 		}
 
@@ -646,6 +692,7 @@ namespace gw2stacks_blish
 		protected override async Task LoadAsync()
 		{
 			await load_LUT();
+			await load_textures();
 		}
 
 		protected override void OnModuleLoaded(EventArgs e)

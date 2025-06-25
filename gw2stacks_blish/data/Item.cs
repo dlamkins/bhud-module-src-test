@@ -44,6 +44,16 @@ namespace gw2stacks_blish.data
 
 		public string chatLink;
 
+		public ItemType type;
+
+		public ItemWeightType armorWeight;
+
+		public ItemArmorSlotType armorType;
+
+		public ItemWeaponType weaponType;
+
+		public ItemTrinketType trinketType;
+
 		public Item(int id_, bool isCharacterBound_, bool isAccountBound_, bool delayedCreate = false)
 		{
 			itemId = id_;
@@ -64,6 +74,11 @@ namespace gw2stacks_blish.data
 			isSellable = true;
 			isSalvagable = true;
 			chatLink = "";
+			type = ItemType.Unknown;
+			armorWeight = ItemWeightType.Unknown;
+			armorType = ItemArmorSlotType.Unknown;
+			weaponType = ItemWeaponType.Unknown;
+			trinketType = ItemTrinketType.Unknown;
 			if (!delayedCreate)
 			{
 				build_basic_item_info();
@@ -97,6 +112,7 @@ namespace gw2stacks_blish.data
 			VendorValue = info_.VendorValue;
 			string urlName = name.Replace(" ", "_");
 			wikiLink = "wiki.guildwars2.com/wiki/" + urlName;
+			type = (ItemType)info_.Type;
 			bool salvagable = true;
 			if (Magic.is_non_stackable_type((ItemType)info_.Type))
 			{
@@ -135,6 +151,10 @@ namespace gw2stacks_blish.data
 			{
 				isRareForSalvage = true;
 			}
+			armorWeight = info_.armorWeight;
+			armorType = info_.armorType;
+			weaponType = info_.weaponType;
+			trinketType = info_.trinketType;
 			hasInformation = true;
 		}
 

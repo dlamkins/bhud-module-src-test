@@ -20,6 +20,11 @@ namespace gw2stacks_blish.reader
 			return await manager.Gw2ApiClient.V2.Account.GetAsync();
 		}
 
+		public async Task<IApiV2ObjectList<AccountLegendaryArmory>> get_legendary_armory()
+		{
+			return await manager.Gw2ApiClient.V2.Account.LegendaryArmory.GetAsync();
+		}
+
 		public async Task<IApiV2ObjectList<AccountItem>> shared_inventory()
 		{
 			return await manager.Gw2ApiClient.V2.Account.Inventory.GetAsync();

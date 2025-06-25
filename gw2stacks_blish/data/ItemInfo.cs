@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Gw2Sharp.WebApi.V2.Models;
 
 namespace gw2stacks_blish.data
 {
@@ -26,6 +27,14 @@ namespace gw2stacks_blish.data
 
 		public string chatLink;
 
+		public ItemWeightType armorWeight;
+
+		public ItemArmorSlotType armorType;
+
+		public ItemWeaponType weaponType;
+
+		public ItemTrinketType trinketType;
+
 		public ItemInfo()
 		{
 			Id = 0;
@@ -39,6 +48,10 @@ namespace gw2stacks_blish.data
 			Level = 0;
 			VendorValue = 0;
 			chatLink = "";
+			armorWeight = ItemWeightType.Unknown;
+			armorType = ItemArmorSlotType.Unknown;
+			weaponType = ItemWeaponType.Unknown;
+			trinketType = ItemTrinketType.Unknown;
 		}
 	}
 }

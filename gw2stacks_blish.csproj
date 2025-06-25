@@ -15,12 +15,12 @@
     <Reference Include="Blish HUD">
       <HintPath>..\..\working\Blish HUD.exe</HintPath>
     </Reference>
+    <Reference Include="MonoGame.Framework">
+      <HintPath>..\..\working\MonoGame.Framework.dll</HintPath>
+    </Reference>
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="Gw2Sharp">
       <HintPath>..\..\working\Gw2Sharp.dll</HintPath>
-    </Reference>
-    <Reference Include="MonoGame.Framework">
-      <HintPath>..\..\working\MonoGame.Framework.dll</HintPath>
     </Reference>
     <Reference Include="System.Memory">
       <HintPath>..\..\working\System.Memory.dll</HintPath>

@@ -36,6 +36,8 @@ namespace gw2stacks_blish.data
 
 		public Dictionary<string, List<InventoryBagSlot>> inventoryBags = new Dictionary<string, List<InventoryBagSlot>>();
 
+		public Armory legendaryArmory;
+
 		public void reset_state()
 		{
 			foreach (KeyValuePair<int, Item> item in items)
@@ -52,6 +54,7 @@ namespace gw2stacks_blish.data
 			characterInventory = new Dictionary<string, List<int?>>();
 			sharedInventory = new List<int?>();
 			inventoryBags = new Dictionary<string, List<InventoryBagSlot>>();
+			legendaryArmory = new Armory();
 			validData = false;
 		}
 
@@ -75,6 +78,7 @@ namespace gw2stacks_blish.data
 			await build_item_prices(api_);
 			Magic.silkBag.build_basic_item_info();
 			Magic.borealTrunk.build_basic_item_info();
+			await build_legendary_armory(api_);
 			validData = true;
 		}
 
@@ -315,6 +319,74 @@ namespace gw2stacks_blish.data
 			}
 		}
 
+		public async Task build_legendary_armory(Gw2Api api_)
+		{
+			foreach (AccountLegendaryArmory item in await api_.get_legendary_armory())
+			{
+				if (Magic.jsonLut.itemLut.ContainsKey(item.Id))
+				{
+					ItemInfo temp = Magic.jsonLut.itemLut[item.Id];
+					switch (temp.Type)
+					{
+					case 1:
+						switch (temp.armorWeight)
+						{
+						case ItemWeightType.Heavy:
+							legendaryArmory.heavyArmor[temp.armorType] = true;
+							break;
+						case ItemWeightType.Medium:
+							legendaryArmory.mediumArmor[temp.armorType] = true;
+							break;
+						case ItemWeightType.Light:
+							legendaryArmory.lightArmor[temp.armorType] = true;
+							break;
+						}
+						continue;
+					case 15:
+						legendaryArmory.weapons[temp.weaponType] += item.Count;
+						continue;
+					case 2:
+						legendaryArmory.backpack = true;
+						continue;
+					case 12:
+						switch (temp.trinketType)
+						{
+						case ItemTrinketType.Ring:
+							legendaryArmory.rings += item.Count;
+							break;
+						case ItemTrinketType.Accessory:
+							legendaryArmory.trinkets += item.Count;
+							break;
+						case ItemTrinketType.Amulet:
+							legendaryArmory.amulet = true;
+							break;
+						}
+						continue;
+					}
+					if (item.Id == 101582)
+					{
+						legendaryArmory.relic = true;
+					}
+					switch (item.Id)
+					{
+					case 101582:
+						legendaryArmory.relic = true;
+						break;
+					case 91505:
+						legendaryArmory.sigils += item.Count;
+						break;
+					case 91536:
+						legendaryArmory.runes += item.Count;
+						break;
+					}
+				}
+				else
+				{
+					log.Warn("Invalid legendary of id" + item.Id);
+				}
+			}
+		}
+
 		public List<ItemForDisplay> get_stacks_advice()
 		{
 			List<ItemForDisplay> result = new List<ItemForDisplay>();
@@ -378,9 +450,101 @@ namespace gw2stacks_blish.data
 		public List<ItemForDisplay> get_just_salvage_advice()
 		{
 			List<ItemForDisplay> result = new List<ItemForDisplay>();
-			foreach (Item item in items.Values.Where((Item list_item) => (Magic.salvageIds.Contains(list_item.itemId) && list_item.itemId != Magic.ectoId) || (list_item.isDeletable && list_item.isSalvagable)))
+			foreach (Item item2 in items.Values.Where((Item list_item) => (Magic.salvageIds.Contains(list_item.itemId) && list_item.itemId != Magic.ectoId) || (list_item.isDeletable && list_item.isSalvagable)))
 			{
-				result.Add(new ItemForDisplay(item, null, "Salvage these items"));
+				result.Add(new ItemForDisplay(item2, null, "Salvage these items"));
+			}
+			foreach (Item item in items.Values.Where((Item entry) => entry.rarity == ItemRarity.Ascended && (entry.type == ItemType.Armor || entry.type == ItemType.Weapon || entry.type == ItemType.Back || entry.type == ItemType.Trinket)))
+			{
+				if (Magic.gaetingSalvage.Contains(item.itemId))
+				{
+					result.Add(new ItemForDisplay(item, null, "Salvage these items for gaeting crystals"));
+					continue;
+				}
+				if (Magic.magnetiteSalvage.Contains(item.itemId))
+				{
+					result.Add(new ItemForDisplay(item, null, "Salvage these items for magnetite shards"));
+					continue;
+				}
+				switch (item.type)
+				{
+				case ItemType.Armor:
+					log.Debug("found ascended armor: " + item.name + " of id: " + item.itemId + " ,type:" + item.type);
+					if (legendaryArmory.mediumArmor.ContainsKey(item.armorType))
+					{
+						switch (item.armorWeight)
+						{
+						case ItemWeightType.Heavy:
+							if (legendaryArmory.heavyArmor[item.armorType])
+							{
+								result.Add(new ItemForDisplay(item, null, "Salvage these items for research notes"));
+							}
+							break;
+						case ItemWeightType.Medium:
+							if (legendaryArmory.mediumArmor[item.armorType])
+							{
+								result.Add(new ItemForDisplay(item, null, "Salvage these items for research notes"));
+							}
+							break;
+						case ItemWeightType.Light:
+							if (legendaryArmory.lightArmor[item.armorType])
+							{
+								result.Add(new ItemForDisplay(item, null, "Salvage these items for research notes"));
+							}
+							break;
+						}
+					}
+					else
+					{
+						log.Warn("Invalid legendary armor type of armor: " + item.name + " of id: " + item.itemId + " ,type:" + item.type.ToString() + " and armour type: " + item.armorType);
+					}
+					break;
+				case ItemType.Weapon:
+					log.Debug("found ascended weapon: " + item.name + " of id: " + item.itemId + " ,type:" + item.type);
+					if (legendaryArmory.weapons.ContainsKey(item.weaponType))
+					{
+						if (Magic.singularWeaponTypes.Contains(item.weaponType))
+						{
+							if (legendaryArmory.weapons[item.weaponType] >= 1)
+							{
+								result.Add(new ItemForDisplay(item, null, "Salvage these items for research notes"));
+							}
+						}
+						else if (legendaryArmory.weapons[item.weaponType] >= 2)
+						{
+							result.Add(new ItemForDisplay(item, null, "Salvage these items for research notes"));
+						}
+					}
+					else
+					{
+						log.Warn("Invalid legendary weapon type of weapon: " + item.name + " of id: " + item.itemId + ", type: " + item.type.ToString() + " and weapon type: " + item.weaponType);
+					}
+					break;
+				case ItemType.Trinket:
+					log.Debug("found ascended trinket: " + item.name + " of id: " + item.itemId + " ,type:" + item.type);
+					switch (item.trinketType)
+					{
+					case ItemTrinketType.Accessory:
+						if (legendaryArmory.trinkets >= 2)
+						{
+							result.Add(new ItemForDisplay(item, null, "Salvage these items"));
+						}
+						break;
+					case ItemTrinketType.Ring:
+						if (legendaryArmory.rings >= 2)
+						{
+							result.Add(new ItemForDisplay(item, null, "Salvage these items"));
+						}
+						break;
+					case ItemTrinketType.Amulet:
+						if (legendaryArmory.amulet)
+						{
+							result.Add(new ItemForDisplay(item, null, "Salvage these items"));
+						}
+						break;
+					}
+					break;
+				}
 			}
 			return result;
 		}
@@ -430,12 +594,12 @@ namespace gw2stacks_blish.data
 			}
 			foreach (CraftingMiscAdvice advice in Magic.craftingMiscAdvices.Values)
 			{
-				foreach (KeyValuePair<int, int> item in advice.idCountMapping)
+				foreach (KeyValuePair<int, int> item3 in advice.idCountMapping)
 				{
-					if (has_item(item.Key) && items[item.Key].total_count() >= Convert.ToUInt64(item.Value))
+					if (has_item(item3.Key) && items[item3.Key].total_count() >= Convert.ToUInt64(item3.Value))
 					{
 						Item output = new Item(advice.outputId, isCharacterBound_: false, isAccountBound_: false);
-						result.Add(new MiscCraftingItemForDisplay(items[item.Key], output, "Craft: "));
+						result.Add(new MiscCraftingItemForDisplay(items[item3.Key], output, "Craft: "));
 					}
 				}
 			}
@@ -477,6 +641,36 @@ namespace gw2stacks_blish.data
 					bag.add_source(new Source(1uL, source));
 				}
 				result.Add(new MiscCraftingItemForDisplay(bag, Magic.silkBag, "Potentially replace these bags with"));
+			}
+			Item wizardGobbler = new Item(104963, isCharacterBound_: true, isAccountBound_: true);
+			Item wizardScroll = new Item(104772, isCharacterBound_: true, isAccountBound_: true);
+			foreach (int item2 in Magic.wizardGobblers)
+			{
+				if (has_item(item2))
+				{
+					if (has_item(wizardGobbler.itemId))
+					{
+						result.Add(new MiscCraftingItemForDisplay(items[item2], wizardGobbler, "Delete and use"));
+					}
+					else
+					{
+						result.Add(new MiscCraftingItemForDisplay(items[item2], wizardGobbler, "Delete and aquire"));
+					}
+				}
+			}
+			foreach (int item in Magic.wizardScrolls)
+			{
+				if (has_item(item))
+				{
+					if (has_item(wizardScroll.itemId))
+					{
+						result.Add(new MiscCraftingItemForDisplay(items[item], wizardScroll, "Delete and use"));
+					}
+					else
+					{
+						result.Add(new MiscCraftingItemForDisplay(items[item], wizardScroll, "Delete and aquire"));
+					}
+				}
 			}
 			return result;
 		}
