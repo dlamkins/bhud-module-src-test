@@ -39,7 +39,6 @@ namespace DecorBlishhudModule
 				try
 				{
 					Clipboard.SetText(text);
-					Logger.Info("Copied '" + text + "' to clipboard.");
 				}
 				catch (Exception ex)
 				{

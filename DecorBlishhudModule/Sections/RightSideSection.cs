@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Content;
@@ -55,7 +56,27 @@ namespace DecorBlishhudModule.Sections
 			{
 				try
 				{
-					Texture2D borderedTexture = CreateBorderedTexture(await DecorModule.DecorModuleInstance.Client.GetByteArrayAsync(decoration.ImageUrl));
+					string localImagePath = LeftSideSection.GetImageAndIconFilePath(decoration.ImageUrl);
+					SemaphoreSlim semaphore = LeftSideSection.GetFileSemaphore(localImagePath);
+					await semaphore.WaitAsync();
+					byte[] imageResponse;
+					try
+					{
+						if (File.Exists(localImagePath))
+						{
+							imageResponse = File.ReadAllBytes(localImagePath);
+						}
+						else
+						{
+							imageResponse = await DecorModule.DecorModuleInstance.Client.GetByteArrayAsync(decoration.ImageUrl);
+							File.WriteAllBytes(localImagePath, imageResponse);
+						}
+					}
+					finally
+					{
+						semaphore.Release();
+					}
+					Texture2D borderedTexture = CreateBorderedTexture(imageResponse);
 					if (borderedTexture != null)
 					{
 						_decorationImage.set_Texture(AsyncTexture2D.op_Implicit(borderedTexture));

@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -175,6 +177,12 @@ namespace DecorBlishhudModule
 
 		protected override async Task LoadAsync()
 		{
+			foreach (string directoryName in DirectoriesManager.get_RegisteredDirectories())
+			{
+				string fullDirectoryPath = DirectoriesManager.GetFullDirectoryPath(directoryName);
+				List<string> allFiles = Directory.EnumerateFiles(fullDirectoryPath, "*", SearchOption.AllDirectories).ToList();
+				Logger.Info($"'{directoryName}' can be found at '{fullDirectoryPath}' and has {allFiles.Count} total files within it.");
+			}
 			_homesteadIconUnactive = ContentsManager.GetTexture("test/homesteadIconUnactive.png");
 			_homesteadIconHover = ContentsManager.GetTexture("test/homesteadIconHover.png");
 			_homesteadIconMenu = ContentsManager.GetTexture("test/homesteadIconMenu.png");

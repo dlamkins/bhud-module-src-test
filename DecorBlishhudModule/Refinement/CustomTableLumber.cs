@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using Blish_HUD;
@@ -389,18 +391,37 @@ namespace DecorBlishhudModule.Refinement
 				return itemTooltips[item];
 			}
 			Tooltip customTooltip = new Tooltip();
+			string localImagePath = LeftSideSection.GetImageAndIconFilePath(item.Icon);
+			SemaphoreSlim semaphore = LeftSideSection.GetFileSemaphore(localImagePath);
+			await semaphore.WaitAsync();
+			byte[] imageResponse;
+			try
+			{
+				if (File.Exists(localImagePath))
+				{
+					imageResponse = File.ReadAllBytes(localImagePath);
+				}
+				else
+				{
+					imageResponse = await DecorModule.DecorModuleInstance.Client.GetByteArrayAsync(item.Icon);
+					File.WriteAllBytes(localImagePath, imageResponse);
+				}
+			}
+			finally
+			{
+				semaphore.Release();
+			}
 			Image val = new Image();
 			((Control)val).set_Parent((Container)(object)customTooltip);
-			Image val2 = val;
-			val2.set_Texture(AsyncTexture2D.op_Implicit(LeftSideSection.CreateIconTexture(await DecorModule.DecorModuleInstance.Client.GetByteArrayAsync(item.Icon))));
+			val.set_Texture(AsyncTexture2D.op_Implicit(LeftSideSection.CreateIconTexture(imageResponse)));
 			((Control)val).set_Size(new Point(30, 30));
-			Label val3 = new Label();
-			((Control)val3).set_Parent((Container)(object)customTooltip);
-			val3.set_Text(item.Name);
-			val3.set_TextColor(Color.get_White());
-			val3.set_Font(GameService.Content.get_DefaultFont18());
-			((Control)val3).set_Location(new Point(35, 3));
-			val3.set_AutoSizeWidth(true);
+			Label val2 = new Label();
+			((Control)val2).set_Parent((Container)(object)customTooltip);
+			val2.set_Text(item.Name);
+			val2.set_TextColor(Color.get_White());
+			val2.set_Font(GameService.Content.get_DefaultFont18());
+			((Control)val2).set_Location(new Point(35, 3));
+			val2.set_AutoSizeWidth(true);
 			itemTooltips[item] = customTooltip;
 			return customTooltip;
 		}
@@ -545,7 +566,7 @@ namespace DecorBlishhudModule.Refinement
 					return;
 				}
 				int secondsCounter = 60;
-				Timer timer = new Timer(1000.0);
+				System.Timers.Timer timer = new System.Timers.Timer(1000.0);
 				timer.Elapsed += delegate
 				{
 					if (secondsCounter > 0)
@@ -556,7 +577,7 @@ namespace DecorBlishhudModule.Refinement
 				};
 				timer.AutoReset = true;
 				timer.Enabled = true;
-				Timer timer2 = new Timer(61000.0);
+				System.Timers.Timer timer2 = new System.Timers.Timer(61000.0);
 				timer2.Elapsed += async delegate
 				{
 					try

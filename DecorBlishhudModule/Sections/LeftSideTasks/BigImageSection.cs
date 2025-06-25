@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Content;
@@ -17,6 +18,8 @@ namespace DecorBlishhudModule.Sections.LeftSideTasks
 		private static readonly Logger Logger = Logger.GetLogger<DecorModule>();
 
 		private static Panel bigImagePanel;
+
+		private static DateTime _lastImageShownTime = DateTime.MinValue;
 
 		public static async Task UpdateDecorationImageAsync(Decoration decoration, Container _decorWindow, Image _decorationImage)
 		{
@@ -47,7 +50,27 @@ namespace DecorBlishhudModule.Sections.LeftSideTasks
 			{
 				try
 				{
-					Texture2D borderedTexture = CreateBorderedTexture(await DecorModule.DecorModuleInstance.Client.GetByteArrayAsync(decoration.ImageUrl));
+					string localImagePath = LeftSideSection.GetImageAndIconFilePath(decoration.ImageUrl);
+					SemaphoreSlim semaphore = LeftSideSection.GetFileSemaphore(localImagePath);
+					await semaphore.WaitAsync();
+					byte[] imageResponse;
+					try
+					{
+						if (File.Exists(localImagePath))
+						{
+							imageResponse = File.ReadAllBytes(localImagePath);
+						}
+						else
+						{
+							imageResponse = await DecorModule.DecorModuleInstance.Client.GetByteArrayAsync(decoration.ImageUrl);
+							File.WriteAllBytes(localImagePath, imageResponse);
+						}
+					}
+					finally
+					{
+						semaphore.Release();
+					}
+					Texture2D borderedTexture = CreateBorderedTexture(imageResponse);
 					if (borderedTexture != null)
 					{
 						_decorationImage.set_Texture(AsyncTexture2D.op_Implicit(borderedTexture));
@@ -55,6 +78,7 @@ namespace DecorBlishhudModule.Sections.LeftSideTasks
 						CenterImageInParent(_decorationImage, (Control)(object)_decorWindow);
 						PositionXIconAtTopLeft(textureXImage, _decorationImage);
 						((Control)bigImagePanel).set_Visible(true);
+						_lastImageShownTime = DateTime.Now;
 						if (((Control)_decorationImage).get_Visible())
 						{
 							((Control)textureXImage).set_Visible(true);
@@ -76,7 +100,7 @@ namespace DecorBlishhudModule.Sections.LeftSideTasks
 				((Control)_decorationImage).add_Click((EventHandler<MouseEventArgs>)async delegate
 				{
 					await Task.Delay(100);
-					if (((Control)_decorationImage).get_Visible() || ((Control)bigImagePanel).get_Visible() || ((Control)textureXImage).get_Visible())
+					if ((DateTime.Now - _lastImageShownTime).TotalMilliseconds > 200.0)
 					{
 						((Control)_decorationImage).set_Visible(false);
 						((Control)bigImagePanel).set_Visible(false);
@@ -86,7 +110,7 @@ namespace DecorBlishhudModule.Sections.LeftSideTasks
 				((Control)_decorWindow).add_Click((EventHandler<MouseEventArgs>)async delegate
 				{
 					await Task.Delay(100);
-					if (((Control)_decorationImage).get_Visible() || ((Control)bigImagePanel).get_Visible() || ((Control)textureXImage).get_Visible())
+					if ((DateTime.Now - _lastImageShownTime).TotalMilliseconds > 200.0)
 					{
 						((Control)_decorationImage).set_Visible(false);
 						((Control)bigImagePanel).set_Visible(false);

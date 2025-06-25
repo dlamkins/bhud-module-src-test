@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Content;
@@ -40,6 +41,10 @@ namespace DecorBlishhudModule
 		private static Label _loadingLabel = null;
 
 		private static Label _loadingLabel2 = null;
+
+		private static readonly Dictionary<string, SemaphoreSlim> _fileSemaphores = new Dictionary<string, SemaphoreSlim>();
+
+		private static readonly object _semaphoreLock = new object();
 
 		private static Task<Dictionary<string, List<Decoration>>> FetchHomesteadDecorationsAsync()
 		{
@@ -475,7 +480,27 @@ namespace DecorBlishhudModule
 			}
 			try
 			{
-				Texture2D newTexture = CreateIconTexture(await DecorModule.DecorModuleInstance.Client.GetByteArrayAsync(iconUrl));
+				string localImagePath = GetImageAndIconFilePath(iconUrl);
+				SemaphoreSlim semaphore = GetFileSemaphore(localImagePath);
+				await semaphore.WaitAsync();
+				byte[] iconResponse;
+				try
+				{
+					if (File.Exists(localImagePath))
+					{
+						iconResponse = File.ReadAllBytes(localImagePath);
+					}
+					else
+					{
+						iconResponse = await DecorModule.DecorModuleInstance.Client.GetByteArrayAsync(iconUrl);
+						File.WriteAllBytes(localImagePath, iconResponse);
+					}
+				}
+				finally
+				{
+					semaphore.Release();
+				}
+				Texture2D newTexture = CreateIconTexture(iconResponse);
 				if (newTexture != null)
 				{
 					_sharedTextureCache[key] = newTexture;
@@ -543,6 +568,30 @@ namespace DecorBlishhudModule
 		{
 			CleanupSharedTextureCache();
 			Unload();
+		}
+
+		public static string GetImageAndIconFilePath(string iconUrl)
+		{
+			string fileName = Path.GetFileName(new Uri(iconUrl).AbsolutePath);
+			string iconDirectory = Path.Combine(DecorModule.DecorModuleInstance.DirectoriesManager.GetFullDirectoryPath("decor"));
+			if (!Directory.Exists(iconDirectory))
+			{
+				Directory.CreateDirectory(iconDirectory);
+			}
+			return Path.Combine(iconDirectory, fileName);
+		}
+
+		public static SemaphoreSlim GetFileSemaphore(string path)
+		{
+			lock (_semaphoreLock)
+			{
+				if (!_fileSemaphores.TryGetValue(path, out var semaphore))
+				{
+					semaphore = new SemaphoreSlim(1, 1);
+					_fileSemaphores[path] = semaphore;
+				}
+				return semaphore;
+			}
 		}
 	}
 }
