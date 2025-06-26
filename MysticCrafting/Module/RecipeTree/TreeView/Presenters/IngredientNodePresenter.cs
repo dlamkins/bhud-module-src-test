@@ -426,6 +426,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Presenters
 			if (tab.ItemSource.UniqueId == "ignore")
 			{
 				(parent as TreeNodeBase)?.ClearChildNodes();
+				(parent as ITradeableItemNode)?.ResetPrices();
 			}
 			else
 			{
