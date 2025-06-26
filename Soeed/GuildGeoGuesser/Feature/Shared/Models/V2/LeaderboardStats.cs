@@ -6,8 +6,5 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Models.V2
 	{
 		public List<LeaderboardStat> Stats { get; set; } = new List<LeaderboardStat>();
 
-
-		public BestScoreStat BestScore { get; set; } = new BestScoreStat();
-
 	}
 }

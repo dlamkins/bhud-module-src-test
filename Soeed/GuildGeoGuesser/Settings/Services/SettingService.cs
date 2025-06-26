@@ -45,6 +45,8 @@ namespace Soeed.GuildGeoGuesser.Settings.Services
 
 		public SettingEntry<bool> ShowCameraModeFilter { get; private set; }
 
+		public SettingEntry<PuzzleSortEnum> PuzzleSort { get; private set; }
+
 		public SettingService(SettingCollection settings)
 		{
 			//IL_01b6: Unknown result type (might be due to invalid IL or missing references)
@@ -76,6 +78,7 @@ namespace Soeed.GuildGeoGuesser.Settings.Services
 			PuzzleTypeFilter = settings.DefineSetting<PuzzleTypeFilterEnum>("GGGPuzzleTypeFilter", PuzzleTypeFilterEnum.ALL, (Func<string>)(() => "Status"), (Func<string>)(() => "Filter puzzles based on their completion status"));
 			CameraModeFilter = settings.DefineSetting<CameraModeFilterEnum>("GGGCameraModeFilter", CameraModeFilterEnum.ALL, (Func<string>)(() => "Camera"), (Func<string>)(() => "Filter puzzles based on their camera mode, first person or third person"));
 			ShowCameraModeFilter = settings.DefineSetting<bool>("GGGShowCameraModeFilter", false, (Func<string>)(() => "Show Camera Mode Filter"), (Func<string>)(() => "Show the camera mode filter in the puzzle list"));
+			PuzzleSort = settings.DefineSetting<PuzzleSortEnum>("GGGPuzzleSort", PuzzleSortEnum.NEWEST_FIRST, (Func<string>)(() => "Sort"), (Func<string>)(() => "How puzzles are sorted in the guild list"));
 		}
 
 		public void Dispose()

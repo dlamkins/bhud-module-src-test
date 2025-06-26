@@ -21,7 +21,7 @@ namespace Soeed.GuildGeoGuesser
 	[Export(typeof(Module))]
 	public class Module : Module
 	{
-		public static string MODULE_VERSION = "0.7.1";
+		public static string MODULE_VERSION = "0.8.0";
 
 		public static string DIRECTORY_PATH = "guildgeoguesser";
 

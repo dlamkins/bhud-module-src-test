@@ -4,7 +4,7 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Controls
 {
 	public enum PuzzleTypeFilterEnum
 	{
-		[Description("Well Liked")]
+		[Description("Highly Upvoted")]
 		LIKED,
 		[Description("Not Completed")]
 		NON_COMPLETED,

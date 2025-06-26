@@ -37,7 +37,7 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Services
 
 		public int ItemsPerPage => ITEMS_PER_PAGE;
 
-		public bool SortNewestFirst { get; set; }
+		public PuzzleSortEnum CurrentSort => Service.Settings.PuzzleSort.get_Value();
 
 		public void SetTotalPages(int totalItems)
 		{
@@ -89,13 +89,13 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Services
 			SelectedGuild = new Guild();
 			DetailsModel = new Puzzle();
 			SearchTerm = "";
-			SortNewestFirst = true;
 			base._002Ector();
 			Service.UserManager.AccountUpdated += new EventHandler<Account>(UserManager_AccountUpdated);
 			Service.UserManager.GuildsUpdated += new EventHandler<IEnumerable<Guild>>(UserManager_GuildsUpdated);
 			Service.Settings.PuzzleTypeFilter.add_SettingChanged((EventHandler<ValueChangedEventArgs<PuzzleTypeFilterEnum>>)ListViewFilter_SettingChanged);
 			Service.Settings.CameraModeFilter.add_SettingChanged((EventHandler<ValueChangedEventArgs<CameraModeFilterEnum>>)CameraModeFilter_SettingChanged);
 			Service.Settings.ShowCameraModeFilter.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowCameraModeFilter_SettingChanged);
+			Service.Settings.PuzzleSort.add_SettingChanged((EventHandler<ValueChangedEventArgs<PuzzleSortEnum>>)PuzzleSort_SettingChanged);
 		}
 
 		private void ListViewFilter_SettingChanged(object sender, ValueChangedEventArgs<PuzzleTypeFilterEnum> e)
@@ -111,6 +111,12 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Services
 		}
 
 		private void ShowCameraModeFilter_SettingChanged(object sender, ValueChangedEventArgs<bool> e)
+		{
+			ResetPagination();
+			Service.GeoGuessWindow.OpenWindowState();
+		}
+
+		private void PuzzleSort_SettingChanged(object sender, ValueChangedEventArgs<PuzzleSortEnum> e)
 		{
 			ResetPagination();
 			Service.GeoGuessWindow.OpenWindowState();
@@ -228,6 +234,7 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Services
 			Service.Settings.PuzzleTypeFilter.remove_SettingChanged((EventHandler<ValueChangedEventArgs<PuzzleTypeFilterEnum>>)ListViewFilter_SettingChanged);
 			Service.Settings.CameraModeFilter.remove_SettingChanged((EventHandler<ValueChangedEventArgs<CameraModeFilterEnum>>)CameraModeFilter_SettingChanged);
 			Service.Settings.ShowCameraModeFilter.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowCameraModeFilter_SettingChanged);
+			Service.Settings.PuzzleSort.remove_SettingChanged((EventHandler<ValueChangedEventArgs<PuzzleSortEnum>>)PuzzleSort_SettingChanged);
 			Service.UserManager.AccountUpdated -= new EventHandler<Account>(UserManager_AccountUpdated);
 			Service.UserManager.GuildsUpdated -= new EventHandler<IEnumerable<Guild>>(UserManager_GuildsUpdated);
 		}

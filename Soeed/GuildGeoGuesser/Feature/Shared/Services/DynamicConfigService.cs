@@ -13,8 +13,6 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Services
 
 		private static readonly Logger Logger = Logger.GetLogger<DynamicConfigService>();
 
-		public event EventHandler? ConfigUpdated;
-
 		protected async Task<T?> Fetch<T>(string url)
 		{
 			_ = 1;

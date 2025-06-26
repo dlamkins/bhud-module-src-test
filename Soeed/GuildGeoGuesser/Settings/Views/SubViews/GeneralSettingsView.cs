@@ -18,12 +18,13 @@ namespace Soeed.GuildGeoGuesser.Settings.Views.SubViews
 		{
 			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0012: Expected O, but got Unknown
-			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a0: Expected O, but got Unknown
+			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b9: Expected O, but got Unknown
 			((View<IPresenter>)this).Build(buildPanel);
 			FlowPanel container = FlowPanelExtensions.BeginFlow(new FlowPanel(), buildPanel).AddString("Puzzle List Settings").AddSetting((SettingEntry)(object)_settings.PuzzlesPerPage)
+				.AddSetting((SettingEntry)(object)_settings.PuzzleSort)
 				.AddSetting((SettingEntry)(object)_settings.ShowCameraModeFilter)
 				.AddSpace()
 				.AddString("Top-left menu bar icon settings")

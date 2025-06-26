@@ -175,19 +175,16 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Views
 
 		private void CreateListFilter(Panel panel, SettingEntry<PuzzleTypeFilterEnum> settingEntry)
 		{
-			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00af: Expected O, but got Unknown
-			int typeDropdownWidth = 40;
+			//IL_0003: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
+			int typeDropdownWidth = 60;
 			ViewContainer val = new ViewContainer();
 			((Control)val).set_Parent((Container)(object)panel);
 			((Control)val).set_Width(typeDropdownWidth);
@@ -200,19 +197,11 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Views
 				((Control)val2).set_Width(cameraDropdownWidth);
 				val2.Show(SettingView.FromType((SettingEntry)(object)Service.Settings.CameraModeFilter, cameraDropdownWidth));
 			}
-			StandardButton val3 = new StandardButton();
+			int sortDropdownWidth = 60;
+			ViewContainer val3 = new ViewContainer();
 			((Control)val3).set_Parent((Container)(object)panel);
-			((Control)val3).set_Width(100);
-			val3.set_Text(_003CWindowState_003EP.SortNewestFirst ? "Newest First" : "Oldest First");
-			((Control)val3).set_BasicTooltipText("Toggle between newest and oldest first");
-			StandardButton sortButton = val3;
-			((Control)sortButton).add_Click((EventHandler<MouseEventArgs>)delegate
-			{
-				_003CWindowState_003EP.SortNewestFirst = !_003CWindowState_003EP.SortNewestFirst;
-				sortButton.set_Text(_003CWindowState_003EP.SortNewestFirst ? "Newest First" : "Oldest First");
-				_003CWindowState_003EP.ResetPagination();
-				_003CWindowState_003EP.SwapToGuildList();
-			});
+			((Control)val3).set_Width(sortDropdownWidth);
+			val3.Show(SettingView.FromType((SettingEntry)(object)Service.Settings.PuzzleSort, sortDropdownWidth));
 		}
 
 		private void CreateSearchField(Panel panel, string searchTerm)
@@ -428,10 +417,17 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Views
 					_filteredItems.Add(new GeoGuessListItem(model));
 				}
 			}
-			_filteredItems.Sort(delegate(GeoGuessListItem a, GeoGuessListItem b)
+			_filteredItems.Sort((GeoGuessListItem a, GeoGuessListItem b) => _003CWindowState_003EP.CurrentSort switch
 			{
-				int num = a.Model.CreatedAt.CompareTo(b.Model.CreatedAt);
-				return (!_003CWindowState_003EP.SortNewestFirst) ? num : (-num);
+				PuzzleSortEnum.NEWEST_FIRST => b.Model.CreatedAt.CompareTo(a.Model.CreatedAt), 
+				PuzzleSortEnum.OLDEST_FIRST => a.Model.CreatedAt.CompareTo(b.Model.CreatedAt), 
+				PuzzleSortEnum.TITLE_ASC => string.Compare(a.Model.Title, b.Model.Title, StringComparison.OrdinalIgnoreCase), 
+				PuzzleSortEnum.TITLE_DESC => string.Compare(b.Model.Title, a.Model.Title, StringComparison.OrdinalIgnoreCase), 
+				PuzzleSortEnum.MOST_PLAYED => b.Model.ActualGuessCount.CompareTo(a.Model.ActualGuessCount), 
+				PuzzleSortEnum.MOST_LIKED => b.Model.Upvotes.CompareTo(a.Model.Upvotes), 
+				PuzzleSortEnum.AUTHOR_ASC => string.Compare(a.Model.AccountName, b.Model.AccountName, StringComparison.OrdinalIgnoreCase), 
+				PuzzleSortEnum.AUTHOR_DESC => string.Compare(b.Model.AccountName, a.Model.AccountName, StringComparison.OrdinalIgnoreCase), 
+				_ => b.Model.CreatedAt.CompareTo(a.Model.CreatedAt), 
 			});
 			_003CWindowState_003EP.SetTotalPages(_filteredItems.Count);
 			if (_filteredItems.Count == 0)

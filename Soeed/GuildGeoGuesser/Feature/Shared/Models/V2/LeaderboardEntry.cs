@@ -6,5 +6,7 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Models.V2
 
 
 		public double Value { get; set; }
+
+		public int Count { get; set; }
 	}
 }

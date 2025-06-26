@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Blish_HUD;
@@ -48,6 +50,7 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Views
 			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
 			((Control)_backButton).add_Click((EventHandler<MouseEventArgs>)GoBackClickHandler);
 			Label val = new Label();
 			((Control)val).set_Parent((Container)(object)_controlsHeader);
@@ -57,10 +60,42 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Views
 			((Control)val).set_Height(40);
 			val.set_Font(GameService.Content.GetFont((FontFace)0, (FontSize)24, (FontStyle)0));
 			val.set_TextColor(Color.get_LightGoldenrodYellow());
-			((Control)new LeaderboardStatBestScoreControl(_stats.BestScore)).set_Parent((Container)(object)_flowPanel);
-			foreach (LeaderboardStat stat in _stats.Stats)
+			foreach (LeaderboardStat stat in _stats.Stats?.OrderBy((LeaderboardStat s) => s.Order).ToList() ?? new List<LeaderboardStat>())
 			{
-				((Control)new LeaderboardStatControl(stat)).set_Parent((Container)(object)_flowPanel);
+				LeaderboardTableControl leaderboardTableControl = new LeaderboardTableControl();
+				((Control)leaderboardTableControl).set_Parent((Container)(object)_flowPanel);
+				((Control)leaderboardTableControl).set_Width(stat.Width);
+				((Control)leaderboardTableControl).set_Location(new Point(0, 0));
+				leaderboardTableControl.Title = stat.Title ?? string.Empty;
+				leaderboardTableControl.Subtitle = stat.Subtitle ?? string.Empty;
+				leaderboardTableControl.Footer = stat.FooterText ?? string.Empty;
+				leaderboardTableControl.ShowTrophyIcons = stat.ShowTrophies;
+				leaderboardTableControl.GoldTrophy = Service.Config.GetTrophyTexture("gold");
+				leaderboardTableControl.SilverTrophy = Service.Config.GetTrophyTexture("silver");
+				leaderboardTableControl.BronzeTrophy = Service.Config.GetTrophyTexture("bronze");
+				LeaderboardTableControl table = leaderboardTableControl;
+				table.SetHeaders(stat.Headers.ToArray());
+				HorizontalAlignment[] alignments = stat.Alignments.Select((string a) => (HorizontalAlignment)(a.ToLower() switch
+				{
+					"left" => 0, 
+					"center" => 1, 
+					"right" => 2, 
+					_ => 0, 
+				})).ToArray();
+				table.SetColumnAlignments(alignments);
+				List<List<string>> rows = new List<List<string>>();
+				foreach (LeaderboardEntry entry in stat.Entries ?? new List<LeaderboardEntry>())
+				{
+					List<string> row = new List<string>();
+					row.Add(entry.Author);
+					row.Add(entry.Value.ToString("0.###"));
+					if (stat.Headers.Count > 2 && entry.Count > 0)
+					{
+						row.Add(entry.Count.ToString());
+					}
+					rows.Add(row);
+				}
+				table.SetRows(rows);
 			}
 			((Panel)_flowPanel).set_CanScroll(true);
 			_flowPanel.set_FlowDirection((ControlFlowDirection)0);

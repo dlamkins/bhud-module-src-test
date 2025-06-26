@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Blish_HUD.Content;
 using Newtonsoft.Json;
 
 namespace Soeed.GuildGeoGuesser.Feature.Shared.Models
@@ -49,5 +50,23 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Models
 		[JsonProperty("show_score_distribution")]
 		public bool ShowScoreDistribution { get; set; } = true;
 
+
+		[JsonProperty("trophy_asset_ids")]
+		public Dictionary<string, int> TrophyAssetIds { get; set; } = new Dictionary<string, int>
+		{
+			{ "gold", 156904 },
+			{ "silver", 156907 },
+			{ "bronze", 156902 }
+		};
+
+
+		public AsyncTexture2D GetTrophyTexture(string type)
+		{
+			if (TrophyAssetIds != null && TrophyAssetIds.TryGetValue(type.ToLower(), out var assetId))
+			{
+				return Service.Textures.DatAsset(assetId);
+			}
+			return null;
+		}
 	}
 }

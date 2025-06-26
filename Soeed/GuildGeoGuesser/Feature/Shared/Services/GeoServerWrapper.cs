@@ -9,7 +9,6 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Blish_HUD;
-using Blish_HUD.Controls;
 using Gw2Sharp.WebApi.V2.Models;
 using Newtonsoft.Json;
 using Soeed.GuildGeoGuesser.Feature.Shared.Controls;
@@ -27,8 +26,6 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Services
 
 		private readonly string _baseUrl;
 
-		private readonly DynamicConfigService _configService;
-
 		private HelpScreen? HelpScreenData;
 
 		private readonly ConfigModel _config;
@@ -40,23 +37,9 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Services
 		public GeoServerWrapper(string baseUrl, Module module, ConfigModel config, GeoGuessWindow geoGuessWindow, SettingsWindow settingsWindow)
 		{
 			_baseUrl = baseUrl;
-			_configService = new DynamicConfigService();
-			_configService.ConfigUpdated += new EventHandler(OnConfigUpdated);
 			_config = config;
 			_geoGuessWindow = geoGuessWindow;
 			_settingsWindow = settingsWindow;
-		}
-
-		private void OnConfigUpdated(object? sender, EventArgs e)
-		{
-			if (((Control)_geoGuessWindow).get_Visible())
-			{
-				_geoGuessWindow.OpenWindowState();
-			}
-			if (((Control)_settingsWindow).get_Visible())
-			{
-				((Control)_settingsWindow).Show();
-			}
 		}
 
 		private async Task<T?> Fetch<T>(string url, Action<T?>? action = null)
@@ -464,7 +447,6 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Services
 
 		public void Dispose()
 		{
-			_configService?.Dispose();
 		}
 	}
 }
