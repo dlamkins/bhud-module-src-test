@@ -34,6 +34,10 @@ namespace MysticCrafting.Module.Services
 
 		public IEnumerable<IItemSource> GetItemSources(Item item)
 		{
+			if (item.Id == 104829)
+			{
+				return new List<IItemSource>();
+			}
 			if (item.Id == 68063 || item.Id == 92687)
 			{
 				return new List<IItemSource> { GetTradingPostSource(item) };

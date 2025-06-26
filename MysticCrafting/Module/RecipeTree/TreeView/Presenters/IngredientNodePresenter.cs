@@ -52,7 +52,35 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Presenters
 			}
 			foreach (Ingredient ingredient in recipe.Ingredients.OrderBy((Ingredient i) => i.Index))
 			{
-				IngredientNode node = ((ingredient.Item != null) ? ((IngredientNode)BuildItemNode(ingredient, parent, loadingChildren: true)) : ((IngredientNode)BuildUnknownNode(ingredient, parent, loadingChildren: true)));
+				IngredientNode node = null;
+				if (ingredient.ItemId == 100078)
+				{
+					_currencyNodePresenter.BuildNode(parent, new CurrencyQuantity
+					{
+						Count = ingredient.Quantity,
+						Currency = ServiceContainer.CurrencyRepository.Currencies.FirstOrDefault((Currency c) => c.Id == 78)
+					});
+				}
+				else if (ingredient.ItemId == 100414)
+				{
+					_currencyNodePresenter.BuildNode(parent, new CurrencyQuantity
+					{
+						Count = ingredient.Quantity,
+						Currency = ServiceContainer.CurrencyRepository.Currencies.FirstOrDefault((Currency c) => c.Id == 80)
+					});
+				}
+				else if (ingredient.ItemId != 100055)
+				{
+					node = ((ingredient.Item != null) ? ((IngredientNode)BuildItemNode(ingredient, parent, loadingChildren: true)) : ((IngredientNode)BuildUnknownNode(ingredient, parent, loadingChildren: true)));
+				}
+				else
+				{
+					_currencyNodePresenter.BuildNode(parent, new CurrencyQuantity
+					{
+						Count = ingredient.Quantity,
+						Currency = ServiceContainer.CurrencyRepository.Currencies.FirstOrDefault((Currency c) => c.Id == 79)
+					});
+				}
 				if (node == null)
 				{
 					continue;
@@ -394,6 +422,7 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Presenters
 				return;
 			}
 			Container parent = ((Control)((Control)tab).get_Parent()).get_Parent();
+			(parent as ITradeableItemNode)?.ResetPrices();
 			if (tab.ItemSource.UniqueId == "ignore")
 			{
 				(parent as TreeNodeBase)?.ClearChildNodes();
@@ -402,7 +431,6 @@ namespace MysticCrafting.Module.RecipeTree.TreeView.Presenters
 			{
 				BuildChildren(tab.ItemSource, parent);
 			}
-			(parent as ITradeableItemNode)?.ResetPrices();
 			IngredientNode node = parent as IngredientNode;
 			if (node != null)
 			{

@@ -1,4 +1,9 @@
-﻿#1.5.5 Bug fixes
+﻿#1.5.6 Bug fixes
+- Fixed an issue with Rift Essence currencies displaying as items
+- Fixed an issue with pricing not updating when changing sources
+- Fixed an issue with Curious Mursaat Remnants
+
+#1.5.5 Bug fixes
 - Fixed German & French translations
 - Fixed broken categories
 - Fixed issue with Backpieces not showing in Armor category
