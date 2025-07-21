@@ -112,7 +112,7 @@ namespace Ideka.CustomCombatText
 
 		public void UpdateVisuals(List<TemplateParser.MarkupFragment> mFrags, int fontSize)
 		{
-			_rect.ParsedFragments = TemplateParser.FinalParse(mFrags, null, CTextModule.FontAssets.Get().GetFont(fontSize), Key.Message, new _003C_003Ez__ReadOnlyArray<Message>(new Message[1] { Key.Message })).ToList();
+			_rect.ParsedFragments = TemplateParser.FinalParse(mFrags, null, CTextModule.FontAssets.Get(null, fontSize), Key.Message, new _003C_003Ez__ReadOnlyArray<Message>(new Message[1] { Key.Message })).ToList();
 			InnerHeight = (_rect.ParsedFragments.Any() ? _rect.ParsedFragments.Max((TemplateParser.Fragment x) => x.Size.Height) : 0f) + 5f;
 		}
 

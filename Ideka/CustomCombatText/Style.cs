@@ -33,84 +33,100 @@ namespace Ideka.CustomCombatText
 			[(ProfessionType)2] = new Color(238, 170, 34)
 		};
 
+		private static readonly Color IngamePink = new Color(224, 85, 224);
+
+		private static readonly Color IngameRed = new Color(241, 45, 45);
+
+		private static readonly Color IngameWhite = new Color(255, 255, 255);
+
+		private static readonly Color IngameGreen = new Color(45, 197, 14);
+
+		private static readonly Color IngameBlue = new Color(105, 229, 255);
+
+		private static readonly Color IngameOrange = new Color(243, 132, 0);
+
+		private static readonly Color IngameTeal = new Color(83, 166, 152);
+
+		private static readonly Color CustomGray = new Color(170, 170, 170);
+
 		public Dictionary<EventResult, ResultFormat> ResultFormats = new Dictionary<EventResult, ResultFormat>
 		{
 			[EventResult.Strike] = new ResultFormat
 			{
-				Color = new Color(238, 136, 0)
+				Color = IngameOrange
 			},
 			[EventResult.Crit] = new ResultFormat
 			{
-				Color = new Color(238, 51, 51)
+				Color = IngameRed
 			},
 			[EventResult.Glance] = new ResultFormat
 			{
-				Color = new Color(170, 170, 170)
+				Color = CustomGray
 			},
 			[EventResult.Block] = new ResultFormat
 			{
-				Color = new Color(170, 170, 170),
+				Color = CustomGray,
 				Text = "block"
 			},
 			[EventResult.Evade] = new ResultFormat
 			{
-				Color = new Color(170, 170, 170),
+				Color = CustomGray,
 				Text = "evade"
 			},
 			[EventResult.Invuln] = new ResultFormat
 			{
-				Color = new Color(170, 170, 170),
+				Color = CustomGray,
 				Text = "invuln"
 			},
 			[EventResult.Miss] = new ResultFormat
 			{
-				Color = new Color(170, 170, 170),
+				Color = CustomGray,
 				Text = "miss"
 			},
 			[EventResult.Bleeding] = new ResultFormat
 			{
-				Color = new Color(221, 85, 221)
+				Color = IngamePink
 			},
 			[EventResult.Burning] = new ResultFormat
 			{
-				Color = new Color(221, 85, 221)
+				Color = IngamePink
 			},
 			[EventResult.Poison] = new ResultFormat
 			{
-				Color = new Color(221, 85, 221)
+				Color = IngamePink
 			},
 			[EventResult.Confusion] = new ResultFormat
 			{
-				Color = new Color(221, 85, 221)
+				Color = IngamePink
 			},
 			[EventResult.Torment] = new ResultFormat
 			{
-				Color = new Color(221, 85, 221)
+				Color = IngamePink
 			},
 			[EventResult.DamageTick] = new ResultFormat
 			{
-				Color = new Color(221, 85, 221)
+				Color = IngamePink
 			},
 			[EventResult.Heal] = new ResultFormat
 			{
-				Color = new Color(51, 204, 17)
+				Color = IngameGreen
 			},
 			[EventResult.HealTick] = new ResultFormat
 			{
-				Color = new Color(51, 204, 17)
+				Color = IngameGreen
 			},
 			[EventResult.Barrier] = new ResultFormat
 			{
-				Color = new Color(102, 221, 255)
+				Color = IngameBlue
 			},
 			[EventResult.Interrupt] = new ResultFormat
 			{
-				Color = new Color(85, 170, 153),
+				Color = IngameTeal,
 				Text = "interrupt"
 			},
 			[EventResult.Breakbar] = new ResultFormat
 			{
-				Color = new Color(85, 170, 153),
+				Color = IngameTeal,
 				Text = "break"
 			}
 		};

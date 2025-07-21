@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using FontStashSharp;
 using Ideka.BHUDCommon.AnchoredRect;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended;
+using MonoGame.Extended.BitmapFonts;
 
 namespace Ideka.CustomCombatText
 {
@@ -12,7 +12,7 @@ namespace Ideka.CustomCombatText
 	{
 		private readonly MessageReceiver _receiver;
 
-		private readonly SpriteFontBase _font;
+		private readonly BitmapFont _font;
 
 		private readonly IReadOnlyList<TemplateParser.MarkupFragment> _markupFrags;
 

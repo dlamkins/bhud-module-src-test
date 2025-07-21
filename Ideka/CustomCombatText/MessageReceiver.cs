@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
-using FontStashSharp;
 using Microsoft.Xna.Framework;
+using MonoGame.Extended.BitmapFonts;
 using Newtonsoft.Json;
 
 namespace Ideka.CustomCombatText
@@ -49,7 +49,7 @@ namespace Ideka.CustomCombatText
 		}
 
 		[JsonIgnore]
-		public SpriteFontBase Font => CTextModule.FontAssets.Get(FontName).GetFont(FontSize ?? CTextModule.Settings.FontSize.Value);
+		public BitmapFont Font => CTextModule.FontAssets.Get(FontName, FontSize);
 
 		[JsonIgnore]
 		public IReadOnlyList<TemplateParser.MarkupFragment> MarkupFrags

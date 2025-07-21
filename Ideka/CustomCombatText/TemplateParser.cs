@@ -5,13 +5,13 @@ using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.ArcDps.Models;
 using Blish_HUD.Content;
-using FontStashSharp;
 using Gw2Sharp.Models;
 using Ideka.BHUDCommon.AnchoredRect;
 using Ideka.NetCommon;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
+using MonoGame.Extended.BitmapFonts;
 
 namespace Ideka.CustomCombatText
 {
@@ -31,31 +31,30 @@ namespace Ideka.CustomCombatText
 
 		public class StringFragment : Fragment
 		{
-			private (SpriteFontBase font, string text, Size2 size)? _cache;
+			private (BitmapFont font, string text, Size2 size)? _cache;
 
 			public string Text { get; set; } = "";
 
 
 			public Color Color { get; set; }
 
-			public SpriteFontBase Font { get; set; }
+			public BitmapFont Font { get; set; }
 
 			public override Size2 Size
 			{
 				get
 				{
-					//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-					//IL_009f: Unknown result type (might be due to invalid IL or missing references)
+					//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+					//IL_0085: Unknown result type (might be due to invalid IL or missing references)
 					if (_cache?.font != Font || _cache?.text != Text)
 					{
-						_cache = new(SpriteFontBase, string, Size2)?((Font, Text, Size2.op_Implicit(Font.MeasureString(Text))));
+						_cache = new(BitmapFont, string, Size2)?((Font, Text, Font.MeasureStringFixed(Text)));
 					}
 					return _cache.Value.size;
 				}
 			}
 
-			public StringFragment(SpriteFontBase font)
+			public StringFragment(BitmapFont font)
 			{
 				Font = font;
 				base._002Ector();
@@ -66,9 +65,7 @@ namespace Ideka.CustomCombatText
 			{
 				//IL_000d: Unknown result type (might be due to invalid IL or missing references)
 				//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-				//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-				spriteBatch.DrawString(Font, Text, position, color);
+				BitmapFontExtensions.DrawString(spriteBatch, Font, Text, position, color, (Rectangle?)null);
 			}
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -346,9 +343,9 @@ namespace Ideka.CustomCombatText
 			return format;
 		}
 
-		public static IEnumerable<Fragment> FinalParse(IEnumerable<MarkupFragment> markupFrags, Color? receiverColor, SpriteFontBase font, Message lastMessage, IReadOnlyList<Message> allMessages)
+		public static IEnumerable<Fragment> FinalParse(IEnumerable<MarkupFragment> markupFrags, Color? receiverColor, BitmapFont font, Message lastMessage, IReadOnlyList<Message> allMessages)
 		{
-			SpriteFontBase font2 = font;
+			BitmapFont font2 = font;
 			List<List<Message>> resultGroups;
 			Style.ResultFormat x2;
 			Style.ResultFormat resultFormat = (byGroup<EventResult, Style.ResultFormat>(allMessages, (Message x) => x.Result, CTextModule.Style.ResultFormats, out resultGroups, out x2) ? x2 : null);
@@ -401,12 +398,12 @@ namespace Ideka.CustomCombatText
 			});
 			templates["%n"] = ((from x in parts.Skip(1)
 				select newString(x.text, x.color)).Cast<Fragment>().ToList(), allMessages.Skip(1).Any());
-			MultiIconFragment mi = new MultiIconFragment(font2.LineHeight)
+			MultiIconFragment mi = new MultiIconFragment(font2.get_LineHeight())
 			{
 				Inner = allMessages.DistinctBy((Message x) => x.SkillId).Select(delegate(Message message)
 				{
 					AsyncTexture2D icon3 = ((!message.SkillIconId.HasValue) ? null : AsyncTexture2D.FromAssetId(message.SkillIconId.Value));
-					return new IconFragment(font2.LineHeight)
+					return new IconFragment(font2.get_LineHeight())
 					{
 						Icon = icon3,
 						Autocropped = true,
@@ -510,7 +507,7 @@ namespace Ideka.CustomCombatText
 				AsyncTexture2D icon = ((!profIcon.HasValue) ? null : AsyncTexture2D.FromAssetId(profIcon.Value.Item1));
 				return (new List<Fragment>(1)
 				{
-					new IconFragment(font2.LineHeight)
+					new IconFragment(font2.get_LineHeight())
 					{
 						Icon = icon,
 						Autocropped = false,

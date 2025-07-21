@@ -24,9 +24,7 @@
     <Reference Include="CustomCombatText.NetCommon">
       <HintPath>..\..\working\CustomCombatText.NetCommon.dll</HintPath>
     </Reference>
-    <Reference Include="FontStashSharp.MonoGame">
-      <HintPath>..\..\working\FontStashSharp.MonoGame.dll</HintPath>
-    </Reference>
+    <Reference Include="MonoGame.Extended" />
     <Reference Include="Blish HUD" />
     <Reference Include="MonoGame.Framework" />
     <Reference Include="System.ComponentModel.Composition" />
@@ -35,7 +33,9 @@
       <HintPath>..\..\working\CustomCombatText.BHUDCommon.dll</HintPath>
     </Reference>
     <Reference Include="System.Core" />
-    <Reference Include="MonoGame.Extended" />
+    <Reference Include="SpriteFontPlus">
+      <HintPath>..\..\working\SpriteFontPlus.dll</HintPath>
+    </Reference>
     <Reference Include="AsyncClipboardService" />
   </ItemGroup>
 </Project>

@@ -1,63 +1,69 @@
 using System;
 using System.IO;
 using Blish_HUD;
-using FontStashSharp;
 using Ideka.NetCommon;
+using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended.BitmapFonts;
 
 namespace Ideka.CustomCombatText
 {
-	internal class FontAssets : WeakRefDict<(bool, string), FontSystem>
+	internal class FontAssets : WeakRefDict<(bool, string, float), BitmapFont>
 	{
 		private static readonly Logger Logger = Logger.GetLogger<FontAssets>();
 
-		public FontSystem Get(string? name = null)
+		public BitmapFont Get()
 		{
-			return Get(@internal: false, name);
+			return Get(null, null);
 		}
 
-		public FontSystem Get(bool @internal, string? name)
+		public BitmapFont Get(string? name, float? size)
 		{
-			return Get((@internal, name ?? CTextModule.Settings.FontName.Value));
+			return Get(@internal: false, name, size);
 		}
 
-		public override FontSystem Load((bool @internal, string name) key)
+		public BitmapFont Get(bool @internal, string? name, float? size)
 		{
-			FontSystem font = null;
+			return Get((@internal, name ?? CTextModule.Settings.FontName.Value, size ?? ((float)CTextModule.Settings.FontSize.Value)));
+		}
+
+		public override BitmapFont Load((bool @internal, string name, float size) key)
+		{
+			BitmapFont font = null;
 			Exception exception = null;
 			try
 			{
-				var (flag, name) = key;
-				FontSystem spriteFontBase = default(FontSystem);
+				var (flag, name, _) = key;
+				SpriteFont spriteFont = default(SpriteFont);
 				if (!(name == ""))
 				{
 					if (!flag)
 					{
 						if (name == null)
 						{
-							goto IL_007a;
+							goto IL_009b;
 						}
-						spriteFontBase = FontUtils.GetSpriteFontBase(Path.Combine(CTextModule.BasePath, CTextModule.FontPath, key.name));
+						spriteFont = FontUtils.GetSpriteFont(Path.Combine(CTextModule.BasePath, CTextModule.FontPath, key.name), key.size);
 					}
 					else
 					{
 						if (name == null)
 						{
-							goto IL_007a;
+							goto IL_009b;
 						}
-						spriteFontBase = CTextModule.ContentsManager.GetSpriteFontBase(Path.Combine(CTextModule.FontPath, key.name));
+						spriteFont = CTextModule.ContentsManager.GetSpriteFont(Path.Combine(CTextModule.FontPath, key.name), key.size);
 					}
 				}
 				else
 				{
-					spriteFontBase = CTextModule.ContentsManager.GetSpriteFontBase(CTextModule.DefaultFontPath);
+					spriteFont = CTextModule.ContentsManager.GetSpriteFont(CTextModule.DefaultFontPath, key.size);
 				}
-				goto IL_007f;
-				IL_007f:
-				font = spriteFontBase;
+				goto IL_00a0;
+				IL_00a0:
+				font = spriteFont?.ToBitmapFont();
 				goto end_IL_0004;
-				IL_007a:
+				IL_009b:
 				_003CPrivateImplementationDetails_003E.ThrowInvalidOperationException();
-				goto IL_007f;
+				goto IL_00a0;
 				end_IL_0004:;
 			}
 			catch (Exception ex)
@@ -66,9 +72,9 @@ namespace Ideka.CustomCombatText
 			}
 			if (font == null)
 			{
-				Logger.Warn($"Font load failed: {key.name}\n{exception}");
+				Logger.Warn($"Font load failed: {key.name} {key.size}\n{exception}");
 			}
-			return font;
+			return font ?? GameService.Content.get_DefaultFont32();
 		}
 	}
 }
