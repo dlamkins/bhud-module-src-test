@@ -51,8 +51,12 @@ namespace BhModule.Community.Pathing.Entity
 		{
 			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001a: Expected O, but got Unknown
-			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
 			ContextMenuStrip newMenu = new ContextMenuStrip();
+			((Control)newMenu.AddMenuItem("Open Parent Category")).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				_packState.CategoryStates.TriggerOpenCategory(pathingEntry.Category);
+			});
 			((Control)newMenu.AddMenuItem("Hide Parent Category")).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				_packState.CategoryStates.SetInactive(pathingEntry.Category.Namespace, isInactive: true);

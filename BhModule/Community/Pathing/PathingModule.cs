@@ -7,6 +7,7 @@ using BhModule.Community.Pathing.Entity;
 using BhModule.Community.Pathing.MarkerPackRepo;
 using BhModule.Community.Pathing.Scripting;
 using BhModule.Community.Pathing.Scripting.Console;
+using BhModule.Community.Pathing.UI.Events;
 using BhModule.Community.Pathing.UI.Views;
 using Blish_HUD;
 using Blish_HUD.Content;
@@ -56,6 +57,10 @@ namespace BhModule.Community.Pathing
 
 		public BhModule.Community.Pathing.MarkerPackRepo.MarkerPackRepo MarkerPackRepo { get; private set; }
 
+		public CategoryTreeView CategoryTreeView { get; private set; }
+
+		public Tab CategoryTreeTab { get; private set; }
+
 		public Tab PackSettingsTab { get; private set; }
 
 		public Tab MapSettingsTab { get; private set; }
@@ -104,15 +109,11 @@ namespace BhModule.Community.Pathing
 			ContextMenuStripItem openSettings = val2;
 			((Control)openSettings).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				if (SettingsWindow.get_SelectedTab() == MarkerRepoTab)
+				if (SettingsWindow.get_SelectedTab() == MarkerRepoTab || SettingsWindow.get_SelectedTab() == CategoryTreeTab)
 				{
 					SettingsWindow.set_SelectedTab(PackSettingsTab);
-					if (((Control)SettingsWindow).get_Visible())
-					{
-						return;
-					}
 				}
-				((WindowBase2)SettingsWindow).ToggleWindow();
+				((Control)SettingsWindow).Show();
 			});
 			yield return openSettings;
 		}
@@ -135,16 +136,18 @@ namespace BhModule.Community.Pathing
 			//IL_013c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0152: Unknown result type (might be due to invalid IL or missing references)
 			//IL_015e: Expected O, but got Unknown
-			//IL_018e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0198: Expected O, but got Unknown
-			//IL_01c8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d2: Expected O, but got Unknown
-			//IL_01f7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0201: Expected O, but got Unknown
-			//IL_0231: Unknown result type (might be due to invalid IL or missing references)
-			//IL_023b: Expected O, but got Unknown
-			//IL_0260: Unknown result type (might be due to invalid IL or missing references)
-			//IL_026a: Expected O, but got Unknown
+			//IL_018f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0199: Expected O, but got Unknown
+			//IL_01c9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d3: Expected O, but got Unknown
+			//IL_0203: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020d: Expected O, but got Unknown
+			//IL_0232: Unknown result type (might be due to invalid IL or missing references)
+			//IL_023c: Expected O, but got Unknown
+			//IL_026c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0276: Expected O, but got Unknown
+			//IL_029b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a5: Expected O, but got Unknown
 			if (DateTime.UtcNow.Date >= new DateTime(2023, 8, 22, 0, 0, 0, DateTimeKind.Utc) && Program.get_OverlayVersion() < new SemVer.Version(1, 1, 0))
 			{
 				try
@@ -168,11 +171,14 @@ namespace BhModule.Community.Pathing
 			((WindowBase2)val2).set_Id(((Module)this).get_Namespace() + "_SettingsWindow");
 			((WindowBase2)val2).set_SavesPosition(true);
 			SettingsWindow = val2;
+			CategoryTreeView = new CategoryTreeView(this);
+			CategoryTreeTab = new Tab(AsyncTexture2D.FromAssetId(1654244), (Func<IView>)(() => (IView)(object)CategoryTreeView), "Category Explorer", (int?)null);
 			PackSettingsTab = new Tab(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\156740+155150.png")), (Func<IView>)(() => (IView)new SettingsView(Settings.PackSettings, -1)), Strings.Window_MainSettingsTab, (int?)null);
 			MapSettingsTab = new Tab(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\157123+155150.png")), (Func<IView>)(() => (IView)new SettingsView(Settings.MapSettings, -1)), Strings.Window_MapSettingsTab, (int?)null);
 			ScriptSettingsTab = new Tab(AsyncTexture2D.FromAssetId(156701), (Func<IView>)(() => (IView)new SettingsView(Settings.ScriptSettings, -1)), "Script Options", (int?)null);
 			KeybindSettingsTab = new Tab(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("png\\156734+155150.png")), (Func<IView>)(() => (IView)new SettingsView(Settings.KeyBindSettings, -1)), Strings.Window_KeyBindSettingsTab, (int?)null);
 			MarkerRepoTab = new Tab(AsyncTexture2D.FromAssetId(156909), (Func<IView>)(() => (IView)(object)new PackRepoView(this)), Strings.Window_DownloadMarkerPacks, (int?)null);
+			SettingsWindow.get_Tabs().Add(CategoryTreeTab);
 			SettingsWindow.get_Tabs().Add(PackSettingsTab);
 			SettingsWindow.get_Tabs().Add(MapSettingsTab);
 			SettingsWindow.get_Tabs().Add(ScriptSettingsTab);
@@ -251,8 +257,23 @@ namespace BhModule.Community.Pathing
 			MarkerPackRepo.Init();
 			PackInitiator = new PackInitiator(DirectoriesManager.GetFullDirectoryPath("markers"), this, GetModuleProgressHandler());
 			await PackInitiator.Init();
+			PackInitiator.PackState.CategoryStates.TriggerOpenCategoryView += CategoryStatesOnTriggerOpenCategoryView;
 			sw.Stop();
 			Logger.Debug($"Took {sw.ElapsedMilliseconds} ms to complete loading Pathing module...");
+		}
+
+		private void CategoryStatesOnTriggerOpenCategoryView(object sender, PathingCategoryEventArgs e)
+		{
+			if (SettingsWindow.get_SelectedTab() != CategoryTreeTab)
+			{
+				CategoryTreeView.TargetCategory = e.Category;
+				SettingsWindow.set_SelectedTab(CategoryTreeTab);
+			}
+			else
+			{
+				CategoryTreeView.NavigateToCategory(e.Category);
+			}
+			((Control)SettingsWindow).Show();
 		}
 
 		public override IView GetSettingsView()

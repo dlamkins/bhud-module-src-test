@@ -43,7 +43,12 @@ namespace BhModule.Community.Pathing.Behavior.Filter
 
 		public static IBehavior BuildFromAttributes(AttributeCollection attributes, StandardMarker marker, IPackState packState)
 		{
-			StandardPathableBehavior behaviorId = (StandardPathableBehavior)attributes["behavior"].GetValueAsInt();
+			attributes.TryGetAttribute("behavior", out var attribute);
+			if (attribute == null)
+			{
+				return null;
+			}
+			StandardPathableBehavior behaviorId = (StandardPathableBehavior)attribute.GetValueAsInt();
 			if (behaviorId <= StandardPathableBehavior.AlwaysVisible)
 			{
 				return null;

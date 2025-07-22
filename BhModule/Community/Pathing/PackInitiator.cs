@@ -44,6 +44,10 @@ namespace BhModule.Community.Pathing
 
 		public IRootPackState PackState => _packState;
 
+		public event EventHandler<EventArgs> LoadMapFromEachPackStarted;
+
+		public event EventHandler<EventArgs> LoadMapFromEachPackFinished;
+
 		public PackInitiator(string watchPath, PathingModule module, IProgress<string> loadingIndicator)
 		{
 			_watchPath = watchPath;
@@ -129,6 +133,11 @@ namespace BhModule.Community.Pathing
 				_module.SettingsWindow.set_SelectedTab(_module.MarkerRepoTab);
 				((Control)_module.SettingsWindow).Show();
 			});
+		}
+
+		public PathingCategory GetAllMarkersCategories()
+		{
+			return _sharedPackCollection?.Categories;
 		}
 
 		public IEnumerable<ContextMenuStripItem> GetPackMenuItems()
@@ -272,6 +281,7 @@ namespace BhModule.Community.Pathing
 		private async Task LoadMapFromEachPack(int mapId)
 		{
 			IsLoading = true;
+			this.LoadMapFromEachPackStarted?.Invoke(this, EventArgs.Empty);
 			Stopwatch loadTimer = Stopwatch.StartNew();
 			_packState.Module.ScriptEngine.Reset();
 			List<(Pack Pack, long LoadDuration)> packTimings = new List<(Pack, long)>();
@@ -335,6 +345,7 @@ namespace BhModule.Community.Pathing
 			}
 			_loadingIndicator.Report(null);
 			IsLoading = false;
+			this.LoadMapFromEachPackFinished?.Invoke(this, EventArgs.Empty);
 			Logger.Info(string.Format("Finished loading packs {0} in {1}ms for map {2}.", string.Join(", ", packTimings.Select(((Pack Pack, long LoadDuration) p) => string.Format("{0}{1}[{2}ms]", p.Pack.ManifestedPack ? "+" : "-", p.Pack.Name, p.LoadDuration))), loadTimer.ElapsedMilliseconds, mapId));
 		}
 

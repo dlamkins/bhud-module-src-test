@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using BhModule.Community.Pathing.Scripting.Lib;
 using BhModule.Community.Pathing.Scripting.Lib.Std;
 using Blish_HUD;
@@ -107,11 +106,11 @@ namespace BhModule.Community.Pathing.Scripting
 			int lookup = HashCode.Combine<string, IPackResourceManager>(scriptName, resourceManager);
 			if (!_loadedChunks.TryGetValue(lookup, out var chunk))
 			{
-				Task<LuaChunk> loadScript = ScriptEngine.LoadScript(scriptName, resourceManager);
-				loadScript.Wait();
-				if (loadScript.Result != null)
+				LuaChunk loadScriptResult = ScriptEngine.LoadScript(scriptName, resourceManager).ConfigureAwait(continueOnCapturedContext: false).GetAwaiter()
+					.GetResult();
+				if (loadScriptResult != null)
 				{
-					chunk = (_loadedChunks[lookup] = loadScript.Result);
+					chunk = (_loadedChunks[lookup] = loadScriptResult);
 				}
 			}
 			if (chunk != null)

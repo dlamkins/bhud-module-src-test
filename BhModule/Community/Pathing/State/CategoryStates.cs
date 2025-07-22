@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using BhModule.Community.Pathing.UI.Events;
 using BhModule.Community.Pathing.Utility;
 using Blish_HUD;
 using Microsoft.Xna.Framework;
@@ -36,6 +37,12 @@ namespace BhModule.Community.Pathing.State
 
 		private bool _calculationDirty;
 
+		public event EventHandler<PathingCategoryEventArgs> CategoryInactiveChanged;
+
+		public event EventHandler<EventArgs> CategoryStatesOptimized;
+
+		public event EventHandler<PathingCategoryEventArgs> TriggerOpenCategoryView;
+
 		public CategoryStates(IRootPackState packState)
 			: base(packState)
 		{
@@ -44,9 +51,13 @@ namespace BhModule.Community.Pathing.State
 		private async Task LoadCategoryState(string stateFileName, SafeList<PathingCategory> rawCategoriesList, PathingCategory rootCategory)
 		{
 			string categoryStatePath = Path.Combine(DataDirUtil.GetSafeDataDir("states"), stateFileName);
-			if (File.Exists(categoryStatePath))
+			if (!File.Exists(categoryStatePath))
 			{
-				string[] recordedCategories = Array.Empty<string>();
+				return;
+			}
+			string[] recordedCategories = Array.Empty<string>();
+			for (int i = 3; i > 0; i--)
+			{
 				try
 				{
 					recordedCategories = await FileUtil.ReadLinesAsync(categoryStatePath);
@@ -54,13 +65,17 @@ namespace BhModule.Community.Pathing.State
 				catch (Exception e)
 				{
 					Logger.Warn(e, "Failed to read categories.txt (" + categoryStatePath + ").");
+					goto IL_0145;
 				}
-				rawCategoriesList.Clear();
-				string[] array = recordedCategories;
-				foreach (string categoryNamespace in array)
-				{
-					rawCategoriesList.Add(rootCategory.GetOrAddCategoryFromNamespace(categoryNamespace));
-				}
+				break;
+				IL_0145:
+				await Task.Delay(1000);
+			}
+			rawCategoriesList.Clear();
+			string[] array = recordedCategories;
+			foreach (string categoryNamespace in array)
+			{
+				rawCategoriesList.Add(rootCategory.GetOrAddCategoryFromNamespace(categoryNamespace));
 			}
 		}
 
@@ -151,6 +166,7 @@ namespace BhModule.Community.Pathing.State
 				}
 			}
 			_inactiveCategories = preCalcInactiveCategories;
+			this.CategoryStatesOptimized?.Invoke(this, EventArgs.Empty);
 			_calculationDirty = false;
 		}
 
@@ -184,6 +200,11 @@ namespace BhModule.Community.Pathing.State
 			return _inactiveCategories.Contains(categoryNamespace);
 		}
 
+		public bool GetRawNamespaceInactive(string categoryNamespace)
+		{
+			return _rawInactiveCategories.FirstOrDefault((PathingCategory c) => c.Namespace.Equals(categoryNamespace)) != null;
+		}
+
 		private bool GetCategoryInactive(PathingCategory category, SafeList<PathingCategory> rawCategoriesList)
 		{
 			return rawCategoriesList.Contains(category);
@@ -198,12 +219,28 @@ namespace BhModule.Community.Pathing.State
 			return !GetCategoryInactive(category, _rawInvertedCategories);
 		}
 
+		public void TriggerOpenCategory(PathingCategory category)
+		{
+			this.TriggerOpenCategoryView?.Invoke(this, new PathingCategoryEventArgs(category));
+		}
+
 		private void SetInactive(PathingCategory category, bool isInactive, SafeList<PathingCategory> rawCategoriesList)
 		{
-			rawCategoriesList.Remove(category);
+			bool num = rawCategoriesList.Contains(category);
+			if (num)
+			{
+				rawCategoriesList.Remove(category);
+			}
 			if (isInactive)
 			{
 				rawCategoriesList.Add(category);
+			}
+			if (num != isInactive)
+			{
+				this.CategoryInactiveChanged?.Invoke(this, new PathingCategoryEventArgs(category)
+				{
+					Active = !isInactive
+				});
 			}
 			_stateDirty = true;
 			_calculationDirty = true;

@@ -74,41 +74,29 @@ namespace BhModule.Community.Pathing.UI.Controls
 			return (Enumerable.Reverse(filteredSubCategories), skipped);
 		}
 
+		private void ShowSearch()
+		{
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0026: Expected O, but got Unknown
+			ContextMenuStripItem val = new ContextMenuStripItem();
+			val.set_Text("Search");
+			((Control)val).set_BackgroundColor(Color.get_LightBlue() * 0.1f);
+			ContextMenuStripItem searchMarker = val;
+			((Control)searchMarker).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				PathingModule.Instance.SettingsWindow.set_SelectedTab(PathingModule.Instance.CategoryTreeTab);
+				((Control)PathingModule.Instance.SettingsWindow).Show();
+			});
+			((ContextMenuStrip)this).AddMenuItem(searchMarker);
+		}
+
 		protected override void OnShown(EventArgs e)
 		{
-			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c4: Expected O, but got Unknown
-			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0108: Expected O, but got Unknown
-			var (subCategories, skipped) = GetSubCategories(_forceShowAll);
-			foreach (PathingCategory subCategory in subCategories)
-			{
-				((ContextMenuStrip)this).AddMenuItem((ContextMenuStripItem)(object)new CategoryContextMenuStripItem(_packState, subCategory, _forceShowAll));
-			}
-			if (skipped > 0 && _packState.UserConfiguration.PackShowWhenCategoriesAreFiltered.get_Value())
-			{
-				ContextMenuStripItem val = new ContextMenuStripItem();
-				val.set_Text($"{skipped} Categories Are Hidden");
-				((Control)val).set_Enabled(false);
-				val.set_CanCheck(true);
-				((Control)val).set_BasicTooltipText(string.Format(Strings.Info_HiddenCategories, ((SettingEntry)_packState.UserConfiguration.PackEnableSmartCategoryFilter).get_DisplayName()));
-				ContextMenuStripItem showAllSkippedCategories = val;
-				((ContextMenuStrip)this).AddMenuItem(showAllSkippedCategories);
-				((Control)showAllSkippedCategories).add_LeftMouseButtonReleased((EventHandler<MouseEventArgs>)ShowAllSkippedCategories_LeftMouseButtonReleased);
-			}
-			if (skipped == 0 && !subCategories.Any())
-			{
-				ContextMenuStripItem val2 = new ContextMenuStripItem();
-				val2.set_Text("No marker packs loaded...");
-				((Control)val2).set_Enabled(false);
-				((ContextMenuStrip)this).AddMenuItem(val2);
-			}
+			PopulateMenuItems(_forceShowAll);
 			((ContextMenuStrip)this).OnShown(e);
 			if (((Control)this).get_Bottom() > ((Control)GameService.Graphics.get_SpriteScreen()).get_Bottom())
 			{
@@ -128,14 +116,51 @@ namespace BhModule.Community.Pathing.UI.Controls
 			}
 		}
 
-		private void ShowAllSkippedCategories_LeftMouseButtonReleased(object sender, MouseEventArgs e)
+		private void PopulateMenuItems(bool showAll)
 		{
+			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005d: Expected O, but got Unknown
+			//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0104: Expected O, but got Unknown
 			((Container)this).ClearChildren();
-			IEnumerable<PathingCategory> subCategories = GetSubCategories(forceShowAll: true).SubCategories;
+			var (subCategories, skipped) = GetSubCategories(showAll);
+			if (_pathingCategory != null && _pathingCategory.Root)
+			{
+				ShowSearch();
+				if (skipped == 0 && !subCategories.Any())
+				{
+					ContextMenuStripItem val = new ContextMenuStripItem();
+					val.set_Text("No marker packs loaded...");
+					((Control)val).set_Enabled(false);
+					((ContextMenuStrip)this).AddMenuItem(val);
+				}
+			}
 			foreach (PathingCategory subCategory in subCategories)
 			{
-				((ContextMenuStrip)this).AddMenuItem((ContextMenuStripItem)(object)new CategoryContextMenuStripItem(_packState, subCategory, forceShowAll: true));
+				((ContextMenuStrip)this).AddMenuItem((ContextMenuStripItem)(object)new CategoryContextMenuStripItem(_packState, subCategory, showAll));
 			}
+			if (skipped > 0 && _packState.UserConfiguration.PackShowWhenCategoriesAreFiltered.get_Value())
+			{
+				ContextMenuStripItem val2 = new ContextMenuStripItem();
+				val2.set_Text($"{skipped} Categories Are Hidden");
+				((Control)val2).set_Enabled(false);
+				val2.set_CanCheck(true);
+				((Control)val2).set_BasicTooltipText(string.Format(Strings.Info_HiddenCategories, ((SettingEntry)_packState.UserConfiguration.PackEnableSmartCategoryFilter).get_DisplayName()));
+				ContextMenuStripItem showAllSkippedCategories = val2;
+				((ContextMenuStrip)this).AddMenuItem(showAllSkippedCategories);
+				((Control)showAllSkippedCategories).add_LeftMouseButtonReleased((EventHandler<MouseEventArgs>)ShowAllSkippedCategories_LeftMouseButtonReleased);
+			}
+		}
+
+		private void ShowAllSkippedCategories_LeftMouseButtonReleased(object sender, MouseEventArgs e)
+		{
+			PopulateMenuItems(showAll: true);
 		}
 
 		protected override void OnHidden(EventArgs e)

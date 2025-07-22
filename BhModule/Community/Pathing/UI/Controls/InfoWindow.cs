@@ -111,7 +111,7 @@ namespace BhModule.Community.Pathing.UI.Controls
 			{
 				((Control)this).set_Visible(false);
 			}
-			if (PathingModule.Instance.Settings.PackInfoDisplayMode.get_Value() == MarkerInfoDisplayMode.NeverDisplay)
+			if (PathingModule.Instance == null || PathingModule.Instance.Settings.PackInfoDisplayMode.get_Value() == MarkerInfoDisplayMode.NeverDisplay)
 			{
 				((Control)this).Hide();
 			}

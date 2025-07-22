@@ -170,8 +170,8 @@ namespace BhModule.Community.Pathing.Scripting
 			}
 			try
 			{
-				using StreamReader scriptReader = new StreamReader(await resourceManager.LoadResourceStreamAsync(scriptName));
-				string scriptSource = await scriptReader.ReadToEndAsync();
+				using StreamReader scriptReader = new StreamReader(await resourceManager.LoadResourceStreamAsync(scriptName).ConfigureAwait(continueOnCapturedContext: false));
+				string scriptSource = await scriptReader.ReadToEndAsync().ConfigureAwait(continueOnCapturedContext: false);
 				LuaChunk chunk = _lua.CompileChunk(scriptSource, scriptName, new LuaCompileOptions
 				{
 					DebugEngine = _stackTraceDebugger
