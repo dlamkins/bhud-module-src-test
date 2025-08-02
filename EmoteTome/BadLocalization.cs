@@ -164,6 +164,8 @@ namespace EmoteTome
 
 		public static readonly List<string> MAGICTRICK = new List<string> { "Magic Trick", "Tourdemagie", "Zaubertrick", "Trucodemagia" };
 
+		public static readonly List<string> CHANNEL = new List<string> { "Channel", "Channel", "Channel", "Channel" };
+
 		public static readonly List<string> BEAR = new List<string> { "Bear", "Ours", "Baer", "Osa" };
 
 		public static readonly List<string> DEER = new List<string> { "Deer", "Daim", "Hirsch", "Ciervo" };
