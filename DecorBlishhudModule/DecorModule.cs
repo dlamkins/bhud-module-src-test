@@ -415,97 +415,120 @@ namespace DecorBlishhudModule
 			((Control)val3).set_Visible(false);
 			val3.set_BackgroundTexture(AsyncTexture2D.op_Implicit(_x));
 			Panel clearButton = val3;
-			DecorModule decorModule2 = this;
-			FlowPanel val4 = new FlowPanel();
+			Panel val4 = new Panel();
 			((Control)val4).set_Parent((Container)(object)_decorWindow);
-			val4.set_FlowDirection((ControlFlowDirection)3);
-			((Panel)val4).set_ShowBorder(true);
-			((Control)val4).set_Width(500);
-			((Control)val4).set_Height(660);
-			((Panel)val4).set_CanScroll(true);
-			((Control)val4).set_Location(new Point(10, ((Control)searchTextBox).get_Bottom() + 10));
-			((Control)val4).set_Visible(true);
-			decorModule2._homesteadDecorationsFlowPanel = val4;
-			FlowPanel val5 = new FlowPanel();
-			((Control)val5).set_Parent((Container)(object)_decorWindow);
-			val5.set_FlowDirection((ControlFlowDirection)3);
-			((Panel)val5).set_ShowBorder(true);
-			((Control)val5).set_Width(500);
-			((Control)val5).set_Height(660);
-			((Panel)val5).set_CanScroll(true);
-			((Control)val5).set_Location(new Point(10, ((Control)searchTextBox).get_Bottom() + 10));
-			((Control)val5).set_Visible(false);
-			FlowPanel guildHallDecorationsFlowPanel = val5;
-			FlowPanel val6 = new FlowPanel();
-			((Control)val6).set_Parent((Container)(object)_decorWindow);
-			val6.set_FlowDirection((ControlFlowDirection)3);
-			((Panel)val6).set_ShowBorder(true);
-			((Control)val6).set_Width(1080);
-			((Control)val6).set_Height(660);
-			((Panel)val6).set_CanScroll(true);
-			((Control)val6).set_Location(new Point(10, ((Control)searchTextBox).get_Bottom() + 10));
+			((Control)val4).set_Location(new Point(((Control)searchTextBox).get_Right() + 20, ((Control)searchTextBox).get_Top()));
+			((Control)val4).set_Width(200);
+			((Control)val4).set_Height(50);
+			Panel checkboxFlowPanel = val4;
+			CustomLoadingSpinner customLoadingSpinner = new CustomLoadingSpinner();
+			((Control)customLoadingSpinner).set_Parent((Container)(object)checkboxFlowPanel);
+			((Control)customLoadingSpinner).set_Location(new Point(0, 0));
+			CustomLoadingSpinner checkboxSpinner = customLoadingSpinner;
+			Label val5 = new Label();
+			((Control)val5).set_Parent((Container)(object)checkboxFlowPanel);
+			((Control)val5).set_Location(new Point(((Control)checkboxSpinner).get_Right(), -8));
+			val5.set_Text("Loading... Please wait");
+			((Control)val5).set_Size(new Point(200, 50));
+			Label checkboxLoading = val5;
+			Checkbox val6 = new Checkbox();
+			((Control)val6).set_Parent((Container)(object)checkboxFlowPanel);
+			((Control)val6).set_Location(new Point(15, 9));
+			val6.set_Text("Display Categories");
+			val6.set_Checked(true);
 			((Control)val6).set_Visible(false);
-			FlowPanel homesteadDecorationsBigFlowPanel = val6;
+			Checkbox checkbox = val6;
+			DecorModule decorModule2 = this;
 			FlowPanel val7 = new FlowPanel();
 			((Control)val7).set_Parent((Container)(object)_decorWindow);
 			val7.set_FlowDirection((ControlFlowDirection)3);
 			((Panel)val7).set_ShowBorder(true);
-			((Control)val7).set_Width(1080);
+			((Control)val7).set_Width(500);
 			((Control)val7).set_Height(660);
 			((Panel)val7).set_CanScroll(true);
 			((Control)val7).set_Location(new Point(10, ((Control)searchTextBox).get_Bottom() + 10));
-			((Control)val7).set_Visible(false);
-			FlowPanel guildHallDecorationsBigFlowPanel = val7;
-			DecorModule decorModule3 = this;
+			((Control)val7).set_Visible(true);
+			decorModule2._homesteadDecorationsFlowPanel = val7;
 			FlowPanel val8 = new FlowPanel();
 			((Control)val8).set_Parent((Container)(object)_decorWindow);
-			val8.set_FlowDirection((ControlFlowDirection)2);
-			((Control)val8).set_Width(1080);
-			((Control)val8).set_Height(700);
+			val8.set_FlowDirection((ControlFlowDirection)3);
+			((Panel)val8).set_ShowBorder(true);
+			((Control)val8).set_Width(500);
+			((Control)val8).set_Height(660);
 			((Panel)val8).set_CanScroll(true);
+			((Control)val8).set_Location(new Point(10, ((Control)searchTextBox).get_Bottom() + 10));
 			((Control)val8).set_Visible(false);
-			decorModule3._farmPanel = val8;
-			DecorModule decorModule4 = this;
+			FlowPanel guildHallDecorationsFlowPanel = val8;
 			FlowPanel val9 = new FlowPanel();
 			((Control)val9).set_Parent((Container)(object)_decorWindow);
-			val9.set_FlowDirection((ControlFlowDirection)2);
+			val9.set_FlowDirection((ControlFlowDirection)3);
+			((Panel)val9).set_ShowBorder(true);
 			((Control)val9).set_Width(1080);
-			((Control)val9).set_Height(700);
+			((Control)val9).set_Height(660);
 			((Panel)val9).set_CanScroll(true);
+			((Control)val9).set_Location(new Point(10, ((Control)searchTextBox).get_Bottom() + 10));
 			((Control)val9).set_Visible(false);
-			decorModule4._lumberPanel = val9;
-			DecorModule decorModule5 = this;
+			FlowPanel homesteadDecorationsBigFlowPanel = val9;
 			FlowPanel val10 = new FlowPanel();
 			((Control)val10).set_Parent((Container)(object)_decorWindow);
-			val10.set_FlowDirection((ControlFlowDirection)2);
+			val10.set_FlowDirection((ControlFlowDirection)3);
+			((Panel)val10).set_ShowBorder(true);
 			((Control)val10).set_Width(1080);
-			((Control)val10).set_Height(700);
+			((Control)val10).set_Height(660);
 			((Panel)val10).set_CanScroll(true);
+			((Control)val10).set_Location(new Point(10, ((Control)searchTextBox).get_Bottom() + 10));
 			((Control)val10).set_Visible(false);
-			decorModule5._metalPanel = val10;
-			DecorModule decorModule6 = this;
-			Label val11 = new Label();
+			FlowPanel guildHallDecorationsBigFlowPanel = val10;
+			DecorModule decorModule3 = this;
+			FlowPanel val11 = new FlowPanel();
 			((Control)val11).set_Parent((Container)(object)_decorWindow);
-			((Control)val11).set_Width(500);
-			((Control)val11).set_Height(120);
-			val11.set_WrapText(true);
-			val11.set_StrokeText(true);
-			val11.set_ShowShadow(true);
-			val11.set_ShadowColor(new Color(0, 0, 0));
-			val11.set_Font(GameService.Content.get_DefaultFont18());
-			decorModule6._decorationRightText = val11;
-			DecorModule decorModule7 = this;
-			Image val12 = new Image();
+			val11.set_FlowDirection((ControlFlowDirection)2);
+			((Control)val11).set_Width(1080);
+			((Control)val11).set_Height(700);
+			((Panel)val11).set_CanScroll(true);
+			((Control)val11).set_Visible(false);
+			decorModule3._farmPanel = val11;
+			DecorModule decorModule4 = this;
+			FlowPanel val12 = new FlowPanel();
 			((Control)val12).set_Parent((Container)(object)_decorWindow);
-			((Control)val12).set_Size(new Point(40, 40));
-			((Control)val12).set_Location(new Point(((Control)_decorationRightText).get_Left(), ((Control)_decorationRightText).get_Bottom() + 5));
-			decorModule7._decorationIcon = val12;
-			DecorModule decorModule8 = this;
-			Image val13 = new Image();
+			val12.set_FlowDirection((ControlFlowDirection)2);
+			((Control)val12).set_Width(1080);
+			((Control)val12).set_Height(700);
+			((Panel)val12).set_CanScroll(true);
+			((Control)val12).set_Visible(false);
+			decorModule4._lumberPanel = val12;
+			DecorModule decorModule5 = this;
+			FlowPanel val13 = new FlowPanel();
 			((Control)val13).set_Parent((Container)(object)_decorWindow);
-			((Control)val13).set_Size(new Point(400, 400));
-			((Control)val13).set_Location(new Point(((Control)_decorationRightText).get_Left(), ((Control)_decorationIcon).get_Bottom() + 5));
-			decorModule8._decorationImage = val13;
+			val13.set_FlowDirection((ControlFlowDirection)2);
+			((Control)val13).set_Width(1080);
+			((Control)val13).set_Height(700);
+			((Panel)val13).set_CanScroll(true);
+			((Control)val13).set_Visible(false);
+			decorModule5._metalPanel = val13;
+			DecorModule decorModule6 = this;
+			Label val14 = new Label();
+			((Control)val14).set_Parent((Container)(object)_decorWindow);
+			((Control)val14).set_Width(500);
+			((Control)val14).set_Height(120);
+			val14.set_WrapText(true);
+			val14.set_StrokeText(true);
+			val14.set_ShowShadow(true);
+			val14.set_ShadowColor(new Color(0, 0, 0));
+			val14.set_Font(GameService.Content.get_DefaultFont18());
+			decorModule6._decorationRightText = val14;
+			DecorModule decorModule7 = this;
+			Image val15 = new Image();
+			((Control)val15).set_Parent((Container)(object)_decorWindow);
+			((Control)val15).set_Size(new Point(40, 40));
+			((Control)val15).set_Location(new Point(((Control)_decorationRightText).get_Left(), ((Control)_decorationRightText).get_Bottom() + 5));
+			decorModule7._decorationIcon = val15;
+			DecorModule decorModule8 = this;
+			Image val16 = new Image();
+			((Control)val16).set_Parent((Container)(object)_decorWindow);
+			((Control)val16).set_Size(new Point(400, 400));
+			((Control)val16).set_Location(new Point(((Control)_decorationRightText).get_Left(), ((Control)_decorationIcon).get_Bottom() + 5));
+			decorModule8._decorationImage = val16;
 			CustomTab customTab1 = new CustomTab(AsyncTexture2D.op_Implicit(_handiworkTab), "Homestead Handiwork", 7);
 			CustomTab customTab2 = new CustomTab(AsyncTexture2D.op_Implicit(_scribeTab), "Guild Hall Scribe", 6);
 			CustomTab customTab3 = new CustomTab(AsyncTexture2D.op_Implicit(_iconsTab), "Icons Preview", 5);
@@ -542,6 +565,8 @@ namespace DecorBlishhudModule
 					((Control)homesteadDecorationsBigFlowPanel).set_Visible(false);
 					((Control)guildHallDecorationsBigFlowPanel).set_Visible(false);
 					((Control)searchTextBox).set_Visible(true);
+					((Control)clearButton).set_Visible(!string.IsNullOrEmpty(((TextInputBase)searchTextBox).get_Text()));
+					((Control)checkboxFlowPanel).set_Visible(true);
 					((Control)_farmPanel).set_Visible(false);
 					((Control)_lumberPanel).set_Visible(false);
 					((Control)_metalPanel).set_Visible(false);
@@ -562,6 +587,8 @@ namespace DecorBlishhudModule
 					((Control)homesteadDecorationsBigFlowPanel).set_Visible(false);
 					((Control)guildHallDecorationsBigFlowPanel).set_Visible(false);
 					((Control)searchTextBox).set_Visible(true);
+					((Control)clearButton).set_Visible(!string.IsNullOrEmpty(((TextInputBase)searchTextBox).get_Text()));
+					((Control)checkboxFlowPanel).set_Visible(true);
 					((Control)_farmPanel).set_Visible(false);
 					((Control)_lumberPanel).set_Visible(false);
 					((Control)_metalPanel).set_Visible(false);
@@ -582,6 +609,8 @@ namespace DecorBlishhudModule
 					((Control)homesteadDecorationsBigFlowPanel).set_Visible(true);
 					((Control)guildHallDecorationsBigFlowPanel).set_Visible(false);
 					((Control)searchTextBox).set_Visible(true);
+					((Control)clearButton).set_Visible(!string.IsNullOrEmpty(((TextInputBase)searchTextBox).get_Text()));
+					((Control)checkboxFlowPanel).set_Visible(true);
 					((Control)_farmPanel).set_Visible(false);
 					((Control)_lumberPanel).set_Visible(false);
 					((Control)_metalPanel).set_Visible(false);
@@ -602,6 +631,8 @@ namespace DecorBlishhudModule
 					((Control)homesteadDecorationsBigFlowPanel).set_Visible(false);
 					((Control)guildHallDecorationsBigFlowPanel).set_Visible(true);
 					((Control)searchTextBox).set_Visible(true);
+					((Control)clearButton).set_Visible(!string.IsNullOrEmpty(((TextInputBase)searchTextBox).get_Text()));
+					((Control)checkboxFlowPanel).set_Visible(true);
 					((Control)_farmPanel).set_Visible(false);
 					((Control)_lumberPanel).set_Visible(false);
 					((Control)_metalPanel).set_Visible(false);
@@ -621,6 +652,8 @@ namespace DecorBlishhudModule
 					((Control)homesteadDecorationsBigFlowPanel).set_Visible(false);
 					((Control)guildHallDecorationsBigFlowPanel).set_Visible(false);
 					((Control)searchTextBox).set_Visible(false);
+					((Control)clearButton).set_Visible(false);
+					((Control)checkboxFlowPanel).set_Visible(false);
 					((Control)_farmPanel).set_Visible(true);
 					((Control)_lumberPanel).set_Visible(false);
 					((Control)_metalPanel).set_Visible(false);
@@ -639,6 +672,8 @@ namespace DecorBlishhudModule
 					((Control)homesteadDecorationsBigFlowPanel).set_Visible(false);
 					((Control)guildHallDecorationsBigFlowPanel).set_Visible(false);
 					((Control)searchTextBox).set_Visible(false);
+					((Control)clearButton).set_Visible(false);
+					((Control)checkboxFlowPanel).set_Visible(false);
 					((Control)_farmPanel).set_Visible(false);
 					((Control)_lumberPanel).set_Visible(true);
 					((Control)_metalPanel).set_Visible(false);
@@ -657,6 +692,8 @@ namespace DecorBlishhudModule
 					((Control)homesteadDecorationsBigFlowPanel).set_Visible(false);
 					((Control)guildHallDecorationsBigFlowPanel).set_Visible(false);
 					((Control)searchTextBox).set_Visible(false);
+					((Control)clearButton).set_Visible(false);
+					((Control)checkboxFlowPanel).set_Visible(false);
 					((Control)_farmPanel).set_Visible(false);
 					((Control)_lumberPanel).set_Visible(false);
 					((Control)_metalPanel).set_Visible(true);
@@ -667,7 +704,13 @@ namespace DecorBlishhudModule
 			};
 			customTab2.Enabled = false;
 			customTab4.Enabled = false;
+			Dictionary<Control, int> _originalHeightsHomestead = new Dictionary<Control, int>();
+			Dictionary<Control, int> _originalHeightsGuildHall = new Dictionary<Control, int>();
+			Dictionary<Control, int> _originalHeightsHomesteadBig = new Dictionary<Control, int>();
+			Dictionary<Control, int> _originalHeightsGuildHallBig = new Dictionary<Control, int>();
 			await LeftSideSection.PopulateHomesteadIconsInFlowPanel(_homesteadDecorationsFlowPanel, _isIconView: true);
+			LeftSideSection.StoreCurrentHeightsForPanel((Panel)(object)_homesteadDecorationsFlowPanel, _originalHeightsHomestead);
+			await ApplySearchFilterAsync();
 			await CustomTableFarm.Initialize(_farmPanel, "farm");
 			await CustomTableLumber.Initialize(_lumberPanel, "lumber");
 			await CustomTableMetal.Initialize(_metalPanel, "metal");
@@ -675,6 +718,8 @@ namespace DecorBlishhudModule
 			Task.Run(async delegate
 			{
 				await LeftSideSection.PopulateGuildHallIconsInFlowPanel(guildHallDecorationsFlowPanel, _isIconView: true);
+				LeftSideSection.StoreCurrentHeightsForPanel((Panel)(object)guildHallDecorationsFlowPanel, _originalHeightsGuildHall);
+				await ApplySearchFilterAsync();
 				customTab2.Enabled = true;
 				if (customTab2.Enabled && customTab4.Enabled)
 				{
@@ -691,10 +736,16 @@ namespace DecorBlishhudModule
 			{
 				await LeftSideSection.PopulateHomesteadBigIconsInFlowPanel(homesteadDecorationsBigFlowPanel, _isIconView: false);
 				await LeftSideSection.PopulateGuildHallBigIconsInFlowPanel(guildHallDecorationsBigFlowPanel, _isIconView: false);
+				LeftSideSection.StoreCurrentHeightsForPanel((Panel)(object)homesteadDecorationsBigFlowPanel, _originalHeightsHomesteadBig);
+				LeftSideSection.StoreCurrentHeightsForPanel((Panel)(object)guildHallDecorationsBigFlowPanel, _originalHeightsGuildHallBig);
+				await ApplySearchFilterAsync();
 				customTab4.Enabled = true;
 				if (customTab2.Enabled && customTab4.Enabled)
 				{
 					_loaded = true;
+					((Control)checkbox).set_Visible(true);
+					((Control)checkboxLoading).set_Visible(false);
+					((Control)checkboxSpinner).set_Visible(false);
 				}
 			}).ContinueWith(delegate(Task t)
 			{
@@ -705,17 +756,52 @@ namespace DecorBlishhudModule
 			});
 			((TextInputBase)searchTextBox).add_TextChanged((EventHandler<EventArgs>)async delegate
 			{
+				await ApplySearchFilterAsync();
+			});
+			((Control)clearButton).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				((TextInputBase)searchTextBox).set_Text(string.Empty);
+			});
+			((Control)checkbox).add_Click((EventHandler<MouseEventArgs>)async delegate
+			{
+				if (_originalHeightsHomestead.Count != ((Container)_homesteadDecorationsFlowPanel).get_Children().get_Count())
+				{
+					LeftSideSection.StoreCurrentHeightsForPanel((Panel)(object)_homesteadDecorationsFlowPanel, _originalHeightsHomestead);
+				}
+				if (_originalHeightsGuildHall.Count != ((Container)guildHallDecorationsFlowPanel).get_Children().get_Count())
+				{
+					LeftSideSection.StoreCurrentHeightsForPanel((Panel)(object)guildHallDecorationsFlowPanel, _originalHeightsGuildHall);
+				}
+				if (_originalHeightsHomesteadBig.Count != ((Container)homesteadDecorationsBigFlowPanel).get_Children().get_Count())
+				{
+					LeftSideSection.StoreCurrentHeightsForPanel((Panel)(object)homesteadDecorationsBigFlowPanel, _originalHeightsHomesteadBig);
+				}
+				if (_originalHeightsGuildHallBig.Count != ((Container)guildHallDecorationsBigFlowPanel).get_Children().get_Count())
+				{
+					LeftSideSection.StoreCurrentHeightsForPanel((Panel)(object)guildHallDecorationsBigFlowPanel, _originalHeightsGuildHallBig);
+				}
+				LeftSideSection.ApplyCheckboxLogic((Panel)(object)_homesteadDecorationsFlowPanel, _originalHeightsHomestead, checkbox.get_Checked());
+				LeftSideSection.ApplyCheckboxLogic((Panel)(object)guildHallDecorationsFlowPanel, _originalHeightsGuildHall, checkbox.get_Checked());
+				LeftSideSection.ApplyCheckboxLogic((Panel)(object)homesteadDecorationsBigFlowPanel, _originalHeightsHomesteadBig, checkbox.get_Checked());
+				LeftSideSection.ApplyCheckboxLogic((Panel)(object)guildHallDecorationsBigFlowPanel, _originalHeightsGuildHallBig, checkbox.get_Checked());
+			});
+			async Task ApplySearchFilterAsync()
+			{
 				string searchText = ((TextInputBase)searchTextBox).get_Text().ToLower();
 				await FilterDecorations.FilterDecorationsAsync(_homesteadDecorationsFlowPanel, searchText, _isIconView: true);
 				await FilterDecorations.FilterDecorationsAsync(guildHallDecorationsFlowPanel, searchText, _isIconView: true);
 				await FilterDecorations.FilterDecorationsAsync(homesteadDecorationsBigFlowPanel, searchText, _isIconView: false);
 				await FilterDecorations.FilterDecorationsAsync(guildHallDecorationsBigFlowPanel, searchText, _isIconView: false);
 				((Control)clearButton).set_Visible(!string.IsNullOrEmpty(searchText));
-			});
-			((Control)clearButton).add_Click((EventHandler<MouseEventArgs>)delegate
-			{
-				((TextInputBase)searchTextBox).set_Text(string.Empty);
-			});
+				LeftSideSection.StoreCurrentHeightsForPanel((Panel)(object)_homesteadDecorationsFlowPanel, _originalHeightsHomestead);
+				LeftSideSection.StoreCurrentHeightsForPanel((Panel)(object)guildHallDecorationsFlowPanel, _originalHeightsGuildHall);
+				LeftSideSection.StoreCurrentHeightsForPanel((Panel)(object)homesteadDecorationsBigFlowPanel, _originalHeightsHomesteadBig);
+				LeftSideSection.StoreCurrentHeightsForPanel((Panel)(object)guildHallDecorationsBigFlowPanel, _originalHeightsGuildHallBig);
+				LeftSideSection.ApplyCheckboxLogic((Panel)(object)_homesteadDecorationsFlowPanel, _originalHeightsHomestead, checkbox.get_Checked());
+				LeftSideSection.ApplyCheckboxLogic((Panel)(object)guildHallDecorationsFlowPanel, _originalHeightsGuildHall, checkbox.get_Checked());
+				LeftSideSection.ApplyCheckboxLogic((Panel)(object)homesteadDecorationsBigFlowPanel, _originalHeightsHomesteadBig, checkbox.get_Checked());
+				LeftSideSection.ApplyCheckboxLogic((Panel)(object)guildHallDecorationsBigFlowPanel, _originalHeightsGuildHallBig, checkbox.get_Checked());
+			}
 		}
 	}
 }

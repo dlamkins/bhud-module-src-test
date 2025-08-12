@@ -84,17 +84,26 @@ namespace DecorBlishhudModule
 			{
 				caseInsensitiveCategories[kvp.Key] = kvp.Value;
 			}
-			await Task.WhenAll((from category in HomesteadCategories.GetCategories()
-				where caseInsensitiveCategories.ContainsKey(category)
-				select category).Select((Func<string, Task>)async delegate(string category)
+			List<string> categories = HomesteadCategories.GetCategories();
+			List<Decoration> allDecorations = (from g in caseInsensitiveCategories.Values.SelectMany((List<Decoration> list) => list).GroupBy((Decoration d) => d.Name, StringComparer.OrdinalIgnoreCase)
+				select g.First()).ToList();
+			List<(string, List<Decoration>)> categoriesToShow = new List<(string, List<Decoration>)> { ("All Decorations", allDecorations) };
+			foreach (string category in categories)
+			{
+				if (caseInsensitiveCategories.ContainsKey(category))
+				{
+					categoriesToShow.Add((category, caseInsensitiveCategories[category]));
+				}
+			}
+			await Task.WhenAll(categoriesToShow.Select<(string, List<Decoration>), Task>(async delegate((string Name, List<Decoration> Decorations) categoryData)
 			{
 				int heightIncrementPerDecorationSet = 52;
-				List<Decoration> decorations = caseInsensitiveCategories[category];
+				List<Decoration> decorations = categoryData.Decorations;
 				int numDecorationSets = (int)Math.Ceiling((double)decorations.Count / 9.0);
 				int calculatedHeight = 45 + numDecorationSets * heightIncrementPerDecorationSet;
 				FlowPanel val = new FlowPanel();
 				((Control)val).set_Parent((Container)(object)homesteadDecorationsFlowPanel);
-				((Panel)val).set_Title(category);
+				((Panel)val).set_Title(categoryData.Name);
 				val.set_FlowDirection((ControlFlowDirection)0);
 				((Control)val).set_Width(((Control)homesteadDecorationsFlowPanel).get_Width() - 20);
 				((Control)val).set_Height(calculatedHeight);
@@ -107,29 +116,44 @@ namespace DecorBlishhudModule
 			await OrderDecorations.OrderDecorationsAsync(homesteadDecorationsFlowPanel, _isIconView);
 		}
 
-		public static async Task PopulateGuildHallIconsInFlowPanel(FlowPanel decorationsFlowPanel, bool _isIconView)
+		public static async Task PopulateGuildHallIconsInFlowPanel(FlowPanel guildHallDecorationsFlowPanel, bool _isIconView)
 		{
-			await Task.WhenAll((await FetchGuildHallDecorationsAsync()).Where((KeyValuePair<string, List<Decoration>> entry) => entry.Value != null && entry.Value.Count > 0).Select((Func<KeyValuePair<string, List<Decoration>>, Task>)async delegate(KeyValuePair<string, List<Decoration>> entry)
+			Dictionary<string, List<Decoration>> obj = await FetchGuildHallDecorationsAsync();
+			Dictionary<string, List<Decoration>> caseInsensitiveCategories = new Dictionary<string, List<Decoration>>(StringComparer.OrdinalIgnoreCase);
+			foreach (KeyValuePair<string, List<Decoration>> kvp in obj)
 			{
-				string category = entry.Key;
-				List<Decoration> value = entry.Value;
-				int baseHeight = 45;
+				caseInsensitiveCategories[kvp.Key] = kvp.Value;
+			}
+			List<string> categories = GuildHallCategories.GetCategories();
+			List<Decoration> allDecorations = (from g in caseInsensitiveCategories.Values.SelectMany((List<Decoration> list) => list).GroupBy((Decoration d) => d.Name, StringComparer.OrdinalIgnoreCase)
+				select g.First()).ToList();
+			List<(string, List<Decoration>)> categoriesToShow = new List<(string, List<Decoration>)> { ("All Decorations", allDecorations) };
+			foreach (string category in categories)
+			{
+				if (caseInsensitiveCategories.ContainsKey(category))
+				{
+					categoriesToShow.Add((category, caseInsensitiveCategories[category]));
+				}
+			}
+			await Task.WhenAll(categoriesToShow.Select<(string, List<Decoration>), Task>(async delegate((string Name, List<Decoration> Decorations) categoryData)
+			{
 				int heightIncrementPerDecorationSet = 52;
-				int numDecorationSets = (int)Math.Ceiling((double)value.Count / 9.0);
-				int calculatedHeight = baseHeight + numDecorationSets * heightIncrementPerDecorationSet;
+				List<Decoration> decorations = categoryData.Decorations;
+				int numDecorationSets = (int)Math.Ceiling((double)decorations.Count / 9.0);
+				int calculatedHeight = 45 + numDecorationSets * heightIncrementPerDecorationSet;
 				FlowPanel val = new FlowPanel();
-				((Control)val).set_Parent((Container)(object)decorationsFlowPanel);
-				((Panel)val).set_Title(category);
+				((Control)val).set_Parent((Container)(object)guildHallDecorationsFlowPanel);
+				((Panel)val).set_Title(categoryData.Name);
 				val.set_FlowDirection((ControlFlowDirection)0);
-				((Control)val).set_Width(((Control)decorationsFlowPanel).get_Width() - 20);
+				((Control)val).set_Width(((Control)guildHallDecorationsFlowPanel).get_Width() - 20);
 				((Control)val).set_Height(calculatedHeight);
 				((Panel)val).set_CanCollapse(false);
 				val.set_ControlPadding(new Vector2(4f, 4f));
 				val.set_OuterControlPadding(new Vector2(6f, 4f));
 				FlowPanel categoryFlowPanel = val;
-				await Task.WhenAll(value.Select((Decoration decoration) => CreateDecorationIconsImagesAsync(decoration, categoryFlowPanel, _isIconView)));
-			}).ToList());
-			await OrderDecorations.OrderDecorationsAsync(decorationsFlowPanel, _isIconView);
+				await Task.WhenAll(decorations.Select((Decoration decoration) => CreateDecorationIconsImagesAsync(decoration, categoryFlowPanel, _isIconView)));
+			}));
+			await OrderDecorations.OrderDecorationsAsync(guildHallDecorationsFlowPanel, _isIconView);
 		}
 
 		public static async Task PopulateHomesteadBigIconsInFlowPanel(FlowPanel homesteadDecorationsFlowPanel, bool _isIconView)
@@ -140,21 +164,30 @@ namespace DecorBlishhudModule
 			{
 				caseInsensitiveCategories[kvp.Key] = kvp.Value;
 			}
-			await Task.WhenAll((from category in HomesteadCategories.GetCategories()
-				where caseInsensitiveCategories.ContainsKey(category)
-				select category).Select((Func<string, Task>)async delegate(string category)
+			List<string> categories = HomesteadCategories.GetCategories();
+			List<Decoration> allDecorations = (from g in caseInsensitiveCategories.Values.SelectMany((List<Decoration> list) => list).GroupBy((Decoration d) => d.Name, StringComparer.OrdinalIgnoreCase)
+				select g.First()).ToList();
+			List<(string, List<Decoration>)> categoriesToShow = new List<(string, List<Decoration>)> { ("All Decorations", allDecorations) };
+			foreach (string category in categories)
+			{
+				if (caseInsensitiveCategories.ContainsKey(category))
+				{
+					categoriesToShow.Add((category, caseInsensitiveCategories[category]));
+				}
+			}
+			await Task.WhenAll(categoriesToShow.Select<(string, List<Decoration>), Task>(async delegate((string Name, List<Decoration> Decorations) categoryData)
 			{
 				int heightIncrementPerDecorationSet = 312;
-				List<Decoration> decorations = caseInsensitiveCategories[category];
+				List<Decoration> decorations = categoryData.Decorations;
 				int numDecorationSets = (int)Math.Ceiling((double)decorations.Count / 4.0);
 				int calculatedHeight = 45 + numDecorationSets * heightIncrementPerDecorationSet;
 				FlowPanel val = new FlowPanel();
 				((Control)val).set_Parent((Container)(object)homesteadDecorationsFlowPanel);
-				((Panel)val).set_Title(category);
+				((Panel)val).set_Title(categoryData.Name);
 				val.set_FlowDirection((ControlFlowDirection)0);
 				((Control)val).set_Width(((Control)homesteadDecorationsFlowPanel).get_Width() - 20);
 				((Control)val).set_Height(calculatedHeight);
-				((Panel)val).set_CanCollapse(true);
+				((Panel)val).set_CanCollapse(categoryData.Name != "All Decorations");
 				val.set_ControlPadding(new Vector2(8f, 10f));
 				val.set_OuterControlPadding(new Vector2(10f, 10f));
 				FlowPanel categoryFlowPanel = val;
@@ -163,29 +196,44 @@ namespace DecorBlishhudModule
 			await OrderDecorations.OrderDecorationsAsync(homesteadDecorationsFlowPanel, _isIconView);
 		}
 
-		public static async Task PopulateGuildHallBigIconsInFlowPanel(FlowPanel decorationsFlowPanel, bool _isIconView)
+		public static async Task PopulateGuildHallBigIconsInFlowPanel(FlowPanel guildHallDecorationsFlowPanel, bool _isIconView)
 		{
-			await Task.WhenAll((await FetchGuildHallDecorationsAsync()).Where((KeyValuePair<string, List<Decoration>> entry) => entry.Value != null && entry.Value.Count > 0).Select((Func<KeyValuePair<string, List<Decoration>>, Task>)async delegate(KeyValuePair<string, List<Decoration>> entry)
+			Dictionary<string, List<Decoration>> obj = await FetchGuildHallDecorationsAsync();
+			Dictionary<string, List<Decoration>> caseInsensitiveCategories = new Dictionary<string, List<Decoration>>(StringComparer.OrdinalIgnoreCase);
+			foreach (KeyValuePair<string, List<Decoration>> kvp in obj)
 			{
-				string category = entry.Key;
-				List<Decoration> value = entry.Value;
-				int baseHeight = 45;
+				caseInsensitiveCategories[kvp.Key] = kvp.Value;
+			}
+			List<string> categories = GuildHallCategories.GetCategories();
+			List<Decoration> allDecorations = (from g in caseInsensitiveCategories.Values.SelectMany((List<Decoration> list) => list).GroupBy((Decoration d) => d.Name, StringComparer.OrdinalIgnoreCase)
+				select g.First()).ToList();
+			List<(string, List<Decoration>)> categoriesToShow = new List<(string, List<Decoration>)> { ("All Decorations", allDecorations) };
+			foreach (string category in categories)
+			{
+				if (caseInsensitiveCategories.ContainsKey(category))
+				{
+					categoriesToShow.Add((category, caseInsensitiveCategories[category]));
+				}
+			}
+			await Task.WhenAll(categoriesToShow.Select<(string, List<Decoration>), Task>(async delegate((string Name, List<Decoration> Decorations) categoryData)
+			{
 				int heightIncrementPerDecorationSet = 312;
-				int numDecorationSets = (int)Math.Ceiling((double)value.Count / 4.0);
-				int calculatedHeight = baseHeight + numDecorationSets * heightIncrementPerDecorationSet;
+				List<Decoration> decorations = categoryData.Decorations;
+				int numDecorationSets = (int)Math.Ceiling((double)decorations.Count / 4.0);
+				int calculatedHeight = 45 + numDecorationSets * heightIncrementPerDecorationSet;
 				FlowPanel val = new FlowPanel();
-				((Control)val).set_Parent((Container)(object)decorationsFlowPanel);
-				((Panel)val).set_Title(category);
+				((Control)val).set_Parent((Container)(object)guildHallDecorationsFlowPanel);
+				((Panel)val).set_Title(categoryData.Name);
 				val.set_FlowDirection((ControlFlowDirection)0);
-				((Control)val).set_Width(((Control)decorationsFlowPanel).get_Width() - 20);
+				((Control)val).set_Width(((Control)guildHallDecorationsFlowPanel).get_Width() - 20);
 				((Control)val).set_Height(calculatedHeight);
-				((Panel)val).set_CanCollapse(true);
+				((Panel)val).set_CanCollapse(categoryData.Name != "All Decorations");
 				val.set_ControlPadding(new Vector2(8f, 10f));
 				val.set_OuterControlPadding(new Vector2(10f, 10f));
 				FlowPanel categoryFlowPanel = val;
-				await Task.WhenAll(value.Select((Decoration decoration) => CreateDecorationIconsImagesAsync(decoration, categoryFlowPanel, _isIconView)));
-			}).ToList());
-			await OrderDecorations.OrderDecorationsAsync(decorationsFlowPanel, _isIconView);
+				await Task.WhenAll(decorations.Select((Decoration decoration) => CreateDecorationIconsImagesAsync(decoration, categoryFlowPanel, _isIconView)));
+			}));
+			await OrderDecorations.OrderDecorationsAsync(guildHallDecorationsFlowPanel, _isIconView);
 		}
 
 		public static async Task CreateDecorationIconsImagesAsync(Decoration decoration, FlowPanel categoryFlowPanel, bool _isIconView)
@@ -591,6 +639,39 @@ namespace DecorBlishhudModule
 					_fileSemaphores[path] = semaphore;
 				}
 				return semaphore;
+			}
+		}
+
+		public static void StoreCurrentHeightsForPanel(Panel panel, Dictionary<Control, int> heightsDict)
+		{
+			heightsDict.Clear();
+			foreach (Control child in ((Container)panel).get_Children())
+			{
+				heightsDict[child] = child.get_Height();
+			}
+		}
+
+		public static void ApplyCheckboxLogic(Panel panel, Dictionary<Control, int> heightsDict, bool checkboxChecked)
+		{
+			if (((Container)panel).get_Children().get_Count() == 0)
+			{
+				return;
+			}
+			if (checkboxChecked)
+			{
+				((Container)panel).get_Children().get_Item(0).set_Height(0);
+				for (int j = 1; j < ((Container)panel).get_Children().get_Count(); j++)
+				{
+					((Container)panel).get_Children().get_Item(j).set_Height(heightsDict[((Container)panel).get_Children().get_Item(j)]);
+				}
+			}
+			else
+			{
+				((Container)panel).get_Children().get_Item(0).set_Height(heightsDict[((Container)panel).get_Children().get_Item(0)]);
+				for (int i = 1; i < ((Container)panel).get_Children().get_Count(); i++)
+				{
+					((Container)panel).get_Children().get_Item(i).set_Height(0);
+				}
 			}
 		}
 	}
