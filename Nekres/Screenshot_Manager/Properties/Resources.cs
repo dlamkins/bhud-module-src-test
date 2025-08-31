@@ -46,13 +46,19 @@ namespace Nekres.Screenshot_Manager.Properties
 
 		internal static string Are_you_sure_ => ResourceManager.GetString("Are you sure?", resourceCulture);
 
-		internal static string By_default__screenshots_are_sent_to_the_Recycle_Bin_so_that_they_can_be_recovered_if_needed__nWhen_this_feature_is_disabled__deleted_screenshots_are_removed_from_the_hard_disk_and_their_space_is_marked_as_overwriteable_ => ResourceManager.GetString("By default, screenshots are sent to the Recycle Bin so that they can be recovered if needed.\\nWhen this feature is disabled, deleted screenshots are removed from the hard disk and their space is marked as overwriteable.", resourceCulture);
+		internal static string By_default__screenshots_are_sent_to_the_Recycle_Bin_so_that_they_can_be_recovered_if_needed_ => ResourceManager.GetString("By default, screenshots are sent to the Recycle Bin so that they can be recovered if needed.", resourceCulture);
 
 		internal static string Cancel => ResourceManager.GetString("Cancel", resourceCulture);
 
 		internal static string Choose_your_preferred_image_format_ => ResourceManager.GetString("Choose your preferred image format.", resourceCulture);
 
 		internal static string Click_To_Zoom => ResourceManager.GetString("Click To Zoom", resourceCulture);
+
+		internal static string Copied_to_Clipboard_ => ResourceManager.GetString("Copied to Clipboard!", resourceCulture);
+
+		internal static string Copies_the_screenshot_to_the_clipboard_after_it_has_been_taken_ => ResourceManager.GetString("Copies the screenshot to the clipboard after it has been taken.", resourceCulture);
+
+		internal static string Copy_to_Clipboard => ResourceManager.GetString("Copy to Clipboard", resourceCulture);
 
 		internal static string Delete_Image_ => ResourceManager.GetString("Delete Image?", resourceCulture);
 
@@ -86,6 +92,8 @@ namespace Nekres.Screenshot_Manager.Properties
 
 		internal static string Rename_Image => ResourceManager.GetString("Rename Image", resourceCulture);
 
+		internal static string Right_Click_to_Copy => ResourceManager.GetString("Right-Click to Copy", resourceCulture);
+
 		internal static string Screenshot => ResourceManager.GetString("Screenshot", resourceCulture);
 
 		internal static string Screenshot_Created_ => ResourceManager.GetString("Screenshot Created!", resourceCulture);
@@ -113,6 +121,8 @@ namespace Nekres.Screenshot_Manager.Properties
 		internal static string Unable_to_rename_image__0__ => ResourceManager.GetString("Unable to rename image {0}.", resourceCulture);
 
 		internal static string Unfavourite => ResourceManager.GetString("Unfavourite", resourceCulture);
+
+		internal static string When_this_feature_is_disabled__deleted_screenshots_are_removed_from_the_hard_disk_and_their_space_is_marked_as_overwriteable_ => ResourceManager.GetString("When this feature is disabled, deleted screenshots are removed from the hard disk and their space is marked as overwriteable.", resourceCulture);
 
 		internal static string Yes => ResourceManager.GetString("Yes", resourceCulture);
 

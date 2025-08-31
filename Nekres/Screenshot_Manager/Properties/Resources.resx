@@ -27,12 +27,14 @@
       </xsd:complexType>
     </xsd:element>
   </xsd:schema>
-<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="Screenshot Options"><value>Screenshot Options</value></data>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="By default, screenshots are sent to the Recycle Bin so that they can be recovered if needed."><value>By default, screenshots are sent to the Recycle Bin so that they can be recovered if needed.</value></data>
+  <data name="Screenshot Options"><value>Screenshot Options</value></data>
   <data name="Are you sure?"><value>Are you sure?</value></data>
   <data name="Search..."><value>Search...</value></data>
   <data name="Stereoscopic"><value>Stereoscopic</value></data>
   <data name="Cancel"><value>Cancel</value></data>
   <data name="Normal"><value>Normal</value></data>
+  <data name="Copied to Clipboard!"><value>Copied to Clipboard!</value></data>
   <data name="Hide Corner Icon"><value>Hide Corner Icon</value></data>
   <data name="Image name cannot be empty."><value>Image name cannot be empty.</value></data>
   <data name="Please enter a different image name."><value>Please enter a different image name.</value></data>
@@ -46,20 +48,22 @@
   <data name="General Options"><value>General Options</value></data>
   <data name="Take a stereoscopic screenshot."><value>Take a stereoscopic screenshot.</value></data>
   <data name="Failed to delete image {0}."><value>Failed to delete image {0}.</value></data>
+  <data name="Copy to Clipboard"><value>Copy to Clipboard</value></data>
   <data name="The image name contains invalid characters."><value>The image name contains invalid characters.</value></data>
   <data name="Unfavourite"><value>Unfavourite</value></data>
   <data name="Yes"><value>Yes</value></data>
+  <data name="Copies the screenshot to the clipboard after it has been taken."><value>Copies the screenshot to the clipboard after it has been taken.</value></data>
   <data name="Image Format"><value>Image Format</value></data>
   <data name="Disables the notification when a new screenshot has been captured."><value>Disables the notification when a new screenshot has been captured.</value></data>
   <data name="The image file is in use by another process."><value>The image is in use by another process.</value></data>
+  <data name="When this feature is disabled, deleted screenshots are removed from the hard disk and their space is marked as overwriteable."><value>When this feature is disabled, deleted screenshots are removed from the hard disk and their space is marked as overwriteable.</value></data>
   <data name="Favourite"><value>Favourite</value></data>
   <data name="Mute Screenshot Sound"><value>Mute Screenshot Sound</value></data>
-  <data name="By default, screenshots are sent to the Recycle Bin so that they can be recovered if needed.\nWhen this feature is disabled, deleted screenshots are removed from the hard disk and their space is marked as overwriteable."><value>By default, screenshots are sent to the Recycle Bin so that they can be recovered if needed.
-When this feature is disabled, deleted screenshots are removed from the hard disk and their space is marked as overwriteable.</value></data>
   <data name="Sound Options"><value>Sound Options</value></data>
   <data name="The following characters are not allowed: {0}"><value>The following characters are not allowed: {0}</value></data>
   <data name="Disables the corner icon in the navigation menu."><value>Disables the icon in the navigation menu.</value></data>
   <data name="You are about to permanently destroy {0}."><value>You are about to permanently destroy {0}.</value></data>
+  <data name="Right-Click to Copy"><value>Right-Click to Copy</value></data>
   <data name="The image file doesn't exist anymore!"><value>The image doesn't exist anymore!</value></data>
   <data name="Take a normal screenshot."><value>Take a normal screenshot.</value></data>
   <data name="Delete sends to Recycle Bin"><value>Delete sends to Recycle Bin</value></data>

@@ -10,13 +10,13 @@ namespace Nekres.Screenshot_Manager
 	{
 		public static string IndexedFilename(string stub, string extension)
 		{
-			int ix = 0;
+			int ix = 1;
 			string filename;
 			do
 			{
+				string indexStr = ix.ToString("D3");
+				filename = stub + indexStr + "." + extension;
 				ix++;
-				string zeros = ((ix < 10) ? "00" : ((ix < 100) ? "0" : string.Empty));
-				filename = $"{stub}{zeros}{ix}.{extension}";
 			}
 			while (File.Exists(filename));
 			return filename;
@@ -34,7 +34,7 @@ namespace Nekres.Screenshot_Manager
 						File.Move(oldFilePath, newFilePath);
 						return true;
 					}
-					catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException || ex is SecurityException)
+					catch (Exception ex) when (((ex is IOException || ex is UnauthorizedAccessException || ex is SecurityException) ? 1 : 0) != 0)
 					{
 						if (!(DateTime.UtcNow < dateTime))
 						{
@@ -66,7 +66,7 @@ namespace Nekres.Screenshot_Manager
 						}
 						return true;
 					}
-					catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException || ex is SecurityException)
+					catch (Exception ex) when (((ex is IOException || ex is UnauthorizedAccessException || ex is SecurityException) ? 1 : 0) != 0)
 					{
 						if (!(DateTime.UtcNow < dateTime))
 						{

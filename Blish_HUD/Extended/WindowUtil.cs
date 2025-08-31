@@ -1,10 +1,10 @@
 using System;
+using System.Drawing;
 using System.Runtime.InteropServices;
-using Microsoft.Xna.Framework;
 
 namespace Blish_HUD.Extended
 {
-	public static class WindowUtil
+	internal static class WindowUtil
 	{
 		private struct RECT
 		{
@@ -17,31 +17,66 @@ namespace Blish_HUD.Extended
 			public int Bottom;
 		}
 
+		private struct POINT
+		{
+			public int X;
+
+			public int Y;
+
+			public static implicit operator Point(POINT point)
+			{
+				return new Point(point.X, point.Y);
+			}
+		}
+
 		[DllImport("user32.dll", SetLastError = true)]
-		[return: MarshalAs(UnmanagedType.Bool)]
-		private static extern bool GetClientRect(IntPtr hWnd, out RECT lpRect);
+		private static extern bool ClientToScreen(IntPtr hWnd, ref POINT lpPoint);
+
+		[DllImport("user32.dll", SetLastError = true)]
+		private static extern bool ScreenToClient(IntPtr hWnd, ref POINT lpPoint);
 
 		[DllImport("user32.dll", SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]
 		private static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
 
+		[DllImport("user32.dll", SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		private static extern bool GetClientRect(IntPtr hWnd, out RECT lpRect);
+
+		[DllImport("user32.dll")]
+		private static extern bool GetCursorPos(out POINT lpPoint);
+
+		internal static bool GetCursorPosition(IntPtr hWnd, out Point cursorPos)
+		{
+			if (GetCursorPos(out var pos) && ScreenToClient(hWnd, ref pos) && GetWindowRect(hWnd, out var wndBounds) && GetClientRect(hWnd, out var clientBounds))
+			{
+				int widthOffset = wndBounds.Right - wndBounds.Left - (clientBounds.Right - clientBounds.Left);
+				int heightOffset = wndBounds.Bottom - wndBounds.Top - (clientBounds.Bottom - clientBounds.Top);
+				pos.X -= wndBounds.Left + widthOffset;
+				pos.Y -= wndBounds.Top + heightOffset;
+				if (ClientToScreen(hWnd, ref pos))
+				{
+					cursorPos = new Point(pos.X, pos.Y);
+					return true;
+				}
+			}
+			cursorPos = Point.Empty;
+			return false;
+		}
+
 		public static bool GetInnerBounds(IntPtr hWnd, out Rectangle bounds)
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-			bounds = Rectangle.get_Empty();
-			if (!GetWindowRect(hWnd, out var wndBounds) || !GetClientRect(hWnd, out var clientBounds))
+			bounds = Rectangle.Empty;
+			if (GetWindowRect(hWnd, out var wndBounds) && GetClientRect(hWnd, out var clientBounds))
 			{
-				return false;
+				int widthOffset = wndBounds.Right - wndBounds.Left - (clientBounds.Right - clientBounds.Left);
+				int heightOffset = wndBounds.Bottom - wndBounds.Top - (clientBounds.Bottom - clientBounds.Top);
+				int width = Math.Abs(wndBounds.Left - wndBounds.Right) - widthOffset * 2;
+				int height = Math.Abs(wndBounds.Top - wndBounds.Bottom) - heightOffset * 2;
+				bounds = new Rectangle(wndBounds.Left + widthOffset, wndBounds.Top + heightOffset, width, height);
+				return true;
 			}
-			int widthOffset = wndBounds.Right - wndBounds.Left - (clientBounds.Right - clientBounds.Left);
-			int heightOffset = wndBounds.Bottom - wndBounds.Top - (clientBounds.Bottom - clientBounds.Top);
-			int width = Math.Abs(wndBounds.Left - wndBounds.Right) - widthOffset * 2;
-			int height = Math.Abs(wndBounds.Top - wndBounds.Bottom) - heightOffset * 2;
-			bounds = new Rectangle(wndBounds.Left + widthOffset, wndBounds.Top + heightOffset, width, height);
-			return true;
+			return false;
 		}
 	}
 }

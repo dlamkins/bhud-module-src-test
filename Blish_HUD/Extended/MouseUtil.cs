@@ -208,7 +208,7 @@ namespace Blish_HUD.Extended
 		private static extern bool GetCursorPos(out POINT lpPoint);
 
 		[DllImport("user32.dll")]
-		private static extern uint SendInput(uint nInputs, [In][MarshalAs(UnmanagedType.LPArray)] Input[] pInputs, int cbSize);
+		private static extern uint SendInput(uint nInputs, [In][MarshalAs(UnmanagedType.LPArray)] Blish_HUD.Extended.WinApi.Input[] pInputs, int cbSize);
 
 		[DllImport("user32.dll", CharSet = CharSet.Auto)]
 		private static extern bool PostMessage(IntPtr hWnd, uint msg, uint wParam, int lParam);
@@ -235,11 +235,11 @@ namespace Blish_HUD.Extended
 				xPos = pos.X;
 				yPos = pos.Y;
 			}
-			if (!GameService.GameIntegration.get_Gw2Instance().get_Gw2IsRunning() || sendToSystem)
+			if (!GameService.GameIntegration.Gw2Instance.Gw2IsRunning || sendToSystem)
 			{
-				Input[] nInputs = new Input[1]
+				Blish_HUD.Extended.WinApi.Input[] nInputs = new Blish_HUD.Extended.WinApi.Input[1]
 				{
-					new Input
+					new Blish_HUD.Extended.WinApi.Input
 					{
 						type = InputType.MOUSE,
 						U = new InputUnion
@@ -255,13 +255,13 @@ namespace Blish_HUD.Extended
 						}
 					}
 				};
-				SendInput((uint)nInputs.Length, nInputs, Input.Size);
+				SendInput((uint)nInputs.Length, nInputs, Blish_HUD.Extended.WinApi.Input.Size);
 			}
 			else
 			{
 				uint wParam = (uint)VirtualButtonShort[button];
 				int lParam = xPos | (yPos << 16);
-				PostMessage(GameService.GameIntegration.get_Gw2Instance().get_Gw2WindowHandle(), WM_BUTTONDOWN[button], wParam, lParam);
+				PostMessage(GameService.GameIntegration.Gw2Instance.Gw2WindowHandle, WM_BUTTONDOWN[button], wParam, lParam);
 			}
 		}
 
@@ -273,11 +273,11 @@ namespace Blish_HUD.Extended
 				xPos = pos.X;
 				yPos = pos.Y;
 			}
-			if (!GameService.GameIntegration.get_Gw2Instance().get_Gw2IsRunning() || sendToSystem)
+			if (!GameService.GameIntegration.Gw2Instance.Gw2IsRunning || sendToSystem)
 			{
-				Input[] nInputs = new Input[1]
+				Blish_HUD.Extended.WinApi.Input[] nInputs = new Blish_HUD.Extended.WinApi.Input[1]
 				{
-					new Input
+					new Blish_HUD.Extended.WinApi.Input
 					{
 						type = InputType.MOUSE,
 						U = new InputUnion
@@ -293,13 +293,13 @@ namespace Blish_HUD.Extended
 						}
 					}
 				};
-				SendInput((uint)nInputs.Length, nInputs, Input.Size);
+				SendInput((uint)nInputs.Length, nInputs, Blish_HUD.Extended.WinApi.Input.Size);
 			}
 			else
 			{
 				uint wParam = (uint)VirtualButtonShort[button];
 				int lParam = xPos | (yPos << 16);
-				PostMessage(GameService.GameIntegration.get_Gw2Instance().get_Gw2WindowHandle(), WM_BUTTONUP[button], wParam, lParam);
+				PostMessage(GameService.GameIntegration.Gw2Instance.Gw2WindowHandle, WM_BUTTONUP[button], wParam, lParam);
 			}
 		}
 
@@ -314,11 +314,11 @@ namespace Blish_HUD.Extended
 					xPos = pos.X;
 					yPos = pos.Y;
 				}
-				if (!GameService.GameIntegration.get_Gw2Instance().get_Gw2IsRunning() || sendToSystem)
+				if (!GameService.GameIntegration.Gw2Instance.Gw2IsRunning || sendToSystem)
 				{
-					Input[] nInputs = new Input[1]
+					Blish_HUD.Extended.WinApi.Input[] nInputs = new Blish_HUD.Extended.WinApi.Input[1]
 					{
-						new Input
+						new Blish_HUD.Extended.WinApi.Input
 						{
 							type = InputType.MOUSE,
 							U = new InputUnion
@@ -334,31 +334,31 @@ namespace Blish_HUD.Extended
 							}
 						}
 					};
-					SendInput((uint)nInputs.Length, nInputs, Input.Size);
+					SendInput((uint)nInputs.Length, nInputs, Blish_HUD.Extended.WinApi.Input.Size);
 				}
 				else
 				{
 					uint wParam = 0u | (uint)(wheelDistance << 16);
 					int lParam = xPos | (yPos << 16);
-					PostMessage(GameService.GameIntegration.get_Gw2Instance().get_Gw2WindowHandle(), horizontalWheel ? 526u : 522u, wParam, lParam);
+					PostMessage(GameService.GameIntegration.Gw2Instance.Gw2WindowHandle, horizontalWheel ? 526u : 522u, wParam, lParam);
 				}
 			}
 		}
 
 		public static void SetPosition(int xPos, int yPos, bool sendToSystem = false)
 		{
-			if (!GameService.GameIntegration.get_Gw2Instance().get_Gw2IsRunning() || sendToSystem)
+			if (!GameService.GameIntegration.Gw2Instance.Gw2IsRunning || sendToSystem)
 			{
 				SetCursorPos(xPos, yPos);
 				return;
 			}
 			int lParam = xPos | (yPos << 16);
-			PostMessage(GameService.GameIntegration.get_Gw2Instance().get_Gw2WindowHandle(), 512u, 0u, lParam);
+			PostMessage(GameService.GameIntegration.Gw2Instance.Gw2WindowHandle, 512u, 0u, lParam);
 		}
 
 		public static Point GetPosition()
 		{
-			IntPtr hWnd = GameService.GameIntegration.get_Gw2Instance().get_Gw2WindowHandle();
+			IntPtr hWnd = GameService.GameIntegration.Gw2Instance.Gw2WindowHandle;
 			if (!GetCursorPos(out var pos) || !ScreenToClient(hWnd, ref pos) || !GetWindowRect(hWnd, out var wndBounds) || !GetClientRect(hWnd, out var clientBounds))
 			{
 				return Point.Empty;
@@ -382,7 +382,7 @@ namespace Blish_HUD.Extended
 
 		public static void DoubleClick(MouseButton button, int xPos = -1, int yPos = -1, bool sendToSystem = false)
 		{
-			if (!GameService.GameIntegration.get_Gw2Instance().get_Gw2IsRunning() || sendToSystem)
+			if (!GameService.GameIntegration.Gw2Instance.Gw2IsRunning || sendToSystem)
 			{
 				for (int i = 0; i <= 1; i++)
 				{
@@ -399,8 +399,8 @@ namespace Blish_HUD.Extended
 			}
 			uint wParam = (uint)VirtualButtonShort[button];
 			int lParam = xPos | (yPos << 16);
-			PostMessage(GameService.GameIntegration.get_Gw2Instance().get_Gw2WindowHandle(), WM_BUTTONDBLCLK[button], wParam, lParam);
-			PostMessage(GameService.GameIntegration.get_Gw2Instance().get_Gw2WindowHandle(), WM_BUTTONUP[button], wParam, lParam);
+			PostMessage(GameService.GameIntegration.Gw2Instance.Gw2WindowHandle, WM_BUTTONDBLCLK[button], wParam, lParam);
+			PostMessage(GameService.GameIntegration.Gw2Instance.Gw2WindowHandle, WM_BUTTONUP[button], wParam, lParam);
 		}
 	}
 }

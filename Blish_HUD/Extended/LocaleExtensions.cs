@@ -1,23 +1,41 @@
+using System.Linq;
 using Gw2Sharp.WebApi;
 
 namespace Blish_HUD.Extended
 {
 	public static class LocaleExtensions
 	{
-		public static string Code(this Locale locale)
+		public static string TwoLetterISOLanguageName(this Locale locale)
 		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001e: Expected I4, but got Unknown
-			return (int)locale switch
+			return locale switch
 			{
-				0 => "en", 
-				1 => "es", 
-				2 => "de", 
-				3 => "fr", 
-				4 => "kr", 
-				5 => "zh", 
+				Locale.English => "en", 
+				Locale.Spanish => "es", 
+				Locale.German => "de", 
+				Locale.French => "fr", 
+				Locale.Korean => "kr", 
+				Locale.Chinese => "zh", 
 				_ => "en", 
 			};
+		}
+
+		public static Locale SupportedOrDefault(this Locale locale, params Locale[] supported)
+		{
+			if (supported == null || !supported.Any())
+			{
+				return locale switch
+				{
+					Locale.Spanish => locale, 
+					Locale.German => locale, 
+					Locale.French => locale, 
+					_ => Locale.English, 
+				};
+			}
+			if (!supported.Contains(locale))
+			{
+				return supported.FirstOrDefault();
+			}
+			return locale;
 		}
 	}
 }

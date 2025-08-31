@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using Blish_HUD;
@@ -14,8 +15,6 @@ namespace Nekres.Screenshot_Manager.UI.Controls
 {
 	public class ResponsiveThumbnail : ThumbnailBase
 	{
-		private Rectangle _nameTextBoxBounds;
-
 		private const int MAX_FILE_NAME_LENGTH = 50;
 
 		private readonly IEnumerable<char> _invalidFileNameCharacters;
@@ -29,6 +28,10 @@ namespace Nekres.Screenshot_Manager.UI.Controls
 		private static Texture2D _trashcanOpenIcon64;
 
 		private static Texture2D _inspectIcon;
+
+		private bool _mouseOverNameTextBox;
+
+		private Rectangle _nameTextBoxBounds;
 
 		private bool _mouseOverFavButton;
 
@@ -54,8 +57,10 @@ namespace Nekres.Screenshot_Manager.UI.Controls
 			}
 			set
 			{
-				this.FavoriteChanged?.Invoke(this, new ValueEventArgs<bool>(value));
-				((Control)this).SetProperty<bool>(ref _isFavorite, value, false, "IsFavorite");
+				if (SetProperty(ref _isFavorite, value, invalidateLayout: false, "IsFavorite"))
+				{
+					this.FavoriteChanged?.Invoke(this, new ValueEventArgs<bool>(value));
+				}
 			}
 		}
 
@@ -108,13 +113,13 @@ namespace Nekres.Screenshot_Manager.UI.Controls
 		protected override void OnMouseMoved(MouseEventArgs e)
 		{
 			InvalidateMousePosition();
-			((Control)this).OnMouseMoved(e);
+			base.OnMouseMoved(e);
 		}
 
 		protected override void OnMoved(MovedEventArgs e)
 		{
 			InvalidateMousePosition();
-			((Control)this).OnMoved(e);
+			base.OnMoved(e);
 		}
 
 		private void InvalidateMousePosition()
@@ -124,44 +129,62 @@ namespace Nekres.Screenshot_Manager.UI.Controls
 			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			Point relPos = ((Control)this).get_RelativeMousePosition();
+			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+			Point relPos = base.RelativeMousePosition;
 			_mouseOverFavButton = ((Rectangle)(ref _favButtonBounds)).Contains(relPos);
 			_mouseOverDelButton = ((Rectangle)(ref _delButtonBounds)).Contains(relPos);
 			_mouseOverInspect = ((Rectangle)(ref _inspectButtonBounds)).Contains(relPos);
+			_mouseOverNameTextBox = ((Rectangle)(ref _nameTextBoxBounds)).Contains(relPos);
 			if (_mouseOverFavButton)
 			{
-				((Control)this).set_BasicTooltipText(IsFavorite ? Resources.Unfavourite : Resources.Favourite);
+				base.BasicTooltipText = (IsFavorite ? Resources.Unfavourite : Resources.Favourite);
 			}
 			else if (_mouseOverDelButton)
 			{
-				((Control)this).set_BasicTooltipText(Resources.Delete_Image_);
+				base.BasicTooltipText = Resources.Delete_Image_;
 			}
 			else if (_mouseOverInspect)
 			{
-				((Control)this).set_BasicTooltipText(Resources.Click_To_Zoom);
+				base.BasicTooltipText = Resources.Click_To_Zoom;
 			}
 			else
 			{
-				((Control)this).set_BasicTooltipText(string.Empty);
+				base.BasicTooltipText = Resources.Right_Click_to_Copy;
 			}
 		}
 
-		protected override void OnClick(MouseEventArgs e)
+		protected override void OnLeftMouseButtonReleased(MouseEventArgs e)
 		{
-			((Control)this).OnClick(e);
 			if (_mouseOverInspect)
 			{
 				this.OnInspect?.Invoke(this, EventArgs.Empty);
 			}
-			if (_mouseOverFavButton)
+			else if (_mouseOverFavButton)
 			{
 				IsFavorite = !IsFavorite;
 				GameService.Content.PlaySoundEffectByName("color-change");
 			}
-			if (_mouseOverDelButton)
+			else if (_mouseOverDelButton)
 			{
 				this.OnDelete?.Invoke(this, EventArgs.Empty);
 			}
+			base.OnLeftMouseButtonReleased(e);
+			InvalidateMousePosition();
+		}
+
+		protected override void OnRightMouseButtonReleased(MouseEventArgs e)
+		{
+			if (base.Texture.HasTexture)
+			{
+				if (_mouseOverFavButton || _mouseOverDelButton || _mouseOverNameTextBox)
+				{
+					return;
+				}
+				base.Texture.Texture.ToBitmap().SaveToClipboard(ImageFormat.Bmp);
+				ScreenNotification.ShowNotification(Resources.Copied_to_Clipboard_);
+				GameService.Content.PlaySoundEffectByName("color-change");
+			}
+			base.OnRightMouseButtonReleased(e);
 		}
 
 		protected override void OnMouseLeft(MouseEventArgs e)
@@ -169,53 +192,47 @@ namespace Nekres.Screenshot_Manager.UI.Controls
 			_mouseOverFavButton = false;
 			_mouseOverDelButton = false;
 			_mouseOverInspect = false;
-			((Control)this).OnMouseLeft(e);
+			_mouseOverNameTextBox = false;
+			base.OnMouseLeft(e);
 		}
 
 		private void CreateNameTextBox()
 		{
-			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0061: Expected O, but got Unknown
 			if (NameTextBox != null)
 			{
 				return;
 			}
-			TextBox val = new TextBox();
-			((Control)val).set_Parent((Container)(object)this);
-			((TextInputBase)val).set_MaxLength(50);
-			((Control)val).set_Size(((Rectangle)(ref _nameTextBoxBounds)).get_Size());
-			((Control)val).set_Location(((Rectangle)(ref _nameTextBoxBounds)).get_Location());
-			((TextInputBase)val).set_Text(Path.GetFileNameWithoutExtension(base.FileName));
-			((Control)val).set_BasicTooltipText(Resources.Rename_Image);
-			NameTextBox = val;
-			((TextInputBase)NameTextBox).add_InputFocusChanged((EventHandler<ValueEventArgs<bool>>)async delegate(object o, ValueEventArgs<bool> e)
+			NameTextBox = new TextBox
 			{
-				if (!e.get_Value() && !((TextInputBase)NameTextBox).get_Text().Equals(Path.GetFileNameWithoutExtension(base.FileName)))
+				Parent = this,
+				MaxLength = 50,
+				Size = ((Rectangle)(ref _nameTextBoxBounds)).get_Size(),
+				Location = ((Rectangle)(ref _nameTextBoxBounds)).get_Location(),
+				Text = Path.GetFileNameWithoutExtension(base.FileName),
+				BasicTooltipText = Resources.Rename_Image
+			};
+			NameTextBox.InputFocusChanged += async delegate(object o, ValueEventArgs<bool> e)
+			{
+				if (!e.Value && !NameTextBox.Text.Equals(Path.GetFileNameWithoutExtension(base.FileName)))
 				{
-					if (string.IsNullOrEmpty(((TextInputBase)NameTextBox).get_Text()))
+					if (string.IsNullOrEmpty(NameTextBox.Text))
 					{
-						ScreenNotification.ShowNotification(Resources.Image_name_cannot_be_empty_, (NotificationType)2, (Texture2D)null, 4);
-						((TextInputBase)NameTextBox).set_Text(Path.GetFileNameWithoutExtension(base.FileName));
+						ScreenNotification.ShowNotification(Resources.Image_name_cannot_be_empty_, ScreenNotification.NotificationType.Error);
+						NameTextBox.Text = Path.GetFileNameWithoutExtension(base.FileName);
 						GameService.Content.PlaySoundEffectByName("error");
 					}
-					else if (((TextInputBase)NameTextBox).get_Text().Length > 50)
+					else if (NameTextBox.Text.Length > 50)
 					{
-						ScreenNotification.ShowNotification(Resources.Please_enter_a_different_image_name_, (NotificationType)2, (Texture2D)null, 4);
-						((TextInputBase)NameTextBox).set_Text(Path.GetFileNameWithoutExtension(base.FileName));
+						ScreenNotification.ShowNotification(Resources.Please_enter_a_different_image_name_, ScreenNotification.NotificationType.Error);
+						NameTextBox.Text = Path.GetFileNameWithoutExtension(base.FileName);
 						GameService.Content.PlaySoundEffectByName("error");
 					}
-					else if (((TextInputBase)NameTextBox).get_Text().Any((char x) => _invalidFileNameCharacters.Any((char y) => y.Equals(x))))
+					else if (NameTextBox.Text.Any((char x) => _invalidFileNameCharacters.Any((char y) => y.Equals(x))))
 					{
-						ScreenNotification.ShowNotification(Resources.The_image_name_contains_invalid_characters_, (NotificationType)2, (Texture2D)null, 4);
-						((TextInputBase)NameTextBox).set_Text(Path.GetFileNameWithoutExtension(base.FileName));
+						ScreenNotification.ShowNotification(Resources.The_image_name_contains_invalid_characters_, ScreenNotification.NotificationType.Error);
+						NameTextBox.Text = Path.GetFileNameWithoutExtension(base.FileName);
 						GameService.Content.PlaySoundEffectByName("error");
 					}
 					else
@@ -224,17 +241,17 @@ namespace Nekres.Screenshot_Manager.UI.Controls
 						string path = Path.GetDirectoryName(base.FileName);
 						if (path != null)
 						{
-							string newName = Path.Combine(path, ((TextInputBase)NameTextBox).get_Text() + ext);
+							string newName = Path.Combine(path, NameTextBox.Text + ext);
 							if (File.Exists(newName))
 							{
-								ScreenNotification.ShowNotification(Resources.A_duplicate_image_name_was_specified_, (NotificationType)2, (Texture2D)null, 4);
-								((TextInputBase)NameTextBox).set_Text(Path.GetFileNameWithoutExtension(base.FileName));
+								ScreenNotification.ShowNotification(Resources.A_duplicate_image_name_was_specified_, ScreenNotification.NotificationType.Error);
+								NameTextBox.Text = Path.GetFileNameWithoutExtension(base.FileName);
 								GameService.Content.PlaySoundEffectByName("error");
 							}
 							else if (!(await FileUtil.MoveAsync(base.FileName, newName)))
 							{
-								ScreenNotification.ShowNotification(string.Format(Resources.Unable_to_rename_image__0__, "“" + Path.GetFileNameWithoutExtension(base.FileName) + "”"), (NotificationType)2, (Texture2D)null, 4);
-								((TextInputBase)NameTextBox).set_Text(Path.GetFileNameWithoutExtension(base.FileName));
+								ScreenNotification.ShowNotification(string.Format(Resources.Unable_to_rename_image__0__, "“" + Path.GetFileNameWithoutExtension(base.FileName) + "”"), ScreenNotification.NotificationType.Error);
+								NameTextBox.Text = Path.GetFileNameWithoutExtension(base.FileName);
 								GameService.Content.PlaySoundEffectByName("error");
 							}
 							else
@@ -244,7 +261,7 @@ namespace Nekres.Screenshot_Manager.UI.Controls
 						}
 					}
 				}
-			});
+			};
 		}
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
@@ -269,17 +286,17 @@ namespace Nekres.Screenshot_Manager.UI.Controls
 			base.PaintBeforeChildren(spriteBatch, bounds);
 			if (_mouseOverInspect)
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), bounds, Color.get_Black() * 0.8f);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, bounds, Color.get_Black() * 0.8f);
 			}
-			_inspectButtonBounds = new Rectangle((((Control)this).get_Width() - _inspectIcon.get_Width() / 2) / 2, (((Control)this).get_Height() - _inspectIcon.get_Height() / 2) / 2, _inspectIcon.get_Width() / 2, _inspectIcon.get_Height() / 2);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _inspectIcon, _inspectButtonBounds, Color.get_White() * (_mouseOverInspect ? 1f : 0.25f));
+			_inspectButtonBounds = new Rectangle((base.Width - _inspectIcon.get_Width() / 2) / 2, (base.Height - _inspectIcon.get_Height() / 2) / 2, _inspectIcon.get_Width() / 2, _inspectIcon.get_Height() / 2);
+			spriteBatch.DrawOnCtrl(this, _inspectIcon, _inspectButtonBounds, Color.get_White() * (_mouseOverInspect ? 1f : 0.25f));
 			Texture2D delTexture = (_mouseOverDelButton ? _trashcanOpenIcon64 : _trashcanClosedIcon64);
-			_nameTextBoxBounds = new Rectangle(0, ((Control)this).get_Height() - 30, ((Control)this).get_Width() - delTexture.get_Width() / 2 - 5, 30);
+			_nameTextBoxBounds = new Rectangle(0, base.Height - 30, base.Width - delTexture.get_Width() / 2 - 5, 30);
 			Texture2D favTexture = (IsFavorite ? _completeHeartIcon : _incompleteHeartIcon);
-			_favButtonBounds = new Rectangle(((Control)this).get_Width() - favTexture.get_Width() - 10, 5, favTexture.get_Width(), favTexture.get_Height());
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, favTexture, _favButtonBounds);
-			_delButtonBounds = new Rectangle(((Control)this).get_Width() - delTexture.get_Width() / 2 - 8, ((Control)this).get_Height() - delTexture.get_Height() / 2, delTexture.get_Width() / 2, delTexture.get_Height() / 2);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, delTexture, _delButtonBounds);
+			_favButtonBounds = new Rectangle(base.Width - favTexture.get_Width() - 10, 5, favTexture.get_Width(), favTexture.get_Height());
+			spriteBatch.DrawOnCtrl(this, favTexture, _favButtonBounds);
+			_delButtonBounds = new Rectangle(base.Width - delTexture.get_Width() / 2 - 8, base.Height - delTexture.get_Height() / 2, delTexture.get_Width() / 2, delTexture.get_Height() / 2);
+			spriteBatch.DrawOnCtrl(this, delTexture, _delButtonBounds);
 			CreateNameTextBox();
 		}
 	}

@@ -2,6 +2,7 @@ using System;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
+using Blish_HUD.Extended;
 using Blish_HUD.Input;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -11,73 +12,97 @@ namespace Nekres.Screenshot_Manager.UI.Controls
 {
 	internal sealed class InspectPanel : Panel
 	{
-		private static readonly BitmapFont Font = GameService.Content.GetFont((FontFace)0, (FontSize)36, (FontStyle)0);
+		private const int BORDER_WIDTH = 10;
+
+		private static readonly BitmapFont _font = GameService.Content.GetFont(ContentService.FontFace.Menomonia, ContentService.FontSize.Size36, ContentService.FontStyle.Regular);
 
 		private readonly AsyncTexture2D _texture;
 
-		private Rectangle _textureBoundsFitted;
+		private Rectangle _textureBounds;
+
+		private Rectangle _borderBounds;
 
 		private readonly string _label;
 
 		public InspectPanel(AsyncTexture2D texture, string label)
-			: this()
 		{
-			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 			_texture = texture;
 			_label = label;
-			((Control)this).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			((Control)this).set_Size(new Point(1, 1));
-			((Control)this).set_Location(new Point(((Control)((Control)this).get_Parent()).get_Width() / 2, ((Control)((Control)this).get_Parent()).get_Height() / 2));
-			((Control)this).set_BackgroundColor(Color.get_Black());
-			((Control)this).set_ZIndex(9999);
-			((Panel)this).set_ShowTint(true);
-			_texture.add_TextureSwapped((EventHandler<ValueChangedEventArgs<Texture2D>>)OnTextureSwapped);
+			base.Parent = GameService.Graphics.SpriteScreen;
+			base.Size = GameService.Graphics.SpriteScreen.Size;
+			ZIndex = 120;
+			base.ShowTint = true;
+			_texture.TextureSwapped += OnTextureSwapped;
+			GameService.Graphics.SpriteScreen.Resized += OnSpriteScreenResized;
+		}
+
+		private void OnSpriteScreenResized(object sender, ResizedEventArgs e)
+		{
+			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
+			base.Size = e.CurrentSize;
+			if (_texture.HasTexture)
+			{
+				_textureBounds = _texture.Texture.get_Bounds().ScaleTo(base.LocalBounds, 0.8f, center: true);
+				_borderBounds = new Rectangle(_textureBounds.X, _textureBounds.Y, _textureBounds.Width + 10, _textureBounds.Height + 10);
+			}
 		}
 
 		protected override void OnClick(MouseEventArgs e)
 		{
-			((Panel)this).OnClick(e);
-			((Control)this).Dispose();
+			base.OnClick(e);
+			Dispose();
 		}
 
 		protected override void DisposeControl()
 		{
+			GameService.Graphics.SpriteScreen.Resized -= OnSpriteScreenResized;
 			_texture.Dispose();
-			((Panel)this).DisposeControl();
+			base.DisposeControl();
 		}
 
 		public void OnTextureSwapped(object o, EventArgs e)
 		{
-			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-			((Control)this).set_Size(new Point(_texture.get_Texture().get_Width() + 10, _texture.get_Texture().get_Height() + 10));
-			((Control)this).set_Location(new Point((((Control)GameService.Graphics.get_SpriteScreen()).get_Width() - ((Control)this).get_Width()) / 2, (((Control)GameService.Graphics.get_SpriteScreen()).get_Height() - ((Control)this).get_Height()) / 2));
-			_textureBoundsFitted = _texture.get_Texture().get_Bounds().Fit(((Control)this).get_LocalBounds());
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
+			_textureBounds = _texture.Texture.get_Bounds().ScaleTo(base.LocalBounds, 0.8f, center: true);
+			_borderBounds = new Rectangle(_textureBounds.X, _textureBounds.Y, _textureBounds.Width + 10, _textureBounds.Height + 10);
 		}
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
 			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-			((Panel)this).PaintBeforeChildren(spriteBatch, bounds);
-			if (_texture.get_HasTexture())
+			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
+			base.PaintBeforeChildren(spriteBatch, bounds);
+			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, bounds, Color.get_Black() * 0.5f);
+			if (_texture.HasTexture)
 			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _texture.get_Texture(), _textureBoundsFitted);
+				spriteBatch.DrawOnCtrl(this, _texture.Texture, _textureBounds);
+				spriteBatch.DrawRectangleOnCtrl(this, _borderBounds, 10, Color.get_Black());
 			}
 			else
 			{
-				LoadingSpinnerUtil.DrawLoadingSpinner((Control)(object)this, spriteBatch, bounds);
+				LoadingSpinnerUtil.DrawLoadingSpinner(this, spriteBatch, bounds);
 			}
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, "“" + _label + "”", Font, new Rectangle(0, 36, ((Control)this).get_Width(), 36), Color.get_White(), false, true, 3, (HorizontalAlignment)1, (VerticalAlignment)1);
+			spriteBatch.DrawStringOnCtrl(this, "“" + _label + "”", _font, new Rectangle(0, 36, base.Width, 36), Color.get_White(), wrap: false, stroke: true, 3, HorizontalAlignment.Center);
 		}
 	}
 }

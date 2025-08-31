@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Gw2Sharp.Models;
 
 namespace Blish_HUD.Extended
 {
@@ -9,19 +8,19 @@ namespace Blish_HUD.Extended
 		private static IReadOnlyDictionary<TyrianTime, (TimeSpan, TimeSpan)> _dayCycleIntervals = new Dictionary<TyrianTime, (TimeSpan, TimeSpan)>
 		{
 			{
-				TyrianTime.Dawn,
+				TyrianTime.DAWN,
 				(new TimeSpan(5, 0, 0), new TimeSpan(6, 0, 0))
 			},
 			{
-				TyrianTime.Day,
+				TyrianTime.DAY,
 				(new TimeSpan(6, 0, 0), new TimeSpan(20, 0, 0))
 			},
 			{
-				TyrianTime.Dusk,
+				TyrianTime.DUSK,
 				(new TimeSpan(20, 0, 0), new TimeSpan(21, 0, 0))
 			},
 			{
-				TyrianTime.Night,
+				TyrianTime.NIGHT,
 				(new TimeSpan(21, 0, 0), new TimeSpan(5, 0, 0))
 			}
 		};
@@ -29,19 +28,19 @@ namespace Blish_HUD.Extended
 		private static IReadOnlyDictionary<TyrianTime, (TimeSpan, TimeSpan)> _canthanDayCycleIntervals = new Dictionary<TyrianTime, (TimeSpan, TimeSpan)>
 		{
 			{
-				TyrianTime.Dawn,
+				TyrianTime.DAWN,
 				(new TimeSpan(7, 0, 0), new TimeSpan(8, 0, 0))
 			},
 			{
-				TyrianTime.Day,
+				TyrianTime.DAY,
 				(new TimeSpan(8, 0, 0), new TimeSpan(19, 0, 0))
 			},
 			{
-				TyrianTime.Dusk,
+				TyrianTime.DUSK,
 				(new TimeSpan(19, 0, 0), new TimeSpan(20, 0, 0))
 			},
 			{
-				TyrianTime.Night,
+				TyrianTime.NIGHT,
 				(new TimeSpan(20, 0, 0), new TimeSpan(7, 0, 0))
 			}
 		};
@@ -58,16 +57,10 @@ namespace Blish_HUD.Extended
 
 		public static TyrianTime GetDayCycle(TimeSpan tyrianTime)
 		{
-			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-			if (GameService.Gw2Mumble.get_IsAvailable())
+			if (GameService.Gw2Mumble.IsAvailable)
 			{
-				Coordinates2 mapPosition = GameService.Gw2Mumble.get_UI().get_MapPosition();
-				double x = ((Coordinates2)(ref mapPosition)).get_X();
-				mapPosition = GameService.Gw2Mumble.get_UI().get_MapPosition();
-				double y = ((Coordinates2)(ref mapPosition)).get_Y();
+				double x = GameService.Gw2Mumble.UI.MapPosition.X;
+				double y = GameService.Gw2Mumble.UI.MapPosition.Y;
 				if (x > 20000.0 && x < 365000.0 && y > 97000.0 && y < 115000.0)
 				{
 					return GetDayCycleFromRegion(_canthanDayCycleIntervals, tyrianTime);
@@ -87,7 +80,7 @@ namespace Blish_HUD.Extended
 					return key;
 				}
 			}
-			return TyrianTime.None;
+			return TyrianTime.NONE;
 		}
 
 		public static TimeSpan FromRealDateTime(DateTime realTime)

@@ -3,8 +3,9 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Runtime.InteropServices;
+using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Nekres.Screenshot_Manager
 {
@@ -37,6 +38,10 @@ namespace Nekres.Screenshot_Manager
 
 		public static async Task SaveOnNetworkShare(this Image image, string fileName, ImageFormat imageFormat)
 		{
+			if (image == null)
+			{
+				throw new ArgumentNullException("image");
+			}
 			try
 			{
 				using MemoryStream lMemoryStream = new MemoryStream();
@@ -45,10 +50,67 @@ namespace Nekres.Screenshot_Manager
 				lMemoryStream.Position = 0L;
 				await lMemoryStream.CopyToAsync(lFileStream);
 			}
-			catch (Exception ex) when (ex is ExternalException || ex is UnauthorizedAccessException || ex is IOException)
+			catch (Exception ex)
 			{
 				ScreenshotManagerModule.Logger.Warn(ex, ex.Message);
 			}
+		}
+
+		public static void SaveToClipboard(this Image image, ImageFormat imageFormat)
+		{
+			try
+			{
+				DataObject dataObject = new DataObject();
+				dataObject.SetData(DataFormats.Bitmap, autoConvert: true, image);
+				using (MemoryStream stream = new MemoryStream())
+				{
+					image.Save(stream, imageFormat);
+					stream.Position = 0L;
+					dataObject.SetData(imageFormat.ToString(), autoConvert: false, stream);
+				}
+				Clipboard.SetDataObject(dataObject, copy: true);
+			}
+			catch (Exception ex)
+			{
+				ScreenshotManagerModule.Logger.Warn(ex, ex.Message);
+			}
+		}
+
+		public static Bitmap CompressToTargetSize(this Bitmap bitmap, long maxBytes)
+		{
+			if (bitmap == null)
+			{
+				throw new ArgumentNullException("bitmap");
+			}
+			if (maxBytes <= 0)
+			{
+				throw new ArgumentOutOfRangeException("maxBytes");
+			}
+			ImageCodecInfo jpegEncoder = ImageCodecInfo.GetImageEncoders().First((ImageCodecInfo e) => e.FormatID == ImageFormat.Jpeg.Guid);
+			int minQ = 1;
+			int maxQ = 100;
+			byte[] bestData = null;
+			while (minQ <= maxQ)
+			{
+				int q = (minQ + maxQ) / 2;
+				using MemoryStream ms = new MemoryStream();
+				EncoderParameters encoderParams = new EncoderParameters(1);
+				encoderParams.Param[0] = new EncoderParameter(Encoder.Quality, q);
+				bitmap.Save(ms, jpegEncoder, encoderParams);
+				if (ms.Length > maxBytes)
+				{
+					maxQ = q - 1;
+					continue;
+				}
+				bestData = ms.ToArray();
+				minQ = q + 1;
+			}
+			if (bestData == null)
+			{
+				throw new Exception("Cannot compress bitmap below target size");
+			}
+			using MemoryStream resultStream = new MemoryStream(bestData);
+			return new Bitmap(resultStream);
 		}
 	}
 }
