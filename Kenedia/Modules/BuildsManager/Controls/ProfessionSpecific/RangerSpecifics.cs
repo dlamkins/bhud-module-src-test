@@ -180,6 +180,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 					where e.Enviroment.HasFlag(flag)
 					orderby e.Order
 					select e);
+				_petSelector.SelectablePerRow = ((flag == Enviroment.Terrestrial) ? 10 : 10);
 			}
 		}
 

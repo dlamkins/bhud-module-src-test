@@ -9,9 +9,18 @@ namespace Kenedia.Modules.Core.Extensions
 		public static bool IsCommonMap(this CurrentMap map)
 		{
 			MapType type = map.Type;
-			if (type == MapType.Public || type == MapType.Tutorial || type == MapType.PublicMini)
+			if ((type != MapType.Public && type != MapType.Tutorial && type != MapType.PublicMini) || 1 == 0)
 			{
-				return true;
+				return map.IsHomesteadMap();
+			}
+			return true;
+		}
+
+		public static bool IsHomesteadMap(this CurrentMap map)
+		{
+			if (map.Type == MapType.Instance)
+			{
+				return map.Id == 1558;
 			}
 			return false;
 		}

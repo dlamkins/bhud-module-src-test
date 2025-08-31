@@ -138,6 +138,11 @@ namespace Kenedia.Modules.BuildsManager.Views
 			}
 		}
 
+		protected override void OnShown(EventArgs e)
+		{
+			base.OnShown(e);
+		}
+
 		private void Data_Loaded(object sender, EventArgs e)
 		{
 			CreateSpecToggles();
@@ -449,21 +454,21 @@ namespace Kenedia.Modules.BuildsManager.Views
 			{
 				TagGroupPanel x2 = x;
 				TagGroupPanel y2 = y;
-				if (x2 == _ungroupedPanel)
+				if (x2 == _specPanel && y2 != _specPanel)
 				{
-					if (y2 != _specPanel)
-					{
-						return 1;
-					}
 					return -1;
 				}
-				if (x2 == _specPanel)
+				if (y2 == _specPanel && x2 != _specPanel)
 				{
-					if (y2 != _ungroupedPanel)
-					{
-						return -1;
-					}
 					return 1;
+				}
+				if (x2 == _ungroupedPanel && y2 != _ungroupedPanel)
+				{
+					return 1;
+				}
+				if (y2 == _ungroupedPanel && x2 != _ungroupedPanel)
+				{
+					return -1;
 				}
 				TagGroup a = TagGroups.FirstOrDefault((TagGroup group) => group == x2.TagGroup);
 				TagGroup b = TagGroups.FirstOrDefault((TagGroup group) => group == y2.TagGroup);
@@ -552,13 +557,21 @@ namespace Kenedia.Modules.BuildsManager.Views
 				HeightSizingMode = SizingMode.Standard,
 				Height = _specializationHeight,
 				AutoSizePadding = new Point(0, 2),
-				ControlPadding = new Vector2(21f, 2f)
+				ControlPadding = new Vector2(15f, 2f)
 			};
 			_specToggles.Clear();
+			int eliteSpecializations = Data.Professions[ProfessionType.Guardian].Specializations.Count<KeyValuePair<int, Specialization>>((KeyValuePair<int, Specialization> e) => e.Value.Elite);
+			_ = Data.Professions[ProfessionType.Guardian].Specializations.Count;
+			base.Width = 10 + (eliteSpecializations + 1) * 42;
+			_resetButton.Width = base.Width - 13;
 			foreach (Profession value in Data.Professions.Values)
 			{
 				Profession p = value;
 				int prio = (int)p.Id * 100;
+				if (p == null)
+				{
+					continue;
+				}
 				TagToggle toggle;
 				_specToggles.Add(toggle = AddTemplateTag(new TemplateTag
 				{
@@ -582,7 +595,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 				foreach (Specialization value2 in p.Specializations.Values)
 				{
 					Specialization s = value2;
-					if (!s.Elite)
+					if (p == null || !s.Elite)
 					{
 						continue;
 					}

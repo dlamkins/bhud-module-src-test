@@ -24,6 +24,10 @@ namespace Kenedia.Modules.BuildsManager.Controls
 {
 	public class SpecLine : Control
 	{
+		public static int Specializations;
+
+		public static int EliteSpecializations;
+
 		private readonly double _ratio = 4.792592592592593;
 
 		private readonly DetailedTexture _baseFrame = new DetailedTexture(993595)
@@ -178,10 +182,11 @@ namespace Kenedia.Modules.BuildsManager.Controls
 			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
 			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0258: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02bc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_026f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_031c: Unknown result type (might be due to invalid IL or missing references)
 			TemplatePresenter = templatePresenter;
 			Data = data;
+			Data.Loaded += new EventHandler(Data_Loaded);
 			base.Tooltip = (_traitTooltip = new TraitTooltip());
 			_basicTooltip = new Tooltip();
 			_basicTooltipLabel = new Kenedia.Modules.Core.Controls.Label
@@ -193,19 +198,46 @@ namespace Kenedia.Modules.BuildsManager.Controls
 			SpecializationSlot = line;
 			base.Height = 165;
 			base.BackgroundColor = new Color(48, 48, 48);
+			if (Data.IsLoaded)
+			{
+				Data_Loaded(this, EventArgs.Empty);
+			}
 			Control.Input.Mouse.LeftMouseButtonPressed += MouseMouseButtonPressed;
 			Control.Input.Mouse.RightMouseButtonPressed += MouseMouseButtonPressed;
-			int size = Scale(72);
-			int offset = 40;
-			for (int i = 0; i < ((SpecializationSlot == SpecializationSlotType.Line_3) ? 8 : 5); i++)
-			{
-				_specBounds.Add(((Specialization)null, new Rectangle(offset, (base.Height - size) / 2, size, size), (AsyncTexture2D)null));
-				offset += size + Scale(10);
-			}
 			TemplatePresenter.SpecializationChanged += new SpecializationChangedEventHandler(OnSpecializationChanged);
 			TemplatePresenter.TemplateChanged += new ValueChangedEventHandler<Template>(TemplatePresenter_TemplateChanged);
 			TemplatePresenter.TraitChanged += new TraitChangedEventHandler(TemplatePresenter_TraitChanged);
-			SetSpecialization();
+			for (int i = 0; i < 20; i++)
+			{
+				_specBounds.Add(((Specialization)null, new Rectangle(0, 0, 0, 0), (AsyncTexture2D)null));
+			}
+		}
+
+		private void Data_Loaded(object sender, EventArgs e)
+		{
+			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0127: Unknown result type (might be due to invalid IL or missing references)
+			_specBounds.Clear();
+			EliteSpecializations = ((EliteSpecializations > 0) ? EliteSpecializations : Data.Professions[ProfessionType.Guardian].Specializations.Count<KeyValuePair<int, Specialization>>((KeyValuePair<int, Specialization> e) => e.Value.Elite));
+			Specializations = ((Specializations > 0) ? Specializations : (Data.Professions[ProfessionType.Guardian].Specializations.Count - EliteSpecializations));
+			int size = Scale(60);
+			int offset = 40;
+			int common_row_y = ((SpecializationSlot == SpecializationSlotType.Line_3) ? ((base.Height - size * 2) / 2) : ((base.Height - size) / 2));
+			int elite_row_y = (base.Height - size * 2) / 2 + size;
+			for (int j = 0; j < Specializations; j++)
+			{
+				_specBounds.Add(((Specialization)null, new Rectangle(offset, common_row_y, size, size), (AsyncTexture2D)null));
+				offset += size + Scale(10);
+			}
+			if (SpecializationSlot == SpecializationSlotType.Line_3)
+			{
+				offset = 40 + size / 2;
+				for (int i = 0; i < EliteSpecializations; i++)
+				{
+					_specBounds.Add(((Specialization)null, new Rectangle(offset, elite_row_y, size, size), (AsyncTexture2D)null));
+					offset += size + Scale(10);
+				}
+			}
 		}
 
 		private void TemplatePresenter_TraitChanged(object sender, TraitChangedEventArgs e)

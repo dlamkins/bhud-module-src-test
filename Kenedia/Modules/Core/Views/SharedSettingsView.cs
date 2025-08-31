@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -44,9 +45,18 @@ namespace Kenedia.Modules.Core.Views
 			base.Icon = AsyncTexture2D.FromAssetId(156736);
 			base.Name = strings_common.GeneralSettings;
 			base.Priority = 0;
+			SharedSettings.PropertyChanged += new PropertyChangedEventHandler(SharedSettings_PropertyChanged);
 		}
 
-		public override void CreateLayout(Container p, int? width = null)
+		private void SharedSettings_PropertyChanged(object sender, PropertyChangedEventArgs e)
+		{
+			if (e.PropertyName == "WindowOffset")
+			{
+				ApplyOffsets();
+			}
+		}
+
+		public override void CreateLayout(Blish_HUD.Controls.Container p, int? width = null)
 		{
 			//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
@@ -123,7 +133,7 @@ namespace Kenedia.Modules.Core.Views
 				SetLocalizedTooltip = () => strings_common.TopOffset,
 				ValueChangedAction = delegate
 				{
-					UpdateOffset();
+					SetWindowOffset();
 				}
 			};
 			pp = new Kenedia.Modules.Core.Controls.FlowPanel
@@ -150,7 +160,7 @@ namespace Kenedia.Modules.Core.Views
 				SetLocalizedTooltip = () => strings_common.LeftOffset,
 				ValueChangedAction = delegate
 				{
-					UpdateOffset();
+					SetWindowOffset();
 				}
 			};
 			pp = new Kenedia.Modules.Core.Controls.FlowPanel
@@ -177,7 +187,7 @@ namespace Kenedia.Modules.Core.Views
 				SetLocalizedTooltip = () => strings_common.BottomOffset,
 				ValueChangedAction = delegate
 				{
-					UpdateOffset();
+					SetWindowOffset();
 				}
 			};
 			pp = new Kenedia.Modules.Core.Controls.FlowPanel
@@ -204,7 +214,7 @@ namespace Kenedia.Modules.Core.Views
 				SetLocalizedTooltip = () => strings_common.RightOffset,
 				ValueChangedAction = delegate
 				{
-					UpdateOffset();
+					SetWindowOffset();
 				}
 			};
 			Kenedia.Modules.Core.Controls.FlowPanel subCP = new Kenedia.Modules.Core.Controls.FlowPanel
@@ -289,11 +299,31 @@ namespace Kenedia.Modules.Core.Views
 			};
 		}
 
-		public void UpdateOffset()
+		private void ApplyOffsets()
+		{
+			if (_leftOffsetBox != null)
+			{
+				_leftOffsetBox.Value = SharedSettings.WindowOffset.Left;
+				_topOffsetBox.Value = SharedSettings.WindowOffset.Top;
+				_rightOffsetBox.Value = SharedSettings.WindowOffset.Right;
+				_bottomOffsetBox.Value = SharedSettings.WindowOffset.Bottom;
+				SetWindowOffsetImages();
+			}
+		}
+
+		public void SetWindowOffset()
 		{
 			if (_leftOffsetBox != null)
 			{
 				SharedSettings.WindowOffset = new RectangleDimensions(_leftOffsetBox.Value, _topOffsetBox.Value, _rightOffsetBox.Value, _bottomOffsetBox.Value);
+				SetWindowOffsetImages();
+			}
+		}
+
+		public void SetWindowOffsetImages()
+		{
+			if (_leftOffsetBox != null)
+			{
 				SetTopLeftImage();
 				SetTopRightImage();
 				SetBottomLeftImage();

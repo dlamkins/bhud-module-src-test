@@ -193,43 +193,46 @@ namespace Kenedia.Modules.Core.Views
 
 		public override void PaintAfterChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0113: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016f: Unknown result type (might be due to invalid IL or missing references)
-			base.PaintAfterChildren(spriteBatch, bounds);
-			if (MainWindowEmblem != null)
+			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0099: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0123: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0129: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0180: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0185: Unknown result type (might be due to invalid IL or missing references)
+			if (spriteBatch != null && base.SelectedTab != null && base.WindowBackground != null)
 			{
-				spriteBatch.DrawOnCtrl(this, MainWindowEmblem, _mainEmblemRectangle, MainWindowEmblem.Bounds, Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
-			}
-			if (SubWindowEmblem != null)
-			{
-				spriteBatch.DrawOnCtrl(this, SubWindowEmblem, _subEmblemRectangle, SubWindowEmblem.Bounds, Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
-			}
-			if (_titleRectangle.Width <= _titleTextRegion.Width && !string.IsNullOrEmpty(Name))
-			{
-				spriteBatch.DrawStringOnCtrl(this, Name, TitleFont, _titleRectangle, NameColor, wrap: false, stroke: true);
-			}
-			if (_subTitleRectangle.Width <= _titleTextRegion.Width && !string.IsNullOrEmpty(SubName))
-			{
-				spriteBatch.DrawStringOnCtrl(this, SubName, SubTitleFont, _subTitleRectangle, SubNameColor, wrap: false, stroke: true);
-			}
-			if (Version != null && _titleTextRegion.Width >= _titleRectangle.Width + 10 + _versionRectangle.Width)
-			{
-				spriteBatch.DrawStringOnCtrl(this, $"v. {Version}", VersionFont, _versionRectangle, Color.get_White(), wrap: false, stroke: true, 1, HorizontalAlignment.Right, VerticalAlignment.Bottom);
+				base.PaintAfterChildren(spriteBatch, bounds);
+				if (MainWindowEmblem != null)
+				{
+					spriteBatch.DrawOnCtrl(this, MainWindowEmblem, _mainEmblemRectangle, MainWindowEmblem.Bounds, Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
+				}
+				if (SubWindowEmblem != null)
+				{
+					spriteBatch.DrawOnCtrl(this, SubWindowEmblem, _subEmblemRectangle, SubWindowEmblem.Bounds, Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
+				}
+				if (_titleRectangle.Width <= _titleTextRegion.Width && !string.IsNullOrEmpty(Name))
+				{
+					spriteBatch.DrawStringOnCtrl(this, Name, TitleFont, _titleRectangle, NameColor, wrap: false, stroke: true);
+				}
+				if (_subTitleRectangle.Width <= _titleTextRegion.Width && !string.IsNullOrEmpty(SubName))
+				{
+					spriteBatch.DrawStringOnCtrl(this, SubName, SubTitleFont, _subTitleRectangle, SubNameColor, wrap: false, stroke: true);
+				}
+				if (Version != null && _titleTextRegion.Width >= _titleRectangle.Width + 10 + _versionRectangle.Width)
+				{
+					spriteBatch.DrawStringOnCtrl(this, $"v. {Version}", VersionFont, _versionRectangle, Color.get_White(), wrap: false, stroke: true, 1, HorizontalAlignment.Right, VerticalAlignment.Bottom);
+				}
 			}
 		}
 

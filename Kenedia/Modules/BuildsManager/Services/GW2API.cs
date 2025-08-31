@@ -146,7 +146,12 @@ namespace Kenedia.Modules.BuildsManager.Services
 					BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths>.Logger.Info($"Fetching chunk {count}/{itemid_lists.Count}");
 					try
 					{
-						foreach (Item item in await Gw2ApiManager.Gw2ApiClient.V2.Items.ManyAsync(ids, _cancellationTokenSource.Token))
+						IReadOnlyList<Item> items = await Gw2ApiManager.Gw2ApiClient.V2.Items.ManyAsync(ids, _cancellationTokenSource.Token);
+						if (_cancellationTokenSource.IsCancellationRequested)
+						{
+							return;
+						}
+						foreach (Item item in items)
 						{
 							try
 							{
@@ -286,8 +291,20 @@ namespace Kenedia.Modules.BuildsManager.Services
 						BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths>.Logger.Warn("Exception thrown for ids: " + Environment.NewLine + string.Join("," + Environment.NewLine, ids) + " " + Environment.NewLine + ex);
 					}
 				}
+				if (_cancellationTokenSource.IsCancellationRequested)
+				{
+					return;
+				}
 				ItemTrinket ring = (ItemTrinket)(await Gw2ApiManager.Gw2ApiClient.V2.Items.GetAsync(91234, _cancellationTokenSource.Token));
+				if (_cancellationTokenSource.IsCancellationRequested)
+				{
+					return;
+				}
 				ItemWeapon legyWeapon = (ItemWeapon)(await Gw2ApiManager.Gw2ApiClient.V2.Items.GetAsync(30698, _cancellationTokenSource.Token));
+				if (_cancellationTokenSource.IsCancellationRequested)
+				{
+					return;
+				}
 				IEnumerable<int> statIds = ring.Details.StatChoices.Concat(legyWeapon.Details.StatChoices);
 				IApiV2ObjectList<Itemstat> apiStats = await Gw2ApiManager.Gw2ApiClient.V2.Itemstats.AllAsync(_cancellationTokenSource.Token);
 				if (_cancellationTokenSource.IsCancellationRequested)

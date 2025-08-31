@@ -1,4 +1,5 @@
 using System;
+using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Kenedia.Modules.BuildsManager.DataModels.Professions;
@@ -19,7 +20,7 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		private readonly DetailedTexture _selector = new DetailedTexture(157138, 157140);
 
-		private readonly DetailedTexture _petTexture = new DetailedTexture
+		private readonly DetailedTexture _petTexture = new DetailedTexture(156794)
 		{
 			TextureRegion = new Rectangle(16, 16, 200, 200)
 		};
@@ -52,14 +53,14 @@ namespace Kenedia.Modules.BuildsManager.Controls
 		public PetControl()
 		{
 			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
 			base.Tooltip = new PetTooltip();
 		}
 
 		private void ApplyPet(object sender, ValueChangedEventArgs<Pet> e)
 		{
-			_petTexture.Texture = Pet?.Icon;
+			_petTexture.Texture = ((Pet?.Icon == null) ? AsyncTexture2D.FromAssetId(156794) : Pet?.Icon);
 			PetTooltip petTooltip = base.Tooltip as PetTooltip;
 			if (petTooltip != null)
 			{
@@ -72,10 +73,6 @@ namespace Kenedia.Modules.BuildsManager.Controls
 			RecalculateLayout();
 			_selector?.Draw(this, spriteBatch);
 			_petTexture?.Draw(this, spriteBatch);
-			if (Pet == null)
-			{
-				_emptySlotTexture?.Draw(this, spriteBatch);
-			}
 			if (base.MouseOver)
 			{
 				_highlight?.Draw(this, spriteBatch);

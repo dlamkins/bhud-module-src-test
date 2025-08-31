@@ -1,15 +1,17 @@
+using System.ComponentModel;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Kenedia.Modules.Core.Extensions;
 using Kenedia.Modules.Core.Models;
 using Kenedia.Modules.Core.Structs;
+using Kenedia.Modules.Core.Utility;
 using Newtonsoft.Json;
 
 namespace Kenedia.Modules.Core.Services
 {
 	[DataContract]
-	public class SharedSettings
+	public class SharedSettings : INotifyPropertyChanged
 	{
 		private bool _loaded;
 
@@ -26,11 +28,22 @@ namespace Kenedia.Modules.Core.Services
 			}
 			set
 			{
-				SetValue(ref _windowOffset, value);
+				Common.SetProperty(ref _windowOffset, value, new ValueChangedEventHandler<RectangleDimensions>(OnPropertyChanged));
 			}
 		}
 
 		public bool Check { get; set; }
+
+		public event PropertyChangedEventHandler PropertyChanged;
+
+		private void OnPropertyChanged(object sender, ValueChangedEventArgs<RectangleDimensions> e)
+		{
+			this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(e.PropertyName));
+			if (_loaded)
+			{
+				Save();
+			}
+		}
 
 		public async Task Load(string p, bool force = false)
 		{
@@ -42,9 +55,10 @@ namespace Kenedia.Modules.Core.Services
 			if (File.Exists(_path) && await FileExtension.WaitForFileUnlock(_path))
 			{
 				using StreamReader reader = File.OpenText(_path);
-				JsonConvert.DeserializeObject<SharedSettings>(await reader.ReadToEndAsync(), SerializerSettings.Default);
+				SharedSettings source = JsonConvert.DeserializeObject<SharedSettings>(await reader.ReadToEndAsync(), SerializerSettings.Default);
+				WindowOffset = source.WindowOffset;
+				_loaded = true;
 			}
-			_loaded = true;
 		}
 
 		private async void Save()
@@ -54,18 +68,6 @@ namespace Kenedia.Modules.Core.Services
 			{
 				using StreamWriter writer = new StreamWriter(_path);
 				await writer.WriteAsync(json);
-			}
-		}
-
-		private void SetValue<T>(ref T prop, T value)
-		{
-			if (!object.Equals(prop, value))
-			{
-				prop = value;
-				if (_loaded)
-				{
-					Save();
-				}
 			}
 		}
 	}
