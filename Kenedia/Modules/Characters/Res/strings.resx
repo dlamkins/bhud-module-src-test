@@ -57,6 +57,7 @@
   <data name="RightOffset"><value>Right Offset</value></data>
   <data name="EnableRadialMenu"><value>Enable Radial Menu</value></data>
   <data name="Delays"><value>Delays</value></data>
+  <data name="Radial_CenterScreen_Tooltip"><value>Always center the radial menu in the games window center</value></data>
   <data name="GW2API"><value>GW2 API</value></data>
   <data name="CreateImages"><value>Create Images</value></data>
   <data name="Utility"><value>Utility</value></data>
@@ -271,6 +272,7 @@ Uu : Üü Ûû Ùù</value></data>
   <data name="RadialMenuKey"><value>Radial Menu Key</value></data>
   <data name="FixCharacter_NoChange"><value>Character name did not change {0}/2 ...</value></data>
   <data name="EmptyColumns"><value>Empty Columns</value></data>
+  <data name="Radial_CenterScreen"><value>Center Menu</value></data>
   <data name="NextBirthday"><value>Next Birthday</value></data>
   <data name="Descending"><value>Descending</value></data>
   <data name="Characters"><value>Characters</value></data>

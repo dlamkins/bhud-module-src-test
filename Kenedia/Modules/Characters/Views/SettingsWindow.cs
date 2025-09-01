@@ -9,8 +9,8 @@ using Kenedia.Modules.Characters.Extensions;
 using Kenedia.Modules.Characters.Res;
 using Kenedia.Modules.Characters.Services;
 using Kenedia.Modules.Core.Controls;
-using Kenedia.Modules.Core.Extensions;
 using Kenedia.Modules.Core.Models;
+using Kenedia.Modules.Core.Structs;
 using Kenedia.Modules.Core.Views;
 using Microsoft.Xna.Framework;
 
@@ -76,40 +76,25 @@ namespace Kenedia.Modules.Characters.Views
 			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
 			//IL_010d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_011d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03a7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_048f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04a7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04da: Unknown result type (might be due to invalid IL or missing references)
-			//IL_051b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0528: Unknown result type (might be due to invalid IL or missing references)
-			//IL_053e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0566: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0424: Unknown result type (might be due to invalid IL or missing references)
+			//IL_050c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_051d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_054a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_057c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_058d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05f7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0638: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0645: Unknown result type (might be due to invalid IL or missing references)
-			//IL_065b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0683: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0699: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06aa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06e1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0714: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0755: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0762: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0778: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07fe: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0831: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0872: Unknown result type (might be due to invalid IL or missing references)
-			//IL_087f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0895: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08bd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08d3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05cc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05f9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_062b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0637: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0664: Unknown result type (might be due to invalid IL or missing references)
+			//IL_068f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06c1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0705: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0711: Unknown result type (might be due to invalid IL or missing references)
+			//IL_073e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0770: Unknown result type (might be due to invalid IL or missing references)
+			//IL_077c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07a9: Unknown result type (might be due to invalid IL or missing references)
 			Kenedia.Modules.Core.Controls.Panel headerPanel = new Kenedia.Modules.Core.Controls.Panel
 			{
 				Parent = _contentPanel,
@@ -193,6 +178,17 @@ namespace Kenedia.Modules.Characters.Views
 					_settings.Radial_UseProfessionIconsColor.Value = b;
 				}
 			};
+			new Kenedia.Modules.Core.Controls.Checkbox
+			{
+				Parent = settingsFlowPanel,
+				SetLocalizedText = () => strings.Radial_CenterScreen,
+				SetLocalizedTooltip = () => strings.Radial_CenterScreen_Tooltip,
+				Checked = _settings.Radial_CenterScreen.Value,
+				CheckedChangedAction = delegate(bool b)
+				{
+					_settings.Radial_CenterScreen.Value = b;
+				}
+			};
 			Kenedia.Modules.Core.Controls.Panel subP = new Kenedia.Modules.Core.Controls.Panel
 			{
 				Parent = settingsFlowPanel,
@@ -220,6 +216,9 @@ namespace Kenedia.Modules.Characters.Views
 				MaxValue = 100f,
 				Location = new Point(250, 0)
 			};
+			int color_box_numbers = 4;
+			int color_box_padding = 5;
+			_ = (base.ContentRegion.Width - 17 - 250 - color_box_padding * (color_box_numbers + 2)) / color_box_numbers;
 			subP = new Kenedia.Modules.Core.Controls.Panel
 			{
 				Parent = settingsFlowPanel,
@@ -230,31 +229,33 @@ namespace Kenedia.Modules.Characters.Views
 			{
 				Parent = subP,
 				AutoSizeWidth = true,
-				Location = new Point(30, 0),
+				Location = new Point(0, 0),
 				SetLocalizedText = () => strings.Radial_IdleBackgroundColor
 			};
-			Kenedia.Modules.Core.Controls.Panel idleBackgroundPreview = new Kenedia.Modules.Core.Controls.Panel
-			{
-				Parent = subP,
-				Location = new Point(0, 0),
-				Size = new Point(20),
-				BackgroundColor = _settings.Radial_IdleColor.Value
-			};
-			new Kenedia.Modules.Core.Controls.TextBox
+			new Kenedia.Modules.Core.Controls.ColorPicker
 			{
 				Parent = subP,
 				Location = new Point(250, 0),
-				Text = _settings.Radial_IdleColor.Value.ToHex(),
-				Width = base.ContentRegion.Width - 20 - 250,
-				TextChangedAction = delegate(string t)
+				Width = base.ContentRegion.Width - 30 - 250,
+				SelectedColor = _settings.Radial_SliceBackground.Value.Start,
+				OnColorChangedAction = delegate(Color color)
 				{
-					//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-					if (t.ColorFromHex(out var outColor4))
-					{
-						_settings.Radial_IdleColor.Value = outColor4;
-						idleBackgroundPreview.BackgroundColor = outColor4;
-					}
+					//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+					//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+					_settings.Radial_SliceBackground.Value = new ColorGradient(color, _settings.Radial_SliceBackground.Value.End);
+				}
+			};
+			new Kenedia.Modules.Core.Controls.ColorPicker
+			{
+				Parent = subP,
+				Location = new Point(250, 25),
+				Width = base.ContentRegion.Width - 30 - 250,
+				SelectedColor = _settings.Radial_SliceBackground.Value.End,
+				OnColorChangedAction = delegate(Color color)
+				{
+					//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+					//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+					_settings.Radial_SliceBackground.Value = new ColorGradient(_settings.Radial_SliceBackground.Value.Start, color);
 				}
 			};
 			subP = new Kenedia.Modules.Core.Controls.Panel
@@ -267,105 +268,33 @@ namespace Kenedia.Modules.Characters.Views
 			{
 				Parent = subP,
 				AutoSizeWidth = true,
-				Location = new Point(30, 0),
-				SetLocalizedText = () => strings.Radial_IdleBorderColor
-			};
-			Kenedia.Modules.Core.Controls.Panel idleBorderPreview = new Kenedia.Modules.Core.Controls.Panel
-			{
-				Parent = subP,
 				Location = new Point(0, 0),
-				Size = new Point(20),
-				BackgroundColor = _settings.Radial_IdleBorderColor.Value
-			};
-			new Kenedia.Modules.Core.Controls.TextBox
-			{
-				Parent = subP,
-				Location = new Point(250, 0),
-				Text = _settings.Radial_IdleBorderColor.Value.ToHex(),
-				Width = base.ContentRegion.Width - 20 - 250,
-				TextChangedAction = delegate(string t)
-				{
-					//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-					if (t.ColorFromHex(out var outColor3))
-					{
-						_settings.Radial_IdleBorderColor.Value = outColor3;
-						idleBorderPreview.BackgroundColor = outColor3;
-					}
-				}
-			};
-			subP = new Kenedia.Modules.Core.Controls.Panel
-			{
-				Parent = settingsFlowPanel,
-				Width = base.ContentRegion.Width - 20,
-				HeightSizingMode = SizingMode.AutoSize
-			};
-			new Kenedia.Modules.Core.Controls.Label
-			{
-				Parent = subP,
-				AutoSizeWidth = true,
-				Location = new Point(30, 0),
 				SetLocalizedText = () => strings.Radial_HoveredBackgroundColor
 			};
-			Kenedia.Modules.Core.Controls.Panel activeBackgroundPreview = new Kenedia.Modules.Core.Controls.Panel
-			{
-				Parent = subP,
-				Location = new Point(0, 0),
-				Size = new Point(20),
-				BackgroundColor = _settings.Radial_HoveredColor.Value
-			};
-			new Kenedia.Modules.Core.Controls.TextBox
+			new Kenedia.Modules.Core.Controls.ColorPicker
 			{
 				Parent = subP,
 				Location = new Point(250, 0),
-				Text = _settings.Radial_HoveredColor.Value.ToHex(),
-				Width = base.ContentRegion.Width - 20 - 250,
-				TextChangedAction = delegate(string t)
+				Width = base.ContentRegion.Width - 30 - 250,
+				SelectedColor = _settings.Radial_SliceHighlight.Value.Start,
+				OnColorChangedAction = delegate(Color color)
 				{
-					//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-					if (t.ColorFromHex(out var outColor2))
-					{
-						_settings.Radial_HoveredColor.Value = outColor2;
-						activeBackgroundPreview.BackgroundColor = outColor2;
-					}
+					//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+					//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+					_settings.Radial_SliceHighlight.Value = new ColorGradient(color, _settings.Radial_SliceHighlight.Value.End);
 				}
 			};
-			subP = new Kenedia.Modules.Core.Controls.Panel
-			{
-				Parent = settingsFlowPanel,
-				Width = base.ContentRegion.Width - 20,
-				HeightSizingMode = SizingMode.AutoSize
-			};
-			new Kenedia.Modules.Core.Controls.Label
+			new Kenedia.Modules.Core.Controls.ColorPicker
 			{
 				Parent = subP,
-				AutoSizeWidth = true,
-				Location = new Point(30, 0),
-				SetLocalizedText = () => strings.Radial_HoveredBorderColor
-			};
-			Kenedia.Modules.Core.Controls.Panel activeBorderPreview = new Kenedia.Modules.Core.Controls.Panel
-			{
-				Parent = subP,
-				Location = new Point(0, 0),
-				Size = new Point(20),
-				BackgroundColor = _settings.Radial_HoveredBorderColor.Value
-			};
-			new Kenedia.Modules.Core.Controls.TextBox
-			{
-				Parent = subP,
-				Location = new Point(250, 0),
-				Text = _settings.Radial_HoveredBorderColor.Value.ToHex(),
-				Width = base.ContentRegion.Width - 20 - 250,
-				TextChangedAction = delegate(string t)
+				Location = new Point(250, 25),
+				Width = base.ContentRegion.Width - 30 - 250,
+				SelectedColor = _settings.Radial_SliceHighlight.Value.End,
+				OnColorChangedAction = delegate(Color color)
 				{
-					//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-					if (t.ColorFromHex(out var outColor))
-					{
-						_settings.Radial_HoveredBorderColor.Value = outColor;
-						activeBorderPreview.BackgroundColor = outColor;
-					}
+					//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+					//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+					_settings.Radial_SliceHighlight.Value = new ColorGradient(_settings.Radial_SliceHighlight.Value.Start, color);
 				}
 			};
 		}

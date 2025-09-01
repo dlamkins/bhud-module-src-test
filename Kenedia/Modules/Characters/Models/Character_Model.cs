@@ -319,6 +319,19 @@ namespace Kenedia.Modules.Characters.Models
 			}
 		}
 
+		public AsyncTexture2D SimpleProfessionIcon
+		{
+			get
+			{
+				//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+				if (_data == null || !_data.Professions.TryGetValue(Profession, out var profession))
+				{
+					return null;
+				}
+				return profession.Icon;
+			}
+		}
+
 		public AsyncTexture2D ProfessionIcon
 		{
 			get
@@ -329,6 +342,18 @@ namespace Kenedia.Modules.Characters.Models
 					return null;
 				}
 				return profession.IconBig;
+			}
+		}
+
+		public AsyncTexture2D SimpleSpecializationIcon
+		{
+			get
+			{
+				if (_data == null || Specialization == SpecializationType.None || !Enum.IsDefined(typeof(SpecializationType), Specialization) || !_data.Specializations.TryGetValue(Specialization, out var specialization))
+				{
+					return SimpleProfessionIcon;
+				}
+				return (AsyncTexture2D)specialization.Icon.Texture;
 			}
 		}
 

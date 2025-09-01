@@ -160,13 +160,11 @@ namespace Kenedia.Modules.Characters.Services
 
 		public SettingEntry<float> Radial_Scale { get; private set; }
 
-		public SettingEntry<Color> Radial_IdleColor { get; private set; }
+		public SettingEntry<bool> Radial_CenterScreen { get; private set; }
 
-		public SettingEntry<Color> Radial_IdleBorderColor { get; private set; }
+		public SettingEntry<ColorGradient> Radial_SliceBackground { get; private set; }
 
-		public SettingEntry<Color> Radial_HoveredBorderColor { get; private set; }
-
-		public SettingEntry<Color> Radial_HoveredColor { get; private set; }
+		public SettingEntry<ColorGradient> Radial_SliceHighlight { get; private set; }
 
 		public SettingEntry<bool> UseBetaGamestate { get; private set; }
 
@@ -249,12 +247,10 @@ namespace Kenedia.Modules.Characters.Services
 		{
 			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002e: Expected O, but got Unknown
-			//IL_01af: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01cd: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01f3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_020b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01fd: Unknown result type (might be due to invalid IL or missing references)
 			//IL_03c2: Unknown result type (might be due to invalid IL or missing references)
 			//IL_040f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0466: Unknown result type (might be due to invalid IL or missing references)
@@ -277,11 +273,10 @@ namespace Kenedia.Modules.Characters.Services
 			UseBetaGamestate = internalSettings.DefineSetting("UseBetaGamestate", defaultValue: false);
 			DebugMode = internalSettings.DefineSetting("DebugMode", defaultValue: true);
 			EnableRadialMenu = internalSettings.DefineSetting("EnableRadialMenu", defaultValue: true);
+			Radial_CenterScreen = internalSettings.DefineSetting("Radial_CenterScreen", defaultValue: true);
 			Radial_Scale = internalSettings.DefineSetting("Radial_Scale", 0.66f);
-			Radial_HoveredBorderColor = internalSettings.DefineSetting<Color>("Radial_HoveredBorderColor", ContentService.Colors.ColonialWhite);
-			Radial_HoveredColor = internalSettings.DefineSetting<Color>("Radial_HoveredBorderColor", ContentService.Colors.ColonialWhite * 0.8f);
-			Radial_IdleColor = internalSettings.DefineSetting<Color>("Radial_IdleColor", Color.get_Black() * 0.8f);
-			Radial_IdleBorderColor = internalSettings.DefineSetting<Color>("Radial_IdleBorderColor", ContentService.Colors.ColonialWhite);
+			Radial_SliceBackground = internalSettings.DefineSetting("Radial_SliceBackground", new ColorGradient(Color.get_Black() * 0.5f));
+			Radial_SliceHighlight = internalSettings.DefineSetting("Radial_SliceHighlight", new ColorGradient(ContentService.Colors.ColonialWhite * 0.5f));
 			Radial_UseProfessionColor = internalSettings.DefineSetting("Radial_UseProfessionColor", defaultValue: false);
 			Radial_UseProfessionIcons = internalSettings.DefineSetting("Radial_UseProfessionIcons", defaultValue: false);
 			Radial_UseProfessionIconsColor = internalSettings.DefineSetting("Radial_UseProfessionIconsColor", defaultValue: false);

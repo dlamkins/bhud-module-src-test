@@ -446,6 +446,10 @@ namespace Kenedia.Modules.Characters.Res
 
 		internal static string Race => ResourceManager.GetString("Race", resourceCulture);
 
+		internal static string Radial_CenterScreen => ResourceManager.GetString("Radial_CenterScreen", resourceCulture);
+
+		internal static string Radial_CenterScreen_Tooltip => ResourceManager.GetString("Radial_CenterScreen_Tooltip", resourceCulture);
+
 		internal static string Radial_HoveredBackgroundColor => ResourceManager.GetString("Radial_HoveredBackgroundColor", resourceCulture);
 
 		internal static string Radial_HoveredBorderColor => ResourceManager.GetString("Radial_HoveredBorderColor", resourceCulture);

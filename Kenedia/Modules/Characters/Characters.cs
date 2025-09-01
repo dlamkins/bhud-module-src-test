@@ -84,7 +84,7 @@ namespace Kenedia.Modules.Characters
 
 		public RunIndicator RunIndicator { get; private set; }
 
-		public RadialMenu RadialMenu { get; private set; }
+		public Kenedia.Modules.Characters.Controls.RadialMenu RadialMenu { get; private set; }
 
 		public PotraitCapture PotraitCapture { get; private set; }
 
@@ -330,16 +330,18 @@ namespace Kenedia.Modules.Characters
 
 		protected override void LoadGUI()
 		{
-			//IL_015d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0177: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0229: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0244: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0331: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0196: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0262: Unknown result type (might be due to invalid IL or missing references)
+			//IL_027d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_036a: Unknown result type (might be due to invalid IL or missing references)
 			base.LoadGUI();
-			RadialMenu = new RadialMenu(base.Settings, CharacterModels, GameService.Graphics.SpriteScreen, () => CurrentCharacterModel, Data, TextureManager)
+			RadialMenu = new Kenedia.Modules.Characters.Controls.RadialMenu(base.Settings, CharacterModels, GameService.Graphics.SpriteScreen, () => CurrentCharacterModel, Data, TextureManager)
 			{
 				Visible = false,
-				ZIndex = 1073741823
+				ZIndex = 1073741823,
+				Size = new Point((int)((float)GameService.Graphics.SpriteScreen.Width * 0.6f), (int)((float)GameService.Graphics.SpriteScreen.Height * 0.6f))
 			};
 			PotraitCapture = new PotraitCapture(base.CoreServices.ClientWindowService, base.CoreServices.SharedSettings, TextureManager)
 			{
@@ -449,8 +451,40 @@ namespace Kenedia.Modules.Characters
 
 		private void RadialMenuToggle(object sender, EventArgs e)
 		{
-			if (base.Settings.EnableRadialMenu.Value && (RadialMenu?.HasDisplayedCharacters() ?? false))
+			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0082: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
+			if (!base.Settings.EnableRadialMenu.Value || RadialMenu == null)
 			{
+				return;
+			}
+			if (!RadialMenu.Visible)
+			{
+				RadialMenu.SetDisplayedCharacters();
+			}
+			if (RadialMenu.HasDisplayedCharacters())
+			{
+				Point val;
+				if (!base.Settings.Radial_CenterScreen.Value)
+				{
+					val = GameService.Graphics.SpriteScreen.RelativeMousePosition;
+				}
+				else
+				{
+					Rectangle localBounds = GameService.Graphics.SpriteScreen.LocalBounds;
+					val = ((Rectangle)(ref localBounds)).get_Center();
+				}
+				Point p = val;
+				RadialMenu.SetGraphicDevice();
+				float size = (float)Math.Min(GameService.Graphics.SpriteScreen.Width, GameService.Graphics.SpriteScreen.Height) * base.Settings.Radial_Scale.Value;
+				RadialMenu.Size = new Point((int)size, (int)size);
+				RadialMenu.SetCenter(new Point(p.X, p.Y));
 				RadialMenu?.ToggleVisibility();
 			}
 		}

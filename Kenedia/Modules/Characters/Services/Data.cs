@@ -141,11 +141,10 @@ namespace Kenedia.Modules.Characters.Services
 
 			private void Icon_TextureSwapped(object sender, Blish_HUD.ValueChangedEventArgs<Texture2D> e)
 			{
-				//IL_004e: Unknown result type (might be due to invalid IL or missing references)
 				if (e.NewValue != null)
 				{
 					Icon.TextureSwapped -= Icon_TextureSwapped;
-					_icon = (AsyncTexture2D)IconBig.Texture.Duplicate().GetRegion(new Rectangle(5, 5, Icon.Width - 10, Icon.Height - 10));
+					_icon = (AsyncTexture2D)Icon.Texture.Duplicate();
 				}
 			}
 		}

@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using Gw2Sharp.Models;
+using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
 
 namespace Kenedia.Modules.Core.Extensions
@@ -189,9 +191,23 @@ namespace Kenedia.Modules.Core.Extensions
 			});
 		}
 
+		public static Color ToApiColor(this Color col)
+		{
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Expected O, but got Unknown
+			Color val = new Color();
+			val.set_BaseRgb((IReadOnlyList<int>)new _003C_003Ez__ReadOnlyArray<int>(new int[4]
+			{
+				((Color)(ref col)).get_R(),
+				((Color)(ref col)).get_G(),
+				((Color)(ref col)).get_B(),
+				((Color)(ref col)).get_A()
+			}));
+			return val;
+		}
+
 		public static string ToHex(this Color col)
 		{
-			Color.FromArgb(((Color)(ref col)).get_A(), ((Color)(ref col)).get_R(), ((Color)(ref col)).get_G(), ((Color)(ref col)).get_B());
 			return $"#{((Color)(ref col)).get_A():X2}{((Color)(ref col)).get_R():X2}{((Color)(ref col)).get_G():X2}{((Color)(ref col)).get_B():X2}";
 		}
 
