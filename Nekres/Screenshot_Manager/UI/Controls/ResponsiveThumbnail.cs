@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
@@ -182,10 +183,11 @@ namespace Nekres.Screenshot_Manager.UI.Controls
 				}
 				if (TryLoadImage(out var tex))
 				{
-					tex.ToBitmap().SaveToClipboard(GetImageFormatFromExtension(base.FileName));
+					using Bitmap bmp = tex.ToBitmap();
+					bmp.SaveToClipboard(GetImageFormatFromExtension(base.FileName));
+					((GraphicsResource)tex).Dispose();
 					ScreenNotification.ShowNotification(Resources.Copied_to_Clipboard_, (NotificationType)0, (Texture2D)null, 4);
 					GameService.Content.PlaySoundEffectByName("color-change");
-					((GraphicsResource)tex).Dispose();
 				}
 			}
 			((Control)this).OnRightMouseButtonReleased(e);
