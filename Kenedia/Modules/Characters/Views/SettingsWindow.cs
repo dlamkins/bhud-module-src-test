@@ -78,23 +78,19 @@ namespace Kenedia.Modules.Characters.Views
 			//IL_011d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0424: Unknown result type (might be due to invalid IL or missing references)
 			//IL_050c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_051d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_054a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_057c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05c0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05cc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05f9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_062b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0637: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0664: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06d4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0718: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0724: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0751: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0783: Unknown result type (might be due to invalid IL or missing references)
-			//IL_078f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07bc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0517: Unknown result type (might be due to invalid IL or missing references)
+			//IL_053a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_056c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05b0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0609: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0630: Unknown result type (might be due to invalid IL or missing references)
+			//IL_066e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_070b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_073d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0764: Unknown result type (might be due to invalid IL or missing references)
 			Kenedia.Modules.Core.Controls.Panel headerPanel = new Kenedia.Modules.Core.Controls.Panel
 			{
 				Parent = _contentPanel,
@@ -216,9 +212,7 @@ namespace Kenedia.Modules.Characters.Views
 				MaxValue = 100f,
 				Location = new Point(250, 0)
 			};
-			int color_box_numbers = 4;
-			int color_box_padding = 5;
-			_ = (base.ContentRegion.Width - 17 - 250 - color_box_padding * (color_box_numbers + 2)) / color_box_numbers;
+			int color_box_width = base.ContentRegion.Width - 37 - 250;
 			subP = new Kenedia.Modules.Core.Controls.Panel
 			{
 				Parent = settingsFlowPanel,
@@ -236,7 +230,7 @@ namespace Kenedia.Modules.Characters.Views
 			{
 				Parent = subP,
 				Location = new Point(250, 0),
-				Width = base.ContentRegion.Width - 30 - 250,
+				Width = color_box_width,
 				SelectedColor = _settings.Radial_SliceBackground.Value.Start,
 				OnColorChangedAction = delegate(Color color)
 				{
@@ -249,7 +243,7 @@ namespace Kenedia.Modules.Characters.Views
 			{
 				Parent = subP,
 				Location = new Point(250, 25),
-				Width = base.ContentRegion.Width - 30 - 250,
+				Width = color_box_width,
 				SelectedColor = _settings.Radial_SliceBackground.Value.End,
 				OnColorChangedAction = delegate(Color color)
 				{
@@ -280,7 +274,7 @@ namespace Kenedia.Modules.Characters.Views
 			{
 				Parent = subP,
 				Location = new Point(250, 0),
-				Width = base.ContentRegion.Width - 30 - 250,
+				Width = color_box_width,
 				SelectedColor = _settings.Radial_SliceHighlight.Value.Start,
 				OnColorChangedAction = delegate(Color color)
 				{
@@ -293,7 +287,7 @@ namespace Kenedia.Modules.Characters.Views
 			{
 				Parent = subP,
 				Location = new Point(250, 25),
-				Width = base.ContentRegion.Width - 30 - 250,
+				Width = color_box_width,
 				SelectedColor = _settings.Radial_SliceHighlight.Value.End,
 				OnColorChangedAction = delegate(Color color)
 				{

@@ -1,6 +1,7 @@
 using System;
 using Kenedia.Modules.Core.Extensions;
 using Kenedia.Modules.Core.Models;
+using Kenedia.Modules.Core.Structs;
 using Kenedia.Modules.Core.Utility;
 using Microsoft.Xna.Framework;
 
@@ -8,7 +9,7 @@ namespace Kenedia.Modules.Core.Controls
 {
 	public class ColorPicker : Panel
 	{
-		private readonly Panel _idleBackgroundPreview;
+		private readonly Panel _color_Preview;
 
 		private readonly NumberBox _red_box;
 
@@ -104,28 +105,33 @@ namespace Kenedia.Modules.Core.Controls
 			}
 		}
 
+		public Color MultipliedSelectedColor => Color.FromNonPremultiplied(R, G, B, A);
+
 		public event ValueChangedEventHandler<Color> ColorChanged;
 
 		public ColorPicker()
 		{
 			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0122: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0184: Unknown result type (might be due to invalid IL or missing references)
-			_idleBackgroundPreview = new Panel
+			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0092: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0156: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b8: Unknown result type (might be due to invalid IL or missing references)
+			_color_Preview = new Panel
 			{
 				Parent = this,
 				Location = new Point(0, 0),
 				Size = new Point(20),
-				BackgroundColor = Color.get_Transparent()
+				BorderWidth = new RectangleDimensions(2),
+				BorderColor = Color.get_Black(),
+				BackgroundColor = Color.FromNonPremultiplied(R, G, B, A)
 			};
 			_red_box = new NumberBox
 			{
 				Parent = this,
-				Location = new Point(_idleBackgroundPreview.Right + 5, 0),
+				Location = new Point(_color_Preview.Right + 5, 0),
 				Value = R,
 				MinValue = 0,
 				MaxValue = 255,
@@ -198,7 +204,7 @@ namespace Kenedia.Modules.Core.Controls
 			_blue_box.Value = B;
 			_green_box.Value = G;
 			_alpha_box.Value = A;
-			_idleBackgroundPreview.BackgroundColor = Color.FromNonPremultiplied(R, G, B, A);
+			_color_Preview.BackgroundColor = Color.FromNonPremultiplied(R, G, B, A);
 		}
 
 		private void SetColor(object sender, ValueChangedEventArgs<int> e)
@@ -225,9 +231,9 @@ namespace Kenedia.Modules.Core.Controls
 			int preview_width = 20;
 			int number_of_boxes = 4;
 			int input_width = (base.ContentRegion.Width - preview_width - padding - padding * (number_of_boxes - 1)) / number_of_boxes;
-			_idleBackgroundPreview?.SetLocation(0, 0);
-			_idleBackgroundPreview?.SetSize(preview_width, preview_width);
-			int red_x = (_idleBackgroundPreview?.Right ?? 0) + padding;
+			_color_Preview?.SetLocation(0, 0);
+			_color_Preview?.SetSize(preview_width, preview_width);
+			int red_x = (_color_Preview?.Right ?? 0) + padding;
 			_red_box?.SetLocation(red_x, 0);
 			_red_box?.SetSize(input_width, null);
 			int green_x = (_red_box?.Right ?? 0) + padding;
