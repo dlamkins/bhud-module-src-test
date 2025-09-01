@@ -209,7 +209,13 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_0112: Unknown result type (might be due to invalid IL or missing references)
 			//IL_011b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0122: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0127: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0137: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0145: Unknown result type (might be due to invalid IL or missing references)
 			//IL_014a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0182: Unknown result type (might be due to invalid IL or missing references)
 			if (Slices == 0)
 			{
 				return;
@@ -236,7 +242,12 @@ namespace Kenedia.Modules.Core.Controls
 				ColorGradient slice_background = GetSliceColors(i, contains_mouse);
 				float innerRadius = (float)Radius * DonutHolePercent;
 				Vector2 slice_center = Center + new Vector2((float)Math.Cos(midAngle), (float)Math.Sin(midAngle)) * (innerRadius + ((float)Radius - innerRadius) / 2f);
-				DrawGradientDonutSlice(startAngle, endAngle, slice_background.Start, slice_background.End, DonutHolePercent, FadePercent, OuterBorderThickness, InerBorderThickness);
+				Color start = slice_background.Start;
+				Color val = slice_background.Start;
+				Color solidColor = start * ((float)(int)((Color)(ref val)).get_A() / 255f);
+				Color end = slice_background.End;
+				val = slice_background.End;
+				DrawGradientDonutSlice(startAngle, endAngle, solidColor, end * ((float)(int)((Color)(ref val)).get_A() / 255f), DonutHolePercent, FadePercent, OuterBorderThickness, InerBorderThickness);
 				DrawSliceContent(spriteBatch, contains_mouse, slice_center, midAngle, innerRadius, i);
 			}
 		}

@@ -87,14 +87,14 @@ namespace Kenedia.Modules.Characters.Views
 			//IL_062b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0637: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0664: Unknown result type (might be due to invalid IL or missing references)
-			//IL_068f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0705: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0711: Unknown result type (might be due to invalid IL or missing references)
-			//IL_073e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0770: Unknown result type (might be due to invalid IL or missing references)
-			//IL_077c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07a9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0718: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0724: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0751: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0783: Unknown result type (might be due to invalid IL or missing references)
+			//IL_078f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07bc: Unknown result type (might be due to invalid IL or missing references)
 			Kenedia.Modules.Core.Controls.Panel headerPanel = new Kenedia.Modules.Core.Controls.Panel
 			{
 				Parent = _contentPanel,
@@ -257,6 +257,11 @@ namespace Kenedia.Modules.Characters.Views
 					//IL_002d: Unknown result type (might be due to invalid IL or missing references)
 					_settings.Radial_SliceBackground.Value = new ColorGradient(_settings.Radial_SliceBackground.Value.Start, color);
 				}
+			};
+			new Dummy
+			{
+				Parent = settingsFlowPanel,
+				Height = 10
 			};
 			subP = new Kenedia.Modules.Core.Controls.Panel
 			{

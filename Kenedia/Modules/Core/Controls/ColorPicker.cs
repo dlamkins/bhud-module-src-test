@@ -193,12 +193,12 @@ namespace Kenedia.Modules.Core.Controls
 
 		private void ApplyColorsToControls()
 		{
-			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
 			_red_box.Value = R;
 			_blue_box.Value = B;
 			_green_box.Value = G;
 			_alpha_box.Value = A;
-			_idleBackgroundPreview.BackgroundColor = SelectedColor;
+			_idleBackgroundPreview.BackgroundColor = Color.FromNonPremultiplied(R, G, B, A);
 		}
 
 		private void SetColor(object sender, ValueChangedEventArgs<int> e)
