@@ -503,6 +503,7 @@ namespace Kenedia.Modules.Characters
 		protected override void ReloadKey_Activated(object sender, EventArgs e)
 		{
 			BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Debug("ReloadKey_Activated: " + base.Name);
+			base.ReloadKey_Activated(sender, e);
 		}
 
 		private void OnCharacterCollectionChanged(object sender, EventArgs e)

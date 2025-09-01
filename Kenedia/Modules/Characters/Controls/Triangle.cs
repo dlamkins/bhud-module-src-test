@@ -82,6 +82,51 @@ namespace Kenedia.Modules.Characters.Controls
 			return new List<Vector2> { Point1, Point2, Point3 };
 		}
 
+		public bool PointInTriangle(Vector2 p)
+		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+			Vector2 val = Point3 - Point1;
+			Vector2 v2 = Point2 - Point1;
+			Vector2 v3 = p - Point1;
+			float dot0 = Vector2.Dot(val, val);
+			float dot = Vector2.Dot(val, v2);
+			float dot2 = Vector2.Dot(val, v3);
+			float dot3 = Vector2.Dot(v2, v2);
+			float dot4 = Vector2.Dot(v2, v3);
+			float denom = dot0 * dot3 - dot * dot;
+			if (Math.Abs(denom) < float.Epsilon)
+			{
+				return false;
+			}
+			float invDenom = 1f / denom;
+			float u = (dot3 * dot2 - dot * dot4) * invDenom;
+			float v = (dot0 * dot4 - dot * dot2) * invDenom;
+			if (u >= 0f && v >= 0f)
+			{
+				return u + v <= 1f;
+			}
+			return false;
+		}
+
 		public bool Contains(Vector2 pt)
 		{
 			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
