@@ -15,15 +15,15 @@ namespace Blish_HUD.Extended
 		private static readonly IReadOnlyDictionary<ModifierKeys, int> _modifierLookUp = new Dictionary<ModifierKeys, int>
 		{
 			{
-				ModifierKeys.Alt,
+				(ModifierKeys)2,
 				18
 			},
 			{
-				ModifierKeys.Ctrl,
+				(ModifierKeys)1,
 				17
 			},
 			{
-				ModifierKeys.Shift,
+				(ModifierKeys)4,
 				16
 			}
 		};
@@ -42,7 +42,7 @@ namespace Blish_HUD.Extended
 			byte[] prevClipboardContent = null;
 			try
 			{
-				prevClipboardContent = ClipboardUtil.WindowsClipboardService.GetAsUnicodeBytesAsync().Result;
+				prevClipboardContent = ClipboardUtil.get_WindowsClipboardService().GetAsUnicodeBytesAsync().Result;
 			}
 			catch (Exception e)
 			{
@@ -92,7 +92,7 @@ namespace Blish_HUD.Extended
 			byte[] prevClipboardContent = null;
 			try
 			{
-				prevClipboardContent = ClipboardUtil.WindowsClipboardService.GetAsUnicodeBytesAsync().Result;
+				prevClipboardContent = ClipboardUtil.get_WindowsClipboardService().GetAsUnicodeBytesAsync().Result;
 			}
 			catch (Exception e)
 			{
@@ -159,7 +159,7 @@ namespace Blish_HUD.Extended
 			byte[] prevClipboardContent = null;
 			try
 			{
-				prevClipboardContent = ClipboardUtil.WindowsClipboardService.GetAsUnicodeBytesAsync().Result;
+				prevClipboardContent = ClipboardUtil.get_WindowsClipboardService().GetAsUnicodeBytesAsync().Result;
 			}
 			catch (Exception e)
 			{
@@ -189,14 +189,16 @@ namespace Blish_HUD.Extended
 			return await Task.Run(delegate
 			{
 				//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
 				//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-				if (GameService.Gw2Mumble.UI.IsTextInputFocused)
+				if (GameService.Gw2Mumble.get_UI().get_IsTextInputFocused())
 				{
 					return true;
 				}
-				if (messageKey == null || ((int)messageKey.PrimaryKey == 0 && messageKey.ModifierKeys == ModifierKeys.None))
+				if (messageKey == null || ((int)messageKey.get_PrimaryKey() == 0 && (int)messageKey.get_ModifierKeys() == 0))
 				{
-					return GameService.Gw2Mumble.UI.IsTextInputFocused;
+					return GameService.Gw2Mumble.get_UI().get_IsTextInputFocused();
 				}
 				List<Func<bool>> list = new List<Func<bool>>
 				{
@@ -204,14 +206,14 @@ namespace Blish_HUD.Extended
 					() => KeyboardUtil.Release(161)
 				};
 				int modifierKey;
-				bool num = _modifierLookUp.TryGetValue(messageKey.ModifierKeys, out modifierKey);
+				bool num = _modifierLookUp.TryGetValue(messageKey.get_ModifierKeys(), out modifierKey);
 				if (num)
 				{
 					list.Add(() => KeyboardUtil.Press(modifierKey));
 				}
-				if ((int)messageKey.PrimaryKey != 0)
+				if ((int)messageKey.get_PrimaryKey() != 0)
 				{
-					list.Add(() => KeyboardUtil.Stroke((int)messageKey.PrimaryKey));
+					list.Add(() => KeyboardUtil.Stroke((int)messageKey.get_PrimaryKey()));
 				}
 				if (num)
 				{
@@ -227,12 +229,12 @@ namespace Blish_HUD.Extended
 				DateTime dateTime = DateTime.UtcNow.AddMilliseconds(250.0);
 				while (DateTime.UtcNow < dateTime)
 				{
-					if (GameService.Gw2Mumble.UI.IsTextInputFocused)
+					if (GameService.Gw2Mumble.get_UI().get_IsTextInputFocused())
 					{
 						return true;
 					}
 				}
-				return GameService.Gw2Mumble.UI.IsTextInputFocused;
+				return GameService.Gw2Mumble.get_UI().get_IsTextInputFocused();
 			});
 		}
 
@@ -240,7 +242,7 @@ namespace Blish_HUD.Extended
 		{
 			return await Task.Run(delegate
 			{
-				if (!GameService.Gw2Mumble.UI.IsTextInputFocused)
+				if (!GameService.Gw2Mumble.get_UI().get_IsTextInputFocused())
 				{
 					return true;
 				}
@@ -251,12 +253,12 @@ namespace Blish_HUD.Extended
 				DateTime dateTime = DateTime.UtcNow.AddMilliseconds(250.0);
 				while (DateTime.UtcNow < dateTime)
 				{
-					if (!GameService.Gw2Mumble.UI.IsTextInputFocused)
+					if (!GameService.Gw2Mumble.get_UI().get_IsTextInputFocused())
 					{
 						return true;
 					}
 				}
-				return !GameService.Gw2Mumble.UI.IsTextInputFocused;
+				return !GameService.Gw2Mumble.get_UI().get_IsTextInputFocused();
 			});
 		}
 
@@ -268,7 +270,7 @@ namespace Blish_HUD.Extended
 			}
 			try
 			{
-				return await ClipboardUtil.WindowsClipboardService.SetUnicodeBytesAsync(clipboardContent);
+				return await ClipboardUtil.get_WindowsClipboardService().SetUnicodeBytesAsync(clipboardContent);
 			}
 			catch (Exception e)
 			{
@@ -283,7 +285,7 @@ namespace Blish_HUD.Extended
 			{
 				do
 				{
-					if (await ClipboardUtil.WindowsClipboardService.SetTextAsync(text))
+					if (await ClipboardUtil.get_WindowsClipboardService().SetTextAsync(text))
 					{
 						return true;
 					}

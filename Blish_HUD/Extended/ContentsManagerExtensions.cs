@@ -36,7 +36,7 @@ namespace Blish_HUD.Extended
 			}
 			catch (IOException e)
 			{
-				Logger.GetLogger<ContentsManager>().Warn(e, e.Message);
+				Logger.GetLogger<ContentsManager>().Warn((Exception)e, e.Message);
 			}
 		}
 	}

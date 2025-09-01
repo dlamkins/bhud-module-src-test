@@ -21,9 +21,9 @@ namespace Nekres.Screenshot_Manager.UI.Presenters
 		public ScreenshotManagerPresenter(ScreenshotManagerView view, ScreenshotManagerModel model)
 			: base(view, model)
 		{
-			base.Model.FileWatcherFactory.FileAdded += OnScreenShotAdded;
-			base.Model.FileWatcherFactory.FileDeleted += OnScreenShotDeleted;
-			base.Model.FileWatcherFactory.FileRenamed += OnScreenShotRenamed;
+			base.get_Model().FileWatcherFactory.FileAdded += OnScreenShotAdded;
+			base.get_Model().FileWatcherFactory.FileDeleted += OnScreenShotDeleted;
+			base.get_Model().FileWatcherFactory.FileRenamed += OnScreenShotRenamed;
 		}
 
 		private void LoadTextures()
@@ -38,31 +38,34 @@ namespace Nekres.Screenshot_Manager.UI.Presenters
 		public async void OnScreenShotAdded(object o, ValueEventArgs<string> e)
 		{
 			AsyncTexture2D texture = new AsyncTexture2D();
-			CreateThumbnail(base.View.ThumbnailFlowPanel, texture, e.Value);
-			await LoadTexture(texture, e.Value);
+			CreateThumbnail(base.get_View().ThumbnailFlowPanel, texture, e.get_Value());
+			await LoadTexture(texture, e.get_Value());
 		}
 
 		public void OnScreenShotDeleted(object o, ValueEventArgs<string> e)
 		{
-			if (FindThumbnailByFileName(e.Value, out var ctrl))
+			if (FindThumbnailByFileName(e.get_Value(), out var ctrl))
 			{
-				base.View.ThumbnailFlowPanel.RemoveChild(ctrl);
-				ctrl?.Dispose();
+				((Container)base.get_View().ThumbnailFlowPanel).RemoveChild((Control)(object)ctrl);
+				if (ctrl != null)
+				{
+					((Control)ctrl).Dispose();
+				}
 			}
 		}
 
 		public void OnScreenShotRenamed(object o, ValueChangedEventArgs<string> e)
 		{
-			if (FindThumbnailByFileName(e.PreviousValue, out var ctrl))
+			if (FindThumbnailByFileName(e.get_PreviousValue(), out var ctrl))
 			{
-				ctrl.FileName = e.NewValue;
-				ctrl.NameTextBox.Text = Path.GetFileNameWithoutExtension(e.NewValue);
+				ctrl.FileName = e.get_NewValue();
+				((TextInputBase)ctrl.NameTextBox).set_Text(Path.GetFileNameWithoutExtension(e.get_NewValue()));
 			}
 		}
 
 		private bool FindThumbnailByFileName(string fileName, out ResponsiveThumbnail thumbnail)
 		{
-			thumbnail = base.View.ThumbnailFlowPanel.Children.Where((Control x) => x.GetType() == typeof(ResponsiveThumbnail)).Cast<ResponsiveThumbnail>().FirstOrDefault((ResponsiveThumbnail y) => fileName.Equals(y.FileName));
+			thumbnail = ((IEnumerable<Control>)((Container)base.get_View().ThumbnailFlowPanel).get_Children()).Where((Control x) => ((object)x).GetType() == typeof(ResponsiveThumbnail)).Cast<ResponsiveThumbnail>().FirstOrDefault((ResponsiveThumbnail y) => fileName.Equals(y.FileName));
 			return thumbnail != null;
 		}
 
@@ -71,9 +74,9 @@ namespace Nekres.Screenshot_Manager.UI.Presenters
 			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
 			ResponsiveThumbnail responsiveThumbnail = new ResponsiveThumbnail(texture, fileName);
-			responsiveThumbnail.Parent = parent;
-			responsiveThumbnail.Size = new Point(parent.Width / 4 - (int)parent.ControlPadding.X, 144);
-			responsiveThumbnail.IsFavorite = ScreenshotManagerModule.ModuleInstance.Favorites.Value.Any((string x) => x.Equals(Path.GetFileName(fileName)));
+			((Control)responsiveThumbnail).set_Parent((Container)(object)parent);
+			((Control)responsiveThumbnail).set_Size(new Point(((Control)parent).get_Width() / 4 - (int)parent.get_ControlPadding().X, 144));
+			responsiveThumbnail.IsFavorite = ScreenshotManagerModule.ModuleInstance.Favorites.get_Value().Any((string x) => x.Equals(Path.GetFileName(fileName)));
 			responsiveThumbnail.OnDelete += OnClickDelete;
 			responsiveThumbnail.FavoriteChanged += OnFavoriteChanged;
 			responsiveThumbnail.OnInspect += OnClickInspect;
@@ -83,7 +86,7 @@ namespace Nekres.Screenshot_Manager.UI.Presenters
 		private void OnClickDelete(object o, EventArgs e)
 		{
 			ThumbnailBase ctrl = (ThumbnailBase)o;
-			if (ScreenshotManagerModule.ModuleInstance.SendToRecycleBin.Value)
+			if (ScreenshotManagerModule.ModuleInstance.SendToRecycleBin.get_Value())
 			{
 				DoDelete(ctrl, sendToRecycleBin: true);
 				return;
@@ -100,26 +103,26 @@ namespace Nekres.Screenshot_Manager.UI.Presenters
 		private async void OnClickInspect(object o, EventArgs e)
 		{
 			ResponsiveThumbnail ctrl = (ResponsiveThumbnail)o;
-			await base.Model.FileWatcherFactory.CreateInspectionPanel(ctrl.FileName);
+			await base.get_Model().FileWatcherFactory.CreateInspectionPanel(ctrl.FileName);
 		}
 
 		private async void DoDelete(ThumbnailBase ctrl, bool sendToRecycleBin)
 		{
 			if (!(await FileUtil.DeleteAsync(ctrl.FileName, sendToRecycleBin)))
 			{
-				ScreenNotification.ShowNotification(string.Format(Resources.Failed_to_delete_image__0__, "“" + Path.GetFileNameWithoutExtension(ctrl.FileName) + "”"), ScreenNotification.NotificationType.Error);
+				ScreenNotification.ShowNotification(string.Format(Resources.Failed_to_delete_image__0__, "“" + Path.GetFileNameWithoutExtension(ctrl.FileName) + "”"), (NotificationType)2, (Texture2D)null, 4);
 				GameService.Content.PlaySoundEffectByName("error");
 				return;
 			}
-			ScreenshotManagerModule.ModuleInstance.DeleteSfx.Play(GameService.GameIntegration.Audio.Volume, 0f, 0f);
-			base.View.ThumbnailFlowPanel.RemoveChild(ctrl);
-			ctrl.Dispose();
-			base.View.ThumbnailFlowPanel.SortChildren<ResponsiveThumbnail>(SortThumbnails);
+			ScreenshotManagerModule.ModuleInstance.DeleteSfx.Play(GameService.GameIntegration.get_Audio().get_Volume(), 0f, 0f);
+			((Container)base.get_View().ThumbnailFlowPanel).RemoveChild((Control)(object)ctrl);
+			((Control)ctrl).Dispose();
+			base.get_View().ThumbnailFlowPanel.SortChildren<ResponsiveThumbnail>((Comparison<ResponsiveThumbnail>)SortThumbnails);
 		}
 
 		private void OnFavoriteChanged(object o, EventArgs e)
 		{
-			base.View.ThumbnailFlowPanel.SortChildren<ResponsiveThumbnail>(SortThumbnails);
+			base.get_View().ThumbnailFlowPanel.SortChildren<ResponsiveThumbnail>((Comparison<ResponsiveThumbnail>)SortThumbnails);
 		}
 
 		public async Task LoadTexture(AsyncTexture2D texture, string fileName)
@@ -132,23 +135,23 @@ namespace Nekres.Screenshot_Manager.UI.Presenters
 
 		protected override void Unload()
 		{
-			base.Model.FileWatcherFactory.FileAdded -= OnScreenShotAdded;
-			base.Model.FileWatcherFactory.FileDeleted -= OnScreenShotDeleted;
-			base.Model.FileWatcherFactory.FileRenamed -= OnScreenShotRenamed;
-			base.Model.Dispose();
-			IEnumerable<string> favorites = from ResponsiveThumbnail x in base.View.ThumbnailFlowPanel.Children.Where((Control x) => x.GetType() == typeof(ResponsiveThumbnail))
+			base.get_Model().FileWatcherFactory.FileAdded -= OnScreenShotAdded;
+			base.get_Model().FileWatcherFactory.FileDeleted -= OnScreenShotDeleted;
+			base.get_Model().FileWatcherFactory.FileRenamed -= OnScreenShotRenamed;
+			base.get_Model().Dispose();
+			IEnumerable<string> favorites = from ResponsiveThumbnail x in ((IEnumerable<Control>)((Container)base.get_View().ThumbnailFlowPanel).get_Children()).Where((Control x) => ((object)x).GetType() == typeof(ResponsiveThumbnail))
 				where x.IsFavorite
 				select x into y
 				select Path.GetFileName(y.FileName);
-			ScreenshotManagerModule.ModuleInstance.Favorites.Value = favorites.ToList();
+			ScreenshotManagerModule.ModuleInstance.Favorites.set_Value(favorites.ToList());
 		}
 
 		public int SortThumbnails(ResponsiveThumbnail x, ResponsiveThumbnail y)
 		{
 			string fileNameX = Path.GetFileNameWithoutExtension(x.FileName);
 			string fileNameY = Path.GetFileNameWithoutExtension(y.FileName);
-			x.Visible = fileNameX.Contains(base.View.SearchBox.Text);
-			y.Visible = fileNameY.Contains(base.View.SearchBox.Text);
+			((Control)x).set_Visible(fileNameX.Contains(((TextInputBase)base.get_View().SearchBox).get_Text()));
+			((Control)y).set_Visible(fileNameY.Contains(((TextInputBase)base.get_View().SearchBox).get_Text()));
 			if (x.IsFavorite && !y.IsFavorite)
 			{
 				return -1;
@@ -157,11 +160,11 @@ namespace Nekres.Screenshot_Manager.UI.Presenters
 			{
 				return 1;
 			}
-			if (x.Visible && !y.Visible)
+			if (((Control)x).get_Visible() && !((Control)y).get_Visible())
 			{
 				return -1;
 			}
-			if (!x.Visible && y.Visible)
+			if (!((Control)x).get_Visible() && ((Control)y).get_Visible())
 			{
 				return 1;
 			}

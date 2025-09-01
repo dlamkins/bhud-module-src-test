@@ -6,15 +6,18 @@ namespace Blish_HUD.Extended
 	{
 		public static bool IsWvW(this MapType type)
 		{
-			switch (type)
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0003: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0031: Expected I4, but got Unknown
+			switch (type - 9)
 			{
-			case MapType.Center:
-			case MapType.BlueHome:
-			case MapType.GreenHome:
-			case MapType.RedHome:
-			case MapType.JumpPuzzle:
-			case MapType.EdgeOfTheMists:
-			case MapType.WvwLounge:
+			case 0:
+			case 1:
+			case 2:
+			case 3:
+			case 5:
+			case 6:
+			case 9:
 				return true;
 			default:
 				return false;
@@ -23,7 +26,10 @@ namespace Blish_HUD.Extended
 
 		public static bool IsWvWMatch(this MapType type)
 		{
-			if ((uint)(type - 9) <= 3u)
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0003: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0005: Invalid comparison between Unknown and I4
+			if (type - 9 <= 3)
 			{
 				return true;
 			}
@@ -32,7 +38,13 @@ namespace Blish_HUD.Extended
 
 		public static bool IsInstance(this MapType type)
 		{
-			if (type == MapType.Instance || type == MapType.Tutorial || type == MapType.FortunesVale)
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0002: Invalid comparison between Unknown and I4
+			//IL_0004: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Invalid comparison between Unknown and I4
+			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000b: Invalid comparison between Unknown and I4
+			if ((int)type == 4 || (int)type == 7 || (int)type == 13)
 			{
 				return true;
 			}
@@ -41,7 +53,11 @@ namespace Blish_HUD.Extended
 
 		public static bool IsPublic(this MapType type)
 		{
-			if (type == MapType.Public || type == MapType.PublicMini)
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0002: Invalid comparison between Unknown and I4
+			//IL_0004: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0007: Invalid comparison between Unknown and I4
+			if ((int)type == 5 || (int)type == 16)
 			{
 				return true;
 			}
@@ -50,7 +66,11 @@ namespace Blish_HUD.Extended
 
 		public static bool IsTournament(this MapType type)
 		{
-			if (type == MapType.Tournament || type == MapType.UserTournament)
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0002: Invalid comparison between Unknown and I4
+			//IL_0004: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Invalid comparison between Unknown and I4
+			if ((int)type == 6 || (int)type == 8)
 			{
 				return true;
 			}
@@ -59,7 +79,11 @@ namespace Blish_HUD.Extended
 
 		public static bool IsPvP(this MapType type)
 		{
-			if ((uint)(type - 2) <= 1u)
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0004: Invalid comparison between Unknown and I4
+			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+			if (type - 2 <= 1)
 			{
 				return true;
 			}

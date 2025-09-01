@@ -42,7 +42,7 @@ namespace Blish_HUD.Extended
 
 		private AsyncTexture2D _icon;
 
-		private static BitmapFont _font = GameService.Content.GetFont(ContentService.FontFace.Menomonia, ContentService.FontSize.Size20, ContentService.FontStyle.Regular);
+		private static BitmapFont _font = GameService.Content.GetFont((FontFace)0, (FontSize)20, (FontStyle)0);
 
 		private Rectangle _bgBounds;
 
@@ -63,6 +63,7 @@ namespace Blish_HUD.Extended
 		private readonly DialogButtons _escapeButton;
 
 		private ErrorPrompt(string text, DialogButtons buttons, Action<DialogButtons> callback = null, DialogIcon icon = DialogIcon.None, AsyncTexture2D customIcon = null, DialogButtons enterButton = DialogButtons.None, DialogButtons escapeButton = DialogButtons.None)
+			: this()
 		{
 			//IL_0004: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0009: Unknown result type (might be due to invalid IL or missing references)
@@ -82,19 +83,21 @@ namespace Blish_HUD.Extended
 			_enterButton = enterButton;
 			_escapeButton = escapeButton;
 			_callback = callback;
-			ZIndex = 999;
+			((Control)this).set_ZIndex(999);
 			LoadIcon(icon, customIcon);
 			LoadTextures();
-			GameService.Input.Keyboard.KeyPressed += OnKeyPressed;
+			GameService.Input.get_Keyboard().add_KeyPressed((EventHandler<KeyboardEventArgs>)OnKeyPressed);
 		}
 
 		private void LoadTextures()
 		{
-			_bgTexture = GameService.Content.DatAssetCache.GetTextureFromAssetId(156003);
+			_bgTexture = GameService.Content.get_DatAssetCache().GetTextureFromAssetId(156003);
 		}
 
 		private void LoadIcon(DialogIcon icon, AsyncTexture2D customIcon)
 		{
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0033: Expected O, but got Unknown
 			if (customIcon != null)
 			{
 				_icon = customIcon;
@@ -106,13 +109,13 @@ namespace Blish_HUD.Extended
 					return;
 				}
 				_icon = new AsyncTexture2D();
-				GameService.Content.DatAssetCache.GetTextureFromAssetId(154985).TextureSwapped += delegate(object _, ValueChangedEventArgs<Texture2D> e)
+				GameService.Content.get_DatAssetCache().GetTextureFromAssetId(154985).add_TextureSwapped((EventHandler<ValueChangedEventArgs<Texture2D>>)delegate(object _, ValueChangedEventArgs<Texture2D> e)
 				{
-					if (e.NewValue != null)
+					if (e.get_NewValue() != null)
 					{
-						GetIconRegion(icon, e.NewValue);
+						GetIconRegion(icon, e.get_NewValue());
 					}
-				};
+				});
 			}
 		}
 
@@ -121,10 +124,10 @@ namespace Blish_HUD.Extended
 			switch (icon)
 			{
 			case DialogIcon.Exclamation:
-				_icon.SwapTexture(atlas.GetRegion(0, 0, 64, 64));
+				_icon.SwapTexture(Texture2DExtension.GetRegion(atlas, 0, 0, 64, 64));
 				break;
 			case DialogIcon.Question:
-				_icon.SwapTexture(atlas.GetRegion(64, 0, 64, 64));
+				_icon.SwapTexture(Texture2DExtension.GetRegion(atlas, 64, 0, 64, 64));
 				break;
 			}
 		}
@@ -146,20 +149,24 @@ namespace Blish_HUD.Extended
 		protected override void DisposeControl()
 		{
 			_singleton = null;
-			_icon?.Dispose();
-			GameService.Input.Keyboard.KeyPressed -= OnKeyPressed;
-			base.DisposeControl();
+			AsyncTexture2D icon = _icon;
+			if (icon != null)
+			{
+				icon.Dispose();
+			}
+			GameService.Input.get_Keyboard().remove_KeyPressed((EventHandler<KeyboardEventArgs>)OnKeyPressed);
+			((Container)this).DisposeControl();
 		}
 
 		private void ButtonPress(DialogButtons button)
 		{
 			if (button != 0)
 			{
-				GameService.Input.Keyboard.KeyPressed -= OnKeyPressed;
+				GameService.Input.get_Keyboard().remove_KeyPressed((EventHandler<KeyboardEventArgs>)OnKeyPressed);
 				GameService.Content.PlaySoundEffectByName("button-click");
 				_callback?.Invoke(button);
 				_singleton = null;
-				Dispose();
+				((Control)this).Dispose();
 			}
 		}
 
@@ -171,7 +178,7 @@ namespace Blish_HUD.Extended
 			//IL_000a: Invalid comparison between Unknown and I4
 			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000f: Invalid comparison between Unknown and I4
-			Keys key = e.Key;
+			Keys key = e.get_Key();
 			if ((int)key != 13)
 			{
 				if ((int)key == 27)
@@ -206,19 +213,26 @@ namespace Blish_HUD.Extended
 			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
 			if (_singleton == null)
 			{
-				_singleton = new ErrorPrompt(text, buttons, callback, icon, customIcon, enterButton, escapeButton)
-				{
-					Parent = Control.Graphics.SpriteScreen,
-					Location = Point.get_Zero(),
-					Size = Control.Graphics.SpriteScreen.Size
-				};
-				_singleton.Show();
+				ErrorPrompt errorPrompt = new ErrorPrompt(text, buttons, callback, icon, customIcon, enterButton, escapeButton);
+				((Control)errorPrompt).set_Parent((Container)(object)Control.get_Graphics().get_SpriteScreen());
+				((Control)errorPrompt).set_Location(Point.get_Zero());
+				((Control)errorPrompt).set_Size(((Control)Control.get_Graphics().get_SpriteScreen()).get_Size());
+				_singleton = errorPrompt;
+				((Control)_singleton).Show();
 			}
 		}
 
 		private void CreateButtons()
 		{
+			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f4: Expected O, but got Unknown
 			int minLeftOffset = 50;
 			int buttonCount = _buttons.Count;
 			int availableWidth = _bgBounds.Width - minLeftOffset;
@@ -234,19 +248,18 @@ namespace Blish_HUD.Extended
 				StandardButton button = _buttons[buttonKey];
 				if (button == null)
 				{
-					button = new StandardButton
-					{
-						Parent = this,
-						Text = GetButtonText(buttonKey),
-						Width = buttonWidth,
-						Height = 25,
-						Location = new Point(((Rectangle)(ref _bgBounds)).get_Left() + minLeftOffset + xOffset, yOffset),
-						Enabled = true
-					};
-					button.Click += delegate
+					StandardButton val = new StandardButton();
+					((Control)val).set_Parent((Container)(object)this);
+					val.set_Text(GetButtonText(buttonKey));
+					((Control)val).set_Width(buttonWidth);
+					((Control)val).set_Height(25);
+					((Control)val).set_Location(new Point(((Rectangle)(ref _bgBounds)).get_Left() + minLeftOffset + xOffset, yOffset));
+					((Control)val).set_Enabled(true);
+					button = val;
+					((Control)button).add_Click((EventHandler<MouseEventArgs>)delegate
 					{
 						ButtonPress(buttonKey);
-					};
+					});
 				}
 				xOffset -= buttonWidth + _iconMargin.X;
 				_buttons[buttonKey] = button;
@@ -299,7 +312,7 @@ namespace Blish_HUD.Extended
 			//IL_01d6: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01e5: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01e7: Unknown result type (might be due to invalid IL or missing references)
-			base.PaintBeforeChildren(spriteBatch, bounds);
+			((Container)this).PaintBeforeChildren(spriteBatch, bounds);
 			int textMarginRight = 25;
 			string text = DrawUtil.WrapText(_font, _text, 412f);
 			Size2 val = _font.MeasureString(text);
@@ -311,7 +324,7 @@ namespace Blish_HUD.Extended
 			int contentWidth = textWidth + iconSize + _iconMargin.X + textMargin.X + textMarginRight;
 			int contentHeight = ((textHeight > 64) ? textHeight : (textHeight + iconSize));
 			contentHeight = ((contentHeight < 150) ? 150 : contentHeight);
-			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, bounds, Color.get_Black() * 0.5f);
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), bounds, Color.get_Black() * 0.5f);
 			Point bgTextureSize = default(Point);
 			((Point)(ref bgTextureSize))._002Ector(contentWidth, contentHeight + 64);
 			Point bgTexturePos = default(Point);
@@ -321,15 +334,15 @@ namespace Blish_HUD.Extended
 			_bgBounds = bgBounds;
 			Rectangle textBounds = default(Rectangle);
 			((Rectangle)(ref textBounds))._002Ector(((Rectangle)(ref bgBounds)).get_Left() + textMargin.X, bgBounds.Y + textMargin.Y, bgBounds.Width - textMarginRight, contentHeight);
-			spriteBatch.DrawOnCtrl((Control)this, (Texture2D)_bgTexture, bgBounds, (Rectangle?)new Rectangle(29, 23, 942, 942), Color.get_White());
-			spriteBatch.DrawRectangleOnCtrl(this, _bgBounds, 2, Color.get_Black() * 0.8f);
-			if (_icon != null && _icon.HasTexture)
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_bgTexture), bgBounds, (Rectangle?)new Rectangle(29, 23, 942, 942), Color.get_White());
+			spriteBatch.DrawRectangleOnCtrl((Control)(object)this, _bgBounds, 2, Color.get_Black() * 0.8f);
+			if (_icon != null && _icon.get_HasTexture())
 			{
 				Rectangle iconBounds = default(Rectangle);
 				((Rectangle)(ref iconBounds))._002Ector(((Rectangle)(ref bgBounds)).get_Left() + _iconMargin.X, ((Rectangle)(ref bgBounds)).get_Top() + _iconMargin.Y, 64, 64);
-				spriteBatch.DrawOnCtrl((Control)this, (Texture2D)_icon, iconBounds);
+				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_icon), iconBounds);
 			}
-			spriteBatch.DrawStringOnCtrl(this, text, _font, textBounds, Color.get_White(), wrap: false, HorizontalAlignment.Left, VerticalAlignment.Top);
+			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, text, _font, textBounds, Color.get_White(), false, (HorizontalAlignment)0, (VerticalAlignment)0);
 			CreateButtons();
 		}
 	}

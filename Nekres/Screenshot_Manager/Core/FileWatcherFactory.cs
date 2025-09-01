@@ -5,6 +5,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Content;
+using Blish_HUD.Controls;
+using Blish_HUD.Graphics.UI;
 using Microsoft.Xna.Framework.Graphics;
 using Nekres.Screenshot_Manager.Properties;
 using Nekres.Screenshot_Manager.UI.Controls;
@@ -42,7 +44,7 @@ namespace Nekres.Screenshot_Manager.Core
 			{
 				FileSystemWatcher watcher = new FileSystemWatcher
 				{
-					Path = DirectoryUtil.ScreensPath,
+					Path = DirectoryUtil.get_ScreensPath(),
 					NotifyFilter = (NotifyFilters.FileName | NotifyFilters.LastWrite),
 					Filter = filter2,
 					EnableRaisingEvents = true
@@ -53,10 +55,10 @@ namespace Nekres.Screenshot_Manager.Core
 				watcher.EnableRaisingEvents = true;
 				_screensPathWatchers.Add(watcher);
 			}
-			IEnumerable<string> initialFiles = from s in Directory.EnumerateFiles(DirectoryUtil.ScreensPath)
+			IEnumerable<string> initialFiles = from s in Directory.EnumerateFiles(DirectoryUtil.get_ScreensPath())
 				where Array.Exists(_imageFilters, (string filter) => filter.Equals("*" + Path.GetExtension(s), StringComparison.InvariantCultureIgnoreCase))
 				select s into x
-				select Path.Combine(DirectoryUtil.ScreensPath, x);
+				select Path.Combine(DirectoryUtil.get_ScreensPath(), x);
 			_index.AddRange(initialFiles);
 		}
 
@@ -82,11 +84,11 @@ namespace Nekres.Screenshot_Manager.Core
 
 		private async Task ScreenShotNotify(string filePath)
 		{
-			if (!ScreenshotManagerModule.ModuleInstance.MuteSound.Value)
+			if (!ScreenshotManagerModule.ModuleInstance.MuteSound.get_Value())
 			{
-				ScreenshotManagerModule.ModuleInstance.ScreenShotSfx.Play(GameService.GameIntegration.Audio.Volume, 0f, 0f);
+				ScreenshotManagerModule.ModuleInstance.ScreenShotSfx.Play(GameService.GameIntegration.get_Audio().get_Volume(), 0f, 0f);
 			}
-			if (ScreenshotManagerModule.ModuleInstance.DisableNotification.Value)
+			if (ScreenshotManagerModule.ModuleInstance.DisableNotification.get_Value())
 			{
 				return;
 			}
@@ -124,8 +126,8 @@ namespace Nekres.Screenshot_Manager.Core
 		private async void OpenInspectionPanel(string filePath)
 		{
 			await CreateInspectionPanel(filePath);
-			GameService.Overlay.BlishHudWindow.Show();
-			GameService.Overlay.BlishHudWindow.Navigate(new ScreenshotManagerView(new ScreenshotManagerModel(this)));
+			((Control)GameService.Overlay.get_BlishHudWindow()).Show();
+			GameService.Overlay.get_BlishHudWindow().Navigate((IView)(object)new ScreenshotManagerView(new ScreenshotManagerModel(this)), true);
 		}
 
 		public async Task CreateInspectionPanel(string filePath)

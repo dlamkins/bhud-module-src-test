@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -8,6 +9,7 @@ using Blish_HUD.Extended.Properties;
 using Blish_HUD.Modules.Managers;
 using Flurl.Http;
 using Gw2Sharp.WebApi.V2.Models;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Blish_HUD.Extended
 {
@@ -48,7 +50,7 @@ namespace Blish_HUD.Extended
 			bool isDown = !string.IsNullOrEmpty(l_err);
 			if (showMessage && isDown)
 			{
-				ScreenNotification.ShowNotification(l_err, ScreenNotification.NotificationType.Error);
+				ScreenNotification.ShowNotification(l_err, (NotificationType)2, (Texture2D)null, 4);
 			}
 			return !isDown;
 		}
@@ -59,30 +61,30 @@ namespace Blish_HUD.Extended
 			{
 				return false;
 			}
-			if (string.IsNullOrWhiteSpace(GameService.Gw2Mumble.PlayerCharacter.Name))
+			if (string.IsNullOrWhiteSpace(GameService.Gw2Mumble.get_PlayerCharacter().get_Name()))
 			{
 				if (showMessage)
 				{
-					ScreenNotification.ShowNotification(Resources.API_unavailable_ + "\n" + Resources.Please__login_to_a_character_, ScreenNotification.NotificationType.Error);
+					ScreenNotification.ShowNotification(Resources.API_unavailable_ + "\n" + Resources.Please__login_to_a_character_, (NotificationType)2, (Texture2D)null, 4);
 				}
 				Logger.GetLogger<Gw2ApiManager>().Info("API unavailable: No character logged in. - No key can be selected because a character has to be logged in once.");
 				return false;
 			}
-			if (!gw2ApiManager.HasPermission(TokenPermission.Account))
+			if (!gw2ApiManager.HasPermission((TokenPermission)1))
 			{
 				if (showMessage)
 				{
-					ScreenNotification.ShowNotification(Resources.Missing_API_key_ + "\n" + string.Format(Resources.Please__add_an_API_key_to__0__, "Blish HUD"), ScreenNotification.NotificationType.Error);
+					ScreenNotification.ShowNotification(Resources.Missing_API_key_ + "\n" + string.Format(Resources.Please__add_an_API_key_to__0__, "Blish HUD"), (NotificationType)2, (Texture2D)null, 4);
 				}
 				Logger.GetLogger<Gw2ApiManager>().Info("Missing API key: Foreign account. - No key associated with the logged in account was found.");
 				return false;
 			}
-			if (!gw2ApiManager.HasPermissions(requiredPermissions))
+			if (!gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)requiredPermissions))
 			{
-				string missing = string.Join(", ", requiredPermissions.Except(Enum.GetValues(typeof(TokenPermission)).Cast<TokenPermission>().Where(gw2ApiManager.HasPermission)));
+				string missing = string.Join(", ", requiredPermissions.Except(Enum.GetValues(typeof(TokenPermission)).Cast<TokenPermission>().Where((Func<TokenPermission, bool>)gw2ApiManager.HasPermission)));
 				if (showMessage)
 				{
-					ScreenNotification.ShowNotification(Resources.Insufficient_API_permissions_ + "\n" + string.Format(Resources.Required___0_, missing), ScreenNotification.NotificationType.Error);
+					ScreenNotification.ShowNotification(Resources.Insufficient_API_permissions_ + "\n" + string.Format(Resources.Required___0_, missing), (NotificationType)2, (Texture2D)null, 4);
 				}
 				Logger.GetLogger<Gw2ApiManager>().Info("Insufficient API permissions. Required: " + missing);
 				return false;

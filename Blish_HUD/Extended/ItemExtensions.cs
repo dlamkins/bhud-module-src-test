@@ -7,6 +7,8 @@ namespace Blish_HUD.Extended
 	{
 		public static Color AsColor(this ItemRarity rarity)
 		{
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002a: Expected I4, but got Unknown
 			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
@@ -28,17 +30,17 @@ namespace Blish_HUD.Extended
 			//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
-			return (Color)(rarity switch
+			return (Color)((int)rarity switch
 			{
-				ItemRarity.Unknown => Color.get_White(), 
-				ItemRarity.Junk => new Color(170, 170, 170), 
-				ItemRarity.Basic => Color.get_White(), 
-				ItemRarity.Fine => new Color(98, 164, 218), 
-				ItemRarity.Masterwork => new Color(26, 147, 6), 
-				ItemRarity.Rare => new Color(252, 208, 11), 
-				ItemRarity.Exotic => new Color(255, 164, 5), 
-				ItemRarity.Ascended => new Color(251, 62, 141), 
-				ItemRarity.Legendary => new Color(136, 79, 217), 
+				0 => Color.get_White(), 
+				1 => new Color(170, 170, 170), 
+				2 => Color.get_White(), 
+				3 => new Color(98, 164, 218), 
+				4 => new Color(26, 147, 6), 
+				5 => new Color(252, 208, 11), 
+				6 => new Color(255, 164, 5), 
+				7 => new Color(251, 62, 141), 
+				8 => new Color(136, 79, 217), 
 				_ => Color.get_White(), 
 			});
 		}

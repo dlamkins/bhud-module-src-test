@@ -1,5 +1,7 @@
 using System;
+using Blish_HUD.Controls;
 using Blish_HUD.Gw2Mumble;
+using Gw2Sharp.Models;
 using Microsoft.Xna.Framework;
 
 namespace Blish_HUD.Extended
@@ -23,9 +25,9 @@ namespace Blish_HUD.Extended
 			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
 			if (!swapYZ)
 			{
-				return playerCharacter.Position;
+				return playerCharacter.get_Position();
 			}
-			return playerCharacter.Position.SwapYZ();
+			return playerCharacter.get_Position().SwapYZ();
 		}
 
 		public static Vector3 Position(this PlayerCamera playerCamera, bool swapYZ)
@@ -35,9 +37,9 @@ namespace Blish_HUD.Extended
 			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
 			if (!swapYZ)
 			{
-				return playerCamera.Position;
+				return playerCamera.get_Position();
 			}
-			return playerCamera.Position.SwapYZ();
+			return playerCamera.get_Position().SwapYZ();
 		}
 
 		public static Vector3 Forward(this PlayerCharacter playerCharacter, bool swapYZ)
@@ -47,9 +49,9 @@ namespace Blish_HUD.Extended
 			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
 			if (!swapYZ)
 			{
-				return playerCharacter.Forward;
+				return playerCharacter.get_Forward();
 			}
-			return playerCharacter.Forward.SwapYZ();
+			return playerCharacter.get_Forward().SwapYZ();
 		}
 
 		public static Vector3 Forward(this PlayerCamera playerCamera, bool swapYZ)
@@ -59,9 +61,9 @@ namespace Blish_HUD.Extended
 			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
 			if (!swapYZ)
 			{
-				return playerCamera.Forward;
+				return playerCamera.get_Forward();
 			}
-			return playerCamera.Forward.SwapYZ();
+			return playerCamera.get_Forward().SwapYZ();
 		}
 
 		private static int GetOffset(float curr, float max, float min, float val)
@@ -71,18 +73,30 @@ namespace Blish_HUD.Extended
 
 		public static Rectangle CompassBounds(this UI ui)
 		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
 			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-			int offsetWidth = GetOffset(ui.CompassSize.Width, 362f, 170f, 40f);
-			int offsetHeight = GetOffset(ui.CompassSize.Height, 338f, 170f, 40f);
-			int width = ui.CompassSize.Width + offsetWidth;
-			int height = ui.CompassSize.Height + offsetHeight;
-			int num = GameService.Graphics.SpriteScreen.ContentRegion.Width - width;
+			Size compassSize = ui.get_CompassSize();
+			int offsetWidth = GetOffset(((Size)(ref compassSize)).get_Width(), 362f, 170f, 40f);
+			compassSize = ui.get_CompassSize();
+			int offsetHeight = GetOffset(((Size)(ref compassSize)).get_Height(), 338f, 170f, 40f);
+			compassSize = ui.get_CompassSize();
+			int width = ((Size)(ref compassSize)).get_Width() + offsetWidth;
+			compassSize = ui.get_CompassSize();
+			int height = ((Size)(ref compassSize)).get_Height() + offsetHeight;
+			int num = ((Container)GameService.Graphics.get_SpriteScreen()).get_ContentRegion().Width - width;
 			int y = 0;
-			if (!ui.IsCompassTopRight)
+			if (!ui.get_IsCompassTopRight())
 			{
-				y += GameService.Graphics.SpriteScreen.ContentRegion.Height - height - 40;
+				y += ((Container)GameService.Graphics.get_SpriteScreen()).get_ContentRegion().Height - height - 40;
 			}
 			return new Rectangle(num, y, width, height);
 		}

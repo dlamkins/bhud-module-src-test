@@ -15,9 +15,7 @@
   </PropertyGroup>
   <ItemGroup />
   <ItemGroup>
-    <Reference Include="Blish HUD">
-      <HintPath>..\..\working\Blish HUD.exe</HintPath>
-    </Reference>
+    <Reference Include="Blish HUD" />
     <Reference Include="MonoGame.Extended" />
     <Reference Include="MonoGame.Framework" />
     <Reference Include="System.ComponentModel.Composition" />
@@ -25,9 +23,8 @@
       <HintPath>..\..\working\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
     </Reference>
     <Reference Include="System.Net.Http" />
-    <Reference Include="Gw2Sharp">
-      <HintPath>..\..\working\Gw2Sharp.dll</HintPath>
-    </Reference>
+    <Reference Include="Gw2Sharp" />
+    <Reference Include="PresentationCore" />
     <Reference Include="System.Core" />
     <Reference Include="Flurl.Http" />
     <Reference Include="Microsoft.VisualBasic" />

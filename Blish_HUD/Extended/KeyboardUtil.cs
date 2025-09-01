@@ -93,7 +93,7 @@ namespace Blish_HUD.Extended
 		private static extern uint MapVirtualKey(uint uCode, uint uMapType);
 
 		[DllImport("user32.dll", SetLastError = true)]
-		private static extern uint SendInput(uint nInputs, [In][MarshalAs(UnmanagedType.LPArray)] Blish_HUD.Extended.WinApi.Input[] pInputs, int cbSize);
+		private static extern uint SendInput(uint nInputs, [In][MarshalAs(UnmanagedType.LPArray)] Input[] pInputs, int cbSize);
 
 		[DllImport("kernel32.dll")]
 		private static extern uint GetLastError();
@@ -152,20 +152,20 @@ namespace Blish_HUD.Extended
 				lParam.prevKeyState = 1;
 				lParam.transitionState = 1;
 			}
-			return PostMessage(GameService.GameIntegration.Gw2Instance.Gw2WindowHandle, msg, (uint)keyCode, lParam.GetInt());
+			return PostMessage(GameService.GameIntegration.get_Gw2Instance().get_Gw2WindowHandle(), msg, (uint)keyCode, lParam.GetInt());
 		}
 
 		private static bool SendInput(int keyCode, bool pressed)
 		{
 			KeyEventF dwFlags = ((!pressed) ? KeyEventF.KEYUP : ((KeyEventF)0u));
-			Blish_HUD.Extended.WinApi.Input input;
+			Input input;
 			InputUnion u;
 			KeybdInput ki;
-			Blish_HUD.Extended.WinApi.Input[] nInputs;
+			Input[] nInputs;
 			if (_extendedKeys.Contains(keyCode))
 			{
-				Blish_HUD.Extended.WinApi.Input[] array = new Blish_HUD.Extended.WinApi.Input[2];
-				input = new Blish_HUD.Extended.WinApi.Input
+				Input[] array = new Input[2];
+				input = new Input
 				{
 					type = InputType.KEYBOARD
 				};
@@ -179,7 +179,7 @@ namespace Blish_HUD.Extended
 				u.ki = ki;
 				input.U = u;
 				array[0] = input;
-				input = new Blish_HUD.Extended.WinApi.Input
+				input = new Input
 				{
 					type = InputType.KEYBOARD
 				};
@@ -197,8 +197,8 @@ namespace Blish_HUD.Extended
 			}
 			else
 			{
-				Blish_HUD.Extended.WinApi.Input[] array2 = new Blish_HUD.Extended.WinApi.Input[1];
-				input = new Blish_HUD.Extended.WinApi.Input
+				Input[] array2 = new Input[1];
+				input = new Input
 				{
 					type = InputType.KEYBOARD
 				};
@@ -214,7 +214,7 @@ namespace Blish_HUD.Extended
 				array2[0] = input;
 				nInputs = array2;
 			}
-			return SendInput((uint)nInputs.Length, nInputs, Blish_HUD.Extended.WinApi.Input.Size) != 0;
+			return SendInput((uint)nInputs.Length, nInputs, Input.Size) != 0;
 		}
 
 		public static bool Paste(bool sendToSystem = true)

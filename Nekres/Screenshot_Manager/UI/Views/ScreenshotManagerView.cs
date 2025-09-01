@@ -1,3 +1,4 @@
+using System;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
@@ -17,7 +18,7 @@ namespace Nekres.Screenshot_Manager.UI.Views
 
 		public ScreenshotManagerView(ScreenshotManagerModel model)
 		{
-			WithPresenter(new ScreenshotManagerPresenter(this, model));
+			base.WithPresenter(new ScreenshotManagerPresenter(this, model));
 		}
 
 		public ScreenshotManagerView()
@@ -27,40 +28,38 @@ namespace Nekres.Screenshot_Manager.UI.Views
 		protected override async void Build(Container buildPanel)
 		{
 			ScreenshotManagerView screenshotManagerView = this;
-			FlowPanel obj = new FlowPanel
-			{
-				Parent = buildPanel
-			};
-			Rectangle contentRegion = buildPanel.ContentRegion;
+			FlowPanel val = new FlowPanel();
+			((Control)val).set_Parent(buildPanel);
+			Rectangle contentRegion = buildPanel.get_ContentRegion();
 			int x = ((Rectangle)(ref contentRegion)).get_Size().X;
-			contentRegion = buildPanel.ContentRegion;
-			obj.Size = new Point(x, ((Rectangle)(ref contentRegion)).get_Size().Y - 90);
-			obj.Location = new Point(0, 50);
-			obj.FlowDirection = ControlFlowDirection.LeftToRight;
-			obj.ControlPadding = new Vector2(5f, 5f);
-			obj.CanCollapse = false;
-			obj.CanScroll = true;
-			obj.Collapsed = false;
-			obj.ShowTint = true;
-			obj.ShowBorder = true;
-			screenshotManagerView.ThumbnailFlowPanel = obj;
-			SearchBox = new TextBox
+			contentRegion = buildPanel.get_ContentRegion();
+			((Control)val).set_Size(new Point(x, ((Rectangle)(ref contentRegion)).get_Size().Y - 90));
+			((Control)val).set_Location(new Point(0, 50));
+			val.set_FlowDirection((ControlFlowDirection)0);
+			val.set_ControlPadding(new Vector2(5f, 5f));
+			((Panel)val).set_CanCollapse(false);
+			((Panel)val).set_CanScroll(true);
+			((Panel)val).set_Collapsed(false);
+			((Panel)val).set_ShowTint(true);
+			((Panel)val).set_ShowBorder(true);
+			screenshotManagerView.ThumbnailFlowPanel = val;
+			ScreenshotManagerView screenshotManagerView2 = this;
+			TextBox val2 = new TextBox();
+			((Control)val2).set_Parent(buildPanel);
+			((Control)val2).set_Location(new Point(((Control)ThumbnailFlowPanel).get_Location().X, ((Control)ThumbnailFlowPanel).get_Location().Y - 40));
+			((Control)val2).set_Size(new Point(200, 40));
+			((TextInputBase)val2).set_PlaceholderText(Resources.Search___);
+			screenshotManagerView2.SearchBox = val2;
+			((TextInputBase)SearchBox).add_TextChanged((EventHandler<EventArgs>)delegate
 			{
-				Parent = buildPanel,
-				Location = new Point(ThumbnailFlowPanel.Location.X, ThumbnailFlowPanel.Location.Y - 40),
-				Size = new Point(200, 40),
-				PlaceholderText = Resources.Search___
-			};
-			SearchBox.TextChanged += delegate
-			{
-				ThumbnailFlowPanel.SortChildren<ResponsiveThumbnail>(base.Presenter.SortThumbnails);
-			};
-			foreach (string fileName in base.Presenter.Model.FileWatcherFactory.Index)
+				ThumbnailFlowPanel.SortChildren<ResponsiveThumbnail>((Comparison<ResponsiveThumbnail>)base.get_Presenter().SortThumbnails);
+			});
+			foreach (string fileName in ((Presenter<ScreenshotManagerView, ScreenshotManagerModel>)base.get_Presenter()).get_Model().FileWatcherFactory.Index)
 			{
 				AsyncTexture2D texture = new AsyncTexture2D();
-				base.Presenter.CreateThumbnail(ThumbnailFlowPanel, texture, fileName);
-				await base.Presenter.LoadTexture(texture, fileName);
-				ThumbnailFlowPanel.SortChildren<ResponsiveThumbnail>(base.Presenter.SortThumbnails);
+				base.get_Presenter().CreateThumbnail(ThumbnailFlowPanel, texture, fileName);
+				await base.get_Presenter().LoadTexture(texture, fileName);
+				ThumbnailFlowPanel.SortChildren<ResponsiveThumbnail>((Comparison<ResponsiveThumbnail>)base.get_Presenter().SortThumbnails);
 			}
 		}
 

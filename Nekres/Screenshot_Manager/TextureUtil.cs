@@ -18,6 +18,8 @@ namespace Nekres.Screenshot_Manager
 		{
 			return await Task.Run((Func<Texture2D>)delegate
 			{
+				//IL_008f: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0094: Unknown result type (might be due to invalid IL or missing references)
 				DateTime dateTime = DateTime.UtcNow.AddMilliseconds(10000.0);
 				while (DateTime.UtcNow < dateTime)
 				{
@@ -35,19 +37,26 @@ namespace Nekres.Screenshot_Manager
 						byte[] array = new byte[memoryStream.Length];
 						memoryStream.Position = 0L;
 						memoryStream.Read(array, 0, array.Length);
-						using GraphicsDeviceContext graphicsDeviceContext = GameService.Graphics.LendGraphicsDeviceContext();
-						return Texture2D.FromStream(graphicsDeviceContext.GraphicsDevice, (Stream)memoryStream);
+						GraphicsDeviceContext val = GameService.Graphics.LendGraphicsDeviceContext();
+						try
+						{
+							return Texture2D.FromStream(((GraphicsDeviceContext)(ref val)).get_GraphicsDevice(), (Stream)memoryStream);
+						}
+						finally
+						{
+							((GraphicsDeviceContext)(ref val)).Dispose();
+						}
 					}
 					catch (Exception ex) when (((ex is ShellException || ex is IOException || ex is UnauthorizedAccessException || ex is SecurityException || ex is InvalidOperationException) ? 1 : 0) != 0)
 					{
 						if (!(DateTime.UtcNow < dateTime))
 						{
 							ScreenshotManagerModule.Logger.Error(ex, ex.Message);
-							return ContentService.Textures.Pixel;
+							return Textures.get_Pixel();
 						}
 					}
 				}
-				return ContentService.Textures.Pixel;
+				return Textures.get_Pixel();
 			});
 		}
 
@@ -55,6 +64,8 @@ namespace Nekres.Screenshot_Manager
 		{
 			return await Task.Run((Func<Texture2D>)delegate
 			{
+				//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
 				DateTime dateTime = DateTime.UtcNow.AddMilliseconds(10000.0);
 				while (DateTime.UtcNow < dateTime)
 				{
@@ -74,19 +85,26 @@ namespace Nekres.Screenshot_Manager
 						byte[] array = new byte[memoryStream.Length];
 						memoryStream.Position = 0L;
 						memoryStream.Read(array, 0, array.Length);
-						using GraphicsDeviceContext graphicsDeviceContext = GameService.Graphics.LendGraphicsDeviceContext();
-						return Texture2D.FromStream(graphicsDeviceContext.GraphicsDevice, (Stream)memoryStream);
+						GraphicsDeviceContext val = GameService.Graphics.LendGraphicsDeviceContext();
+						try
+						{
+							return Texture2D.FromStream(((GraphicsDeviceContext)(ref val)).get_GraphicsDevice(), (Stream)memoryStream);
+						}
+						finally
+						{
+							((GraphicsDeviceContext)(ref val)).Dispose();
+						}
 					}
 					catch (Exception ex) when (((ex is IOException || ex is UnauthorizedAccessException || ex is SecurityException || ex is InvalidOperationException) ? 1 : 0) != 0)
 					{
 						if (!(DateTime.UtcNow < dateTime))
 						{
 							ScreenshotManagerModule.Logger.Error(ex, ex.Message);
-							return ContentService.Textures.Pixel;
+							return Textures.get_Pixel();
 						}
 					}
 				}
-				return ContentService.Textures.Pixel;
+				return Textures.get_Pixel();
 			});
 		}
 	}

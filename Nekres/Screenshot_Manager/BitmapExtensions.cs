@@ -5,6 +5,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Forms;
 
 namespace Nekres.Screenshot_Manager
@@ -60,20 +61,49 @@ namespace Nekres.Screenshot_Manager
 		{
 			try
 			{
-				DataObject dataObject = new DataObject();
-				dataObject.SetData(DataFormats.Bitmap, autoConvert: true, image);
+				System.Windows.Forms.DataObject dataObject = new System.Windows.Forms.DataObject();
+				dataObject.SetData(GetClipboardFormatString(ImageFormat.Bmp), autoConvert: true, image);
 				using (MemoryStream stream = new MemoryStream())
 				{
 					image.Save(stream, imageFormat);
 					stream.Position = 0L;
-					dataObject.SetData(imageFormat.ToString(), autoConvert: false, stream);
+					dataObject.SetData(GetClipboardFormatString(imageFormat), autoConvert: false, stream);
 				}
-				Clipboard.SetDataObject(dataObject, copy: true);
+				System.Windows.Forms.Clipboard.SetDataObject(dataObject, copy: true);
 			}
 			catch (Exception ex)
 			{
 				ScreenshotManagerModule.Logger.Warn(ex, ex.Message);
 			}
+		}
+
+		private static string GetClipboardFormatString(ImageFormat format)
+		{
+			if (object.Equals(format, ImageFormat.Bmp))
+			{
+				return System.Windows.DataFormats.Bitmap;
+			}
+			if (object.Equals(format, ImageFormat.Tiff))
+			{
+				return System.Windows.DataFormats.Tiff;
+			}
+			if (object.Equals(format, ImageFormat.Gif))
+			{
+				return "image/gif";
+			}
+			if (object.Equals(format, ImageFormat.Jpeg))
+			{
+				return "image/jpeg";
+			}
+			if (object.Equals(format, ImageFormat.Png))
+			{
+				return "image/png";
+			}
+			if (object.Equals(format, ImageFormat.Icon))
+			{
+				return "image/x-icon";
+			}
+			return "application/octet-stream";
 		}
 
 		public static Bitmap CompressToTargetSize(this Bitmap bitmap, long maxBytes)

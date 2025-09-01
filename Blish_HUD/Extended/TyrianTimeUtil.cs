@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Gw2Sharp.Models;
 
 namespace Blish_HUD.Extended
 {
@@ -57,10 +58,16 @@ namespace Blish_HUD.Extended
 
 		public static TyrianTime GetDayCycle(TimeSpan tyrianTime)
 		{
-			if (GameService.Gw2Mumble.IsAvailable)
+			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+			if (GameService.Gw2Mumble.get_IsAvailable())
 			{
-				double x = GameService.Gw2Mumble.UI.MapPosition.X;
-				double y = GameService.Gw2Mumble.UI.MapPosition.Y;
+				Coordinates2 mapPosition = GameService.Gw2Mumble.get_UI().get_MapPosition();
+				double x = ((Coordinates2)(ref mapPosition)).get_X();
+				mapPosition = GameService.Gw2Mumble.get_UI().get_MapPosition();
+				double y = ((Coordinates2)(ref mapPosition)).get_Y();
 				if (x > 20000.0 && x < 365000.0 && y > 97000.0 && y < 115000.0)
 				{
 					return GetDayCycleFromRegion(_canthanDayCycleIntervals, tyrianTime);
