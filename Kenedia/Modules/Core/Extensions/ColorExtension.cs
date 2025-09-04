@@ -1,6 +1,7 @@
 using System;
 using System.Drawing;
 using Gw2Sharp.Models;
+using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
 
 namespace Kenedia.Modules.Core.Extensions
@@ -177,9 +178,21 @@ namespace Kenedia.Modules.Core.Extensions
 			});
 		}
 
+		public static Gw2Sharp.WebApi.V2.Models.Color ToApiColor(this Color col)
+		{
+			Gw2Sharp.WebApi.V2.Models.Color color = new Gw2Sharp.WebApi.V2.Models.Color();
+			color.BaseRgb = new _003C_003Ez__ReadOnlyArray<int>(new int[4]
+			{
+				((Color)(ref col)).get_R(),
+				((Color)(ref col)).get_G(),
+				((Color)(ref col)).get_B(),
+				((Color)(ref col)).get_A()
+			});
+			return color;
+		}
+
 		public static string ToHex(this Color col)
 		{
-			Color.FromArgb(((Color)(ref col)).get_A(), ((Color)(ref col)).get_R(), ((Color)(ref col)).get_G(), ((Color)(ref col)).get_B());
 			return $"#{((Color)(ref col)).get_A():X2}{((Color)(ref col)).get_R():X2}{((Color)(ref col)).get_G():X2}{((Color)(ref col)).get_B():X2}";
 		}
 
@@ -191,7 +204,7 @@ namespace Kenedia.Modules.Core.Extensions
 			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
 			try
 			{
-				Color c = ColorTranslator.FromHtml(col);
+				System.Drawing.Color c = ColorTranslator.FromHtml(col);
 				outColor = new Color(c.R, c.G, c.B, c.A);
 				return true;
 			}

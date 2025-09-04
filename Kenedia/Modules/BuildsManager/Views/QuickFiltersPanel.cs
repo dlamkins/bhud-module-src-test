@@ -399,6 +399,10 @@ namespace Kenedia.Modules.BuildsManager.Views
 		private TagToggle AddTemplateTag(TemplateTag e, TagGroupPanel? parent = null, Action<TemplateTag>? action = null)
 		{
 			TemplateTag e2 = e;
+			if (e2 == null || string.IsNullOrEmpty(e2.Name) || _tagControls.SelectMany<KeyValuePair<TagGroupPanel, List<TagToggle>>, TagToggle>((KeyValuePair<TagGroupPanel, List<TagToggle>> x) => x.Value).Any((TagToggle x) => x.Tag == e2))
+			{
+				return null;
+			}
 			TagGroupPanel panel = parent ?? GetPanel(e2.Group);
 			Action<TemplateTag> a = action ?? ((Action<TemplateTag>)delegate
 			{
@@ -548,8 +552,10 @@ namespace Kenedia.Modules.BuildsManager.Views
 
 		private void CreateSpecToggles()
 		{
-			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+			_specPanel?.ClearChildren();
+			_specPanel?.Dispose();
 			_specPanel = new TagGroupPanel(new TagGroup(strings.Specializations), _tagPanel)
 			{
 				FlowDirection = ControlFlowDirection.LeftToRight,
@@ -572,8 +578,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 				{
 					continue;
 				}
-				TagToggle toggle;
-				_specToggles.Add(toggle = AddTemplateTag(new TemplateTag
+				TagToggle toggle = AddTemplateTag(new TemplateTag
 				{
 					Name = p.Name,
 					Group = strings.Specializations,
@@ -590,8 +595,12 @@ namespace Kenedia.Modules.BuildsManager.Views
 						SelectionPanel.BuildSelection.SpecializationFilterQueries.Add(isProfession);
 					}
 					SelectionPanel.BuildSelection.FilterTemplates();
-				}));
-				toggle.SetLocalizedTooltip = () => p.Name;
+				});
+				if (toggle != null)
+				{
+					_specToggles.Add(toggle);
+					toggle.SetLocalizedTooltip = () => p.Name;
+				}
 				foreach (Specialization value2 in p.Specializations.Values)
 				{
 					Specialization s = value2;
@@ -599,7 +608,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 					{
 						continue;
 					}
-					_specToggles.Add(toggle = AddTemplateTag(new TemplateTag
+					toggle = AddTemplateTag(new TemplateTag
 					{
 						Name = s.Name,
 						Group = strings.Specializations,
@@ -616,8 +625,12 @@ namespace Kenedia.Modules.BuildsManager.Views
 							SelectionPanel.BuildSelection.SpecializationFilterQueries.Add(isSpecialization);
 						}
 						SelectionPanel.BuildSelection.FilterTemplates();
-					}));
-					toggle.SetLocalizedTooltip = () => s.Name;
+					});
+					if (toggle != null)
+					{
+						_specToggles.Add(toggle);
+						toggle.SetLocalizedTooltip = () => s.Name;
+					}
 					bool isSpecialization(Template t)
 					{
 						return t.EliteSpecializationId == s.Id;

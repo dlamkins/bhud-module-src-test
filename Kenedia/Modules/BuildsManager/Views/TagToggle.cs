@@ -63,6 +63,11 @@ namespace Kenedia.Modules.BuildsManager.Views
 		{
 			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 			base.Size = new Point(TagHeight);
+			if (tag == null)
+			{
+				Logger.GetLogger(typeof(BuildsManager)).Error("TagToggle created with null tag.");
+				throw new ArgumentNullException("tag");
+			}
 			Tag = tag;
 			Tag.PropertyChanged += new PropertyChangedEventHandler(Tag_PropertyChanged);
 			Tag.Icon.Texture.TextureSwapped += Texture_TextureSwapped;

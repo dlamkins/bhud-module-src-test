@@ -16,9 +16,12 @@ namespace Kenedia.Modules.BuildsManager.Views
 	{
 		public Settings Settings { get; }
 
-		public SettingsView(Settings settings)
+		public Data Data { get; }
+
+		public SettingsView(Settings settings, Data data)
 		{
 			Settings = settings;
+			Data = data;
 		}
 
 		protected override void Build(Container buildPanel)
@@ -32,6 +35,8 @@ namespace Kenedia.Modules.BuildsManager.Views
 			//IL_048b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0599: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0683: Unknown result type (might be due to invalid IL or missing references)
+			//IL_081d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0841: Unknown result type (might be due to invalid IL or missing references)
 			base.Build(buildPanel);
 			Kenedia.Modules.Core.Controls.FlowPanel p = new Kenedia.Modules.Core.Controls.FlowPanel
 			{
@@ -252,6 +257,28 @@ namespace Kenedia.Modules.BuildsManager.Views
 				},
 				SetLocalizedText = () => strings.ShowQuickFilterPanelOnTabOpen_Name,
 				SetLocalizedTooltip = () => strings.ShowQuickFilterPanelOnTabOpen_Tooltip
+			};
+			fp = new Kenedia.Modules.Core.Controls.FlowPanel
+			{
+				Title = "Data Handling",
+				Parent = p,
+				WidthSizingMode = SizingMode.Fill,
+				HeightSizingMode = SizingMode.AutoSize,
+				AutoSizePadding = new Point(0, 20),
+				ContentPadding = new RectangleDimensions(10, 10),
+				ControlPadding = new Vector2(10f, 5f),
+				FlowDirection = ControlFlowDirection.TopToBottom
+			};
+			new Button
+			{
+				Parent = fp,
+				Width = 200,
+				Height = 30,
+				SetLocalizedText = () => "Check for updated data",
+				ClickAction = async delegate
+				{
+					await Data.Load(force: true);
+				}
 			};
 		}
 	}

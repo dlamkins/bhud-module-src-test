@@ -74,14 +74,12 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 
 		private void CreateStatSelectables()
 		{
-			//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-			if (_stats.Count > 0)
-			{
-				return;
-			}
+			//IL_00af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
+			_stats.Clear();
+			_statIcons.Clear();
 			int size = 25;
 			Point start = default(Point);
 			((Point)(ref start))._002Ector(0, 0);

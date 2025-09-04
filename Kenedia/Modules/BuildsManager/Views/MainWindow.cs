@@ -58,14 +58,14 @@ namespace Kenedia.Modules.BuildsManager.Views
 
 		public SettingsView SettingsView { get; private set; }
 
-		public MainWindow(Module module, MainWindowPresenter mainWindowPresenter, TemplatePresenter templatePresenter, TemplateTags templateTags, TagGroups tagGroups, SelectionPanel selectionPanel, AboutTab aboutTab, BuildTab buildTab, GearTab gearTab, QuickFiltersPanel quickFiltersPanel, Settings settings)
+		public MainWindow(Module module, MainWindowPresenter mainWindowPresenter, TemplatePresenter templatePresenter, TemplateTags templateTags, TagGroups tagGroups, SelectionPanel selectionPanel, AboutTab aboutTab, BuildTab buildTab, GearTab gearTab, QuickFiltersPanel quickFiltersPanel, Settings settings, Data data)
 		{
 			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b8: Unknown result type (might be due to invalid IL or missing references)
 			SelectionPanel selectionPanel2 = selectionPanel;
 			AboutTab aboutTab2 = aboutTab;
 			BuildTab buildTab2 = buildTab;
@@ -74,6 +74,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 			TemplateTags templateTags2 = templateTags;
 			TagGroups tagGroups2 = tagGroups;
 			Settings settings2 = settings;
+			Data data2 = data;
 			base._002Ector((AsyncTexture2D)TexturesService.GetTextureFromRef("textures\\mainwindow_background.png", "mainwindow_background"), new Rectangle(30, 30, 915, 665), new Rectangle(40, 20, 895, 665));
 			MainWindow mainWindow = this;
 			MainWindowPresenter = mainWindowPresenter;
@@ -101,7 +102,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 			TemplatePresenter.NameChanged += new ValueChangedEventHandler<string>(TemplatePresenter_NameChanged);
 			base.Tabs.Add(TemplateViewTab = new Tab(AsyncTexture2D.FromAssetId(156720), () => mainWindow.TemplateView = new TemplateView(mainWindow, selectionPanel2, aboutTab2, buildTab2, gearTab2, quickFiltersPanel2, mainWindow.MainWindowPresenter), strings.Templates));
 			base.Tabs.Add(TagEditViewTab = new Tab(TexturesService.GetTextureFromRef(textures_common.Tag, "Tag"), () => mainWindow.TagEditView = new TagEditView(templateTags2, tagGroups2, mainWindow.MainWindowPresenter), strings.Tags));
-			base.Tabs.Add(SettingsViewTab = new Tab(AsyncTexture2D.FromAssetId(157109), () => mainWindow.SettingsView = new SettingsView(settings2), strings_common.Settings));
+			base.Tabs.Add(SettingsViewTab = new Tab(AsyncTexture2D.FromAssetId(157109), () => mainWindow.SettingsView = new SettingsView(settings2, data2), strings_common.Settings));
 		}
 
 		private void TemplatePresenter_TemplateChanged(object sender, Kenedia.Modules.Core.Models.ValueChangedEventArgs<Template> e)
