@@ -69,8 +69,6 @@ namespace Kenedia.Modules.Characters.Services
 			}
 		}
 
-		public CharactersApiService CharactersApiService { get; }
-
 		public event EventHandler Succeeded;
 
 		public event EventHandler Failed;
@@ -81,12 +79,11 @@ namespace Kenedia.Modules.Characters.Services
 
 		public event EventHandler StatusChanged;
 
-		public CharacterSwapping(Settings settings, GameStateDetectionService gameState, ObservableCollection<Character_Model> characterModels, CharactersApiService charactersApiService)
+		public CharacterSwapping(Settings settings, GameStateDetectionService gameState, ObservableCollection<Character_Model> characterModels)
 		{
 			_settings = settings;
 			_gameState = gameState;
 			_rawCharacterModels = characterModels;
-			CharactersApiService = charactersApiService;
 		}
 
 		private bool IsTaskCanceled(CancellationToken cancellationToken)

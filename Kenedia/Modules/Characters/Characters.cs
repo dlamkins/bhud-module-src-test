@@ -67,8 +67,6 @@ namespace Kenedia.Modules.Characters
 
 		private CancellationTokenSource _characterFileTokenSource;
 
-		private CharactersApiService CharactersApiService;
-
 		public SearchFilterCollection SearchFilters { get; } = new SearchFilterCollection();
 
 
@@ -143,7 +141,6 @@ namespace Kenedia.Modules.Characters
 
 		protected override ServiceCollection DefineServices(ServiceCollection services)
 		{
-			services.AddSingleton<CharactersApiService>();
 			services.AddSingleton<ContextManager>();
 			services.AddSingleton<CharactersContext>();
 			services.AddSingleton<CharacterSwapping>();
@@ -224,9 +221,10 @@ namespace Kenedia.Modules.Characters
 		protected override async Task LoadAsync()
 		{
 			await base.LoadAsync();
-			GameService.Contexts.RegisterContext(ServiceProviderServiceExtensions.GetRequiredService<CharactersContext>(base.ServiceProvider));
-			CharactersApiService = new CharactersApiService();
-			CharactersApiService.Start();
+			if (GameService.Contexts.GetContext<CharactersContext>() == null)
+			{
+				GameService.Contexts.RegisterContext(ServiceProviderServiceExtensions.GetRequiredService<CharactersContext>(base.ServiceProvider));
+			}
 			CharacterSwapping = ServiceProviderServiceExtensions.GetRequiredService<CharacterSwapping>(base.ServiceProvider);
 			CharacterSorting = ServiceProviderServiceExtensions.GetRequiredService<CharacterSorting>(base.ServiceProvider);
 			CharacterSwapping.CharacterSorting = CharacterSorting;
