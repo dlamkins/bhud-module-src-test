@@ -6,7 +6,7 @@ namespace falcon.cmtracker
 {
 	internal class SettingUtil : INotifyPropertyChanged
 	{
-		private List<SettingValue> Setting = new List<SettingValue>();
+		private HashSet<SettingValue> Setting = new HashSet<SettingValue>(new SettingValueComparer());
 
 		private string _localSettingValue = "";
 
@@ -65,10 +65,10 @@ namespace falcon.cmtracker
 					break;
 				}
 			}
-			SettingString = ConvirtListToString(Setting);
+			SettingString = ConvertHashToString(Setting);
 		}
 
-		public string ConvirtListToString(List<SettingValue> arrayValues)
+		public string ConvertHashToString(HashSet<SettingValue> arrayValues)
 		{
 			string localValue = "";
 			foreach (SettingValue Item in arrayValues)
@@ -115,7 +115,7 @@ namespace falcon.cmtracker
 			{
 				Setting.Add(new SettingValue(accountName, boss, value: false));
 			}
-			SettingString = ConvirtListToString(Setting);
+			SettingString = ConvertHashToString(Setting);
 		}
 
 		public static SettingValue AddNewBoss(List<SettingValue> settingList, string account, Boss boss)
@@ -140,7 +140,7 @@ namespace falcon.cmtracker
 			{
 				item.Value = false;
 			}
-			SettingString = ConvirtListToString(Setting);
+			SettingString = ConvertHashToString(Setting);
 		}
 	}
 }

@@ -19,6 +19,8 @@ namespace falcon.cmtracker
 		Xunlai_Jade_Junkyard,
 		Kaineng_Overlook,
 		Harvest_Temple,
-		Old
+		Old,
+		Cosmic_Observatory,
+		Temple_Of_Febe
 	}
 }

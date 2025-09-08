@@ -31,6 +31,10 @@ namespace falcon.cmtracker
 
 		public static SettingEntry<string> CM_CLEARS;
 
+		public static SettingEntry<long> LAST_WEEKLY_RESET_TIMESTAMP_IN_SECONDS;
+
+		public static SettingEntry<bool> SHOULD_AUTOMATICALLY_RESET_CLEARS;
+
 		internal Texture2D _CmClearsIconTexture;
 
 		internal Texture2D _CmClearsLogoTexture;
@@ -97,6 +101,8 @@ namespace falcon.cmtracker
 			SettingCollection obj = settings.AddSubCollection("Managed Settings", false);
 			CURRENT_ACCOUNT = obj.DefineSetting<string>("CURRENT_ACCOUNT", "Local", (Func<string>)null, (Func<string>)null);
 			CM_CLEARS = obj.DefineSetting<string>("CM_CLEARS", "", (Func<string>)null, (Func<string>)null);
+			LAST_WEEKLY_RESET_TIMESTAMP_IN_SECONDS = settings.DefineSetting<long>("LAST_WEEKLY_RESET_TIMESTAMP_IN_SECONDS", UnixTimestampHelper.getLatestWeeklyServerResetTimestampInSeconds(), (Func<string>)null, (Func<string>)null);
+			SHOULD_AUTOMATICALLY_RESET_CLEARS = settings.DefineSetting<bool>("SHOULD_AUTOMATICALLY_RESET_CLEARS", true, (Func<string>)(() => "Reset clears on weekly reset"), (Func<string>)(() => "Indicates if you want to automatically reset clears after weekly server reset."));
 		}
 
 		protected override void Initialize()
@@ -253,7 +259,22 @@ namespace falcon.cmtracker
 			_displayedBosses.Clear();
 			FinishLoadingCmTrackerPanel(wndw, hPanel);
 			((Control)pageLoading).Dispose();
+			HandleWeeklyReset();
 			return hPanel;
+		}
+
+		private void HandleWeeklyReset()
+		{
+			long latestWeeklyServerReset = UnixTimestampHelper.getLatestWeeklyServerResetTimestampInSeconds();
+			if (latestWeeklyServerReset > LAST_WEEKLY_RESET_TIMESTAMP_IN_SECONDS.get_Value())
+			{
+				LAST_WEEKLY_RESET_TIMESTAMP_IN_SECONDS.set_Value(latestWeeklyServerReset);
+				if (SHOULD_AUTOMATICALLY_RESET_CLEARS.get_Value())
+				{
+					clearAllBosses();
+					CM_CLEARS.set_Value(_localSetting.SettingString);
+				}
+			}
 		}
 
 		private void RepositionTokens()
@@ -628,17 +649,7 @@ namespace falcon.cmtracker
 			});
 			((Control)yesAllButton).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-				foreach (Token token2 in _myBossesClears.Tokens)
-				{
-					token2.setting.Value = false;
-				}
-				foreach (BossButton displayedBoss2 in _displayedBosses)
-				{
-					displayedBoss2.Background = (displayedBoss2.Token.setting.Value ? Color.get_Green() : Color.get_Black());
-				}
-				_localSetting.ResetAllValues();
+				clearAllBosses();
 				((Control)clearCheckbox).set_Visible(true);
 				((Control)confirmPanel).set_Visible(false);
 			});
@@ -656,6 +667,21 @@ namespace falcon.cmtracker
 			val17.set_ShowTint(true);
 			contentPanel = val17;
 			SetupBossClears();
+		}
+
+		private void clearAllBosses()
+		{
+			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+			foreach (Token token in _myBossesClears.Tokens)
+			{
+				token.setting.Value = false;
+			}
+			foreach (BossButton displayedBoss in _displayedBosses)
+			{
+				displayedBoss.Background = (displayedBoss.Token.setting.Value ? Color.get_Green() : Color.get_Black());
+			}
+			_localSetting.ResetAllValues();
 		}
 
 		private void SetupBossClears()

@@ -10,21 +10,33 @@ namespace falcon.cmtracker.Persistance
 
 		public Bosses(List<SettingValue> setting)
 		{
-			Tokens = GenrateTokens(setting);
+			Tokens = GenerateTokens(setting);
 		}
 
-		private List<Token> GenrateTokens(List<SettingValue> setting)
+		private List<Token> GenerateTokens(List<SettingValue> setting)
+		{
+			List<Token> list = new List<Token>();
+			list.Add(new Token
+			{
+				Id = 77302,
+				Name = "Keep Construct",
+				Icon = "icon_keep_Construct.png",
+				setting = SettingUtil.GetSettingForBoss(setting, Module.CURRENT_ACCOUNT.get_Value(), Boss.Keep_Construct),
+				bossType = BossType.Raid
+			});
+			list.AddRange(GenerateBastionOfThePenitent(setting));
+			list.AddRange(GenerateHallOfChains(setting));
+			list.AddRange(GenerateMythwrightGambit(setting));
+			list.AddRange(GenerateTheKeyOfAdashim(setting));
+			list.AddRange(GenerateEndOfDragons(setting));
+			list.AddRange(GenerateSecretsOfTheObscure(setting));
+			return list;
+		}
+
+		private List<Token> GenerateBastionOfThePenitent(List<SettingValue> setting)
 		{
 			return new List<Token>
 			{
-				new Token
-				{
-					Id = 77302,
-					Name = "Keep Construct",
-					Icon = "icon_keep_Construct.png",
-					setting = SettingUtil.GetSettingForBoss(setting, Module.CURRENT_ACCOUNT.get_Value(), Boss.Keep_Construct),
-					bossType = BossType.Raid
-				},
 				new Token
 				{
 					Id = 77302,
@@ -56,7 +68,14 @@ namespace falcon.cmtracker.Persistance
 					Icon = "icon_deimos.png",
 					setting = SettingUtil.GetSettingForBoss(setting, Module.CURRENT_ACCOUNT.get_Value(), Boss.Deimos),
 					bossType = BossType.Raid
-				},
+				}
+			};
+		}
+
+		private List<Token> GenerateHallOfChains(List<SettingValue> setting)
+		{
+			return new List<Token>
+			{
 				new Token
 				{
 					Id = 77302,
@@ -72,7 +91,14 @@ namespace falcon.cmtracker.Persistance
 					Icon = "icon_dhuum.png",
 					setting = SettingUtil.GetSettingForBoss(setting, Module.CURRENT_ACCOUNT.get_Value(), Boss.Dhuum),
 					bossType = BossType.Raid
-				},
+				}
+			};
+		}
+
+		private List<Token> GenerateMythwrightGambit(List<SettingValue> setting)
+		{
+			return new List<Token>
+			{
 				new Token
 				{
 					Id = 77302,
@@ -96,7 +122,14 @@ namespace falcon.cmtracker.Persistance
 					Icon = "icon_qadim.png",
 					setting = SettingUtil.GetSettingForBoss(setting, Module.CURRENT_ACCOUNT.get_Value(), Boss.Qadim),
 					bossType = BossType.Raid
-				},
+				}
+			};
+		}
+
+		private List<Token> GenerateTheKeyOfAdashim(List<SettingValue> setting)
+		{
+			return new List<Token>
+			{
 				new Token
 				{
 					Id = 77302,
@@ -120,7 +153,14 @@ namespace falcon.cmtracker.Persistance
 					Icon = "icon_qadim2.png",
 					setting = SettingUtil.GetSettingForBoss(setting, Module.CURRENT_ACCOUNT.get_Value(), Boss.Qadim2),
 					bossType = BossType.Raid
-				},
+				}
+			};
+		}
+
+		private List<Token> GenerateEndOfDragons(List<SettingValue> setting)
+		{
+			return new List<Token>
+			{
 				new Token
 				{
 					Id = 77302,
@@ -159,6 +199,29 @@ namespace falcon.cmtracker.Persistance
 					Name = "Old Lion's Court",
 					Icon = "icon_old.png",
 					setting = SettingUtil.GetSettingForBoss(setting, Module.CURRENT_ACCOUNT.get_Value(), Boss.Old),
+					bossType = BossType.Strike
+				}
+			};
+		}
+
+		private List<Token> GenerateSecretsOfTheObscure(List<SettingValue> setting)
+		{
+			return new List<Token>
+			{
+				new Token
+				{
+					Id = 77302,
+					Name = "Cosmic Observatory",
+					Icon = "icon_cosmic_observatory.png",
+					setting = SettingUtil.GetSettingForBoss(setting, Module.CURRENT_ACCOUNT.get_Value(), Boss.Cosmic_Observatory),
+					bossType = BossType.Strike
+				},
+				new Token
+				{
+					Id = 77302,
+					Name = "Temple of Febe",
+					Icon = "icon_temple_of_febe.png",
+					setting = SettingUtil.GetSettingForBoss(setting, Module.CURRENT_ACCOUNT.get_Value(), Boss.Temple_Of_Febe),
 					bossType = BossType.Strike
 				}
 			};
