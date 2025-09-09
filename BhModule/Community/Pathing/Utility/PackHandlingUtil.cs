@@ -128,12 +128,18 @@ namespace BhModule.Community.Pathing.Utility
 				bool needsInit = true;
 				using (FileStream packStream = File.Open(tempPackDownloadDestination, FileMode.Open, FileAccess.Read, FileShare.Read))
 				{
-					ZipArchive val = new ZipArchive((Stream)packStream);
-					if (val.get_Entries().Count <= 0)
+					ZipArchive packArchive = new ZipArchive((Stream)packStream);
+					try
 					{
-						throw new InvalidDataException();
+						if (packArchive.get_Entries().Count <= 0)
+						{
+							throw new InvalidDataException();
+						}
 					}
-					val.Dispose();
+					finally
+					{
+						((IDisposable)packArchive)?.Dispose();
+					}
 				}
 				if ((int)((Module)module).get_RunState() == 2 && module.PackInitiator.PackState.UserResourceStates.Advanced.OptimizeMarkerPacks)
 				{
@@ -149,9 +155,21 @@ namespace BhModule.Community.Pathing.Utility
 					needsInit = false;
 					while (module.PackInitiator.IsLoading)
 					{
-						Thread.Sleep(1000);
+						await Task.Delay(1000);
 					}
-					File.Delete(finalPath);
+					for (int i = 5; i >= 0; i--)
+					{
+						try
+						{
+							File.Delete(finalPath);
+						}
+						catch (IOException) when (i > 0)
+						{
+							await Task.Delay(1500);
+							continue;
+						}
+						break;
+					}
 				}
 				try
 				{

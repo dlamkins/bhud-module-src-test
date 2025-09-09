@@ -27,6 +27,7 @@
       <HintPath>..\..\working\Neo.Lua.dll</HintPath>
     </Reference>
     <Reference Include="Gw2Sharp" />
+    <Reference Include="System.IO.Compression" />
     <Reference Include="System.Numerics" />
     <Reference Include="Cronos">
       <HintPath>..\..\working\Cronos.dll</HintPath>
@@ -51,7 +52,6 @@
     <Reference Include="Humanizer">
       <HintPath>..\..\working\Humanizer.dll</HintPath>
     </Reference>
-    <Reference Include="System.IO.Compression" />
     <Reference Include="System.Net.Http" />
   </ItemGroup>
 </Project>
