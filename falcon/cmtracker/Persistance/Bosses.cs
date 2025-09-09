@@ -28,6 +28,7 @@ namespace falcon.cmtracker.Persistance
 			list.AddRange(GenerateHallOfChains(setting));
 			list.AddRange(GenerateMythwrightGambit(setting));
 			list.AddRange(GenerateTheKeyOfAdashim(setting));
+			list.AddRange(GenerateTheMountBalrior(setting));
 			list.AddRange(GenerateEndOfDragons(setting));
 			list.AddRange(GenerateSecretsOfTheObscure(setting));
 			return list;
@@ -152,6 +153,37 @@ namespace falcon.cmtracker.Persistance
 					Name = "Qadim the Peerless",
 					Icon = "icon_qadim2.png",
 					setting = SettingUtil.GetSettingForBoss(setting, Module.CURRENT_ACCOUNT.get_Value(), Boss.Qadim2),
+					bossType = BossType.Raid
+				}
+			};
+		}
+
+		private List<Token> GenerateTheMountBalrior(List<SettingValue> setting)
+		{
+			return new List<Token>
+			{
+				new Token
+				{
+					Id = 77302,
+					Name = "Greer",
+					Icon = "icon_greer.png",
+					setting = SettingUtil.GetSettingForBoss(setting, Module.CURRENT_ACCOUNT.get_Value(), Boss.Greer),
+					bossType = BossType.Raid
+				},
+				new Token
+				{
+					Id = 77302,
+					Name = "Decima",
+					Icon = "icon_decima.png",
+					setting = SettingUtil.GetSettingForBoss(setting, Module.CURRENT_ACCOUNT.get_Value(), Boss.Decima),
+					bossType = BossType.Raid
+				},
+				new Token
+				{
+					Id = 77302,
+					Name = "Ura",
+					Icon = "icon_ura.png",
+					setting = SettingUtil.GetSettingForBoss(setting, Module.CURRENT_ACCOUNT.get_Value(), Boss.Ura),
 					bossType = BossType.Raid
 				}
 			};
