@@ -403,26 +403,39 @@ namespace Kenedia.Modules.BuildsManager.Views
 			{
 				return null;
 			}
+			if (e2?.Icon?.Texture == null)
+			{
+				BaseModule<BuildsManager, MainWindow, Kenedia.Modules.BuildsManager.Services.Settings, Paths>.Logger.Warn("Tag '" + e2.Name + "' in Group " + e2.Group + " has no icon.");
+				return null;
+			}
 			TagGroupPanel panel = parent ?? GetPanel(e2.Group);
 			Action<TemplateTag> a = action ?? ((Action<TemplateTag>)delegate
 			{
-				if (!SelectionPanel.BuildSelection.FilterQueries.Any<KeyValuePair<string, List<Func<Template, bool>>>>((KeyValuePair<string, List<Func<Template, bool>>> x) => x.Key == e2.Group))
+				if (e2?.Icon?.Texture == null)
 				{
-					SelectionPanel.BuildSelection.FilterQueries.Add(new KeyValuePair<string, List<Func<Template, bool>>>(e2.Group, new List<Func<Template, bool>>()));
+					BaseModule<BuildsManager, MainWindow, Kenedia.Modules.BuildsManager.Services.Settings, Paths>.Logger.Warn("[OnSelectedChanged]: Tag '" + e2.Name + "' in Group '" + e2.Group + "' has no icon.");
+					BaseModule<BuildsManager, MainWindow, Kenedia.Modules.BuildsManager.Services.Settings, Paths>.Logger.Warn(e2?.ToJson() ?? "");
 				}
-				KeyValuePair<string, List<Func<Template, bool>>> keyValuePair = SelectionPanel.BuildSelection.FilterQueries.FirstOrDefault<KeyValuePair<string, List<Func<Template, bool>>>>((KeyValuePair<string, List<Func<Template, bool>>> x) => x.Key == e2.Group);
-				if (keyValuePair.Value != null)
+				else
 				{
-					if (keyValuePair.Value.Contains(hasTag))
+					if (!SelectionPanel.BuildSelection.FilterQueries.Any<KeyValuePair<string, List<Func<Template, bool>>>>((KeyValuePair<string, List<Func<Template, bool>>> x) => x.Key == e2.Group))
 					{
-						keyValuePair.Value.Remove(hasTag);
+						SelectionPanel.BuildSelection.FilterQueries.Add(new KeyValuePair<string, List<Func<Template, bool>>>(e2.Group, new List<Func<Template, bool>>()));
 					}
-					else
+					KeyValuePair<string, List<Func<Template, bool>>> keyValuePair = SelectionPanel.BuildSelection.FilterQueries.FirstOrDefault<KeyValuePair<string, List<Func<Template, bool>>>>((KeyValuePair<string, List<Func<Template, bool>>> x) => x.Key == e2.Group);
+					if (keyValuePair.Value != null)
 					{
-						keyValuePair.Value.Add(hasTag);
+						if (keyValuePair.Value.Contains(hasTag))
+						{
+							keyValuePair.Value.Remove(hasTag);
+						}
+						else
+						{
+							keyValuePair.Value.Add(hasTag);
+						}
 					}
+					SelectionPanel.BuildSelection.FilterTemplates();
 				}
-				SelectionPanel.BuildSelection.FilterTemplates();
 			});
 			TagToggle t2 = new TagToggle(e2)
 			{

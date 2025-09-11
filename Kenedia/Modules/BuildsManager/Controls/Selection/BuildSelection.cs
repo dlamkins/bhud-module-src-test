@@ -228,22 +228,29 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 
 		public void FilterTemplates()
 		{
-			string lowerTxt = Search.Text?.Trim().ToLower();
-			bool anyName = string.IsNullOrEmpty(lowerTxt);
-			foreach (TemplateSelectable template in TemplateSelectables)
+			try
 			{
-				bool filterQueriesMatches = FilterQueries.Count == 0 || FilterQueries.All<KeyValuePair<string, List<Func<Template, bool>>>>((KeyValuePair<string, List<Func<Template, bool>>> x) => x.Value.Count == 0 || x.Value.Any((Func<Template, bool> x) => x(template.Template)));
-				bool specMatches = SpecializationFilterQueries.Count == 0 || SpecializationFilterQueries.Any((Func<Template, bool> x) => x(template.Template));
-				bool nameMatches = anyName || template.Template.Name.ToLower().Contains(lowerTxt);
-				bool lastModifiedMatch = template.Template.LastModified.ToLower().Contains(lowerTxt);
-				template.Visible = filterQueriesMatches && specMatches && (nameMatches || lastModifiedMatch);
+				string lowerTxt = Search.Text?.Trim().ToLower();
+				bool anyName = string.IsNullOrEmpty(lowerTxt);
+				foreach (TemplateSelectable template in TemplateSelectables)
+				{
+					bool filterQueriesMatches = FilterQueries.Count == 0 || FilterQueries.All<KeyValuePair<string, List<Func<Template, bool>>>>((KeyValuePair<string, List<Func<Template, bool>>> x) => x.Value.Count == 0 || x.Value.Any((Func<Template, bool> x) => x(template.Template)));
+					bool specMatches = SpecializationFilterQueries.Count == 0 || SpecializationFilterQueries.Any((Func<Template, bool> x) => x(template.Template));
+					bool nameMatches = anyName || template.Template.Name.ToLower().Contains(lowerTxt);
+					bool lastModifiedMatch = template.Template.LastModified.ToLower().Contains(lowerTxt);
+					template.Visible = filterQueriesMatches && specMatches && (nameMatches || lastModifiedMatch);
+				}
+				SortTemplates();
+				TemplateSelectable current = TemplateSelectables.FirstOrDefault((TemplateSelectable x) => x.Template == TemplatePresenter.Template);
+				if ((((!(current?.Visible)) ?? true) && Settings.RequireVisibleTemplate.Value) || current?.Template == Template.Empty)
+				{
+					TemplateSelectable t = SelectionContent.OfType<TemplateSelectable>().FirstOrDefault((TemplateSelectable x) => x.Visible);
+					TemplatePresenter.SetTemplate(((t != null) ? t : null)?.Template);
+				}
 			}
-			SortTemplates();
-			TemplateSelectable current = TemplateSelectables.FirstOrDefault((TemplateSelectable x) => x.Template == TemplatePresenter.Template);
-			if ((((!(current?.Visible)) ?? true) && Settings.RequireVisibleTemplate.Value) || current?.Template == Template.Empty)
+			catch (Exception ex)
 			{
-				TemplateSelectable t = SelectionContent.OfType<TemplateSelectable>().FirstOrDefault((TemplateSelectable x) => x.Visible);
-				TemplatePresenter.SetTemplate(((t != null) ? t : null)?.Template);
+				BaseModule<BuildsManager, MainWindow, Kenedia.Modules.BuildsManager.Services.Settings, Paths>.Logger.Debug(ex, "Error while filtering templates");
 			}
 		}
 

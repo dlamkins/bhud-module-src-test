@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel;
 using Blish_HUD.Content;
 using Kenedia.Modules.BuildsManager.Res;
@@ -149,6 +150,18 @@ namespace Kenedia.Modules.BuildsManager.Models
 		private void OnGroupChanged(object sender, ValueChangedEventArgs<string> e)
 		{
 			this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Group"));
+		}
+
+		public string ToJson()
+		{
+			try
+			{
+				return JsonConvert.SerializeObject((object)this);
+			}
+			catch (Exception)
+			{
+				return string.Empty;
+			}
 		}
 	}
 }

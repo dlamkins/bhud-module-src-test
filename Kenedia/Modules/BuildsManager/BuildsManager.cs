@@ -115,6 +115,14 @@ namespace Kenedia.Modules.BuildsManager
 			TemplatePresenter = ServiceProviderServiceExtensions.GetRequiredService<TemplatePresenter>(base.ServiceProvider);
 			TemplateTags = ServiceProviderServiceExtensions.GetRequiredService<TemplateTags>(base.ServiceProvider);
 			GW2API = ServiceProviderServiceExtensions.GetRequiredService<GW2API>(base.ServiceProvider);
+			Data.Loaded += new EventHandler(Data_Loaded);
+		}
+
+		private async void Data_Loaded(object sender, EventArgs e)
+		{
+			await ServiceProviderServiceExtensions.GetService<TagGroups>(base.ServiceProvider)!.Load();
+			await TemplateTags.Load();
+			await Templates.Load();
 		}
 
 		protected override void DefineSettings(SettingCollection settings)
@@ -160,9 +168,6 @@ namespace Kenedia.Modules.BuildsManager
 		{
 			LoadingSpinner?.Show();
 			await base.LoadAsync();
-			await ServiceProviderServiceExtensions.GetService<TagGroups>(base.ServiceProvider)!.Load();
-			await TemplateTags.Load();
-			await Templates.Load();
 			await Data.Load();
 		}
 
