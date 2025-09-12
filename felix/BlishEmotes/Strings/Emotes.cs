@@ -42,6 +42,8 @@ namespace felix.BlishEmotes.Strings
 			}
 		}
 
+		internal static string barbecue => ResourceManager.GetString("barbecue", resourceCulture);
+
 		internal static string beckon => ResourceManager.GetString("beckon", resourceCulture);
 
 		internal static string bless => ResourceManager.GetString("bless", resourceCulture);
@@ -53,6 +55,8 @@ namespace felix.BlishEmotes.Strings
 		internal static string bow => ResourceManager.GetString("bow", resourceCulture);
 
 		internal static string breakdance => ResourceManager.GetString("breakdance", resourceCulture);
+
+		internal static string channel => ResourceManager.GetString("channel", resourceCulture);
 
 		internal static string cheer => ResourceManager.GetString("cheer", resourceCulture);
 
