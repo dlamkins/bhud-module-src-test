@@ -5,7 +5,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Gw2Sharp.Models;
 using Gw2Sharp.WebApi.V2.Models;
@@ -15,6 +15,12 @@ namespace Nekres.Mistwar
 {
 	internal static class MapUtil
 	{
+		private const int MAX_ZOOM = 7;
+
+		private const int TILE_SIZE = 256;
+
+		private const int PADDING = 0;
+
 		public static async Task BuildMap(Map map, string filePath, bool removeBackground = false, IProgress<string> progress = null)
 		{
 			if (map == null)
@@ -22,70 +28,65 @@ namespace Nekres.Mistwar
 				return;
 			}
 			Rectangle area = map.get_ContinentRect();
-			int zoom = 6;
-			int padding = 0;
 			List<Point> tileArea = GetAreaTileList(area);
 			Coordinates2 topLeftPx = ((Rectangle)(ref area)).get_TopLeft();
 			Coordinates2 rightBottomPx = ((Rectangle)(ref area)).get_BottomRight();
 			Point pxDelta = default(Point);
 			((Point)(ref pxDelta))._002Ector((int)(((Coordinates2)(ref rightBottomPx)).get_X() - ((Coordinates2)(ref topLeftPx)).get_X()), (int)(((Coordinates2)(ref rightBottomPx)).get_Y() - ((Coordinates2)(ref topLeftPx)).get_Y()));
-			Bitmap bmpDestination = new Bitmap(pxDelta.X + padding * 2, pxDelta.Y + padding * 2);
+			Bitmap bmpDestination = new Bitmap(pxDelta.X, pxDelta.Y);
 			using (Graphics gfx = Graphics.FromImage(bmpDestination))
 			{
 				gfx.CompositingMode = CompositingMode.SourceOver;
 				foreach (Point p in tileArea)
 				{
 					progress?.Report($"Downloading {map.get_Name().Trim()} ({map.get_Id()})... {(float)tileArea.IndexOf(p) / (float)(tileArea.Count - 1) * 100f:N0}%");
-					Bitmap tile = await GetTileImage(0, map.get_ContinentId(), map.get_DefaultFloor(), p.X, p.Y, zoom);
+					using Bitmap tile = await GetTileImage(0, map.get_ContinentId(), map.get_DefaultFloor(), p.X, p.Y, 7);
 					if (tile != null)
 					{
-						using (tile)
-						{
-							long x = (long)((double)(p.X * tile.Width) - ((Coordinates2)(ref topLeftPx)).get_X() + (double)padding);
-							long y = (long)((double)(p.Y * tile.Height) - ((Coordinates2)(ref topLeftPx)).get_Y() + (double)padding);
-							gfx.DrawImage(tile, x, y, tile.Width, tile.Height);
-						}
+						long x = (long)((double)(p.X * tile.Width) - ((Coordinates2)(ref topLeftPx)).get_X() + 0.0);
+						long y = (long)((double)(p.Y * tile.Height) - ((Coordinates2)(ref topLeftPx)).get_Y() + 0.0);
+						gfx.DrawImage(tile, x, y, tile.Width, tile.Height);
 					}
 				}
 				gfx.Flush();
 				if (removeBackground)
 				{
-					ContinentFloorRegionMap obj = await MistwarModule.ModuleInstance.Resources.GetMapExpanded(map, map.get_DefaultFloor());
-					GraphicsPath polygonPath = new GraphicsPath
+					ContinentFloorRegionMap mapExp = await MistwarModule.ModuleInstance.Resources.GetMapExpanded(map, map.get_DefaultFloor());
+					if (mapExp != null && mapExp.get_Sectors().Count > 0)
 					{
-						FillMode = FillMode.Alternate
-					};
-					foreach (ContinentFloorRegionMapSector value in obj.get_Sectors().Values)
-					{
-						Point[] bbox = (from coord in value.get_Bounds()
-							select Refit(coord, topLeftPx, padding)).ToArray();
-						polygonPath.AddPolygon(bbox);
+						GraphicsPath polygonPath = new GraphicsPath();
+						polygonPath.FillMode = FillMode.Alternate;
+						foreach (ContinentFloorRegionMapSector value in mapExp.get_Sectors().Values)
+						{
+							Point[] bbox = (from coord in value.get_Bounds()
+								select Refit(coord, topLeftPx)).ToArray();
+							polygonPath.AddPolygon(bbox);
+						}
+						Region region = new Region();
+						region.MakeInfinite();
+						region.Exclude(polygonPath);
+						gfx.CompositingMode = CompositingMode.SourceCopy;
+						gfx.FillRegion(Brushes.Transparent, region);
 					}
-					Region region = new Region();
-					region.MakeInfinite();
-					region.Exclude(polygonPath);
-					gfx.CompositingMode = CompositingMode.SourceCopy;
-					gfx.FillRegion(Brushes.Transparent, region);
 				}
 			}
 			bmpDestination.Save(filePath, ImageFormat.Png);
 			bmpDestination.Dispose();
 		}
 
-		public static Point Refit(Coordinates2 value, Coordinates2 destTopLeft, int padding = 0, int tileSize = 256)
+		public static Point Refit(Coordinates2 value, Coordinates2 destTopLeft, int padding = 0)
 		{
 			Coordinates2 node = default(Coordinates2);
-			((Coordinates2)(ref node))._002Ector(((Coordinates2)(ref value)).get_X() / (double)tileSize, ((Coordinates2)(ref value)).get_Y() / (double)tileSize);
-			int x = (int)(((Coordinates2)(ref node)).get_X() * (double)tileSize - ((Coordinates2)(ref destTopLeft)).get_X() + (double)padding);
-			int y = (int)(((Coordinates2)(ref node)).get_Y() * (double)tileSize - ((Coordinates2)(ref destTopLeft)).get_Y() + (double)padding);
+			((Coordinates2)(ref node))._002Ector(((Coordinates2)(ref value)).get_X() / 256.0, ((Coordinates2)(ref value)).get_Y() / 256.0);
+			int x = (int)(((Coordinates2)(ref node)).get_X() * 256.0 - ((Coordinates2)(ref destTopLeft)).get_X() + (double)padding);
+			int y = (int)(((Coordinates2)(ref node)).get_Y() * 256.0 - ((Coordinates2)(ref destTopLeft)).get_Y() + (double)padding);
 			return new Point(x, y);
 		}
 
-		private static Point FromPixelToTileXy(Coordinates2 p, int zoom = 8)
+		private static Point FromPixelToTileXy(Coordinates2 p, int zoom = 7)
 		{
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			int tileSize = zoom * 32;
-			return new Point((int)(((Coordinates2)(ref p)).get_X() / (double)tileSize), (int)(((Coordinates2)(ref p)).get_Y() / (double)tileSize));
+			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+			return new Point((int)(((Coordinates2)(ref p)).get_X() / 256.0), (int)(((Coordinates2)(ref p)).get_Y() / 256.0));
 		}
 
 		private static List<Point> GetAreaTileList(Rectangle rect)
@@ -116,20 +117,34 @@ namespace Nekres.Mistwar
 			return list;
 		}
 
-		private static async Task<Bitmap> GetTileImage(int dnsAlias, int continentId, int floor, int x, int y, int zoom = 6)
+		private static async Task<Bitmap> GetTileImage(int dnsAlias, int continentId, int floor, int x, int y, int zoom)
 		{
 			if (zoom < 0 || zoom > 7)
 			{
-				return null;
+				throw new ArgumentOutOfRangeException("zoom");
 			}
-			string dns = ((dnsAlias > 0 && dnsAlias < 5) ? dnsAlias.ToString() : string.Empty);
-			using WebResponse response = await WebRequest.Create($"https://tiles{dns}.guildwars2.com/{continentId}/{floor}/{zoom}/{x}/{y}.jpg").GetResponseAsync();
-			using Stream responseStream = response.GetResponseStream();
-			if (responseStream == null)
+			string dns = ((dnsAlias >= 1 && dnsAlias <= 4) ? dnsAlias.ToString() : "1");
+			string url = $"https://tiles{dns}.guildwars2.com/{continentId}/{floor}/{zoom}/{x}/{y}.jpg";
+			try
+			{
+				HttpClient client = new HttpClient();
+				try
+				{
+					using Stream responseStream = await client.GetStreamAsync(url);
+					using MemoryStream ms = new MemoryStream();
+					await responseStream.CopyToAsync(ms);
+					ms.Position = 0L;
+					return new Bitmap(ms);
+				}
+				finally
+				{
+					((IDisposable)client)?.Dispose();
+				}
+			}
+			catch (Exception)
 			{
 				return null;
 			}
-			return new Bitmap(responseStream);
 		}
 	}
 }

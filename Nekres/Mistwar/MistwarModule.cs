@@ -147,20 +147,19 @@ namespace Nekres.Mistwar
 
 		protected override void OnModuleLoaded(EventArgs e)
 		{
-			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0032: Expected O, but got Unknown
+			//IL_0102: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010c: Expected O, but got Unknown
 			CornerTex = ContentsManager.GetTexture("corner_icon.png");
-			_moduleIcon = new CornerIcon(AsyncTexture2D.op_Implicit(CornerTex), ((Module)this).get_Name());
 			ColorIntensitySetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OnColorIntensitySettingChanged);
 			ToggleMapKeySetting.get_Value().add_Activated((EventHandler<EventArgs>)OnToggleKeyActivated);
 			ToggleMarkersKeySetting.get_Value().add_Activated((EventHandler<EventArgs>)OnToggleMarkersKeyActivated);
 			EnableMarkersSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnEnableMarkersSettingChanged);
 			GameService.Gw2Mumble.get_CurrentMap().add_MapChanged((EventHandler<ValueEventArgs<int>>)OnMapChanged);
 			GameService.Gw2Mumble.get_UI().add_IsMapOpenChanged((EventHandler<ValueEventArgs<bool>>)OnIsMapOpenChanged);
-			GameService.GameIntegration.get_Gw2Instance().add_IsInGameChanged((EventHandler<ValueEventArgs<bool>>)OnIsInGameChanged);
 			ToggleMapKeySetting.get_Value().set_Enabled(true);
 			ToggleMarkersKeySetting.get_Value().set_Enabled(true);
 			OnColorIntensitySettingChanged(null, new ValueChangedEventArgs<float>(0f, ColorIntensitySetting.get_Value()));
+			_moduleIcon = new CornerIcon(AsyncTexture2D.op_Implicit(CornerTex), ((Module)this).get_Name());
 			((Control)_moduleIcon).add_Click((EventHandler<MouseEventArgs>)OnModuleIconClick);
 			Maps.DownloadMaps(WvW.GetWvWMapIds());
 			((Module)this).OnModuleLoaded(e);
@@ -184,18 +183,12 @@ namespace Nekres.Mistwar
 
 		private void UpdateModuleLoading(string loadingMessage)
 		{
-			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-			if (_moduleIcon == null)
+			if (_moduleIcon != null)
 			{
-				return;
-			}
-			_moduleIcon.set_LoadingMessage(loadingMessage);
-			if (loadingMessage == null && !GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWvWMatch())
-			{
-				CornerIcon moduleIcon = _moduleIcon;
-				if (moduleIcon != null)
+				_moduleIcon.set_LoadingMessage(loadingMessage);
+				if (loadingMessage == null)
 				{
-					((Control)moduleIcon).Dispose();
+					InvalidateCornerIcon();
 				}
 			}
 		}
@@ -213,7 +206,7 @@ namespace Nekres.Mistwar
 				GameService.Content.PlaySoundEffectByName("error");
 				return false;
 			}
-			if (Maps.IsLoading)
+			if (Maps.IsLoading || !Maps.IsAvailable)
 			{
 				ScreenNotification.ShowNotification(((Module)this).get_Name() + " unavailable. Map not loaded.", (NotificationType)2, (Texture2D)null, 4);
 				GameService.Content.PlaySoundEffectByName("error");
@@ -248,6 +241,11 @@ namespace Nekres.Mistwar
 
 		private void OnMapChanged(object o, ValueEventArgs<int> e)
 		{
+			InvalidateCornerIcon();
+		}
+
+		private void InvalidateCornerIcon()
+		{
 			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0043: Expected O, but got Unknown
@@ -269,33 +267,7 @@ namespace Nekres.Mistwar
 				{
 					((Control)moduleIcon2).Dispose();
 				}
-				ToggleMapKeySetting.get_Value().set_Enabled(false);
-			}
-		}
-
-		private void OnIsInGameChanged(object o, ValueEventArgs<bool> e)
-		{
-			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004b: Expected O, but got Unknown
-			if (e.get_Value() && GameService.Gw2Mumble.get_CurrentMap().get_Type().IsWvWMatch())
-			{
-				CornerIcon moduleIcon = _moduleIcon;
-				if (moduleIcon != null)
-				{
-					((Control)moduleIcon).Dispose();
-				}
-				_moduleIcon = new CornerIcon(AsyncTexture2D.op_Implicit(CornerTex), ((Module)this).get_Name());
-				((Control)_moduleIcon).add_Click((EventHandler<MouseEventArgs>)OnModuleIconClick);
-				ToggleMapKeySetting.get_Value().set_Enabled(true);
-			}
-			else
-			{
-				CornerIcon moduleIcon2 = _moduleIcon;
-				if (moduleIcon2 != null)
-				{
-					((Control)moduleIcon2).Dispose();
-				}
+				_moduleIcon = null;
 				ToggleMapKeySetting.get_Value().set_Enabled(false);
 			}
 		}
@@ -333,7 +305,6 @@ namespace Nekres.Mistwar
 			EnableMarkersSetting.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnEnableMarkersSettingChanged);
 			ToggleMapKeySetting.get_Value().set_Enabled(false);
 			ToggleMarkersKeySetting.get_Value().set_Enabled(false);
-			GameService.GameIntegration.get_Gw2Instance().remove_IsInGameChanged((EventHandler<ValueEventArgs<bool>>)OnIsInGameChanged);
 			GameService.Gw2Mumble.get_CurrentMap().remove_MapChanged((EventHandler<ValueEventArgs<int>>)OnMapChanged);
 			GameService.Gw2Mumble.get_UI().remove_IsMapOpenChanged((EventHandler<ValueEventArgs<bool>>)OnIsMapOpenChanged);
 			Maps?.Dispose();
