@@ -1,9 +1,10 @@
+using System;
 using Blish_HUD;
 using Blish_HUD.Content;
 
 namespace Tortle.PlayerMarker.Models
 {
-	internal abstract class ModuleManagedTextureBase
+	internal abstract class ModuleManagedTextureBase : IDisposable
 	{
 		protected AsyncTexture2D _texture;
 
@@ -11,6 +12,16 @@ namespace Tortle.PlayerMarker.Models
 
 		public void Dispose()
 		{
+			Dispose(disposing: true);
+			GC.SuppressFinalize(this);
+		}
+
+		protected virtual void Dispose(bool disposing)
+		{
+			if (!disposing)
+			{
+				return;
+			}
 			AsyncTexture2D texture = _texture;
 			if (((texture != null) ? texture.get_Texture() : null) != Textures.get_Error())
 			{

@@ -9,11 +9,17 @@ using Tortle.PlayerMarker.Models;
 
 namespace Tortle.PlayerMarker.Entity
 {
-	internal class PlayerMarker : IEntity, IUpdatable, IRenderable3D
+	internal sealed class PlayerMarker : IEntity, IUpdatable, IRenderable3D, IDisposable
 	{
+		private static readonly Logger Logger = Logger.GetLogger(typeof(PlayerMarker));
+
 		private readonly VertexPositionColorTexture[] _vertex;
 
 		private ITexture _markerTexture;
+
+		private BasicEffect _effect;
+
+		private VertexBuffer _buffer;
 
 		public ITexture MarkerTexture
 		{
@@ -62,6 +68,25 @@ namespace Tortle.PlayerMarker.Entity
 			Visible = false;
 			VerticalOffset = 0f;
 			_vertex = (VertexPositionColorTexture[])(object)new VertexPositionColorTexture[4];
+		}
+
+		public void Dispose()
+		{
+			Logger.Debug("Disposing");
+			VertexBuffer buffer = _buffer;
+			if (buffer != null)
+			{
+				((GraphicsResource)buffer).Dispose();
+			}
+			_buffer = null;
+			BasicEffect effect = _effect;
+			if (effect != null)
+			{
+				((GraphicsResource)effect).Dispose();
+			}
+			_effect = null;
+			_markerTexture?.Dispose();
+			_markerTexture = null;
 		}
 
 		public void UpdateMarker()
@@ -130,21 +155,17 @@ namespace Tortle.PlayerMarker.Entity
 			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0105: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0106: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e9: Expected O, but got Unknown
+			//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0113: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0123: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0137: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013e: Expected O, but got Unknown
-			//IL_015e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0163: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0167: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0171: Expected O, but got Unknown
+			//IL_019f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a4: Unknown result type (might be due to invalid IL or missing references)
 			if (!Visible || MarkerTexture == null)
 			{
 				return;
@@ -157,18 +178,25 @@ namespace Tortle.PlayerMarker.Entity
 			Matrix rotationMatrixZ = Matrix.CreateRotationZ((float)((double)panAngleRad - Math.PI / 2.0));
 			Matrix translationMatrix = Matrix.CreateTranslation(x, y, z);
 			Matrix worldMatrix = Matrix.Multiply(Matrix.Multiply(val, rotationMatrixZ), translationMatrix);
-			BasicEffect val2 = new BasicEffect(graphicsDevice);
-			val2.set_VertexColorEnabled(true);
-			val2.set_TextureEnabled(true);
-			val2.set_View(GameService.Gw2Mumble.get_PlayerCamera().get_View());
-			val2.set_Projection(GameService.Gw2Mumble.get_PlayerCamera().get_Projection());
-			val2.set_World(worldMatrix);
-			val2.set_Texture(AsyncTexture2D.op_Implicit(MarkerTexture.Get()));
-			val2.set_Alpha(MarkerOpacity);
-			VertexBuffer geometryBuffer = new VertexBuffer(graphicsDevice, VertexPositionColorTexture.VertexDeclaration, 4, (BufferUsage)1);
-			geometryBuffer.SetData<VertexPositionColorTexture>(_vertex);
-			graphicsDevice.SetVertexBuffer(geometryBuffer, 0);
-			Enumerator enumerator = ((Effect)val2).get_CurrentTechnique().get_Passes().GetEnumerator();
+			if (_effect == null)
+			{
+				BasicEffect val2 = new BasicEffect(graphicsDevice);
+				val2.set_VertexColorEnabled(true);
+				val2.set_TextureEnabled(true);
+				_effect = val2;
+			}
+			_effect.set_View(GameService.Gw2Mumble.get_PlayerCamera().get_View());
+			_effect.set_Projection(GameService.Gw2Mumble.get_PlayerCamera().get_Projection());
+			_effect.set_World(worldMatrix);
+			_effect.set_Alpha(MarkerOpacity);
+			_effect.set_Texture(AsyncTexture2D.op_Implicit(MarkerTexture.Get()));
+			if (_buffer == null)
+			{
+				_buffer = new VertexBuffer(graphicsDevice, VertexPositionColorTexture.VertexDeclaration, 4, (BufferUsage)1);
+			}
+			_buffer.SetData<VertexPositionColorTexture>(_vertex);
+			graphicsDevice.SetVertexBuffer(_buffer, 0);
+			Enumerator enumerator = ((Effect)_effect).get_CurrentTechnique().get_Passes().GetEnumerator();
 			try
 			{
 				while (((Enumerator)(ref enumerator)).MoveNext())

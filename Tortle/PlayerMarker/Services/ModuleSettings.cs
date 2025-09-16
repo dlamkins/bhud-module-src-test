@@ -9,7 +9,7 @@ using Tortle.PlayerMarker.Util;
 
 namespace Tortle.PlayerMarker.Services
 {
-	internal class ModuleSettings : IDisposable
+	internal sealed class ModuleSettings : IDisposable
 	{
 		private static readonly Logger Logger = Logger.GetLogger(typeof(ModuleSettings));
 

@@ -9,7 +9,7 @@ using Tortle.PlayerMarker.Models;
 
 namespace Tortle.PlayerMarker.Services
 {
-	internal class MarkerTextureManager : IDisposable
+	internal sealed class MarkerTextureManager : IDisposable
 	{
 		private static readonly Logger Logger = Logger.GetLogger(typeof(MarkerTextureManager));
 
@@ -145,7 +145,7 @@ namespace Tortle.PlayerMarker.Services
 			}
 		}
 
-		private bool TryDelete(string filePath)
+		private static bool TryDelete(string filePath)
 		{
 			try
 			{

@@ -16,7 +16,7 @@ using Tortle.PlayerMarker.Services;
 
 namespace Tortle.PlayerMarker.Views
 {
-	internal class SettingsView : View, IDisposable
+	internal sealed class SettingsView : View, IDisposable
 	{
 		private const int SliderWidth = 175;
 

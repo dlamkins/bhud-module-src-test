@@ -87,6 +87,7 @@ namespace Tortle.PlayerMarker
 			_markerTextureManager.Dispose();
 			_settingsView.Dispose();
 			GameService.Graphics.get_World().RemoveEntity((IEntity)(object)_playerMarker);
+			_playerMarker.Dispose();
 		}
 
 		private void NormalizeSettings()

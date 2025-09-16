@@ -28,7 +28,16 @@ namespace Tortle.PlayerMarker.Models
 
 		public void Dispose()
 		{
-			_texture = null;
+			Dispose(disposing: true);
+			GC.SuppressFinalize(this);
+		}
+
+		protected virtual void Dispose(bool disposing)
+		{
+			if (disposing)
+			{
+				_texture = null;
+			}
 		}
 	}
 }
