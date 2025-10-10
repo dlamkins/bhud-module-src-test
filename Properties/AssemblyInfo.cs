@@ -6,7 +6,7 @@ using System.Runtime.Versioning;
 [assembly: AssemblyCompany("CommanderMarkers")]
 [assembly: AssemblyConfiguration("Release")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
-[assembly: AssemblyInformationalVersion("1.0.0+7c3b2081596f7b8746e5e57d65213711aafa938c")]
+[assembly: AssemblyInformationalVersion("1.0.0+ba884c677503ab824f7b5757a773c0086ade436c")]
 [assembly: AssemblyProduct("CommanderMarkers")]
 [assembly: AssemblyTitle("CommanderMarkers")]
 [assembly: AssemblyVersion("1.0.0.0")]

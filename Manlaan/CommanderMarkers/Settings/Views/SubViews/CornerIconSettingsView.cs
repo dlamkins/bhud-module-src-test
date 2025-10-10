@@ -27,6 +27,7 @@ namespace Manlaan.CommanderMarkers.Settings.Views.SubViews
 			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
 			_settings = Service.Settings;
 			((View<IPresenter>)this).Build(buildPanel);
 			FlowPanel panel = FlowPanelExtensions.BeginFlow(new FlowPanel(), buildPanel).AddString("Top-left menu bar icon settings").AddSetting((SettingEntry)(object)_settings.CornerIconEnabled)
@@ -51,9 +52,10 @@ namespace Manlaan.CommanderMarkers.Settings.Views.SubViews
 			});
 			Label val2 = new Label();
 			((Control)val2).set_Parent(buildPanel);
-			((Control)val2).set_Location(new Point(20, ((Control)buildPanel).get_Height() - 30));
-			val2.set_Text("Special Thank You to the testers: QuitarHero, Kami, and Naru");
+			((Control)val2).set_Location(new Point(20, ((Control)buildPanel).get_Height() - 50));
+			val2.set_Text("Special Thank You to the testers: QuitarHero, Kami, and Naru\nand to Metallis for the module icon");
 			val2.set_AutoSizeWidth(true);
+			val2.set_AutoSizeHeight(true);
 		}
 
 		public CornerIconSettingsView()

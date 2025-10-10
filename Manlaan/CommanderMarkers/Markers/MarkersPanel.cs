@@ -7,6 +7,9 @@ using Blish_HUD.Controls.Extern;
 using Blish_HUD.Controls.Intern;
 using Blish_HUD.Input;
 using Blish_HUD.Settings;
+using Manlaan.CommanderMarkers.Library.Enums;
+using Manlaan.CommanderMarkers.Library.Models;
+using Manlaan.CommanderMarkers.Library.Services;
 using Manlaan.CommanderMarkers.Settings.Services;
 using Manlaan.CommanderMarkers.Utils;
 using Microsoft.Xna.Framework;
@@ -62,24 +65,7 @@ namespace Manlaan.CommanderMarkers.Markers
 			groundIcons.VisiblityChanged(_settings._settingGroundMarkersEnabled);
 			FlowPanel objectIcons = CreateGroupingFlowPanel();
 			objectIcons.VisiblityChanged(_settings._settingTargetMarkersEnabled);
-			CreateIconButton((Container)(object)groundIcons, AsyncTexture2D.op_Implicit(_textures._imgArrow), size, opacity, "Arrow Ground", _settings._settingArrowGndBinding);
-			CreateIconButton((Container)(object)objectIcons, AsyncTexture2D.op_Implicit(_textures._imgArrow), size, opacity, "Arrow Object", _settings._settingArrowObjBinding, groundTarget: false);
-			CreateIconButton((Container)(object)groundIcons, AsyncTexture2D.op_Implicit(_textures._imgCircle), size, opacity, "Circle Ground", _settings._settingCircleGndBinding);
-			CreateIconButton((Container)(object)objectIcons, AsyncTexture2D.op_Implicit(_textures._imgCircle), size, opacity, "Circle Object", _settings._settingCircleObjBinding, groundTarget: false);
-			CreateIconButton((Container)(object)groundIcons, AsyncTexture2D.op_Implicit(_textures._imgHeart), size, opacity, "Heart Ground", _settings._settingHeartGndBinding);
-			CreateIconButton((Container)(object)objectIcons, AsyncTexture2D.op_Implicit(_textures._imgHeart), size, opacity, "Heart Object", _settings._settingHeartObjBinding, groundTarget: false);
-			CreateIconButton((Container)(object)groundIcons, AsyncTexture2D.op_Implicit(_textures._imgSquare), size, opacity, "Square Ground", _settings._settingSquareGndBinding);
-			CreateIconButton((Container)(object)objectIcons, AsyncTexture2D.op_Implicit(_textures._imgSquare), size, opacity, "Square Object", _settings._settingSquareObjBinding, groundTarget: false);
-			CreateIconButton((Container)(object)groundIcons, AsyncTexture2D.op_Implicit(_textures._imgStar), size, opacity, "Star Ground", _settings._settingStarGndBinding);
-			CreateIconButton((Container)(object)objectIcons, AsyncTexture2D.op_Implicit(_textures._imgStar), size, opacity, "Star Object", _settings._settingStarObjBinding, groundTarget: false);
-			CreateIconButton((Container)(object)groundIcons, AsyncTexture2D.op_Implicit(_textures._imgSpiral), size, opacity, "Spiral Ground", _settings._settingSpiralGndBinding);
-			CreateIconButton((Container)(object)objectIcons, AsyncTexture2D.op_Implicit(_textures._imgSpiral), size, opacity, "Spiral Object", _settings._settingSpiralObjBinding, groundTarget: false);
-			CreateIconButton((Container)(object)groundIcons, AsyncTexture2D.op_Implicit(_textures._imgTriangle), size, opacity, "Triangle Ground", _settings._settingTriangleGndBinding);
-			CreateIconButton((Container)(object)objectIcons, AsyncTexture2D.op_Implicit(_textures._imgTriangle), size, opacity, "Triangle Object", _settings._settingTriangleObjBinding, groundTarget: false);
-			CreateIconButton((Container)(object)groundIcons, AsyncTexture2D.op_Implicit(_textures._imgX), size, opacity, "X Ground", _settings._settingXGndBinding);
-			CreateIconButton((Container)(object)objectIcons, AsyncTexture2D.op_Implicit(_textures._imgX), size, opacity, "X Object", _settings._settingXObjBinding, groundTarget: false);
-			CreateIconButton((Container)(object)groundIcons, AsyncTexture2D.op_Implicit(_textures._imgClear), size, opacity, "Clear Ground", _settings._settingClearGndBinding, groundTarget: false);
-			CreateIconButton((Container)(object)objectIcons, AsyncTexture2D.op_Implicit(_textures._imgClear), size, opacity, "Clear Object", _settings._settingClearObjBinding, groundTarget: false);
+			CreateMarkerButtons(groundIcons, objectIcons, size, opacity);
 			if (_mouseEventsEnabled)
 			{
 				AddDragDelegates();
@@ -98,6 +84,59 @@ namespace Manlaan.CommanderMarkers.Markers
 			{
 				GameService.Input.get_Mouse().add_LeftMouseButtonPressed((EventHandler<MouseEventArgs>)OnMouseClick);
 			}
+		}
+
+		private void CreateMarkerButtons(FlowPanel groundIcons, FlowPanel objectIcons, int size, float opacity)
+		{
+			MarkerDefinition[] allMarkers = MarkerDefinitionService.AllMarkers;
+			for (int i = 0; i < allMarkers.Length; i++)
+			{
+				MarkerDefinition markerDef = allMarkers[i];
+				if (markerDef.SupportsGroundTarget)
+				{
+					SettingEntry<KeyBinding> groundBinding = GetKeyBindingForMarker(markerDef, isGroundTarget: true);
+					CreateIconButton((Container)(object)groundIcons, GetTextureForMarker(markerDef.MarkerType), size, opacity, markerDef.GetGroundTooltip(), groundBinding);
+				}
+				if (markerDef.SupportsObjectTarget)
+				{
+					SettingEntry<KeyBinding> objectBinding = GetKeyBindingForMarker(markerDef, isGroundTarget: false);
+					CreateIconButton((Container)(object)objectIcons, GetTextureForMarker(markerDef.MarkerType), size, opacity, markerDef.GetObjectTooltip(), objectBinding, groundTarget: false);
+				}
+			}
+		}
+
+		private SettingEntry<KeyBinding> GetKeyBindingForMarker(MarkerDefinition markerDef, bool isGroundTarget)
+		{
+			return (SettingEntry<KeyBinding>)(markerDef.MarkerType switch
+			{
+				SquadMarker.Arrow => isGroundTarget ? _settings._settingArrowGndBinding : _settings._settingArrowObjBinding, 
+				SquadMarker.Circle => isGroundTarget ? _settings._settingCircleGndBinding : _settings._settingCircleObjBinding, 
+				SquadMarker.Heart => isGroundTarget ? _settings._settingHeartGndBinding : _settings._settingHeartObjBinding, 
+				SquadMarker.Square => isGroundTarget ? _settings._settingSquareGndBinding : _settings._settingSquareObjBinding, 
+				SquadMarker.Star => isGroundTarget ? _settings._settingStarGndBinding : _settings._settingStarObjBinding, 
+				SquadMarker.Spiral => isGroundTarget ? _settings._settingSpiralGndBinding : _settings._settingSpiralObjBinding, 
+				SquadMarker.Triangle => isGroundTarget ? _settings._settingTriangleGndBinding : _settings._settingTriangleObjBinding, 
+				SquadMarker.Cross => isGroundTarget ? _settings._settingXGndBinding : _settings._settingXObjBinding, 
+				SquadMarker.Clear => isGroundTarget ? _settings._settingClearGndBinding : _settings._settingClearObjBinding, 
+				_ => throw new ArgumentException($"Unknown marker type: {markerDef.MarkerType}"), 
+			});
+		}
+
+		private AsyncTexture2D GetTextureForMarker(SquadMarker markerType)
+		{
+			return AsyncTexture2D.op_Implicit((Texture2D)(markerType switch
+			{
+				SquadMarker.Arrow => _textures._imgArrow, 
+				SquadMarker.Circle => _textures._imgCircle, 
+				SquadMarker.Heart => _textures._imgHeart, 
+				SquadMarker.Square => _textures._imgSquare, 
+				SquadMarker.Star => _textures._imgStar, 
+				SquadMarker.Spiral => _textures._imgSpiral, 
+				SquadMarker.Triangle => _textures._imgTriangle, 
+				SquadMarker.Cross => _textures._imgX, 
+				SquadMarker.Clear => _textures._imgClear, 
+				_ => _textures._imgArrow, 
+			}));
 		}
 
 		public override void PaintAfterChildren(SpriteBatch spriteBatch, Rectangle bounds)

@@ -123,7 +123,7 @@ namespace Manlaan.CommanderMarkers
 		{
 			if (Service.CornerIcon != null)
 			{
-				Service.CornerIcon!.IconLeftClicked += new EventHandler<bool>(CornerIcon_IconLeftClicked);
+				Service.CornerIcon!.IconLeftClicked -= new EventHandler<bool>(CornerIcon_IconLeftClicked);
 			}
 			Service.CornerIcon?.Dispose();
 			SettingsPanel settingsWindow = Service.SettingsWindow;

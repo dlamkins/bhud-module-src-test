@@ -30,15 +30,26 @@ namespace Manlaan.CommanderMarkers.Presets.Services
 
 		private List<BasicMarker> _triggerMarker = new List<BasicMarker>();
 
+		private BillboardControl _billboards;
+
 		private MarkerPreview? _previewMarkerSet;
 
+		private BillBoardPreview? _billboardPreview;
+
 		private DateTime _lastTrigger = DateTime.Now;
+
+		public const float TRIGGER_DISTANCE_OPEN_MAP = 15f;
+
+		public const float TRIGGER_DISTANCE_CLOSED_MAP = 2f;
 
 		public MapWatchService(MapData map, SettingService settings)
 		{
 			ScreenMap screenMap = new ScreenMap(map);
 			((Control)screenMap).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			_screenMap = screenMap;
+			BillboardControl billboardControl = new BillboardControl(map);
+			((Control)billboardControl).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+			_billboards = billboardControl;
 			_map = map;
 			_setting = settings;
 			GameService.Gw2Mumble.get_CurrentMap().add_MapChanged((EventHandler<ValueEventArgs<int>>)CurrentMap_MapChanged);
@@ -49,6 +60,7 @@ namespace Manlaan.CommanderMarkers.Presets.Services
 			CurrentMap_MapChanged(this, new ValueEventArgs<int>(GameService.Gw2Mumble.get_CurrentMap().get_Id()));
 			_setting.AutoMarker_FeatureEnabled.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)AutoMarkerBooleanSettingChanged);
 			_setting.AutoMarker_ShowTrigger.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)AutoMarkerBooleanSettingChanged);
+			_setting.AutoMarker_Billboard_FeatureEnabled.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)AutoMarkerBooleanSettingChanged);
 			Service.LtMode.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)AutoMarkerBooleanSettingChanged);
 		}
 
@@ -64,24 +76,27 @@ namespace Manlaan.CommanderMarkers.Presets.Services
 
 		private void _interactKeybind_Activated(object sender, EventArgs e)
 		{
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0103: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0121: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0126: Unknown result type (might be due to invalid IL or missing references)
 			DateTime now = DateTime.Now;
 			TimeSpan cooldown = TimeSpan.FromSeconds(3.0);
-			if (now - _lastTrigger < cooldown || _markers.Count <= 0 || !GameService.Gw2Mumble.get_UI().get_IsMapOpen() || !ShouldAttemptPlacement())
+			if (now - _lastTrigger < cooldown || _markers.Count <= 0 || (!GameService.Gw2Mumble.get_UI().get_IsMapOpen() && !Service.Settings.AutoMarker_Billboard_Placement.get_Value()) || !ShouldAttemptPlacement())
 			{
 				return;
 			}
 			_lastTrigger = now;
 			Vector3 playerPosition = GameService.Gw2Mumble.get_PlayerCharacter().get_Position();
+			MarkerSet closestMarker = null;
+			float closestDistance = float.MaxValue;
+			float placementThreshold = (GameService.Gw2Mumble.get_UI().get_IsMapOpen() ? 15f : 2f);
 			foreach (MarkerSet marker in _markers)
 			{
 				Vector3 val = playerPosition;
@@ -97,17 +112,23 @@ namespace Manlaan.CommanderMarkers.Presets.Services
 					Vector3 valueOrDefault = val3.GetValueOrDefault();
 					num = ((Vector3)(ref valueOrDefault)).Length();
 				}
-				if (num < 15f)
+				float d = num;
+				if (d < placementThreshold && d < closestDistance)
 				{
-					PlaceMarkers(marker, _map);
-					break;
+					closestMarker = marker;
+					closestDistance = d;
 				}
+			}
+			if (closestMarker != null)
+			{
+				PlaceMarkers(closestMarker, _map);
 			}
 		}
 
 		public void Update(GameTime gameTime)
 		{
 			((Control)_screenMap).Update(gameTime);
+			((Control)_billboards).Update(gameTime);
 		}
 
 		public Task PlaceMarkers(MarkerSet marders)
@@ -199,9 +220,10 @@ namespace Manlaan.CommanderMarkers.Presets.Services
 
 		private void CurrentMap_MapChanged(object sender, ValueEventArgs<int> e)
 		{
-			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
 			_screenMap.ClearEntities();
-			if (!_setting.AutoMarker_ShowTrigger.get_Value())
+			_billboards.ClearEntities();
+			if (!_setting.AutoMarker_ShowTrigger.get_Value() && !_setting.AutoMarker_Billboard_FeatureEnabled.get_Value())
 			{
 				return;
 			}
@@ -211,7 +233,14 @@ namespace Manlaan.CommanderMarkers.Presets.Services
 				select m).ToList();
 			foreach (MarkerSet marker in _markers)
 			{
-				_screenMap.AddEntity(new BasicMarker(_map, marker.trigger!.ToVector3(), marker.name, marker.description));
+				if (_setting.AutoMarker_ShowTrigger.get_Value())
+				{
+					_screenMap.AddEntity(new BasicMarker(_map, marker.trigger!.ToVector3(), marker.name, marker.description));
+				}
+				if (_setting.AutoMarker_Billboard_FeatureEnabled.get_Value())
+				{
+					_billboards.AddEntity(new BillBoardPreview(_map, marker));
+				}
 			}
 		}
 
@@ -222,6 +251,11 @@ namespace Manlaan.CommanderMarkers.Presets.Services
 			{
 				_previewMarkerSet = new MarkerPreview(_map, preview);
 				_screenMap.AddEntity(_previewMarkerSet);
+				if (!GameService.Gw2Mumble.get_UI().get_IsMapOpen())
+				{
+					_billboardPreview = new BillBoardPreview(_map, preview);
+					_billboards.AddEntity(_billboardPreview);
+				}
 			}
 		}
 
@@ -229,15 +263,17 @@ namespace Manlaan.CommanderMarkers.Presets.Services
 		{
 			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0099: Unknown result type (might be due to invalid IL or missing references)
 			Vector3 playerPosition = GameService.Gw2Mumble.get_PlayerCharacter().get_Position();
+			MarkerSet closestMarker = null;
+			float closestDistance = float.MaxValue;
 			foreach (MarkerSet marker in _markers)
 			{
 				Vector3 val = playerPosition;
@@ -253,11 +289,16 @@ namespace Manlaan.CommanderMarkers.Presets.Services
 					Vector3 valueOrDefault = val3.GetValueOrDefault();
 					num = ((Vector3)(ref valueOrDefault)).Length();
 				}
-				if (num < 15f)
+				float d = num;
+				if (d < 15f && d < closestDistance)
 				{
-					PreviewMarkerSet(marker);
-					break;
+					closestMarker = marker;
+					closestDistance = d;
 				}
+			}
+			if (closestMarker != null)
+			{
+				PreviewMarkerSet(closestMarker);
 			}
 		}
 
@@ -266,6 +307,7 @@ namespace Manlaan.CommanderMarkers.Presets.Services
 			if (_previewMarkerSet != null)
 			{
 				_screenMap.RemoveEntity(_previewMarkerSet);
+				_billboards.RemoveEntity(_billboardPreview);
 				_previewMarkerSet = null;
 			}
 		}
@@ -273,6 +315,8 @@ namespace Manlaan.CommanderMarkers.Presets.Services
 		public void Dispose()
 		{
 			((Control)_screenMap).Dispose();
+			((Control)_billboards).Dispose();
+			_setting.AutoMarker_Billboard_FeatureEnabled.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)AutoMarkerBooleanSettingChanged);
 			_setting.AutoMarker_ShowTrigger.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)AutoMarkerBooleanSettingChanged);
 			_setting.AutoMarker_FeatureEnabled.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)AutoMarkerBooleanSettingChanged);
 			Service.LtMode.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)AutoMarkerBooleanSettingChanged);
