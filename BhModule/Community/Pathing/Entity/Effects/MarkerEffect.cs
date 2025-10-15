@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Graphics;
 using Microsoft.Xna.Framework;
@@ -7,15 +8,41 @@ namespace BhModule.Community.Pathing.Entity.Effects
 {
 	public class MarkerEffect : SharedEffect
 	{
-		private const string PARAMETER_VIEW = "View";
+		private readonly EffectParameter _pView;
 
-		private const string PARAMETER_PROJECTION = "Projection";
+		private readonly EffectParameter _pProj;
 
-		private const string PARAMETER_PLAYERVIEW = "PlayerView";
+		private readonly EffectParameter _pPlayerView;
 
-		private const string PARAMETER_PLAYERPOSITION = "PlayerPosition";
+		private readonly EffectParameter _pPlayerPos;
 
-		private const string PARAMETER_CAMERAPOSITION = "CameraPosition";
+		private readonly EffectParameter _pCameraPos;
+
+		private readonly EffectParameter _pRace;
+
+		private readonly EffectParameter _pMount;
+
+		private readonly EffectParameter _pFadeNearCamera;
+
+		private readonly EffectParameter _pWorld;
+
+		private readonly EffectParameter _pTexture;
+
+		private readonly EffectParameter _pFadeTexture;
+
+		private readonly EffectParameter _pOpacity;
+
+		private readonly EffectParameter _pFadeNear;
+
+		private readonly EffectParameter _pFadeFar;
+
+		private readonly EffectParameter _pPlayerFadeRadius;
+
+		private readonly EffectParameter _pFadeCenter;
+
+		private readonly EffectParameter _pTintColor;
+
+		private readonly EffectParameter _pShowDebugWireframe;
 
 		private Matrix _view;
 
@@ -27,37 +54,11 @@ namespace BhModule.Community.Pathing.Entity.Effects
 
 		private Vector3 _cameraPosition;
 
-		private const string PARAMETER_RACE = "Race";
-
-		private const string PARAMETER_MOUNT = "Mount";
-
-		private const string PARAMETER_FADENEARCAMERA = "FadeNearCamera";
-
 		private int _race;
 
 		private int _mount;
 
 		private bool _fadeNearCamera;
-
-		private const string PARAMETER_WORLD = "World";
-
-		private const string PARAMETER_TEXTURE = "Texture";
-
-		private const string PARAMETER_FADETEXTURE = "FadeTexture";
-
-		private const string PARAMETER_OPACITY = "Opacity";
-
-		private const string PARAMETER_FADENEAR = "FadeNear";
-
-		private const string PARAMETER_FADEFAR = "FadeFar";
-
-		private const string PARAMETER_PLAYERFADERADIUS = "PlayerFadeRadius";
-
-		private const string PARAMETER_FADECENTER = "FadeCenter";
-
-		private const string PARAMETER_TINTCOLOR = "TintColor";
-
-		private const string PARAMETER_SHOWDEBUGWIREFRAME = "ShowDebugWireframe";
 
 		private Matrix _world;
 
@@ -88,8 +89,8 @@ namespace BhModule.Community.Pathing.Entity.Effects
 			}
 			set
 			{
-				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-				((SharedEffect)this).SetParameter("View", ref _view, value);
+				//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+				SetParam(ref _view, value, _pView);
 			}
 		}
 
@@ -102,8 +103,8 @@ namespace BhModule.Community.Pathing.Entity.Effects
 			}
 			set
 			{
-				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-				((SharedEffect)this).SetParameter("Projection", ref _projection, value);
+				//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+				SetParam(ref _projection, value, _pProj);
 			}
 		}
 
@@ -116,8 +117,8 @@ namespace BhModule.Community.Pathing.Entity.Effects
 			}
 			set
 			{
-				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-				((SharedEffect)this).SetParameter("PlayerView", ref _playerView, value);
+				//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+				SetParam(ref _playerView, value, _pPlayerView);
 			}
 		}
 
@@ -130,8 +131,8 @@ namespace BhModule.Community.Pathing.Entity.Effects
 			}
 			set
 			{
-				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-				((SharedEffect)this).SetParameter("PlayerPosition", ref _playerPosition, value);
+				//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+				SetParam(ref _playerPosition, value, _pPlayerPos);
 			}
 		}
 
@@ -144,8 +145,8 @@ namespace BhModule.Community.Pathing.Entity.Effects
 			}
 			set
 			{
-				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-				((SharedEffect)this).SetParameter("CameraPosition", ref _cameraPosition, value);
+				//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+				SetParam(ref _cameraPosition, value, _pCameraPos);
 			}
 		}
 
@@ -157,7 +158,7 @@ namespace BhModule.Community.Pathing.Entity.Effects
 			}
 			set
 			{
-				((SharedEffect)this).SetParameter("Race", ref _race, value);
+				SetParam(ref _race, value, _pRace);
 			}
 		}
 
@@ -169,7 +170,19 @@ namespace BhModule.Community.Pathing.Entity.Effects
 			}
 			set
 			{
-				((SharedEffect)this).SetParameter("Mount", ref _mount, value);
+				SetParam(ref _mount, value, _pMount);
+			}
+		}
+
+		public bool FadeNearCamera
+		{
+			get
+			{
+				return _fadeNearCamera;
+			}
+			set
+			{
+				SetParam(ref _fadeNearCamera, value, _pFadeNearCamera);
 			}
 		}
 
@@ -182,8 +195,8 @@ namespace BhModule.Community.Pathing.Entity.Effects
 			}
 			set
 			{
-				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-				((SharedEffect)this).SetParameter("World", ref _world, value);
+				//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+				SetParam(ref _world, value, _pWorld);
 			}
 		}
 
@@ -195,7 +208,7 @@ namespace BhModule.Community.Pathing.Entity.Effects
 			}
 			set
 			{
-				((SharedEffect)this).SetParameter("Texture", ref _texture, value);
+				SetParam(ref _texture, value, _pTexture);
 			}
 		}
 
@@ -207,7 +220,7 @@ namespace BhModule.Community.Pathing.Entity.Effects
 			}
 			set
 			{
-				((SharedEffect)this).SetParameter("FadeTexture", ref _fadeTexture, value);
+				SetParam(ref _fadeTexture, value, _pFadeTexture);
 			}
 		}
 
@@ -219,7 +232,7 @@ namespace BhModule.Community.Pathing.Entity.Effects
 			}
 			set
 			{
-				((SharedEffect)this).SetParameter("Opacity", ref _opacity, value);
+				SetParam(ref _opacity, value, _pOpacity);
 			}
 		}
 
@@ -231,7 +244,7 @@ namespace BhModule.Community.Pathing.Entity.Effects
 			}
 			set
 			{
-				((SharedEffect)this).SetParameter("FadeNear", ref _fadeNear, value);
+				SetParam(ref _fadeNear, value, _pFadeNear);
 			}
 		}
 
@@ -243,7 +256,7 @@ namespace BhModule.Community.Pathing.Entity.Effects
 			}
 			set
 			{
-				((SharedEffect)this).SetParameter("FadeFar", ref _fadeFar, value);
+				SetParam(ref _fadeFar, value, _pFadeFar);
 			}
 		}
 
@@ -255,7 +268,7 @@ namespace BhModule.Community.Pathing.Entity.Effects
 			}
 			set
 			{
-				((SharedEffect)this).SetParameter("PlayerFadeRadius", ref _playerFadeRadius, value);
+				SetParam(ref _playerFadeRadius, value, _pPlayerFadeRadius);
 			}
 		}
 
@@ -267,19 +280,7 @@ namespace BhModule.Community.Pathing.Entity.Effects
 			}
 			set
 			{
-				((SharedEffect)this).SetParameter("FadeCenter", ref _fadeCenter, value);
-			}
-		}
-
-		public bool FadeNearCamera
-		{
-			get
-			{
-				return _fadeNearCamera;
-			}
-			set
-			{
-				((SharedEffect)this).SetParameter("FadeNearCamera", ref _fadeNearCamera, value);
+				SetParam(ref _fadeCenter, value, _pFadeCenter);
 			}
 		}
 
@@ -292,8 +293,8 @@ namespace BhModule.Community.Pathing.Entity.Effects
 			}
 			set
 			{
-				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-				((SharedEffect)this).SetParameter("TintColor", ref _tintColor, value);
+				//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+				SetParam(ref _tintColor, value, _pTintColor);
 			}
 		}
 
@@ -305,23 +306,77 @@ namespace BhModule.Community.Pathing.Entity.Effects
 			}
 			set
 			{
-				((SharedEffect)this).SetParameter("ShowDebugWireframe", ref _showDebugWireframe, value);
+				SetParam(ref _showDebugWireframe, value, _pShowDebugWireframe);
 			}
 		}
 
 		public MarkerEffect(Effect baseEffect)
 			: this(baseEffect)
 		{
+			_pView = ((Effect)this).get_Parameters().get_Item("View");
+			_pProj = ((Effect)this).get_Parameters().get_Item("Projection");
+			_pPlayerView = ((Effect)this).get_Parameters().get_Item("PlayerView");
+			_pPlayerPos = ((Effect)this).get_Parameters().get_Item("PlayerPosition");
+			_pCameraPos = ((Effect)this).get_Parameters().get_Item("CameraPosition");
+			_pRace = ((Effect)this).get_Parameters().get_Item("Race");
+			_pMount = ((Effect)this).get_Parameters().get_Item("Mount");
+			_pFadeNearCamera = ((Effect)this).get_Parameters().get_Item("FadeNearCamera");
+			_pWorld = ((Effect)this).get_Parameters().get_Item("World");
+			_pTexture = ((Effect)this).get_Parameters().get_Item("Texture");
+			_pFadeTexture = ((Effect)this).get_Parameters().get_Item("FadeTexture");
+			_pOpacity = ((Effect)this).get_Parameters().get_Item("Opacity");
+			_pFadeNear = ((Effect)this).get_Parameters().get_Item("FadeNear");
+			_pFadeFar = ((Effect)this).get_Parameters().get_Item("FadeFar");
+			_pPlayerFadeRadius = ((Effect)this).get_Parameters().get_Item("PlayerFadeRadius");
+			_pFadeCenter = ((Effect)this).get_Parameters().get_Item("FadeCenter");
+			_pTintColor = ((Effect)this).get_Parameters().get_Item("TintColor");
+			_pShowDebugWireframe = ((Effect)this).get_Parameters().get_Item("ShowDebugWireframe");
 		}
 
 		private MarkerEffect(GraphicsDevice graphicsDevice, byte[] effectCode)
 			: this(graphicsDevice, effectCode)
 		{
+			_pView = ((Effect)this).get_Parameters().get_Item("View");
+			_pProj = ((Effect)this).get_Parameters().get_Item("Projection");
+			_pPlayerView = ((Effect)this).get_Parameters().get_Item("PlayerView");
+			_pPlayerPos = ((Effect)this).get_Parameters().get_Item("PlayerPosition");
+			_pCameraPos = ((Effect)this).get_Parameters().get_Item("CameraPosition");
+			_pRace = ((Effect)this).get_Parameters().get_Item("Race");
+			_pMount = ((Effect)this).get_Parameters().get_Item("Mount");
+			_pFadeNearCamera = ((Effect)this).get_Parameters().get_Item("FadeNearCamera");
+			_pWorld = ((Effect)this).get_Parameters().get_Item("World");
+			_pTexture = ((Effect)this).get_Parameters().get_Item("Texture");
+			_pFadeTexture = ((Effect)this).get_Parameters().get_Item("FadeTexture");
+			_pOpacity = ((Effect)this).get_Parameters().get_Item("Opacity");
+			_pFadeNear = ((Effect)this).get_Parameters().get_Item("FadeNear");
+			_pFadeFar = ((Effect)this).get_Parameters().get_Item("FadeFar");
+			_pPlayerFadeRadius = ((Effect)this).get_Parameters().get_Item("PlayerFadeRadius");
+			_pFadeCenter = ((Effect)this).get_Parameters().get_Item("FadeCenter");
+			_pTintColor = ((Effect)this).get_Parameters().get_Item("TintColor");
+			_pShowDebugWireframe = ((Effect)this).get_Parameters().get_Item("ShowDebugWireframe");
 		}
 
 		private MarkerEffect(GraphicsDevice graphicsDevice, byte[] effectCode, int index, int count)
 			: this(graphicsDevice, effectCode, index, count)
 		{
+			_pView = ((Effect)this).get_Parameters().get_Item("View");
+			_pProj = ((Effect)this).get_Parameters().get_Item("Projection");
+			_pPlayerView = ((Effect)this).get_Parameters().get_Item("PlayerView");
+			_pPlayerPos = ((Effect)this).get_Parameters().get_Item("PlayerPosition");
+			_pCameraPos = ((Effect)this).get_Parameters().get_Item("CameraPosition");
+			_pRace = ((Effect)this).get_Parameters().get_Item("Race");
+			_pMount = ((Effect)this).get_Parameters().get_Item("Mount");
+			_pFadeNearCamera = ((Effect)this).get_Parameters().get_Item("FadeNearCamera");
+			_pWorld = ((Effect)this).get_Parameters().get_Item("World");
+			_pTexture = ((Effect)this).get_Parameters().get_Item("Texture");
+			_pFadeTexture = ((Effect)this).get_Parameters().get_Item("FadeTexture");
+			_pOpacity = ((Effect)this).get_Parameters().get_Item("Opacity");
+			_pFadeNear = ((Effect)this).get_Parameters().get_Item("FadeNear");
+			_pFadeFar = ((Effect)this).get_Parameters().get_Item("FadeFar");
+			_pPlayerFadeRadius = ((Effect)this).get_Parameters().get_Item("PlayerFadeRadius");
+			_pFadeCenter = ((Effect)this).get_Parameters().get_Item("FadeCenter");
+			_pTintColor = ((Effect)this).get_Parameters().get_Item("TintColor");
+			_pShowDebugWireframe = ((Effect)this).get_Parameters().get_Item("ShowDebugWireframe");
 		}
 
 		public void SetEntityState(Matrix world, Texture2D texture, float opacity, float fadeNear, float fadeFar, bool fadeNearCamera, Color tintColor, bool showDebugWireframe)
@@ -356,6 +411,105 @@ namespace BhModule.Community.Pathing.Entity.Effects
 			View = GameService.Gw2Mumble.get_PlayerCamera().get_View();
 			Projection = GameService.Gw2Mumble.get_PlayerCamera().get_Projection();
 			PlayerView = GameService.Gw2Mumble.get_PlayerCamera().get_PlayerView();
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private static bool SetParam(ref Matrix f, Matrix v, EffectParameter p)
+		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+			if (f == v)
+			{
+				return false;
+			}
+			f = v;
+			p.SetValue(v);
+			return true;
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private static bool SetParam(ref Vector3 f, Vector3 v, EffectParameter p)
+		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+			if (f == v)
+			{
+				return false;
+			}
+			f = v;
+			p.SetValue(v);
+			return true;
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private static bool SetParam(ref Texture2D f, Texture2D v, EffectParameter p)
+		{
+			if (f == v)
+			{
+				return false;
+			}
+			f = v;
+			p.SetValue((Texture)(object)v);
+			return true;
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private static bool SetParam(ref float f, float v, EffectParameter p)
+		{
+			if (f == v)
+			{
+				return false;
+			}
+			f = v;
+			p.SetValue(v);
+			return true;
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private static bool SetParam(ref int f, int v, EffectParameter p)
+		{
+			if (f == v)
+			{
+				return false;
+			}
+			f = v;
+			p.SetValue(v);
+			return true;
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private static bool SetParam(ref bool f, bool v, EffectParameter p)
+		{
+			if (f == v)
+			{
+				return false;
+			}
+			f = v;
+			p.SetValue(v);
+			return true;
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private static bool SetParam(ref Color f, Color v, EffectParameter p)
+		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+			if (f == v)
+			{
+				return false;
+			}
+			f = v;
+			p.SetValue(((Color)(ref v)).ToVector4());
+			return true;
 		}
 	}
 }
