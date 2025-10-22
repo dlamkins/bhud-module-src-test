@@ -5,18 +5,14 @@ using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Input;
-using Blish_HUD.Modules.Managers;
 using Microsoft.Xna.Framework;
 using flakysalt.CharacterKeybinds.Data;
-using flakysalt.CharacterKeybinds.Presenter;
 using flakysalt.CharacterKeybinds.Views.UiElements;
 
 namespace flakysalt.CharacterKeybinds.Views
 {
-	public class CharacterKeybindsTab : View<CharacterKeybindSettingsPresenter>, IDisposable
+	public class CharacterKeybindsTab : View
 	{
-		private TabbedWindow2 WindowView;
-
 		private StandardButton addEntryButton;
 
 		private StandardButton applyDefaultKeybindButton;
@@ -27,9 +23,13 @@ namespace flakysalt.CharacterKeybinds.Views
 
 		private FlowPanel keybindScrollView;
 
-		private Label blockerOverlay;
-
 		private Dropdown defaultKeybindDropdown;
+
+		private LoadingSpinner _spinner;
+
+		private Label defaultKeybindsLabel;
+
+		private Image errorInfoIcon;
 
 		public EventHandler<string> OnApplyDefaultKeymapClicked;
 
@@ -37,141 +37,127 @@ namespace flakysalt.CharacterKeybinds.Views
 
 		public EventHandler OnAddButtonClicked;
 
-		public void Dispose()
+		protected override void Build(Container buildPanel)
 		{
-			base.Unload();
-		}
-
-		private IView SomeViewMethod()
-		{
-			Logger.GetLogger<CharacterKeybindsTab>().Debug("test");
-			return (IView)(object)this;
-		}
-
-		public CharacterKeybindsTab(ContentsManager ContentsManager)
-		{
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0067: Expected O, but got Unknown
 			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009b: Expected O, but got Unknown
-			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cb: Expected O, but got Unknown
-			//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0105: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0114: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0125: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0137: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0138: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0147: Expected O, but got Unknown
-			//IL_0148: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d2: Expected O, but got Unknown
+			//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0100: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0120: Expected O, but got Unknown
+			//IL_012d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0132: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0143: Unknown result type (might be due to invalid IL or missing references)
 			//IL_014d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0158: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0162: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0169: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0154: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0171: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0182: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0193: Expected O, but got Unknown
-			//IL_0193: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0198: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0180: Expected O, but got Unknown
+			//IL_0180: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0185: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0194: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a8: Expected O, but got Unknown
+			//IL_01a9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ae: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01b5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01da: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01df: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ff: Unknown result type (might be due to invalid IL or missing references)
-			//IL_020c: Expected O, but got Unknown
-			//IL_020d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0212: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0219: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0226: Expected O, but got Unknown
-			//IL_0227: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0234: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c2: Expected O, but got Unknown
+			//IL_01c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ef: Expected O, but got Unknown
+			//IL_01ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0200: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0211: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0237: Unknown result type (might be due to invalid IL or missing references)
 			//IL_023c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0247: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0253: Expected O, but got Unknown
-			//IL_0253: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0258: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0243: Unknown result type (might be due to invalid IL or missing references)
+			//IL_024a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0251: Unknown result type (might be due to invalid IL or missing references)
+			//IL_025d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0264: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0275: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0280: Unknown result type (might be due to invalid IL or missing references)
-			//IL_029b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0270: Expected O, but got Unknown
+			//IL_0271: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0276: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0281: Unknown result type (might be due to invalid IL or missing references)
+			//IL_028b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0296: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02a0: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02a7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02de: Expected O, but got Unknown
-			//IL_02df: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02e4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ef: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02f9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02c6: Expected O, but got Unknown
+			//IL_02cc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02e2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02e7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02f2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02fe: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0305: Unknown result type (might be due to invalid IL or missing references)
 			//IL_030a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0311: Unknown result type (might be due to invalid IL or missing references)
-			//IL_031d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0329: Expected O, but got Unknown
-			//IL_032f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0345: Unknown result type (might be due to invalid IL or missing references)
-			//IL_034a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0355: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0361: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0377: Expected O, but got Unknown
-			TabbedWindow2 val = new TabbedWindow2(AsyncTexture2D.FromAssetId(155997), new Rectangle(24, 30, 545, 600), new Rectangle(82, 30, 467, 600));
-			((WindowBase2)val).set_Emblem(ContentsManager.GetTexture("images/logo.png"));
-			((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			((WindowBase2)val).set_Title("Character Keybinds");
-			((Control)val).set_Size(new Point(645, 700));
-			((WindowBase2)val).set_SavesPosition(true);
-			((WindowBase2)val).set_Id("flakysalt_CharacterKeybinds");
-			((WindowBase2)val).set_CanClose(true);
-			WindowView = val;
-			Tab tab1 = new Tab(AsyncTexture2D.op_Implicit(ContentsManager.GetTexture("images/logo_small.png")), (Func<IView>)SomeViewMethod, "Character Keybinds", (int?)null);
-			WindowView.get_Tabs().Add(tab1);
-			WindowView.add_TabChanged((EventHandler<ValueChangedEventArgs<Tab>>)WindowView_TabChanged);
-			Label val2 = new Label();
-			((Control)val2).set_Parent((Container)(object)WindowView);
-			((Control)val2).set_ZIndex(10);
-			val2.set_HorizontalAlignment((HorizontalAlignment)1);
-			((Control)val2).set_Size(((Control)WindowView).get_Size());
+			//IL_030d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0321: Expected O, but got Unknown
+			FlowPanel val = new FlowPanel();
+			val.set_ControlPadding(new Vector2(0f, 10f));
+			((Container)val).set_HeightSizingMode((SizingMode)2);
+			Rectangle contentRegion = buildPanel.get_ContentRegion();
+			((Control)val).set_Size(((Rectangle)(ref contentRegion)).get_Size());
+			val.set_FlowDirection((ControlFlowDirection)3);
+			((Control)val).set_Parent(buildPanel);
+			mainFlowPanel = val;
+			LoadingSpinner val2 = new LoadingSpinner();
+			((Control)val2).set_Parent(buildPanel);
+			((Control)val2).set_BasicTooltipText("Loading Data from API...");
+			((Control)val2).set_Location(new Point(((Control)mainFlowPanel).get_Width() / 2 - 32, ((Control)mainFlowPanel).get_Height() / 2 - 32));
+			((Control)val2).set_Size(new Point(64, 64));
+			((Control)val2).set_ZIndex(100);
 			((Control)val2).set_Visible(false);
-			val2.set_Text("");
-			((Control)val2).set_BackgroundColor(Color.get_Black());
-			blockerOverlay = val2;
-			FlowPanel val3 = new FlowPanel();
-			val3.set_ControlPadding(new Vector2(0f, 10f));
-			Rectangle contentRegion = ((Container)WindowView).get_ContentRegion();
-			((Control)val3).set_Size(((Rectangle)(ref contentRegion)).get_Size());
-			val3.set_FlowDirection((ControlFlowDirection)3);
-			((Control)val3).set_Parent((Container)(object)WindowView);
-			mainFlowPanel = val3;
-			Label val4 = new Label();
-			((Control)val4).set_Parent((Container)(object)mainFlowPanel);
-			((Control)val4).set_Width(((Control)mainFlowPanel).get_Width());
-			((Control)val4).set_BasicTooltipText("Applies these keybindings in case there are no specific ones setup for a character.");
-			val4.set_Text("Default Keybinds");
-			val4.set_Font(GameService.Content.get_DefaultFont18());
+			_spinner = val2;
+			Label val3 = new Label();
+			((Control)val3).set_Parent((Container)(object)mainFlowPanel);
+			((Control)val3).set_Width(((Control)mainFlowPanel).get_Width());
+			((Control)val3).set_BasicTooltipText("Applies these keybindings in case there are no specific ones setup for a character.\nCan be disabled in the settings.");
+			val3.set_Text("Default Keybinds");
+			val3.set_Font(GameService.Content.get_DefaultFont18());
+			defaultKeybindsLabel = val3;
+			AsyncTexture2D texture = AsyncTexture2D.FromAssetId(155018);
+			Image val4 = new Image(texture);
+			((Control)val4).set_Parent(buildPanel);
+			((Control)val4).set_Size(new Point(48, 48));
+			((Control)val4).set_Visible(false);
+			((Control)val4).set_Location(new Point(((Control)mainFlowPanel).get_Right() - 64, ((Control)mainFlowPanel).get_Top() + 16));
+			errorInfoIcon = val4;
 			FlowPanel val5 = new FlowPanel();
 			((Control)val5).set_Height(30);
-			((Control)val5).set_Width(((Control)mainFlowPanel).get_Width());
 			val5.set_FlowDirection((ControlFlowDirection)2);
 			((Control)val5).set_Parent((Container)(object)mainFlowPanel);
+			((Container)val5).set_WidthSizingMode((SizingMode)2);
 			FlowPanel defaultKeybindFlowPanel = val5;
 			Dropdown val6 = new Dropdown();
 			((Control)val6).set_Parent((Container)(object)defaultKeybindFlowPanel);
@@ -192,23 +178,25 @@ namespace flakysalt.CharacterKeybinds.Views
 			FlowPanel val9 = new FlowPanel();
 			((Panel)val9).set_CanScroll(true);
 			((Panel)val9).set_ShowBorder(true);
-			((Control)val9).set_Width(((Control)mainFlowPanel).get_Width());
 			val9.set_FlowDirection((ControlFlowDirection)3);
 			((Control)val9).set_Parent((Container)(object)mainFlowPanel);
 			((Container)val9).set_HeightSizingMode((SizingMode)2);
+			((Container)val9).set_WidthSizingMode((SizingMode)2);
 			scrollView = val9;
 			FlowPanel val10 = new FlowPanel();
 			val10.set_OuterControlPadding(new Vector2(0f, 10f));
-			((Control)val10).set_Width(((Control)scrollView).get_Width());
+			val10.set_ControlPadding(new Vector2(0f, 5f));
 			val10.set_FlowDirection((ControlFlowDirection)3);
 			((Control)val10).set_Parent((Container)(object)scrollView);
 			((Container)val10).set_HeightSizingMode((SizingMode)1);
+			((Container)val10).set_WidthSizingMode((SizingMode)2);
 			keybindScrollView = val10;
 			((Control)new Scrollbar((Container)(object)scrollView)).set_Height(((Control)scrollView).get_Height());
 			StandardButton val11 = new StandardButton();
 			val11.set_Text("+ Add Binding");
 			((Control)val11).set_Parent((Container)(object)scrollView);
-			((Control)val11).set_Width(((Control)scrollView).get_Width());
+			contentRegion = buildPanel.get_ContentRegion();
+			((Control)val11).set_Width(((Rectangle)(ref contentRegion)).get_Size().X);
 			addEntryButton = val11;
 			((Control)addEntryButton).add_Click((EventHandler<MouseEventArgs>)delegate(object sender, MouseEventArgs args)
 			{
@@ -222,22 +210,56 @@ namespace flakysalt.CharacterKeybinds.Views
 			{
 				OnDefaultKeymapChanged?.Invoke(sender, args.get_CurrentValue());
 			});
+			((Control)buildPanel).add_Resized((EventHandler<ResizedEventArgs>)delegate
+			{
+				//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+				//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0070: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0075: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0078: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0098: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
+				Logger logger = Logger.GetLogger<CharacterKeybindsTab>();
+				object arg = ((Control)buildPanel).get_Size();
+				Rectangle contentRegion2 = buildPanel.get_ContentRegion();
+				logger.Debug($"Window{arg}| Content: {((Rectangle)(ref contentRegion2)).get_Size()},");
+				FlowPanel obj = mainFlowPanel;
+				contentRegion2 = buildPanel.get_ContentRegion();
+				((Control)obj).set_Size(((Rectangle)(ref contentRegion2)).get_Size());
+				StandardButton obj2 = addEntryButton;
+				contentRegion2 = buildPanel.get_ContentRegion();
+				((Control)obj2).set_Width(((Rectangle)(ref contentRegion2)).get_Size().X);
+				((Control)_spinner).set_Location(new Point(buildPanel.get_ContentBounds().X / 2 - 32, buildPanel.get_ContentBounds().Y / 2 - 32));
+				((Control)errorInfoIcon).set_Location(new Point(((Control)mainFlowPanel).get_Right() - 64, ((Control)mainFlowPanel).get_Top() + 16));
+			});
+			((View<IPresenter>)this).Build(buildPanel);
 		}
 
-		private void WindowView_TabChanged(object sender, ValueChangedEventArgs<Tab> e)
+		public void SetSpinner(bool state)
 		{
-			Logger.GetLogger<CharacterKeybindsTab>().Debug("test");
+			((Control)_spinner).set_Visible(state);
 		}
 
-		public void Show()
+		public void SetErrorInfoIcon(bool isValid, bool isDataLoaded, string error)
 		{
-			((Control)WindowView).Show();
+			((Control)errorInfoIcon).set_BasicTooltipText(error);
+			((Control)errorInfoIcon).set_Visible(!isValid);
+			SetKeybindContainerEnabled(isValid && isDataLoaded);
 		}
 
-		public void SetAddButtonState(bool state)
+		private void SetKeybindContainerEnabled(bool enabled)
 		{
-			((Control)addEntryButton).set_Enabled(state);
-			addEntryButton.set_Text(state ? "+ Add Binding" : "Add Binding (Loading Characters...)");
+			foreach (KeybindFlowContainer item in ((Container)keybindScrollView).GetChildrenOfType<KeybindFlowContainer>())
+			{
+				item.SetEnabled(enabled);
+			}
 		}
 
 		public void SetDefaultKeybindOptions(List<string> options, string selectedOption)
@@ -250,18 +272,6 @@ namespace flakysalt.CharacterKeybinds.Views
 			defaultKeybindDropdown.set_SelectedItem(selectedOption);
 		}
 
-		public void ToggleWindow()
-		{
-			((WindowBase2)WindowView).ToggleWindow();
-		}
-
-		public void SetBlocker(bool visibility)
-		{
-			SetAddButtonState(!visibility);
-			blockerOverlay.set_Text("API token missing or not available yet.\n\nMake sure you have added an API token to Blish HUD \nand it has the neccessary permissions!\n(Previously setup keybinds will still work!)");
-			((Control)blockerOverlay).set_Visible(visibility);
-		}
-
 		public KeybindFlowContainer AddKeybind()
 		{
 			KeybindFlowContainer keybindFlowContainer = new KeybindFlowContainer();
@@ -272,30 +282,36 @@ namespace flakysalt.CharacterKeybinds.Views
 			return keybindFlowContainer;
 		}
 
-		public void SetKeybindOptions(KeybindFlowContainer keybindFlowContainer, List<string> charaters, List<string> specializations, List<string> keymaps)
+		public void SetKeybindOptions(KeybindFlowContainer keybindFlowContainer, List<string> characterList, List<LocalizedSpecialization> specializations, List<string> keymaps)
 		{
-			keybindFlowContainer.SetDropdownContent(keybindFlowContainer.characterNameDropdown, charaters);
-			keybindFlowContainer.SetDropdownContent(keybindFlowContainer.specializationDropdown, specializations);
-			keybindFlowContainer.SetDropdownContent(keybindFlowContainer.keymapDropdown, keymaps);
+			keybindFlowContainer.SetDropdownContent(keybindFlowContainer.CharacterNameDropdown, characterList);
+			keybindFlowContainer.SetSpecializationContent(specializations);
+			keybindFlowContainer.SetDropdownContent(keybindFlowContainer.KeymapDropdown, keymaps);
 		}
 
-		public void SetKeybindValues(KeybindFlowContainer keybindFlowContainer, CharacterKeybind characterKeybind, int iconId)
+		public void SetKeybindValues(KeybindFlowContainer keybindFlowContainer, Keymap characterKeybind, int iconId)
 		{
 			keybindFlowContainer.SetValues(characterKeybind);
 			keybindFlowContainer.SetProfessionIcon(iconId);
 		}
 
-		public void AttachListeners(KeybindFlowContainer keybindFlowContainer, EventHandler<CharacterKeybind> OnApplyAction, EventHandler<KeymapEventArgs> OnDataChanged, EventHandler<CharacterKeybind> OnDeleteAction)
+		public void AttachListeners(KeybindFlowContainer keybindFlowContainer, EventHandler<Keymap> onApplyAction, EventHandler<KeymapEventArgs> onDataChanged, EventHandler<Keymap> OnDeleteAction)
 		{
-			keybindFlowContainer.AttachListeners(OnApplyAction, OnDataChanged, OnDeleteAction);
+			keybindFlowContainer.AttachListeners(onApplyAction, onDataChanged, OnDeleteAction);
 		}
 
 		public void ClearKeybindEntries()
 		{
 			for (int i = ((Container)keybindScrollView).get_Children().get_Count() - 1; i >= 0; i--)
 			{
+				((KeybindFlowContainer)(object)((Container)keybindScrollView).get_Children().get_Item(i)).DisposeEvents();
 				((Container)keybindScrollView).RemoveChild(((Container)keybindScrollView).get_Children().get_Item(i));
 			}
+		}
+
+		public CharacterKeybindsTab()
+			: this()
+		{
 		}
 	}
 }

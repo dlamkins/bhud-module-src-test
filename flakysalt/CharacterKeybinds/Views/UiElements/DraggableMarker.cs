@@ -8,11 +8,13 @@ using Microsoft.Xna.Framework;
 
 namespace flakysalt.CharacterKeybinds.Views.UiElements
 {
-	internal class DraggableMarker : Container
+	internal sealed class DraggableMarker : Container
 	{
-		private Point startDragMouseOffset;
+		private Point _startDragMouseOffset;
 
-		private bool Dragging;
+		private bool _dragging;
+
+		private const int MarkerTextureId = 1863840;
 
 		public event EventHandler<Point> OnMarkerReleased;
 
@@ -21,20 +23,18 @@ namespace flakysalt.CharacterKeybinds.Views.UiElements
 		{
 			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0092: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
 			AsyncTexture2D obj = AsyncTexture2D.FromAssetId(1863840);
 			((Control)this).set_Width(32);
 			((Control)this).set_Height(32);
@@ -56,11 +56,35 @@ namespace flakysalt.CharacterKeybinds.Views.UiElements
 			((Control)this).add_LeftMouseButtonReleased((EventHandler<MouseEventArgs>)DragMarker_LeftMouseButtonReleased);
 		}
 
+		public override void UpdateContainer(GameTime gameTime)
+		{
+			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+			((Container)this).UpdateContainer(gameTime);
+			if (_dragging)
+			{
+				((Control)this).set_Location(Control.get_Input().get_Mouse().get_Position() + _startDragMouseOffset);
+			}
+		}
+
+		public void SimulateClick()
+		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0009: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+			Point offset = CalculateClickOffset();
+			Mouse.Click((MouseButton)0, ((Control)this).get_Location().X - offset.X, ((Control)this).get_Location().Y - offset.Y, false);
+		}
+
 		private void DragMarker_LeftMouseButtonReleased(object sender, MouseEventArgs e)
 		{
-			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-			Dragging = false;
-			this.OnMarkerReleased(this, ((Control)this).get_Location());
+			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+			_dragging = false;
+			this.OnMarkerReleased?.Invoke(this, ((Control)this).get_Location());
 		}
 
 		private void Image_LeftMouseButtonPressed(object sender, MouseEventArgs e)
@@ -69,23 +93,11 @@ namespace flakysalt.CharacterKeybinds.Views.UiElements
 			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			startDragMouseOffset = ((Control)this).get_Location() - Control.get_Input().get_Mouse().get_Position();
-			Dragging = true;
+			_startDragMouseOffset = ((Control)this).get_Location() - Control.get_Input().get_Mouse().get_Position();
+			_dragging = true;
 		}
 
-		public override void UpdateContainer(GameTime gameTime)
-		{
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			((Container)this).UpdateContainer(gameTime);
-			if (Dragging)
-			{
-				((Control)this).set_Location(Control.get_Input().get_Mouse().get_Position() + startDragMouseOffset);
-			}
-		}
-
-		public Point CalculateClickOffset()
+		private Point CalculateClickOffset()
 		{
 			//IL_0003: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
@@ -95,15 +107,6 @@ namespace flakysalt.CharacterKeybinds.Views.UiElements
 			Point offset = default(Point);
 			((Point)(ref offset))._002Ector((int)((float)((Control)this).get_Location().X * GameService.Graphics.get_UIScaleMultiplier()), (int)((float)((Control)this).get_Location().Y * GameService.Graphics.get_UIScaleMultiplier()));
 			return ((Control)this).get_Location() - offset;
-		}
-
-		public void SimulateClick()
-		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			Mouse.Click((MouseButton)0, ((Control)this).get_Location().X - CalculateClickOffset().X, ((Control)this).get_Location().Y - CalculateClickOffset().Y, false);
 		}
 	}
 }
