@@ -38,6 +38,8 @@ namespace gw2stacks_blish.data
 
 		public Armory legendaryArmory;
 
+		public Unlocks unlocks;
+
 		public void reset_state()
 		{
 			foreach (KeyValuePair<int, Item> item in items)
@@ -55,6 +57,7 @@ namespace gw2stacks_blish.data
 			sharedInventory = new List<int?>();
 			inventoryBags = new Dictionary<string, List<InventoryBagSlot>>();
 			legendaryArmory = new Armory();
+			unlocks = new Unlocks();
 			validData = false;
 		}
 
@@ -79,6 +82,7 @@ namespace gw2stacks_blish.data
 			Magic.silkBag.build_basic_item_info();
 			Magic.borealTrunk.build_basic_item_info();
 			await build_legendary_armory(api_);
+			await get_unlocks(api_);
 			validData = true;
 		}
 
@@ -387,6 +391,16 @@ namespace gw2stacks_blish.data
 			}
 		}
 
+		public async Task get_unlocks(Gw2Api api_)
+		{
+			Unlocks unlocks = this.unlocks;
+			unlocks.skins = await api_.get_unlocked_skins();
+			unlocks = this.unlocks;
+			unlocks.minis = await api_.get_unlocked_minis();
+			unlocks = this.unlocks;
+			unlocks.recipes = await api_.get_unlocked_recipes();
+		}
+
 		public List<ItemForDisplay> get_stacks_advice()
 		{
 			List<ItemForDisplay> result = new List<ItemForDisplay>();
@@ -440,7 +454,9 @@ namespace gw2stacks_blish.data
 		public List<ItemForDisplay> get_just_delete_advice()
 		{
 			List<ItemForDisplay> result = new List<ItemForDisplay>();
-			foreach (Item item in items.Values.Where((Item list_item) => list_item.isDeletable && !list_item.isSellable && !list_item.isSalvagable))
+			IEnumerable<Item> first = items.Values.Where((Item list_item) => list_item.isDeletable && !list_item.isSellable && !list_item.isSalvagable);
+			IEnumerable<Item> unlocks = items.Values.Where((Item list_item) => list_item.isDeletable && (list_item.isAccountBound || list_item.isCharacterBound) && (this.unlocks.recipes.Contains(list_item.recipeId) || this.unlocks.minis.Contains(list_item.miniId) || list_item.skinId.All((int unlocked_skin) => this.unlocks.skins.Any((int potentialSkin) => unlocked_skin == potentialSkin))));
+			foreach (Item item in first.Union(unlocks))
 			{
 				result.Add(new ItemForDisplay(item, null, "Delete these items"));
 			}
@@ -671,6 +687,10 @@ namespace gw2stacks_blish.data
 						result.Add(new MiscCraftingItemForDisplay(items[item], wizardScroll, "Delete and aquire"));
 					}
 				}
+			}
+			foreach (Item id in items.Values.Where((Item list_item) => list_item.isDeletable && !list_item.isAccountBound && !list_item.isCharacterBound && (unlocks.recipes.Contains(list_item.recipeId) || unlocks.minis.Contains(list_item.miniId) || list_item.skinId.All((int unlocked_skin) => unlocks.skins.Any((int potentialSkin) => unlocked_skin == potentialSkin)))))
+			{
+				result.Add(new ItemForDisplay(id, null, "Sell these items on the TP"));
 			}
 			return result;
 		}

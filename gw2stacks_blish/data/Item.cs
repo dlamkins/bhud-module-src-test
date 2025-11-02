@@ -54,6 +54,14 @@ namespace gw2stacks_blish.data
 
 		public ItemTrinketType trinketType;
 
+		public int defaultSkin;
+
+		public IReadOnlyList<int> skinId;
+
+		public int miniId;
+
+		public int recipeId;
+
 		public Item(int id_, bool isCharacterBound_, bool isAccountBound_, bool delayedCreate = false)
 		{
 			itemId = id_;
@@ -79,6 +87,10 @@ namespace gw2stacks_blish.data
 			armorType = ItemArmorSlotType.Unknown;
 			weaponType = ItemWeaponType.Unknown;
 			trinketType = ItemTrinketType.Unknown;
+			defaultSkin = -1;
+			skinId = new List<int> { -1 };
+			miniId = -1;
+			recipeId = -1;
 			if (!delayedCreate)
 			{
 				build_basic_item_info();

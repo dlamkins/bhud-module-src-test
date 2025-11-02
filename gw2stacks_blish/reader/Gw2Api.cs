@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Blish_HUD.Modules.Managers;
 using Gw2Sharp.WebApi.V2;
@@ -23,6 +24,21 @@ namespace gw2stacks_blish.reader
 		public async Task<IApiV2ObjectList<AccountLegendaryArmory>> get_legendary_armory()
 		{
 			return await manager.Gw2ApiClient.V2.Account.LegendaryArmory.GetAsync();
+		}
+
+		public async Task<List<int>> get_unlocked_skins()
+		{
+			return (await manager.Gw2ApiClient.V2.Account.Skins.GetAsync()).ToList();
+		}
+
+		public async Task<List<int>> get_unlocked_minis()
+		{
+			return (await manager.Gw2ApiClient.V2.Account.Minis.GetAsync()).ToList();
+		}
+
+		public async Task<List<int>> get_unlocked_recipes()
+		{
+			return (await manager.Gw2ApiClient.V2.Account.Recipes.GetAsync()).ToList();
 		}
 
 		public async Task<IApiV2ObjectList<AccountItem>> shared_inventory()

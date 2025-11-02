@@ -2,9 +2,9 @@ namespace gw2stacks_blish.data
 {
 	internal class InventoryBagSlot
 	{
-		private int id;
+		public int id;
 
-		private int size;
+		public int size;
 
 		public InventoryBagSlot(int id_, int size_ = 0)
 		{

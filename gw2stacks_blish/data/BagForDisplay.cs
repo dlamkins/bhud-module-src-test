@@ -32,7 +32,11 @@ namespace gw2stacks_blish.data
 			{
 				return 1414044;
 			}
-			return Magic.jsonLut.itemLut[id.Value].IconId;
+			if (Magic.jsonLut.itemLut.ContainsKey(id.Value))
+			{
+				return Magic.jsonLut.itemLut[id.Value].IconId;
+			}
+			return 63369;
 		}
 
 		public string get_name()
