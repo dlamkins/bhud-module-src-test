@@ -3,12 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
-using System.Security.Cryptography;
-using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
@@ -43,10 +38,6 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Controls
 		private readonly double floorId;
 
 		private readonly double continentId;
-
-		private readonly Waypoints waypoints;
-
-		private readonly TileWhitelist tileWhiteList;
 
 		private readonly ((double X, double Y) StartCoordinate, (double X, double Y) EndCoordinate) continentDimensions;
 
@@ -98,7 +89,7 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Controls
 			}
 			(double, double) centroid = GetCentroid(mastercoords.Select((List<double> x) => (x[0], x[1])).ToList());
 			GetSize(mastercoords.Select((List<double> x) => (x[0], x[1])).ToList());
-			maxzoom = 8;
+			maxzoom = 7;
 			continentDimensions = ((0.0, 0.0), (131072.0, 131072.0));
 			if (continentId == 2.0)
 			{
@@ -106,13 +97,8 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Controls
 				continentDimensions = ((0.0, 0.0), (16384.0, 16384.0));
 			}
 			mapBounds = ConvertCoordinates(continentDimensions.EndCoordinate, maxzoom);
-			(Waypoints Waypoints, TileWhitelist TileWhitelist) tuple = InitializeWaypointsAndTiles();
-			Waypoints waypoints = tuple.Waypoints;
-			TileWhitelist tileWhiteList = tuple.TileWhitelist;
-			this.waypoints = waypoints;
-			this.tileWhiteList = tileWhiteList;
-			(float, float) tuple2 = ConvertCoordinates(centroid, maxzoom);
-			mapCoords = (tuple2.Item1, tuple2.Item2);
+			(float, float) tuple = ConvertCoordinates(centroid, maxzoom);
+			mapCoords = (tuple.Item1, tuple.Item2);
 			intMapCoords = ((int)Math.Floor(mapCoords.X), (int)Math.Floor(mapCoords.Y));
 			InitializeTextures();
 		}
@@ -147,8 +133,8 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Controls
 		{
 			dot = InitializeTexture("https://wiki.guildwars2.com/images/2/23/Widget_map_dot.png");
 			swirl = InitializeTexture("https://wiki.guildwars2.com/images/8/8d/Widget_map_yellow_swirl.png");
-			flagStart = InitializeTexture("https://wiki.guildwars2.com/images/f/f0/Event_flag_green.png");
-			flagEnd = InitializeTexture("https://wiki.guildwars2.com/images/8/8d/Event_flag_red.png");
+			flagStart = InitializeTexture("https://wiki.guildwars2.com/images/2/26/Event_flag_green_(map_icon).png");
+			flagEnd = InitializeTexture("https://wiki.guildwars2.com/images/e/e7/Event_flag_red_(map_icon).png");
 		}
 
 		private static AsyncTexture2D InitializeTexture(string url)
@@ -272,7 +258,7 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Controls
 				{
 					for (int n = 0; n < upperBoundY3 - lowerBoundY3; n++)
 					{
-						tileUrls[k, n] = GetTileUrl((lowerBoundX3 + k, lowerBoundY3 + n, maxzoom), floorId, continentId, tileWhiteList);
+						tileUrls[k, n] = GetTileUrl((lowerBoundX3 + k, lowerBoundY3 + n, maxzoom), floorId, continentId);
 					}
 				}
 			}
@@ -292,7 +278,7 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Controls
 				{
 					for (int m = 0; m < upperBoundY2 - lowerBoundY2; m++)
 					{
-						tileUrls[j, m] = GetTileUrl((lowerBoundX2 + j, lowerBoundY2 + m, maxzoom), floorId, continentId, tileWhiteList);
+						tileUrls[j, m] = GetTileUrl((lowerBoundX2 + j, lowerBoundY2 + m, maxzoom), floorId, continentId);
 					}
 				}
 			}
@@ -309,7 +295,7 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Controls
 				{
 					for (int l = 0; l < upperBoundY - lowerBoundY; l++)
 					{
-						tileUrls[i, l] = GetTileUrl((lowerBoundX + i, lowerBoundY + l, maxzoom), floorId, continentId, tileWhiteList);
+						tileUrls[i, l] = GetTileUrl((lowerBoundX + i, lowerBoundY + l, maxzoom), floorId, continentId);
 					}
 				}
 			}
@@ -514,18 +500,6 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Controls
 			return result;
 		}
 
-		private string GenerateUrl(string fileName)
-		{
-			(string, string) parts = GenerateUrlComponents(fileName);
-			return "https://wiki.guildwars2.com/images/" + parts.Item1 + "/" + parts.Item2 + "/" + fileName;
-		}
-
-		private (string FirstPart, string SecondPart) GenerateUrlComponents(string fileName)
-		{
-			string hex = BitConverter.ToString(MD5.Create().ComputeHash(Encoding.ASCII.GetBytes(fileName)), 0, 1);
-			return (hex[0].ToString().ToLower(), hex.ToLower());
-		}
-
 		private static (double X, double Y) GetCentroid(List<(double X, double Y)> poly)
 		{
 			return poly.Aggregate(((double X, double Y) x, (double X, double Y) y) => (x.X + y.X / (double)poly.Count, x.Y + y.Y / (double)poly.Count));
@@ -548,64 +522,17 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Controls
 			return (maximumArray[0] - minimumArray[0], maximumArray[1] - minimumArray[1]);
 		}
 
-		private string GetTileUrl((int X, int Y, int Z) coordinates, double floorId, double continentId, TileWhitelist tileWhitelist)
+		private string GetTileUrl((int X, int Y, int Z) coordinates, double floorId, double continentId)
 		{
-			if (floorId == 1.0)
-			{
-				TileWhitelist.Continent continent = tileWhitelist.Tyria;
-				if (continentId == 2.0)
-				{
-					continent = tileWhitelist.Mists;
-				}
-				if (!continent.Floors.First((TileWhitelist.Floor x) => x.Id == coordinates.Z).Coordinates.Contains("X" + coordinates.X + "_Y" + coordinates.Y))
-				{
-					return "https://wiki.guildwars2.com/images/c/cb/World_map_tile_under_construction.png";
-				}
-				string file = $"World_map_tile_C{continentId}_F{floorId}_Z{coordinates.Z}_X{coordinates.X}_Y{coordinates.Y}.jpg";
-				return GenerateUrl(file);
-			}
-			int xBodge = -1;
-			int yBodge = -1;
-			int zBodge = -1;
-			if (continentId == 1.0)
-			{
-				xBodge = coordinates.X - (int)(128.0 / Math.Pow(2.0, 8 - coordinates.Z));
-				yBodge = coordinates.Y - (int)(64.0 / Math.Pow(2.0, 8 - coordinates.Z));
-				zBodge = coordinates.Z - 1;
-			}
-			else
-			{
-				xBodge = coordinates.X;
-				yBodge = coordinates.Y;
-				zBodge = coordinates.Z;
-			}
-			if (xBodge >= 0 && yBodge >= 0)
-			{
-				return $"https://tiles.guildwars2.com/{continentId}/{floorId}/{zBodge}/{xBodge}/{yBodge}.jpg";
-			}
-			return "https://wiki.guildwars2.com/images/c/cb/World_map_tile_under_construction.png";
+			return $"https://tiles.guildwars2.com/{continentId}/{floorId}/{coordinates.Z}/{coordinates.X}/{coordinates.Y}.jpg";
 		}
 
 		private (float X, float Y) ConvertCoordinates((double X, double Y) gw2Coordinates, int zoom)
 		{
 			double scale = Math.Pow(2.0, zoom);
-			double num = gw2Coordinates.X / scale;
-			double y = gw2Coordinates.Y / scale;
+			double num = gw2Coordinates.X / scale / 2.0;
+			double y = gw2Coordinates.Y / scale / 2.0;
 			return ((float)num, (float)y);
-		}
-
-		private (Waypoints Waypoints, TileWhitelist TileWhitelist) InitializeWaypointsAndTiles()
-		{
-			string[] array = new WebClient
-			{
-				Headers = { { "user-agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36" } }
-			}.DownloadString("https://wiki.guildwars2.com/index.php?title=Widget:Interactive_map_data_builder/infobox-map-output.js&action=raw").Split(new string[1] { ";" }, StringSplitOptions.RemoveEmptyEntries);
-			Waypoints waypoints = JsonSerializer.Deserialize<Waypoints>(array[0].Replace("var wiki_waypoints = ", string.Empty));
-			TileWhitelist tiles = JsonSerializer.Deserialize<TileWhitelist>(array[1].Replace("var wiki_tile_whitelist = ", string.Empty), new JsonSerializerOptions
-			{
-				Converters = { (JsonConverter)new TileWhitelist.ContinentConverter() }
-			});
-			return (waypoints, tiles);
 		}
 	}
 }
