@@ -89,10 +89,10 @@ namespace Manlaan.Mounts
 
 		public async Task IsCombatLaunchUnlockedAsync()
 		{
-			if (!Gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)new List<TokenPermission> { (TokenPermission)1 }))
+			if (!Gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)new List<TokenPermission> { (TokenPermission)6 }))
 			{
-				_isCombatLaunchUnlockedReason = "API permissions \"account\" is not enabled.";
-				Logger.Error("IsCombatLaunchUnlockedAsync " + _isCombatLaunchUnlockedReason);
+				_isCombatLaunchUnlockedReason = "API permissions \"progression\" is not enabled.";
+				Logger.Info("IsCombatLaunchUnlockedAsync " + _isCombatLaunchUnlockedReason);
 				return;
 			}
 			try

@@ -11,5 +11,10 @@ namespace Manlaan.Mounts.Things.Mounts
 			: base(settingCollection, helper, "Skimmer", "Skimmer", "skimmer")
 		{
 		}
+
+		public override bool IsUsableInCombat()
+		{
+			return true;
+		}
 	}
 }

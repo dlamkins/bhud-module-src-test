@@ -509,7 +509,10 @@ namespace Manlaan.Mounts
 			_debug.Add("Applicable Contextual RadialSettings", () => $"Name: {_helper.GetApplicableContextualRadialThingSettings()?.Name}, Things count: {_helper.GetApplicableContextualRadialThingSettings()?.AvailableThings.Count}");
 			_debug.Add("Queued for out of combat", () => _helper.GetQueuedThing()?.Name ?? "");
 			_debug.Add("TappedModuleKeybind", () => string.Format("{0} {1} {2} {3}", DateTime.Now, tappedModuleKeybind, lastTriggered, lastTriggered.HasValue ? ((object)(int)(DateTime.Now - lastTriggered.Value).TotalMilliseconds) : ""));
-			_helper.IsCombatLaunchUnlockedAsync();
+			if (Gw2ApiManager.get_HasSubtoken())
+			{
+				_helper.IsCombatLaunchUnlockedAsync();
+			}
 			Gw2ApiManager.add_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)async delegate
 			{
 				await _helper.IsCombatLaunchUnlockedAsync();
