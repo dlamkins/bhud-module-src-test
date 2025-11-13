@@ -1,10 +1,14 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.WebSockets;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Blish_HUD;
 using Newtonsoft.Json;
 
 namespace FarmingTracker
@@ -43,6 +47,10 @@ namespace FarmingTracker
 
 		private bool _disposed;
 
+		private readonly string _blishVersion = Program.get_OverlayVersion().BaseVersion().ToString();
+
+		private readonly string _moduleVersion;
+
 		public string WebSocketUrl { get; set; } = "wss://drf.rs/ws";
 
 
@@ -70,16 +78,25 @@ namespace FarmingTracker
 
 		public event EventHandler<GenericEventArgs<Exception>>? ReceiveFailed;
 
-		public DrfWebSocketClient()
+		public DrfWebSocketClient(string moduleVersion)
 		{
+			_moduleVersion = moduleVersion;
 			try
 			{
 				_clientWebSocket = new ClientWebSocket();
 			}
-			catch (PlatformNotSupportedException e)
+			catch (PlatformNotSupportedException e2)
 			{
 				WindowsVersionIsTooLowToSupportWebSockets = true;
-				Module.Logger.Warn("Failed to initialize the DRF WebSocket client. This is typically caused by not using at least Windows 8. WebSockets are not supported in older Windows versions. The module will not work. PlatformNotSupportedException message: " + e.Message);
+				Module.Logger.Warn("Failed to initialize the DRF WebSocket client. This is typically caused by not using at least Windows 8. WebSockets are not supported in older Windows versions. The module will not work. PlatformNotSupportedException message: " + e2.Message);
+			}
+			try
+			{
+				AllowToSetUserAgentHeaderForWebSockets();
+			}
+			catch (Exception e)
+			{
+				Module.Logger.Error("Failed to initialize the DRF WebSocket client because the user agent reflection workaround crashed. exception message: " + e.Message);
 			}
 		}
 
@@ -154,6 +171,7 @@ namespace FarmingTracker
 						_disposeCts = disposeCts;
 					}
 					clientWebSocket = new ClientWebSocket();
+					clientWebSocket.Options.SetRequestHeader("User-Agent", "FarmingTracker/" + _moduleVersion + " BlishHUD/" + _blishVersion);
 					_clientWebSocket = clientWebSocket;
 				}
 				finally
@@ -327,6 +345,36 @@ namespace FarmingTracker
 		private static List<DrfMessage> RemoveInvalidMessages(List<DrfMessage> drfMessages)
 		{
 			return drfMessages.Where((DrfMessage m) => m.Payload.Drop.Currencies.Count <= 10).ToList();
+		}
+
+		private static void AllowToSetUserAgentHeaderForWebSockets()
+		{
+			Assembly assembly = typeof(HttpWebRequest).Assembly;
+			FieldInfo[] fields = assembly.GetType("System.Net.HeaderInfoTable").GetFields(BindingFlags.Static | BindingFlags.NonPublic);
+			foreach (FieldInfo headerInfoTableFieldInfo in fields)
+			{
+				if (!(headerInfoTableFieldInfo.Name == "HeaderHashTable"))
+				{
+					continue;
+				}
+				Hashtable headerHashTable = headerInfoTableFieldInfo.GetValue(null) as Hashtable;
+				if (headerHashTable == null)
+				{
+					throw new Exception("headerHashTable is null");
+				}
+				foreach (string key in headerHashTable.Keys)
+				{
+					object headerInfo = headerHashTable[key];
+					FieldInfo[] fields2 = assembly.GetType("System.Net.HeaderInfo").GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
+					foreach (FieldInfo headerInfoFieldInfo in fields2)
+					{
+						if (headerInfoFieldInfo.Name == "IsRequestRestricted" && (bool)headerInfoFieldInfo.GetValue(headerInfo))
+						{
+							headerInfoFieldInfo.SetValue(headerInfo, false);
+						}
+					}
+				}
+			}
 		}
 	}
 }

@@ -72,7 +72,7 @@ namespace FarmingTracker
 				Logger.Error("Cannot load module without settingsService and dateTimeService from Module.DefineSettings().");
 				return;
 			}
-			Services services = new Services(ContentsManager, DirectoriesManager, Gw2ApiManager, _settingService, _dateTimeService);
+			Services services = new Services(ContentsManager, DirectoriesManager, Gw2ApiManager, _settingService, _dateTimeService, ((Module)this).get_Version().ToString());
 			Model model = (_model = await services.FileLoader.LoadModelFromFile());
 			_services = services;
 			if (services.Drf.WindowsVersionIsTooLowToSupportWebSockets)

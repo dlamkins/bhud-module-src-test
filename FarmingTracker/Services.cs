@@ -38,7 +38,7 @@ namespace FarmingTracker
 		public string SearchTerm { get; set; } = string.Empty;
 
 
-		public Services(ContentsManager contentsManager, DirectoriesManager directoriesManager, Gw2ApiManager gw2ApiManager, SettingService settingService, DateTimeService dateTimeService)
+		public Services(ContentsManager contentsManager, DirectoriesManager directoriesManager, Gw2ApiManager gw2ApiManager, SettingService settingService, DateTimeService dateTimeService, string moduleVersion)
 		{
 			string moduleFolderPath = FileService.GetModuleFolderPath(directoriesManager);
 			string modelFilePath = FileService.GetModelFilePath(moduleFolderPath);
@@ -49,7 +49,7 @@ namespace FarmingTracker
 			CsvFileExporter = new CsvFileExporter(moduleFolderPath);
 			FileLoader = new FileLoader(modelFilePath);
 			FileSaver = new FileSaver(modelFilePath);
-			Drf = new Drf(settingService);
+			Drf = new Drf(settingService, moduleVersion);
 			FarmingDuration = new FarmingDuration(settingService);
 		}
 

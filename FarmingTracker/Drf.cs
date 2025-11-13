@@ -10,7 +10,7 @@ namespace FarmingTracker
 	{
 		private readonly SettingService _settingService;
 
-		private readonly DrfWebSocketClient _drfWebSocketClient = new DrfWebSocketClient();
+		private readonly DrfWebSocketClient _drfWebSocketClient;
 
 		private int _reconnectTriesCounter;
 
@@ -26,8 +26,9 @@ namespace FarmingTracker
 
 		public event EventHandler? DrfConnectionStatusChanged;
 
-		public Drf(SettingService settingService)
+		public Drf(SettingService settingService, string moduleVersion)
 		{
+			_drfWebSocketClient = new DrfWebSocketClient(moduleVersion);
 			_settingService = settingService;
 			InitializeEventHandlers();
 			FireAndForgetConnectToDrf();
