@@ -7,7 +7,6 @@ using Blish_HUD.Content;
 using Blish_HUD.Modules.Managers;
 using Gw2Sharp.Models;
 using Gw2Sharp.WebApi;
-using Kenedia.Modules.Characters.Enums;
 using Kenedia.Modules.Characters.Models;
 using Kenedia.Modules.Characters.Views;
 using Kenedia.Modules.Core.DataModels;
@@ -811,10 +810,10 @@ namespace Kenedia.Modules.Characters.Services
 		};
 
 
-		public Dictionary<Kenedia.Modules.Characters.Enums.SpecializationType, Specialization> Specializations { get; } = new Dictionary<Kenedia.Modules.Characters.Enums.SpecializationType, Specialization>
+		public Dictionary<SpecializationType, Specialization> Specializations { get; } = new Dictionary<SpecializationType, Specialization>
 		{
 			{
-				Kenedia.Modules.Characters.Enums.SpecializationType.Druid,
+				SpecializationType.Druid,
 				new Specialization
 				{
 					IconBig = AsyncTexture2D.FromAssetId(1128574),
@@ -843,7 +842,7 @@ namespace Kenedia.Modules.Characters.Services
 				}
 			},
 			{
-				Kenedia.Modules.Characters.Enums.SpecializationType.Daredevil,
+				SpecializationType.Daredevil,
 				new Specialization
 				{
 					IconBig = AsyncTexture2D.FromAssetId(1128570),
@@ -872,7 +871,7 @@ namespace Kenedia.Modules.Characters.Services
 				}
 			},
 			{
-				Kenedia.Modules.Characters.Enums.SpecializationType.Berserker,
+				SpecializationType.Berserker,
 				new Specialization
 				{
 					IconBig = AsyncTexture2D.FromAssetId(1128566),
@@ -901,7 +900,7 @@ namespace Kenedia.Modules.Characters.Services
 				}
 			},
 			{
-				Kenedia.Modules.Characters.Enums.SpecializationType.Dragonhunter,
+				SpecializationType.Dragonhunter,
 				new Specialization
 				{
 					IconBig = AsyncTexture2D.FromAssetId(1128572),
@@ -930,7 +929,7 @@ namespace Kenedia.Modules.Characters.Services
 				}
 			},
 			{
-				Kenedia.Modules.Characters.Enums.SpecializationType.Reaper,
+				SpecializationType.Reaper,
 				new Specialization
 				{
 					IconBig = AsyncTexture2D.FromAssetId(1128578),
@@ -959,7 +958,7 @@ namespace Kenedia.Modules.Characters.Services
 				}
 			},
 			{
-				Kenedia.Modules.Characters.Enums.SpecializationType.Chronomancer,
+				SpecializationType.Chronomancer,
 				new Specialization
 				{
 					IconBig = AsyncTexture2D.FromAssetId(1128568),
@@ -988,7 +987,7 @@ namespace Kenedia.Modules.Characters.Services
 				}
 			},
 			{
-				Kenedia.Modules.Characters.Enums.SpecializationType.Scrapper,
+				SpecializationType.Scrapper,
 				new Specialization
 				{
 					IconBig = AsyncTexture2D.FromAssetId(1128580),
@@ -1017,7 +1016,7 @@ namespace Kenedia.Modules.Characters.Services
 				}
 			},
 			{
-				Kenedia.Modules.Characters.Enums.SpecializationType.Tempest,
+				SpecializationType.Tempest,
 				new Specialization
 				{
 					IconBig = AsyncTexture2D.FromAssetId(1128582),
@@ -1046,7 +1045,7 @@ namespace Kenedia.Modules.Characters.Services
 				}
 			},
 			{
-				Kenedia.Modules.Characters.Enums.SpecializationType.Herald,
+				SpecializationType.Herald,
 				new Specialization
 				{
 					IconBig = AsyncTexture2D.FromAssetId(1128576),
@@ -1075,7 +1074,7 @@ namespace Kenedia.Modules.Characters.Services
 				}
 			},
 			{
-				Kenedia.Modules.Characters.Enums.SpecializationType.Soulbeast,
+				SpecializationType.Soulbeast,
 				new Specialization
 				{
 					IconBig = AsyncTexture2D.FromAssetId(1770214),
@@ -1104,7 +1103,7 @@ namespace Kenedia.Modules.Characters.Services
 				}
 			},
 			{
-				Kenedia.Modules.Characters.Enums.SpecializationType.Weaver,
+				SpecializationType.Weaver,
 				new Specialization
 				{
 					IconBig = AsyncTexture2D.FromAssetId(1670505),
@@ -1133,7 +1132,7 @@ namespace Kenedia.Modules.Characters.Services
 				}
 			},
 			{
-				Kenedia.Modules.Characters.Enums.SpecializationType.Holosmith,
+				SpecializationType.Holosmith,
 				new Specialization
 				{
 					IconBig = AsyncTexture2D.FromAssetId(1770224),
@@ -1162,7 +1161,7 @@ namespace Kenedia.Modules.Characters.Services
 				}
 			},
 			{
-				Kenedia.Modules.Characters.Enums.SpecializationType.Deadeye,
+				SpecializationType.Deadeye,
 				new Specialization
 				{
 					IconBig = AsyncTexture2D.FromAssetId(1770212),
@@ -1191,7 +1190,7 @@ namespace Kenedia.Modules.Characters.Services
 				}
 			},
 			{
-				Kenedia.Modules.Characters.Enums.SpecializationType.Mirage,
+				SpecializationType.Mirage,
 				new Specialization
 				{
 					IconBig = AsyncTexture2D.FromAssetId(1770216),
@@ -1220,7 +1219,7 @@ namespace Kenedia.Modules.Characters.Services
 				}
 			},
 			{
-				Kenedia.Modules.Characters.Enums.SpecializationType.Scourge,
+				SpecializationType.Scourge,
 				new Specialization
 				{
 					IconBig = AsyncTexture2D.FromAssetId(1770220),
@@ -1249,7 +1248,7 @@ namespace Kenedia.Modules.Characters.Services
 				}
 			},
 			{
-				Kenedia.Modules.Characters.Enums.SpecializationType.Spellbreaker,
+				SpecializationType.Spellbreaker,
 				new Specialization
 				{
 					IconBig = AsyncTexture2D.FromAssetId(1770222),
@@ -1278,7 +1277,7 @@ namespace Kenedia.Modules.Characters.Services
 				}
 			},
 			{
-				Kenedia.Modules.Characters.Enums.SpecializationType.Firebrand,
+				SpecializationType.Firebrand,
 				new Specialization
 				{
 					IconBig = AsyncTexture2D.FromAssetId(1770210),
@@ -1307,7 +1306,7 @@ namespace Kenedia.Modules.Characters.Services
 				}
 			},
 			{
-				Kenedia.Modules.Characters.Enums.SpecializationType.Renegade,
+				SpecializationType.Renegade,
 				new Specialization
 				{
 					IconBig = AsyncTexture2D.FromAssetId(1770218),
@@ -1336,7 +1335,7 @@ namespace Kenedia.Modules.Characters.Services
 				}
 			},
 			{
-				Kenedia.Modules.Characters.Enums.SpecializationType.Harbinger,
+				SpecializationType.Harbinger,
 				new Specialization
 				{
 					IconBig = AsyncTexture2D.FromAssetId(2479359),
@@ -1365,7 +1364,7 @@ namespace Kenedia.Modules.Characters.Services
 				}
 			},
 			{
-				Kenedia.Modules.Characters.Enums.SpecializationType.Willbender,
+				SpecializationType.Willbender,
 				new Specialization
 				{
 					IconBig = AsyncTexture2D.FromAssetId(2479351),
@@ -1394,7 +1393,7 @@ namespace Kenedia.Modules.Characters.Services
 				}
 			},
 			{
-				Kenedia.Modules.Characters.Enums.SpecializationType.Virtuoso,
+				SpecializationType.Virtuoso,
 				new Specialization
 				{
 					IconBig = AsyncTexture2D.FromAssetId(2479355),
@@ -1423,7 +1422,7 @@ namespace Kenedia.Modules.Characters.Services
 				}
 			},
 			{
-				Kenedia.Modules.Characters.Enums.SpecializationType.Catalyst,
+				SpecializationType.Catalyst,
 				new Specialization
 				{
 					IconBig = AsyncTexture2D.FromAssetId(2491555),
@@ -1452,7 +1451,7 @@ namespace Kenedia.Modules.Characters.Services
 				}
 			},
 			{
-				Kenedia.Modules.Characters.Enums.SpecializationType.Bladesworn,
+				SpecializationType.Bladesworn,
 				new Specialization
 				{
 					IconBig = AsyncTexture2D.FromAssetId(2491563),
@@ -1481,7 +1480,7 @@ namespace Kenedia.Modules.Characters.Services
 				}
 			},
 			{
-				Kenedia.Modules.Characters.Enums.SpecializationType.Vindicator,
+				SpecializationType.Vindicator,
 				new Specialization
 				{
 					IconBig = AsyncTexture2D.FromAssetId(2491559),
@@ -1510,7 +1509,7 @@ namespace Kenedia.Modules.Characters.Services
 				}
 			},
 			{
-				Kenedia.Modules.Characters.Enums.SpecializationType.Mechanist,
+				SpecializationType.Mechanist,
 				new Specialization
 				{
 					IconBig = AsyncTexture2D.FromAssetId(2503656),
@@ -1539,7 +1538,7 @@ namespace Kenedia.Modules.Characters.Services
 				}
 			},
 			{
-				Kenedia.Modules.Characters.Enums.SpecializationType.Specter,
+				SpecializationType.Specter,
 				new Specialization
 				{
 					IconBig = AsyncTexture2D.FromAssetId(2503664),
@@ -1568,7 +1567,7 @@ namespace Kenedia.Modules.Characters.Services
 				}
 			},
 			{
-				Kenedia.Modules.Characters.Enums.SpecializationType.Untamed,
+				SpecializationType.Untamed,
 				new Specialization
 				{
 					IconBig = AsyncTexture2D.FromAssetId(2503660),
@@ -1592,6 +1591,267 @@ namespace Kenedia.Modules.Characters.Services
 						{
 							(Locale)3,
 							"Indomptable"
+						}
+					}
+				}
+			},
+			{
+				SpecializationType.Luminary,
+				new Specialization
+				{
+					IconBig = AsyncTexture2D.FromAssetId(3680067),
+					Icon = AsyncTexture2D.FromAssetId(3680069),
+					Id = 81,
+					Profession = (ProfessionType)1,
+					Names = new Dictionary<Locale, string>
+					{
+						{
+							(Locale)0,
+							"Luminary"
+						},
+						{
+							(Locale)1,
+							"Luminaria"
+						},
+						{
+							(Locale)2,
+							"Lichtgestalt"
+						},
+						{
+							(Locale)3,
+							"Luminescence"
+						}
+					}
+				}
+			},
+			{
+				SpecializationType.Paragon,
+				new Specialization
+				{
+					Icon = AsyncTexture2D.FromAssetId(3680093),
+					IconBig = AsyncTexture2D.FromAssetId(3680091),
+					Id = 74,
+					Profession = (ProfessionType)2,
+					Names = new Dictionary<Locale, string>
+					{
+						{
+							(Locale)0,
+							"Paragon"
+						},
+						{
+							(Locale)1,
+							"Paragón"
+						},
+						{
+							(Locale)2,
+							"Paragon"
+						},
+						{
+							(Locale)3,
+							"Parangon"
+						}
+					}
+				}
+			},
+			{
+				SpecializationType.Amalgam,
+				new Specialization
+				{
+					Icon = AsyncTexture2D.FromAssetId(3680065),
+					IconBig = AsyncTexture2D.FromAssetId(3680063),
+					Id = 75,
+					Profession = (ProfessionType)3,
+					Names = new Dictionary<Locale, string>
+					{
+						{
+							(Locale)0,
+							"Amalgam"
+						},
+						{
+							(Locale)1,
+							"Amalgama"
+						},
+						{
+							(Locale)2,
+							"Amalgam"
+						},
+						{
+							(Locale)3,
+							"Amalgame"
+						}
+					}
+				}
+			},
+			{
+				SpecializationType.Galeshot,
+				new Specialization
+				{
+					Icon = AsyncTexture2D.FromAssetId(3680081),
+					IconBig = AsyncTexture2D.FromAssetId(3680079),
+					Id = 78,
+					Profession = (ProfessionType)4,
+					Names = new Dictionary<Locale, string>
+					{
+						{
+							(Locale)0,
+							"Galeshot"
+						},
+						{
+							(Locale)1,
+							"Vendaval"
+						},
+						{
+							(Locale)2,
+							"Orkanschütze"
+						},
+						{
+							(Locale)3,
+							"Ventireur"
+						}
+					}
+				}
+			},
+			{
+				SpecializationType.Antiquary,
+				new Specialization
+				{
+					Icon = AsyncTexture2D.FromAssetId(3680089),
+					IconBig = AsyncTexture2D.FromAssetId(3680087),
+					Id = 77,
+					Profession = (ProfessionType)5,
+					Names = new Dictionary<Locale, string>
+					{
+						{
+							(Locale)0,
+							"Antiquary"
+						},
+						{
+							(Locale)1,
+							"Anticuario"
+						},
+						{
+							(Locale)2,
+							"Antiquar"
+						},
+						{
+							(Locale)3,
+							"Antiquaire"
+						}
+					}
+				}
+			},
+			{
+				SpecializationType.Evoker,
+				new Specialization
+				{
+					Icon = AsyncTexture2D.FromAssetId(3680061),
+					IconBig = AsyncTexture2D.FromAssetId(3680059),
+					Id = 80,
+					Profession = (ProfessionType)6,
+					Names = new Dictionary<Locale, string>
+					{
+						{
+							(Locale)0,
+							"Evoker"
+						},
+						{
+							(Locale)1,
+							"Evocador"
+						},
+						{
+							(Locale)2,
+							"Beschwörer"
+						},
+						{
+							(Locale)3,
+							"Évocateur"
+						}
+					}
+				}
+			},
+			{
+				SpecializationType.Troubadour,
+				new Specialization
+				{
+					Icon = AsyncTexture2D.FromAssetId(3680073),
+					IconBig = AsyncTexture2D.FromAssetId(3680071),
+					Id = 73,
+					Profession = (ProfessionType)7,
+					Names = new Dictionary<Locale, string>
+					{
+						{
+							(Locale)0,
+							"Troubadour"
+						},
+						{
+							(Locale)1,
+							"Trovador"
+						},
+						{
+							(Locale)2,
+							"Troubadour"
+						},
+						{
+							(Locale)3,
+							"Troubadour"
+						}
+					}
+				}
+			},
+			{
+				SpecializationType.Ritualist,
+				new Specialization
+				{
+					Icon = AsyncTexture2D.FromAssetId(3680077),
+					IconBig = AsyncTexture2D.FromAssetId(3680075),
+					Id = 76,
+					Profession = (ProfessionType)8,
+					Names = new Dictionary<Locale, string>
+					{
+						{
+							(Locale)0,
+							"Ritualist"
+						},
+						{
+							(Locale)1,
+							"Ritualista"
+						},
+						{
+							(Locale)2,
+							"Ritualist"
+						},
+						{
+							(Locale)3,
+							"Ritualiste"
+						}
+					}
+				}
+			},
+			{
+				SpecializationType.Conduit,
+				new Specialization
+				{
+					Icon = AsyncTexture2D.FromAssetId(3680085),
+					IconBig = AsyncTexture2D.FromAssetId(3680083),
+					Id = 79,
+					Profession = (ProfessionType)9,
+					Names = new Dictionary<Locale, string>
+					{
+						{
+							(Locale)0,
+							"Conduit"
+						},
+						{
+							(Locale)1,
+							"Conductor"
+						},
+						{
+							(Locale)2,
+							"Medium"
+						},
+						{
+							(Locale)3,
+							"Conduit"
 						}
 					}
 				}

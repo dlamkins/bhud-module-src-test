@@ -6,11 +6,11 @@ using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Gw2Sharp.Models;
-using Kenedia.Modules.Characters.Enums;
 using Kenedia.Modules.Characters.Models;
 using Kenedia.Modules.Characters.Res;
 using Kenedia.Modules.Characters.Services;
 using Kenedia.Modules.Core.Controls;
+using Kenedia.Modules.Core.DataModels;
 using Kenedia.Modules.Core.Interfaces;
 using Microsoft.Xna.Framework;
 
@@ -239,7 +239,7 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 					t4.BasicTooltipText = specialization.Value.Name;
 				}));
 			}
-			for (int i = 0; i < 3; i++)
+			for (int i = 0; i < 4; i++)
 			{
 				foreach (KeyValuePair<ProfessionType, Data.Profession> p in profs)
 				{

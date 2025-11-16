@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Gw2Sharp.Models;
-using Kenedia.Modules.Characters.Enums;
 using Kenedia.Modules.Characters.Services;
+using Kenedia.Modules.Core.DataModels;
 
 namespace Kenedia.Modules.Characters.Extensions
 {
