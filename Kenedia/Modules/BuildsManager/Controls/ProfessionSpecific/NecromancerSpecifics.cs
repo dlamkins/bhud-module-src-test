@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using Blish_HUD;
 using Blish_HUD.Content;
@@ -43,19 +42,26 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 
 		public override void RecalculateLayout()
 		{
-			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0113: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0130: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01fe: Unknown result type (might be due to invalid IL or missing references)
-			//IL_021d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0138: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0156: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0173: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0192: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01cd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0206: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0251: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0256: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0267: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0285: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02fa: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
 			int xOffset = 80;
 			switch (base.TemplatePresenter.Template.EliteSpecialization?.Id)
@@ -78,6 +84,20 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 				_lifeForceBar.Bounds = new Rectangle(xOffset + 11, 71, 203, 18);
 				Skills[0].Bounds = new Rectangle(xOffset + 215, 55, 42, 42);
 				break;
+			case 76:
+			{
+				_lifeForceBarBackground.Bounds = new Rectangle(xOffset - 10, 75, 255, 20);
+				_lifeForce.Bounds = new Rectangle(xOffset - 10, 75, 255, 20);
+				_lifeForce.TextureRegion = new Rectangle(1, 42, _lifeForce.Texture.Width - 30, _lifeForce.Texture.Height - 49);
+				for (int j = 1; j < 4; j++)
+				{
+					Skills[j].Bounds = new Rectangle(xOffset + 54 + j * 39, 28, 36, 36);
+				}
+				SkillIcon obj = Skills[0];
+				Rectangle bounds = _lifeForce.Bounds;
+				obj.Bounds = new Rectangle(((Rectangle)(ref bounds)).get_Left() - 1, 22, 48, 48);
+				break;
+			}
 			default:
 				_lifeForceBarBackground.Bounds = new Rectangle(xOffset + 10, 70, 205, 20);
 				_lifeForce.Bounds = new Rectangle(xOffset + 10, 70, 205, 20);
@@ -90,21 +110,26 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 		public override void PaintAfterChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
 			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0103: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ba: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0221: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_026d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ca: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0331: Unknown result type (might be due to invalid IL or missing references)
-			//IL_033b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_037d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03d5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0101: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0153: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0229: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0233: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0275: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02cd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0339: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0343: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0391: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0396: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_045a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0464: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04fe: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0503: Unknown result type (might be due to invalid IL or missing references)
 			base.PaintAfterChildren(spriteBatch, bounds);
 			switch (base.TemplatePresenter.Template.EliteSpecialization?.Id)
 			{
@@ -113,9 +138,9 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 				_shades.Draw(this, spriteBatch);
 				_lifeForceBarBackground.Draw(this, spriteBatch);
 				_lifeForceScourge.Draw(this, spriteBatch, null, Color.get_LightGray() * 0.7f);
-				for (int i = 0; i < Skills.Length; i++)
+				for (int j = 0; j < Skills.Length; j++)
 				{
-					Skills[i].Draw(this, spriteBatch, base.RelativeMousePosition);
+					Skills[j].Draw(this, spriteBatch, base.RelativeMousePosition);
 				}
 				spriteBatch.DrawStringOnCtrl(this, "100%", Control.Content.DefaultFont12, _lifeForceScourge.Bounds, Color.get_White(), wrap: false, HorizontalAlignment.Center);
 				break;
@@ -126,6 +151,17 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 				Skills[0].Draw(this, spriteBatch, base.RelativeMousePosition);
 				spriteBatch.DrawStringOnCtrl(this, "100%", Control.Content.DefaultFont12, _lifeForceBar.Bounds, Color.get_White(), wrap: false, HorizontalAlignment.Center);
 				break;
+			case 76:
+			{
+				_lifeForceBarBackground.Draw(this, spriteBatch);
+				_lifeForce.Draw(this, spriteBatch, null, Color.get_LightGray() * 0.7f);
+				spriteBatch.DrawStringOnCtrl(this, "100%", Control.Content.DefaultFont12, _lifeForce.Bounds, Color.get_White(), wrap: false, HorizontalAlignment.Center);
+				for (int i = 0; i < 4; i++)
+				{
+					Skills[i].Draw(this, spriteBatch, base.RelativeMousePosition);
+				}
+				break;
+			}
 			default:
 				_lifeForceBarBackground.Draw(this, spriteBatch);
 				_lifeForce.Draw(this, spriteBatch, null, Color.get_LightGray() * 0.7f);
@@ -142,35 +178,46 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 				return;
 			}
 			base.ApplyTemplate();
-			Dictionary<int, Kenedia.Modules.BuildsManager.DataModels.Professions.Skill> skills = base.Data?.Professions?[ProfessionType.Necromancer]?.Skills;
-			if (skills == null)
+			SkillDictionary skills = base.Data?.Professions?[ProfessionType.Necromancer]?.Skills;
+			if (skills != null)
 			{
-				return;
-			}
-			switch (base.TemplatePresenter.Template.EliteSpecialization?.Id)
-			{
-			case 60:
-			{
-				Skills[0].Skill = GetSkill(SkillSlot.Profession1);
-				Skills[1].Skill = GetSkill(SkillSlot.Profession2);
-				Skills[2].Skill = GetSkill(SkillSlot.Profession3);
-				Skills[3].Skill = GetSkill(SkillSlot.Profession4);
-				DetailedTexture shades = _shades;
-				Kenedia.Modules.BuildsManager.DataModels.Professions.Trait? grandMaster = base.TemplatePresenter.Template.Specializations.Specialization3.Traits.GrandMaster;
-				shades.Texture = ((grandMaster != null && grandMaster!.Id == 2112) ? AsyncTexture2D.FromAssetId(1636742) : AsyncTexture2D.FromAssetId(1636744));
-				int masterSkill = (base.TemplatePresenter.Template.Specializations.Specialization3.Traits.Master?.Skills?.FirstOrDefault()).GetValueOrDefault();
-				Skills[4].Skill = skills.Values.FirstOrDefault((Kenedia.Modules.BuildsManager.DataModels.Professions.Skill e) => e.Id == masterSkill) ?? GetSkill(SkillSlot.Profession5);
-				break;
-			}
-			case 64:
-				Skills[0].Skill = skills.Values.FirstOrDefault((Kenedia.Modules.BuildsManager.DataModels.Professions.Skill e) => e.Id == 62567);
-				break;
-			case 34:
-				Skills[0].Skill = skills.Values.FirstOrDefault((Kenedia.Modules.BuildsManager.DataModels.Professions.Skill e) => e.Id == 30792);
-				break;
-			default:
-				Skills[0].Skill = GetSkill(SkillSlot.Profession1);
-				break;
+				switch (base.TemplatePresenter.Template.EliteSpecialization?.Id)
+				{
+				case 60:
+				{
+					Skills[0].Skill = GetSkill(SkillSlot.Profession1);
+					Skills[1].Skill = GetSkill(SkillSlot.Profession2);
+					Skills[2].Skill = GetSkill(SkillSlot.Profession3);
+					Skills[3].Skill = GetSkill(SkillSlot.Profession4);
+					DetailedTexture shades = _shades;
+					Kenedia.Modules.BuildsManager.DataModels.Professions.Trait? grandMaster = base.TemplatePresenter.Template.Specializations.Specialization3.Traits.GrandMaster;
+					shades.Texture = ((grandMaster != null && grandMaster!.Id == 2112) ? AsyncTexture2D.FromAssetId(1636742) : AsyncTexture2D.FromAssetId(1636744));
+					int masterSkill = (base.TemplatePresenter.Template.Specializations.Specialization3.Traits.Master?.Skills?.FirstOrDefault()).GetValueOrDefault();
+					Skills[4].Skill = (skills.TryGetValue(masterSkill, out var scourgeMasterSkill) ? scourgeMasterSkill : GetSkill(SkillSlot.Profession5));
+					break;
+				}
+				case 64:
+				{
+					Skills[0].Skill = (skills.TryGetValue(62567, out var harbingerSkill) ? harbingerSkill : null);
+					break;
+				}
+				case 34:
+				{
+					Skills[0].Skill = (skills.TryGetValue(30792, out var reaperSkill) ? reaperSkill : null);
+					break;
+				}
+				case 76:
+				{
+					Skills[0].Skill = (skills.TryGetValue(77238, out var ritualistSkill) ? ritualistSkill : null);
+					Skills[1].Skill = (skills.TryGetValue(77003, out var ritualistSkill2) ? ritualistSkill2 : null);
+					Skills[2].Skill = (skills.TryGetValue(76732, out var ritualistSkill3) ? ritualistSkill3 : null);
+					Skills[3].Skill = (skills.TryGetValue(76602, out var ritualistSkill4) ? ritualistSkill4 : null);
+					break;
+				}
+				default:
+					Skills[0].Skill = GetSkill(SkillSlot.Profession1);
+					break;
+				}
 			}
 			Kenedia.Modules.BuildsManager.DataModels.Professions.Skill? GetSkill(SkillSlot slot)
 			{

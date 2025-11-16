@@ -14,15 +14,15 @@
   </PropertyGroup>
   <ItemGroup />
   <ItemGroup>
+    <Reference Include="Gw2Sharp">
+      <HintPath>..\..\working\Gw2Sharp.dll</HintPath>
+    </Reference>
     <Reference Include="Blish HUD">
       <HintPath>..\..\working\Blish HUD.exe</HintPath>
     </Reference>
     <Reference Include="MonoGame.Framework" />
     <Reference Include="MonoGame.Extended" />
     <Reference Include="SemVer" />
-    <Reference Include="Gw2Sharp">
-      <HintPath>..\..\working\Gw2Sharp.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Net.Http" />

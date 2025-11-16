@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Blish_HUD;
 using Gw2Sharp.Models;
 using Gw2Sharp.WebApi.V2.Models;
 using Kenedia.Modules.BuildsManager.DataModels.Professions;
@@ -85,8 +86,11 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 
 		private readonly DetailedTexture _pages = new DetailedTexture(1636728);
 
-		protected override SkillIcon[] Skills { get; } = new SkillIcon[3]
+		private Rectangle _separatorBounds;
+
+		protected override SkillIcon[] Skills { get; } = new SkillIcon[4]
 		{
+			new SkillIcon(),
 			new SkillIcon(),
 			new SkillIcon(),
 			new SkillIcon()
@@ -100,14 +104,38 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 
 		public override void RecalculateLayout()
 		{
-			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0153: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018e: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
 			int xOffset = 90;
-			int? num = base.TemplatePresenter.Template.EliteSpecialization?.Id;
-			if (num.HasValue && num.GetValueOrDefault() == 62)
+			switch (base.TemplatePresenter.Template.EliteSpecialization?.Id)
+			{
+			case 81:
+			{
+				for (int i = 0; i < Skills.Length; i++)
+				{
+					Skills[i].Bounds = new Rectangle(xOffset - 10 + i * 44 + ((i == 3) ? 18 : 0), 56, 42, 42);
+					if (i == 3)
+					{
+						Rectangle bounds = Skills[i].Bounds;
+						int num = ((Rectangle)(ref bounds)).get_Left() - 10;
+						bounds = Skills[i].Bounds;
+						_separatorBounds = new Rectangle(num, ((Rectangle)(ref bounds)).get_Top() - 2, 2, Skills[i].Bounds.Height + 4);
+					}
+				}
+				break;
+			}
+			case 62:
 			{
 				_pagesBackground.Bounds = new Rectangle(xOffset + 10, 50, 256, 64);
 				_pages.Bounds = new Rectangle(xOffset + 125, 50, 140, 44);
@@ -115,45 +143,84 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 				{
 					Skills[j].Bounds = new Rectangle(xOffset + 3 + j * 40, 53, 38, 38);
 				}
+				break;
 			}
-			else
+			default:
 			{
-				for (int i = 0; i < Skills.Length; i++)
+				for (int k = 0; k < Skills.Length; k++)
 				{
-					Skills[i].Bounds = new Rectangle(xOffset + 100 + i * 42, 56, 42, 42);
+					Skills[k].Bounds = new Rectangle(xOffset + 100 + k * 42, 56, 42, 42);
 				}
+				break;
+			}
 			}
 		}
 
 		public override void PaintAfterChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
 			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01cb: Unknown result type (might be due to invalid IL or missing references)
 			base.PaintAfterChildren(spriteBatch, bounds);
-			int? num = base.TemplatePresenter.Template.EliteSpecialization?.Id;
-			if (num.HasValue && num.GetValueOrDefault() == 62)
+			switch (base.TemplatePresenter.Template.EliteSpecialization?.Id)
+			{
+			case 81:
+			{
+				for (int k = 0; k < Skills.Length; k++)
+				{
+					Skills[k].Draw(this, spriteBatch, base.RelativeMousePosition);
+				}
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, _separatorBounds, Color.get_White());
+				break;
+			}
+			case 62:
 			{
 				_pagesBackground.Draw(this, spriteBatch);
 				_pages.Draw(this, spriteBatch);
+				for (int j = 0; j < 4; j++)
+				{
+					Skills[j].Draw(this, spriteBatch, base.RelativeMousePosition);
+				}
+				break;
 			}
-			for (int i = 0; i < Skills.Length; i++)
+			default:
 			{
-				Skills[i].Draw(this, spriteBatch, base.RelativeMousePosition);
+				for (int i = 0; i < 4; i++)
+				{
+					Skills[i].Draw(this, spriteBatch, base.RelativeMousePosition);
+				}
+				break;
+			}
 			}
 		}
 
 		protected override void ApplyTemplate()
 		{
-			Dictionary<int, Kenedia.Modules.BuildsManager.DataModels.Professions.Skill> skills;
-			if (base.TemplatePresenter?.Template != null && base.Data.IsLoaded)
+			if (base.TemplatePresenter?.Template == null || !base.Data.IsLoaded)
 			{
-				base.ApplyTemplate();
-				skills = base.Data?.Professions?[ProfessionType.Guardian]?.Skills;
-				if (skills != null)
+				return;
+			}
+			base.ApplyTemplate();
+			SkillDictionary skills = base.Data?.Professions?[ProfessionType.Guardian]?.Skills;
+			if (skills != null)
+			{
+				int? num = base.TemplatePresenter.Template.EliteSpecialization?.Id;
+				if (num.HasValue && num.GetValueOrDefault() == 81)
+				{
+					Skills[0].Skill = skills.Get(78837);
+					Skills[1].Skill = skills.Get(78604);
+					Skills[2].Skill = skills.Get(78358);
+					Skills[3].Skill = skills.Get(77073);
+				}
+				else
 				{
 					Skills[0].Skill = GetSkill(SkillSlot.Profession1);
 					Skills[1].Skill = GetSkill(SkillSlot.Profession2);
 					Skills[2].Skill = GetSkill(SkillSlot.Profession3);
+					Skills[3].Skill = null;
 				}
 			}
 			Kenedia.Modules.BuildsManager.DataModels.Professions.Skill? GetSkill(SkillSlot slot)

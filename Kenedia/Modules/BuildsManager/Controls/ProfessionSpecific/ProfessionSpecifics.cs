@@ -88,7 +88,11 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 
 		protected virtual void ApplyTemplate()
 		{
-			SetTooltipSkill();
+			TemplatePresenter templatePresenter = TemplatePresenter;
+			if (templatePresenter != null && templatePresenter.Template?.Loaded == true)
+			{
+				SetTooltipSkill();
+			}
 		}
 
 		protected override void OnMouseMoved(MouseEventArgs e)
@@ -108,6 +112,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 				TemplatePresenter.TraitChanged -= new TraitChangedEventHandler(OnTraitChanged);
 				TemplatePresenter.SkillChanged -= new SkillChangedEventHandler(OnSkillChanged);
 			}
+			Data.Loaded -= new EventHandler(Data_Loaded);
 		}
 
 		protected void SetTooltipSkill()

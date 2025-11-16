@@ -24,6 +24,24 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 			new DetailedTexture(156429)
 		};
 
+		private readonly DetailedTexture _notesRegionBackground = new DetailedTexture(3680685);
+
+		private readonly DetailedTexture[] _notes = new DetailedTexture[3]
+		{
+			new DetailedTexture(3680686),
+			new DetailedTexture(3680688),
+			new DetailedTexture(3680690)
+		};
+
+		private readonly DetailedTexture[] _notesBackground = new DetailedTexture[3]
+		{
+			new DetailedTexture(3680687),
+			new DetailedTexture(3680689),
+			new DetailedTexture(3680691)
+		};
+
+		private Color _notesColor = new Color(198, 100, 231);
+
 		private Rectangle _separatorBounds;
 
 		protected override SkillIcon[] Skills { get; } = new SkillIcon[5]
@@ -39,35 +57,57 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 		public MesmerSpecifics(TemplatePresenter template, Data data)
 			: base(template, data)
 		{
-		}
+		}//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
+		//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
+
 
 		public override void RecalculateLayout()
 		{
-			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0121: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0126: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0131: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0138: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0143: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0087: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0135: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01fd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0202: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0214: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021f: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
 			int xOffset = 70;
-			int? num = base.TemplatePresenter?.Template?.EliteSpecialization?.Id;
-			if (num.HasValue && num.GetValueOrDefault() == 66)
+			switch (base.TemplatePresenter?.Template?.EliteSpecialization?.Id)
 			{
-				for (int k = 0; k < _clones.Length; k++)
+			case 73:
+				_notesRegionBackground.Bounds = new Rectangle(xOffset + 85, 0, 125, 42);
+				_notesBackground[0].Bounds = new Rectangle(xOffset + 95, 6, 36, 36);
+				_notes[0].Bounds = new Rectangle(xOffset + 95, 6, 36, 36);
+				_notesBackground[1].Bounds = new Rectangle(xOffset + 135, 0, 36, 36);
+				_notes[1].Bounds = new Rectangle(xOffset + 135, 0, 36, 36);
+				_notesBackground[2].Bounds = new Rectangle(xOffset + 165, 2, 36, 36);
+				_notes[2].Bounds = new Rectangle(xOffset + 165, 2, 36, 36);
+				break;
+			case 66:
+			{
+				for (int j = 0; j < _clones.Length; j++)
 				{
-					_clones[k].Bounds = new Rectangle(xOffset + 90 + k * 24, 24, 30, 30);
+					_clones[j].Bounds = new Rectangle(xOffset + 90 + j * 24, 24, 30, 30);
 				}
+				break;
 			}
-			else
+			default:
 			{
-				for (int j = 0; j < 3; j++)
+				for (int k = 0; k < 3; k++)
 				{
-					_clones[j].Bounds = new Rectangle(xOffset + 80 + j * 32, 12, 42, 42);
+					_clones[k].Bounds = new Rectangle(xOffset + 80 + k * 32, 12, 42, 42);
 				}
+				break;
+			}
 			}
 			for (int i = 0; i < Skills.Length; i++)
 			{
@@ -80,16 +120,43 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 		public override void PaintAfterChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
 			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0119: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0196: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ef: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0267: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0123: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0184: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_025b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_032b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_037f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0384: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03fb: Unknown result type (might be due to invalid IL or missing references)
 			base.PaintAfterChildren(spriteBatch, bounds);
 			switch (base.TemplatePresenter.Template.EliteSpecialization?.Id)
 			{
+			case 73:
+			{
+				_notesRegionBackground.Draw(this, spriteBatch);
+				DetailedTexture[] notesBackground = _notesBackground;
+				foreach (DetailedTexture obj in notesBackground)
+				{
+					Color? color = Color.get_Black();
+					obj.Draw(this, spriteBatch, null, color);
+				}
+				notesBackground = _notes;
+				foreach (DetailedTexture obj2 in notesBackground)
+				{
+					Color? color = _notesColor;
+					obj2.Draw(this, spriteBatch, null, color);
+				}
+				for (int i2 = 0; i2 < 5; i2++)
+				{
+					Skills[i2].Draw(this, spriteBatch, base.RelativeMousePosition);
+				}
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, _separatorBounds, Color.get_Black());
+				break;
+			}
 			case 66:
 			{
 				for (int m = 0; m < _clones.Length; m++)
@@ -133,18 +200,23 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 
 		protected override void ApplyTemplate()
 		{
-			Dictionary<int, Kenedia.Modules.BuildsManager.DataModels.Professions.Skill> skills;
-			if (base.TemplatePresenter?.Template != null && base.Data.IsLoaded)
+			if (base.TemplatePresenter?.Template == null || !base.Data.IsLoaded)
 			{
-				base.ApplyTemplate();
-				skills = base.Data?.Professions?[ProfessionType.Mesmer]?.Skills;
-				if (skills != null)
+				return;
+			}
+			base.ApplyTemplate();
+			SkillDictionary skills = base.Data?.Professions?[ProfessionType.Mesmer]?.Skills;
+			if (skills != null)
+			{
+				Skills[0].Skill = GetSkill(SkillSlot.Profession1);
+				Skills[1].Skill = GetSkill(SkillSlot.Profession2);
+				Skills[2].Skill = GetSkill(SkillSlot.Profession3);
+				Skills[3].Skill = GetSkill(SkillSlot.Profession4);
+				Skills[4].Skill = GetSkill(SkillSlot.Profession5);
+				int? num = base.TemplatePresenter.Template.EliteSpecialization?.Id;
+				if (num.HasValue && num.GetValueOrDefault() == 73)
 				{
-					Skills[0].Skill = GetSkill(SkillSlot.Profession1);
-					Skills[1].Skill = GetSkill(SkillSlot.Profession2);
-					Skills[2].Skill = GetSkill(SkillSlot.Profession3);
-					Skills[3].Skill = GetSkill(SkillSlot.Profession4);
-					Skills[4].Skill = GetSkill(SkillSlot.Profession5);
+					Skills[4].Skill = skills.Get(76931);
 				}
 			}
 			Kenedia.Modules.BuildsManager.DataModels.Professions.Skill GetSkill(SkillSlot slot)

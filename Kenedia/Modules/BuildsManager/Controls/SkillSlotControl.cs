@@ -368,7 +368,7 @@ namespace Kenedia.Modules.BuildsManager.Controls
 			if (templatePresenter == null || templatePresenter.Template?.Profession != ProfessionType.Revenant)
 			{
 				BuildSpecialization slot2;
-				List<KeyValuePair<int, Kenedia.Modules.BuildsManager.DataModels.Professions.Skill>> filteredSkills2 = Data.Professions[TemplatePresenter.Template.Profession].Skills.Where<KeyValuePair<int, Kenedia.Modules.BuildsManager.DataModels.Professions.Skill>>((KeyValuePair<int, Kenedia.Modules.BuildsManager.DataModels.Professions.Skill> e) => e.Value.PaletteId > 0 && e.Value.Slot.HasValue && e.Value.Slot == slot && (e.Value.Specialization == 0 || TemplatePresenter.Template.HasSpecialization(e.Value.Specialization, out slot2))).ToList();
+				List<KeyValuePair<int, Kenedia.Modules.BuildsManager.DataModels.Professions.Skill>> filteredSkills2 = Data.Professions[TemplatePresenter.Template.Profession].Skills.Where((KeyValuePair<int, Kenedia.Modules.BuildsManager.DataModels.Professions.Skill> e) => e.Value.PaletteId > 0 && e.Value.Slot.HasValue && e.Value.Slot == slot && (e.Value.Specialization == 0 || TemplatePresenter.Template.HasSpecialization(e.Value.Specialization, out slot2))).ToList();
 				List<KeyValuePair<int, Kenedia.Modules.BuildsManager.DataModels.Professions.Skill>> racialSkills = ((TemplatePresenter.Template.Race == Races.None) ? new List<KeyValuePair<int, Kenedia.Modules.BuildsManager.DataModels.Professions.Skill>>() : Data.Races[TemplatePresenter.Template.Race]?.Skills.Where<KeyValuePair<int, Kenedia.Modules.BuildsManager.DataModels.Professions.Skill>>((KeyValuePair<int, Kenedia.Modules.BuildsManager.DataModels.Professions.Skill> e) => e.Value.PaletteId > 0 && e.Value.Slot.HasValue && e.Value.Slot == slot).ToList());
 				if (racialSkills != null)
 				{

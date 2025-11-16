@@ -228,8 +228,9 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 
 		protected override void DisposeControl()
 		{
-			base.DisposeControl();
+			base.TemplatePresenter.LegendSlotChanged -= new ValueChangedEventHandler<LegendSlotType>(TemplatePresenter_LegendSlotChanged);
 			_legendSelector?.Dispose();
+			base.DisposeControl();
 		}
 
 		private LegendSlotType GetOtherSlot(LegendSlotType? slot = null)

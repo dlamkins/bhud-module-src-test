@@ -427,6 +427,10 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 					foreach (SelectionPanelSelectable item3 in _weapons)
 					{
 						bool weaponMatch = true;
+						if (!(item3.Item is Kenedia.Modules.BuildsManager.DataModels.Items.Weapon))
+						{
+							continue;
+						}
 						KeyValuePair<Kenedia.Modules.BuildsManager.DataModels.Professions.Weapon.WeaponType, Kenedia.Modules.BuildsManager.DataModels.Professions.Weapon> weapon = Data.Professions[TemplatePresenter?.Template.Profession ?? ProfessionType.Guardian].Weapons.Where<KeyValuePair<Kenedia.Modules.BuildsManager.DataModels.Professions.Weapon.WeaponType, Kenedia.Modules.BuildsManager.DataModels.Professions.Weapon>>((KeyValuePair<Kenedia.Modules.BuildsManager.DataModels.Professions.Weapon.WeaponType, Kenedia.Modules.BuildsManager.DataModels.Professions.Weapon> e) => (item3.Item as Kenedia.Modules.BuildsManager.DataModels.Items.Weapon).WeaponType.IsWeaponType(e.Value.Type)).FirstOrDefault();
 						if (weapon.Value != null)
 						{
