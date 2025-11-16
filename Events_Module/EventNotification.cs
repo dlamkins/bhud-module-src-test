@@ -118,9 +118,12 @@ namespace Events_Module
 			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _textureBackground, bounds, Color.get_White() * 0.85f);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_icon), _layoutIconBounds);
+			if (_icon != null)
+			{
+				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_icon), _layoutIconBounds);
+			}
 		}
 
 		private void Show(float duration)
