@@ -1,6 +1,8 @@
+using System;
 using BhModule.Community.Pathing.Entity;
 using BhModule.Community.Pathing.State;
 using BhModule.Community.Pathing.Utility;
+using Blish_HUD;
 using TmfLib.Pathable;
 using TmfLib.Prototype;
 
@@ -8,6 +10,8 @@ namespace BhModule.Community.Pathing.Behavior.Modifier
 {
 	public class ShowHideModifier : Behavior<StandardMarker>, ICanInteract, ICanFocus
 	{
+		private static readonly Logger Logger = Logger.GetLogger<ShowHideModifier>();
+
 		public const string SHOW_PRIMARY_ATTR_NAME = "show";
 
 		public const string HIDE_PRIMARY_ATTR_NAME = "hide";
@@ -30,11 +34,43 @@ namespace BhModule.Community.Pathing.Behavior.Modifier
 		{
 			if (attributes.TryGetAttribute("show", out var showAttr))
 			{
-				return new ShowHideModifier(packState.RootCategory.GetOrAddCategoryFromNamespace(showAttr.GetValueAsString()), showOnInteract: true, marker, packState);
+				string attrValue2 = showAttr.GetValueAsString();
+				if (!string.IsNullOrWhiteSpace(attrValue2))
+				{
+					PathingCategory category2 = null;
+					try
+					{
+						category2 = packState.RootCategory.GetOrAddCategoryFromNamespace(attrValue2);
+					}
+					catch (Exception e2)
+					{
+						Logger.Warn(e2, "Failed to load " + showAttr.Name + "=\"" + attrValue2 + "\".");
+					}
+					if (category2 != null)
+					{
+						return new ShowHideModifier(category2, showOnInteract: true, marker, packState);
+					}
+				}
 			}
 			if (attributes.TryGetAttribute("hide", out var hideAttr))
 			{
-				return new ShowHideModifier(packState.RootCategory.GetOrAddCategoryFromNamespace(hideAttr.GetValueAsString()), showOnInteract: false, marker, packState);
+				string attrValue = hideAttr.GetValueAsString();
+				if (!string.IsNullOrWhiteSpace(attrValue))
+				{
+					PathingCategory category = null;
+					try
+					{
+						category = packState.RootCategory.GetOrAddCategoryFromNamespace(attrValue);
+					}
+					catch (Exception e)
+					{
+						Logger.Warn(e, "Failed to load " + hideAttr.Name + "=\"" + attrValue + "\".");
+					}
+					if (category != null)
+					{
+						return new ShowHideModifier(category, showOnInteract: false, marker, packState);
+					}
+				}
 			}
 			return null;
 		}
