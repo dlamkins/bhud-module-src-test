@@ -178,7 +178,7 @@ namespace Kenedia.Modules.BuildsManager.Utility
 				codeArray[75] = template.PveRelic.Relic?.MappedId ?? 0;
 				codeArray[76] = template.PvpRelic.Relic?.MappedId ?? 0;
 			}
-			return "[&" + Convert.ToBase64String(new System.Span<byte>(codeArray).ToArray()) + "]";
+			return "[&" + Convert.ToBase64String(new Span<byte>(codeArray).ToArray()) + "]";
 		}
 
 		public static void LoadTemplateFromChatCode(Template template, string? chatCode, Data data)

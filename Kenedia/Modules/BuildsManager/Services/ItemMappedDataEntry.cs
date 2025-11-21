@@ -23,14 +23,13 @@ namespace Kenedia.Modules.BuildsManager.Services
 {
 	public class ItemMappedDataEntry<T> : MappedDataEntry<int, T> where T : BaseItem, new()
 	{
-		public override async Task<bool> LoadAndUpdate(string name, ByteIntMap map, string path, Gw2ApiManager gw2ApiManager, CancellationToken cancellationToken)
+		private List<int> _pendingIds = new List<int>();
+
+		public async Task<List<int>> LoadAndGetPending(string name, ByteIntMap map, string path)
 		{
-			_ = 2;
 			try
 			{
-				bool saveRequired = false;
 				MappedDataEntry<int, T> loaded = null;
-				BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Debug("Load and if required update " + name);
 				if (!DataLoaded && System.IO.File.Exists(path))
 				{
 					BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Debug("Load " + name + ".json");
@@ -40,30 +39,55 @@ namespace Kenedia.Modules.BuildsManager.Services
 				base.Map = map;
 				base.Items = loaded?.Items ?? base.Items;
 				base.Version = loaded?.Version ?? base.Version;
+				BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Debug($"{name} Current Version: {base.Version} | Required Version: {map.Version}");
 				foreach (int id in base.Map.Ignored.Values)
 				{
 					base.Items.Remove(id);
 				}
-				BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Debug($"{name} Version {base.Version} | version {map.Version}");
-				BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Debug("Check for missing values for " + name);
 				Locale value = GameService.Overlay.UserLocale.Value;
 				bool flag = (((uint)(value - 4) <= 1u) ? true : false);
 				Locale lang = ((!flag) ? GameService.Overlay.UserLocale.Value : Locale.English);
-				IEnumerable<int> fetchIds = base.Items.Values.Where((T item) => item.Names[lang] == null)?.Select((T e) => e.Id);
-				bool fetchAll = map.Version > base.Version;
+				_pendingIds = new List<int>();
 				if (map.Version > base.Version)
 				{
+					BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Debug("The current version does not match the map version. Updating all values for " + name + ".");
 					base.Version = map.Version;
-					fetchIds = fetchIds.Concat(base.Map.Values.Except(base.Items.Keys).Except(base.Map.Ignored.Values));
-					saveRequired = true;
-					if (fetchAll)
-					{
-						BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Debug("The current version does not match the map version. Updating all values for " + name + ".");
-					}
+					ItemMappedDataEntry<T> itemMappedDataEntry = this;
+					List<int> list = new List<int>();
+					list.AddRange(_pendingIds);
+					list.AddRange(base.Map.Values.Except(base.Items.Keys).Except(base.Map.Ignored.Values));
+					itemMappedDataEntry._pendingIds = list;
 				}
-				if (fetchIds.Count() > 0)
+				else
 				{
-					List<List<int>> idSets = fetchIds.ToList().ChunkBy(200);
+					ItemMappedDataEntry<T> itemMappedDataEntry2 = this;
+					List<int> list2 = new List<int>();
+					list2.AddRange(base.Items.Values.Where((T item) => item.Names[lang] == null)?.Select((T e) => e.Id));
+					itemMappedDataEntry2._pendingIds = list2;
+				}
+				if (_pendingIds.Count > 0)
+				{
+					BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Debug($"A total of {_pendingIds.Count} {name} need to be fetched.");
+					return _pendingIds;
+				}
+				return new List<int>();
+			}
+			catch (Exception ex)
+			{
+				BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Warn(ex, "Failed to load " + name + " data.");
+				return new List<int>();
+			}
+		}
+
+		public override async Task<bool> LoadAndUpdate(string name, ByteIntMap map, string path, Gw2ApiManager gw2ApiManager, CancellationToken cancellationToken)
+		{
+			_ = 2;
+			try
+			{
+				bool saveRequired = _pendingIds.Count > 0;
+				if (_pendingIds.Count > 0)
+				{
+					List<List<int>> idSets = _pendingIds.ChunkBy(200);
 					ItemArmor armor = (await gw2ApiManager.Gw2ApiClient.V2.Items.GetAsync(80384, cancellationToken)) as ItemArmor;
 					IReadOnlyList<int> readOnlyList2;
 					if (armor == null)
@@ -77,7 +101,7 @@ namespace Kenedia.Modules.BuildsManager.Services
 					}
 					IReadOnlyList<int> statChoices = readOnlyList2;
 					saveRequired = saveRequired || idSets.Count > 0;
-					BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Debug($"Fetch a total of {fetchIds.Count()} {name} in {idSets.Count} sets.");
+					BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Debug($"Fetch a total of {_pendingIds.Count} {name} in {idSets.Count} sets.");
 					foreach (List<int> ids in idSets)
 					{
 						IReadOnlyList<Item> items = await gw2ApiManager.Gw2ApiClient.V2.Items.ManyAsync(ids, cancellationToken);
@@ -85,23 +109,23 @@ namespace Kenedia.Modules.BuildsManager.Services
 						{
 							return false;
 						}
-						foreach (Item item2 in items)
+						foreach (Item item in items)
 						{
 							T entryItem;
-							bool exists = base.Items.Values.TryFind((T e) => e.Id == item2.Id, out entryItem);
+							bool exists = base.Items.Values.TryFind((T e) => e.Id == item.Id, out entryItem);
 							if (entryItem == null)
 							{
 								entryItem = new T
 								{
-									MappedId = (base.Map?.Items?.FirstOrDefault((KeyValuePair<byte, int> e) => e.Value == item2.Id).Key).GetValueOrDefault()
+									MappedId = (base.Map?.Items?.FirstOrDefault((KeyValuePair<byte, int> e) => e.Value == item.Id).Key).GetValueOrDefault()
 								};
 							}
-							entryItem?.Apply(item2);
+							entryItem?.Apply(item);
 							if (entryItem != null && entryItem.Type == Kenedia.Modules.Core.DataModels.ItemType.Relic)
 							{
 								entryItem.TemplateSlot = ((name == "PvpRelics") ? TemplateSlotType.PvpRelic : TemplateSlotType.PveRelic);
 							}
-							if (entryItem != null && Data.SkinDictionary.TryGetValue(item2.Id, out var assetId) && assetId.HasValue)
+							if (entryItem != null && Data.SkinDictionary.TryGetValue(item.Id, out var assetId) && assetId.HasValue)
 							{
 								entryItem.Rarity = ItemRarity.Ascended;
 								if (entryItem.TemplateSlot == TemplateSlotType.AquaBreather)
@@ -134,7 +158,7 @@ namespace Kenedia.Modules.BuildsManager.Services
 							}
 							if (!exists)
 							{
-								base.Items.Add(item2.Id, entryItem);
+								base.Items.Add(item.Id, entryItem);
 							}
 							entryItem = null;
 						}

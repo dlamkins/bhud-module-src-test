@@ -108,17 +108,17 @@ namespace Kenedia.Modules.BuildsManager
 		protected override void AssignServiceInstaces(IServiceProvider serviceProvider)
 		{
 			base.AssignServiceInstaces(serviceProvider);
-			Data = ServiceProviderServiceExtensions.GetRequiredService<Data>(base.ServiceProvider);
-			Templates = ServiceProviderServiceExtensions.GetRequiredService<TemplateCollection>(base.ServiceProvider);
-			TemplatePresenter = ServiceProviderServiceExtensions.GetRequiredService<TemplatePresenter>(base.ServiceProvider);
-			TemplateTags = ServiceProviderServiceExtensions.GetRequiredService<TemplateTags>(base.ServiceProvider);
-			GW2API = ServiceProviderServiceExtensions.GetRequiredService<GW2API>(base.ServiceProvider);
+			Data = base.ServiceProvider.GetRequiredService<Data>();
+			Templates = base.ServiceProvider.GetRequiredService<TemplateCollection>();
+			TemplatePresenter = base.ServiceProvider.GetRequiredService<TemplatePresenter>();
+			TemplateTags = base.ServiceProvider.GetRequiredService<TemplateTags>();
+			GW2API = base.ServiceProvider.GetRequiredService<GW2API>();
 			Data.Loaded += new EventHandler(Data_Loaded);
 		}
 
 		private async void Data_Loaded(object sender, EventArgs e)
 		{
-			await ServiceProviderServiceExtensions.GetService<TagGroups>(base.ServiceProvider)!.Load();
+			await base.ServiceProvider.GetService<TagGroups>().Load();
 			await TemplateTags.Load();
 			await Templates.Load();
 		}
@@ -206,8 +206,8 @@ namespace Kenedia.Modules.BuildsManager
 		{
 			base.LoadGUI();
 			BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Info("Building UI for " + base.Name);
-			IServiceScope scope = ServiceProviderServiceExtensions.CreateScope(base.ServiceProvider);
-			base.MainWindow = ServiceProviderServiceExtensions.GetRequiredService<MainWindow>(scope.ServiceProvider);
+			IServiceScope scope = base.ServiceProvider.CreateScope();
+			base.MainWindow = scope.ServiceProvider.GetRequiredService<MainWindow>();
 		}
 
 		protected override void UnloadGUI()

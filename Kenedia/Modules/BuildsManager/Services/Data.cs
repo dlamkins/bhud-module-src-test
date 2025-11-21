@@ -1,8 +1,10 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
@@ -13,12 +15,13 @@ using Kenedia.Modules.BuildsManager.Models;
 using Kenedia.Modules.BuildsManager.Views;
 using Kenedia.Modules.Core.Attributes;
 using Kenedia.Modules.Core.Controls;
+using Kenedia.Modules.Core.Extensions;
 using Kenedia.Modules.Core.Models;
 using Kenedia.Modules.Core.Utility;
 
 namespace Kenedia.Modules.BuildsManager.Services
 {
-	public class Data : IDisposable
+	public class Data : IDisposable, IEnumerable<(string name, BaseMappedDataEntry map)>, IEnumerable
 	{
 		public static readonly Dictionary<int, int?> SkinDictionary = new Dictionary<int, int?>
 		{
@@ -223,13 +226,22 @@ namespace Kenedia.Modules.BuildsManager.Services
 
 		public IEnumerator<(string name, BaseMappedDataEntry map)> GetEnumerator()
 		{
-			IEnumerable<PropertyInfo> propertiesToEnumerate = from property in GetType().GetProperties()
-				where property.GetCustomAttribute<EnumeratorMemberAttribute>() != null
-				select property;
-			foreach (PropertyInfo property2 in propertiesToEnumerate)
+			IEnumerable<PropertyInfo> propertiesToEnumerate = from p in GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)
+				where p.GetCustomAttribute<EnumeratorMemberAttribute>() != null
+				select p;
+			foreach (PropertyInfo property in propertiesToEnumerate)
 			{
-				yield return (property2.Name, property2.GetValue(this) as BaseMappedDataEntry);
+				BaseMappedDataEntry value = property.GetValue(this) as BaseMappedDataEntry;
+				if (value != null)
+				{
+					yield return (property.Name, value);
+				}
 			}
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return GetEnumerator();
 		}
 
 		public async Task<bool> Load(bool force)
@@ -246,7 +258,7 @@ namespace Kenedia.Modules.BuildsManager.Services
 			return await Load(!LoadedLocales.Contains(locale));
 		}
 
-		public async Task<bool> Load()
+		public unsafe async Task<bool> Load()
 		{
 			if (Common.Now - LastLoadAttempt <= 180000.0)
 			{
@@ -274,6 +286,66 @@ namespace Kenedia.Modules.BuildsManager.Services
 					}
 					spinner?.Hide();
 					return false;
+				}
+				List<int> itemIds = new List<int>();
+				using (IEnumerator<(string name, BaseMappedDataEntry map)> enumerator = GetEnumerator())
+				{
+					AsyncTaskMethodBuilder<bool> asyncTaskMethodBuilder = default(AsyncTaskMethodBuilder<bool>);
+					while (enumerator.MoveNext())
+					{
+						var (name2, map2) = enumerator.Current;
+						if (!map2.GetType().IsGenericType || !(map2.GetType().GetGenericTypeDefinition() == typeof(ItemMappedDataEntry<>)))
+						{
+							continue;
+						}
+						Type innerType = map2.GetType().GetGenericArguments()[0];
+						if (!typeof(BaseItem).IsAssignableFrom(innerType))
+						{
+							continue;
+						}
+						dynamic dynMap = map2;
+						dynamic awaiter = dynMap.LoadAndGetPending(name2, versions[name2], Path.Combine(Paths.ModuleDataPath, name2 + ".json")).GetAwaiter();
+						if (!(bool)awaiter.IsCompleted)
+						{
+							ICriticalNotifyCompletion awaiter2 = awaiter as ICriticalNotifyCompletion;
+							if (awaiter2 == null)
+							{
+								INotifyCompletion awaiter3 = (INotifyCompletion)awaiter;
+								asyncTaskMethodBuilder.AwaitOnCompleted(ref awaiter3, ref *(_003CLoad_003Ed__91*)/*Error near IL_03c8: stateMachine*/);
+							}
+							else
+							{
+								asyncTaskMethodBuilder.AwaitUnsafeOnCompleted(ref awaiter2, ref *(_003CLoad_003Ed__91*)/*Error near IL_03db: stateMachine*/);
+							}
+							/*Error near IL_03e4: leave MoveNext - await not detected correctly*/;
+						}
+						object ids = awaiter.GetResult();
+						List<int> idList = ids as List<int>;
+						List<int> list;
+						if (idList == null)
+						{
+							list = itemIds;
+						}
+						else
+						{
+							list = new List<int>();
+							list.AddRange(itemIds.Union(idList));
+						}
+						itemIds = list;
+					}
+				}
+				List<List<int>> idSets = itemIds.ToList().ChunkBy(200);
+				BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths>.Logger.Info($"Pre-Fetching {itemIds.Count} items from API...");
+				int count = 0;
+				foreach (List<int> idSet in idSets)
+				{
+					if (_cancellationTokenSource.IsCancellationRequested)
+					{
+						return false;
+					}
+					count += idSet.Count;
+					BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths>.Logger.Info($"Fetching {count}/{itemIds.Count} items...");
+					await Gw2ApiManager.Gw2ApiClient.V2.Items.ManyAsync(idSet);
 				}
 				bool failed = false;
 				string loadStatus = string.Empty;
@@ -313,7 +385,7 @@ namespace Kenedia.Modules.BuildsManager.Services
 						badge.AddNotification(new ConditionalNotification
 						{
 							NotificationText = txt,
-							Condition = () => DateTime.Now >= endTime
+							Condition = () => DateTime.Now >= endTime || IsLoaded
 						});
 						BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths>.Logger.Info(txt);
 					}

@@ -181,9 +181,11 @@ namespace Gw2BuildTemplates
 
 		public static string Encode(BuildTemplate t)
 		{
-			List<byte> buf = new List<byte>();
-			buf.Add(BuildHeader);
-			buf.Add((byte)t.Profession);
+			List<byte> buf = new List<byte>(2)
+			{
+				BuildHeader,
+				(byte)t.Profession
+			};
 			SpecializationEntry[] specializations = t.Specializations;
 			foreach (SpecializationEntry s in specializations)
 			{
