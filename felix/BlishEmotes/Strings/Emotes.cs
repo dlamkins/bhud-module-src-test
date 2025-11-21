@@ -62,11 +62,15 @@ namespace felix.BlishEmotes.Strings
 
 		internal static string cower => ResourceManager.GetString("cower", resourceCulture);
 
+		internal static string crabdance => ResourceManager.GetString("crabdance", resourceCulture);
+
 		internal static string crossarms => ResourceManager.GetString("crossarms", resourceCulture);
 
 		internal static string cry => ResourceManager.GetString("cry", resourceCulture);
 
 		internal static string dance => ResourceManager.GetString("dance", resourceCulture);
+
+		internal static string drink => ResourceManager.GetString("drink", resourceCulture);
 
 		internal static string facepalm => ResourceManager.GetString("facepalm", resourceCulture);
 
@@ -118,6 +122,8 @@ namespace felix.BlishEmotes.Strings
 
 		internal static string shiverplus => ResourceManager.GetString("shiverplus", resourceCulture);
 
+		internal static string shocked => ResourceManager.GetString("shocked", resourceCulture);
+
 		internal static string shrug => ResourceManager.GetString("shrug", resourceCulture);
 
 		internal static string shuffle => ResourceManager.GetString("shuffle", resourceCulture);
@@ -139,6 +145,10 @@ namespace felix.BlishEmotes.Strings
 		internal static string thanks => ResourceManager.GetString("thanks", resourceCulture);
 
 		internal static string threaten => ResourceManager.GetString("threaten", resourceCulture);
+
+		internal static string thumbsdown => ResourceManager.GetString("thumbsdown", resourceCulture);
+
+		internal static string thumbsup => ResourceManager.GetString("thumbsup", resourceCulture);
 
 		internal static string unleash => ResourceManager.GetString("unleash", resourceCulture);
 

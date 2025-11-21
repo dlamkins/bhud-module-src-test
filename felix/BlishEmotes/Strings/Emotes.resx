@@ -36,8 +36,10 @@
   <data name="readbook"><value>Read book</value></data>
   <data name="shuffle"><value>Shuffle</value></data>
   <data name="crossarms"><value>Crossarms</value></data>
+  <data name="shocked"><value>Shocked</value></data>
   <data name="geargrind"><value>Geargrind</value></data>
   <data name="unleash"><value>Unleash</value></data>
+  <data name="thumbsup"><value>Thumbs up</value></data>
   <data name="threaten"><value>Threaten</value></data>
   <data name="magictrick"><value>Magic trick</value></data>
   <data name="channel"><value>Channel</value></data>
@@ -45,6 +47,7 @@
   <data name="blowkiss"><value>Blow kiss</value></data>
   <data name="no"><value>No</value></data>
   <data name="dance"><value>Dance</value></data>
+  <data name="drink"><value>Drink</value></data>
   <data name="laugh"><value>Laugh</value></data>
   <data name="bless"><value>Bless</value></data>
   <data name="cower"><value>Cower</value></data>
@@ -62,6 +65,8 @@
   <data name="shrug"><value>Shrug</value></data>
   <data name="barbecue"><value>Barbecue</value></data>
   <data name="scissors"><value>Scissors</value></data>
+  <data name="thumbsdown"><value>Thumbs down</value></data>
+  <data name="crabdance"><value>Crabdance</value></data>
   <data name="petalthrow"><value>Petal throw</value></data>
   <data name="rockout"><value>Rockout</value></data>
   <data name="beckon"><value>Beckon</value></data>
