@@ -120,35 +120,35 @@ namespace BhModule.Community.Pathing
 
 		protected override void Initialize()
 		{
-			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c0: Expected O, but got Unknown
-			//IL_00df: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0107: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0126: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d6: Expected O, but got Unknown
+			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0108: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0112: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0132: Unknown result type (might be due to invalid IL or missing references)
 			//IL_013c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0152: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015e: Expected O, but got Unknown
-			//IL_018f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0199: Expected O, but got Unknown
-			//IL_01c9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d3: Expected O, but got Unknown
-			//IL_0203: Unknown result type (might be due to invalid IL or missing references)
-			//IL_020d: Expected O, but got Unknown
-			//IL_0232: Unknown result type (might be due to invalid IL or missing references)
-			//IL_023c: Expected O, but got Unknown
-			//IL_026c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0276: Expected O, but got Unknown
-			//IL_029b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a5: Expected O, but got Unknown
-			if (DateTime.UtcNow.Date >= new DateTime(2023, 8, 22, 0, 0, 0, DateTimeKind.Utc) && Program.get_OverlayVersion() < new SemVer.Version(1, 1, 0))
+			//IL_0168: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0174: Expected O, but got Unknown
+			//IL_01a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01af: Expected O, but got Unknown
+			//IL_01df: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e9: Expected O, but got Unknown
+			//IL_0219: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0223: Expected O, but got Unknown
+			//IL_0248: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0252: Expected O, but got Unknown
+			//IL_0282: Unknown result type (might be due to invalid IL or missing references)
+			//IL_028c: Expected O, but got Unknown
+			//IL_02b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02bb: Expected O, but got Unknown
+			if (DateTime.UtcNow.Date >= new DateTime(2023, 8, 22, 0, 0, 0, DateTimeKind.Utc) && Program.get_OverlayVersion() < new SemVer.Version(1, 1, 0) && Program.get_OverlayVersion() > new SemVer.Version(0, 1, 0))
 			{
 				try
 				{
