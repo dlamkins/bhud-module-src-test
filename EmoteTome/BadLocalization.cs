@@ -168,6 +168,16 @@ namespace EmoteTome
 
 		public static readonly List<string> BARBECUE = new List<string> { "Barbecue", "Barbecue", "Grillen", "Barbacoa" };
 
+		public static readonly List<string> DRINK = new List<string> { "Drink", "boire", "Trinken", "Beber" };
+
+		public static readonly List<string> CRABDANCE = new List<string> { "Crabdance", "danseducrabe", "Krabbentanz", "bailedelcangrejo" };
+
+		public static readonly List<string> SHOCKED = new List<string> { "Shocked", "Choque", "Schockiert", "Impactado" };
+
+		public static readonly List<string> THUMBSUP = new List<string> { "ThumbsUp", "Poucehaut", "Daumenhoch", "Megusta" };
+
+		public static readonly List<string> THUMBSDOWN = new List<string> { "ThumbsDown", "Poucebas", "Daumenrunter", "Nomegusta" };
+
 		public static readonly List<string> BEAR = new List<string> { "Bear", "Ours", "Baer", "Osa" };
 
 		public static readonly List<string> DEER = new List<string> { "Deer", "Daim", "Hirsch", "Ciervo" };
