@@ -5,6 +5,7 @@ using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Input;
 using Microsoft.Xna.Framework;
+using flakysalt.CharacterKeybinds.Resources;
 
 namespace flakysalt.CharacterKeybinds.Views
 {
@@ -87,7 +88,7 @@ namespace flakysalt.CharacterKeybinds.Views
 			Label val2 = new Label();
 			((Control)val2).set_Parent((Container)(object)mainFlowPanel);
 			((Control)val2).set_Width(((Control)mainFlowPanel).get_Width());
-			val2.set_Text("Migration Tab");
+			val2.set_Text(Loca.migration);
 			val2.set_Font(GameService.Content.get_DefaultFont18());
 			Label val3 = new Label();
 			((Control)val3).set_Parent((Container)(object)mainFlowPanel);
@@ -136,6 +137,13 @@ namespace flakysalt.CharacterKeybinds.Views
 				OnDeleteClicked?.Invoke(sender, (EventArgs)(object)args);
 			});
 			((View<IPresenter>)this).Build(buildPanel);
+		}
+
+		public void SetDeletionText()
+		{
+			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+			resultLabel.set_Text("Old Data Deleted Successfully.");
+			resultLabel.set_TextColor(Color.get_LimeGreen());
 		}
 
 		public void SetMigrationResult(List<string> result)

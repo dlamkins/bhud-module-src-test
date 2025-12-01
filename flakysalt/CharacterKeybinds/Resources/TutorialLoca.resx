@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="initialSetupPanel2"><value>To set up your Guild Wars 2 keybinds, go to your settings menu and then to the Control Options Tab.
+
+In here, press the Export button at the bottom of the page.
+
+This will save your current keybindings to be used in the module.</value></data>
+  <data name="initialSetupPanel3"><value>Repeat this step for every unique set of keybinds you want to create.
+
+You can also repeat this step at any time in the future.</value></data>
+  <data name="initialSetupPanel1"><value>Welcome to Character Keybinds!
+
+If you have not done so already, please provide an API key to Blish HUD.</value></data>
+  <data name="initialSetupPanel4"><value>Now you can open the module itself from the top left of your screen. 
+
+Here you can specify your default keybinds, which will be used 
+for all characters and specializations that have no keybinds assigned in this menu.
+
+Below, you can specify keybinds per character or specialization.</value></data>
+  <data name="initialSetupPanel5"><value>If you have any questions or suggestions,
+you can find the FAQ and other useful functions 
+at the bottom of the module settings page.
+
+Feel free to reach out to me directly on the Blish HUD Discord server for further support &lt;3</value></data>
+  <data name="initialSetupHeader"><value>Initial Setup Tutorial</value></data>
+  <data name="nextButtonText"><value>Next</value></data>
+  <data name="previousButtonText"><value>Previous</value></data>
+  <data name="closeButtonText"><value>Close</value></data>
+  </root>

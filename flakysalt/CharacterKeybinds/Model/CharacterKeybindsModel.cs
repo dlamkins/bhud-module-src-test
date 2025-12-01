@@ -68,28 +68,19 @@ namespace flakysalt.CharacterKeybinds.Model
 
 		public async Task LoadResourcesAsync()
 		{
-			_ = 2;
-			try
+			IEnumerable<Character> characters = await _apiService.GetCharactersAsync();
+			IEnumerable<Profession> professions = await _apiService.GetProfessionsAsync();
+			IEnumerable<Specialization> obj = await _apiService.GetSpecializationsAsync();
+			_characters = characters.ToList();
+			foreach (Specialization specialization in obj)
 			{
-				IEnumerable<Character> characters = await _apiService.GetCharactersAsync();
-				IEnumerable<Profession> professions = await _apiService.GetProfessionsAsync();
-				IEnumerable<Specialization> obj = await _apiService.GetSpecializationsAsync();
-				_characters = characters.ToList();
-				foreach (Specialization specialization in obj)
+				if (specialization.get_Elite())
 				{
-					if (specialization.get_Elite())
-					{
-						Profession profession = professions.First((Profession p) => p.get_Id() == specialization.get_Profession());
-						AddProfessionEliteSpecialization(profession, specialization);
-					}
+					Profession profession = professions.First((Profession p) => p.get_Id() == specialization.get_Profession());
+					AddProfessionEliteSpecialization(profession, specialization);
 				}
-				OnCharactersChanged?.Invoke();
 			}
-			catch (Exception ex)
-			{
-				_logger.Error(ex, "Failed to load resources from API");
-				throw;
-			}
+			OnCharactersChanged?.Invoke();
 		}
 
 		public void ClearResources()
@@ -129,6 +120,21 @@ namespace flakysalt.CharacterKeybinds.Model
 				foreach (Specialization specialization in item.Value)
 				{
 					if (specialization.get_Name() == name)
+					{
+						return specialization;
+					}
+				}
+			}
+			return null;
+		}
+
+		public Specialization GetSpecializationById(int id)
+		{
+			foreach (KeyValuePair<Profession, List<Specialization>> item in _professionEliteSpecialization)
+			{
+				foreach (Specialization specialization in item.Value)
+				{
+					if (specialization.get_Id() == id)
 					{
 						return specialization;
 					}

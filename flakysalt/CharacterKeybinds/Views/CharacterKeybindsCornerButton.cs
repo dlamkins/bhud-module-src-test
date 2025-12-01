@@ -7,6 +7,7 @@ using Blish_HUD.Input;
 using Blish_HUD.Settings;
 using Microsoft.Xna.Framework.Graphics;
 using flakysalt.CharacterKeybinds.Model;
+using flakysalt.CharacterKeybinds.Resources;
 using flakysalt.CharacterKeybinds.Services;
 
 namespace flakysalt.CharacterKeybinds.Views
@@ -48,7 +49,7 @@ namespace flakysalt.CharacterKeybinds.Views
 				_cornerTexture = contentService.GetTexture("images/logo_small.png");
 				CornerIcon val = new CornerIcon();
 				val.set_Icon(AsyncTexture2D.op_Implicit(_cornerTexture));
-				((Control)val).set_BasicTooltipText("Character Keybinds");
+				((Control)val).set_BasicTooltipText(Loca.moduleName);
 				((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 				cornerIcon = val;
 				((Control)cornerIcon).add_Click((EventHandler<MouseEventArgs>)CornerIconClicked);

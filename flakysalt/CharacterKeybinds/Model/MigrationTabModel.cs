@@ -27,5 +27,10 @@ namespace flakysalt.CharacterKeybinds.Model
 			Settings.Keymaps.set_Value(keymaps);
 			return migrationReport;
 		}
+
+		public void DeleteOldData()
+		{
+			Settings.characterKeybinds.set_Value((List<CharacterKeybind>)null);
+		}
 	}
 }

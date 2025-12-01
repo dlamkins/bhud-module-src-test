@@ -8,14 +8,17 @@
     <LangVersion>Preview</LangVersion>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
-  <PropertyGroup />
+  <PropertyGroup>
+    <RootNamespace />
+  </PropertyGroup>
   <ItemGroup />
   <ItemGroup>
     <Reference Include="Blish HUD" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="MonoGame.Framework" />
     <Reference Include="Gw2Sharp" />
-    <Reference Include="System.Core" />
     <Reference Include="MonoGame.Extended" />
+    <Reference Include="Newtonsoft.Json" />
+    <Reference Include="System.Core" />
   </ItemGroup>
 </Project>

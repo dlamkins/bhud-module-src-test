@@ -5,6 +5,8 @@ using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Modules.Managers;
 using Microsoft.Xna.Framework;
+using flakysalt.CharacterKeybinds.Resources;
+using flakysalt.CharacterKeybinds.Services;
 
 namespace flakysalt.CharacterKeybinds.Views
 {
@@ -37,11 +39,11 @@ namespace flakysalt.CharacterKeybinds.Views
 			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0068: Expected O, but got Unknown
-			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00da: Unknown result type (might be due to invalid IL or missing references)
 			TabbedWindow2 val = new TabbedWindow2(windowBackgroundTexture, windowRegion, contentRegion);
 			((WindowBase2)val).set_Emblem(contentsManager.GetTexture("images/logo.png"));
 			((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			((WindowBase2)val).set_Title("Character Keybinds");
+			((WindowBase2)val).set_Title(Loca.moduleName);
 			((WindowBase2)val).set_SavesPosition(true);
 			((WindowBase2)val).set_Id("flakysalt_CharacterKeybinds");
 			((WindowBase2)val).set_CanClose(true);
@@ -52,6 +54,10 @@ namespace flakysalt.CharacterKeybinds.Views
 			((Control)window).add_Shown((EventHandler<EventArgs>)WindowShownEvent);
 			window.add_TabChanged((EventHandler<ValueChangedEventArgs<Tab>>)TabChangedEvent);
 			((Control)window).add_Resized((EventHandler<ResizedEventArgs>)OnResized);
+			LocaService.Instance.LocaleChanged += delegate
+			{
+				((WindowBase2)window).set_Title(Loca.moduleName);
+			};
 			((Control)window).set_Size(new Point(670, 600));
 		}
 
@@ -69,13 +75,6 @@ namespace flakysalt.CharacterKeybinds.Views
 
 		private void TabChangedEvent(object sender, ValueChangedEventArgs<Tab> e)
 		{
-			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			Logger logger = Logger.GetLogger<MainWindowView>();
-			object arg = ((Control)window).get_Size();
-			Point contentBounds = ((Container)window).get_ContentBounds();
-			logger.Debug($"Window:{arg} | ContenBounds:{((object)(Point)(ref contentBounds)).ToString()}");
 			this.TabChanged?.Invoke(sender, e);
 		}
 
@@ -86,15 +85,16 @@ namespace flakysalt.CharacterKeybinds.Views
 
 		private void InitializeTabs(ContentsManager contentsManager)
 		{
-			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0062: Expected O, but got Unknown
-			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0082: Expected O, but got Unknown
+			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006d: Expected O, but got Unknown
+			//IL_0087: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008d: Expected O, but got Unknown
 			KeybindsTab = new CharacterKeybindsTab();
 			MigrationTab = new KeybindMigrationTab();
 			AsyncTexture2D obj = AsyncTexture2D.FromAssetId(784346);
-			Tab keybindsTabItem = new Tab(AsyncTexture2D.op_Implicit(contentsManager.GetTexture("images/logo_small.png")), (Func<IView>)(() => (IView)(object)KeybindsTab), "Character Keybinds", (int?)null);
-			Tab migrationTabItem = new Tab(obj, (Func<IView>)(() => (IView)(object)MigrationTab), "Migration", (int?)null);
+			AsyncTexture2D.FromAssetId(157113);
+			Tab keybindsTabItem = new Tab(AsyncTexture2D.op_Implicit(contentsManager.GetTexture("images/Character_Keybinds_key_32.png")), (Func<IView>)(() => (IView)(object)KeybindsTab), "Character Keybinds", (int?)null);
+			Tab migrationTabItem = new Tab(obj, (Func<IView>)(() => (IView)(object)MigrationTab), Loca.migration, (int?)null);
 			CharacterKeybindsTab keybindsTab = KeybindsTab;
 			keybindsTab.OnAddButtonClicked = (EventHandler)Delegate.Combine(keybindsTab.OnAddButtonClicked, (EventHandler)delegate
 			{

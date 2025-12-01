@@ -15,6 +15,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using flakysalt.CharacterKeybinds.Data;
 using flakysalt.CharacterKeybinds.Model;
+using flakysalt.CharacterKeybinds.Resources;
 using flakysalt.CharacterKeybinds.Views.UiElements;
 
 namespace flakysalt.CharacterKeybinds.Views
@@ -98,7 +99,7 @@ namespace flakysalt.CharacterKeybinds.Views
 			StandardWindow val = new StandardWindow(windowBackgroundTexture, new Rectangle(25, 26, 560, 649), new Rectangle(40, 50, 540, 590), new Point(560, 400));
 			((WindowBase2)val).set_Emblem(emblem);
 			((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			((WindowBase2)val).set_Title("Troubleshoot Window");
+			((WindowBase2)val).set_Title(Loca.troubleshootWindowName);
 			((WindowBase2)val).set_SavesPosition(true);
 			((WindowBase2)val).set_Id("flakysalt_AutoClickerView");
 			((WindowBase2)val).set_CanClose(true);
@@ -111,7 +112,7 @@ namespace flakysalt.CharacterKeybinds.Views
 			((Control)val2).set_Parent((Container)(object)WindowView);
 			FlowPanel mainFlowPanel = val2;
 			Label val3 = new Label();
-			val3.set_Text("Only change the position of the markes if you erxperience problems. \n\nEnable the markers by pressing 'Toggle Marker Visibility'\nMove the marker to the following positions if they do not allign automatically:\n1. The Options menu tab\n2. The dropdown at the bottom right of the options menu\n3. The first entry of the dropdown when opening it\n4. The 'Yes' button of the confirmation popup when importing key binds");
+			val3.set_Text(Loca.troubleshootText);
 			((Control)val3).set_Width(((Control)mainFlowPanel).get_Width());
 			((Control)val3).set_Height(150);
 			((Control)val3).set_Parent((Container)(object)mainFlowPanel);
@@ -123,18 +124,18 @@ namespace flakysalt.CharacterKeybinds.Views
 			((Control)val4).set_Parent((Container)(object)mainFlowPanel);
 			FlowPanel buttonFlowPanel = val4;
 			StandardButton val5 = new StandardButton();
-			val5.set_Text("Toggle Marker Visibility");
+			val5.set_Text(Loca.troubleshootMarkers);
 			((Control)val5).set_Width(160);
 			((Control)val5).set_Parent((Container)(object)buttonFlowPanel);
 			ToggleVisibilityButton = val5;
 			StandardButton val6 = new StandardButton();
-			val6.set_Text("Reset Marker Positions");
+			val6.set_Text(Loca.troubleshootResetMarkers);
 			((Control)val6).set_Width(160);
 			((Control)val6).set_Parent((Container)(object)buttonFlowPanel);
 			resetPositionButton = val6;
 			StandardButton val7 = new StandardButton();
-			val7.set_Text("Test Markers");
-			((Control)val7).set_BasicTooltipText("This will simulate the sequence of clicks");
+			val7.set_Text(Loca.troubleshootTestButtonText);
+			((Control)val7).set_BasicTooltipText(Loca.troubleshootTestButtonHint);
 			((Control)val7).set_Width(160);
 			((Control)val7).set_Parent((Container)(object)buttonFlowPanel);
 			testClickerButton = val7;
@@ -219,7 +220,7 @@ namespace flakysalt.CharacterKeybinds.Views
 
 		public async Task ClickInOrder()
 		{
-			ScreenNotification.ShowNotification("Switching keybinds... ", (NotificationType)6, (Texture2D)null, 4 - (int)settingsModel.autoClickSpeedMultiplier.get_Value());
+			ScreenNotification.ShowNotification(Loca.switchKeybindsNotificationText, (NotificationType)6, (Texture2D)null, 4 - (int)settingsModel.autoClickSpeedMultiplier.get_Value());
 			Keys keyboardShortcut = settingsModel.optionsKeybind.get_Value().get_PrimaryKey();
 			await Task.Delay(1000);
 			Keyboard.Stroke((VirtualKeyShort)(short)keyboardShortcut, false);

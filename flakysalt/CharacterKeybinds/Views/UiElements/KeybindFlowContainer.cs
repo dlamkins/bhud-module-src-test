@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Microsoft.Xna.Framework;
 using flakysalt.CharacterKeybinds.Data;
+using flakysalt.CharacterKeybinds.Resources;
 
 namespace flakysalt.CharacterKeybinds.Views.UiElements
 {
@@ -13,17 +15,11 @@ namespace flakysalt.CharacterKeybinds.Views.UiElements
 	{
 		private readonly int _minDropdownWidth = 130;
 
-		private const string DefaultCharacterEntry = "Select Character";
+		private readonly int maxDropdownHeight = 300;
 
-		private const string DefaultKeybindsEntry = "Keybinds";
+		private string WildcardSpecialization = Loca.wildcardSpecializationName;
 
-		private const string DefaultSpecializationEntry = "Specialization";
-
-		private const string CoreSpecialization = "Core";
-
-		private const string WildcardSpecialization = "All Specialization";
-
-		private const string InvalidSpecialization = "Invalid";
+		private string InvalidSpecialization = Loca.invalidSpecializationName;
 
 		private Keymap _oldCharacterKeymap;
 
@@ -35,11 +31,19 @@ namespace flakysalt.CharacterKeybinds.Views.UiElements
 
 		private Image ProfessionImage { get; }
 
-		public Dropdown CharacterNameDropdown { get; }
+		public Dropdown<string> CharacterNameDropdown { get; }
 
-		public Dropdown SpecializationDropdown { get; }
+		public Dropdown<string> SpecializationDropdown { get; }
 
-		public Dropdown KeymapDropdown { get; }
+		public Dropdown<string> KeymapDropdown { get; }
+
+		private string DefaultCharacterEntry => Loca.defaultCharacterEntry;
+
+		private string DefaultKeybindsEntry => Loca.defaultKeybindsEntry;
+
+		private string DefaultSpecializationEntry => Loca.defaultSpecializationEntry;
+
+		private string CoreSpecialization => Loca.coreSpecializationName;
 
 		public event EventHandler<Keymap> OnApply;
 
@@ -50,79 +54,70 @@ namespace flakysalt.CharacterKeybinds.Views.UiElements
 		public KeybindFlowContainer()
 			: this()
 		{
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0071: Expected O, but got Unknown
-			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0097: Expected O, but got Unknown
-			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bd: Expected O, but got Unknown
-			//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010d: Expected O, but got Unknown
-			//IL_010e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0113: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0125: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0139: Expected O, but got Unknown
-			//IL_013a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0146: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0151: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0156: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0165: Expected O, but got Unknown
+			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0099: Expected O, but got Unknown
+			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0180: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0187: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0192: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0197: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a6: Expected O, but got Unknown
+			//IL_01a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d2: Expected O, but got Unknown
 			((FlowPanel)this).set_OuterControlPadding(new Vector2(10f, 0f));
 			((FlowPanel)this).set_ControlPadding(new Vector2(2f, 0f));
 			((FlowPanel)this).set_FlowDirection((ControlFlowDirection)0);
 			((Container)this).set_WidthSizingMode((SizingMode)2);
 			((Container)this).set_HeightSizingMode((SizingMode)1);
+			((Panel)this).set_CanScroll(false);
 			Image val = new Image();
 			((Control)val).set_Parent((Container)(object)this);
-			((Control)val).set_Size(new Point(30, 30));
+			((Control)val).set_Size(new Point(32, 32));
 			ProfessionImage = val;
-			Dropdown val2 = new Dropdown();
-			((Control)val2).set_Height(30);
+			Dropdown<string> dropdown = new Dropdown<string>();
+			((Control)dropdown).set_Height(30);
+			((Control)dropdown).set_Parent((Container)(object)this);
+			((Control)dropdown).set_Width(_minDropdownWidth);
+			dropdown.PanelHeight = maxDropdownHeight;
+			CharacterNameDropdown = dropdown;
+			Dropdown<string> dropdown2 = new Dropdown<string>();
+			((Control)dropdown2).set_Padding(new Thickness(22f, 0f, 0f, 0f));
+			((Control)dropdown2).set_Height(30);
+			((Control)dropdown2).set_Parent((Container)(object)this);
+			((Control)dropdown2).set_Width(_minDropdownWidth);
+			dropdown2.PanelHeight = maxDropdownHeight;
+			SpecializationDropdown = dropdown2;
+			SpecializationDropdown.Items.Add(WildcardSpecialization);
+			SpecializationDropdown.Items.Add(CoreSpecialization);
+			Dropdown<string> dropdown3 = new Dropdown<string>();
+			((Control)dropdown3).set_Height(30);
+			((Control)dropdown3).set_Parent((Container)(object)this);
+			((Control)dropdown3).set_Width(_minDropdownWidth);
+			dropdown3.PanelHeight = maxDropdownHeight;
+			KeymapDropdown = dropdown3;
+			StandardButton val2 = new StandardButton();
 			((Control)val2).set_Parent((Container)(object)this);
-			((Control)val2).set_Width(_minDropdownWidth);
-			CharacterNameDropdown = val2;
-			Dropdown val3 = new Dropdown();
-			((Control)val3).set_Height(30);
+			val2.set_Text(Loca.apply);
+			((Control)val2).set_Size(new Point(60, 30));
+			ApplyButton = val2;
+			StandardButton val3 = new StandardButton();
 			((Control)val3).set_Parent((Container)(object)this);
-			((Control)val3).set_Width(_minDropdownWidth);
-			SpecializationDropdown = val3;
-			SpecializationDropdown.get_Items().Add("All Specialization");
-			SpecializationDropdown.get_Items().Add("Core");
-			Dropdown val4 = new Dropdown();
-			((Control)val4).set_Height(30);
-			((Control)val4).set_Parent((Container)(object)this);
-			((Control)val4).set_Width(_minDropdownWidth);
-			KeymapDropdown = val4;
-			StandardButton val5 = new StandardButton();
-			((Control)val5).set_Parent((Container)(object)this);
-			val5.set_Text("Apply");
-			((Control)val5).set_Size(new Point(60, 30));
-			ApplyButton = val5;
-			StandardButton val6 = new StandardButton();
-			((Control)val6).set_Parent((Container)(object)this);
-			val6.set_Text("Delete");
-			((Control)val6).set_Size(new Point(60, 30));
-			RemoveButton = val6;
-			KeymapDropdown.add_ValueChanged((EventHandler<ValueChangedEventArgs>)OnKeymapChanged);
-			SpecializationDropdown.add_ValueChanged((EventHandler<ValueChangedEventArgs>)OnSpecializationChanged);
-			CharacterNameDropdown.add_ValueChanged((EventHandler<ValueChangedEventArgs>)OnCharacterChanged);
+			val3.set_Text(Loca.delete);
+			((Control)val3).set_Size(new Point(60, 30));
+			RemoveButton = val3;
+			KeymapDropdown.ValueChanged += OnKeymapChanged;
+			SpecializationDropdown.ValueChanged += OnSpecializationChanged;
+			CharacterNameDropdown.ValueChanged += OnCharacterChanged;
 			((Control)ApplyButton).add_Click((EventHandler<MouseEventArgs>)OnApplyClick);
 			((Control)RemoveButton).add_Click((EventHandler<MouseEventArgs>)OnRemoveClick);
 			((Control)this).add_Resized((EventHandler<ResizedEventArgs>)OnResized);
@@ -148,11 +143,11 @@ namespace flakysalt.CharacterKeybinds.Views.UiElements
 			((Control)RemoveButton).set_Enabled(enabled);
 		}
 
-		public void SetDropdownContent(Dropdown dropdown, List<string> values)
+		public void SetDropdownContent(Dropdown<string> dropdown, List<string> values)
 		{
 			values.ForEach(delegate(string e)
 			{
-				dropdown.get_Items().Add(e);
+				dropdown.Items.Add(e);
 			});
 		}
 
@@ -161,33 +156,33 @@ namespace flakysalt.CharacterKeybinds.Views.UiElements
 			_localizedSpecializations = values;
 			values.ForEach(delegate(LocalizedSpecialization e)
 			{
-				SpecializationDropdown.get_Items().Add(e.displayName);
+				SpecializationDropdown.Items.Add(e.displayName);
 			});
 		}
 
 		public void SetValues(Keymap keymap)
 		{
 			_oldCharacterKeymap = keymap;
-			CharacterNameDropdown.set_SelectedItem(string.IsNullOrEmpty(keymap.CharacterName) ? "Select Character" : keymap.CharacterName);
+			CharacterNameDropdown.SelectedItem = (string.IsNullOrEmpty(keymap.CharacterName) ? DefaultCharacterEntry : keymap.CharacterName);
 			switch (keymap.SpecialisationId)
 			{
 			case 0:
-				SpecializationDropdown.set_SelectedItem("Specialization");
+				SpecializationDropdown.SelectedItem = DefaultSpecializationEntry;
 				break;
 			case -1:
-				SpecializationDropdown.set_SelectedItem("Core");
+				SpecializationDropdown.SelectedItem = CoreSpecialization;
 				break;
 			case -2:
-				SpecializationDropdown.set_SelectedItem("All Specialization");
+				SpecializationDropdown.SelectedItem = WildcardSpecialization;
 				break;
 			case -10:
-				SpecializationDropdown.set_SelectedItem("Invalid");
+				SpecializationDropdown.SelectedItem = InvalidSpecialization;
 				break;
 			default:
-				SpecializationDropdown.set_SelectedItem(_localizedSpecializations.FirstOrDefault((LocalizedSpecialization e) => e.id == keymap.SpecialisationId)?.displayName);
+				SpecializationDropdown.SelectedItem = _localizedSpecializations.FirstOrDefault((LocalizedSpecialization e) => e.id == keymap.SpecialisationId)?.displayName;
 				break;
 			}
-			KeymapDropdown.set_SelectedItem(string.IsNullOrEmpty(keymap.KeymapName) ? "Keybinds" : keymap.KeymapName);
+			KeymapDropdown.SelectedItem = (string.IsNullOrEmpty(keymap.KeymapName) ? DefaultKeybindsEntry : keymap.KeymapName);
 		}
 
 		public void SetProfessionIcon(int iconId)
@@ -220,39 +215,39 @@ namespace flakysalt.CharacterKeybinds.Views.UiElements
 		private Keymap GetKeymap()
 		{
 			int specialisationId = 0;
-			if (SpecializationDropdown.get_Items().Contains(SpecializationDropdown.get_SelectedItem()) || SpecializationDropdown.get_SelectedItem() == "Invalid")
+			if (SpecializationDropdown.Items.Contains(SpecializationDropdown.SelectedItem) || SpecializationDropdown.SelectedItem == InvalidSpecialization)
 			{
-				specialisationId = SpecializationDropdown.get_Items().IndexOf(SpecializationDropdown.get_SelectedItem()) switch
+				specialisationId = SpecializationDropdown.Items.IndexOf(SpecializationDropdown.SelectedItem) switch
 				{
 					0 => -2, 
 					1 => -1, 
-					_ => _localizedSpecializations.FirstOrDefault((LocalizedSpecialization e) => e.displayName == SpecializationDropdown.get_SelectedItem())?.id ?? (-10), 
+					_ => _localizedSpecializations.FirstOrDefault((LocalizedSpecialization e) => e.displayName == SpecializationDropdown.SelectedItem)?.id ?? (-10), 
 				};
 			}
 			return new Keymap
 			{
-				CharacterName = (CharacterNameDropdown.get_Items().Contains(CharacterNameDropdown.get_SelectedItem()) ? CharacterNameDropdown.get_SelectedItem() : null),
+				CharacterName = (CharacterNameDropdown.Items.Contains(CharacterNameDropdown.SelectedItem) ? CharacterNameDropdown.SelectedItem : null),
 				SpecialisationId = specialisationId,
-				KeymapName = (KeymapDropdown.get_Items().Contains(KeymapDropdown.get_SelectedItem()) ? KeymapDropdown.get_SelectedItem() : null)
+				KeymapName = (KeymapDropdown.Items.Contains(KeymapDropdown.SelectedItem) ? KeymapDropdown.SelectedItem : null)
 			};
 		}
 
-		private void OnKeymapChanged(object sender, ValueChangedEventArgs args)
+		private void OnKeymapChanged(object sender, ValueChangedEventArgs<string> args)
 		{
-			((Control)ApplyButton).set_Enabled(KeymapDropdown.get_SelectedItem() != "Keybinds");
+			((Control)ApplyButton).set_Enabled(KeymapDropdown.SelectedItem != DefaultKeybindsEntry);
 			this.OnDataChanged?.Invoke(this, GetKeymapArgs());
 			_oldCharacterKeymap = GetKeymap();
 		}
 
-		private void OnSpecializationChanged(object sender, ValueChangedEventArgs args)
+		private void OnSpecializationChanged(object sender, ValueChangedEventArgs<string> args)
 		{
 			this.OnDataChanged?.Invoke(this, GetKeymapArgs());
 			_oldCharacterKeymap = GetKeymap();
 		}
 
-		private void OnCharacterChanged(object sender, ValueChangedEventArgs args)
+		private void OnCharacterChanged(object sender, ValueChangedEventArgs<string> args)
 		{
-			SpecializationDropdown.set_SelectedItem("Specialization");
+			SpecializationDropdown.SelectedItem = DefaultSpecializationEntry;
 			this.OnDataChanged?.Invoke(this, GetKeymapArgs());
 			_oldCharacterKeymap = GetKeymap();
 		}
@@ -271,9 +266,9 @@ namespace flakysalt.CharacterKeybinds.Views.UiElements
 
 		public void DisposeEvents()
 		{
-			KeymapDropdown.remove_ValueChanged((EventHandler<ValueChangedEventArgs>)OnKeymapChanged);
-			SpecializationDropdown.remove_ValueChanged((EventHandler<ValueChangedEventArgs>)OnSpecializationChanged);
-			CharacterNameDropdown.remove_ValueChanged((EventHandler<ValueChangedEventArgs>)OnCharacterChanged);
+			KeymapDropdown.ValueChanged -= OnKeymapChanged;
+			SpecializationDropdown.ValueChanged -= OnSpecializationChanged;
+			CharacterNameDropdown.ValueChanged -= OnCharacterChanged;
 			((Control)ApplyButton).remove_Click((EventHandler<MouseEventArgs>)OnApplyClick);
 			((Control)RemoveButton).remove_Click((EventHandler<MouseEventArgs>)OnRemoveClick);
 		}

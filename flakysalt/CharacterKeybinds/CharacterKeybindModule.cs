@@ -1,12 +1,15 @@
 using System;
 using System.ComponentModel.Composition;
 using System.Threading.Tasks;
+using Blish_HUD;
 using Blish_HUD.Content;
+using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
 using Microsoft.Xna.Framework;
+using flakysalt.CharacterKeybinds.Data.Tutorial;
 using flakysalt.CharacterKeybinds.Model;
 using flakysalt.CharacterKeybinds.Presenter;
 using flakysalt.CharacterKeybinds.Services;
@@ -35,6 +38,8 @@ namespace flakysalt.CharacterKeybinds
 
 		private MainWindowModel mainWindowModel;
 
+		private TutorialView tutorialView;
+
 		private ContentsManager ContentsManager => base.ModuleParameters.get_ContentsManager();
 
 		private Gw2ApiManager Gw2ApiManager => base.ModuleParameters.get_Gw2ApiManager();
@@ -59,6 +64,7 @@ namespace flakysalt.CharacterKeybinds
 		protected override Task LoadAsync()
 		{
 			CreateServices();
+			new LocaService();
 			CreateViews();
 			CreatePresenters();
 			AttachEvents();
@@ -77,6 +83,17 @@ namespace flakysalt.CharacterKeybinds
 			_cornerButtonView = new CharacterKeybindsCornerButton(contentService, _settingsModel);
 			_autoClickerView = new AutoClickerView(_settingsModel, ContentsManager);
 			mainWindowView = new MainWindowView(ContentsManager, AsyncTexture2D.FromAssetId(155997), new Rectangle(24, 30, 545, 600), new Rectangle(82, 30, 467, 600));
+			Ftue();
+		}
+
+		private void Ftue()
+		{
+			tutorialView = new TutorialView(_settingsModel);
+			if (!_settingsModel.experiencedFtue.get_Value() && _settingsModel.Keymaps.get_Value().Count == 0)
+			{
+				tutorialView.Show(new SetupTutorial());
+				((Control)GameService.Overlay.get_BlishHudWindow()).Hide();
+			}
 		}
 
 		private void CreateServices()

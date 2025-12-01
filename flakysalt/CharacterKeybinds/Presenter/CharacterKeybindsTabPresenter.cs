@@ -11,6 +11,7 @@ using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
 using flakysalt.CharacterKeybinds.Data;
 using flakysalt.CharacterKeybinds.Model;
+using flakysalt.CharacterKeybinds.Resources;
 using flakysalt.CharacterKeybinds.Services;
 using flakysalt.CharacterKeybinds.Util;
 using flakysalt.CharacterKeybinds.Views;
@@ -21,6 +22,8 @@ namespace flakysalt.CharacterKeybinds.Presenter
 	public class CharacterKeybindsTabPresenter : Presenter<CharacterKeybindsTab, CharacterKeybindsModel>, IDisposable
 	{
 		private readonly Logger Logger = Logger.GetLogger<CharacterKeybindsTabPresenter>();
+
+		private int errorRetryCount;
 
 		private static object taskLock = new object();
 
@@ -66,11 +69,18 @@ namespace flakysalt.CharacterKeybinds.Presenter
 				GameService.Overlay.add_UserLocaleChanged((EventHandler<ValueEventArgs<CultureInfo>>)OnLocaleChange);
 				GameService.Gw2Mumble.get_PlayerCharacter().add_NameChanged((EventHandler<ValueEventArgs<string>>)PlayerCharacter_NameChanged);
 				GameService.Gw2Mumble.get_PlayerCharacter().add_SpecializationChanged((EventHandler<ValueEventArgs<int>>)PlayerCharacter_SpecializationChanged);
+				_apiService.SubtokenUpdated += OnSubtokenUpdated;
 			}
 			catch (Exception ex)
 			{
 				Logger.Error(ex, "[CharacterKeybindSettingsPresenter] Failed to attach to Game Services");
 			}
+		}
+
+		private void OnSubtokenUpdated(object sender, ValueEventArgs<IEnumerable<TokenPermission>> e)
+		{
+			Task.Run((Func<Task>)LoadCharacterInformationAsync);
+			SetUpdateInterval(5000.0);
 		}
 
 		private void OnLocaleChange(object sender, ValueEventArgs<CultureInfo> info)
@@ -85,6 +95,7 @@ namespace flakysalt.CharacterKeybinds.Presenter
 			GameService.Overlay.remove_UserLocaleChanged((EventHandler<ValueEventArgs<CultureInfo>>)OnLocaleChange);
 			GameService.Gw2Mumble.get_PlayerCharacter().remove_NameChanged((EventHandler<ValueEventArgs<string>>)PlayerCharacter_NameChanged);
 			GameService.Gw2Mumble.get_PlayerCharacter().remove_SpecializationChanged((EventHandler<ValueEventArgs<int>>)PlayerCharacter_SpecializationChanged);
+			_apiService.SubtokenUpdated -= OnSubtokenUpdated;
 			CharacterKeybindsTab view = base.get_View();
 			view.OnAddButtonClicked = (EventHandler)Delegate.Remove(view.OnAddButtonClicked, new EventHandler(OnAddButtonPressed));
 			CharacterKeybindsTab view2 = base.get_View();
@@ -106,7 +117,7 @@ namespace flakysalt.CharacterKeybinds.Presenter
 			}
 			catch (Exception e)
 			{
-				Logger.Error(e, "[CharacterKeybindSettingsPresenter] Failed to attach to View");
+				Logger.Error(e, "Failed to attach to View");
 			}
 		}
 
@@ -119,14 +130,16 @@ namespace flakysalt.CharacterKeybinds.Presenter
 			}
 			catch (Exception e)
 			{
-				Logger.Error(e, "[CharacterKeybindSettingsPresenter] Failed to attach to Model");
+				Logger.Error(e, "Failed to attach to Model");
 			}
 		}
 
 		protected override void UpdateView()
 		{
-			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
 			try
 			{
 				base.get_View()?.ClearKeybindEntries();
@@ -139,8 +152,18 @@ namespace flakysalt.CharacterKeybinds.Presenter
 					Character character = base.get_Model().GetCharacter(keymap.CharacterName);
 					if (character != null)
 					{
-						RenderUrl icon = base.get_Model().GetProfession(character.get_Profession()).get_Icon();
-						iconAssetId = int.Parse(Path.GetFileNameWithoutExtension(((RenderUrl)(ref icon)).get_Url().AbsoluteUri));
+						Specialization spec = base.get_Model().GetSpecializationById(keymap.SpecialisationId);
+						RenderUrl val;
+						if (spec != null && spec.get_ProfessionIconBig().HasValue)
+						{
+							val = spec.get_ProfessionIconBig().Value;
+							iconAssetId = int.Parse(Path.GetFileNameWithoutExtension(((RenderUrl)(ref val)).get_Url().AbsoluteUri));
+						}
+						else
+						{
+							val = base.get_Model().GetProfession(character.get_Profession()).get_IconBig();
+							iconAssetId = int.Parse(Path.GetFileNameWithoutExtension(((RenderUrl)(ref val)).get_Url().AbsoluteUri));
+						}
 					}
 					KeybindFlowContainer container = base.get_View()?.AddKeybind();
 					if (container != null)
@@ -157,37 +180,35 @@ namespace flakysalt.CharacterKeybinds.Presenter
 			}
 			finally
 			{
-				base.get_View()?.SetErrorInfoIcon(IsDataValid(out var error), base.get_Model().IsDataLoaded, error);
+				base.get_View()?.SetErrorInfoIcon(HasErrors(), base.get_Model().IsDataLoaded);
 			}
 			base.UpdateView();
 		}
 
-		private bool IsDataValid(out string errorMessage)
+		private async Task<List<string>> HasErrors()
 		{
 			List<string> errors = new List<string>();
-			errorMessage = string.Empty;
-			bool isValid = true;
-			if (!_apiService.HasRequiredPermissions())
+			if (!(await _apiService.IsApiAvailable()))
 			{
-				isValid = false;
-				errors.Add("Missing API key or insufficient permissions.");
+				errors.Add(Loca.errorMessageMissingApiDown);
+			}
+			if (!_apiService.HasSubtoken())
+			{
+				errors.Add(Loca.errorMessageMissingSubtoken);
+			}
+			if (_apiService.HasSubtoken() && !_apiService.HasRequiredPermissions())
+			{
+				errors.Add(Loca.errorMessageMissingApiPermissions);
 			}
 			if (base.get_Model().NeedsMigration)
 			{
-				isValid = false;
-				errors.Add("Old keybinds format found. Please go to the Migration tab to update your keybinds.");
+				errors.Add(Loca.errorMessageNeedsMigration);
 			}
 			if (!base.get_Model().KeybindsFoldersValid)
 			{
-				isValid = false;
-				errors.Add("The selected keybinds folder is invalid. Please check your settings.");
+				errors.Add(Loca.errorMessageInvalidFolder);
 			}
-			if (!isValid)
-			{
-				errorMessage = $"{errors.Count} Potential issues detected:\n\n";
-				errorMessage += string.Join(Environment.NewLine, errors);
-			}
-			return isValid;
+			return errors;
 		}
 
 		public void OnApplyKeymap(object sender, Keymap characterKeybind)
@@ -313,14 +334,24 @@ namespace flakysalt.CharacterKeybinds.Presenter
 
 		private async Task LoadCharacterInformationAsync()
 		{
+			if (!_apiService.HasSubtoken())
+			{
+				return;
+			}
 			try
 			{
 				base.get_View().SetSpinner(state: true);
 				await base.get_Model().LoadResourcesAsync();
 				SetUpdateInterval(300000.0);
+				errorRetryCount = 0;
 			}
 			catch (Exception e)
 			{
+				errorRetryCount++;
+				if (errorRetryCount % 5 == 0)
+				{
+					Logger.Error($"Failed to load data from the API! Retries: {errorRetryCount} \n {e}");
+				}
 				Logger.Info($"Failed to load data from the API \n {e}");
 			}
 			finally
