@@ -207,6 +207,7 @@ namespace Kenedia.Modules.Core.Controls
 		{
 			if (notification != null)
 			{
+				notification.ConditionMatched += new EventHandler(Notification_ConditionMatched);
 				Notifications.Add(notification);
 			}
 		}

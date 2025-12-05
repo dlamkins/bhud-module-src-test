@@ -229,7 +229,7 @@ namespace Kenedia.Modules.Characters.Controls
 				HeightSizingMode = SizingMode.AutoSize,
 				Visible = false
 			};
-			DataControls = new List<Control>
+			DataControls = new List<Control>(12)
 			{
 				_nameLabel, _customIndex, _levelLabel, _genderLabel, _raceLabel, _professionLabel, _mapLabel, _nextBirthdayLabel, _ageLabel, _lastLoginLabel,
 				_craftingControl, TagPanel

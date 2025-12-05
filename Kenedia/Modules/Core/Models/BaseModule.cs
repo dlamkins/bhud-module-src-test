@@ -117,16 +117,16 @@ namespace Kenedia.Modules.Core.Models
 
 		protected virtual void AssignServiceInstaces(IServiceProvider serviceProvider)
 		{
-			CoreServices = ServiceProviderServiceExtensions.GetRequiredService<CoreServiceCollection>(serviceProvider);
-			SharedSettingsView = ServiceProviderServiceExtensions.GetRequiredService<SharedSettingsView>(serviceProvider);
-			ContentsManager = ServiceProviderServiceExtensions.GetRequiredService<ContentsManager>(serviceProvider);
-			DirectoriesManager = ServiceProviderServiceExtensions.GetRequiredService<DirectoriesManager>(serviceProvider);
-			Gw2ApiManager = ServiceProviderServiceExtensions.GetRequiredService<Gw2ApiManager>(serviceProvider);
-			SettingsManager = ServiceProviderServiceExtensions.GetRequiredService<SettingsManager>(serviceProvider);
-			Logger = ServiceProviderServiceExtensions.GetRequiredService<Logger>(serviceProvider);
-			StaticHosting = ServiceProviderServiceExtensions.GetRequiredService<StaticHosting>(serviceProvider);
-			Paths = ServiceProviderServiceExtensions.GetRequiredService<ModulePaths>(serviceProvider);
-			Settings = ServiceProviderServiceExtensions.GetRequiredService<ModuleSettings>(serviceProvider);
+			CoreServices = serviceProvider.GetRequiredService<CoreServiceCollection>();
+			SharedSettingsView = serviceProvider.GetRequiredService<SharedSettingsView>();
+			ContentsManager = serviceProvider.GetRequiredService<ContentsManager>();
+			DirectoriesManager = serviceProvider.GetRequiredService<DirectoriesManager>();
+			Gw2ApiManager = serviceProvider.GetRequiredService<Gw2ApiManager>();
+			SettingsManager = serviceProvider.GetRequiredService<SettingsManager>();
+			Logger = serviceProvider.GetRequiredService<Logger>();
+			StaticHosting = serviceProvider.GetRequiredService<StaticHosting>();
+			Paths = serviceProvider.GetRequiredService<ModulePaths>();
+			Settings = serviceProvider.GetRequiredService<ModuleSettings>();
 			TexturesService.Initilize(ContentsManager);
 		}
 

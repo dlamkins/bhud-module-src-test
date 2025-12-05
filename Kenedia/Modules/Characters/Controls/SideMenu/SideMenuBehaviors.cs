@@ -14,7 +14,7 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 {
 	public class SideMenuBehaviors : FlowTab, ILocalizable
 	{
-		private readonly List<KeyValuePair<string, DisplayCheckToggle>> _toggles = new List<KeyValuePair<string, DisplayCheckToggle>>
+		private readonly List<KeyValuePair<string, DisplayCheckToggle>> _toggles = new List<KeyValuePair<string, DisplayCheckToggle>>(13)
 		{
 			new KeyValuePair<string, DisplayCheckToggle>("Name", null),
 			new KeyValuePair<string, DisplayCheckToggle>("Level", null),
@@ -53,12 +53,12 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 
 		public SideMenuBehaviors(ResourceManager resourceManager, TextureManager textureManager, Settings settings, Action onSortChanged)
 		{
-			//IL_0115: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0131: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0146: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0154: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0289: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0293: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0133: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0148: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0156: Unknown result type (might be due to invalid IL or missing references)
+			//IL_028b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0295: Unknown result type (might be due to invalid IL or missing references)
 			_resourceManager = resourceManager;
 			_settings = settings;
 			_onSortChanged = onSortChanged;

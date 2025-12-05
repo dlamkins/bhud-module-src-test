@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
@@ -45,7 +46,7 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 
 		public SideMenuToggles TogglesTab { get; set; }
 
-		public SideMenu(Action toggleOCR, Action togglePotrait, Action refreshAPI, TextureManager textureManager, Settings settings, CharacterSorting characterSorting)
+		public SideMenu(Action toggleOCR, Action togglePotrait, Action refreshAPI, TextureManager textureManager, Settings settings, CharacterSorting characterSorting, Data data)
 		{
 			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
@@ -53,7 +54,7 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 			//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0177: Unknown result type (might be due to invalid IL or missing references)
 			_textureManager = textureManager;
 			_toggleOCR = toggleOCR;
 			_togglePotrait = togglePotrait;
@@ -74,7 +75,10 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 			};
 			TabsButtonPanel.Location = new Point(0, _headerPanel.Bottom);
 			CreateHeaderButtons();
+			int eliteSpecializationsCount = data.Specializations.Values.Where((Data.Specialization x) => (int)x.Profession == 1).Count();
+			int cols = 2 + eliteSpecializationsCount + 1 + 1;
 			base.Width = 250;
+			base.Width = cols * 35 + 5;
 			HeightSizingMode = SizingMode.AutoSize;
 			if (base.BackgroundImage != null)
 			{

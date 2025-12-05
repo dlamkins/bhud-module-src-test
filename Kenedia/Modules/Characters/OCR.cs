@@ -117,6 +117,7 @@ namespace Kenedia.Modules.Characters
 		{
 			if (!_isDisposed)
 			{
+				_ocrApi.Dispose();
 				_isDisposed = true;
 				_view?.Dispose();
 				Texture2D cleanedTexture = CleanedTexture;

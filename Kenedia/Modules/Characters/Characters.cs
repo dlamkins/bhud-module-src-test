@@ -223,10 +223,10 @@ namespace Kenedia.Modules.Characters
 			await base.LoadAsync();
 			if (GameService.Contexts.GetContext<CharactersContext>() == null)
 			{
-				GameService.Contexts.RegisterContext(ServiceProviderServiceExtensions.GetRequiredService<CharactersContext>(base.ServiceProvider));
+				GameService.Contexts.RegisterContext(base.ServiceProvider.GetRequiredService<CharactersContext>());
 			}
-			CharacterSwapping = ServiceProviderServiceExtensions.GetRequiredService<CharacterSwapping>(base.ServiceProvider);
-			CharacterSorting = ServiceProviderServiceExtensions.GetRequiredService<CharacterSorting>(base.ServiceProvider);
+			CharacterSwapping = base.ServiceProvider.GetRequiredService<CharacterSwapping>();
+			CharacterSorting = base.ServiceProvider.GetRequiredService<CharacterSorting>();
 			CharacterSwapping.CharacterSorting = CharacterSorting;
 			CharacterSorting.CharacterSwapping = CharacterSwapping;
 			TextureManager = new TextureManager();
@@ -323,6 +323,7 @@ namespace Kenedia.Modules.Characters
 			CharacterModels.CollectionChanged -= OnCharacterCollectionChanged;
 			Tags.CollectionChanged -= Tags_CollectionChanged;
 			base.CoreServices.ClientWindowService.ResolutionChanged -= new EventHandler<Blish_HUD.ValueChangedEventArgs<Point>>(ClientWindowService_ResolutionChanged);
+			OCR.Dispose();
 			base.Unload();
 		}
 

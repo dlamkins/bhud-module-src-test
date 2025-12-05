@@ -297,7 +297,7 @@ namespace Kenedia.Modules.Characters.Views
 				Visible = false,
 				FadeOut = !_settings.PinSideMenus.Value
 			};
-			SideMenu = new SideMenu(toggleOCR, togglePotrait, refreshAPI, textureManager, settings, characterSorting)
+			SideMenu = new SideMenu(toggleOCR, togglePotrait, refreshAPI, textureManager, settings, characterSorting, data)
 			{
 				Parent = GameService.Graphics.SpriteScreen,
 				Anchor = this,

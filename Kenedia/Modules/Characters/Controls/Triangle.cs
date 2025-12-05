@@ -76,10 +76,10 @@ namespace Kenedia.Modules.Characters.Controls
 
 		public List<Vector2> ToVectorList()
 		{
-			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-			return new List<Vector2> { Point1, Point2, Point3 };
+			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+			return new List<Vector2>(3) { Point1, Point2, Point3 };
 		}
 
 		public bool PointInTriangle(Vector2 p)

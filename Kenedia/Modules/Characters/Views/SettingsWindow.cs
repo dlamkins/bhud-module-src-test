@@ -780,7 +780,7 @@ namespace Kenedia.Modules.Characters.Views
 			{
 				Location = new Point(250, 0),
 				Parent = subP,
-				SetLocalizedItems = () => new List<string>
+				SetLocalizedItems = () => new List<string>(4)
 				{
 					strings.Small,
 					strings.Normal,
@@ -810,7 +810,7 @@ namespace Kenedia.Modules.Characters.Views
 			{
 				Parent = subP,
 				Location = new Point(250, 0),
-				SetLocalizedItems = () => new List<string>
+				SetLocalizedItems = () => new List<string>(3)
 				{
 					strings.OnlyText,
 					strings.OnlyIcons,
