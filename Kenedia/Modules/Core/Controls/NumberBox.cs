@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
@@ -32,21 +33,18 @@ namespace Kenedia.Modules.Core.Controls
 
 		private int _value;
 
-		private Func<string> _setLocalizedTooltip;
-
-		private bool _showButtons = true;
-
 		public Action<int> ValueChangedAction { get; set; }
 
 		public new Func<string> SetLocalizedTooltip
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _setLocalizedTooltip;
+				return _003CSetLocalizedTooltip_003Ek__BackingField;
 			}
 			set
 			{
-				_setLocalizedTooltip = value;
+				_003CSetLocalizedTooltip_003Ek__BackingField = value;
 				BasicTooltipText = value?.Invoke();
 			}
 		}
@@ -78,29 +76,32 @@ namespace Kenedia.Modules.Core.Controls
 
 		public bool ShowButtons
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _showButtons;
+				return _003CShowButtons_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _showButtons, value, new Action(RecalculateLayout));
+				Common.SetProperty(ref _003CShowButtons_003Ek__BackingField, value, new Action(RecalculateLayout));
 			}
 		}
 
-		public int Step { get; set; } = 1;
+		public int Step { get; set; }
 
+		public int MaxValue { get; set; }
 
-		public int MaxValue { get; set; } = int.MaxValue;
-
-
-		public int MinValue { get; set; } = int.MinValue;
-
+		public int MinValue { get; set; }
 
 		public event EventHandler<int> ValueChanged;
 
 		public NumberBox()
 		{
+			_003CShowButtons_003Ek__BackingField = true;
+			Step = 1;
+			MaxValue = int.MaxValue;
+			MinValue = int.MinValue;
+			base._002Ector();
 			_inputField.Parent = this;
 			_inputField.TextChanged += InputField_TextChanged;
 			_inputField.InputFocusChanged += InputField_TextChanged;

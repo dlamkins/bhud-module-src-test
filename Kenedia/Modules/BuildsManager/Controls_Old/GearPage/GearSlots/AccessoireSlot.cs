@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
@@ -26,31 +27,29 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 			TextureRegion = new Rectangle(38, 38, 52, 52)
 		});
 
-		private Stat? _stat;
-
-		private Infusion? _infusion;
-
 		public Stat Stat
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _stat;
+				return _003CStat_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty<Stat>(ref _stat, value, new ValueChangedEventHandler<Stat>(OnStatChanged));
+				Common.SetProperty(ref _003CStat_003Ek__BackingField, value, new ValueChangedEventHandler<Stat>(OnStatChanged));
 			}
 		}
 
 		public Infusion Infusion
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _infusion;
+				return _003CInfusion_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty<Infusion>(ref _infusion, value, new ValueChangedEventHandler<Infusion>(OnInfusionChanged));
+				Common.SetProperty(ref _003CInfusion_003Ek__BackingField, value, new ValueChangedEventHandler<Infusion>(OnInfusionChanged));
 			}
 		}
 
@@ -58,7 +57,7 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 			: base(gearSlot, parent, templatePresenter, selectionPanel, data)
 		{
 			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-			_infusionControl.Placeholder.Texture = (AsyncTexture2D)BaseModule<BuildsManager, MainWindow, Settings, Paths>.ModuleInstance.ContentsManager.GetTexture("textures\\infusionslot.png");
+			_infusionControl.Placeholder.Texture = (AsyncTexture2D)BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.ModuleInstance.ContentsManager.GetTexture("textures\\infusionslot.png");
 			_infusionControl.Parent = this;
 		}
 

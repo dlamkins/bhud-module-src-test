@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using Blish_HUD.Content;
 using Gw2Sharp.Models;
@@ -11,7 +12,6 @@ using Kenedia.Modules.BuildsManager.Models;
 using Kenedia.Modules.Core.DataModels;
 using Kenedia.Modules.Core.Extensions;
 using Kenedia.Modules.Core.Models;
-using Kenedia.Modules.Core.Utility;
 
 namespace Kenedia.Modules.BuildsManager.DataModels.Professions
 {
@@ -20,10 +20,6 @@ namespace Kenedia.Modules.BuildsManager.DataModels.Professions
 	{
 		private bool _isDisposed;
 
-		private AsyncTexture2D _icon;
-
-		private AsyncTexture2D _iconBig;
-
 		[DataMember]
 		public ProfessionType Id { get; set; }
 
@@ -31,15 +27,20 @@ namespace Kenedia.Modules.BuildsManager.DataModels.Professions
 		{
 			get
 			{
-				if (_icon != null)
+				if (_003CIcon_003Ek__BackingField != null)
 				{
-					return _icon;
+					return _003CIcon_003Ek__BackingField;
 				}
 				if (IconAssetId != 0)
 				{
-					_icon = AsyncTexture2D.FromAssetId(IconAssetId);
+					_003CIcon_003Ek__BackingField = AsyncTexture2D.FromAssetId(IconAssetId);
 				}
-				return _icon;
+				return _003CIcon_003Ek__BackingField;
+			}
+			[CompilerGenerated]
+			set
+			{
+				_003CIcon_003Ek__BackingField = value;
 			}
 		}
 
@@ -47,15 +48,20 @@ namespace Kenedia.Modules.BuildsManager.DataModels.Professions
 		{
 			get
 			{
-				if (_iconBig != null)
+				if (_003CIconBig_003Ek__BackingField != null)
 				{
-					return _iconBig;
+					return _003CIconBig_003Ek__BackingField;
 				}
 				if (IconBigAssetId != 0)
 				{
-					_iconBig = AsyncTexture2D.FromAssetId(IconBigAssetId);
+					_003CIconBig_003Ek__BackingField = AsyncTexture2D.FromAssetId(IconBigAssetId);
 				}
-				return _iconBig;
+				return _003CIconBig_003Ek__BackingField;
+			}
+			[CompilerGenerated]
+			set
+			{
+				_003CIconBig_003Ek__BackingField = value;
 			}
 		}
 
@@ -104,8 +110,8 @@ namespace Kenedia.Modules.BuildsManager.DataModels.Professions
 			if (!_isDisposed)
 			{
 				_isDisposed = true;
-				_icon = null;
-				_iconBig = null;
+				Icon = null;
+				IconBig = null;
 				Skills?.Values.DisposeAll();
 				Skills?.Clear();
 				Legends?.Values.DisposeAll();

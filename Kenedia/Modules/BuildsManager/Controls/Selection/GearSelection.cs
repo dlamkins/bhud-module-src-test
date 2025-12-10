@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Blish_HUD.Controls;
 using Gw2Sharp.Models;
 using Kenedia.Modules.BuildsManager.DataModels.Items;
@@ -22,13 +23,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 	{
 		private List<SelectionPanelSelectable> _selectables = new List<SelectionPanelSelectable>();
 
-		private TemplateSlotType _activeSlot;
-
-		private GearSubSlotType _subSlotType;
-
 		private string _filterText = string.Empty;
-
-		private TemplatePresenter _templatePresenter;
 
 		private List<SelectionPanelSelectable> _armors = new List<SelectionPanelSelectable>();
 
@@ -64,13 +59,14 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 
 		public TemplatePresenter TemplatePresenter
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _templatePresenter;
+				return _003CTemplatePresenter_003Ek__BackingField;
 			}
 			private set
 			{
-				Common.SetProperty(ref _templatePresenter, value, new ValueChangedEventHandler<TemplatePresenter>(OnTemplatePresenterChanged));
+				Common.SetProperty(ref _003CTemplatePresenter_003Ek__BackingField, value, new ValueChangedEventHandler<TemplatePresenter>(OnTemplatePresenterChanged));
 			}
 		}
 
@@ -78,25 +74,27 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 
 		public TemplateSlotType ActiveSlot
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _activeSlot;
+				return _003CActiveSlot_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _activeSlot, value, new Action(ApplySlot));
+				Common.SetProperty(ref _003CActiveSlot_003Ek__BackingField, value, new Action(ApplySlot));
 			}
 		}
 
 		public GearSubSlotType SubSlotType
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _subSlotType;
+				return _003CSubSlotType_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _subSlotType, value, new PropertyChangedEventHandler(ApplySubSlot), triggerOnUpdate: true, "SubSlotType");
+				Common.SetProperty(ref _003CSubSlotType_003Ek__BackingField, value, new PropertyChangedEventHandler(ApplySubSlot), triggerOnUpdate: true, "SubSlotType");
 			}
 		}
 
@@ -258,7 +256,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 						{
 							return false;
 						}
-						return details.Description?.ToLower()?.Contains(filterText) == true;
+						return (details.Description?.ToLower()?.Contains(filterText)).GetValueOrDefault();
 					}
 					return true;
 				}
@@ -274,7 +272,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 					{
 						return false;
 					}
-					return details2.Description?.ToLower()?.Contains(filterText) == true;
+					return (details2.Description?.ToLower()?.Contains(filterText)).GetValueOrDefault();
 				}
 				return true;
 			}
@@ -331,7 +329,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 						if (!item.Name.ToLower().Contains(searchTxt))
 						{
 							string attributesString = amulet.AttributesString;
-							num = ((attributesString != null && attributesString.ToLower()?.Contains(searchTxt) == true) ? 1 : 0);
+							num = ((attributesString != null && (attributesString.ToLower()?.Contains(searchTxt)).GetValueOrDefault()) ? 1 : 0);
 						}
 						else
 						{

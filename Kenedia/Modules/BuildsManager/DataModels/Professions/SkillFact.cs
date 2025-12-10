@@ -2,15 +2,12 @@ using System.Runtime.Serialization;
 using Blish_HUD.Content;
 using Gw2Sharp.WebApi.V2.Models;
 using Kenedia.Modules.Core.Models;
-using Kenedia.Modules.Core.Utility;
 
 namespace Kenedia.Modules.BuildsManager.DataModels.Professions
 {
 	[DataContract]
 	public class SkillFact
 	{
-		private AsyncTexture2D _icon;
-
 		[DataMember]
 		public int? RequiresTrait { get; set; }
 
@@ -43,12 +40,12 @@ namespace Kenedia.Modules.BuildsManager.DataModels.Professions
 		{
 			get
 			{
-				if (_icon != null)
+				if (_003CIcon_003Ek__BackingField != null)
 				{
-					return _icon;
+					return _003CIcon_003Ek__BackingField;
 				}
-				_icon = AsyncTexture2D.FromAssetId(IconAssetId);
-				return _icon;
+				_003CIcon_003Ek__BackingField = AsyncTexture2D.FromAssetId(IconAssetId);
+				return _003CIcon_003Ek__BackingField;
 			}
 		}
 

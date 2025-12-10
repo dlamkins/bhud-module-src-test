@@ -16,7 +16,6 @@ using Kenedia.Modules.BuildsManager.Views;
 using Kenedia.Modules.Core.DataModels;
 using Kenedia.Modules.Core.Extensions;
 using Kenedia.Modules.Core.Models;
-using Kenedia.Modules.Core.Utility;
 using Newtonsoft.Json;
 
 namespace Kenedia.Modules.BuildsManager.Services
@@ -32,14 +31,14 @@ namespace Kenedia.Modules.BuildsManager.Services
 				MappedDataEntry<int, T> loaded = null;
 				if (!DataLoaded && System.IO.File.Exists(path))
 				{
-					BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Debug("Load " + name + ".json");
+					BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug("Load " + name + ".json");
 					loaded = JsonConvert.DeserializeObject<MappedDataEntry<int, T>>(System.IO.File.ReadAllText(path), SerializerSettings.Default);
 					DataLoaded = true;
 				}
 				base.Map = map;
 				base.Items = loaded?.Items ?? base.Items;
 				base.Version = loaded?.Version ?? base.Version;
-				BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Debug($"{name} Current Version: {base.Version} | Required Version: {map.Version}");
+				BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug($"{name} Current Version: {base.Version} | Required Version: {map.Version}");
 				foreach (int id in base.Map.Ignored.Values)
 				{
 					base.Items.Remove(id);
@@ -50,7 +49,7 @@ namespace Kenedia.Modules.BuildsManager.Services
 				_pendingIds = new List<int>();
 				if (map.Version > base.Version)
 				{
-					BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Debug("The current version does not match the map version. Updating all values for " + name + ".");
+					BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug("The current version does not match the map version. Updating all values for " + name + ".");
 					base.Version = map.Version;
 					ItemMappedDataEntry<T> itemMappedDataEntry = this;
 					List<int> list = new List<int>();
@@ -60,21 +59,18 @@ namespace Kenedia.Modules.BuildsManager.Services
 				}
 				else
 				{
-					ItemMappedDataEntry<T> itemMappedDataEntry2 = this;
-					List<int> list2 = new List<int>();
-					list2.AddRange(base.Items.Values.Where((T item) => item.Names[lang] == null)?.Select((T e) => e.Id));
-					itemMappedDataEntry2._pendingIds = list2;
+					_pendingIds = (base.Items.Values.Where((T item) => item.Names[lang] == null)?.Select((T e) => e.Id)).ToList();
 				}
 				if (_pendingIds.Count > 0)
 				{
-					BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Debug($"A total of {_pendingIds.Count} {name} need to be fetched.");
+					BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug($"A total of {_pendingIds.Count} {name} need to be fetched.");
 					return _pendingIds;
 				}
 				return new List<int>();
 			}
 			catch (Exception ex)
 			{
-				BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Warn(ex, "Failed to load " + name + " data.");
+				BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Warn(ex, "Failed to load " + name + " data.");
 				return new List<int>();
 			}
 		}
@@ -101,7 +97,7 @@ namespace Kenedia.Modules.BuildsManager.Services
 					}
 					IReadOnlyList<int> statChoices = readOnlyList2;
 					saveRequired = saveRequired || idSets.Count > 0;
-					BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Debug($"Fetch a total of {_pendingIds.Count} {name} in {idSets.Count} sets.");
+					BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug($"Fetch a total of {_pendingIds.Count} {name} in {idSets.Count} sets.");
 					foreach (List<int> ids in idSets)
 					{
 						IReadOnlyList<Item> items = await gw2ApiManager.Gw2ApiClient.V2.Items.ManyAsync(ids, cancellationToken);
@@ -166,7 +162,7 @@ namespace Kenedia.Modules.BuildsManager.Services
 				}
 				if (saveRequired)
 				{
-					BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Debug("Saving " + name + ".json");
+					BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug("Saving " + name + ".json");
 					string json = JsonConvert.SerializeObject((object)this, SerializerSettings.Default);
 					System.IO.File.WriteAllText(path, json);
 				}
@@ -175,7 +171,7 @@ namespace Kenedia.Modules.BuildsManager.Services
 			}
 			catch (Exception ex)
 			{
-				BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Warn(ex, "Failed to load " + name + " data.");
+				BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Warn(ex, "Failed to load " + name + " data.");
 				return false;
 			}
 		}

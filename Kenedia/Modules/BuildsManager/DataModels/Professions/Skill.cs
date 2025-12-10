@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Threading;
 using Blish_HUD.Content;
@@ -12,7 +13,6 @@ using Kenedia.Modules.BuildsManager.Interfaces;
 using Kenedia.Modules.BuildsManager.Services;
 using Kenedia.Modules.Core.DataModels;
 using Kenedia.Modules.Core.Models;
-using Kenedia.Modules.Core.Utility;
 
 namespace Kenedia.Modules.BuildsManager.DataModels.Professions
 {
@@ -20,8 +20,6 @@ namespace Kenedia.Modules.BuildsManager.DataModels.Professions
 	public class Skill : IDisposable, IBaseApiData, IDataMember
 	{
 		private bool _isDisposed;
-
-		private AsyncTexture2D _icon;
 
 		[DataMember]
 		public LocalizedString Names { get; protected set; } = new LocalizedString();
@@ -62,15 +60,20 @@ namespace Kenedia.Modules.BuildsManager.DataModels.Professions
 		{
 			get
 			{
-				if (_icon != null)
+				if (_003CIcon_003Ek__BackingField != null)
 				{
-					return _icon;
+					return _003CIcon_003Ek__BackingField;
 				}
 				if (IconAssetId != 0 && BuildsManager.MainThread == Thread.CurrentThread.ManagedThreadId)
 				{
-					_icon = AsyncTexture2D.FromAssetId(IconAssetId);
+					_003CIcon_003Ek__BackingField = AsyncTexture2D.FromAssetId(IconAssetId);
 				}
-				return _icon;
+				return _003CIcon_003Ek__BackingField;
+			}
+			[CompilerGenerated]
+			set
+			{
+				_003CIcon_003Ek__BackingField = value;
 			}
 		}
 
@@ -170,7 +173,7 @@ namespace Kenedia.Modules.BuildsManager.DataModels.Professions
 			}
 			int skillid = 0;
 			ProfessionDataEntry professions = data.Professions;
-			if (professions == null || professions[profession]?.SkillsByPalette.TryGetValue(id, out skillid) != true)
+			if (professions == null || !(professions[profession]?.SkillsByPalette.TryGetValue(id, out skillid)).GetValueOrDefault())
 			{
 				return null;
 			}
@@ -221,7 +224,7 @@ namespace Kenedia.Modules.BuildsManager.DataModels.Professions
 			if (!_isDisposed)
 			{
 				_isDisposed = true;
-				_icon = null;
+				Icon = null;
 			}
 		}
 

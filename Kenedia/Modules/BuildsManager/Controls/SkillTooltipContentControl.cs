@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Gw2Sharp.WebApi;
@@ -26,17 +27,16 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		private readonly Label _description;
 
-		private Skill _skill;
-
 		public Skill Skill
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _skill;
+				return _003CSkill_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _skill, value, new ValueChangedEventHandler<Skill>(SetSkill));
+				Common.SetProperty(ref _003CSkill_003Ek__BackingField, value, new ValueChangedEventHandler<Skill>(SetSkill));
 			}
 		}
 

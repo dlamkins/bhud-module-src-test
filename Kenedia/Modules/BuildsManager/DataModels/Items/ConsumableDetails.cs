@@ -9,8 +9,6 @@ namespace Kenedia.Modules.BuildsManager.DataModels.Items
 	[DataContract]
 	public class ConsumableDetails
 	{
-		private AsyncTexture2D _icon;
-
 		[DataMember]
 		public ItemConsumableType Type { get; set; }
 
@@ -72,12 +70,12 @@ namespace Kenedia.Modules.BuildsManager.DataModels.Items
 		{
 			get
 			{
-				if (_icon != null)
+				if (_003CIcon_003Ek__BackingField != null)
 				{
-					return _icon;
+					return _003CIcon_003Ek__BackingField;
 				}
-				_icon = AsyncTexture2D.FromAssetId(AssetId);
-				return _icon;
+				_003CIcon_003Ek__BackingField = AsyncTexture2D.FromAssetId(AssetId);
+				return _003CIcon_003Ek__BackingField;
 			}
 		}
 	}

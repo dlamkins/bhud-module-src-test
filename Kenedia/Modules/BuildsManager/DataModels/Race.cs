@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using Blish_HUD.Content;
 using Gw2Sharp.WebApi.V2;
@@ -19,10 +20,6 @@ namespace Kenedia.Modules.BuildsManager.DataModels
 	public class Race : IDisposable, IDataMember
 	{
 		private bool _isDisposed;
-
-		private AsyncTexture2D _icon;
-
-		private AsyncTexture2D _hoveredIcon;
 
 		[DataMember]
 		public Races Id { get; set; }
@@ -53,12 +50,17 @@ namespace Kenedia.Modules.BuildsManager.DataModels
 		{
 			get
 			{
-				if (_icon != null)
+				if (_003CIcon_003Ek__BackingField != null)
 				{
-					return _icon;
+					return _003CIcon_003Ek__BackingField;
 				}
-				_icon = (AsyncTexture2D)BaseModule<BuildsManager, MainWindow, Settings, Paths>.ModuleInstance.ContentsManager.GetTexture("textures\\races\\" + Id.ToString().ToLower() + ".png");
-				return _icon;
+				_003CIcon_003Ek__BackingField = (AsyncTexture2D)BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.ModuleInstance.ContentsManager.GetTexture("textures\\races\\" + Id.ToString().ToLower() + ".png");
+				return _003CIcon_003Ek__BackingField;
+			}
+			[CompilerGenerated]
+			set
+			{
+				_003CIcon_003Ek__BackingField = value;
 			}
 		}
 
@@ -66,12 +68,17 @@ namespace Kenedia.Modules.BuildsManager.DataModels
 		{
 			get
 			{
-				if (_hoveredIcon != null)
+				if (_003CHoveredIcon_003Ek__BackingField != null)
 				{
-					return _hoveredIcon;
+					return _003CHoveredIcon_003Ek__BackingField;
 				}
-				_hoveredIcon = (AsyncTexture2D)BaseModule<BuildsManager, MainWindow, Settings, Paths>.ModuleInstance.ContentsManager.GetTexture("textures\\races\\" + Id.ToString().ToLower() + "_hovered.png");
-				return _hoveredIcon;
+				_003CHoveredIcon_003Ek__BackingField = (AsyncTexture2D)BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.ModuleInstance.ContentsManager.GetTexture("textures\\races\\" + Id.ToString().ToLower() + "_hovered.png");
+				return _003CHoveredIcon_003Ek__BackingField;
+			}
+			[CompilerGenerated]
+			private set
+			{
+				_003CHoveredIcon_003Ek__BackingField = value;
 			}
 		}
 
@@ -135,8 +142,8 @@ namespace Kenedia.Modules.BuildsManager.DataModels
 			if (!_isDisposed)
 			{
 				_isDisposed = true;
-				_icon = null;
-				_hoveredIcon = null;
+				Icon = null;
+				HoveredIcon = null;
 			}
 		}
 

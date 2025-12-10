@@ -25,18 +25,18 @@ namespace Kenedia.Modules.BuildsManager.Services
 			{
 				bool saveRequired = false;
 				MappedDataEntry<int, Kenedia.Modules.BuildsManager.DataModels.Items.PvpAmulet> loaded = null;
-				BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Debug("Load and if required update " + name);
+				BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug("Load and if required update " + name);
 				if (!DataLoaded && System.IO.File.Exists(path))
 				{
-					BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Debug("Load " + name + ".json");
+					BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug("Load " + name + ".json");
 					loaded = JsonConvert.DeserializeObject<MappedDataEntry<int, Kenedia.Modules.BuildsManager.DataModels.Items.PvpAmulet>>(System.IO.File.ReadAllText(path), SerializerSettings.Default);
 					DataLoaded = true;
 				}
 				base.Map = map;
 				base.Items = loaded?.Items ?? base.Items;
 				base.Version = loaded?.Version ?? base.Version;
-				BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Debug($"{name} Version {base.Version} | version {map.Version}");
-				BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Debug("Check for missing values for " + name);
+				BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug($"{name} Version {base.Version} | version {map.Version}");
+				BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug("Check for missing values for " + name);
 				Locale value = GameService.Overlay.UserLocale.Value;
 				bool flag = (((uint)(value - 4) <= 1u) ? true : false);
 				Locale lang = ((!flag) ? GameService.Overlay.UserLocale.Value : Locale.English);
@@ -46,13 +46,13 @@ namespace Kenedia.Modules.BuildsManager.Services
 					base.Version = map.Version;
 					fetchIds = fetchIds.Concat(base.Map.Values.Except(base.Items.Keys).Except(base.Map.Ignored.Values));
 					saveRequired = true;
-					BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Debug("The current version does not match the map version. Updating all values for " + name + ".");
+					BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug("The current version does not match the map version. Updating all values for " + name + ".");
 				}
 				if (fetchIds.Count() > 0)
 				{
 					List<List<int>> idSets = fetchIds.ToList().ChunkBy(200);
 					saveRequired = saveRequired || idSets.Count > 0;
-					BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Debug($"Fetch a total of {fetchIds.Count()} in {idSets.Count} sets.");
+					BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug($"Fetch a total of {fetchIds.Count()} in {idSets.Count} sets.");
 					foreach (List<int> ids in idSets)
 					{
 						IReadOnlyList<Gw2Sharp.WebApi.V2.Models.PvpAmulet> items = await gw2ApiManager.Gw2ApiClient.V2.Pvp.Amulets.ManyAsync(ids, cancellationToken);
@@ -81,7 +81,7 @@ namespace Kenedia.Modules.BuildsManager.Services
 				}
 				if (saveRequired)
 				{
-					BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Debug("Saving " + name + ".json");
+					BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug("Saving " + name + ".json");
 					string json = JsonConvert.SerializeObject((object)this, SerializerSettings.Default);
 					System.IO.File.WriteAllText(path, json);
 				}
@@ -90,7 +90,7 @@ namespace Kenedia.Modules.BuildsManager.Services
 			}
 			catch (Exception ex)
 			{
-				BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Warn(ex, "Failed to load " + name + " data.");
+				BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Warn(ex, "Failed to load " + name + " data.");
 				return false;
 			}
 		}

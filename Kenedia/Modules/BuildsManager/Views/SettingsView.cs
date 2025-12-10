@@ -90,7 +90,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 				{
 					Settings.ShowCornerIcon.Value = b;
 				},
-				SetLocalizedText = () => string.Format(strings_common.ShowCornerIcon, BaseModule<BuildsManager, MainWindow, Kenedia.Modules.BuildsManager.Services.Settings, Paths>.ModuleName),
+				SetLocalizedText = () => string.Format(strings_common.ShowCornerIcon, BaseModule<BuildsManager, MainWindow, Kenedia.Modules.BuildsManager.Services.Settings, Paths, StaticHosting>.ModuleName),
 				SetLocalizedTooltip = () => strings_common.ShowCornerIcon_ttp
 			};
 			new Kenedia.Modules.Core.Controls.Checkbox
@@ -101,21 +101,21 @@ namespace Kenedia.Modules.BuildsManager.Views
 				{
 					Settings.RequireVisibleTemplate.Value = b;
 				},
-				SetLocalizedText = () => string.Format(strings.RequireVisibleTemplate, BaseModule<BuildsManager, MainWindow, Kenedia.Modules.BuildsManager.Services.Settings, Paths>.ModuleName),
+				SetLocalizedText = () => string.Format(strings.RequireVisibleTemplate, BaseModule<BuildsManager, MainWindow, Kenedia.Modules.BuildsManager.Services.Settings, Paths, StaticHosting>.ModuleName),
 				SetLocalizedTooltip = () => strings.RequireVisibleTemplate_Tooltip
 			};
 			Kenedia.Modules.Core.Controls.Checkbox setFilterOnTemplateCreate = new Kenedia.Modules.Core.Controls.Checkbox
 			{
 				Parent = fp,
 				Checked = Settings.SetFilterOnTemplateCreate.Value,
-				SetLocalizedText = () => string.Format(strings.SetFilterOnTemplateCreate, BaseModule<BuildsManager, MainWindow, Kenedia.Modules.BuildsManager.Services.Settings, Paths>.ModuleName),
+				SetLocalizedText = () => string.Format(strings.SetFilterOnTemplateCreate, BaseModule<BuildsManager, MainWindow, Kenedia.Modules.BuildsManager.Services.Settings, Paths, StaticHosting>.ModuleName),
 				SetLocalizedTooltip = () => strings.SetFilterOnTemplateCreate_Tooltip
 			};
 			Kenedia.Modules.Core.Controls.Checkbox resetFilterOnTemplateCreate = new Kenedia.Modules.Core.Controls.Checkbox
 			{
 				Parent = fp,
 				Checked = Settings.ResetFilterOnTemplateCreate.Value,
-				SetLocalizedText = () => string.Format(strings.ResetFilterOnTemplateCreate, BaseModule<BuildsManager, MainWindow, Kenedia.Modules.BuildsManager.Services.Settings, Paths>.ModuleName),
+				SetLocalizedText = () => string.Format(strings.ResetFilterOnTemplateCreate, BaseModule<BuildsManager, MainWindow, Kenedia.Modules.BuildsManager.Services.Settings, Paths, StaticHosting>.ModuleName),
 				SetLocalizedTooltip = () => strings.ResetFilterOnTemplateCreate_Tooltip
 			};
 			setFilterOnTemplateCreate.CheckedChangedAction = delegate(bool b)
@@ -150,7 +150,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 						IgnoreWhenInTextField = true
 					};
 				},
-				SetLocalizedKeyBindingName = () => string.Format(strings_common.ToggleItem, BaseModule<BuildsManager, MainWindow, Kenedia.Modules.BuildsManager.Services.Settings, Paths>.ModuleName)
+				SetLocalizedKeyBindingName = () => string.Format(strings_common.ToggleItem, BaseModule<BuildsManager, MainWindow, Kenedia.Modules.BuildsManager.Services.Settings, Paths, StaticHosting>.ModuleName)
 			};
 			fp = new Kenedia.Modules.Core.Controls.FlowPanel
 			{

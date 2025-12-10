@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Kenedia.Modules.BuildsManager.DataModels.Items;
 using Kenedia.Modules.BuildsManager.Models.Templates;
 using Kenedia.Modules.BuildsManager.Services;
@@ -11,17 +12,16 @@ namespace Kenedia.Modules.BuildsManager.TemplateEntries
 	{
 		private bool _isDisposed;
 
-		private Enhancement _enhancement;
-
 		public Enhancement Enhancement
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _enhancement;
+				return _003CEnhancement_003Ek__BackingField;
 			}
 			private set
 			{
-				Common.SetProperty(ref _enhancement, value);
+				Common.SetProperty(ref _003CEnhancement_003Ek__BackingField, value);
 			}
 		}
 

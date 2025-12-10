@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Kenedia.Modules.BuildsManager.DataModels.Items;
 using Kenedia.Modules.BuildsManager.Interfaces;
 using Kenedia.Modules.BuildsManager.Models.Templates;
@@ -12,31 +13,29 @@ namespace Kenedia.Modules.BuildsManager.TemplateEntries
 	{
 		private bool _isDisposed;
 
-		private PvpAmulet _pvpAmulet;
-
-		private Rune _rune;
-
 		public PvpAmulet PvpAmulet
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _pvpAmulet;
+				return _003CPvpAmulet_003Ek__BackingField;
 			}
 			private set
 			{
-				Common.SetProperty(ref _pvpAmulet, value);
+				Common.SetProperty(ref _003CPvpAmulet_003Ek__BackingField, value);
 			}
 		}
 
 		public Rune Rune
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _rune;
+				return _003CRune_003Ek__BackingField;
 			}
 			private set
 			{
-				Common.SetProperty(ref _rune, value);
+				Common.SetProperty(ref _003CRune_003Ek__BackingField, value);
 			}
 		}
 

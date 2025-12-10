@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
@@ -40,12 +41,6 @@ namespace Kenedia.Modules.Core.Controls
 			Visible = false
 		};
 
-		private Func<string> _setLocalizedTitleTooltip;
-
-		private Func<string> _setLocalizedTooltip;
-
-		private Func<string> _setLocalizedTitle;
-
 		private Vector2 _layoutAccordionArrowOrigin;
 
 		private Rectangle _layoutTopLeftAccentBounds;
@@ -75,8 +70,6 @@ namespace Kenedia.Modules.Core.Controls
 		private Rectangle _backgroundBounds;
 
 		private RectangleDimensions _titleIconPadding = new RectangleDimensions(3, 3, 5, 3);
-
-		private int _titleBarHeight = 36;
 
 		public string BasicTitleTooltipText { get; set; }
 
@@ -161,13 +154,14 @@ namespace Kenedia.Modules.Core.Controls
 
 		public int TitleBarHeight
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _titleBarHeight;
+				return _003CTitleBarHeight_003Ek__BackingField;
 			}
 			set
 			{
-				_titleBarHeight = value;
+				_003CTitleBarHeight_003Ek__BackingField = value;
 				RecalculateLayout();
 			}
 		}
@@ -186,45 +180,47 @@ namespace Kenedia.Modules.Core.Controls
 
 		public Func<string> SetLocalizedTooltip
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _setLocalizedTooltip;
+				return _003CSetLocalizedTooltip_003Ek__BackingField;
 			}
 			set
 			{
-				_setLocalizedTooltip = value;
+				_003CSetLocalizedTooltip_003Ek__BackingField = value;
 				base.BasicTooltipText = value?.Invoke();
 			}
 		}
 
 		public Func<string> SetLocalizedTitleTooltip
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _setLocalizedTitleTooltip;
+				return _003CSetLocalizedTitleTooltip_003Ek__BackingField;
 			}
 			set
 			{
-				_setLocalizedTitleTooltip = value;
+				_003CSetLocalizedTitleTooltip_003Ek__BackingField = value;
 				TitleTooltipText = value?.Invoke();
 			}
 		}
 
 		public Func<string> SetLocalizedTitle
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _setLocalizedTitle;
+				return _003CSetLocalizedTitle_003Ek__BackingField;
 			}
 			set
 			{
-				_setLocalizedTitle = value;
+				_003CSetLocalizedTitle_003Ek__BackingField = value;
 				base.Title = value?.Invoke();
 			}
 		}
 
-		public bool CaptureInput { get; set; } = true;
-
+		public bool CaptureInput { get; set; }
 
 		public CaptureType? Capture { get; set; }
 
@@ -236,7 +232,10 @@ namespace Kenedia.Modules.Core.Controls
 
 		public Panel()
 		{
-			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
+			_003CTitleBarHeight_003Ek__BackingField = 36;
+			CaptureInput = true;
+			base._002Ector();
 			LocalizingService.LocaleChanged += new EventHandler<ValueChangedEventArgs<Locale>>(UserLocale_SettingChanged);
 			UserLocale_SettingChanged(null, null);
 		}
@@ -294,7 +293,7 @@ namespace Kenedia.Modules.Core.Controls
 			base.RecalculateLayout();
 			_contentRegion = new Rectangle(_contentPadding.Left + BorderWidth.Left, _contentPadding.Top + BorderWidth.Top, base.Width - _contentPadding.Horizontal - BorderWidth.Horizontal - ((WidthSizingMode == SizingMode.AutoSize) ? base.AutoSizePadding.X : 0), base.Height - _contentPadding.Vertical - BorderWidth.Vertical - ((HeightSizingMode == SizingMode.AutoSize) ? base.AutoSizePadding.Y : 0));
 			_backgroundBounds = new Rectangle(Math.Max(BorderWidth.Left - 2, 0), Math.Max(BorderWidth.Top - 2, 0), base.Width - Math.Max(BorderWidth.Horizontal - 4, 0), base.Height - Math.Max(BorderWidth.Vertical - 4, 0));
-			int num = ((!string.IsNullOrEmpty(_title)) ? _titleBarHeight : 0);
+			int num = ((!string.IsNullOrEmpty(_title)) ? TitleBarHeight : 0);
 			int num2 = 0;
 			int num3 = 0;
 			int num4 = 0;

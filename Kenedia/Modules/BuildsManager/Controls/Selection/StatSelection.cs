@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Blish_HUD.Controls;
 using Gw2Sharp.WebApi.V2.Models;
 using Kenedia.Modules.BuildsManager.DataModels.Stats;
@@ -22,35 +23,33 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 
 		private readonly bool _created;
 
-		private IReadOnlyList<int> _statChoices;
-
-		private double _attributeAdjustments;
-
 		public TemplatePresenter TemplatePresenter { get; }
 
 		public Data Data { get; }
 
 		public IReadOnlyList<int> StatChoices
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _statChoices;
+				return _003CStatChoices_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _statChoices, value, new ValueChangedEventHandler<IReadOnlyList<int>>(OnStatChoicesChanged));
+				Common.SetProperty(ref _003CStatChoices_003Ek__BackingField, value, new ValueChangedEventHandler<IReadOnlyList<int>>(OnStatChoicesChanged));
 			}
 		}
 
 		public double AttributeAdjustments
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _attributeAdjustments;
+				return _003CAttributeAdjustments_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _attributeAdjustments, value, new ValueChangedEventHandler<double>(OnAttributeAdjustmentsChanged));
+				Common.SetProperty(ref _003CAttributeAdjustments_003Ek__BackingField, value, new ValueChangedEventHandler<double>(OnAttributeAdjustmentsChanged));
 			}
 		}
 

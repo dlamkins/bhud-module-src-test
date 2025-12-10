@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
@@ -22,10 +23,6 @@ namespace Kenedia.Modules.Core.Controls
 
 		private DetailedTexture _badge = new DetailedTexture(222246);
 
-		private Control _anchor;
-
-		private float _opcacity = 1f;
-
 		private double _lastChecked;
 
 		private bool _deleting;
@@ -42,26 +39,28 @@ namespace Kenedia.Modules.Core.Controls
 
 		public new float Opacity
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _opcacity;
+				return _003COpacity_003Ek__BackingField;
 			}
 			set
 			{
-				_opcacity = value;
+				_003COpacity_003Ek__BackingField = value;
 				SetOpacity();
 			}
 		}
 
 		public Control Anchor
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _anchor;
+				return _003CAnchor_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _anchor, value, new ValueChangedEventHandler<Control>(OnAnchorChanged));
+				Common.SetProperty(ref _003CAnchor_003Ek__BackingField, value, new ValueChangedEventHandler<Control>(OnAnchorChanged));
 			}
 		}
 
@@ -70,6 +69,8 @@ namespace Kenedia.Modules.Core.Controls
 		public NotificationBadge()
 		{
 			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+			_003COpacity_003Ek__BackingField = 1f;
+			base._002Ector();
 			base.Size = new Point(32);
 			LocalizingService.LocaleChanged += new EventHandler<Blish_HUD.ValueChangedEventArgs<Locale>>(UserLocale_SettingChanged);
 			Notifications.CollectionChanged += Notifications_CollectionChanged;

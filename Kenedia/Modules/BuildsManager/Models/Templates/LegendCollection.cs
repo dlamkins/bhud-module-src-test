@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Kenedia.Modules.BuildsManager.DataModels.Professions;
 
 namespace Kenedia.Modules.BuildsManager.Models.Templates
@@ -94,12 +95,13 @@ namespace Kenedia.Modules.BuildsManager.Models.Templates
 			}
 		}
 
+		[IteratorStateMachine(typeof(_003CGetEnumerator_003Ed__24))]
 		public IEnumerator<Legend> GetEnumerator()
 		{
-			yield return TerrestrialActive;
-			yield return TerrestrialInactive;
-			yield return AquaticActive;
-			yield return AquaticInactive;
+			return new _003CGetEnumerator_003Ed__24(0)
+			{
+				_003C_003E4__this = this
+			};
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()

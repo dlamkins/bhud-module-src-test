@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
@@ -15,25 +16,20 @@ namespace Kenedia.Modules.Core.Controls
 
 		private bool _clicked;
 
-		private Action<bool> _onCheckChanged;
-
 		private Rectangle _xTextureRectangle;
 
 		private Rectangle _xDrawRectangle;
 
-		private bool _checked;
-
-		private Func<string> _setLocalizedTooltip;
-
 		public Func<string> SetLocalizedTooltip
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _setLocalizedTooltip;
+				return _003CSetLocalizedTooltip_003Ek__BackingField;
 			}
 			set
 			{
-				_setLocalizedTooltip = value;
+				_003CSetLocalizedTooltip_003Ek__BackingField = value;
 				base.BasicTooltipText = value?.Invoke();
 			}
 		}
@@ -60,26 +56,28 @@ namespace Kenedia.Modules.Core.Controls
 
 		public bool Checked
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _checked;
+				return _003CChecked_003Ek__BackingField;
 			}
 			set
 			{
-				_checked = value;
+				_003CChecked_003Ek__BackingField = value;
 				OnCheckedChanged();
 			}
 		}
 
 		public Action<bool> OnCheckChanged
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _onCheckChanged;
+				return _003COnCheckChanged_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _onCheckChanged, value);
+				Common.SetProperty(ref _003COnCheckChanged_003Ek__BackingField, value);
 			}
 		}
 
@@ -100,7 +98,7 @@ namespace Kenedia.Modules.Core.Controls
 
 		private void OnCheckedChanged()
 		{
-			this.CheckedChanged?.Invoke(this, new CheckChangedEvent(_checked));
+			this.CheckedChanged?.Invoke(this, new CheckChangedEvent(Checked));
 		}
 
 		private AsyncTexture2D GetTexture()

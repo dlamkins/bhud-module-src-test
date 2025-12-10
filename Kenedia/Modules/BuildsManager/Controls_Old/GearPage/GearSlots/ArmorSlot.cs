@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
@@ -33,49 +34,46 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 			TextureRegion = new Rectangle(38, 38, 52, 52)
 		});
 
-		private Stat? _stat;
-
-		private Rune? _rune;
-
-		private Infusion? _infusion;
-
 		private Rectangle _runeBounds;
 
 		private Rectangle _infusionBounds;
 
 		public Stat? Stat
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _stat;
+				return _003CStat_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty<Stat>(ref _stat, value, new ValueChangedEventHandler<Stat>(OnStatChanged));
+				Common.SetProperty<Stat>(ref _003CStat_003Ek__BackingField, value, new ValueChangedEventHandler<Stat>(OnStatChanged));
 			}
 		}
 
 		public Rune? Rune
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _rune;
+				return _003CRune_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty<Rune>(ref _rune, value, new ValueChangedEventHandler<Rune>(OnRuneChanged));
+				Common.SetProperty<Rune>(ref _003CRune_003Ek__BackingField, value, new ValueChangedEventHandler<Rune>(OnRuneChanged));
 			}
 		}
 
 		public Infusion? Infusion
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _infusion;
+				return _003CInfusion_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty<Infusion>(ref _infusion, value, new ValueChangedEventHandler<Infusion>(OnInfusionChanged));
+				Common.SetProperty<Infusion>(ref _003CInfusion_003Ek__BackingField, value, new ValueChangedEventHandler<Infusion>(OnInfusionChanged));
 			}
 		}
 
@@ -84,7 +82,7 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 		{
 			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-			_infusionControl.Placeholder.Texture = (AsyncTexture2D)BaseModule<BuildsManager, MainWindow, Settings, Paths>.ModuleInstance.ContentsManager.GetTexture("textures\\infusionslot.png");
+			_infusionControl.Placeholder.Texture = (AsyncTexture2D)BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.ModuleInstance.ContentsManager.GetTexture("textures\\infusionslot.png");
 			_runeControl.Parent = this;
 			_infusionControl.Parent = this;
 		}

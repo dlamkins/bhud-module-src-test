@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using Blish_HUD;
 using Blish_HUD.Content;
@@ -26,8 +27,6 @@ namespace Kenedia.Modules.BuildsManager.Controls
 {
 	public class SkillSlotControl : Control
 	{
-		private Kenedia.Modules.BuildsManager.DataModels.Professions.Skill _skill;
-
 		public DetailedTexture Selector { get; } = new DetailedTexture(157138, 157140);
 
 
@@ -108,13 +107,14 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		public Kenedia.Modules.BuildsManager.DataModels.Professions.Skill? Skill
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _skill;
+				return _003CSkill_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _skill, value, new ValueChangedEventHandler<Kenedia.Modules.BuildsManager.DataModels.Professions.Skill>(OnSkillChanged));
+				Common.SetProperty<Kenedia.Modules.BuildsManager.DataModels.Professions.Skill>(ref _003CSkill_003Ek__BackingField, value, new ValueChangedEventHandler<Kenedia.Modules.BuildsManager.DataModels.Professions.Skill>(OnSkillChanged));
 			}
 		}
 

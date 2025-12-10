@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Kenedia.Modules.Core.Extensions;
@@ -15,17 +16,16 @@ namespace Kenedia.Modules.Core.Controls
 	{
 		private List<(Rectangle r, float opacity, int thickness)> _borders = new List<(Rectangle, float, int)>();
 
-		private Control _coveredControl;
-
 		public Control CoveredControl
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _coveredControl;
+				return _003CCoveredControl_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _coveredControl, value, new ValueChangedEventHandler<Control>(OnCoveredControlChanged));
+				Common.SetProperty(ref _003CCoveredControl_003Ek__BackingField, value, new ValueChangedEventHandler<Control>(OnCoveredControlChanged));
 			}
 		}
 

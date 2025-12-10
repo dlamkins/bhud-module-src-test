@@ -2,6 +2,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
@@ -25,8 +26,6 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		private TabbedRegionTab _activeTab;
 
-		private ObservableCollection<TabbedRegionTab> _tabs = new ObservableCollection<TabbedRegionTab>();
-
 		private new Rectangle _contentRegion;
 
 		private Rectangle _headerRegion;
@@ -34,8 +33,6 @@ namespace Kenedia.Modules.BuildsManager.Controls
 		private RectangleDimensions _headerPading = new RectangleDimensions(0, 8);
 
 		private RectangleDimensions _contentPadding = new RectangleDimensions(0, 4);
-
-		private BitmapFont _headerFont = Control.Content.DefaultFont18;
 
 		public TabbedRegionTab ActiveTab
 		{
@@ -49,20 +46,22 @@ namespace Kenedia.Modules.BuildsManager.Controls
 			}
 		}
 
-		public ObservableCollection<TabbedRegionTab> Tabs => _tabs;
+		public ObservableCollection<TabbedRegionTab> Tabs { get; } = new ObservableCollection<TabbedRegionTab>();
+
 
 		public BitmapFont HeaderFont
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _headerFont;
+				return _003CHeaderFont_003Ek__BackingField;
 			}
 			set
 			{
-				_headerFont = value ?? Control.Content.DefaultFont18;
-				foreach (TabbedRegionTab tab in _tabs)
+				_003CHeaderFont_003Ek__BackingField = value ?? Control.Content.DefaultFont18;
+				foreach (TabbedRegionTab tab in Tabs)
 				{
-					tab.Font = _headerFont;
+					tab.Font = _003CHeaderFont_003Ek__BackingField;
 				}
 			}
 		}
@@ -83,7 +82,9 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		public TabbedRegion()
 		{
-			_tabs.CollectionChanged += Tab_CollectionChanged;
+			_003CHeaderFont_003Ek__BackingField = Control.Content.DefaultFont18;
+			base._002Ector();
+			Tabs.CollectionChanged += Tab_CollectionChanged;
 			_contentPanel = new Panel
 			{
 				Parent = this
@@ -94,7 +95,7 @@ namespace Kenedia.Modules.BuildsManager.Controls
 		{
 			if (_activeTab == null)
 			{
-				SwitchTab(_tabs.FirstOrDefault());
+				SwitchTab(Tabs.FirstOrDefault());
 			}
 			RecalculateLayout();
 		}
@@ -103,18 +104,18 @@ namespace Kenedia.Modules.BuildsManager.Controls
 		{
 			tab.Container.Visible = false;
 			tab.Container.Parent = _contentPanel;
-			_tabs.Add(tab);
+			Tabs.Add(tab);
 		}
 
 		public void AddTab(Container tab)
 		{
-			_tabs.Add(new TabbedRegionTab(tab));
+			Tabs.Add(new TabbedRegionTab(tab));
 		}
 
 		public void RemoveTab(Container tab)
 		{
 			Container tab2 = tab;
-			_tabs.ToList().RemoveAll((TabbedRegionTab e) => e.Container == tab2);
+			Tabs.ToList().RemoveAll((TabbedRegionTab e) => e.Container == tab2);
 		}
 
 		public void SwitchTab(TabbedRegionTab tab)
@@ -125,7 +126,7 @@ namespace Kenedia.Modules.BuildsManager.Controls
 				_activeTab = tab;
 				_activeTab.Container?.Invalidate();
 			}
-			foreach (TabbedRegionTab item in _tabs)
+			foreach (TabbedRegionTab item in Tabs)
 			{
 				item.IsActive = item == _activeTab;
 				item.Container.Visible = item.IsActive;
@@ -151,10 +152,10 @@ namespace Kenedia.Modules.BuildsManager.Controls
 				_contentPanel.Location = ((Rectangle)(ref _contentRegion)).get_Location();
 				_contentPanel.Size = ((Rectangle)(ref _contentRegion)).get_Size();
 			}
-			int tabHeaderWidth = base.Width / Math.Max(1, _tabs.Count);
-			for (int i = 0; i < _tabs.Count; i++)
+			int tabHeaderWidth = base.Width / Math.Max(1, Tabs.Count);
+			for (int i = 0; i < Tabs.Count; i++)
 			{
-				_tabs[i].Bounds = new Rectangle(((Rectangle)(ref _headerRegion)).get_Left() + i * tabHeaderWidth, ((Rectangle)(ref _headerRegion)).get_Top(), tabHeaderWidth, _headerRegion.Height);
+				Tabs[i].Bounds = new Rectangle(((Rectangle)(ref _headerRegion)).get_Left() + i * tabHeaderWidth, ((Rectangle)(ref _headerRegion)).get_Top(), tabHeaderWidth, _headerRegion.Height);
 			}
 		}
 
@@ -165,9 +166,9 @@ namespace Kenedia.Modules.BuildsManager.Controls
 			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
 			base.PaintBeforeChildren(spriteBatch, bounds);
-			for (int i = 0; i < _tabs.Count; i++)
+			for (int i = 0; i < Tabs.Count; i++)
 			{
-				_tabs[i].DrawHeader(this, spriteBatch, base.RelativeMousePosition);
+				Tabs[i].DrawHeader(this, spriteBatch, base.RelativeMousePosition);
 			}
 			spriteBatch.DrawOnCtrl((Control)this, (Texture2D)_separator, new Rectangle(((Rectangle)(ref _headerRegion)).get_Left(), ((Rectangle)(ref _headerRegion)).get_Bottom() - 9, _headerRegion.Width, 16), Color.get_Black());
 		}
@@ -176,11 +177,11 @@ namespace Kenedia.Modules.BuildsManager.Controls
 		{
 			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
 			base.OnClick(e);
-			for (int i = 0; i < _tabs.Count; i++)
+			for (int i = 0; i < Tabs.Count; i++)
 			{
-				if (_tabs[i].IsHovered(base.RelativeMousePosition))
+				if (Tabs[i].IsHovered(base.RelativeMousePosition))
 				{
-					SwitchTab(_tabs[i]);
+					SwitchTab(Tabs[i]);
 					break;
 				}
 			}
@@ -189,7 +190,7 @@ namespace Kenedia.Modules.BuildsManager.Controls
 		protected override void DisposeControl()
 		{
 			base.DisposeControl();
-			_tabs.CollectionChanged -= Tab_CollectionChanged;
+			Tabs.CollectionChanged -= Tab_CollectionChanged;
 		}
 	}
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Gw2Sharp.WebApi;
@@ -28,17 +29,16 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		private readonly Kenedia.Modules.Core.Controls.Label _description;
 
-		private Trait _trait;
-
 		public Trait Trait
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _trait;
+				return _003CTrait_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _trait, value, new ValueChangedEventHandler<Trait>(ApplyTrait));
+				Common.SetProperty(ref _003CTrait_003Ek__BackingField, value, new ValueChangedEventHandler<Trait>(ApplyTrait));
 			}
 		}
 

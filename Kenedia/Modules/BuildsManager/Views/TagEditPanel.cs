@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
@@ -18,8 +19,6 @@ namespace Kenedia.Modules.BuildsManager.Views
 {
 	public class TagEditPanel : Kenedia.Modules.Core.Controls.Panel
 	{
-		private TemplateTag _tag;
-
 		private readonly (Kenedia.Modules.Core.Controls.Label label, Kenedia.Modules.Core.Controls.TextBox textBox) _name;
 
 		private readonly (Kenedia.Modules.Core.Controls.Label label, Kenedia.Modules.Core.Controls.Dropdown textBox) _group;
@@ -54,13 +53,14 @@ namespace Kenedia.Modules.BuildsManager.Views
 
 		public TemplateTag Tag
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _tag;
+				return _003CTag_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _tag, value, new ValueChangedEventHandler<TemplateTag>(OnTagChanged));
+				Common.SetProperty(ref _003CTag_003Ek__BackingField, value, new ValueChangedEventHandler<TemplateTag>(OnTagChanged));
 			}
 		}
 

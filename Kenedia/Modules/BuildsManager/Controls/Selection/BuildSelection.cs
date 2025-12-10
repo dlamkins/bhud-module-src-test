@@ -131,19 +131,13 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 			Templates.Loaded += new EventHandler(Templates_Loaded);
 			if (Templates.IsLoaded)
 			{
-				TemplateCollection templates3 = Templates;
-				List<Template> list = new List<Template>(templates3.Count);
-				list.AddRange(templates3);
-				AddTemplateSelectable(firstLoad: true, list);
+				AddTemplateSelectable(firstLoad: true, Templates.ToList());
 			}
 		}
 
 		private void Templates_Loaded(object sender, EventArgs e)
 		{
-			TemplateCollection templates = Templates;
-			List<Template> list = new List<Template>(templates.Count);
-			list.AddRange(templates);
-			AddTemplateSelectable(firstLoad: true, list);
+			AddTemplateSelectable(firstLoad: true, Templates.ToList());
 		}
 
 		private void AddNewTemplate()
@@ -160,7 +154,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 					{
 						try
 						{
-							BaseModule<BuildsManager, MainWindow, Kenedia.Modules.BuildsManager.Services.Settings, Paths>.Logger.Debug("Load template from clipboard code: " + code);
+							BaseModule<BuildsManager, MainWindow, Kenedia.Modules.BuildsManager.Services.Settings, Paths, Kenedia.Modules.BuildsManager.Services.StaticHosting>.Logger.Debug("Load template from clipboard code: " + code);
 							t.LoadFromCode(code);
 						}
 						catch (Exception)
@@ -250,7 +244,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 			}
 			catch (Exception ex)
 			{
-				BaseModule<BuildsManager, MainWindow, Kenedia.Modules.BuildsManager.Services.Settings, Paths>.Logger.Debug(ex, "Error while filtering templates");
+				BaseModule<BuildsManager, MainWindow, Kenedia.Modules.BuildsManager.Services.Settings, Paths, Kenedia.Modules.BuildsManager.Services.StaticHosting>.Logger.Debug(ex, "Error while filtering templates");
 			}
 		}
 

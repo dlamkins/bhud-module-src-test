@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
@@ -17,8 +18,6 @@ namespace Kenedia.Modules.BuildsManager.Controls
 	{
 		private AsyncTexture2D _editIcon = AsyncTexture2D.FromAssetId(157109);
 
-		private TemplateTag _tag;
-
 		private string _displayText = string.Empty;
 
 		private Rectangle _bounds;
@@ -35,13 +34,14 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		public TemplateTag Tag
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _tag;
+				return _003CTag_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _tag, value, new ValueChangedEventHandler<TemplateTag>(OnTagChanged));
+				Common.SetProperty(ref _003CTag_003Ek__BackingField, value, new ValueChangedEventHandler<TemplateTag>(OnTagChanged));
 			}
 		}
 

@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Kenedia.Modules.BuildsManager.DataModels.Professions;
 using Kenedia.Modules.Core.Models;
 using Kenedia.Modules.Core.Services;
@@ -9,17 +10,16 @@ namespace Kenedia.Modules.BuildsManager.Controls
 {
 	public class TraitIcon : DetailedTexture
 	{
-		private Trait _trait;
-
 		public Trait Trait
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _trait;
+				return _003CTrait_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _trait, value, new Action(ApplyTrait));
+				Common.SetProperty(ref _003CTrait_003Ek__BackingField, value, new Action(ApplyTrait));
 			}
 		}
 

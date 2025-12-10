@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
@@ -49,14 +50,6 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 			TextureRegion = new Rectangle(38, 38, 52, 52)
 		});
 
-		private Stat _stat;
-
-		private Sigil _sigil;
-
-		private Sigil _pvpSigil;
-
-		private Infusion _infusion;
-
 		private Rectangle _sigilBounds;
 
 		private Rectangle _pvpSigilBounds;
@@ -65,49 +58,53 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 
 		public Stat Stat
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _stat;
+				return _003CStat_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _stat, value, new ValueChangedEventHandler<Stat>(OnStatChanged));
+				Common.SetProperty(ref _003CStat_003Ek__BackingField, value, new ValueChangedEventHandler<Stat>(OnStatChanged));
 			}
 		}
 
 		public Sigil Sigil
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _sigil;
+				return _003CSigil_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _sigil, value, new ValueChangedEventHandler<Sigil>(OnSigilChanged));
+				Common.SetProperty(ref _003CSigil_003Ek__BackingField, value, new ValueChangedEventHandler<Sigil>(OnSigilChanged));
 			}
 		}
 
 		public Sigil PvpSigil
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _pvpSigil;
+				return _003CPvpSigil_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _pvpSigil, value, new ValueChangedEventHandler<Sigil>(OnPvpSigilChanged));
+				Common.SetProperty(ref _003CPvpSigil_003Ek__BackingField, value, new ValueChangedEventHandler<Sigil>(OnPvpSigilChanged));
 			}
 		}
 
 		public Infusion Infusion
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _infusion;
+				return _003CInfusion_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _infusion, value, new ValueChangedEventHandler<Infusion>(OnInfusionChanged));
+				Common.SetProperty(ref _003CInfusion_003Ek__BackingField, value, new ValueChangedEventHandler<Infusion>(OnInfusionChanged));
 			}
 		}
 
@@ -121,7 +118,7 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
 			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-			_infusionControl.Placeholder.Texture = (AsyncTexture2D)BaseModule<BuildsManager, MainWindow, Settings, Paths>.ModuleInstance.ContentsManager.GetTexture("textures\\infusionslot.png");
+			_infusionControl.Placeholder.Texture = (AsyncTexture2D)BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.ModuleInstance.ContentsManager.GetTexture("textures\\infusionslot.png");
 			_sigilControl.Parent = this;
 			_pvpSigilControl.Parent = this;
 			_infusionControl.Parent = this;

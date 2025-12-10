@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Kenedia.Modules.BuildsManager.DataModels.Items;
 using Kenedia.Modules.BuildsManager.Interfaces;
 using Kenedia.Modules.BuildsManager.Models.Templates;
@@ -10,21 +11,20 @@ namespace Kenedia.Modules.BuildsManager.TemplateEntries
 {
 	public abstract class TemplateEntry : IItemTemplateEntry
 	{
-		private BaseItem _item;
-
 		public TemplateSlotType Slot { get; }
 
 		public Data Data { get; }
 
 		public BaseItem Item
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _item;
+				return _003CItem_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _item, value, new ValueChangedEventHandler<BaseItem>(OnItemChanged));
+				Common.SetProperty(ref _003CItem_003Ek__BackingField, value, new ValueChangedEventHandler<BaseItem>(OnItemChanged));
 			}
 		}
 

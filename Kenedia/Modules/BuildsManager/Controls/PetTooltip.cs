@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Gw2Sharp.WebApi;
@@ -27,17 +28,16 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		private readonly Kenedia.Modules.Core.Controls.Label _description;
 
-		private Pet? _pet;
-
 		public Pet? Pet
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _pet;
+				return _003CPet_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty<Pet>(ref _pet, value, new ValueChangedEventHandler<Pet>(ApplyPet));
+				Common.SetProperty<Pet>(ref _003CPet_003Ek__BackingField, value, new ValueChangedEventHandler<Pet>(ApplyPet));
 			}
 		}
 

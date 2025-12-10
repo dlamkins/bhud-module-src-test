@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Runtime.CompilerServices;
 using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
 using Kenedia.Modules.Core.Utility;
@@ -12,17 +13,16 @@ namespace Kenedia.Modules.Core.Models
 
 		protected readonly DirectoriesManager DirectoriesManager;
 
-		private string? _accountName;
-
 		public string? AccountName
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _accountName;
+				return _003CAccountName_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _accountName, value, new Action(AddAccountFolder), !string.IsNullOrEmpty(value));
+				Common.SetProperty(ref _003CAccountName_003Ek__BackingField, value, new Action(AddAccountFolder), !string.IsNullOrEmpty(value));
 			}
 		}
 
@@ -38,7 +38,7 @@ namespace Kenedia.Modules.Core.Models
 		{
 			get
 			{
-				if (_accountName == null)
+				if (AccountName == null)
 				{
 					return null;
 				}

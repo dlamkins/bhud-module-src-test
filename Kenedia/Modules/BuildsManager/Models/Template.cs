@@ -52,26 +52,18 @@ namespace Kenedia.Modules.BuildsManager.Models
 
 		private string _savedGearCode = string.Empty;
 
-		[JsonProperty("Tags")]
-		[DataMember]
-		private UniqueObservableCollection<string> _tags = new UniqueObservableCollection<string>();
-
 		private CancellationTokenSource? _cancellationTokenSource;
 
 		private bool _saveRequested;
 
 		private List<BuildSpecialization> _specializations;
 
-		[JsonProperty("LastModified")]
-		[DataMember]
-		private string _lastModified = DateTime.Now.ToString("d");
-
 		public static Template Empty { get; } = new Template();
 
 
 		public Data Data { get; }
 
-		public string FilePath => BaseModule<BuildsManager, MainWindow, Settings, Paths>.ModuleInstance.Paths.TemplatesPath + Common.MakeValidFileName(Name.Trim(), '_') + ".json";
+		public string FilePath => BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.ModuleInstance.Paths.TemplatesPath + Common.MakeValidFileName(Name.Trim(), '_') + ".json";
 
 		[DataMember]
 		public ProfessionType Profession
@@ -101,13 +93,14 @@ namespace Kenedia.Modules.BuildsManager.Models
 
 		public UniqueObservableCollection<string> Tags
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _tags;
+				return _003CTags_003Ek__BackingField;
 			}
 			private set
 			{
-				Common.SetProperty<UniqueObservableCollection<string>>(ref _tags, value, new ValueChangedEventHandler<UniqueObservableCollection<string>>(OnTagsListChanged));
+				Common.SetProperty<UniqueObservableCollection<string>>(ref _003CTags_003Ek__BackingField, value, new ValueChangedEventHandler<UniqueObservableCollection<string>>(OnTagsListChanged));
 			}
 		}
 
@@ -185,17 +178,13 @@ namespace Kenedia.Modules.BuildsManager.Models
 			}
 		}
 
-		public RangerPets Pets { get; } = new RangerPets();
+		public RangerPets Pets { get; }
 
+		public SkillCollection Skills { get; }
 
-		public SkillCollection Skills { get; } = new SkillCollection();
+		public LegendCollection Legends { get; }
 
-
-		public LegendCollection Legends { get; } = new LegendCollection();
-
-
-		public Specializations Specializations { get; } = new Specializations();
-
+		public Specializations Specializations { get; }
 
 		public BuildSpecialization? this[SpecializationSlotType slot] => slot switch
 		{
@@ -267,11 +256,9 @@ namespace Kenedia.Modules.BuildsManager.Models
 
 		public PvpRelicTemplateEntry PvpRelic { get; }
 
-		public List<TemplateWeaponType> SelectedWeapons { get; set; } = new List<TemplateWeaponType>();
+		public List<TemplateWeaponType> SelectedWeapons { get; set; }
 
-
-		public List<uint> SkillOverrides { get; set; } = new List<uint>();
-
+		public List<uint> SkillOverrides { get; set; }
 
 		public Dictionary<TemplateSlotType, TemplateEntry> Weapons { get; }
 
@@ -279,13 +266,14 @@ namespace Kenedia.Modules.BuildsManager.Models
 
 		public string LastModified
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _lastModified;
+				return _003CLastModified_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _lastModified, value, new ValueChangedEventHandler<string>(OnLastModifiedChanged));
+				Common.SetProperty(ref _003CLastModified_003Ek__BackingField, value, new ValueChangedEventHandler<string>(OnLastModifiedChanged));
 			}
 		}
 
@@ -321,12 +309,30 @@ namespace Kenedia.Modules.BuildsManager.Models
 
 		private Template()
 		{
+			_003CTags_003Ek__BackingField = new UniqueObservableCollection<string>();
+			Pets = new RangerPets();
+			Skills = new SkillCollection();
+			Legends = new LegendCollection();
+			Specializations = new Specializations();
+			SelectedWeapons = new List<TemplateWeaponType>();
+			SkillOverrides = new List<uint>();
+			_003CLastModified_003Ek__BackingField = DateTime.Now.ToString("d");
+			base._002Ector();
 			Name = string.Empty;
 			TriggerAutoSave = false;
 		}
 
 		public Template(Data data)
 		{
+			_003CTags_003Ek__BackingField = new UniqueObservableCollection<string>();
+			Pets = new RangerPets();
+			Skills = new SkillCollection();
+			Legends = new LegendCollection();
+			Specializations = new Specializations();
+			SelectedWeapons = new List<TemplateWeaponType>();
+			SkillOverrides = new List<uint>();
+			_003CLastModified_003Ek__BackingField = DateTime.Now.ToString("d");
+			base._002Ector();
 			Data = data;
 			_timer = new System.Timers.Timer(1000.0);
 			_timer.Elapsed += OnTimerElapsed;
@@ -405,7 +411,7 @@ namespace Kenedia.Modules.BuildsManager.Models
 			_race = race.GetValueOrDefault(Races.None);
 			_profession = profession.GetValueOrDefault(ProfessionType.Guardian);
 			_description = description;
-			Tags = tags ?? _tags;
+			Tags = tags ?? Tags;
 			_savedBuildCode = buildCode;
 			_savedGearCode = gearCode;
 			SetArmorItems();
@@ -836,7 +842,7 @@ namespace Kenedia.Modules.BuildsManager.Models
 				await Task.Delay(timeToWait, _cancellationTokenSource!.Token);
 				if (!_cancellationTokenSource!.Token.IsCancellationRequested)
 				{
-					string path = BaseModule<BuildsManager, MainWindow, Settings, Paths>.ModuleInstance.Paths.TemplatesPath;
+					string path = BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.ModuleInstance.Paths.TemplatesPath;
 					if (!Directory.Exists(path))
 					{
 						Directory.CreateDirectory(path);
@@ -844,7 +850,7 @@ namespace Kenedia.Modules.BuildsManager.Models
 					string json = JsonConvert.SerializeObject((object)this, SerializerSettings.Default);
 					string filePath = path + "\\" + Common.MakeValidFileName(Name.Trim(), '_') + ".json";
 					System.IO.File.WriteAllText(filePath, json);
-					BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Debug("Saved " + Name + " in " + filePath);
+					BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug("Saved " + Name + " in " + filePath);
 					_saveRequested = false;
 					_timer.Stop();
 				}
@@ -853,7 +859,7 @@ namespace Kenedia.Modules.BuildsManager.Models
 			{
 				if (!_cancellationTokenSource!.Token.IsCancellationRequested)
 				{
-					BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Warn(ex.ToString());
+					BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Warn(ex.ToString());
 				}
 			}
 		}
@@ -874,7 +880,7 @@ namespace Kenedia.Modules.BuildsManager.Models
 			}
 			catch (Exception ex)
 			{
-				BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Warn(ex.ToString());
+				BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Warn(ex.ToString());
 			}
 			Name = name;
 			RequestSave("ChangeName");
@@ -896,7 +902,7 @@ namespace Kenedia.Modules.BuildsManager.Models
 			}
 			catch (Exception ex)
 			{
-				BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Warn(ex.ToString());
+				BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Warn(ex.ToString());
 			}
 			return true;
 		}
@@ -1179,7 +1185,7 @@ namespace Kenedia.Modules.BuildsManager.Models
 					WeaponTemplateEntry weapon2 = Weapons[slot] as WeaponTemplateEntry;
 					if (weapon2 != null)
 					{
-						BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Info($"Remove {weapon2.Weapon?.Name} because we can not wield it with our current profession '{Profession}'.");
+						BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Info($"Remove {weapon2.Weapon?.Name} because we can not wield it with our current profession '{Profession}'.");
 						SetItem<Kenedia.Modules.BuildsManager.DataModels.Items.Weapon>(slot, TemplateSubSlotType.Item, null);
 					}
 				}
@@ -1188,7 +1194,7 @@ namespace Kenedia.Modules.BuildsManager.Models
 					AquaticWeaponTemplateEntry weapon = Weapons[slot] as AquaticWeaponTemplateEntry;
 					if (weapon != null)
 					{
-						BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Info($"Remove {weapon.Weapon?.Name} because we can not wield it with our current profession '{Profession}'.");
+						BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Info($"Remove {weapon.Weapon?.Name} because we can not wield it with our current profession '{Profession}'.");
 						SetItem<Kenedia.Modules.BuildsManager.DataModels.Items.Weapon>(slot, TemplateSubSlotType.Item, null);
 					}
 				}

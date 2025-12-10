@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Gw2Sharp.WebApi;
@@ -28,61 +29,57 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage
 
 		private readonly Kenedia.Modules.Core.Controls.Label _commentLabel;
 
-		private BaseItem? _item;
-
-		private Stat? _stat;
-
-		private string _comment;
-
 		private Color _frameColor = Color.get_Transparent();
-
-		private Func<string> _setLocalizedComment;
 
 		public BaseItem? Item
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _item;
+				return _003CItem_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty<BaseItem>(ref _item, value, new ValueChangedEventHandler<BaseItem>(ApplyItem));
+				Common.SetProperty<BaseItem>(ref _003CItem_003Ek__BackingField, value, new ValueChangedEventHandler<BaseItem>(ApplyItem));
 			}
 		}
 
 		public Stat? Stat
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _stat;
+				return _003CStat_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty<Stat>(ref _stat, value, new ValueChangedEventHandler<Stat>(ApplyStat));
+				Common.SetProperty<Stat>(ref _003CStat_003Ek__BackingField, value, new ValueChangedEventHandler<Stat>(ApplyStat));
 			}
 		}
 
 		public string Comment
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _comment;
+				return _003CComment_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _comment, value, new ValueChangedEventHandler<string>(ApplyComment));
+				Common.SetProperty(ref _003CComment_003Ek__BackingField, value, new ValueChangedEventHandler<string>(ApplyComment));
 			}
 		}
 
 		public Func<string> SetLocalizedComment
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _setLocalizedComment;
+				return _003CSetLocalizedComment_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty<Func<string>>(ref _setLocalizedComment, value, new ValueChangedEventHandler<Func<string>>(ApplyLocalizedComment));
+				Common.SetProperty<Func<string>>(ref _003CSetLocalizedComment_003Ek__BackingField, value, new ValueChangedEventHandler<Func<string>>(ApplyLocalizedComment));
 			}
 		}
 

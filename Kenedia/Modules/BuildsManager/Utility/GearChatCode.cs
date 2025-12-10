@@ -178,7 +178,7 @@ namespace Kenedia.Modules.BuildsManager.Utility
 				codeArray[75] = template.PveRelic.Relic?.MappedId ?? 0;
 				codeArray[76] = template.PvpRelic.Relic?.MappedId ?? 0;
 			}
-			return "[&" + Convert.ToBase64String(new Span<byte>(codeArray).ToArray()) + "]";
+			return "[&" + Convert.ToBase64String(codeArray.ToArray()) + "]";
 		}
 
 		public static void LoadTemplateFromChatCode(Template template, string? chatCode, Data data)
@@ -279,11 +279,11 @@ namespace Kenedia.Modules.BuildsManager.Utility
 			}
 			catch (FormatException)
 			{
-				BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Info((template?.Name ?? "Unkown Template") + " has a invalid chat code format.");
+				BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Info((template?.Name ?? "Unkown Template") + " has a invalid chat code format.");
 			}
 			catch (Exception ex)
 			{
-				BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Warn(ex, "Error while loading template from chat code of " + (template?.Name ?? "Unkown Template") + ".");
+				BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Warn(ex, "Error while loading template from chat code of " + (template?.Name ?? "Unkown Template") + ".");
 			}
 		}
 	}

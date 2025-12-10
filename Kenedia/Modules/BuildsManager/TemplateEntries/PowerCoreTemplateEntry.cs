@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Kenedia.Modules.BuildsManager.DataModels.Items;
 using Kenedia.Modules.BuildsManager.Models.Templates;
 using Kenedia.Modules.BuildsManager.Services;
@@ -11,17 +12,16 @@ namespace Kenedia.Modules.BuildsManager.TemplateEntries
 	{
 		private bool _isDisposed;
 
-		private PowerCore _powerCore;
-
 		public PowerCore PowerCore
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _powerCore;
+				return _003CPowerCore_003Ek__BackingField;
 			}
 			private set
 			{
-				Common.SetProperty(ref _powerCore, value);
+				Common.SetProperty(ref _003CPowerCore_003Ek__BackingField, value);
 			}
 		}
 

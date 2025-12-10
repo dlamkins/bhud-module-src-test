@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Blish_HUD.Modules.Managers;
 using Kenedia.Modules.BuildsManager.DataModels.Items;
 using Kenedia.Modules.BuildsManager.Models;
+using Kenedia.Modules.Core.Converter;
 using Newtonsoft.Json;
 using SemVer;
 
@@ -17,24 +18,10 @@ namespace Kenedia.Modules.BuildsManager.Services
 	{
 		protected bool DataLoaded;
 
+		[DataMember]
+		[JsonConverter(typeof(SemverVersionConverter))]
 		public Version Version { get; set; } = new Version(0, 0, 0, (string)null, (string)null);
 
-
-		[DataMember]
-		[JsonProperty("Version")]
-		public string VersionString
-		{
-			get
-			{
-				return ((object)Version).ToString();
-			}
-			set
-			{
-				//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-				//IL_000d: Expected O, but got Unknown
-				Version = new Version(value, false);
-			}
-		}
 
 		[DataMember]
 		public Dictionary<string, object> Items { get; set; } = new Dictionary<string, object>();

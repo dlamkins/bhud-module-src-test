@@ -130,13 +130,13 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 			//IL_02ab: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02bf: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_033a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_034c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_032f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0341: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0346: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0351: Unknown result type (might be due to invalid IL or missing references)
-			//IL_035c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0358: Unknown result type (might be due to invalid IL or missing references)
+			//IL_035e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0363: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0369: Unknown result type (might be due to invalid IL or missing references)
-			//IL_036e: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
 			int xOffset = 90;
 			Skills[0].TextureRegion = new Rectangle(14, 14, 100, 100);
@@ -186,7 +186,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 			}
 			}
 			Template template = base.TemplatePresenter.Template;
-			if (template != null && template.EliteSpecialization?.Id == 43)
+			if (template != null && (template.EliteSpecialization?.Id).GetValueOrDefault() == 43)
 			{
 				Skills[4].TextureRegion = new Rectangle(6, 6, 51, 51);
 			}

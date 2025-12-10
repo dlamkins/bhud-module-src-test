@@ -66,8 +66,8 @@ namespace Kenedia.Modules.BuildsManager.Services
 				}
 				catch (Exception ex)
 				{
-					BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Warn("Failed to load TagGroups.json");
-					BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Warn($"{ex}");
+					BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Warn("Failed to load TagGroups.json");
+					BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Warn($"{ex}");
 				}
 			}
 			else
@@ -75,7 +75,7 @@ namespace Kenedia.Modules.BuildsManager.Services
 				string json = await new StreamReader(_contentsManager.GetFileStream("data\\TagGroups.json")).ReadToEndAsync();
 				_groups = JsonConvert.DeserializeObject<List<TagGroup>>(json, SerializerSettings.Default);
 				File.WriteAllText(_paths.ModulePath + "TagGroups.json", json);
-				BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Warn("Loaded default TagGroups.json");
+				BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Warn("Loaded default TagGroups.json");
 			}
 			foreach (TagGroup group in _groups)
 			{
@@ -169,8 +169,8 @@ namespace Kenedia.Modules.BuildsManager.Services
 			{
 				if (!(ex is TaskCanceledException))
 				{
-					BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Warn("Failed to save TagGroups.json");
-					BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Warn($"{ex}");
+					BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Warn("Failed to save TagGroups.json");
+					BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Warn($"{ex}");
 				}
 			}
 		}

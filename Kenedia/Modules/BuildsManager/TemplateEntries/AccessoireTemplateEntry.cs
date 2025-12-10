@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Kenedia.Modules.BuildsManager.DataModels.Items;
 using Kenedia.Modules.BuildsManager.DataModels.Stats;
 using Kenedia.Modules.BuildsManager.Interfaces;
@@ -13,33 +14,31 @@ namespace Kenedia.Modules.BuildsManager.TemplateEntries
 	{
 		private bool _isDisposed;
 
-		private Stat _stat;
-
-		private Infusion _infusion;
-
 		public Trinket Accessoire { get; private set; }
 
 		public Stat Stat
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _stat;
+				return _003CStat_003Ek__BackingField;
 			}
 			private set
 			{
-				Common.SetProperty(ref _stat, value);
+				Common.SetProperty(ref _003CStat_003Ek__BackingField, value);
 			}
 		}
 
 		public Infusion Infusion1
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _infusion;
+				return _003CInfusion1_003Ek__BackingField;
 			}
 			private set
 			{
-				Common.SetProperty(ref _infusion, value);
+				Common.SetProperty(ref _003CInfusion1_003Ek__BackingField, value);
 			}
 		}
 

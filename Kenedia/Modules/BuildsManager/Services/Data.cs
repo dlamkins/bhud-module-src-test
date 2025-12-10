@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
+using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,6 +11,7 @@ using Blish_HUD;
 using Blish_HUD.Modules.Managers;
 using Gw2Sharp.WebApi;
 using Kenedia.Modules.BuildsManager.DataModels.Items;
+using Kenedia.Modules.BuildsManager.DataModels.Stats;
 using Kenedia.Modules.BuildsManager.Models;
 using Kenedia.Modules.BuildsManager.Views;
 using Kenedia.Modules.Core.Attributes;
@@ -18,6 +19,7 @@ using Kenedia.Modules.Core.Controls;
 using Kenedia.Modules.Core.Extensions;
 using Kenedia.Modules.Core.Models;
 using Kenedia.Modules.Core.Utility;
+using Newtonsoft.Json;
 
 namespace Kenedia.Modules.BuildsManager.Services
 {
@@ -214,29 +216,26 @@ namespace Kenedia.Modules.BuildsManager.Services
 
 		public Gw2ApiManager Gw2ApiManager { get; }
 
+		public StaticHosting StaticHosting { get; }
+
 		public event EventHandler Loaded;
 
-		public Data(Paths paths, Gw2ApiManager gw2ApiManager, Func<NotificationBadge> notificationBadge, Func<LoadingSpinner> spinner)
+		public Data(Paths paths, Gw2ApiManager gw2ApiManager, Func<NotificationBadge> notificationBadge, Func<LoadingSpinner> spinner, StaticHosting staticHosting)
 		{
 			Paths = paths;
 			Gw2ApiManager = gw2ApiManager;
-			_getNotificationBadge = notificationBadge;
+			StaticHosting = staticHosting;
 			_getSpinner = spinner;
+			_getNotificationBadge = notificationBadge;
 		}
 
+		[IteratorStateMachine(typeof(_003CGetEnumerator_003Ed__90))]
 		public IEnumerator<(string name, BaseMappedDataEntry map)> GetEnumerator()
 		{
-			IEnumerable<PropertyInfo> propertiesToEnumerate = from p in GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)
-				where p.GetCustomAttribute<EnumeratorMemberAttribute>() != null
-				select p;
-			foreach (PropertyInfo property in propertiesToEnumerate)
+			return new _003CGetEnumerator_003Ed__90(0)
 			{
-				BaseMappedDataEntry value = property.GetValue(this) as BaseMappedDataEntry;
-				if (value != null)
-				{
-					yield return (property.Name, value);
-				}
-			}
+				_003C_003E4__this = this
+			};
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()
@@ -266,7 +265,7 @@ namespace Kenedia.Modules.BuildsManager.Services
 			}
 			LoadingSpinner spinner = Spinner;
 			LastLoadAttempt = Common.Now;
-			BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths>.Logger.Info("Loading data");
+			BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths, Kenedia.Modules.BuildsManager.Services.StaticHosting>.Logger.Info("Loading data");
 			try
 			{
 				_cancellationTokenSource?.Cancel();
@@ -277,16 +276,55 @@ namespace Kenedia.Modules.BuildsManager.Services
 					NotificationBadge badge2 = NotificationBadge;
 					if (badge2 != null)
 					{
-						DateTime endTime2 = DateTime.Now.AddMinutes(3.0);
+						DateTime endTime3 = DateTime.Now.AddMinutes(3.0);
 						badge2.AddNotification(new ConditionalNotification
 						{
 							NotificationText = $"Failed to get the version file. Retry at {DateTime.Now.AddMinutes(3.0):T}",
+							Condition = () => DateTime.Now >= endTime3
+						});
+					}
+					spinner?.Hide();
+					return false;
+				}
+				StaticStats stats = await StaticHosting.GetStaticStats();
+				BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths, Kenedia.Modules.BuildsManager.Services.StaticHosting>.Logger.Info("Latest static stats version: " + (object)stats?.Version);
+				if (stats == null)
+				{
+					BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths, Kenedia.Modules.BuildsManager.Services.StaticHosting>.Logger.Info("Failed to get the stats file.");
+					NotificationBadge badge3 = NotificationBadge;
+					if (badge3 != null)
+					{
+						DateTime endTime2 = DateTime.Now.AddMinutes(3.0);
+						badge3.AddNotification(new ConditionalNotification
+						{
+							NotificationText = $"Failed to get the stats file. Retry at {DateTime.Now.AddMinutes(3.0):T}",
 							Condition = () => DateTime.Now >= endTime2
 						});
 					}
 					spinner?.Hide();
 					return false;
 				}
+				BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths, Kenedia.Modules.BuildsManager.Services.StaticHosting>.Logger.Info($"Latest static stats version: {stats.Version}");
+				StaticStats localStats = (File.Exists(Path.Combine(Paths.ModuleDataPath, "static_stats.json")) ? JsonConvert.DeserializeObject<StaticStats>(File.ReadAllText(Path.Combine(Paths.ModuleDataPath, "static_stats.json"))) : null);
+				if (localStats == null || localStats.Version < stats.Version)
+				{
+					BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths, Kenedia.Modules.BuildsManager.Services.StaticHosting>.Logger.Info("Updating local static stats file...");
+					File.WriteAllText(Path.Combine(Paths.ModuleDataPath, "static_stats.json"), JsonConvert.SerializeObject((object)stats, (Formatting)1));
+					string url = stats.ImageUrl;
+					HttpClient client = new HttpClient();
+					try
+					{
+						BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths, Kenedia.Modules.BuildsManager.Services.StaticHosting>.Logger.Info("Downloading stat map image from " + url + "...");
+						byte[] data = await client.GetByteArrayAsync(url);
+						File.WriteAllBytes(Path.Combine(Paths.ModuleDataPath, "stat_map.png"), data);
+					}
+					finally
+					{
+						((IDisposable)client)?.Dispose();
+					}
+				}
+				BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths, Kenedia.Modules.BuildsManager.Services.StaticHosting>.Logger.Info("Apply stat texture map...");
+				Stat.StatTextureMap = stats.TextureMapInfo;
 				List<int> itemIds = new List<int>();
 				using (IEnumerator<(string name, BaseMappedDataEntry map)> enumerator = GetEnumerator())
 				{
@@ -311,31 +349,21 @@ namespace Kenedia.Modules.BuildsManager.Services
 							if (awaiter2 == null)
 							{
 								INotifyCompletion awaiter3 = (INotifyCompletion)awaiter;
-								asyncTaskMethodBuilder.AwaitOnCompleted(ref awaiter3, ref *(_003CLoad_003Ed__91*)/*Error near IL_03c8: stateMachine*/);
+								asyncTaskMethodBuilder.AwaitOnCompleted(ref awaiter3, ref *(_003CLoad_003Ed__94*)/*Error near IL_06d2: stateMachine*/);
 							}
 							else
 							{
-								asyncTaskMethodBuilder.AwaitUnsafeOnCompleted(ref awaiter2, ref *(_003CLoad_003Ed__91*)/*Error near IL_03db: stateMachine*/);
+								asyncTaskMethodBuilder.AwaitUnsafeOnCompleted(ref awaiter2, ref *(_003CLoad_003Ed__94*)/*Error near IL_06e5: stateMachine*/);
 							}
-							/*Error near IL_03e4: leave MoveNext - await not detected correctly*/;
+							/*Error near IL_06ee: leave MoveNext - await not detected correctly*/;
 						}
 						object ids = awaiter.GetResult();
 						List<int> idList = ids as List<int>;
-						List<int> list;
-						if (idList == null)
-						{
-							list = itemIds;
-						}
-						else
-						{
-							list = new List<int>();
-							list.AddRange(itemIds.Union(idList));
-						}
-						itemIds = list;
+						itemIds = ((idList != null) ? itemIds.Union(idList).ToList() : itemIds);
 					}
 				}
 				List<List<int>> idSets = itemIds.ToList().ChunkBy(200);
-				BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths>.Logger.Info($"Pre-Fetching {itemIds.Count} items from API...");
+				BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths, Kenedia.Modules.BuildsManager.Services.StaticHosting>.Logger.Info($"Pre-Fetching {itemIds.Count} items from API...");
 				int count = 0;
 				foreach (List<int> idSet in idSets)
 				{
@@ -344,7 +372,7 @@ namespace Kenedia.Modules.BuildsManager.Services
 						return false;
 					}
 					count += idSet.Count;
-					BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths>.Logger.Info($"Fetching {count}/{itemIds.Count} items...");
+					BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths, Kenedia.Modules.BuildsManager.Services.StaticHosting>.Logger.Info($"Fetching {count}/{itemIds.Count} items...");
 					await Gw2ApiManager.Gw2ApiClient.V2.Items.ManyAsync(idSet);
 				}
 				bool failed = false;
@@ -369,7 +397,7 @@ namespace Kenedia.Modules.BuildsManager.Services
 				}
 				if (!failed)
 				{
-					BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths>.Logger.Info("All data loaded!");
+					BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths, Kenedia.Modules.BuildsManager.Services.StaticHosting>.Logger.Info("All data loaded!");
 					GameService.Graphics.QueueMainThreadRender(delegate
 					{
 						this.Loaded?.Invoke(this, EventArgs.Empty);
@@ -387,7 +415,7 @@ namespace Kenedia.Modules.BuildsManager.Services
 							NotificationText = txt,
 							Condition = () => DateTime.Now >= endTime || IsLoaded
 						});
-						BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths>.Logger.Info(txt);
+						BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths, Kenedia.Modules.BuildsManager.Services.StaticHosting>.Logger.Info(txt);
 					}
 				}
 				spinner?.Hide();

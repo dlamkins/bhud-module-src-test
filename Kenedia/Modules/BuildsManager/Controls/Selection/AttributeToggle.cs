@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Blish_HUD.Content;
 using Gw2Sharp.WebApi.V2.Models;
 using Kenedia.Modules.Core.Controls;
@@ -9,17 +10,16 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 {
 	public class AttributeToggle : ImageToggle
 	{
-		private AttributeType _attribute;
-
 		public AttributeType Attribute
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _attribute;
+				return _003CAttribute_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _attribute, value, new Action(OnAttributeChanged));
+				Common.SetProperty(ref _003CAttribute_003Ek__BackingField, value, new Action(OnAttributeChanged));
 			}
 		}
 
@@ -36,7 +36,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 
 		private void OnAttributeChanged()
 		{
-			base.Texture = _attribute switch
+			base.Texture = Attribute switch
 			{
 				AttributeType.Power => AsyncTexture2D.FromAssetId(66722), 
 				AttributeType.Toughness => AsyncTexture2D.FromAssetId(156612), 

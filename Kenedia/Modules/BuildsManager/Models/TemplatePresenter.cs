@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Gw2Sharp.Models;
 using Kenedia.Modules.BuildsManager.DataModels.Professions;
 using Kenedia.Modules.BuildsManager.Models.Templates;
@@ -11,73 +12,68 @@ namespace Kenedia.Modules.BuildsManager.Models
 {
 	public class TemplatePresenter
 	{
-		private Template _template = Kenedia.Modules.BuildsManager.Models.Template.Empty;
-
-		private GameModeType _gameMode;
-
-		private AttunementType _mainAttunement = AttunementType.Fire;
-
-		private AttunementType _altAttunement = AttunementType.Fire;
-
-		private LegendSlotType _legendSlot = LegendSlotType.TerrestrialActive;
-
 		public Template Template
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _template;
+				return _003CTemplate_003Ek__BackingField;
 			}
 			private set
 			{
-				Common.SetProperty(ref _template, value, new ValueChangedEventHandler<Template>(On_TemplateChanged));
+				Common.SetProperty(ref _003CTemplate_003Ek__BackingField, value, new ValueChangedEventHandler<Template>(On_TemplateChanged));
 			}
 		}
 
 		public AttunementType MainAttunement
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _mainAttunement;
+				return _003CMainAttunement_003Ek__BackingField;
 			}
 			private set
 			{
-				Common.SetProperty(ref _mainAttunement, value);
+				Common.SetProperty(ref _003CMainAttunement_003Ek__BackingField, value);
 			}
 		}
 
 		public AttunementType AltAttunement
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _altAttunement;
+				return _003CAltAttunement_003Ek__BackingField;
 			}
 			private set
 			{
-				Common.SetProperty(ref _altAttunement, value);
+				Common.SetProperty(ref _003CAltAttunement_003Ek__BackingField, value);
 			}
 		}
 
 		public LegendSlotType LegendSlot
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _legendSlot;
+				return _003CLegendSlot_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _legendSlot, value, new ValueChangedEventHandler<LegendSlotType>(OnLegendSlotChanged));
+				Common.SetProperty(ref _003CLegendSlot_003Ek__BackingField, value, new ValueChangedEventHandler<LegendSlotType>(OnLegendSlotChanged));
 			}
 		}
 
 		public GameModeType GameMode
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _gameMode;
+				return _003CGameMode_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _gameMode, value, new ValueChangedEventHandler<GameModeType>(On_GameModeChanged));
+				Common.SetProperty(ref _003CGameMode_003Ek__BackingField, value, new ValueChangedEventHandler<GameModeType>(On_GameModeChanged));
 			}
 		}
 
@@ -129,6 +125,11 @@ namespace Kenedia.Modules.BuildsManager.Models
 
 		public TemplatePresenter(TemplateFactory templateFactory, Data data)
 		{
+			_003CTemplate_003Ek__BackingField = Kenedia.Modules.BuildsManager.Models.Template.Empty;
+			_003CMainAttunement_003Ek__BackingField = AttunementType.Fire;
+			_003CAltAttunement_003Ek__BackingField = AttunementType.Fire;
+			_003CLegendSlot_003Ek__BackingField = LegendSlotType.TerrestrialActive;
+			base._002Ector();
 			TemplateFactory = templateFactory;
 			Data = data;
 			Data.Loaded += new EventHandler(Data_Loaded);
@@ -303,7 +304,7 @@ namespace Kenedia.Modules.BuildsManager.Models
 
 		public void InvokeTemplateSwitch()
 		{
-			this.TemplateChanged?.Invoke(this, new ValueChangedEventArgs<Template>(_template, _template));
+			this.TemplateChanged?.Invoke(this, new ValueChangedEventArgs<Template>(Template, Template));
 		}
 	}
 }

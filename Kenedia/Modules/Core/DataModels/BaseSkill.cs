@@ -1,18 +1,16 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using Blish_HUD.Content;
 using Gw2Sharp.WebApi.V2.Models;
 using Kenedia.Modules.Core.Models;
-using Kenedia.Modules.Core.Utility;
 
 namespace Kenedia.Modules.Core.DataModels
 {
 	[DataContract]
 	public class BaseSkill
 	{
-		private AsyncTexture2D _icon;
-
 		[DataMember]
 		public SkillSlot? Slot { get; set; }
 
@@ -62,12 +60,17 @@ namespace Kenedia.Modules.Core.DataModels
 		{
 			get
 			{
-				if (_icon != null || !AssetId.HasValue)
+				if (_003CIcon_003Ek__BackingField != null || !AssetId.HasValue)
 				{
-					return _icon;
+					return _003CIcon_003Ek__BackingField;
 				}
-				_icon = AsyncTexture2D.FromAssetId(AssetId.Value);
-				return _icon;
+				_003CIcon_003Ek__BackingField = AsyncTexture2D.FromAssetId(AssetId.Value);
+				return _003CIcon_003Ek__BackingField;
+			}
+			[CompilerGenerated]
+			private set
+			{
+				_003CIcon_003Ek__BackingField = value;
 			}
 		}
 

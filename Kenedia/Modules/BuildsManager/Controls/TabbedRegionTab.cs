@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
@@ -26,8 +27,6 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		private Rectangle _textBounds;
 
-		private Func<string> _header;
-
 		private string _title;
 
 		public Container Container { get; set; }
@@ -36,13 +35,14 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		public Func<string> Header
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _header;
+				return _003CHeader_003Ek__BackingField;
 			}
 			set
 			{
-				_header = value;
+				_003CHeader_003Ek__BackingField = value;
 				_title = value?.Invoke();
 			}
 		}

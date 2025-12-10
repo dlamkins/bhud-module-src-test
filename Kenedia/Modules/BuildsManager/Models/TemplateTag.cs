@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using Blish_HUD.Content;
 using Kenedia.Modules.BuildsManager.Res;
 using Kenedia.Modules.Core.Models;
@@ -13,46 +14,39 @@ namespace Kenedia.Modules.BuildsManager.Models
 {
 	public class TemplateTag
 	{
-		[JsonProperty("AssetId")]
-		private int _assetId = 156025;
-
 		[JsonProperty("Name")]
 		private string _name = DefaultName;
 
 		[JsonProperty("TextureRegion")]
 		private Rectangle? _textureRegion = new Rectangle(0, 0, 32, 32);
 
-		[JsonProperty("Priority")]
-		private int _priority = 1;
-
-		[JsonProperty("Group")]
-		private string _group = string.Empty;
-
 		public static string DefaultName => strings.NewTemplate;
 
 		[JsonIgnore]
 		public string Group
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _group;
+				return _003CGroup_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _group, value, new ValueChangedEventHandler<string>(OnGroupChanged));
+				Common.SetProperty(ref _003CGroup_003Ek__BackingField, value, new ValueChangedEventHandler<string>(OnGroupChanged));
 			}
 		}
 
 		[JsonIgnore]
 		public int Priority
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _priority;
+				return _003CPriority_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _priority, value, new ValueChangedEventHandler<int>(OnPriorityChanged));
+				Common.SetProperty(ref _003CPriority_003Ek__BackingField, value, new ValueChangedEventHandler<int>(OnPriorityChanged));
 			}
 		}
 
@@ -70,19 +64,19 @@ namespace Kenedia.Modules.BuildsManager.Models
 		}
 
 		[JsonIgnore]
-		public DetailedTexture Icon { get; set; } = new DetailedTexture((AsyncTexture2D)TexturesService.GetTextureFromRef(textures_common.Tag, "Tag"));
-
+		public DetailedTexture Icon { get; set; }
 
 		[JsonIgnore]
 		public int AssetId
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _assetId;
+				return _003CAssetId_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _assetId, value, new ValueChangedEventHandler<int>(OnAssetIdChanged));
+				Common.SetProperty(ref _003CAssetId_003Ek__BackingField, value, new ValueChangedEventHandler<int>(OnAssetIdChanged));
 			}
 		}
 
@@ -103,12 +97,22 @@ namespace Kenedia.Modules.BuildsManager.Models
 
 		public TemplateTag()
 		{
-		}//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+			_003CGroup_003Ek__BackingField = string.Empty;
+			_003CPriority_003Ek__BackingField = 1;
+			Icon = new DetailedTexture((AsyncTexture2D)TexturesService.GetTextureFromRef(textures_common.Tag, "Tag"));
+			_003CAssetId_003Ek__BackingField = 156025;
+			base._002Ector();
+		}
 
 		public TemplateTag(string name)
 		{
-			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+			_003CGroup_003Ek__BackingField = string.Empty;
+			_003CPriority_003Ek__BackingField = 1;
+			Icon = new DetailedTexture((AsyncTexture2D)TexturesService.GetTextureFromRef(textures_common.Tag, "Tag"));
+			_003CAssetId_003Ek__BackingField = 156025;
+			base._002Ector();
 			if (!string.IsNullOrEmpty(name))
 			{
 				_name = name;

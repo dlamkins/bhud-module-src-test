@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using Blish_HUD.Content;
 using Gw2Sharp.WebApi.V2.Models;
 using Kenedia.Modules.BuildsManager.Extensions;
 using Kenedia.Modules.BuildsManager.Models.Templates;
 using Kenedia.Modules.Core.Models;
-using Kenedia.Modules.Core.Utility;
 
 namespace Kenedia.Modules.BuildsManager.DataModels.Professions
 {
@@ -15,8 +15,6 @@ namespace Kenedia.Modules.BuildsManager.DataModels.Professions
 	public class Trait : IDisposable
 	{
 		private bool _isDisposed;
-
-		private AsyncTexture2D _icon;
 
 		[DataMember]
 		public List<int> Skills = new List<int>();
@@ -72,15 +70,20 @@ namespace Kenedia.Modules.BuildsManager.DataModels.Professions
 		{
 			get
 			{
-				if (_icon != null)
+				if (_003CIcon_003Ek__BackingField != null)
 				{
-					return _icon;
+					return _003CIcon_003Ek__BackingField;
 				}
 				if (IconAssetId != 0)
 				{
-					_icon = AsyncTexture2D.FromAssetId(IconAssetId);
+					_003CIcon_003Ek__BackingField = AsyncTexture2D.FromAssetId(IconAssetId);
 				}
-				return _icon;
+				return _003CIcon_003Ek__BackingField;
+			}
+			[CompilerGenerated]
+			set
+			{
+				_003CIcon_003Ek__BackingField = value;
 			}
 		}
 
@@ -126,7 +129,7 @@ namespace Kenedia.Modules.BuildsManager.DataModels.Professions
 			if (!_isDisposed)
 			{
 				_isDisposed = true;
-				_icon = null;
+				Icon = null;
 			}
 		}
 

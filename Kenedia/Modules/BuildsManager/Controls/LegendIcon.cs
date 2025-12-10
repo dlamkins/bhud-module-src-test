@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Gw2Sharp;
@@ -14,8 +15,6 @@ namespace Kenedia.Modules.BuildsManager.Controls
 {
 	public class LegendIcon : Control
 	{
-		private Legend? _legend;
-
 		private readonly DetailedTexture _selector = new DetailedTexture(157138, 157140);
 
 		private readonly DetailedTexture _fallBackTexture = new DetailedTexture(157154);
@@ -37,13 +36,14 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		public Legend? Legend
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _legend;
+				return _003CLegend_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _legend, value, new Action(ApplyLegend));
+				Common.SetProperty(ref _003CLegend_003Ek__BackingField, value, new Action(ApplyLegend));
 			}
 		}
 

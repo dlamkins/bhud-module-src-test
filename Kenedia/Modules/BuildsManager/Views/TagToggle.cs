@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
@@ -23,31 +24,29 @@ namespace Kenedia.Modules.BuildsManager.Views
 
 		private AsyncTexture2D _textureDisabled;
 
-		private Func<string> _setLocalizedTooltip;
-
-		private bool _selected;
-
 		public bool Selected
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _selected;
+				return _003CSelected_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _selected, value, new ValueChangedEventHandler<bool>(OnSelected));
+				Common.SetProperty(ref _003CSelected_003Ek__BackingField, value, new ValueChangedEventHandler<bool>(OnSelected));
 			}
 		}
 
 		public Func<string> SetLocalizedTooltip
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _setLocalizedTooltip;
+				return _003CSetLocalizedTooltip_003Ek__BackingField;
 			}
 			set
 			{
-				_setLocalizedTooltip = value;
+				_003CSetLocalizedTooltip_003Ek__BackingField = value;
 				if (value != null)
 				{
 					base.BasicTooltipText = value?.Invoke();

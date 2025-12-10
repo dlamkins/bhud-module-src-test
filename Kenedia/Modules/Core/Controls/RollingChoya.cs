@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
@@ -16,8 +17,6 @@ namespace Kenedia.Modules.Core.Controls
 		private float _xOffset;
 
 		private float _yOffset;
-
-		private bool _canMove = true;
 
 		private Rectangle _movementBounds = Rectangle.get_Empty();
 
@@ -65,15 +64,16 @@ namespace Kenedia.Modules.Core.Controls
 
 		public bool CanMove
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _canMove;
+				return _003CCanMove_003Ek__BackingField;
 			}
 			set
 			{
-				if (_canMove != value)
+				if (_003CCanMove_003Ek__BackingField != value)
 				{
-					_canMove = value;
+					_003CCanMove_003Ek__BackingField = value;
 					ResetPosition();
 				}
 			}
@@ -102,26 +102,30 @@ namespace Kenedia.Modules.Core.Controls
 
 		public RollingChoya()
 		{
-		}//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-		//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+			_003CCanMove_003Ek__BackingField = true;
+			base._002Ector();
+		}
 
 		public RollingChoya(InputDetectionService inputDetectionService)
 		{
-			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+			_003CCanMove_003Ek__BackingField = true;
+			base._002Ector();
 			InputDetectionService = inputDetectionService;
 			inputDetectionService.MouseClicked += new EventHandler<double>(InputDetectionService_MouseClicked);
 		}

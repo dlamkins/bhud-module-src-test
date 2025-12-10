@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
@@ -24,12 +25,6 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage
 
 		private readonly DetailedTexture _statTexture = new DetailedTexture();
 
-		private DetailedTexture _placeholder = new DetailedTexture();
-
-		private BaseItem? _item;
-
-		private Stat? _stat;
-
 		private int _frameThickness = 2;
 
 		private Color _frameColor = Color.get_White() * 0.15f;
@@ -39,25 +34,27 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage
 
 		public BaseItem? Item
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _item;
+				return _003CItem_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty<BaseItem>(ref _item, value, new ValueChangedEventHandler<BaseItem>(ApplyItem));
+				Common.SetProperty<BaseItem>(ref _003CItem_003Ek__BackingField, value, new ValueChangedEventHandler<BaseItem>(ApplyItem));
 			}
 		}
 
 		public Stat? Stat
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _stat;
+				return _003CStat_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty<Stat>(ref _stat, value, new ValueChangedEventHandler<Stat>(ApplyStat));
+				Common.SetProperty<Stat>(ref _003CStat_003Ek__BackingField, value, new ValueChangedEventHandler<Stat>(ApplyStat));
 			}
 		}
 
@@ -78,24 +75,27 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage
 
 		public DetailedTexture Placeholder
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _placeholder;
+				return _003CPlaceholder_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _placeholder, value, new ValueChangedEventHandler<DetailedTexture>(ApplyPlaceholder));
+				Common.SetProperty(ref _003CPlaceholder_003Ek__BackingField, value, new ValueChangedEventHandler<DetailedTexture>(ApplyPlaceholder));
 			}
 		}
 
-		public bool CaptureInput { get; set; } = true;
-
+		public bool CaptureInput { get; set; }
 
 		public ItemControl()
 		{
-			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+			_003CPlaceholder_003Ek__BackingField = new DetailedTexture();
+			CaptureInput = true;
+			base._002Ector();
 			base.Tooltip = new ItemTooltip
 			{
 				SetLocalizedComment = () => Environment.NewLine + strings.ItemControlClickToCopyItem
@@ -114,7 +114,10 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage
 
 		private void ApplyStat(object sender, Kenedia.Modules.Core.Models.ValueChangedEventArgs<Stat> e)
 		{
-			_statTexture.Texture = TexturesService.GetTextureFromRef(Stat?.IconPath);
+			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+			_statTexture.Texture = Stat?.Icon.Texture;
+			_statTexture.TextureRegion = Stat?.Icon.TextureRegion ?? Rectangle.get_Empty();
 			ItemTooltip itemTooltip = base.Tooltip as ItemTooltip;
 			if (itemTooltip != null)
 			{
@@ -179,7 +182,7 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage
 			Rectangle bounds = _texture.Bounds;
 			statTexture.Bounds = new Rectangle(((Rectangle)(ref bounds)).get_Center().Add(new Point(-padding, -padding)), new Point((size - padding * 2) / 2));
 			_texture.Bounds = new Rectangle(_frameThickness, _frameThickness, base.Width - _frameThickness * 2, base.Height - _frameThickness * 2);
-			_placeholder.Bounds = new Rectangle(_frameThickness, _frameThickness, base.Width - _frameThickness * 2, base.Height - _frameThickness * 2);
+			Placeholder.Bounds = new Rectangle(_frameThickness, _frameThickness, base.Width - _frameThickness * 2, base.Height - _frameThickness * 2);
 		}
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
@@ -193,7 +196,7 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage
 			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
 			if (Item == null)
 			{
-				_placeholder.Draw(this, spriteBatch, base.RelativeMousePosition, TextureColor);
+				Placeholder.Draw(this, spriteBatch, base.RelativeMousePosition, TextureColor);
 			}
 			else
 			{
@@ -240,7 +243,7 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage
 			Stat = null;
 			_texture?.Dispose();
 			_statTexture?.Dispose();
-			_placeholder?.Dispose();
+			Placeholder?.Dispose();
 			base.DisposeControl();
 		}
 	}

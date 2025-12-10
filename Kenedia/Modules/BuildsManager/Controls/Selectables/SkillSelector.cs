@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Kenedia.Modules.BuildsManager.DataModels.Professions;
 using Kenedia.Modules.Core.DataModels;
@@ -14,17 +15,16 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selectables
 	{
 		private readonly DetailedTexture _selectingFrame = new DetailedTexture(157147);
 
-		private Enviroment _enviroment;
-
 		public Enviroment Enviroment
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _enviroment;
+				return _003CEnviroment_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _enviroment, value, new ValueChangedEventHandler<Enviroment>(OnEnviromentChanged));
+				Common.SetProperty(ref _003CEnviroment_003Ek__BackingField, value, new ValueChangedEventHandler<Enviroment>(OnEnviromentChanged));
 			}
 		}
 

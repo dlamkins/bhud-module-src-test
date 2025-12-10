@@ -5,15 +5,12 @@ using Kenedia.Modules.BuildsManager.Models.Templates;
 using Kenedia.Modules.Core.DataModels;
 using Kenedia.Modules.Core.Extensions;
 using Kenedia.Modules.Core.Models;
-using Kenedia.Modules.Core.Utility;
 
 namespace Kenedia.Modules.BuildsManager.DataModels.Items
 {
 	[DataContract]
 	public class BaseItem : IDataMember
 	{
-		private AsyncTexture2D _icon;
-
 		[DataMember]
 		public Kenedia.Modules.Core.DataModels.ItemType Type { get; set; }
 
@@ -39,15 +36,15 @@ namespace Kenedia.Modules.BuildsManager.DataModels.Items
 		{
 			get
 			{
-				if (_icon != null)
+				if (_003CIcon_003Ek__BackingField != null)
 				{
-					return _icon;
+					return _003CIcon_003Ek__BackingField;
 				}
 				if (AssetId != 0)
 				{
-					_icon = AsyncTexture2D.FromAssetId(AssetId);
+					_003CIcon_003Ek__BackingField = AsyncTexture2D.FromAssetId(AssetId);
 				}
-				return _icon;
+				return _003CIcon_003Ek__BackingField;
 			}
 		}
 

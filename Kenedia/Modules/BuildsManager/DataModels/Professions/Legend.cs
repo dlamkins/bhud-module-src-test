@@ -91,7 +91,7 @@ namespace Kenedia.Modules.BuildsManager.DataModels.Professions
 
 		public static Legend FromByte(byte id)
 		{
-			if (new bool?(BuildsManager.Data.Professions[ProfessionType.Revenant].Legends.TryGetValue(id, out var legend)) != true)
+			if (!new bool?(BuildsManager.Data.Professions[ProfessionType.Revenant].Legends.TryGetValue(id, out var legend)).GetValueOrDefault())
 			{
 				return null;
 			}

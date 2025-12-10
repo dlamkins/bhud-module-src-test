@@ -63,7 +63,7 @@ namespace Kenedia.Modules.BuildsManager.Services
 			QuickFiltersPanelFadeDelay = internalSettings.DefineSetting("QuickFiltersPanelFadeDelay", 5000.0);
 			AutoSetFilterProfession = internalSettings.DefineSetting("AutoSetFilterProfession", defaultValue: false, () => strings.AutoSetProfession_Name, () => strings.AutoSetProfession_Tooltip);
 			AutoSetFilterSpecialization = internalSettings.DefineSetting("AutoSetFilterSpecialization", defaultValue: false, () => strings.AutoSetFilterSpecialization_Name, () => strings.AutoSetFilterSpecialization_Tooltip);
-			ToggleWindowKey = internalSettings.DefineSetting("ToggleWindowKey", new KeyBinding(ModifierKeys.Shift, (Keys)66), () => string.Format(strings_common.ToggleItem, BaseModule<BuildsManager, MainWindow, Settings, Paths>.ModuleName), () => string.Format(strings_common.ToggleItem, BaseModule<BuildsManager, MainWindow, Settings, Paths>.ModuleName));
+			ToggleWindowKey = internalSettings.DefineSetting("ToggleWindowKey", new KeyBinding(ModifierKeys.Shift, (Keys)66), () => string.Format(strings_common.ToggleItem, BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.ModuleName), () => string.Format(strings_common.ToggleItem, BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.ModuleName));
 		}
 	}
 }

@@ -1,18 +1,16 @@
-using System.Runtime.Serialization;
 using Gw2Sharp.Models;
-using Gw2Sharp.WebApi;
 using Gw2Sharp.WebApi.V2.Models;
 using Kenedia.Modules.Core.Models;
+using Newtonsoft.Json;
 
 namespace Kenedia.Modules.Core.DataModels
 {
-	[DataContract]
 	public class Map
 	{
-		[DataMember]
 		public LocalizedString Names { get; } = new LocalizedString();
 
 
+		[JsonIgnore]
 		public string Name
 		{
 			get
@@ -25,10 +23,8 @@ namespace Kenedia.Modules.Core.DataModels
 			}
 		}
 
-		[DataMember]
 		public int Id { get; set; }
 
-		[DataMember]
 		public MapType Type { get; set; }
 
 		public Map()
@@ -37,15 +33,14 @@ namespace Kenedia.Modules.Core.DataModels
 
 		public Map(Gw2Sharp.WebApi.V2.Models.Map map)
 		{
-			Id = map.Id;
-			Name = map.Name;
-			Type = map.Type;
+			ApplyApiData(map);
 		}
 
-		public Map(Gw2Sharp.WebApi.V2.Models.Map map, Locale lang)
-			: this(map)
+		public void ApplyApiData(Gw2Sharp.WebApi.V2.Models.Map map)
 		{
-			Names[lang] = map.Name;
+			Id = map.Id;
+			Type = map.Type;
+			Names.Text = map.Name;
 		}
 	}
 }

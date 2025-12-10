@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
@@ -18,21 +19,20 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		protected Rectangle TextBounds;
 
-		private bool _selected;
-
 		public T Item { get; }
 
 		public Action<T>? OnClickAction { get; set; }
 
 		public bool Selected
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _selected;
+				return _003CSelected_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _selected, value, new ValueChangedEventHandler<bool>(OnSelectedChanged));
+				Common.SetProperty(ref _003CSelected_003Ek__BackingField, value, new ValueChangedEventHandler<bool>(OnSelectedChanged));
 			}
 		}
 

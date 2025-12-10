@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
@@ -23,23 +24,13 @@ namespace Kenedia.Modules.Core.Controls
 
 		private readonly List<(Rectangle, float)> _bottomBorders = new List<(Rectangle, float)>();
 
-		private Func<string> _setLocalizedTooltip;
-
 		protected DateTime LastInteraction;
-
-		private bool _fadeOut;
 
 		private double _fadeTickDuration;
 
 		private double _fadeTick;
 
-		private double _fadeDelay = 2500.0;
-
-		private double _fadeDuration = 500.0;
-
 		private double _fadePerMs;
-
-		private int _fadeSteps = 200;
 
 		private Rectangle _backgroundBounds = Rectangle.get_Empty();
 
@@ -49,52 +40,56 @@ namespace Kenedia.Modules.Core.Controls
 
 		public bool FadeOut
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _fadeOut;
+				return _003CFadeOut_003Ek__BackingField;
 			}
 			set
 			{
-				_fadeOut = value;
+				_003CFadeOut_003Ek__BackingField = value;
 				base.Opacity = 1f;
 			}
 		}
 
 		public double FadeDelay
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _fadeDelay;
+				return _003CFadeDelay_003Ek__BackingField;
 			}
 			set
 			{
-				_fadeDelay = value;
+				_003CFadeDelay_003Ek__BackingField = value;
 				RecalculateFading();
 			}
 		}
 
 		public double FadeDuration
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _fadeDuration;
+				return _003CFadeDuration_003Ek__BackingField;
 			}
 			set
 			{
-				_fadeDuration = value;
+				_003CFadeDuration_003Ek__BackingField = value;
 				RecalculateFading();
 			}
 		}
 
 		public int FadeSteps
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _fadeSteps;
+				return _003CFadeSteps_003Ek__BackingField;
 			}
 			set
 			{
-				_fadeSteps = value;
+				_003CFadeSteps_003Ek__BackingField = value;
 				RecalculateFading();
 			}
 		}
@@ -131,8 +126,7 @@ namespace Kenedia.Modules.Core.Controls
 
 		public AsyncTexture2D BackgroundImage { get; set; }
 
-		public Color? BackgroundImageColor { get; set; } = Color.get_White();
-
+		public Color? BackgroundImageColor { get; set; }
 
 		public Color? BackgroundImageHoveredColor { get; set; }
 
@@ -144,22 +138,28 @@ namespace Kenedia.Modules.Core.Controls
 
 		public Func<string> SetLocalizedTooltip
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _setLocalizedTooltip;
+				return _003CSetLocalizedTooltip_003Ek__BackingField;
 			}
 			set
 			{
-				_setLocalizedTooltip = value;
+				_003CSetLocalizedTooltip_003Ek__BackingField = value;
 				base.BasicTooltipText = value?.Invoke();
 			}
 		}
 
 		public FramedContainer()
 		{
-			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
+			_003CFadeDelay_003Ek__BackingField = 2500.0;
+			_003CFadeDuration_003Ek__BackingField = 500.0;
+			_003CFadeSteps_003Ek__BackingField = 200;
+			BackgroundImageColor = Color.get_White();
+			base._002Ector();
 			LocalizingService.LocaleChanged += new EventHandler<ValueChangedEventArgs<Locale>>(UserLocale_SettingChanged);
 			UserLocale_SettingChanged(null, null);
 			RecalculateFading();

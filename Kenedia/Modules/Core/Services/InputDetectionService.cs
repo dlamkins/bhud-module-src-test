@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
@@ -9,18 +10,6 @@ namespace Kenedia.Modules.Core.Services
 {
 	public class InputDetectionService
 	{
-		private double _lastInteraction;
-
-		private double _lastKeyInteraction;
-
-		private double _lastMouseInteraction;
-
-		private double _lastMouseMove;
-
-		private double _lastMouseClick;
-
-		private double _lastClickOrKey;
-
 		private readonly List<Keys> _ignoredKeys = new List<Keys>(1) { (Keys)0 };
 
 		private readonly List<Keys> _noKeys = new List<Keys>();
@@ -32,15 +21,16 @@ namespace Kenedia.Modules.Core.Services
 
 		public double LastInteraction
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _lastInteraction;
+				return _003CLastInteraction_003Ek__BackingField;
 			}
 			set
 			{
-				if (_lastInteraction != value)
+				if (_003CLastInteraction_003Ek__BackingField != value)
 				{
-					_lastInteraction = value;
+					_003CLastInteraction_003Ek__BackingField = value;
 					this.Interacted?.Invoke(this, value);
 				}
 			}
@@ -48,15 +38,16 @@ namespace Kenedia.Modules.Core.Services
 
 		public double LastKeyInteraction
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _lastKeyInteraction;
+				return _003CLastKeyInteraction_003Ek__BackingField;
 			}
 			set
 			{
-				if (_lastKeyInteraction != value)
+				if (_003CLastKeyInteraction_003Ek__BackingField != value)
 				{
-					_lastKeyInteraction = value;
+					_003CLastKeyInteraction_003Ek__BackingField = value;
 					this.KeyInteracted?.Invoke(this, value);
 				}
 			}
@@ -64,15 +55,16 @@ namespace Kenedia.Modules.Core.Services
 
 		public double LastMouseInteraction
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _lastMouseInteraction;
+				return _003CLastMouseInteraction_003Ek__BackingField;
 			}
 			set
 			{
-				if (_lastMouseInteraction != value)
+				if (_003CLastMouseInteraction_003Ek__BackingField != value)
 				{
-					_lastMouseInteraction = value;
+					_003CLastMouseInteraction_003Ek__BackingField = value;
 					this.MouseInteracted?.Invoke(this, value);
 				}
 			}
@@ -80,15 +72,16 @@ namespace Kenedia.Modules.Core.Services
 
 		public double LastMouseMove
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _lastMouseMove;
+				return _003CLastMouseMove_003Ek__BackingField;
 			}
 			set
 			{
-				if (_lastMouseMove != value)
+				if (_003CLastMouseMove_003Ek__BackingField != value)
 				{
-					_lastMouseMove = value;
+					_003CLastMouseMove_003Ek__BackingField = value;
 					this.MouseMoved?.Invoke(this, value);
 				}
 			}
@@ -96,15 +89,16 @@ namespace Kenedia.Modules.Core.Services
 
 		public double LastMouseClick
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _lastMouseClick;
+				return _003CLastMouseClick_003Ek__BackingField;
 			}
 			set
 			{
-				if (_lastMouseClick != value)
+				if (_003CLastMouseClick_003Ek__BackingField != value)
 				{
-					_lastMouseClick = value;
+					_003CLastMouseClick_003Ek__BackingField = value;
 					this.MouseClicked?.Invoke(this, value);
 				}
 			}
@@ -112,15 +106,16 @@ namespace Kenedia.Modules.Core.Services
 
 		public double LastClickOrKey
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _lastClickOrKey;
+				return _003CLastClickOrKey_003Ek__BackingField;
 			}
 			set
 			{
-				if (_lastClickOrKey != value)
+				if (_003CLastClickOrKey_003Ek__BackingField != value)
 				{
-					_lastClickOrKey = value;
+					_003CLastClickOrKey_003Ek__BackingField = value;
 					this.ClickedOrKey?.Invoke(this, value);
 				}
 			}

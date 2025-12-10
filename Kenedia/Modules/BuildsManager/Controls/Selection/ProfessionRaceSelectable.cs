@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
@@ -27,19 +28,16 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 
 		private readonly Kenedia.Modules.Core.Controls.Label _name;
 
-		private Enum _value = ProfessionType.Guardian;
-
-		private ProfessionRaceSelection.SelectionType _selectionType = ProfessionRaceSelection.SelectionType.Profession;
-
 		public Enum Value
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _value;
+				return _003CValue_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _value, value, new PropertyChangedEventHandler(SetValue), triggerOnUpdate: true, "Value");
+				Common.SetProperty(ref _003CValue_003Ek__BackingField, value, new PropertyChangedEventHandler(SetValue), triggerOnUpdate: true, "Value");
 			}
 		}
 
@@ -47,13 +45,14 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 
 		public ProfessionRaceSelection.SelectionType SelectionType
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _selectionType;
+				return _003CSelectionType_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _selectionType, value, (Action)delegate
+				Common.SetProperty(ref _003CSelectionType_003Ek__BackingField, value, (Action)delegate
 				{
 					Value = null;
 				}, triggerOnUpdate: true);
@@ -71,6 +70,9 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
+			_003CValue_003Ek__BackingField = ProfessionType.Guardian;
+			_003CSelectionType_003Ek__BackingField = ProfessionRaceSelection.SelectionType.Profession;
+			base._002Ector();
 			Data = data;
 			HeightSizingMode = SizingMode.AutoSize;
 			base.BorderWidth = new RectangleDimensions(2);
@@ -146,7 +148,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 				if (Data.Races.TryGetValue((Races)(object)Value, out var race))
 				{
 					_name.SetLocalizedText = () => race?.Name;
-					_icon.Texture = BaseModule<BuildsManager, MainWindow, Settings, Paths>.ModuleInstance.ContentsManager.GetTexture(race?.IconPath);
+					_icon.Texture = BaseModule<BuildsManager, MainWindow, Settings, Paths, Kenedia.Modules.BuildsManager.Services.StaticHosting>.ModuleInstance.ContentsManager.GetTexture(race?.IconPath);
 				}
 				break;
 			}

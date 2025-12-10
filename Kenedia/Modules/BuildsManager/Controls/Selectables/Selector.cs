@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
@@ -18,17 +19,9 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selectables
 {
 	public class Selector<T> : Kenedia.Modules.Core.Controls.FlowPanel where T : IBaseApiData
 	{
-		private Control? _anchor;
-
 		private readonly Kenedia.Modules.Core.Controls.Label _label;
 
 		private Point _selectableSize = new Point(64);
-
-		private Action<T> _onClickAction;
-
-		private T _selectedItem;
-
-		private int _selectablePerRow = 4;
 
 		private Point _anchorOffset;
 
@@ -47,13 +40,14 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selectables
 
 		public T SelectedItem
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _selectedItem;
+				return _003CSelectedItem_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _selectedItem, value, new ValueChangedEventHandler<T>(ApplySelected));
+				Common.SetProperty(ref _003CSelectedItem_003Ek__BackingField, value, new ValueChangedEventHandler<T>(ApplySelected));
 			}
 		}
 
@@ -62,25 +56,27 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selectables
 
 		public Action<T> OnClickAction
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _onClickAction;
+				return _003COnClickAction_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _onClickAction, value, new ValueChangedEventHandler<Action<T>>(ApplyAction));
+				Common.SetProperty(ref _003COnClickAction_003Ek__BackingField, value, new ValueChangedEventHandler<Action<T>>(ApplyAction));
 			}
 		}
 
 		public int SelectablePerRow
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _selectablePerRow;
+				return _003CSelectablePerRow_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _selectablePerRow, value, new Action(RecalculateLayout));
+				Common.SetProperty(ref _003CSelectablePerRow_003Ek__BackingField, value, new Action(RecalculateLayout));
 			}
 		}
 
@@ -100,13 +96,14 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selectables
 
 		public Control Anchor
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _anchor;
+				return _003CAnchor_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _anchor, value, new Action(RecalculateLayout));
+				Common.SetProperty(ref _003CAnchor_003Ek__BackingField, value, new Action(RecalculateLayout));
 			}
 		}
 
@@ -136,8 +133,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selectables
 			}
 		}
 
-		public bool PassSelected { get; set; } = true;
-
+		public bool PassSelected { get; set; }
 
 		public Selector()
 		{
@@ -148,6 +144,9 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selectables
 			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
 			//IL_012e: Unknown result type (might be due to invalid IL or missing references)
+			_003CSelectablePerRow_003Ek__BackingField = 4;
+			PassSelected = true;
+			base._002Ector();
 			HeaderPanel = new Kenedia.Modules.Core.Controls.Panel
 			{
 				Parent = this

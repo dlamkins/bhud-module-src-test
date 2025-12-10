@@ -42,6 +42,18 @@ namespace Kenedia.Modules.Core.Models
 			base[lang] = comon;
 		}
 
+		public new void Add(Locale key, string value)
+		{
+			if (!ContainsKey(key))
+			{
+				base.Add(key, value);
+			}
+			else
+			{
+				base[key] = value;
+			}
+		}
+
 		private void SetText(string value, Locale? lang = null)
 		{
 			Locale valueOrDefault = lang.GetValueOrDefault();

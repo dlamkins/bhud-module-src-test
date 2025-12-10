@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
@@ -17,21 +18,20 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		private readonly AsyncTexture2D _pawPressed = AsyncTexture2D.FromAssetId(156796);
 
-		private Pet? _pet;
-
 		public PetSlotType PetSlot { get; set; }
 
 		public Rectangle PawRegion { get; set; }
 
 		public Pet? Pet
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _pet;
+				return _003CPet_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _pet, value, new Action(ApplyPet));
+				Common.SetProperty(ref _003CPet_003Ek__BackingField, value, new Action(ApplyPet));
 			}
 		}
 

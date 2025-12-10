@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
@@ -6,7 +7,6 @@ using Blish_HUD.Input;
 using Kenedia.Modules.BuildsManager.DataModels.Stats;
 using Kenedia.Modules.Core.Controls;
 using Kenedia.Modules.Core.Extensions;
-using Kenedia.Modules.Core.Services;
 using Kenedia.Modules.Core.Structs;
 using Kenedia.Modules.Core.Utility;
 using Microsoft.Xna.Framework;
@@ -28,31 +28,29 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 
 		private readonly Kenedia.Modules.Core.Controls.Label _statSummary;
 
-		private double _attributeAdjustment;
-
-		private Stat _stat;
-
 		public Stat Stat
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _stat;
+				return _003CStat_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _stat, value, new Action(OnStatChanged));
+				Common.SetProperty(ref _003CStat_003Ek__BackingField, value, new Action(OnStatChanged));
 			}
 		}
 
 		public double AttributeAdjustment
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _attributeAdjustment;
+				return _003CAttributeAdjustment_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _attributeAdjustment, value, new Action(OnMultiplierChanged));
+				Common.SetProperty(ref _003CAttributeAdjustment_003Ek__BackingField, value, new Action(OnMultiplierChanged));
 			}
 		}
 
@@ -137,14 +135,17 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 
 		private void OnStatChanged()
 		{
-			_name.SetLocalizedText = () => _stat?.Name;
-			_statSummary.SetLocalizedText = () => _stat?.Attributes.ToString(AttributeAdjustment);
-			_icon.Texture = TexturesService.GetTextureFromRef(_stat?.IconPath);
+			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+			_name.SetLocalizedText = () => Stat?.Name;
+			_statSummary.SetLocalizedText = () => Stat?.Attributes.ToString(AttributeAdjustment);
+			_icon.Texture = Stat?.Icon.Texture;
+			_icon.SourceRectangle = Stat?.Icon.TextureRegion ?? Rectangle.get_Empty();
 		}
 
 		private void OnMultiplierChanged()
 		{
-			_statSummary.SetLocalizedText = () => _stat?.Attributes.ToString(AttributeAdjustment);
+			_statSummary.SetLocalizedText = () => Stat?.Attributes.ToString(AttributeAdjustment);
 		}
 
 		protected override void DisposeControl()

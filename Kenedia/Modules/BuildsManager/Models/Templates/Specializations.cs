@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace Kenedia.Modules.BuildsManager.Models.Templates
 {
@@ -23,11 +24,13 @@ namespace Kenedia.Modules.BuildsManager.Models.Templates
 			_ => throw new ArgumentOutOfRangeException("slot", slot, null), 
 		};
 
+		[IteratorStateMachine(typeof(_003CGetEnumerator_003Ed__11))]
 		public IEnumerator<BuildSpecialization> GetEnumerator()
 		{
-			yield return Specialization1;
-			yield return Specialization2;
-			yield return Specialization3;
+			return new _003CGetEnumerator_003Ed__11(0)
+			{
+				_003C_003E4__this = this
+			};
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
@@ -120,8 +121,6 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		private Dictionary<int, Trait> _majorTraits = new Dictionary<int, Trait>();
 
-		private bool _selectorOpen;
-
 		private readonly TraitTooltip _traitTooltip;
 
 		private readonly Tooltip _basicTooltip;
@@ -134,13 +133,14 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		public bool SelectorOpen
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _selectorOpen;
+				return _003CSelectorOpen_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _selectorOpen, value, new ValueChangedEventHandler<bool>(OnSelectorToggled));
+				Common.SetProperty(ref _003CSelectorOpen_003Ek__BackingField, value, new ValueChangedEventHandler<bool>(OnSelectorToggled));
 			}
 		}
 
@@ -562,7 +562,7 @@ namespace Kenedia.Modules.BuildsManager.Controls
 				}
 				catch (Exception ex)
 				{
-					BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Warn($"{ex}");
+					BaseModule<BuildsManager, MainWindow, Settings, Paths, Kenedia.Modules.BuildsManager.Services.StaticHosting>.Logger.Warn($"{ex}");
 				}
 			}
 			SelectorOpen = (_hexagon.Hovered || _noSpecHexagon.Hovered || _selector.Hovered) && !SelectorOpen;
@@ -603,21 +603,21 @@ namespace Kenedia.Modules.BuildsManager.Controls
 			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0106: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0148: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0151: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0166: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0170: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0108: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0130: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0139: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0142: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0157: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0161: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016b: Unknown result type (might be due to invalid IL or missing references)
 			string txt = null;
 			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, _specSelectorBounds, Rectangle.get_Empty(), Color.get_Black() * 0.8f, 0f, Vector2.get_Zero(), (SpriteEffects)0);
 			foreach (var spec in _specBounds)
@@ -626,7 +626,7 @@ namespace Kenedia.Modules.BuildsManager.Controls
 				bool hovered = ((Rectangle)(ref item)).Contains(base.RelativeMousePosition);
 				TemplatePresenter templatePresenter = TemplatePresenter;
 				BuildSpecialization slot;
-				bool hasSpec = templatePresenter != null && templatePresenter.Template?.HasSpecialization(spec.spec, out slot) == true;
+				bool hasSpec = templatePresenter != null && (templatePresenter.Template?.HasSpecialization(spec.spec, out slot)).GetValueOrDefault();
 				if (spec.spec != null)
 				{
 					AsyncTexture2D specIcon = spec.texture;

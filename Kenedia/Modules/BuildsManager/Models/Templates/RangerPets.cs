@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Kenedia.Modules.BuildsManager.DataModels.Professions;
 
 namespace Kenedia.Modules.BuildsManager.Models.Templates
@@ -75,12 +76,13 @@ namespace Kenedia.Modules.BuildsManager.Models.Templates
 			Aquatic_2 = Pet.FromByte(aquatic_2);
 		}
 
+		[IteratorStateMachine(typeof(_003CGetEnumerator_003Ed__21))]
 		public IEnumerator<Pet?> GetEnumerator()
 		{
-			yield return Terrestrial_1;
-			yield return Terrestrial_2;
-			yield return Aquatic_1;
-			yield return Aquatic_2;
+			return new _003CGetEnumerator_003Ed__21(0)
+			{
+				_003C_003E4__this = this
+			};
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.GameIntegration.GfxSettings;
 using Kenedia.Modules.Core.Controls;
@@ -127,8 +128,6 @@ namespace Kenedia.Modules.Core.Services
 
 		private readonly List<GameStatusType> _gameStatuses = new List<GameStatusType>();
 
-		private GameStatusType _gameStatus = GameStatusType.None;
-
 		private (Bitmap lastImage, Bitmap newImage) _bottomLeftImages = (null, null);
 
 		private (Bitmap lastImage, Bitmap newImage) _bottomRightImages = (null, null);
@@ -154,22 +153,23 @@ namespace Kenedia.Modules.Core.Services
 
 		public GameStatusType GameStatus
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _gameStatus;
+				return _003CGameStatus_003Ek__BackingField;
 			}
 			private set
 			{
-				if (_gameStatus != value)
+				if (_003CGameStatus_003Ek__BackingField != value)
 				{
-					OldStatus = _gameStatus;
-					_gameStatus = value;
+					OldStatus = _003CGameStatus_003Ek__BackingField;
+					_003CGameStatus_003Ek__BackingField = value;
 					GameStateChangedEventArgs eventArgs = new GameStateChangedEventArgs
 					{
 						OldStatus = OldStatus,
-						Status = _gameStatus
+						Status = _003CGameStatus_003Ek__BackingField
 					};
-					switch (_gameStatus)
+					switch (_003CGameStatus_003Ek__BackingField)
 					{
 					case GameStatusType.Ingame:
 						this.ChangedToIngame?.Invoke(GameStatus, eventArgs);
@@ -216,6 +216,8 @@ namespace Kenedia.Modules.Core.Services
 			//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
 			//IL_013e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0182: Unknown result type (might be due to invalid IL or missing references)
+			_003CGameStatus_003Ek__BackingField = GameStatusType.None;
+			base._002Ector();
 			ClientWindowService = clientWindowService;
 			SharedSettings = sharedSettings;
 		}

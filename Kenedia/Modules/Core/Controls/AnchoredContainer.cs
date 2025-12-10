@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Kenedia.Modules.Core.Models;
@@ -21,19 +22,18 @@ namespace Kenedia.Modules.Core.Controls
 			AutoVertical
 		}
 
-		private Control _anchor;
-
 		public CaptureType? CaptureInput { get; set; }
 
 		public Control Anchor
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _anchor;
+				return _003CAnchor_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _anchor, value, new ValueChangedEventHandler<Control>(OnAnchorChanged));
+				Common.SetProperty(ref _003CAnchor_003Ek__BackingField, value, new ValueChangedEventHandler<Control>(OnAnchorChanged));
 			}
 		}
 

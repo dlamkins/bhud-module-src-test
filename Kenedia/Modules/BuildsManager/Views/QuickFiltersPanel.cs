@@ -405,7 +405,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 			}
 			if (e2?.Icon?.Texture == null)
 			{
-				BaseModule<BuildsManager, MainWindow, Kenedia.Modules.BuildsManager.Services.Settings, Paths>.Logger.Warn("Tag '" + e2.Name + "' in Group " + e2.Group + " has no icon.");
+				BaseModule<BuildsManager, MainWindow, Kenedia.Modules.BuildsManager.Services.Settings, Paths, StaticHosting>.Logger.Warn("Tag '" + e2.Name + "' in Group " + e2.Group + " has no icon.");
 				return null;
 			}
 			TagGroupPanel panel = parent ?? GetPanel(e2.Group);
@@ -413,8 +413,8 @@ namespace Kenedia.Modules.BuildsManager.Views
 			{
 				if (e2?.Icon?.Texture == null)
 				{
-					BaseModule<BuildsManager, MainWindow, Kenedia.Modules.BuildsManager.Services.Settings, Paths>.Logger.Warn("[OnSelectedChanged]: Tag '" + e2.Name + "' in Group '" + e2.Group + "' has no icon.");
-					BaseModule<BuildsManager, MainWindow, Kenedia.Modules.BuildsManager.Services.Settings, Paths>.Logger.Warn(e2?.ToJson() ?? "");
+					BaseModule<BuildsManager, MainWindow, Kenedia.Modules.BuildsManager.Services.Settings, Paths, StaticHosting>.Logger.Warn("[OnSelectedChanged]: Tag '" + e2.Name + "' in Group '" + e2.Group + "' has no icon.");
+					BaseModule<BuildsManager, MainWindow, Kenedia.Modules.BuildsManager.Services.Settings, Paths, StaticHosting>.Logger.Warn(e2?.ToJson() ?? "");
 				}
 				else
 				{

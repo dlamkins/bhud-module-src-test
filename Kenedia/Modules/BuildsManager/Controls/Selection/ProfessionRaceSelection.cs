@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
@@ -27,17 +28,16 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 
 		private readonly List<ProfessionRaceSelectable> _professions = new List<ProfessionRaceSelectable>();
 
-		private SelectionType _type = SelectionType.Race;
-
 		public SelectionType Type
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _type;
+				return _003CType_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _type, value, new PropertyChangedEventHandler(OnTypeChanged), triggerOnUpdate: true, "Type");
+				Common.SetProperty(ref _003CType_003Ek__BackingField, value, new PropertyChangedEventHandler(OnTypeChanged), triggerOnUpdate: true, "Type");
 			}
 		}
 
@@ -47,6 +47,8 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 		{
 			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
+			_003CType_003Ek__BackingField = SelectionType.Race;
+			base._002Ector();
 			Data = data;
 			Search.Dispose();
 			base.BackgroundImage = AsyncTexture2D.FromAssetId(155963);

@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
@@ -49,21 +50,18 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 
 		private Color _rarityColor = Color.get_White();
 
-		private BaseItem _item;
-
-		private SelectableType _type;
-
 		private Color _fontColor;
 
 		public SelectableType Type
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _type;
+				return _003CType_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _type, value, new PropertyChangedEventHandler(OnTypeChanged), triggerOnUpdate: true, "Type");
+				Common.SetProperty(ref _003CType_003Ek__BackingField, value, new PropertyChangedEventHandler(OnTypeChanged), triggerOnUpdate: true, "Type");
 			}
 		}
 
@@ -73,13 +71,14 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 
 		public BaseItem Item
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _item;
+				return _003CItem_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _item, value, new Action(SetItem));
+				Common.SetProperty(ref _003CItem_003Ek__BackingField, value, new Action(SetItem));
 			}
 		}
 

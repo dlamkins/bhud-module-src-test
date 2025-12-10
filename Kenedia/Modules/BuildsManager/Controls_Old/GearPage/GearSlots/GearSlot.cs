@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
@@ -20,8 +21,6 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 {
 	public abstract class GearSlot : Container
 	{
-		private TemplateSlotType _slot = TemplateSlotType.None;
-
 		protected int MaxTextLength = 52;
 
 		protected Color StatColor = Color.get_White();
@@ -37,8 +36,6 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 		protected BitmapFont UpgradeFont = Control.Content.DefaultFont18;
 
 		protected BitmapFont InfusionFont = Control.Content.DefaultFont12;
-
-		private TemplatePresenter _templatePresenter;
 
 		protected ItemControl ItemControl { get; } = new ItemControl();
 
@@ -61,13 +58,14 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 
 		public TemplateSlotType Slot
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _slot;
+				return _003CSlot_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _slot, value, new Action(ApplySlot));
+				Common.SetProperty(ref _003CSlot_003Ek__BackingField, value, new Action(ApplySlot));
 			}
 		}
 
@@ -79,27 +77,30 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 
 		protected TemplatePresenter TemplatePresenter
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _templatePresenter;
+				return _003CTemplatePresenter_003Ek__BackingField;
 			}
 			private set
 			{
-				Common.SetProperty(ref _templatePresenter, value, new ValueChangedEventHandler<TemplatePresenter>(OnTemplatePresenterChanged));
+				Common.SetProperty(ref _003CTemplatePresenter_003Ek__BackingField, value, new ValueChangedEventHandler<TemplatePresenter>(OnTemplatePresenterChanged));
 			}
 		}
 
 		public GearSlot(TemplateSlotType gearSlot, Container parent, TemplatePresenter templatePresenter, SelectionPanel selectionPanel, Data data)
 		{
-			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0009: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
+			_003CSlot_003Ek__BackingField = TemplateSlotType.None;
+			base._002Ector();
 			TemplatePresenter = templatePresenter;
 			SelectionPanel = selectionPanel;
 			Data = data;

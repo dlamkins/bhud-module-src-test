@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
@@ -12,23 +13,18 @@ namespace Kenedia.Modules.Core.Models
 	{
 		private bool _isDisposed;
 
-		private AsyncTexture2D _texture;
-
-		private AsyncTexture2D _hoveredTexture;
-
-		private AsyncTexture2D _fallbackTexture;
-
 		public bool Hovered { get; protected set; }
 
 		public AsyncTexture2D Texture
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _texture;
+				return _003CTexture_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _texture, value, (Action)delegate
+				Common.SetProperty(ref _003CTexture_003Ek__BackingField, value, (Action)delegate
 				{
 					ApplyBounds();
 				}, value != null);
@@ -37,13 +33,14 @@ namespace Kenedia.Modules.Core.Models
 
 		public AsyncTexture2D HoveredTexture
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _hoveredTexture;
+				return _003CHoveredTexture_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _hoveredTexture, value, (Action)delegate
+				Common.SetProperty(ref _003CHoveredTexture_003Ek__BackingField, value, (Action)delegate
 				{
 					ApplyBounds();
 				}, value != null);
@@ -52,13 +49,14 @@ namespace Kenedia.Modules.Core.Models
 
 		public AsyncTexture2D FallBackTexture
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _fallbackTexture;
+				return _003CFallBackTexture_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _fallbackTexture, value, (Action)delegate
+				Common.SetProperty(ref _003CFallBackTexture_003Ek__BackingField, value, (Action)delegate
 				{
 					ApplyBounds();
 				}, value != null);
@@ -131,25 +129,25 @@ namespace Kenedia.Modules.Core.Models
 			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0151: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0187: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0199: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ef: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01fe: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0125: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0137: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0146: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0161: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0166: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0173: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0181: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d8: Unknown result type (might be due to invalid IL or missing references)
 			if (!_isDisposed && (FallBackTexture != null || Texture != null))
 			{
 				Vector2 valueOrDefault = origin.GetValueOrDefault();
@@ -178,12 +176,12 @@ namespace Kenedia.Modules.Core.Models
 				Color valueOrDefault3 = color.GetValueOrDefault();
 				if (!color.HasValue)
 				{
-					valueOrDefault3 = (Color)(((_003F?)(((forceHover == true || Hovered) && HoverDrawColor.HasValue) ? HoverDrawColor : DrawColor)) ?? Color.get_White());
+					valueOrDefault3 = (Color)(((_003F?)(((forceHover.GetValueOrDefault() || Hovered) && HoverDrawColor.HasValue) ? HoverDrawColor : DrawColor)) ?? Color.get_White());
 					color = valueOrDefault3;
 				}
 				if (Texture != null)
 				{
-					spriteBatch.DrawOnCtrl(ctrl, ((forceHover == true || Hovered) && HoveredTexture != null) ? HoveredTexture : (Texture ?? FallBackTexture), Bounds, TextureRegion, color.Value, rotation.Value, origin.Value, (SpriteEffects)0);
+					spriteBatch.DrawOnCtrl(ctrl, ((forceHover.GetValueOrDefault() || Hovered) && HoveredTexture != null) ? HoveredTexture : (Texture ?? FallBackTexture), Bounds, TextureRegion, color.Value, rotation.Value, origin.Value, (SpriteEffects)0);
 				}
 				else
 				{
@@ -216,24 +214,24 @@ namespace Kenedia.Modules.Core.Models
 			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0150: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0156: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0140: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0162: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0171: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0178: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0192: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0197: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ac: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0181: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0196: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b7: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ef: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f9: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0200: Unknown result type (might be due to invalid IL or missing references)
-			//IL_020f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0216: Unknown result type (might be due to invalid IL or missing references)
 			if (!_isDisposed && (FallBackTexture != null || Texture != null))
 			{
 				SpriteEffects valueOrDefault = effect.GetValueOrDefault();
@@ -273,7 +271,7 @@ namespace Kenedia.Modules.Core.Models
 				}
 				if (Texture != null)
 				{
-					spriteBatch.DrawOnCtrl(ctrl, ((forceHover == true || Hovered) && HoveredTexture != null) ? HoveredTexture : (Texture ?? FallBackTexture), Bounds, TextureRegion, color.Value, rotation.Value, origin.Value, effect.Value);
+					spriteBatch.DrawOnCtrl(ctrl, ((forceHover.GetValueOrDefault() || Hovered) && HoveredTexture != null) ? HoveredTexture : (Texture ?? FallBackTexture), Bounds, TextureRegion, color.Value, rotation.Value, origin.Value, effect.Value);
 				}
 				else
 				{

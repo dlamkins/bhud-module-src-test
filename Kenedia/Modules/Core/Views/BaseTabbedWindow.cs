@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
@@ -57,8 +58,6 @@ namespace Kenedia.Modules.Core.Views
 
 		private int _selectedTabIndex = -1;
 
-		private int _hoveredTabIndex;
-
 		public BaseTab SelectedTab
 		{
 			get
@@ -88,13 +87,14 @@ namespace Kenedia.Modules.Core.Views
 
 		private int HoveredTabIndex
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _hoveredTabIndex;
+				return _003CHoveredTabIndex_003Ek__BackingField;
 			}
 			set
 			{
-				SetProperty(ref _hoveredTabIndex, value, invalidateLayout: false, "HoveredTabIndex");
+				SetProperty(ref _003CHoveredTabIndex_003Ek__BackingField, value, invalidateLayout: false, "HoveredTabIndex");
 			}
 		}
 

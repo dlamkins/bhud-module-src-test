@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Kenedia.Modules.BuildsManager.Controls.Selection;
@@ -26,19 +27,18 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 			TextureRegion = new Rectangle(38, 38, 52, 52)
 		});
 
-		private Rune? _rune;
-
 		private Rectangle _runeBounds;
 
 		public Rune? Rune
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _rune;
+				return _003CRune_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty<Rune>(ref _rune, value, new ValueChangedEventHandler<Rune>(OnRuneChanged));
+				Common.SetProperty<Rune>(ref _003CRune_003Ek__BackingField, value, new ValueChangedEventHandler<Rune>(OnRuneChanged));
 			}
 		}
 

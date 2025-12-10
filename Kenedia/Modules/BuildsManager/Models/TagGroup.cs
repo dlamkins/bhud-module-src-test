@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Kenedia.Modules.BuildsManager.Res;
 using Kenedia.Modules.BuildsManager.Services;
 using Kenedia.Modules.Core.Models;
@@ -9,63 +10,53 @@ namespace Kenedia.Modules.BuildsManager.Models
 {
 	public class TagGroup
 	{
-		[JsonProperty("AssetId")]
-		private int _assetId = 156025;
-
-		[JsonProperty("Name")]
-		private string _name = DefaultName;
-
 		[JsonProperty("TextureRegion")]
 		private Rectangle? _textureRegion;
-
-		[JsonProperty("Priority")]
-		private int _priority = 1;
 
 		public static string DefaultName => strings.GroupNotDefined;
 
 		[JsonIgnore]
 		public int Priority
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _priority;
+				return _003CPriority_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _priority, value, new ValueChangedEventHandler<int>(OnPriorityChanged));
+				Common.SetProperty(ref _003CPriority_003Ek__BackingField, value, new ValueChangedEventHandler<int>(OnPriorityChanged));
 			}
 		}
 
 		[JsonIgnore]
 		public string Name
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _name;
+				return _003CName_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _name, value, new ValueChangedEventHandler<string>(OnNameChanged));
+				Common.SetProperty(ref _003CName_003Ek__BackingField, value, new ValueChangedEventHandler<string>(OnNameChanged));
 			}
 		}
 
 		[JsonIgnore]
-		public DetailedTexture Icon { get; set; } = new DetailedTexture(156025)
-		{
-			TextureRegion = new Rectangle(44, 48, 43, 46)
-		};
-
+		public DetailedTexture Icon { get; set; }
 
 		[JsonIgnore]
 		public int AssetId
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _assetId;
+				return _003CAssetId_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _assetId, value, new ValueChangedEventHandler<int>(OnAssetIdChanged));
+				Common.SetProperty(ref _003CAssetId_003Ek__BackingField, value, new ValueChangedEventHandler<int>(OnAssetIdChanged));
 			}
 		}
 
@@ -89,8 +80,16 @@ namespace Kenedia.Modules.BuildsManager.Models
 
 		public TagGroup()
 		{
-		}//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-
+			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+			_003CPriority_003Ek__BackingField = 1;
+			_003CName_003Ek__BackingField = DefaultName;
+			Icon = new DetailedTexture(156025)
+			{
+				TextureRegion = new Rectangle(44, 48, 43, 46)
+			};
+			_003CAssetId_003Ek__BackingField = 156025;
+			base._002Ector();
+		}
 
 		public TagGroup(string name)
 			: this()

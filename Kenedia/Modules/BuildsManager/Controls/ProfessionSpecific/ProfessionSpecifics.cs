@@ -89,7 +89,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 		protected virtual void ApplyTemplate()
 		{
 			TemplatePresenter templatePresenter = TemplatePresenter;
-			if (templatePresenter != null && templatePresenter.Template?.Loaded == true)
+			if (templatePresenter != null && (templatePresenter.Template?.Loaded).GetValueOrDefault())
 			{
 				SetTooltipSkill();
 			}

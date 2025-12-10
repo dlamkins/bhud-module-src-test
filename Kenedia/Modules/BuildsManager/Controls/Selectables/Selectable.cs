@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
@@ -17,19 +18,18 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selectables
 	{
 		private Rectangle _textureBounds;
 
-		private IBaseApiData? _data;
-
 		protected AsyncTexture2D? Texture;
 
 		public IBaseApiData? Data
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _data;
+				return _003CData_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty<IBaseApiData>(ref _data, value, new ValueChangedEventHandler<IBaseApiData>(ApplyData));
+				Common.SetProperty<IBaseApiData>(ref _003CData_003Ek__BackingField, value, new ValueChangedEventHandler<IBaseApiData>(ApplyData));
 			}
 		}
 

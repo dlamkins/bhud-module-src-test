@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
@@ -58,73 +59,68 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 
 		private Rectangle _infusion2Bounds;
 
-		private Stat _stat;
-
-		private Sigil _sigil1;
-
-		private Sigil _sigil2;
-
-		private Infusion _infusion1;
-
-		private Infusion _infusion2;
-
 		public Stat Stat
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _stat;
+				return _003CStat_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _stat, value, new ValueChangedEventHandler<Stat>(OnStatChanged));
+				Common.SetProperty(ref _003CStat_003Ek__BackingField, value, new ValueChangedEventHandler<Stat>(OnStatChanged));
 			}
 		}
 
 		public Sigil Sigil1
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _sigil1;
+				return _003CSigil1_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _sigil1, value, new ValueChangedEventHandler<Sigil>(OnSigil1Changed));
+				Common.SetProperty(ref _003CSigil1_003Ek__BackingField, value, new ValueChangedEventHandler<Sigil>(OnSigil1Changed));
 			}
 		}
 
 		public Sigil Sigil2
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _sigil2;
+				return _003CSigil2_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _sigil2, value, new ValueChangedEventHandler<Sigil>(OnSigil2Changed));
+				Common.SetProperty(ref _003CSigil2_003Ek__BackingField, value, new ValueChangedEventHandler<Sigil>(OnSigil2Changed));
 			}
 		}
 
 		public Infusion Infusion1
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _infusion1;
+				return _003CInfusion1_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _infusion1, value, new ValueChangedEventHandler<Infusion>(OnInfusion1Changed));
+				Common.SetProperty(ref _003CInfusion1_003Ek__BackingField, value, new ValueChangedEventHandler<Infusion>(OnInfusion1Changed));
 			}
 		}
 
 		public Infusion Infusion2
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _infusion2;
+				return _003CInfusion2_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _infusion2, value, new ValueChangedEventHandler<Infusion>(OnInfusion2Changed));
+				Common.SetProperty(ref _003CInfusion2_003Ek__BackingField, value, new ValueChangedEventHandler<Infusion>(OnInfusion2Changed));
 			}
 		}
 
@@ -139,8 +135,8 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
-			_infusion1Control.Placeholder.Texture = (AsyncTexture2D)BaseModule<BuildsManager, MainWindow, Settings, Paths>.ModuleInstance.ContentsManager.GetTexture("textures\\infusionslot.png");
-			_infusion2Control.Placeholder.Texture = (AsyncTexture2D)BaseModule<BuildsManager, MainWindow, Settings, Paths>.ModuleInstance.ContentsManager.GetTexture("textures\\infusionslot.png");
+			_infusion1Control.Placeholder.Texture = (AsyncTexture2D)BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.ModuleInstance.ContentsManager.GetTexture("textures\\infusionslot.png");
+			_infusion2Control.Placeholder.Texture = (AsyncTexture2D)BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.ModuleInstance.ContentsManager.GetTexture("textures\\infusionslot.png");
 			_sigil1Control.Parent = this;
 			_sigil2Control.Parent = this;
 			_infusion1Control.Parent = this;

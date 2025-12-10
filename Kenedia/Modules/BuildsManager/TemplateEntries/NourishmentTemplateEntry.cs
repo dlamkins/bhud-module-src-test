@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Kenedia.Modules.BuildsManager.DataModels.Items;
 using Kenedia.Modules.BuildsManager.Models.Templates;
 using Kenedia.Modules.BuildsManager.Services;
@@ -11,17 +12,16 @@ namespace Kenedia.Modules.BuildsManager.TemplateEntries
 	{
 		private bool _isDisposed;
 
-		private Nourishment _nourishment;
-
 		public Nourishment Nourishment
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _nourishment;
+				return _003CNourishment_003Ek__BackingField;
 			}
 			private set
 			{
-				Common.SetProperty(ref _nourishment, value);
+				Common.SetProperty(ref _003CNourishment_003Ek__BackingField, value);
 			}
 		}
 

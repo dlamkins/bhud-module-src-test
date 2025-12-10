@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
@@ -41,8 +42,6 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 
 		private Dictionary<TemplateSlotType, GearSlot> _templateSlots = new Dictionary<TemplateSlotType, GearSlot>();
 
-		private TemplatePresenter _templatePresenter;
-
 		private Blocker _blocker;
 
 		private readonly DetailedTexture _terrestrialSet = new DetailedTexture(156323);
@@ -61,13 +60,14 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 
 		public TemplatePresenter TemplatePresenter
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _templatePresenter;
+				return _003CTemplatePresenter_003Ek__BackingField;
 			}
 			private set
 			{
-				Common.SetProperty(ref _templatePresenter, value, new ValueChangedEventHandler<TemplatePresenter>(OnTemplatePresenterChanged));
+				Common.SetProperty(ref _003CTemplatePresenter_003Ek__BackingField, value, new ValueChangedEventHandler<TemplatePresenter>(OnTemplatePresenterChanged));
 			}
 		}
 

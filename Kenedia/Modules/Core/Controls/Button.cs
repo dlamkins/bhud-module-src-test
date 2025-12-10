@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
@@ -17,10 +18,6 @@ namespace Kenedia.Modules.Core.Controls
 
 		private Texture2D _textureButtonBorder = Control.Content.GetTexture("button-border");
 
-		private Func<string> _setLocalizedText;
-
-		private Func<string> _setLocalizedTooltip;
-
 		private Rectangle _layoutIconBounds;
 
 		private Rectangle _layoutTextBounds;
@@ -31,26 +28,28 @@ namespace Kenedia.Modules.Core.Controls
 
 		public Func<string> SetLocalizedText
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _setLocalizedText;
+				return _003CSetLocalizedText_003Ek__BackingField;
 			}
 			set
 			{
-				_setLocalizedText = value;
+				_003CSetLocalizedText_003Ek__BackingField = value;
 				base.Text = value?.Invoke();
 			}
 		}
 
 		public Func<string> SetLocalizedTooltip
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _setLocalizedTooltip;
+				return _003CSetLocalizedTooltip_003Ek__BackingField;
 			}
 			set
 			{
-				_setLocalizedTooltip = value;
+				_003CSetLocalizedTooltip_003Ek__BackingField = value;
 				base.BasicTooltipText = value?.Invoke();
 			}
 		}

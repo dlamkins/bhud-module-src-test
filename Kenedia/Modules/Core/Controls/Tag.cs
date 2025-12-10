@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
@@ -23,8 +24,6 @@ namespace Kenedia.Modules.Core.Controls
 		private Color _disabledColor = new Color(156, 156, 156);
 
 		private Texture2D _disabledBackground;
-
-		private AsyncTexture2D _background;
 
 		private bool _active;
 
@@ -78,17 +77,18 @@ namespace Kenedia.Modules.Core.Controls
 
 		public AsyncTexture2D Background
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _background;
+				return _003CBackground_003Ek__BackingField;
 			}
 			set
 			{
-				_background = value;
+				_003CBackground_003Ek__BackingField = value;
 				if (value != null)
 				{
 					CreateDisabledBackground(null, null);
-					_background.TextureSwapped += CreateDisabledBackground;
+					_003CBackground_003Ek__BackingField.TextureSwapped += CreateDisabledBackground;
 				}
 			}
 		}
@@ -242,9 +242,9 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_023d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0247: Unknown result type (might be due to invalid IL or missing references)
 			//IL_024d: Unknown result type (might be due to invalid IL or missing references)
-			if (_background != null)
+			if (Background != null)
 			{
-				AsyncTexture2D texture = (Active ? _background : ((_disabledBackground != null) ? ((AsyncTexture2D)_disabledBackground) : _background));
+				AsyncTexture2D texture = (Active ? Background : ((_disabledBackground != null) ? ((AsyncTexture2D)_disabledBackground) : Background));
 				spriteBatch.DrawOnCtrl(this, texture, bounds, bounds, Active ? (Color.get_White() * 0.98f) : (_disabledColor * 0.8f));
 			}
 			Color color = Color.get_Black();
@@ -280,8 +280,8 @@ namespace Kenedia.Modules.Core.Controls
 
 		private void CreateDisabledBackground(object sender, ValueChangedEventArgs<Texture2D> e)
 		{
-			_disabledBackground = _background.Texture.ToGrayScaledPalettable();
-			_background.TextureSwapped -= CreateDisabledBackground;
+			_disabledBackground = Background.Texture.ToGrayScaledPalettable();
+			Background.TextureSwapped -= CreateDisabledBackground;
 		}
 	}
 }

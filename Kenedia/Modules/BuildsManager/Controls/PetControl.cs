@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
@@ -30,19 +31,18 @@ namespace Kenedia.Modules.BuildsManager.Controls
 			TextureRegion = new Rectangle(14, 14, 100, 100)
 		};
 
-		private Pet? _pet;
-
 		public PetSlotType PetSlot { get; set; }
 
 		public Pet? Pet
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _pet;
+				return _003CPet_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty<Pet>(ref _pet, value, new ValueChangedEventHandler<Pet>(ApplyPet));
+				Common.SetProperty<Pet>(ref _003CPet_003Ek__BackingField, value, new ValueChangedEventHandler<Pet>(ApplyPet));
 			}
 		}
 

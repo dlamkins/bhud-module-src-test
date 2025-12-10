@@ -45,18 +45,18 @@ namespace Kenedia.Modules.BuildsManager.Services
 			{
 				bool saveRequired = false;
 				RaceDataEntry loaded = null;
-				BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Debug("Load and if required update " + name);
+				BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug("Load and if required update " + name);
 				if (!DataLoaded && System.IO.File.Exists(path))
 				{
-					BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Debug("Load " + name + ".json");
+					BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug("Load " + name + ".json");
 					loaded = JsonConvert.DeserializeObject<RaceDataEntry>(System.IO.File.ReadAllText(path), SerializerSettings.Default);
 					DataLoaded = true;
 				}
 				base.Map = map;
 				base.Items = loaded?.Items ?? base.Items;
 				base.Version = loaded?.Version ?? base.Version;
-				BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Debug($"{name} Version {base.Version} | version {map.Version}");
-				BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Debug("Check for missing values for " + name);
+				BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug($"{name} Version {base.Version} | version {map.Version}");
+				BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug("Check for missing values for " + name);
 				IApiV2ObjectList<string> raceIds = await gw2ApiManager.Gw2ApiClient.V2.Races.IdsAsync(cancellationToken);
 				if (cancellationToken.IsCancellationRequested)
 				{
@@ -71,13 +71,13 @@ namespace Kenedia.Modules.BuildsManager.Services
 				{
 					base.Version = map.Version;
 					missing = raceIds;
-					BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Debug("The current version does not match the map version. Updating all values for " + name + ".");
+					BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug("The current version does not match the map version. Updating all values for " + name + ".");
 				}
 				if (missing.Count() > 0)
 				{
 					List<List<string>> idSets = missing.ToList().ChunkBy(200);
 					saveRequired = saveRequired || idSets.Count > 0;
-					BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Debug($"Fetch a total of {missing.Count()} {name} in {idSets.Count} sets.");
+					BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug($"Fetch a total of {missing.Count()} {name} in {idSets.Count} sets.");
 					IApiV2ObjectList<Skill> apiSkills = await gw2ApiManager.Gw2ApiClient.V2.Skills.AllAsync(cancellationToken);
 					Profession profession = await gw2ApiManager.Gw2ApiClient.V2.Professions.GetAsync(ProfessionType.Guardian, cancellationToken);
 					if (cancellationToken.IsCancellationRequested)
@@ -109,7 +109,7 @@ namespace Kenedia.Modules.BuildsManager.Services
 				}
 				if (saveRequired)
 				{
-					BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Debug("Saving " + name + ".json");
+					BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug("Saving " + name + ".json");
 					string json = JsonConvert.SerializeObject((object)this, SerializerSettings.Default);
 					System.IO.File.WriteAllText(path, json);
 				}
@@ -118,7 +118,7 @@ namespace Kenedia.Modules.BuildsManager.Services
 			}
 			catch (Exception ex)
 			{
-				BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Warn(ex, "Failed to load " + name + " data.");
+				BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Warn(ex, "Failed to load " + name + " data.");
 				return false;
 			}
 		}

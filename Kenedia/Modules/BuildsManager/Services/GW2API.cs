@@ -143,7 +143,7 @@ namespace Kenedia.Modules.BuildsManager.Services
 						continue;
 					}
 					count++;
-					BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths>.Logger.Info($"Fetching chunk {count}/{itemid_lists.Count}");
+					BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths, StaticHosting>.Logger.Info($"Fetching chunk {count}/{itemid_lists.Count}");
 					try
 					{
 						IReadOnlyList<Item> items = await Gw2ApiManager.Gw2ApiClient.V2.Items.ManyAsync(ids, _cancellationTokenSource.Token);
@@ -175,14 +175,14 @@ namespace Kenedia.Modules.BuildsManager.Services
 													if (upgrade != null)
 													{
 														ApiFlags<ItemInfusionFlag> infusionUpgradeFlags = upgrade.Details.InfusionUpgradeFlags;
-														if ((object)infusionUpgradeFlags != null && infusionUpgradeFlags.ToList()?.Contains((ApiEnum<ItemInfusionFlag>)ItemInfusionFlag.Infusion) == true && _infusions.Contains(upgrade.Id))
+														if ((object)infusionUpgradeFlags != null && (infusionUpgradeFlags.ToList()?.Contains((ApiEnum<ItemInfusionFlag>)ItemInfusionFlag.Infusion)).GetValueOrDefault() && _infusions.Contains(upgrade.Id))
 														{
 															maps.Add(mapCollection.Infusions);
 														}
 														else
 														{
 															ApiFlags<ItemInfusionFlag> infusionUpgradeFlags2 = upgrade.Details.InfusionUpgradeFlags;
-															if ((object)infusionUpgradeFlags2 != null && infusionUpgradeFlags2.ToList()?.Contains((ApiEnum<ItemInfusionFlag>)ItemInfusionFlag.Enrichment) == true)
+															if ((object)infusionUpgradeFlags2 != null && (infusionUpgradeFlags2.ToList()?.Contains((ApiEnum<ItemInfusionFlag>)ItemInfusionFlag.Enrichment)).GetValueOrDefault())
 															{
 																maps.Add(mapCollection.Enrichments);
 															}
@@ -270,25 +270,25 @@ namespace Kenedia.Modules.BuildsManager.Services
 								{
 									if (map3 != null && map3.Items.FirstOrDefault((KeyValuePair<byte, int> x) => x.Value == item.Id).Value <= 0 && map3.Count < 255)
 									{
-										BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths>.Logger.Info($"Adding {item.Id} to {item.Type}");
+										BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths, StaticHosting>.Logger.Info($"Adding {item.Id} to {item.Type}");
 										map3.Add((byte)(map3.Count + 1), item.Id);
 										if (mapVersions.TryGetValue(map3.Name, out var mapVersion) && ((object)mapVersion).ToString() == ((object)map3.Version).ToString())
 										{
 											map3.Version = map3.Version.Increment();
-											BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths>.Logger.Info($"Updating {item.Type} version from {mapVersion} to {map3.Version}");
+											BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths, StaticHosting>.Logger.Info($"Updating {item.Type} version from {mapVersion} to {map3.Version}");
 										}
 									}
 								}
 							}
 							catch (Exception ex2)
 							{
-								BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths>.Logger.Warn($"{item.Id}Exception {ex2}");
+								BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths, StaticHosting>.Logger.Warn($"{item.Id}Exception {ex2}");
 							}
 						}
 					}
 					catch (Exception ex)
 					{
-						BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths>.Logger.Warn("Exception thrown for ids: " + Environment.NewLine + string.Join("," + Environment.NewLine, ids) + " " + Environment.NewLine + ex);
+						BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths, StaticHosting>.Logger.Warn("Exception thrown for ids: " + Environment.NewLine + string.Join("," + Environment.NewLine, ids) + " " + Environment.NewLine + ex);
 					}
 				}
 				if (_cancellationTokenSource.IsCancellationRequested)
@@ -318,7 +318,7 @@ namespace Kenedia.Modules.BuildsManager.Services
 						ByteIntMap map2 = mapCollection.Stats;
 						if (map2 != null && map2.Items.FirstOrDefault((KeyValuePair<byte, int> x) => x.Value == e3.Id).Value <= 0 && map2.Count < 255)
 						{
-							BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths>.Logger.Info($"Adding {e3.Id} to Stats.");
+							BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths, StaticHosting>.Logger.Info($"Adding {e3.Id} to Stats.");
 							map2.Add((byte)(map2.Count + 1), e3.Id);
 						}
 					}
@@ -333,11 +333,11 @@ namespace Kenedia.Modules.BuildsManager.Services
 					ByteIntMap map = mapCollection.PvpAmulets;
 					if (map != null && map.Items.FirstOrDefault((KeyValuePair<byte, int> x) => x.Value == e2.Id).Value <= 0 && map.Count < 255)
 					{
-						BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths>.Logger.Info($"Adding {e2.Id} to Pvp Amulets.");
+						BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths, StaticHosting>.Logger.Info($"Adding {e2.Id} to Pvp Amulets.");
 						map.Add((byte)(map.Count + 1), e2.Id);
 					}
 				}
-				BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths>.Logger.Info("Save to " + Paths.ModuleDataPath + "DataMap.json");
+				BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths, StaticHosting>.Logger.Info("Save to " + Paths.ModuleDataPath + "DataMap.json");
 				mapCollection.Save(Paths.ModuleDataPath + "DataMap.json");
 			}
 			catch

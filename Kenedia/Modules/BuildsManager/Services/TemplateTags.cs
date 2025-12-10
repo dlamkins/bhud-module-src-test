@@ -63,10 +63,7 @@ namespace Kenedia.Modules.BuildsManager.Services
 			string oldGroup = ((old != null) ? old : string.Empty);
 			string newgrp = e.NewValue as string;
 			string newGroup = ((newgrp != null) ? newgrp : string.Empty);
-			List<TemplateTag> tags = _tags;
-			List<TemplateTag> list = new List<TemplateTag>(tags.Count);
-			list.AddRange(tags);
-			foreach (TemplateTag tag in list)
+			foreach (TemplateTag tag in _tags.ToList())
 			{
 				if (tag.Group == oldGroup)
 				{
@@ -77,10 +74,7 @@ namespace Kenedia.Modules.BuildsManager.Services
 
 		private void TagGroups_TagRemoved(object sender, TagGroup e)
 		{
-			List<TemplateTag> tags = _tags;
-			List<TemplateTag> list = new List<TemplateTag>(tags.Count);
-			list.AddRange(tags);
-			foreach (TemplateTag tag in list)
+			foreach (TemplateTag tag in _tags.ToList())
 			{
 				if (tag.Group == e.Name)
 				{
@@ -112,8 +106,8 @@ namespace Kenedia.Modules.BuildsManager.Services
 				}
 				catch (Exception ex)
 				{
-					BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Warn("Failed to load TemplateTags.json");
-					BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Warn($"{ex}");
+					BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Warn("Failed to load TemplateTags.json");
+					BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Warn($"{ex}");
 				}
 			}
 			else
@@ -121,7 +115,7 @@ namespace Kenedia.Modules.BuildsManager.Services
 				string json2 = await new StreamReader(_contentsManager.GetFileStream("data\\TemplateTags.json")).ReadToEndAsync();
 				_tags = JsonConvert.DeserializeObject<List<TemplateTag>>(json2, SerializerSettings.Default);
 				File.WriteAllText(_paths.ModulePath + "TemplateTags.json", json2);
-				BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Warn("Loaded default TemplateTags.json");
+				BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Warn("Loaded default TemplateTags.json");
 			}
 			foreach (TemplateTag tag in _tags)
 			{
@@ -217,8 +211,8 @@ namespace Kenedia.Modules.BuildsManager.Services
 			{
 				if (!(ex is TaskCanceledException))
 				{
-					BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Warn("Failed to save TemplateTags.json");
-					BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Warn($"{ex}");
+					BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Warn("Failed to save TemplateTags.json");
+					BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Warn($"{ex}");
 				}
 			}
 		}

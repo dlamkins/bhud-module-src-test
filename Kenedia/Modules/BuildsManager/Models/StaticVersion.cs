@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Kenedia.Modules.Core.Models;
 using Newtonsoft.Json;
 using SemVer;
@@ -214,28 +215,13 @@ namespace Kenedia.Modules.BuildsManager.Models
 			}
 		}
 
+		[IteratorStateMachine(typeof(_003CGetEnumerator_003Ed__85))]
 		public IEnumerator<KeyValuePair<string, ByteIntMap>> GetEnumerator()
 		{
-			yield return new KeyValuePair<string, ByteIntMap>("Nourishments", Nourishments);
-			yield return new KeyValuePair<string, ByteIntMap>("Enhancements", Enhancements);
-			yield return new KeyValuePair<string, ByteIntMap>("PveRunes", PveRunes);
-			yield return new KeyValuePair<string, ByteIntMap>("PvpRunes", PvpRunes);
-			yield return new KeyValuePair<string, ByteIntMap>("PveSigils", PveSigils);
-			yield return new KeyValuePair<string, ByteIntMap>("PvpSigils", PvpSigils);
-			yield return new KeyValuePair<string, ByteIntMap>("Infusions", Infusions);
-			yield return new KeyValuePair<string, ByteIntMap>("Enrichments", Enrichments);
-			yield return new KeyValuePair<string, ByteIntMap>("Trinkets", Trinkets);
-			yield return new KeyValuePair<string, ByteIntMap>("Backs", Backs);
-			yield return new KeyValuePair<string, ByteIntMap>("Weapons", Weapons);
-			yield return new KeyValuePair<string, ByteIntMap>("Armors", Armors);
-			yield return new KeyValuePair<string, ByteIntMap>("PowerCores", PowerCores);
-			yield return new KeyValuePair<string, ByteIntMap>("PveRelics", PveRelics);
-			yield return new KeyValuePair<string, ByteIntMap>("PvpRelics", PvpRelics);
-			yield return new KeyValuePair<string, ByteIntMap>("PvpAmulets", PvpAmulets);
-			yield return new KeyValuePair<string, ByteIntMap>("Stats", Stats);
-			yield return new KeyValuePair<string, ByteIntMap>("Professions", Professions);
-			yield return new KeyValuePair<string, ByteIntMap>("Pets", Pets);
-			yield return new KeyValuePair<string, ByteIntMap>("Races", Races);
+			return new _003CGetEnumerator_003Ed__85(0)
+			{
+				_003C_003E4__this = this
+			};
 		}
 
 		public void Save(string path)

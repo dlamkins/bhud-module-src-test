@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Kenedia.Modules.BuildsManager.DataModels.Items;
 using Kenedia.Modules.BuildsManager.Models.Templates;
 using Kenedia.Modules.BuildsManager.Services;
@@ -11,17 +12,16 @@ namespace Kenedia.Modules.BuildsManager.TemplateEntries
 	{
 		private bool _isDisposed;
 
-		private Relic _relic;
-
 		public Relic Relic
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _relic;
+				return _003CRelic_003Ek__BackingField;
 			}
 			private set
 			{
-				Common.SetProperty(ref _relic, value);
+				Common.SetProperty(ref _003CRelic_003Ek__BackingField, value);
 			}
 		}
 

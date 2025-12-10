@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
@@ -33,12 +34,6 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 
 		private Rectangle _backTextBounds;
 
-		private SelectionTypes _selectionType = SelectionTypes.Templates;
-
-		private Control? _anchor;
-
-		private MainWindow _mainWindow;
-
 		public BuildSelection BuildSelection { get; }
 
 		public TemplatePresenter TemplatePresenter { get; private set; }
@@ -47,46 +42,38 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 
 		public Settings Settings { get; }
 
-		public MainWindow MainWindow
-		{
-			get
-			{
-				return _mainWindow;
-			}
-			set
-			{
-				_mainWindow = value;
-			}
-		}
+		public MainWindow MainWindow { get; set; }
 
 		public string Title { get; set; }
 
 		public SelectionTypes SelectionType
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _selectionType;
+				return _003CSelectionType_003Ek__BackingField;
 			}
 			set
 			{
-				if (Common.SetProperty(ref _selectionType, value))
+				if (Common.SetProperty(ref _003CSelectionType_003Ek__BackingField, value))
 				{
-					_gearSelection.Visible = _selectionType == SelectionTypes.Items;
-					BuildSelection.Visible = _selectionType == SelectionTypes.Templates;
-					_statSelection.Visible = _selectionType == SelectionTypes.Stats;
+					_gearSelection.Visible = _003CSelectionType_003Ek__BackingField == SelectionTypes.Items;
+					BuildSelection.Visible = _003CSelectionType_003Ek__BackingField == SelectionTypes.Templates;
+					_statSelection.Visible = _003CSelectionType_003Ek__BackingField == SelectionTypes.Stats;
 				}
 			}
 		}
 
 		public Control Anchor
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _anchor;
+				return _003CAnchor_003Ek__BackingField;
 			}
 			private set
 			{
-				if (_selectionType == SelectionTypes.Templates)
+				if (SelectionType == SelectionTypes.Templates)
 				{
 					_mainAnchor = value;
 				}
@@ -94,7 +81,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 				{
 					_subAnchor = value;
 				}
-				Pointer.Anchor = (_anchor = ((_selectionType == SelectionTypes.Templates) ? _mainAnchor : _subAnchor));
+				Pointer.Anchor = (_003CAnchor_003Ek__BackingField = ((SelectionType == SelectionTypes.Templates) ? _mainAnchor : _subAnchor));
 			}
 		}
 
@@ -104,6 +91,8 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 
 		public SelectionPanel(TemplatePresenter templatePresenter, TemplateCollection templates, TemplateTags templateTags, Data data, TemplateFactory templateFactory, Settings settings)
 		{
+			_003CSelectionType_003Ek__BackingField = SelectionTypes.Templates;
+			base._002Ector();
 			TemplatePresenter = templatePresenter;
 			Data = data;
 			Settings = settings;
@@ -327,7 +316,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 			base.OnClick(e);
 			if (Anchor != null)
 			{
-				SelectionTypes selectionType = _selectionType;
+				SelectionTypes selectionType = SelectionType;
 				bool flag = (((uint)(selectionType - 2) <= 1u) ? true : false);
 				if (flag && ((Rectangle)(ref _backBounds)).Contains(base.RelativeMousePosition))
 				{

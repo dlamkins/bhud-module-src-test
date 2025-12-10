@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Kenedia.Modules.BuildsManager.DataModels.Items;
 using Kenedia.Modules.BuildsManager.DataModels.Stats;
 using Kenedia.Modules.BuildsManager.Interfaces;
@@ -13,87 +14,81 @@ namespace Kenedia.Modules.BuildsManager.TemplateEntries
 	{
 		private bool _isDisposed;
 
-		private Weapon _weapon;
-
-		private Sigil _sigil1;
-
-		private Sigil _pvpSigil;
-
-		private Infusion _infusion1;
-
-		private Stat _stat;
-
-		private WeaponTemplateEntry _pairedWeapon;
-
 		public Weapon Weapon
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _weapon;
+				return _003CWeapon_003Ek__BackingField;
 			}
 			private set
 			{
-				Common.SetProperty(ref _weapon, value);
+				Common.SetProperty(ref _003CWeapon_003Ek__BackingField, value);
 			}
 		}
 
 		public Sigil Sigil1
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _sigil1;
+				return _003CSigil1_003Ek__BackingField;
 			}
 			private set
 			{
-				Common.SetProperty(ref _sigil1, value);
+				Common.SetProperty(ref _003CSigil1_003Ek__BackingField, value);
 			}
 		}
 
 		public Sigil PvpSigil
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _pvpSigil;
+				return _003CPvpSigil_003Ek__BackingField;
 			}
 			private set
 			{
-				Common.SetProperty(ref _pvpSigil, value);
+				Common.SetProperty(ref _003CPvpSigil_003Ek__BackingField, value);
 			}
 		}
 
 		public Infusion Infusion1
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _infusion1;
+				return _003CInfusion1_003Ek__BackingField;
 			}
 			private set
 			{
-				Common.SetProperty(ref _infusion1, value);
+				Common.SetProperty(ref _003CInfusion1_003Ek__BackingField, value);
 			}
 		}
 
 		public Stat Stat
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _stat;
+				return _003CStat_003Ek__BackingField;
 			}
 			private set
 			{
-				Common.SetProperty(ref _stat, value);
+				Common.SetProperty(ref _003CStat_003Ek__BackingField, value);
 			}
 		}
 
 		public WeaponTemplateEntry PairedWeapon
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _pairedWeapon;
+				return _003CPairedWeapon_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _pairedWeapon, value);
+				Common.SetProperty(ref _003CPairedWeapon_003Ek__BackingField, value);
 			}
 		}
 

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using Blish_HUD.Content;
 using Gw2Sharp.WebApi.V2;
@@ -10,7 +11,6 @@ using Kenedia.Modules.BuildsManager.Interfaces;
 using Kenedia.Modules.Core.DataModels;
 using Kenedia.Modules.Core.Extensions;
 using Kenedia.Modules.Core.Models;
-using Kenedia.Modules.Core.Utility;
 
 namespace Kenedia.Modules.BuildsManager.DataModels.Professions
 {
@@ -248,10 +248,6 @@ namespace Kenedia.Modules.BuildsManager.DataModels.Professions
 			Pets.RaptorSwiftwing
 		};
 
-		private AsyncTexture2D _icon;
-
-		private AsyncTexture2D _selectedIcon;
-
 		[DataMember]
 		public int Id { get; set; }
 
@@ -294,15 +290,20 @@ namespace Kenedia.Modules.BuildsManager.DataModels.Professions
 		{
 			get
 			{
-				if (_icon != null)
+				if (_003CIcon_003Ek__BackingField != null)
 				{
-					return _icon;
+					return _003CIcon_003Ek__BackingField;
 				}
 				if (IconAssetId != 0)
 				{
-					_icon = AsyncTexture2D.FromAssetId(IconAssetId);
+					_003CIcon_003Ek__BackingField = AsyncTexture2D.FromAssetId(IconAssetId);
 				}
-				return _icon;
+				return _003CIcon_003Ek__BackingField;
+			}
+			[CompilerGenerated]
+			private set
+			{
+				_003CIcon_003Ek__BackingField = value;
 			}
 		}
 
@@ -310,13 +311,18 @@ namespace Kenedia.Modules.BuildsManager.DataModels.Professions
 		{
 			get
 			{
-				if (_selectedIcon != null)
+				if (_003CSelectedIcon_003Ek__BackingField != null)
 				{
-					return _selectedIcon;
+					return _003CSelectedIcon_003Ek__BackingField;
 				}
 				int assetId = ((IconAssetId == 52565) ? 1769874 : (IconAssetId + 1));
-				_selectedIcon = AsyncTexture2D.FromAssetId(assetId);
-				return _selectedIcon;
+				_003CSelectedIcon_003Ek__BackingField = AsyncTexture2D.FromAssetId(assetId);
+				return _003CSelectedIcon_003Ek__BackingField;
+			}
+			[CompilerGenerated]
+			private set
+			{
+				_003CSelectedIcon_003Ek__BackingField = value;
 			}
 		}
 
@@ -388,8 +394,8 @@ namespace Kenedia.Modules.BuildsManager.DataModels.Professions
 			if (!_isDisposed)
 			{
 				_isDisposed = true;
-				_icon = null;
-				_selectedIcon = null;
+				Icon = null;
+				SelectedIcon = null;
 				Skills?.Values?.DisposeAll();
 				Skills?.Clear();
 			}

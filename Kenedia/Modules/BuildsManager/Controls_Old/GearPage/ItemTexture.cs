@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Kenedia.Modules.BuildsManager.DataModels.Items;
@@ -13,19 +14,18 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage
 {
 	public class ItemTexture : DetailedTexture
 	{
-		private BaseItem? _item;
-
 		private Color _frameColor;
 
 		public BaseItem? Item
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _item;
+				return _003CItem_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _item, value, new Action(ApplyItem));
+				Common.SetProperty(ref _003CItem_003Ek__BackingField, value, new Action(ApplyItem));
 			}
 		}
 

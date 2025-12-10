@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Gw2Sharp.WebApi;
@@ -11,32 +12,30 @@ namespace Kenedia.Modules.Core.Controls
 {
 	public class Checkbox : Blish_HUD.Controls.Checkbox, ILocalizable
 	{
-		private Func<string> _setLocalizedTooltip;
-
-		private Func<string> _setLocalizedText;
-
 		public Func<string> SetLocalizedText
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _setLocalizedText;
+				return _003CSetLocalizedText_003Ek__BackingField;
 			}
 			set
 			{
-				_setLocalizedText = value;
+				_003CSetLocalizedText_003Ek__BackingField = value;
 				base.Text = value?.Invoke();
 			}
 		}
 
 		public Func<string> SetLocalizedTooltip
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _setLocalizedTooltip;
+				return _003CSetLocalizedTooltip_003Ek__BackingField;
 			}
 			set
 			{
-				_setLocalizedTooltip = value;
+				_003CSetLocalizedTooltip_003Ek__BackingField = value;
 				base.BasicTooltipText = value?.Invoke();
 			}
 		}

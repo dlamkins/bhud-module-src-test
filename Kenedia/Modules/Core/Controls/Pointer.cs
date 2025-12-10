@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Kenedia.Modules.Core.Models;
@@ -19,19 +20,18 @@ namespace Kenedia.Modules.Core.Controls
 
 		private Rectangle _anchorDrawBounds;
 
-		private Control _anchor;
-
 		private WindowBase2 _container;
 
 		public Control Anchor
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _anchor;
+				return _003CAnchor_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _anchor, value, new ValueChangedEventHandler<Control>(SetAnchor));
+				Common.SetProperty(ref _003CAnchor_003Ek__BackingField, value, new ValueChangedEventHandler<Control>(SetAnchor));
 			}
 		}
 

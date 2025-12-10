@@ -1,5 +1,7 @@
 using System;
 using System.ComponentModel.Composition;
+using System.IO;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
@@ -11,6 +13,7 @@ using Blish_HUD.Settings;
 using Gw2Sharp.WebApi;
 using Kenedia.Modules.BuildsManager.Controls.Selection;
 using Kenedia.Modules.BuildsManager.Controls.Tabs;
+using Kenedia.Modules.BuildsManager.DataModels.Stats;
 using Kenedia.Modules.BuildsManager.Models;
 using Kenedia.Modules.BuildsManager.Services;
 using Kenedia.Modules.BuildsManager.Utility;
@@ -23,11 +26,12 @@ using Kenedia.Modules.Core.Structs;
 using Kenedia.Modules.Core.Utility;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
+using Newtonsoft.Json;
 
 namespace Kenedia.Modules.BuildsManager
 {
 	[Export(typeof(Module))]
-	public class BuildsManager : BaseModule<BuildsManager, MainWindow, Settings, Paths>
+	public class BuildsManager : BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>
 	{
 		public static int MainThread = Thread.CurrentThread.ManagedThreadId;
 
@@ -35,19 +39,18 @@ namespace Kenedia.Modules.BuildsManager
 
 		private CancellationTokenSource _cancellationTokenSource;
 
-		private bool _templatesLoaded;
-
 		public static Data Data { get; set; }
 
 		public bool TemplatesLoaded
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _templatesLoaded;
+				return _003CTemplatesLoaded_003Ek__BackingField;
 			}
 			private set
 			{
-				Common.SetProperty(ref _templatesLoaded, value);
+				Common.SetProperty(ref _003CTemplatesLoaded_003Ek__BackingField, value);
 			}
 		}
 
@@ -133,7 +136,7 @@ namespace Kenedia.Modules.BuildsManager
 		{
 			base.Initialize();
 			CreateCornerIcons();
-			BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Info("Starting " + base.Name + " v." + (object)base.Version.BaseVersion());
+			BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Info("Starting " + base.Name + " v." + (object)base.Version.BaseVersion());
 			LoadGUI();
 		}
 
@@ -196,16 +199,21 @@ namespace Kenedia.Modules.BuildsManager
 
 		protected override async void ReloadKey_Activated(object sender, EventArgs e)
 		{
-			BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Debug("ReloadKey_Activated: " + base.Name);
+			BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug("ReloadKey_Activated: " + base.Name);
 			_cancellationTokenSource?.Cancel();
 			_cancellationTokenSource = new CancellationTokenSource();
-			await LoadAsync();
+			string json = JsonConvert.SerializeObject((object)new StaticStats
+			{
+				TextureMapInfo = Stat.StatTextureMap,
+				ImageUrl = "https://img.gw2skills.net/editor/UI/profile-icons-44x44.v3.png"
+			});
+			File.WriteAllText("C:\\Users\\lasse\\Downloads\\Stats.json", json);
 		}
 
 		protected override void LoadGUI()
 		{
 			base.LoadGUI();
-			BaseModule<BuildsManager, MainWindow, Settings, Paths>.Logger.Info("Building UI for " + base.Name);
+			BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Info("Building UI for " + base.Name);
 			IServiceScope scope = base.ServiceProvider.CreateScope();
 			base.MainWindow = scope.ServiceProvider.GetRequiredService<MainWindow>();
 		}

@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
@@ -19,17 +20,16 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		private Rectangle _noAquaticFlagTextureRegion;
 
-		private Skill _skill;
-
 		public Skill Skill
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _skill;
+				return _003CSkill_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _skill, value, new Action(ApplySkill));
+				Common.SetProperty(ref _003CSkill_003Ek__BackingField, value, new Action(ApplySkill));
 			}
 		}
 

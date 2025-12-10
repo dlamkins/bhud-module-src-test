@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using Kenedia.Modules.Core.Converter;
 using Kenedia.Modules.Core.Models;
 using Newtonsoft.Json;
 using SemVer;
@@ -17,24 +18,9 @@ namespace Kenedia.Modules.BuildsManager.Models
 		[JsonIgnore]
 		public string Name { get; set; }
 
-		[JsonIgnore]
+		[JsonConverter(typeof(SemverVersionConverter))]
 		public Version Version { get; set; } = new Version(0, 0, 0, (string)null, (string)null);
 
-
-		[JsonProperty("Version")]
-		private string VersionString
-		{
-			get
-			{
-				return ((object)Version).ToString();
-			}
-			set
-			{
-				//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-				//IL_000d: Expected O, but got Unknown
-				Version = new Version(value, false);
-			}
-		}
 
 		public int this[byte key]
 		{

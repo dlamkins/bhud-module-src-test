@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Kenedia.Modules.BuildsManager.DataModels.Items;
 using Kenedia.Modules.BuildsManager.DataModels.Stats;
 using Kenedia.Modules.BuildsManager.Interfaces;
@@ -13,59 +14,55 @@ namespace Kenedia.Modules.BuildsManager.TemplateEntries
 	{
 		private bool _isDisposed;
 
-		private Stat _stat;
-
-		private Infusion _infusion1;
-
-		private Rune _rune;
-
-		private Armor _armor;
-
 		public Armor Armor
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _armor;
+				return _003CArmor_003Ek__BackingField;
 			}
 			private set
 			{
-				Common.SetProperty(ref _armor, value);
+				Common.SetProperty(ref _003CArmor_003Ek__BackingField, value);
 			}
 		}
 
 		public Rune Rune
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _rune;
+				return _003CRune_003Ek__BackingField;
 			}
 			private set
 			{
-				Common.SetProperty(ref _rune, value);
+				Common.SetProperty(ref _003CRune_003Ek__BackingField, value);
 			}
 		}
 
 		public Infusion Infusion1
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _infusion1;
+				return _003CInfusion1_003Ek__BackingField;
 			}
 			private set
 			{
-				Common.SetProperty(ref _infusion1, value);
+				Common.SetProperty(ref _003CInfusion1_003Ek__BackingField, value);
 			}
 		}
 
 		public Stat Stat
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _stat;
+				return _003CStat_003Ek__BackingField;
 			}
 			private set
 			{
-				Common.SetProperty(ref _stat, value);
+				Common.SetProperty(ref _003CStat_003Ek__BackingField, value);
 			}
 		}
 

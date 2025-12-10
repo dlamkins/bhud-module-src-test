@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Kenedia.Modules.BuildsManager.DataModels.Professions;
 
 namespace Kenedia.Modules.BuildsManager.Models.Templates
@@ -21,11 +22,13 @@ namespace Kenedia.Modules.BuildsManager.Models.Templates
 			_ => throw new ArgumentOutOfRangeException("slot", slot, null), 
 		};
 
+		[IteratorStateMachine(typeof(_003CGetEnumerator_003Ed__14))]
 		public IEnumerator<Trait?> GetEnumerator()
 		{
-			yield return Adept;
-			yield return Master;
-			yield return GrandMaster;
+			return new _003CGetEnumerator_003Ed__14(0)
+			{
+				_003C_003E4__this = this
+			};
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()

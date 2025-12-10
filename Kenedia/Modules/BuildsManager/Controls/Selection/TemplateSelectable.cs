@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
@@ -75,8 +76,6 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 
 		private Rectangle _tagBounds;
 
-		private Template _template;
-
 		private double _animationStart;
 
 		private double _animationDuration = 1500.0;
@@ -97,54 +96,55 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 
 		public Template Template
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _template;
+				return _003CTemplate_003Ek__BackingField;
 			}
 			set
 			{
-				Template temp = _template;
-				if (Common.SetProperty(ref _template, value, new Action(ApplyTemplate)))
+				Template temp = _003CTemplate_003Ek__BackingField;
+				if (Common.SetProperty(ref _003CTemplate_003Ek__BackingField, value, new Action(ApplyTemplate)))
 				{
 					if (temp != null)
 					{
 						temp.RaceChanged -= new ValueChangedEventHandler<Races>(Template_RaceChanged);
 					}
-					if (_template != null)
+					if (_003CTemplate_003Ek__BackingField != null)
 					{
-						_template.RaceChanged += new ValueChangedEventHandler<Races>(Template_RaceChanged);
+						_003CTemplate_003Ek__BackingField.RaceChanged += new ValueChangedEventHandler<Races>(Template_RaceChanged);
 					}
 					if (temp != null)
 					{
 						temp.ProfessionChanged -= new ValueChangedEventHandler<ProfessionType>(Template_ProfessionChanged);
 					}
-					if (_template != null)
+					if (_003CTemplate_003Ek__BackingField != null)
 					{
-						_template.ProfessionChanged += new ValueChangedEventHandler<ProfessionType>(Template_ProfessionChanged);
+						_003CTemplate_003Ek__BackingField.ProfessionChanged += new ValueChangedEventHandler<ProfessionType>(Template_ProfessionChanged);
 					}
 					if (temp != null)
 					{
 						temp.EliteSpecializationChanged -= new SpecializationChangedEventHandler(Template_EliteSpecializationChanged);
 					}
-					if (_template != null)
+					if (_003CTemplate_003Ek__BackingField != null)
 					{
-						_template.EliteSpecializationChanged += new SpecializationChangedEventHandler(Template_EliteSpecializationChanged);
+						_003CTemplate_003Ek__BackingField.EliteSpecializationChanged += new SpecializationChangedEventHandler(Template_EliteSpecializationChanged);
 					}
 					if (temp != null)
 					{
 						temp.Tags.CollectionChanged -= Tags_CollectionChanged;
 					}
-					if (_template != null)
+					if (_003CTemplate_003Ek__BackingField != null)
 					{
-						_template.Tags.CollectionChanged += Tags_CollectionChanged;
+						_003CTemplate_003Ek__BackingField.Tags.CollectionChanged += Tags_CollectionChanged;
 					}
 					if (temp != null)
 					{
 						temp.LastModifiedChanged -= new ValueChangedEventHandler<string>(Template_LastModifiedChanged);
 					}
-					if (_template != null)
+					if (_003CTemplate_003Ek__BackingField != null)
 					{
-						_template.LastModifiedChanged += new ValueChangedEventHandler<string>(Template_LastModifiedChanged);
+						_003CTemplate_003Ek__BackingField.LastModifiedChanged += new ValueChangedEventHandler<string>(Template_LastModifiedChanged);
 					}
 				}
 			}
@@ -352,7 +352,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 
 		private void Template_RaceChanged(object sender, Kenedia.Modules.Core.Models.ValueChangedEventArgs<Races> e)
 		{
-			_raceTexture = (Data.Races.TryGetValue(_template?.Race ?? Races.None, out var race) ? TexturesService.GetTextureFromRef(race.IconPath) : null);
+			_raceTexture = (Data.Races.TryGetValue(Template?.Race ?? Races.None, out var race) ? TexturesService.GetTextureFromRef(race.IconPath) : null);
 		}
 
 		public void ToggleEditMode(bool enable)
@@ -497,7 +497,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 			Rectangle contentRegion = base.ContentRegion;
 			spriteBatch.DrawOnCtrl(this, pixel2, new Rectangle(x, ((Rectangle)(ref contentRegion)).get_Bottom() - 28, base.ContentRegion.Width, 28), Rectangle.get_Empty(), Color.get_Black() * 0.3f);
 			base.PaintBeforeChildren(spriteBatch, bounds);
-			bool isActive = BaseModule<BuildsManager, MainWindow, Settings, Paths>.ModuleInstance.SelectedTemplate == _template;
+			bool isActive = BaseModule<BuildsManager, MainWindow, Settings, Paths, Kenedia.Modules.BuildsManager.Services.StaticHosting>.ModuleInstance.SelectedTemplate == Template;
 			spriteBatch.DrawFrame(this, bounds, isActive ? ContentService.Colors.ColonialWhite : Color.get_Transparent(), 2);
 			spriteBatch.DrawOnCtrl(this, _textureBottomSectionSeparator, _separatorBounds, _textureBottomSectionSeparator.Bounds, Color.get_Black(), 0f, Vector2.get_Zero(), (SpriteEffects)0);
 			spriteBatch.DrawOnCtrl(this, _lineTexture, _leftAccentBorderBounds, _lineTexture.Bounds, Color.get_Black() * 0.6f, 0f, Vector2.get_Zero(), (SpriteEffects)0);
@@ -680,7 +680,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 			_name.WrapText = true;
 			_name.HorizontalAlignment = HorizontalAlignment.Left;
 			_name.Opacity = 1f;
-			_name.Text = _template.Name;
+			_name.Text = Template.Name;
 			_animationRunning = false;
 		}
 
@@ -709,7 +709,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 			//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00df: Unknown result type (might be due to invalid IL or missing references)
 			_tagTextures.Clear();
-			if (_template == null)
+			if (Template == null)
 			{
 				return;
 			}
@@ -717,7 +717,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 			((Point)(ref s))._002Ector(20);
 			Rectangle r = default(Rectangle);
 			((Rectangle)(ref r))._002Ector(_tagBounds.X, _tagBounds.Y, s.X, s.Y);
-			foreach (string t in _template.Tags)
+			foreach (string t in Template.Tags)
 			{
 				TemplateTag tag = TemplateTags.FirstOrDefault((TemplateTag x) => x.Name == t);
 				if (tag != null)

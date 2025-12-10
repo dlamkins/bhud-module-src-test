@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
@@ -16,8 +17,6 @@ namespace Kenedia.Modules.BuildsManager.Views
 {
 	public class GroupEditPanel : Kenedia.Modules.Core.Controls.Panel
 	{
-		private TagGroup _group;
-
 		private readonly (Kenedia.Modules.Core.Controls.Label label, Kenedia.Modules.Core.Controls.TextBox textBox) _name;
 
 		private readonly (Kenedia.Modules.Core.Controls.Label label, NumberBox numberBox) _iconId;
@@ -48,13 +47,14 @@ namespace Kenedia.Modules.BuildsManager.Views
 
 		public TagGroup Group
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _group;
+				return _003CGroup_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _group, value, new ValueChangedEventHandler<TagGroup>(OnTagChanged));
+				Common.SetProperty(ref _003CGroup_003Ek__BackingField, value, new ValueChangedEventHandler<TagGroup>(OnTagChanged));
 			}
 		}
 
