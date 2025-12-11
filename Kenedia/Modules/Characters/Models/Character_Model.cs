@@ -565,11 +565,11 @@ namespace Kenedia.Modules.Characters.Models
 
 		public Character_Model(Character character, CharacterSwapping characterSwapping, string modulePath, Action requestSave, ObservableCollection<Character_Model> characterModels, Data data)
 		{
-			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0106: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0131: Unknown result type (might be due to invalid IL or missing references)
 			_characterSwapping = characterSwapping;
 			ModulePath = modulePath;
 			_requestSave = requestSave;
@@ -577,8 +577,8 @@ namespace Kenedia.Modules.Characters.Models
 			_data = data;
 			_name = character.get_Name();
 			_level = character.get_Level();
-			_race = (Races)Enum.Parse(typeof(RaceType), character.get_Race());
-			_profession = (ProfessionType)Enum.Parse(typeof(ProfessionType), character.get_Profession());
+			_race = (Enum.TryParse<Races>(character.get_Race(), out var race) ? race : Races.None);
+			_profession = (ProfessionType)((!Enum.TryParse<ProfessionType>(character.get_Profession(), out ProfessionType profession)) ? 1 : ((int)profession));
 			_specialization = 0;
 			_created = character.get_Created();
 			_lastModified = character.get_LastModified().UtcDateTime;

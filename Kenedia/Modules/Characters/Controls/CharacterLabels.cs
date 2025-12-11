@@ -12,6 +12,7 @@ using Kenedia.Modules.Characters.Models;
 using Kenedia.Modules.Characters.Res;
 using Kenedia.Modules.Characters.Services;
 using Kenedia.Modules.Core.Controls;
+using Kenedia.Modules.Core.DataModels;
 using Kenedia.Modules.Core.Extensions;
 using Kenedia.Modules.Core.Services;
 using Kenedia.Modules.Core.Utility;
@@ -278,15 +279,20 @@ namespace Kenedia.Modules.Characters.Controls
 
 		public void UpdateCharacterInfo()
 		{
-			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cc: Invalid comparison between Unknown and I4
-			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d1: Invalid comparison between Unknown and I4
+			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f3: Invalid comparison between Unknown and I4
+			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f8: Invalid comparison between Unknown and I4
 			if (Character == null)
+			{
+				return;
+			}
+			Data data = Data;
+			if (data == null || !data.IsLoaded || Character.Race == Races.None)
 			{
 				return;
 			}
@@ -301,8 +307,8 @@ namespace Kenedia.Modules.Characters.Controls
 			IconLabel genderLabel = _genderLabel;
 			Gender gender = Character.Gender;
 			string text2 = (genderLabel.Text = (((int)gender == 1) ? strings.Male : (((int)gender != 2) ? strings.Unknown : strings.Female)));
-			_raceLabel.Text = Data.Races[Character.Race].Name;
-			_raceLabel.Icon = Data.Races[Character.Race].Icon;
+			_raceLabel.Text = (Data.Races.TryGetValue(Character.Race, out var race) ? race.Name : strings.Unknown);
+			_raceLabel.Icon = (Data.Races.TryGetValue(Character.Race, out race) ? race.Icon : null);
 			_mapLabel.Text = Data.GetMapById(Character.Map).Name;
 			_customIndex.Text = string.Format(strings.CustomIndex + " {0}", Character.Index);
 			IEnumerable<string> tagLlist = _tags.Select((Tag e) => e.Text);

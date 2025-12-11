@@ -18,6 +18,7 @@ using Blish_HUD.Graphics.UI;
 using Blish_HUD.Gw2Mumble;
 using Blish_HUD.Modules;
 using Blish_HUD.Settings;
+using Characters.Views;
 using Gw2Sharp.Models;
 using Gw2Sharp.WebApi;
 using Gw2Sharp.WebApi.V2;
@@ -192,20 +193,7 @@ namespace Kenedia.Modules.Characters
 				return val;
 			});
 			GlobalAccountsPath = base.Paths.ModulePath + "\\accounts.json";
-			if (!File.Exists(base.Paths.ModulePath + "\\gw2.traineddata") || base.Settings.Version.Value != base.ModuleVersion)
-			{
-				using Stream destination = File.Create(base.Paths.ModulePath + "\\gw2.traineddata");
-				Stream fileStream = base.ContentsManager.GetFileStream("data\\gw2.traineddata");
-				fileStream.Seek(0L, SeekOrigin.Begin);
-				fileStream.CopyTo(destination);
-			}
-			if (!File.Exists(base.Paths.ModulePath + "\\tesseract.dll") || base.Settings.Version.Value != base.ModuleVersion)
-			{
-				using Stream target = File.Create(base.Paths.ModulePath + "\\tesseract.dll");
-				Stream fileStream2 = base.ContentsManager.GetFileStream("data\\tesseract.dll");
-				fileStream2.Seek(0L, SeekOrigin.Begin);
-				fileStream2.CopyTo(target);
-			}
+			base.Settings.LoadAccountSettings(base.Paths.AccountName);
 			base.Settings.ShortcutKey.Value.Enabled = true;
 			base.Settings.ShortcutKey.Value.Activated += ShortcutWindowToggle;
 			base.Settings.RadialKey.Value.Enabled = true;
@@ -344,13 +332,19 @@ namespace Kenedia.Modules.Characters
 
 		protected override void LoadGUI()
 		{
-			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0178: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0245: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0332: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0268: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0283: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0370: Unknown result type (might be due to invalid IL or missing references)
 			base.LoadGUI();
+			OCR.OcrView = new OCRView(base.Settings, OCR)
+			{
+				Parent = GameService.Graphics.SpriteScreen,
+				ZIndex = 1073741822,
+				Visible = false
+			};
 			RadialMenu = new Kenedia.Modules.Characters.Controls.RadialMenu(base.Settings, CharacterModels, GameService.Graphics.SpriteScreen, () => CurrentCharacterModel, Data, TextureManager)
 			{
 				Visible = false,
@@ -445,7 +439,6 @@ namespace Kenedia.Modules.Characters
 			base.SettingsWindow?.Dispose();
 			base.MainWindow?.Dispose();
 			PotraitCapture?.Dispose();
-			OCR?.Dispose();
 			RunIndicator?.Dispose();
 		}
 

@@ -11,6 +11,8 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.GameIntegration.GfxSettings;
+using Blish_HUD.Modules;
+using Blish_HUD.Modules.Managers;
 using Characters.Views;
 using Kenedia.Modules.Characters.Models;
 using Kenedia.Modules.Characters.Services;
@@ -23,20 +25,17 @@ using Kenedia.Modules.Core.Utility.WindowsUtil;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Patagames.Ocr;
+using SemVer;
 
 namespace Kenedia.Modules.Characters
 {
 	public class OCR : IDisposable
 	{
-		private readonly OCRView _view;
-
 		private readonly OcrApi _ocrApi;
 
 		private readonly ClientWindowService _clientWindowService;
 
 		private readonly SharedSettings _sharedSettings;
-
-		private readonly Settings _settings;
 
 		private readonly ObservableCollection<Character_Model> _characterModels;
 
@@ -45,6 +44,8 @@ namespace Kenedia.Modules.Characters
 		private readonly Color _ignoredColor = Color.FromArgb(255, 100, 100, 100);
 
 		private bool _isDisposed;
+
+		public OCRView OcrView { get; set; }
 
 		public MainWindow MainWindow
 		{
@@ -73,44 +74,51 @@ namespace Kenedia.Modules.Characters
 
 		public string PathToEngine => OcrApi.PathToEngine;
 
+		public Settings Settings { get; }
+
 		private int CustomThreshold
 		{
 			get
 			{
-				return _settings.OCRNoPixelColumns.Value;
+				return Settings.OCRNoPixelColumns.Value;
 			}
 			set
 			{
-				_settings.OCRNoPixelColumns.Value = value;
+				Settings.OCRNoPixelColumns.Value = value;
 			}
 		}
 
-		public OCR(ClientWindowService clientWindowService, SharedSettings sharedSettings, Settings settings, PathCollection paths, ObservableCollection<Character_Model> characterModels)
+		public PathCollection Paths { get; }
+
+		public ContentsManager ContentsManager { get; }
+
+		public Module Module { get; }
+
+		public OCR(ClientWindowService clientWindowService, SharedSettings sharedSettings, Settings settings, PathCollection paths, ObservableCollection<Character_Model> characterModels, ContentsManager contentsManager, Module module)
 		{
 			_clientWindowService = clientWindowService;
 			_sharedSettings = sharedSettings;
-			_settings = settings;
+			Settings = settings;
+			Paths = paths;
 			_characterModels = characterModels;
+			ContentsManager = contentsManager;
+			Module = module;
+			EnsureTesseractExists();
 			try
 			{
 				string path = (OcrApi.PathToEngine = paths.ModulePath + "tesseract.dll");
-				BaseModule<Characters, Kenedia.Modules.Characters.Views.MainWindow, Settings, PathCollection, Kenedia.Modules.Characters.Services.StaticHosting>.Logger.Info($"Set Path to Tesseract Engine: {OcrApi.PathToEngine}. File exists: {File.Exists(path)}");
+				BaseModule<Characters, Kenedia.Modules.Characters.Views.MainWindow, Kenedia.Modules.Characters.Services.Settings, PathCollection, Kenedia.Modules.Characters.Services.StaticHosting>.Logger.Info($"Set Path to Tesseract Engine: {OcrApi.PathToEngine}. File exists: {File.Exists(path)}");
 				_ocrApi = OcrApi.Create();
 				_ocrApi.Init(paths.ModulePath, "gw2");
 				IsLoaded = true;
+				BaseModule<Characters, Kenedia.Modules.Characters.Views.MainWindow, Kenedia.Modules.Characters.Services.Settings, PathCollection, Kenedia.Modules.Characters.Services.StaticHosting>.Logger.Info("OcrApi Instance created successfully. OCR is useable. " + paths.ModulePath);
 			}
 			catch (Exception ex)
 			{
-				BaseModule<Characters, Kenedia.Modules.Characters.Views.MainWindow, Settings, PathCollection, Kenedia.Modules.Characters.Services.StaticHosting>.Logger.Warn("Creating the OcrApi Instance failed. OCR will not be useable. Character names can not be confirmed.");
-				BaseModule<Characters, Kenedia.Modules.Characters.Views.MainWindow, Settings, PathCollection, Kenedia.Modules.Characters.Services.StaticHosting>.Logger.Warn($"{ex}");
+				BaseModule<Characters, Kenedia.Modules.Characters.Views.MainWindow, Kenedia.Modules.Characters.Services.Settings, PathCollection, Kenedia.Modules.Characters.Services.StaticHosting>.Logger.Warn("Creating the OcrApi Instance failed. OCR will not be useable. Character names can not be confirmed.");
+				BaseModule<Characters, Kenedia.Modules.Characters.Views.MainWindow, Kenedia.Modules.Characters.Services.Settings, PathCollection, Kenedia.Modules.Characters.Services.StaticHosting>.Logger.Warn($"{ex}");
 				MainWindow?.SendTesseractFailedNotification(PathToEngine);
 			}
-			_view = new OCRView(_settings, this)
-			{
-				Parent = GameService.Graphics.SpriteScreen,
-				ZIndex = 1073741822,
-				Visible = false
-			};
 		}
 
 		public void Dispose()
@@ -119,7 +127,7 @@ namespace Kenedia.Modules.Characters
 			{
 				_ocrApi.Dispose();
 				_isDisposed = true;
-				_view?.Dispose();
+				OcrView?.Dispose();
 				Texture2D cleanedTexture = CleanedTexture;
 				if (cleanedTexture != null)
 				{
@@ -133,6 +141,25 @@ namespace Kenedia.Modules.Characters
 			}
 		}
 
+		private void EnsureTesseractExists()
+		{
+			Version module_version = Module.Version;
+			if (!File.Exists(Paths.ModulePath + "\\gw2.traineddata") || Settings.Version.Value != module_version)
+			{
+				using Stream destination = File.Create(Paths.ModulePath + "\\gw2.traineddata");
+				Stream fileStream = ContentsManager.GetFileStream("data\\gw2.traineddata");
+				fileStream.Seek(0L, SeekOrigin.Begin);
+				fileStream.CopyTo(destination);
+			}
+			if (!File.Exists(Paths.ModulePath + "\\tesseract.dll") || Settings.Version.Value != module_version)
+			{
+				using Stream target = File.Create(Paths.ModulePath + "\\tesseract.dll");
+				Stream fileStream2 = ContentsManager.GetFileStream("data\\tesseract.dll");
+				fileStream2.Seek(0L, SeekOrigin.Begin);
+				fileStream2.CopyTo(target);
+			}
+		}
+
 		public async Task<string?> Read(bool show = false)
 		{
 			string finalText = null;
@@ -142,7 +169,7 @@ namespace Kenedia.Modules.Characters
 				{
 					if (!show)
 					{
-						_view.EnableMaskedRegion();
+						OcrView?.EnableMaskedRegion();
 					}
 					await Task.Delay(5);
 					User32Dll.RECT wndBounds = _clientWindowService.WindowBounds;
@@ -150,7 +177,7 @@ namespace Kenedia.Modules.Characters
 					Point p = (Point)(((screenMode.HasValue ? ((string)screenMode.GetValueOrDefault()) : null) == (string)ScreenModeSetting.Windowed) ? new Point(_sharedSettings.WindowOffset.Left, _sharedSettings.WindowOffset.Top) : Point.get_Zero());
 					double factor = GameService.Graphics.UIScaleMultiplier;
 					Point size = default(Point);
-					((Point)(ref size))._002Ector((int)((double)_settings.ActiveOCRRegion.Width * factor), (int)((double)_settings.ActiveOCRRegion.Height * factor));
+					((Point)(ref size))._002Ector((int)((double)Settings.ActiveOCRRegion.Width * factor), (int)((double)Settings.ActiveOCRRegion.Height * factor));
 					using (Bitmap bitmap = new Bitmap(size.X, size.Y))
 					{
 						Bitmap spacingVisibleBitmap = new Bitmap(size.X, size.Y);
@@ -158,9 +185,9 @@ namespace Kenedia.Modules.Characters
 						{
 							int left = wndBounds.Left + p.X;
 							int top = wndBounds.Top + p.Y;
-							Rectangle activeOCRRegion = _settings.ActiveOCRRegion;
+							Rectangle activeOCRRegion = Settings.ActiveOCRRegion;
 							int x = (int)Math.Ceiling((double)((Rectangle)(ref activeOCRRegion)).get_Left() * factor);
-							activeOCRRegion = _settings.ActiveOCRRegion;
+							activeOCRRegion = Settings.ActiveOCRRegion;
 							int y = (int)Math.Ceiling((double)((Rectangle)(ref activeOCRRegion)).get_Top() * factor);
 							g.CopyFromScreen(new Point(left + x, top + y), Point.Empty, new Size(size.X, size.Y));
 							if (show)
@@ -182,7 +209,7 @@ namespace Kenedia.Modules.Characters
 								for (int k = 0; k < bitmap.Height; k++)
 								{
 									Color oc = bitmap.GetPixel(i, k);
-									int threshold = _settings.OCR_ColorThreshold.Value;
+									int threshold = Settings.OCR_ColorThreshold.Value;
 									if (oc.R >= threshold && oc.G >= threshold && oc.B >= threshold && emptyPixelRow < CustomThreshold)
 									{
 										bitmap.SetPixel(i, k, Color.Black);
@@ -278,7 +305,7 @@ namespace Kenedia.Modules.Characters
 					}
 					if (!show)
 					{
-						_view.DisableMaskedRegion();
+						OcrView.DisableMaskedRegion();
 					}
 					return finalText;
 				}
@@ -304,7 +331,7 @@ namespace Kenedia.Modules.Characters
 
 		public void ToggleContainer()
 		{
-			_view?.ToggleContainer();
+			OcrView?.ToggleContainer();
 		}
 
 		private void MainWindowChanged(object sender, PropertyChangedEventArgs e)

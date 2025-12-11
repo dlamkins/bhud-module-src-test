@@ -118,11 +118,11 @@ namespace Characters.Views
 			//IL_0c12: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0c16: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0c21: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c40: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c9a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c9f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0ca3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0cc9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0c54: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0cae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0cb3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0cb7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0cdd: Unknown result type (might be due to invalid IL or missing references)
 			_settings = settings;
 			_ocr = ocr;
 			base.BorderColor = Color.get_Black();
@@ -435,6 +435,8 @@ namespace Characters.Views
 			obj.Size = ((Rectangle)(ref activeOCRRegion)).get_Size();
 			obj.BorderColor = ContentService.Colors.ColonialWhite;
 			obj.ShowResizeOnlyOnMouseOver = true;
+			obj.Width = base.Width;
+			obj.Height = 50;
 			obj.MaxSize = new Point(base.Width, 100);
 			obj.BorderWidth = new RectangleDimensions(2);
 			obj.ZIndex = 2147483646;
@@ -543,7 +545,7 @@ namespace Characters.Views
 			{
 				_readTick = gameTime.get_TotalGameTime().TotalMilliseconds;
 				string result = await _ocr.Read(show: true);
-				if (result != null)
+				if (result != null && _ocr.SourceTexture != null)
 				{
 					_sourceImage.Texture = _ocr.SourceTexture;
 					Kenedia.Modules.Core.Controls.Image sourceImage = _sourceImage;
