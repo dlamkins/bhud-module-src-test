@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
@@ -32,8 +33,6 @@ namespace Kenedia.Modules.Characters.Services
 
 		private int _movedLeft;
 
-		private string _status;
-
 		private SwappingState _state;
 
 		public OCR OCR { get; set; }
@@ -44,13 +43,14 @@ namespace Kenedia.Modules.Characters.Services
 
 		public string Status
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _status;
+				return _003CStatus_003Ek__BackingField;
 			}
 			set
 			{
-				_status = value;
+				_003CStatus_003Ek__BackingField = value;
 				this.StatusChanged?.Invoke(null, EventArgs.Empty);
 			}
 		}
@@ -61,7 +61,7 @@ namespace Kenedia.Modules.Characters.Services
 		{
 			get
 			{
-				if (!BaseModule<Characters, MainWindow, Settings, PathCollection>.ModuleInstance.Data.StaticInfo.IsBeta)
+				if (!BaseModule<Characters, MainWindow, Settings, PathCollection, StaticHosting>.ModuleInstance.Data.StaticInfo.IsBeta)
 				{
 					return _rawCharacterModels.Where((Character_Model e) => !e.Beta).ToList();
 				}
@@ -108,7 +108,7 @@ namespace Kenedia.Modules.Characters.Services
 		{
 			if (_settings.DebugMode.Value)
 			{
-				BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info(txt);
+				BaseModule<Characters, MainWindow, Settings, PathCollection, StaticHosting>.Logger.Info(txt);
 			}
 		}
 

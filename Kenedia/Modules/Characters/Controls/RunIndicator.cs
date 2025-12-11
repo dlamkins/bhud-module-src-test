@@ -75,7 +75,7 @@ namespace Kenedia.Modules.Characters.Controls
 			{
 				Parent = this,
 				Location = new Point(0, 10),
-				Text = BaseModule<Characters, MainWindow, Settings, PathCollection>.ModuleName,
+				Text = BaseModule<Characters, MainWindow, Settings, PathCollection, StaticHosting>.ModuleName,
 				AutoSizeHeight = true,
 				HorizontalAlignment = HorizontalAlignment.Center,
 				Font = GameService.Content.GetFont(ContentService.FontFace.Menomonia, ContentService.FontSize.Size36, ContentService.FontStyle.Regular),

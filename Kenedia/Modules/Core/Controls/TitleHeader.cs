@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
@@ -16,10 +17,6 @@ namespace Kenedia.Modules.Core.Controls
 
 		private Rectangle _titleBounds = Rectangle.get_Empty();
 
-		private Func<string> _setLocalizedTitle;
-
-		private Func<string> _setLocalizedTooltip;
-
 		public BitmapFont Font { get; set; } = Control.Content.DefaultFont16;
 
 
@@ -27,26 +24,28 @@ namespace Kenedia.Modules.Core.Controls
 
 		public Func<string> SetLocalizedTooltip
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _setLocalizedTooltip;
+				return _003CSetLocalizedTooltip_003Ek__BackingField;
 			}
 			set
 			{
-				_setLocalizedTooltip = value;
+				_003CSetLocalizedTooltip_003Ek__BackingField = value;
 				base.BasicTooltipText = value?.Invoke();
 			}
 		}
 
 		public Func<string> SetLocalizedTitle
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _setLocalizedTitle;
+				return _003CSetLocalizedTitle_003Ek__BackingField;
 			}
 			set
 			{
-				_setLocalizedTitle = value;
+				_003CSetLocalizedTitle_003Ek__BackingField = value;
 				Title = value?.Invoke();
 			}
 		}

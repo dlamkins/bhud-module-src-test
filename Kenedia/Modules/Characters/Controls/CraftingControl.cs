@@ -1,11 +1,13 @@
-using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
+using Gw2Sharp.WebApi.V2.Models;
 using Kenedia.Modules.Characters.Models;
 using Kenedia.Modules.Characters.Res;
 using Kenedia.Modules.Characters.Services;
 using Kenedia.Modules.Core.Interfaces;
+using Kenedia.Modules.Core.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.BitmapFonts;
@@ -16,8 +18,6 @@ namespace Kenedia.Modules.Characters.Controls
 	{
 		private readonly AsyncTexture2D _craftingIcon = AsyncTexture2D.FromAssetId(156711);
 
-		private BitmapFont _font = GameService.Content.DefaultFont14;
-
 		public Data Data { get; set; }
 
 		public Settings Settings { get; set; }
@@ -26,14 +26,15 @@ namespace Kenedia.Modules.Characters.Controls
 
 		public BitmapFont Font
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _font;
+				return _003CFont_003Ek__BackingField;
 			}
 			set
 			{
 				//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-				_font = value;
+				_003CFont_003Ek__BackingField = value;
 				if (value != null)
 				{
 					base.Width = base.Height + 4 + (int)value.MeasureString(strings.NoCraftingProfession).Width;
@@ -45,10 +46,14 @@ namespace Kenedia.Modules.Characters.Controls
 
 		public CraftingControl()
 		{
+			_003CFont_003Ek__BackingField = GameService.Content.DefaultFont14;
+			base._002Ector();
 		}
 
 		public CraftingControl(Data data, Settings settings)
 		{
+			_003CFont_003Ek__BackingField = GameService.Content.DefaultFont14;
+			base._002Ector();
 			Data = data;
 			Settings = settings;
 		}
@@ -62,6 +67,7 @@ namespace Kenedia.Modules.Characters.Controls
 			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0121: Unknown result type (might be due to invalid IL or missing references)
 			//IL_012b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0134: Unknown result type (might be due to invalid IL or missing references)
@@ -83,7 +89,7 @@ namespace Kenedia.Modules.Characters.Controls
 			bool craftingDisplayed = false;
 			if (Character != null && Character.Crafting.Count > 0 && Settings != null && Data != null)
 			{
-				Dictionary<int, Data.CraftingProfession> craftingDictionary = Data.CrafingProfessions;
+				DataDictionary<CraftingDisciplineType, CraftingProfession> craftingDictionary = Data.CraftingProfessions;
 				int i = 0;
 				Rectangle craftBounds = default(Rectangle);
 				foreach (CharacterCrafting crafting in Character.Crafting)

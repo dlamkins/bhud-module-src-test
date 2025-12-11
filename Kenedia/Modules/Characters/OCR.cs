@@ -7,6 +7,7 @@ using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.GameIntegration.GfxSettings;
@@ -45,17 +46,16 @@ namespace Kenedia.Modules.Characters
 
 		private bool _isDisposed;
 
-		private MainWindow _mainWindow;
-
 		public MainWindow MainWindow
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _mainWindow;
+				return _003CMainWindow_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _mainWindow, value, new PropertyChangedEventHandler(MainWindowChanged), triggerOnUpdate: true, "MainWindow");
+				Common.SetProperty(ref _003CMainWindow_003Ek__BackingField, value, new PropertyChangedEventHandler(MainWindowChanged), triggerOnUpdate: true, "MainWindow");
 			}
 		}
 
@@ -85,7 +85,7 @@ namespace Kenedia.Modules.Characters
 			}
 		}
 
-		public OCR(ClientWindowService clientWindowService, SharedSettings sharedSettings, Settings settings, string basePath, ObservableCollection<Character_Model> characterModels)
+		public OCR(ClientWindowService clientWindowService, SharedSettings sharedSettings, Settings settings, PathCollection paths, ObservableCollection<Character_Model> characterModels)
 		{
 			_clientWindowService = clientWindowService;
 			_sharedSettings = sharedSettings;
@@ -93,16 +93,16 @@ namespace Kenedia.Modules.Characters
 			_characterModels = characterModels;
 			try
 			{
-				string path = (OcrApi.PathToEngine = basePath + "tesseract.dll");
-				BaseModule<Characters, Kenedia.Modules.Characters.Views.MainWindow, Settings, PathCollection>.Logger.Info($"Set Path to Tesseract Engine: {OcrApi.PathToEngine}. File exists: {File.Exists(path)}");
+				string path = (OcrApi.PathToEngine = paths.ModulePath + "tesseract.dll");
+				BaseModule<Characters, Kenedia.Modules.Characters.Views.MainWindow, Settings, PathCollection, Kenedia.Modules.Characters.Services.StaticHosting>.Logger.Info($"Set Path to Tesseract Engine: {OcrApi.PathToEngine}. File exists: {File.Exists(path)}");
 				_ocrApi = OcrApi.Create();
-				_ocrApi.Init(basePath, "gw2");
+				_ocrApi.Init(paths.ModulePath, "gw2");
 				IsLoaded = true;
 			}
 			catch (Exception ex)
 			{
-				BaseModule<Characters, Kenedia.Modules.Characters.Views.MainWindow, Settings, PathCollection>.Logger.Warn("Creating the OcrApi Instance failed. OCR will not be useable. Character names can not be confirmed.");
-				BaseModule<Characters, Kenedia.Modules.Characters.Views.MainWindow, Settings, PathCollection>.Logger.Warn($"{ex}");
+				BaseModule<Characters, Kenedia.Modules.Characters.Views.MainWindow, Settings, PathCollection, Kenedia.Modules.Characters.Services.StaticHosting>.Logger.Warn("Creating the OcrApi Instance failed. OCR will not be useable. Character names can not be confirmed.");
+				BaseModule<Characters, Kenedia.Modules.Characters.Views.MainWindow, Settings, PathCollection, Kenedia.Modules.Characters.Services.StaticHosting>.Logger.Warn($"{ex}");
 				MainWindow?.SendTesseractFailedNotification(PathToEngine);
 			}
 			_view = new OCRView(_settings, this)

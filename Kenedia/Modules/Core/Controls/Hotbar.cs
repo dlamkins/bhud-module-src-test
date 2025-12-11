@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
@@ -26,8 +27,6 @@ namespace Kenedia.Modules.Core.Controls
 
 		private bool _resizeBarPending;
 
-		private bool _expandBar;
-
 		private Point _dragStart;
 
 		private bool _dragging;
@@ -40,45 +39,44 @@ namespace Kenedia.Modules.Core.Controls
 
 		private Rectangle _expanderBackgroundBounds;
 
-		private ExpandType _expandType;
-
-		private SortType _sortType;
-
 		protected readonly FlowPanel ItemsPanel;
 
 		public ExpandType ExpandType
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _expandType;
+				return _003CExpandType_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _expandType, value, new ValueChangedEventHandler<ExpandType>(OnExpandTypeChanged));
+				Common.SetProperty(ref _003CExpandType_003Ek__BackingField, value, new ValueChangedEventHandler<ExpandType>(OnExpandTypeChanged));
 			}
 		}
 
 		public SortType SortType
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _sortType;
+				return _003CSortType_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _sortType, value, new ValueChangedEventHandler<SortType>(OnSortTypeCanged));
+				Common.SetProperty(ref _003CSortType_003Ek__BackingField, value, new ValueChangedEventHandler<SortType>(OnSortTypeCanged));
 			}
 		}
 
 		public bool ExpandBar
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _expandBar;
+				return _003CExpandBar_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _expandBar, value, new ValueChangedEventHandler<bool>(OnExpandChanged));
+				Common.SetProperty(ref _003CExpandBar_003Ek__BackingField, value, new ValueChangedEventHandler<bool>(OnExpandChanged));
 			}
 		}
 

@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Kenedia.Modules.Core.Models;
@@ -21,39 +22,31 @@ namespace Kenedia.Modules.Core.Controls
 
 		public bool AutoSize;
 
-		private BitmapFont _font = GameService.Content.DefaultFont14;
-
-		private string _text = string.Empty;
-
-		private DetailedTexture _texture;
-
-		private int _innerPadding = 5;
-
 		private RectangleDimensions _outerPadding = new RectangleDimensions(2);
-
-		private bool _showIcon = true;
 
 		public string Text
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _text;
+				return _003CText_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _text, value, new Action(RecalculateLayout));
+				Common.SetProperty(ref _003CText_003Ek__BackingField, value, new Action(RecalculateLayout));
 			}
 		}
 
 		public DetailedTexture Texture
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _texture;
+				return _003CTexture_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _texture, value, new Action(RecalculateLayout));
+				Common.SetProperty(ref _003CTexture_003Ek__BackingField, value, new Action(RecalculateLayout));
 			}
 		}
 
@@ -71,45 +64,46 @@ namespace Kenedia.Modules.Core.Controls
 
 		public int InnerPadding
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _innerPadding;
+				return _003CInnerPadding_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _innerPadding, value, new Action(RecalculateLayout));
+				Common.SetProperty(ref _003CInnerPadding_003Ek__BackingField, value, new Action(RecalculateLayout));
 			}
 		}
 
 		public BitmapFont Font
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _font;
+				return _003CFont_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _font, value, new Action(RecalculateLayout));
+				Common.SetProperty(ref _003CFont_003Ek__BackingField, value, new Action(RecalculateLayout));
 			}
 		}
 
-		public Color FontColor { get; set; } = Color.get_White();
+		public Color FontColor { get; set; }
 
-
-		public bool CaptureInput { get; set; } = true;
-
+		public bool CaptureInput { get; set; }
 
 		public CaptureType? Capture { get; set; }
 
 		public bool ShowIcon
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _showIcon;
+				return _003CShowIcon_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _showIcon, value, new Action(RecalculateLayout));
+				Common.SetProperty(ref _003CShowIcon_003Ek__BackingField, value, new Action(RecalculateLayout));
 			}
 		}
 
@@ -197,6 +191,19 @@ namespace Kenedia.Modules.Core.Controls
 		{
 			base.DisposeControl();
 			Texture = null;
+		}
+
+		public IconLabel()
+		{
+			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+			_003CText_003Ek__BackingField = string.Empty;
+			_003CInnerPadding_003Ek__BackingField = 5;
+			_003CFont_003Ek__BackingField = GameService.Content.DefaultFont14;
+			FontColor = Color.get_White();
+			CaptureInput = true;
+			_003CShowIcon_003Ek__BackingField = true;
+			base._002Ector();
 		}
 	}
 }

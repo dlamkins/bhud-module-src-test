@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
@@ -23,17 +24,16 @@ namespace Kenedia.Modules.Characters.Controls
 			TextureRegion = new Rectangle(4, 4, 24, 24)
 		};
 
-		private Character_Model _markedCharacter;
-
 		public Character_Model MarkedCharacter
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _markedCharacter;
+				return _003CMarkedCharacter_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _markedCharacter, value, new Action(RecalculateLayout));
+				Common.SetProperty(ref _003CMarkedCharacter_003Ek__BackingField, value, new Action(RecalculateLayout));
 			}
 		}
 

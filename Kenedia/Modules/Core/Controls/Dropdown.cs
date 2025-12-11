@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Gw2Sharp.WebApi;
@@ -11,32 +12,30 @@ namespace Kenedia.Modules.Core.Controls
 {
 	public class Dropdown : Blish_HUD.Controls.Dropdown, ILocalizable
 	{
-		private Func<List<string>> _setLocalizedItems;
-
-		private Func<string> _setLocalizedTooltip;
-
 		public Func<List<string>> SetLocalizedItems
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _setLocalizedItems;
+				return _003CSetLocalizedItems_003Ek__BackingField;
 			}
 			set
 			{
-				_setLocalizedItems = value;
+				_003CSetLocalizedItems_003Ek__BackingField = value;
 				UserLocale_SettingChanged(null, null);
 			}
 		}
 
 		public Func<string> SetLocalizedTooltip
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _setLocalizedTooltip;
+				return _003CSetLocalizedTooltip_003Ek__BackingField;
 			}
 			set
 			{
-				_setLocalizedTooltip = value;
+				_003CSetLocalizedTooltip_003Ek__BackingField = value;
 				base.BasicTooltipText = value?.Invoke();
 			}
 		}

@@ -50,6 +50,21 @@ namespace Kenedia.Modules.Core.Models
 			base[lang] = comon;
 		}
 
+		public new void Add(Locale key, string value)
+		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+			if (!ContainsKey(key))
+			{
+				base.Add(key, value);
+			}
+			else
+			{
+				base[key] = value;
+			}
+		}
+
 		private void SetText(string value, Locale? lang = null)
 		{
 			//IL_0002: Unknown result type (might be due to invalid IL or missing references)

@@ -431,7 +431,7 @@ namespace Kenedia.Modules.Characters.Views
 				{
 					stringFilters.Add(new KeyValuePair<string, SearchFilter<Character_Model>>("CraftingProfession", new SearchFilter<Character_Model>(delegate(Character_Model c)
 					{
-						foreach (KeyValuePair<int, Data.CraftingProfession> current3 in c.CraftingDisciplines)
+						foreach (KeyValuePair<int, CraftingProfession> current3 in c.CraftingDisciplines)
 						{
 							if ((!_settings.DisplayToggles.Value["OnlyMaxCrafting"].Check || current3.Key == current3.Value.MaxRating) && SearchableString(current3.Value.Name).Contains(string_text))
 							{
@@ -749,7 +749,7 @@ namespace Kenedia.Modules.Characters.Views
 				c?.Character.Swap();
 				if (c == null)
 				{
-					BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Debug("No character found to swap to.");
+					BaseModule<Characters, MainWindow, Settings, PathCollection, StaticHosting>.Logger.Debug("No character found to swap to.");
 				}
 			}
 		}

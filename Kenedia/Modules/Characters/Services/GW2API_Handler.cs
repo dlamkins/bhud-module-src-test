@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Modules.Managers;
-using Gw2Sharp.WebApi;
 using Gw2Sharp.WebApi.Exceptions;
 using Gw2Sharp.WebApi.V2;
 using Gw2Sharp.WebApi.V2.Clients;
@@ -17,7 +17,6 @@ using Kenedia.Modules.Characters.Models;
 using Kenedia.Modules.Characters.Res;
 using Kenedia.Modules.Characters.Views;
 using Kenedia.Modules.Core.Controls;
-using Kenedia.Modules.Core.DataModels;
 using Kenedia.Modules.Core.Models;
 using Kenedia.Modules.Core.Res;
 using Kenedia.Modules.Core.Utility;
@@ -51,25 +50,24 @@ namespace Kenedia.Modules.Characters.Services
 
 		private CancellationTokenSource _cancellationTokenSource;
 
-		private Account _account;
-
 		private Exception _lastException;
 
 		public MainWindow MainWindow { get; set; }
 
 		public Account Account
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _account;
+				return _003CAccount_003Ek__BackingField;
 			}
 			set
 			{
-				Account temp = _account;
-				if (Common.SetProperty(ref _account, value, this.AccountChanged, triggerOnUpdate: true, "Account"))
+				Account temp = _003CAccount_003Ek__BackingField;
+				if (Common.SetProperty(ref _003CAccount_003Ek__BackingField, value, this.AccountChanged, triggerOnUpdate: true, "Account"))
 				{
 					_paths.AccountName = ((value != null) ? value.get_Name() : null);
-					BaseModule<Characters, Kenedia.Modules.Characters.Views.MainWindow, Settings, PathCollection>.Logger.Info("Account changed from " + (((temp != null) ? temp.get_Name() : null) ?? "No Account") + " to " + (((value != null) ? value.get_Name() : null) ?? "No Account") + "!");
+					BaseModule<Characters, Kenedia.Modules.Characters.Views.MainWindow, Settings, PathCollection, StaticHosting>.Logger.Info("Account changed from " + (((temp != null) ? temp.get_Name() : null) ?? "No Account") + " to " + (((value != null) ? value.get_Name() : null) ?? "No Account") + "!");
 				}
 			}
 		}
@@ -156,7 +154,7 @@ namespace Kenedia.Modules.Characters.Services
 			}
 			if (cancellationToken.IsCancellationRequested)
 			{
-				BaseModule<Characters, Kenedia.Modules.Characters.Views.MainWindow, Settings, PathCollection>.Logger.Info("Canceled API Data fetch!");
+				BaseModule<Characters, Kenedia.Modules.Characters.Views.MainWindow, Settings, PathCollection, StaticHosting>.Logger.Info("Canceled API Data fetch!");
 			}
 			_cancellationTokenSource = null;
 		}
@@ -168,12 +166,11 @@ namespace Kenedia.Modules.Characters.Services
 			CancellationToken cancellationToken = _cancellationTokenSource.Token;
 			_getSpinner?.Invoke()?.Show();
 			NotificationBadge notificationBadge = _notificationBadge();
-			bool result = default(bool);
 			object obj;
 			int num;
 			try
 			{
-				BaseModule<Characters, Kenedia.Modules.Characters.Views.MainWindow, Settings, PathCollection>.Logger.Info("Fetching new API Data ...");
+				BaseModule<Characters, Kenedia.Modules.Characters.Views.MainWindow, Settings, PathCollection, StaticHosting>.Logger.Info("Fetching new API Data ...");
 				if (_gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)(object)new TokenPermission[2]
 				{
 					(TokenPermission)1,
@@ -184,36 +181,32 @@ namespace Kenedia.Modules.Characters.Services
 					if (cancellationToken.IsCancellationRequested)
 					{
 						Reset(cancellationToken, !cancellationToken.IsCancellationRequested);
-						result = false;
-						return result;
+						return false;
 					}
 					Account = account;
-					BaseModule<Characters, Kenedia.Modules.Characters.Views.MainWindow, Settings, PathCollection>.Logger.Info("Fetching characters for '" + Account.get_Name() + "' ...");
+					BaseModule<Characters, Kenedia.Modules.Characters.Views.MainWindow, Settings, PathCollection, StaticHosting>.Logger.Info("Fetching characters for '" + Account.get_Name() + "' ...");
 					IApiV2ObjectList<Character> characters = await ((IAllExpandableClient<Character>)(object)_gw2ApiManager.Gw2ApiClient.get_V2().get_Characters()).AllAsync(cancellationToken);
 					if (cancellationToken.IsCancellationRequested)
 					{
 						Reset(cancellationToken, !cancellationToken.IsCancellationRequested);
-						result = false;
-						return result;
+						return false;
 					}
 					UpdateAccountsList(account, characters);
 					_callBack?.Invoke(characters);
 					Reset(cancellationToken, !cancellationToken.IsCancellationRequested);
 					_apiStatus = StatusType.Success;
-					result = true;
-					return result;
+					return true;
 				}
 				if (!cancellationToken.IsCancellationRequested)
 				{
-					BaseModule<Characters, Kenedia.Modules.Characters.Views.MainWindow, Settings, PathCollection>.Logger.Warn(strings.Error_InvalidPermissions);
+					BaseModule<Characters, Kenedia.Modules.Characters.Views.MainWindow, Settings, PathCollection, StaticHosting>.Logger.Warn(strings.Error_InvalidPermissions);
 					MainWindow?.SendAPIPermissionNotification();
 					Task<Func<string>> text3 = HandleAPIExceptions(new Gw2ApiInvalidPermissionsException());
 					_apiStatus = StatusType.Error;
 					notificationBadge?.AddNotification(new ConditionalNotification(await text3, () => _apiStatus == StatusType.Success));
 				}
 				Reset(cancellationToken, !cancellationToken.IsCancellationRequested);
-				result = false;
-				return result;
+				return false;
 			}
 			catch (UnexpectedStatusException val)
 			{
@@ -232,67 +225,18 @@ namespace Kenedia.Modules.Characters.Services
 				Reset(cancellationToken, !cancellationToken.IsCancellationRequested);
 				return false;
 			}
-			if (num != 1)
+			if (num == 1)
 			{
-				return result;
+				UnexpectedStatusException ex = (UnexpectedStatusException)obj;
+				Task<Func<string>> text = HandleAPIExceptions((Exception)(object)ex);
+				MainWindow?.SendAPITimeoutNotification();
+				BaseModule<Characters, Kenedia.Modules.Characters.Views.MainWindow, Settings, PathCollection, StaticHosting>.Logger.Warn((Exception)(object)ex, strings.APITimeoutNotification);
+				Reset(cancellationToken, !cancellationToken.IsCancellationRequested);
+				_apiStatus = StatusType.Error;
+				notificationBadge?.AddNotification(new ConditionalNotification(await text, () => _apiStatus == StatusType.Success));
+				return false;
 			}
-			UnexpectedStatusException ex = (UnexpectedStatusException)obj;
-			Task<Func<string>> text = HandleAPIExceptions((Exception)(object)ex);
-			MainWindow?.SendAPITimeoutNotification();
-			BaseModule<Characters, Kenedia.Modules.Characters.Views.MainWindow, Settings, PathCollection>.Logger.Warn((Exception)(object)ex, strings.APITimeoutNotification);
-			Reset(cancellationToken, !cancellationToken.IsCancellationRequested);
-			_apiStatus = StatusType.Error;
-			notificationBadge?.AddNotification(new ConditionalNotification(await text, () => _apiStatus == StatusType.Success));
-			return false;
-		}
-
-		public async Task FetchLocale(Locale? locale = null, bool force = false)
-		{
-			locale.GetValueOrDefault();
-			if (!locale.HasValue)
-			{
-				Locale value = GameService.Overlay.UserLocale.Value;
-				locale = value;
-			}
-			if (force || _data.Maps.Count == 0 || !_data.Maps.FirstOrDefault().Value.Names.TryGetValue(locale.Value, out var name) || string.IsNullOrEmpty(name))
-			{
-				BaseModule<Characters, Kenedia.Modules.Characters.Views.MainWindow, Settings, PathCollection>.Logger.Info($"No data for {locale.Value} loaded yet. Fetching new data from the API.");
-				await GetMaps();
-			}
-		}
-
-		public async Task GetMaps()
-		{
-			NotificationBadge notificationBadge = _notificationBadge();
-			try
-			{
-				Dictionary<int, Map> _maps = _data.Maps;
-				foreach (Map i in (IEnumerable<Map>)(await ((IAllExpandableClient<Map>)(object)_gw2ApiManager.Gw2ApiClient.get_V2().get_Maps()).AllAsync(default(CancellationToken))))
-				{
-					Map map;
-					bool num = _maps.TryGetValue(i.get_Id(), out map);
-					if (map == null)
-					{
-						map = new Map(i);
-					}
-					map.Name = i.get_Name();
-					if (!num)
-					{
-						_maps.Add(i.get_Id(), map);
-					}
-				}
-				string json = JsonConvert.SerializeObject((object)_maps, SerializerSettings.Default);
-				File.WriteAllText(_paths.ModuleDataPath + "\\Maps.json", json);
-				_mapStatus = StatusType.Success;
-			}
-			catch (Exception ex)
-			{
-				_logger.Warn("Failed to fetch armory items.");
-				_logger.Warn($"{ex}");
-				Task<Func<string>> text = HandleAPIExceptions(ex);
-				_mapStatus = StatusType.Error;
-				notificationBadge?.AddNotification(new ConditionalNotification(await text, () => _mapStatus == StatusType.Success));
-			}
+			throw null;
 		}
 
 		private static string? GetExceptionMessage(Exception ex)

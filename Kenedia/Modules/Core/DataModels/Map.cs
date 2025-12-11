@@ -1,18 +1,16 @@
-using System.Runtime.Serialization;
 using Gw2Sharp.Models;
-using Gw2Sharp.WebApi;
 using Gw2Sharp.WebApi.V2.Models;
 using Kenedia.Modules.Core.Models;
+using Newtonsoft.Json;
 
 namespace Kenedia.Modules.Core.DataModels
 {
-	[DataContract]
 	public class Map
 	{
-		[DataMember]
 		public LocalizedString Names { get; } = new LocalizedString();
 
 
+		[JsonIgnore]
 		public string Name
 		{
 			get
@@ -25,10 +23,8 @@ namespace Kenedia.Modules.Core.DataModels
 			}
 		}
 
-		[DataMember]
 		public int Id { get; set; }
 
-		[DataMember]
 		public MapType Type { get; set; }
 
 		public Map()
@@ -37,17 +33,15 @@ namespace Kenedia.Modules.Core.DataModels
 
 		public Map(Map map)
 		{
-			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-			Id = map.get_Id();
-			Name = map.get_Name();
-			Type = ApiEnum<MapType>.op_Implicit(map.get_Type());
+			ApplyApiData(map);
 		}
 
-		public Map(Map map, Locale lang)
-			: this(map)
+		public void ApplyApiData(Map map)
 		{
-			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			Names[lang] = map.get_Name();
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+			Id = map.get_Id();
+			Type = ApiEnum<MapType>.op_Implicit(map.get_Type());
+			Names.Text = map.get_Name();
 		}
 	}
 }

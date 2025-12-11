@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
@@ -13,8 +14,6 @@ namespace Kenedia.Modules.Core.Controls
 {
 	public class Image : Blish_HUD.Controls.Image, ILocalizable
 	{
-		private Func<string> _setLocalizedTooltip;
-
 		private Color? _defaultBackgroundColor;
 
 		private Color? _hoveredBackgroundColor;
@@ -33,13 +32,14 @@ namespace Kenedia.Modules.Core.Controls
 
 		public Func<string> SetLocalizedTooltip
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _setLocalizedTooltip;
+				return _003CSetLocalizedTooltip_003Ek__BackingField;
 			}
 			set
 			{
-				_setLocalizedTooltip = value;
+				_003CSetLocalizedTooltip_003Ek__BackingField = value;
 				base.BasicTooltipText = value?.Invoke();
 			}
 		}

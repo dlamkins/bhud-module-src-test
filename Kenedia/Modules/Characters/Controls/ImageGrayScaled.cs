@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
@@ -21,33 +22,32 @@ namespace Kenedia.Modules.Characters.Controls
 
 		private Texture2D _grayScaleTexture;
 
-		private AsyncTexture2D _texture;
-
 		public bool UseGrayScale { get; set; } = true;
 
 
 		public AsyncTexture2D Texture
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _texture;
+				return _003CTexture_003Ek__BackingField;
 			}
 			set
 			{
-				AsyncTexture2D temp = _texture;
-				if (Common.SetProperty(ref _texture, value))
+				AsyncTexture2D temp = _003CTexture_003Ek__BackingField;
+				if (Common.SetProperty(ref _003CTexture_003Ek__BackingField, value))
 				{
 					if (temp != null)
 					{
 						temp.TextureSwapped -= Texture_TextureSwapped;
 					}
-					if (_texture != null)
+					if (_003CTexture_003Ek__BackingField != null)
 					{
-						_texture.TextureSwapped += Texture_TextureSwapped;
+						_003CTexture_003Ek__BackingField.TextureSwapped += Texture_TextureSwapped;
 					}
-					if (_texture != null)
+					if (_003CTexture_003Ek__BackingField != null)
 					{
-						_grayScaleTexture = _texture.Texture.ToGrayScaledPalettable();
+						_grayScaleTexture = _003CTexture_003Ek__BackingField.Texture.ToGrayScaledPalettable();
 					}
 				}
 			}
@@ -142,16 +142,16 @@ namespace Kenedia.Modules.Characters.Controls
 			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
-			if (_texture != null)
+			if (Texture != null)
 			{
-				spriteBatch.DrawOnCtrl(this, (Texture2D)((UseGrayScale && !Active && !base.MouseOver) ? ((object)_grayScaleTexture) : ((object)(Texture2D)_texture)), (SizeRectangle != Rectangle.get_Empty()) ? SizeRectangle : bounds, (_textureRectangle == Rectangle.get_Empty()) ? _texture.Bounds : _textureRectangle, Active ? ColorActive : (base.MouseOver ? ColorHovered : (ColorInActive * (UseGrayScale ? 0.5f : Alpha))), 0f, default(Vector2), (SpriteEffects)0);
+				spriteBatch.DrawOnCtrl(this, (Texture2D)((UseGrayScale && !Active && !base.MouseOver) ? ((object)_grayScaleTexture) : ((object)(Texture2D)Texture)), (SizeRectangle != Rectangle.get_Empty()) ? SizeRectangle : bounds, (_textureRectangle == Rectangle.get_Empty()) ? Texture.Bounds : _textureRectangle, Active ? ColorActive : (base.MouseOver ? ColorHovered : (ColorInActive * (UseGrayScale ? 0.5f : Alpha))), 0f, default(Vector2), (SpriteEffects)0);
 			}
 		}
 
 		private void Texture_TextureSwapped(object sender, ValueChangedEventArgs<Texture2D> e)
 		{
-			_grayScaleTexture = _texture.Texture.ToGrayScaledPalettable();
-			_texture.TextureSwapped -= Texture_TextureSwapped;
+			_grayScaleTexture = Texture.Texture.ToGrayScaledPalettable();
+			Texture.TextureSwapped -= Texture_TextureSwapped;
 		}
 	}
 }

@@ -68,7 +68,7 @@ namespace Kenedia.Modules.Characters.Models
 			}
 			catch
 			{
-				BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Warn("Failed to get static info from " + Url);
+				BaseModule<Characters, MainWindow, Settings, PathCollection, StaticHosting>.Logger.Warn("Failed to get static info from " + Url);
 			}
 			return new StaticInfo();
 		}
@@ -81,7 +81,7 @@ namespace Kenedia.Modules.Characters.Models
 				if (_isBeta != IsBeta)
 				{
 					_isBeta = IsBeta;
-					BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Debug("Beta has " + (IsBeta ? "started." : "ended."));
+					BaseModule<Characters, MainWindow, Settings, PathCollection, StaticHosting>.Logger.Debug("Beta has " + (IsBeta ? "started." : "ended."));
 					this.BetaStateChanged?.Invoke(this, _isBeta);
 				}
 			}

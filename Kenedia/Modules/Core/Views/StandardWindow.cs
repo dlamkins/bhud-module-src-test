@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
@@ -32,13 +33,7 @@ namespace Kenedia.Modules.Core.Views
 
 		private Rectangle _versionRectangle;
 
-		private string _name;
-
 		protected BitmapFont VersionFont = Control.Content.DefaultFont14;
-
-		private Version _version;
-
-		private string _subName;
 
 		private readonly List<AnchoredContainer> _attachedContainers = new List<AnchoredContainer>();
 
@@ -46,37 +41,40 @@ namespace Kenedia.Modules.Core.Views
 
 		public Version Version
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _version;
+				return _003CVersion_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _version, value, new Action(RecalculateLayout));
+				Common.SetProperty(ref _003CVersion_003Ek__BackingField, value, new Action(RecalculateLayout));
 			}
 		}
 
 		public string Name
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _name;
+				return _003CName_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _name, value, new Action(RecalculateLayout));
+				Common.SetProperty(ref _003CName_003Ek__BackingField, value, new Action(RecalculateLayout));
 			}
 		}
 
 		public string SubName
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _subName;
+				return _003CSubName_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _subName, value, new Action(RecalculateLayout));
+				Common.SetProperty(ref _003CSubName_003Ek__BackingField, value, new Action(RecalculateLayout));
 			}
 		}
 

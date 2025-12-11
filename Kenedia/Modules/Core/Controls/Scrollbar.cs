@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 using Blish_HUD;
 using Blish_HUD.Controls;
@@ -52,17 +53,11 @@ namespace Kenedia.Modules.Core.Controls
 
 		private static readonly TextureRegion2D s_textureBottomCap = Blish_HUD.Controls.Resources.Control.TextureAtlasControl.GetRegion("scrollbar/sb-cap-bottom");
 
-		private ClickFocus _scrollFocus;
-
 		private Tween _targetScrollDistanceAnim;
 
 		private float _targetScrollDistance;
 
-		private float _scrollDistance;
-
-		private int _scrollbarHeight = 32;
-
-		private double _scrollbarPercent = 1.0;
+		private double _scrollbarPercent;
 
 		private Container _associatedContainer;
 
@@ -82,13 +77,14 @@ namespace Kenedia.Modules.Core.Controls
 
 		private ClickFocus ScrollFocus
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _scrollFocus;
+				return _003CScrollFocus_003Ek__BackingField;
 			}
 			set
 			{
-				_scrollFocus = value;
+				_003CScrollFocus_003Ek__BackingField = value;
 				HandleClickScroll(clicked: true);
 			}
 		}
@@ -101,7 +97,7 @@ namespace Kenedia.Modules.Core.Controls
 				{
 					return _targetScrollDistance;
 				}
-				return _scrollDistance;
+				return ScrollDistance;
 			}
 			set
 			{
@@ -115,15 +111,16 @@ namespace Kenedia.Modules.Core.Controls
 
 		public float ScrollDistance
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _scrollDistance;
+				return _003CScrollDistance_003Ek__BackingField;
 			}
 			set
 			{
-				if (SetProperty(ref _scrollDistance, MathHelper.Clamp(value, 0f, 1f), invalidateLayout: true, "ScrollDistance"))
+				if (SetProperty(ref _003CScrollDistance_003Ek__BackingField, MathHelper.Clamp(value, 0f, 1f), invalidateLayout: true, "ScrollDistance"))
 				{
-					_targetScrollDistance = _scrollDistance;
+					_targetScrollDistance = _003CScrollDistance_003Ek__BackingField;
 				}
 				UpdateAssocContainer();
 			}
@@ -131,13 +128,14 @@ namespace Kenedia.Modules.Core.Controls
 
 		private int ScrollbarHeight
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _scrollbarHeight;
+				return _003CScrollbarHeight_003Ek__BackingField;
 			}
 			set
 			{
-				if (SetProperty(ref _scrollbarHeight, value, invalidateLayout: true, "ScrollbarHeight"))
+				if (SetProperty(ref _003CScrollbarHeight_003Ek__BackingField, value, invalidateLayout: true, "ScrollbarHeight"))
 				{
 					RecalculateScrollbarSize();
 					UpdateAssocContainer();
@@ -185,6 +183,9 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
+			_003CScrollbarHeight_003Ek__BackingField = 32;
+			_scrollbarPercent = 1.0;
+			base._002Ector();
 			_associatedContainer = container;
 			_upArrowBounds = Rectangle.get_Empty();
 			_downArrowBounds = Rectangle.get_Empty();

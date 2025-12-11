@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD.Controls.Extern;
@@ -18,8 +19,6 @@ namespace Kenedia.Modules.Characters.Services
 {
 	public class CharacterSorting
 	{
-		private string _status;
-
 		private readonly Settings _settings;
 
 		private readonly GameStateDetectionService _gameState;
@@ -34,24 +33,23 @@ namespace Kenedia.Modules.Characters.Services
 
 		private string _lastName;
 
-		private int _noNameChange;
-
 		private int _currentIndex;
 
 		private int NoNameChange
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _noNameChange;
+				return _003CNoNameChange_003Ek__BackingField;
 			}
 			set
 			{
-				_noNameChange = value;
-				if (_noNameChange > 0)
+				_003CNoNameChange_003Ek__BackingField = value;
+				if (_003CNoNameChange_003Ek__BackingField > 0)
 				{
-					Status = string.Format(strings.FixCharacter_NoChange, _noNameChange);
+					Status = string.Format(strings.FixCharacter_NoChange, _003CNoNameChange_003Ek__BackingField);
 				}
-				if (_noNameChange >= 2)
+				if (_003CNoNameChange_003Ek__BackingField >= 2)
 				{
 					_state = SortingState.Done;
 					Status = strings.Status_Done;
@@ -71,7 +69,7 @@ namespace Kenedia.Modules.Characters.Services
 		{
 			get
 			{
-				if (!BaseModule<Kenedia.Modules.Characters.Characters, MainWindow, Settings, PathCollection>.ModuleInstance.Data.StaticInfo.IsBeta)
+				if (!BaseModule<Kenedia.Modules.Characters.Characters, MainWindow, Settings, PathCollection, StaticHosting>.ModuleInstance.Data.StaticInfo.IsBeta)
 				{
 					return _rawCharacterModels.Where((Character_Model e) => !e.Beta).ToList();
 				}
@@ -81,13 +79,14 @@ namespace Kenedia.Modules.Characters.Services
 
 		public string Status
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _status;
+				return _003CStatus_003Ek__BackingField;
 			}
 			set
 			{
-				_status = value;
+				_003CStatus_003Ek__BackingField = value;
 				this.StatusChanged?.Invoke(null, EventArgs.Empty);
 			}
 		}

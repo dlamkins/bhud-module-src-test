@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
@@ -65,8 +66,6 @@ namespace Kenedia.Modules.Characters.Controls
 
 		private int _iconSize;
 
-		private Character_Model _character;
-
 		private readonly TextureManager _textureManager;
 
 		private readonly Data _data;
@@ -111,24 +110,25 @@ namespace Kenedia.Modules.Characters.Controls
 
 		public Character_Model Character
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _character;
+				return _003CCharacter_003Ek__BackingField;
 			}
 			set
 			{
-				Character_Model temp = _character;
-				if (Common.SetProperty(ref _character, value))
+				Character_Model temp = _003CCharacter_003Ek__BackingField;
+				if (Common.SetProperty(ref _003CCharacter_003Ek__BackingField, value))
 				{
 					if (temp != null)
 					{
 						temp.Deleted -= new EventHandler(CharacterDeleted);
 						temp.Updated -= new EventHandler(ApplyCharacter);
 					}
-					if (_character != null)
+					if (_003CCharacter_003Ek__BackingField != null)
 					{
-						_character.Deleted += new EventHandler(CharacterDeleted);
-						_character.Updated += new EventHandler(ApplyCharacter);
+						_003CCharacter_003Ek__BackingField.Deleted += new EventHandler(CharacterDeleted);
+						_003CCharacter_003Ek__BackingField.Updated += new EventHandler(ApplyCharacter);
 					}
 				}
 				if (_characterTooltip != null)
@@ -206,7 +206,7 @@ namespace Kenedia.Modules.Characters.Controls
 			_mainWindow = card._mainWindow;
 			_settings = card._settings;
 			base.Size = card.Size;
-			Character = card._character;
+			Character = card.Character;
 			_infoLabels.TextureManager = _textureManager;
 			_infoLabels.Data = _data;
 			_infoLabels.Settings = _settings;
@@ -738,9 +738,9 @@ namespace Kenedia.Modules.Characters.Controls
 		{
 			base.DisposeControl();
 			_textTooltip.Shown -= TextTooltip_Shown;
-			if (_character != null)
+			if (Character != null)
 			{
-				_character.Deleted -= new EventHandler(CharacterDeleted);
+				Character.Deleted -= new EventHandler(CharacterDeleted);
 			}
 			_infoLabels?.Dispose();
 			_contentPanel?.Dispose();

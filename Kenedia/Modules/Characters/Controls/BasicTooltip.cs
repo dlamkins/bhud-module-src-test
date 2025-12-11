@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
@@ -11,10 +12,6 @@ namespace Kenedia.Modules.Characters.Controls
 {
 	public class BasicTooltip : Control
 	{
-		private BitmapFont _font = GameService.Content.DefaultFont14;
-
-		private string _text;
-
 		public Rectangle TextureRectangle { get; set; } = new Rectangle(40, 25, 250, 250);
 
 
@@ -23,26 +20,28 @@ namespace Kenedia.Modules.Characters.Controls
 
 		public BitmapFont Font
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _font;
+				return _003CFont_003Ek__BackingField;
 			}
 			set
 			{
-				_font = value;
+				_003CFont_003Ek__BackingField = value;
 				UpdateLayout();
 			}
 		}
 
 		public string Text
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _text;
+				return _003CText_003Ek__BackingField;
 			}
 			set
 			{
-				_text = value;
+				_003CText_003Ek__BackingField = value;
 				if (value == null)
 				{
 					Hide();
@@ -151,6 +150,14 @@ namespace Kenedia.Modules.Characters.Controls
 				Size2 sSize = Font.MeasureString(Text);
 				base.Size = new Point(10 + (int)sSize.Width, 10 + (int)sSize.Height);
 			}
+		}
+
+		public BasicTooltip()
+		{
+			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+			_003CFont_003Ek__BackingField = GameService.Content.DefaultFont14;
+			base._002Ector();
 		}
 	}
 }

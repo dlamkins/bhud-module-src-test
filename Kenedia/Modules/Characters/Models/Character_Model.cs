@@ -46,11 +46,11 @@ namespace Kenedia.Modules.Characters.Models
 
 		private Gender _gender;
 
-		private RaceType _race;
+		private Races _race;
 
 		private ProfessionType _profession;
 
-		private SpecializationType _specialization;
+		private int _specialization;
 
 		private DateTimeOffset _created;
 
@@ -70,23 +70,18 @@ namespace Kenedia.Modules.Characters.Models
 
 		private bool _hadBirthday;
 
-		private bool _isCurrentCharacter;
-
-		private bool _markedAsDeleted;
-
-		private DateTime _nextBirthday;
-
 		private bool _beta;
 
 		public bool IsCurrentCharacter
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _isCurrentCharacter;
+				return _003CIsCurrentCharacter_003Ek__BackingField;
 			}
 			set
 			{
-				SetProperty(ref _isCurrentCharacter, value, "IsCurrentCharacter");
+				SetProperty(ref _003CIsCurrentCharacter_003Ek__BackingField, value, "IsCurrentCharacter");
 			}
 		}
 
@@ -146,19 +141,19 @@ namespace Kenedia.Modules.Characters.Models
 		public List<CharacterCrafting> Crafting { get; } = new List<CharacterCrafting>();
 
 
-		public List<KeyValuePair<int, Data.CraftingProfession>> CraftingDisciplines
+		public List<KeyValuePair<int, CraftingProfession>> CraftingDisciplines
 		{
 			get
 			{
-				List<KeyValuePair<int, Data.CraftingProfession>> list = new List<KeyValuePair<int, Data.CraftingProfession>>();
+				List<KeyValuePair<int, CraftingProfession>> list = new List<KeyValuePair<int, CraftingProfession>>();
 				if (_data != null)
 				{
 					foreach (CharacterCrafting crafting in Crafting)
 					{
-						Data.CraftingProfession craftingProf = _data.CrafingProfessions.Where<KeyValuePair<int, Data.CraftingProfession>>((KeyValuePair<int, Data.CraftingProfession> e) => e.Value.Id == crafting.Id)?.FirstOrDefault().Value;
+						CraftingProfession craftingProf = _data.CraftingProfessions.Where<KeyValuePair<CraftingDisciplineType, CraftingProfession>>((KeyValuePair<CraftingDisciplineType, CraftingProfession> e) => e.Value.Id == crafting.Id)?.FirstOrDefault().Value;
 						if (craftingProf != null)
 						{
-							list.Add(new KeyValuePair<int, Data.CraftingProfession>(crafting.Rating, craftingProf));
+							list.Add(new KeyValuePair<int, CraftingProfession>(crafting.Rating, craftingProf));
 						}
 					}
 					return list;
@@ -168,16 +163,14 @@ namespace Kenedia.Modules.Characters.Models
 		}
 
 		[DataMember]
-		public RaceType Race
+		public Races Race
 		{
 			get
 			{
-				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 				return _race;
 			}
 			set
 			{
-				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 				SetProperty(ref _race, value, "Race");
 			}
 		}
@@ -198,7 +191,7 @@ namespace Kenedia.Modules.Characters.Models
 		}
 
 		[DataMember]
-		public SpecializationType Specialization
+		public int Specialization
 		{
 			get
 			{
@@ -285,7 +278,6 @@ namespace Kenedia.Modules.Characters.Models
 		{
 			get
 			{
-				//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 				if (_data == null || !_data.Races.TryGetValue(Race, out var race))
 				{
 					return "Unkown Race";
@@ -311,7 +303,7 @@ namespace Kenedia.Modules.Characters.Models
 		{
 			get
 			{
-				if (_data == null || Specialization == SpecializationType.None || !Enum.IsDefined(typeof(SpecializationType), Specialization) || !_data.Specializations.TryGetValue(Specialization, out var specialization))
+				if (_data == null || Specialization == 0 || !Enum.IsDefined(typeof(SpecializationType), Specialization) || !_data.Specializations.TryGetValue(Specialization, out var specialization))
 				{
 					return ProfessionName;
 				}
@@ -349,7 +341,7 @@ namespace Kenedia.Modules.Characters.Models
 		{
 			get
 			{
-				if (_data == null || Specialization == SpecializationType.None || !Enum.IsDefined(typeof(SpecializationType), Specialization) || !_data.Specializations.TryGetValue(Specialization, out var specialization))
+				if (_data == null || Specialization == 0 || !Enum.IsDefined(typeof(SpecializationType), Specialization) || !_data.Specializations.TryGetValue(Specialization, out var specialization))
 				{
 					return SimpleProfessionIcon;
 				}
@@ -361,7 +353,7 @@ namespace Kenedia.Modules.Characters.Models
 		{
 			get
 			{
-				if (_data == null || Specialization == SpecializationType.None || !Enum.IsDefined(typeof(SpecializationType), Specialization) || !_data.Specializations.TryGetValue(Specialization, out var specialization))
+				if (_data == null || Specialization == 0 || !Enum.IsDefined(typeof(SpecializationType), Specialization) || !_data.Specializations.TryGetValue(Specialization, out var specialization))
 				{
 					return ProfessionIcon;
 				}
@@ -412,13 +404,14 @@ namespace Kenedia.Modules.Characters.Models
 		[DataMember]
 		public bool MarkedAsDeleted
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _markedAsDeleted;
+				return _003CMarkedAsDeleted_003Ek__BackingField;
 			}
 			set
 			{
-				SetProperty(ref _markedAsDeleted, value, "MarkedAsDeleted");
+				SetProperty(ref _003CMarkedAsDeleted_003Ek__BackingField, value, "MarkedAsDeleted");
 			}
 		}
 
@@ -537,11 +530,11 @@ namespace Kenedia.Modules.Characters.Models
 					DateTime birthDay = Created.AddDays(365 * i).DateTime;
 					if ((birthDay.Year == DateTime.UtcNow.Year && birthDay >= DateTime.UtcNow) || birthDay.Year == DateTime.UtcNow.Year + 1)
 					{
-						_nextBirthday = birthDay;
-						return _nextBirthday;
+						_003CNextBirthday_003Ek__BackingField = birthDay;
+						return _003CNextBirthday_003Ek__BackingField;
 					}
 				}
-				return _nextBirthday;
+				return _003CNextBirthday_003Ek__BackingField;
 			}
 		}
 
@@ -572,14 +565,11 @@ namespace Kenedia.Modules.Characters.Models
 
 		public Character_Model(Character character, CharacterSwapping characterSwapping, string modulePath, Action requestSave, ObservableCollection<Character_Model> characterModels, Data data)
 		{
-			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
 			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0106: Unknown result type (might be due to invalid IL or missing references)
 			//IL_010b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_013d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0147: Expected I4, but got Unknown
 			_characterSwapping = characterSwapping;
 			ModulePath = modulePath;
 			_requestSave = requestSave;
@@ -587,9 +577,9 @@ namespace Kenedia.Modules.Characters.Models
 			_data = data;
 			_name = character.get_Name();
 			_level = character.get_Level();
-			_race = (RaceType)Enum.Parse(typeof(RaceType), character.get_Race());
+			_race = (Races)Enum.Parse(typeof(RaceType), character.get_Race());
 			_profession = (ProfessionType)Enum.Parse(typeof(ProfessionType), character.get_Profession());
-			_specialization = SpecializationType.None;
+			_specialization = 0;
 			_created = character.get_Created();
 			_lastModified = character.get_LastModified().UtcDateTime;
 			_lastLogin = ((_lastLogin > character.get_LastModified().UtcDateTime) ? _lastLogin : character.get_LastModified().UtcDateTime);
@@ -598,7 +588,7 @@ namespace Kenedia.Modules.Characters.Models
 			{
 				Crafting.Add(new CharacterCrafting
 				{
-					Id = (int)disc.get_Discipline().get_Value(),
+					Id = disc.get_Discipline().get_Value(),
 					Rating = disc.get_Rating(),
 					Active = disc.get_Active()
 				});
@@ -608,8 +598,6 @@ namespace Kenedia.Modules.Characters.Models
 
 		public Character_Model(Character_Model character, CharacterSwapping characterSwapping, string modulePath, Action requestSave, ObservableCollection<Character_Model> characterModels, Data data)
 		{
-			//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
 			//IL_010b: Unknown result type (might be due to invalid IL or missing references)
@@ -735,7 +723,7 @@ namespace Kenedia.Modules.Characters.Models
 			{
 				Save();
 				_characterSwapping?.Start(this, ignoreOCR);
-				BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info(string.Format(strings.CharacterSwap_SwitchTo, Name));
+				BaseModule<Characters, MainWindow, Settings, PathCollection, StaticHosting>.Logger.Info(string.Format(strings.CharacterSwap_SwitchTo, Name));
 			}
 			else
 			{
@@ -751,7 +739,7 @@ namespace Kenedia.Modules.Characters.Models
 			}
 			if (character != null && character.Name == Name)
 			{
-				Specialization = (SpecializationType)character.Specialization;
+				Specialization = character.Specialization;
 				Map = (GameService.Gw2Mumble.CurrentMap.IsCommonMap() ? GameService.Gw2Mumble.CurrentMap.Id : Map);
 				LastLogin = DateTime.UtcNow;
 			}
@@ -759,17 +747,14 @@ namespace Kenedia.Modules.Characters.Models
 
 		public void UpdateCharacter(Character character)
 		{
-			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0121: Expected I4, but got Unknown
 			_name = character.get_Name();
 			_level = character.get_Level();
-			_race = (RaceType)Enum.Parse(typeof(RaceType), character.get_Race());
+			_race = (Races)Enum.Parse(typeof(Races), character.get_Race());
 			_profession = (ProfessionType)Enum.Parse(typeof(ProfessionType), character.get_Profession());
 			_created = character.get_Created();
 			_lastModified = character.get_LastModified().UtcDateTime;
@@ -777,13 +762,13 @@ namespace Kenedia.Modules.Characters.Models
 			_gender = ApiEnum<Gender>.op_Implicit(character.get_Gender());
 			foreach (CharacterCraftingDiscipline disc in character.get_Crafting().ToList())
 			{
-				CharacterCrafting craft = Crafting.Find((CharacterCrafting e) => e.Id == (int)disc.get_Discipline().get_Value());
+				CharacterCrafting craft = Crafting.Find((CharacterCrafting e) => e.Id == disc.get_Discipline().get_Value());
 				bool num = craft != null;
 				if (craft == null)
 				{
 					craft = new CharacterCrafting();
 				}
-				craft.Id = (int)disc.get_Discipline().get_Value();
+				craft.Id = disc.get_Discipline().get_Value();
 				craft.Rating = disc.get_Rating();
 				craft.Active = disc.get_Active();
 				if (!num)

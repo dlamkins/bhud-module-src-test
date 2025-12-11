@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Blish_HUD.Content;
 using Microsoft.Xna.Framework;
 
@@ -9,10 +10,6 @@ namespace Kenedia.Modules.Core.Controls
 		private new AsyncTexture2D _icon;
 
 		private Rectangle _textureRectangle = Rectangle.get_Empty();
-
-		private bool _active;
-
-		private string _name;
 
 		public TabButton TabButton { get; private set; }
 
@@ -50,26 +47,28 @@ namespace Kenedia.Modules.Core.Controls
 
 		public string Name
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _name;
+				return _003CName_003Ek__BackingField;
 			}
 			set
 			{
-				_name = value;
+				_003CName_003Ek__BackingField = value;
 				TabButton.BasicTooltipText = value;
 			}
 		}
 
 		public bool Active
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _active;
+				return _003CActive_003Ek__BackingField;
 			}
 			set
 			{
-				_active = value;
+				_003CActive_003Ek__BackingField = value;
 				TabButton.Active = value;
 				if (value)
 				{

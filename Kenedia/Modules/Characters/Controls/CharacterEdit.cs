@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
@@ -66,21 +67,20 @@ namespace Kenedia.Modules.Characters.Controls
 
 		private readonly Action _refreshCharacters;
 
-		private Character_Model _character;
-
 		private ImageButton _noImgButton;
 
 		public Func<string> AccountImagePath { get; set; }
 
 		public Character_Model Character
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _character;
+				return _003CCharacter_003Ek__BackingField;
 			}
 			set
 			{
-				_character = value;
+				_003CCharacter_003Ek__BackingField = value;
 				ApplyCharacter();
 			}
 		}
@@ -567,7 +567,7 @@ namespace Kenedia.Modules.Characters.Controls
 			_delete.UserLocale_SettingChanged(null, null);
 			foreach (Tag t in _tags)
 			{
-				t.SetActive(_character.Tags.Contains(t.Text));
+				t.SetActive(Character.Tags.Contains(t.Text));
 			}
 			if (_noImgButton != null)
 			{
@@ -594,13 +594,13 @@ namespace Kenedia.Modules.Characters.Controls
 		private void Tag_ActiveChanged(object sender, EventArgs e)
 		{
 			Tag tag = (Tag)sender;
-			if (tag.Active && !_character.Tags.Contains(tag.Text))
+			if (tag.Active && !Character.Tags.Contains(tag.Text))
 			{
-				_character.AddTag(tag.Text);
+				Character.AddTag(tag.Text);
 			}
 			else
 			{
-				_character.RemoveTag(tag.Text);
+				Character.RemoveTag(tag.Text);
 			}
 		}
 

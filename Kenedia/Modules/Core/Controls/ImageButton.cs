@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
@@ -14,8 +15,6 @@ namespace Kenedia.Modules.Core.Controls
 {
 	public class ImageButton : Control, ILocalizable
 	{
-		private Func<string> _setLocalizedTooltip;
-
 		private bool Clicked
 		{
 			get
@@ -71,13 +70,14 @@ namespace Kenedia.Modules.Core.Controls
 
 		public Func<string> SetLocalizedTooltip
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _setLocalizedTooltip;
+				return _003CSetLocalizedTooltip_003Ek__BackingField;
 			}
 			set
 			{
-				_setLocalizedTooltip = value;
+				_003CSetLocalizedTooltip_003Ek__BackingField = value;
 				base.BasicTooltipText = value?.Invoke();
 			}
 		}

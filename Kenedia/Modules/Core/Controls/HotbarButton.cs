@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Kenedia.Modules.Core.Models;
@@ -16,19 +17,18 @@ namespace Kenedia.Modules.Core.Controls
 
 		public int Index;
 
-		private bool _checked;
-
 		public DetailedTexture Icon { get; set; }
 
 		public bool Checked
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _checked;
+				return _003CChecked_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _checked, value, new ValueChangedEventHandler<bool>(On_CheckChanged));
+				Common.SetProperty(ref _003CChecked_003Ek__BackingField, value, new ValueChangedEventHandler<bool>(On_CheckChanged));
 			}
 		}
 

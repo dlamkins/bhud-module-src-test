@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
@@ -43,17 +44,9 @@ namespace Kenedia.Modules.Characters.Controls
 
 		private readonly IconLabel _customIndex;
 
-		private Character_Model _character;
-
 		private readonly List<Tag> _tags = new List<Tag>();
 
 		private readonly bool _created;
-
-		private TextureManager _textureManager;
-
-		private Data _data;
-
-		private Settings _settings;
 
 		public TagFlowPanel TagPanel { get; }
 
@@ -65,13 +58,14 @@ namespace Kenedia.Modules.Characters.Controls
 
 		public Character_Model Character
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _character;
+				return _003CCharacter_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _character, value);
+				Common.SetProperty(ref _003CCharacter_003Ek__BackingField, value);
 			}
 		}
 
@@ -80,34 +74,36 @@ namespace Kenedia.Modules.Characters.Controls
 
 		public Data Data
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _data;
+				return _003CData_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _data, value, new PropertyChangedEventHandler(OnDataChanged), triggerOnUpdate: true, "Data");
+				Common.SetProperty(ref _003CData_003Ek__BackingField, value, new PropertyChangedEventHandler(OnDataChanged), triggerOnUpdate: true, "Data");
 			}
 		}
 
 		public Settings Settings
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _settings;
+				return _003CSettings_003Ek__BackingField;
 			}
 			set
 			{
-				Settings temp = _settings;
-				if (Common.SetProperty(ref _settings, value, new PropertyChangedEventHandler(OnSettingsChanged), triggerOnUpdate: true, "Settings"))
+				Settings temp = _003CSettings_003Ek__BackingField;
+				if (Common.SetProperty(ref _003CSettings_003Ek__BackingField, value, new PropertyChangedEventHandler(OnSettingsChanged), triggerOnUpdate: true, "Settings"))
 				{
 					if (temp != null)
 					{
 						temp.AppearanceSettingChanged -= new EventHandler(Settings_AppearanceSettingChanged);
 					}
-					if (_settings != null)
+					if (_003CSettings_003Ek__BackingField != null)
 					{
-						_settings.AppearanceSettingChanged += new EventHandler(Settings_AppearanceSettingChanged);
+						_003CSettings_003Ek__BackingField.AppearanceSettingChanged += new EventHandler(Settings_AppearanceSettingChanged);
 					}
 				}
 			}
@@ -115,13 +111,14 @@ namespace Kenedia.Modules.Characters.Controls
 
 		public TextureManager TextureManager
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _textureManager;
+				return _003CTextureManager_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _textureManager, value, new PropertyChangedEventHandler(OnTextureManagerAdded), triggerOnUpdate: true, "TextureManager");
+				Common.SetProperty(ref _003CTextureManager_003Ek__BackingField, value, new PropertyChangedEventHandler(OnTextureManagerAdded), triggerOnUpdate: true, "TextureManager");
 			}
 		}
 
@@ -247,8 +244,8 @@ namespace Kenedia.Modules.Characters.Controls
 
 		private void OnSettingsChanged(object sender, PropertyChangedEventArgs e)
 		{
-			_craftingControl.Settings = _settings;
-			if (_settings != null)
+			_craftingControl.Settings = Settings;
+			if (Settings != null)
 			{
 				RecalculateBounds();
 			}
@@ -256,14 +253,14 @@ namespace Kenedia.Modules.Characters.Controls
 
 		private void OnDataChanged(object sender, PropertyChangedEventArgs e)
 		{
-			_craftingControl.Data = _data;
+			_craftingControl.Data = Data;
 		}
 
 		private void OnTextureManagerAdded(object sender, PropertyChangedEventArgs e)
 		{
 			if (_genderLabel != null)
 			{
-				_genderLabel.Icon = (AsyncTexture2D)(_textureManager?.GetIcon(Kenedia.Modules.Characters.Services.TextureManager.Icons.Gender));
+				_genderLabel.Icon = (AsyncTexture2D)(TextureManager?.GetIcon(Kenedia.Modules.Characters.Services.TextureManager.Icons.Gender));
 			}
 		}
 
@@ -283,10 +280,12 @@ namespace Kenedia.Modules.Characters.Controls
 		{
 			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cc: Invalid comparison between Unknown and I4
+			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d1: Invalid comparison between Unknown and I4
 			if (Character == null)
 			{
 				return;
@@ -301,10 +300,10 @@ namespace Kenedia.Modules.Characters.Controls
 			}
 			IconLabel genderLabel = _genderLabel;
 			Gender gender = Character.Gender;
-			genderLabel.Text = ((object)(Gender)(ref gender)).ToString();
-			_raceLabel.Text = _data.Races[Character.Race].Name;
-			_raceLabel.Icon = _data.Races[Character.Race].Icon;
-			_mapLabel.Text = _data.GetMapById(Character.Map).Name;
+			string text2 = (genderLabel.Text = (((int)gender == 1) ? strings.Male : (((int)gender != 2) ? strings.Unknown : strings.Female)));
+			_raceLabel.Text = Data.Races[Character.Race].Name;
+			_raceLabel.Icon = Data.Races[Character.Race].Icon;
+			_mapLabel.Text = Data.GetMapById(Character.Map).Name;
 			_customIndex.Text = string.Format(strings.CustomIndex + " {0}", Character.Index);
 			IEnumerable<string> tagLlist = _tags.Select((Tag e) => e.Text);
 			List<string> characterTags = Character.Tags.ToList();
@@ -345,9 +344,9 @@ namespace Kenedia.Modules.Characters.Controls
 		public void UpdateDataControlsVisibility(bool tooltip = false)
 		{
 			//IL_039a: Unknown result type (might be due to invalid IL or missing references)
-			if (_settings != null)
+			if (Settings != null)
 			{
-				Dictionary<string, ShowCheckPair> settings = _settings.DisplayToggles.Value;
+				Dictionary<string, ShowCheckPair> settings = Settings.DisplayToggles.Value;
 				NameFont = GetFont(nameFont: true);
 				Font = GetFont();
 				_nameLabel.Visible = !settings.TryGetValue("Name", out var name) || (tooltip ? name.ShowTooltip : name.Show);
@@ -386,11 +385,11 @@ namespace Kenedia.Modules.Characters.Controls
 		private BitmapFont GetFont(bool nameFont = false)
 		{
 			ContentService.FontSize fontSize = ContentService.FontSize.Size8;
-			if (_settings == null)
+			if (Settings == null)
 			{
 				return GameService.Content.DefaultFont12;
 			}
-			switch (_settings.PanelSize.Value)
+			switch (Settings.PanelSize.Value)
 			{
 			case Kenedia.Modules.Characters.Services.Settings.PanelSizes.Small:
 				fontSize = (nameFont ? ContentService.FontSize.Size16 : ContentService.FontSize.Size12);
@@ -402,7 +401,7 @@ namespace Kenedia.Modules.Characters.Controls
 				fontSize = (nameFont ? ContentService.FontSize.Size22 : ContentService.FontSize.Size18);
 				break;
 			case Kenedia.Modules.Characters.Services.Settings.PanelSizes.Custom:
-				fontSize = (ContentService.FontSize)(nameFont ? _settings.CustomCharacterNameFontSize.Value : _settings.CustomCharacterFontSize.Value);
+				fontSize = (ContentService.FontSize)(nameFont ? Settings.CustomCharacterNameFontSize.Value : Settings.CustomCharacterFontSize.Value);
 				break;
 			}
 			return GameService.Content.GetFont(ContentService.FontFace.Menomonia, fontSize, ContentService.FontStyle.Regular);
@@ -429,7 +428,7 @@ namespace Kenedia.Modules.Characters.Controls
 			}
 			if (Character != null && _ageLabel.Visible)
 			{
-				_ageLabel.Text = string.Format("{1} ({0} Years)", Character.Age, Character.Created.Date.ToString("d"));
+				_ageLabel.Text = string.Format("{1} ({0} {2})", Character.Age, Character.Created.Date.ToString("d"), strings.Years);
 			}
 			if (_created && (Parent?.Visible ?? false))
 			{

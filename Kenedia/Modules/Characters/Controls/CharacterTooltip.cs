@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
@@ -33,8 +34,6 @@ namespace Kenedia.Modules.Characters.Controls
 
 		private Point _textureOffset = new Point(25, 25);
 
-		private Character_Model _character;
-
 		private readonly List<Tag> _tags = new List<Tag>();
 
 		public Color BackgroundTint { get; set; } = Color.get_Honeydew() * 0.95f;
@@ -48,23 +47,24 @@ namespace Kenedia.Modules.Characters.Controls
 
 		public Character_Model Character
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _character;
+				return _003CCharacter_003Ek__BackingField;
 			}
 			set
 			{
 				_infoLabels.Character = value;
-				Character_Model temp = _character;
-				if (Common.SetProperty(ref _character, value))
+				Character_Model temp = _003CCharacter_003Ek__BackingField;
+				if (Common.SetProperty(ref _003CCharacter_003Ek__BackingField, value))
 				{
 					if (temp != null)
 					{
 						temp.Updated -= new EventHandler(Character_Updated);
 					}
-					if (_character != null)
+					if (_003CCharacter_003Ek__BackingField != null)
 					{
-						_character.Updated += new EventHandler(Character_Updated);
+						_003CCharacter_003Ek__BackingField.Updated += new EventHandler(Character_Updated);
 					}
 				}
 			}
@@ -167,9 +167,9 @@ namespace Kenedia.Modules.Characters.Controls
 		protected override void DisposeControl()
 		{
 			base.DisposeControl();
-			if (_character != null)
+			if (Character != null)
 			{
-				_character.Updated -= new EventHandler(Character_Updated);
+				Character.Updated -= new EventHandler(Character_Updated);
 			}
 		}
 	}

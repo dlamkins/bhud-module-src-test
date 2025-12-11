@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Blish_HUD.Controls;
 using Kenedia.Modules.Core.Interfaces;
 using MonoGame.Extended.BitmapFonts;
@@ -8,19 +9,18 @@ namespace Kenedia.Modules.Characters.Controls
 {
 	public class FontFlowPanel : FlowPanel, IFontControl
 	{
-		private BitmapFont _font;
-
 		public BitmapFont Font
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _font;
+				return _003CFont_003Ek__BackingField;
 			}
 			set
 			{
-				if (_font != value && value != null)
+				if (_003CFont_003Ek__BackingField != value && value != null)
 				{
-					_font = value;
+					_003CFont_003Ek__BackingField = value;
 					OnFontChanged();
 				}
 			}

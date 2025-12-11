@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
@@ -12,12 +13,6 @@ namespace Kenedia.Modules.Characters.Controls
 {
 	public class IconLabel : Control, IFontControl
 	{
-		private AsyncTexture2D _icon;
-
-		private BitmapFont _font = GameService.Content.DefaultFont14;
-
-		private string _text;
-
 		private Rectangle _iconRectangle = Rectangle.get_Empty();
 
 		private Rectangle _textRectangle = Rectangle.get_Empty();
@@ -26,13 +21,14 @@ namespace Kenedia.Modules.Characters.Controls
 
 		public string Text
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _text;
+				return _003CText_003Ek__BackingField;
 			}
 			set
 			{
-				_text = value;
+				_003CText_003Ek__BackingField = value;
 				UpdateLayout();
 			}
 		}
@@ -42,13 +38,14 @@ namespace Kenedia.Modules.Characters.Controls
 
 		public AsyncTexture2D Icon
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _icon;
+				return _003CIcon_003Ek__BackingField;
 			}
 			set
 			{
-				_icon = value;
+				_003CIcon_003Ek__BackingField = value;
 				if (value != null)
 				{
 					UpdateLayout();
@@ -58,13 +55,14 @@ namespace Kenedia.Modules.Characters.Controls
 
 		public BitmapFont Font
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _font;
+				return _003CFont_003Ek__BackingField;
 			}
 			set
 			{
-				_font = value;
+				_003CFont_003Ek__BackingField = value;
 				if (value != null)
 				{
 					UpdateLayout();
@@ -76,8 +74,7 @@ namespace Kenedia.Modules.Characters.Controls
 
 		public bool AutoSizeHeight { get; set; }
 
-		public Rectangle TextureRectangle { get; set; } = Rectangle.get_Empty();
-
+		public Rectangle TextureRectangle { get; set; }
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
@@ -134,6 +131,21 @@ namespace Kenedia.Modules.Characters.Controls
 			}
 			_iconRectangle = (Rectangle)((Icon == null) ? Rectangle.get_Empty() : new Rectangle(2, 2, base.LocalBounds.Height - 4, base.LocalBounds.Height - 4));
 			_textRectangle = new Rectangle(((Rectangle)(ref _iconRectangle)).get_Right() + ((Icon != null) ? 5 : 0), 2, base.LocalBounds.Width - (((Rectangle)(ref _iconRectangle)).get_Right() + ((Icon != null) ? 5 : 0) + 2), base.LocalBounds.Height - 4);
+		}
+
+		public IconLabel()
+		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+			_003CFont_003Ek__BackingField = GameService.Content.DefaultFont14;
+			TextureRectangle = Rectangle.get_Empty();
+			base._002Ector();
 		}
 	}
 }

@@ -57,7 +57,7 @@ namespace Kenedia.Modules.Characters.Views
 			};
 			base.SubWindowEmblem = AsyncTexture2D.FromAssetId(156027);
 			base.MainWindowEmblem = AsyncTexture2D.FromAssetId(156015);
-			base.Name = string.Format(strings.ItemSettings, BaseModule<Characters, MainWindow, Settings, PathCollection>.ModuleName ?? "");
+			base.Name = string.Format(strings.ItemSettings, BaseModule<Characters, MainWindow, Settings, PathCollection, StaticHosting>.ModuleName ?? "");
 			CreateOCR();
 			CreateAppearance();
 			CreateBehavior();
@@ -724,7 +724,7 @@ namespace Kenedia.Modules.Characters.Views
 				Parent = cP,
 				Checked = _settings.ShowCornerIcon.Value,
 				SetLocalizedText = () => strings.ShowCorner_Name,
-				SetLocalizedTooltip = () => string.Format(strings.ShowCorner_Tooltip, BaseModule<Characters, MainWindow, Settings, PathCollection>.ModuleName),
+				SetLocalizedTooltip = () => string.Format(strings.ShowCorner_Tooltip, BaseModule<Characters, MainWindow, Settings, PathCollection, StaticHosting>.ModuleName),
 				CheckedChangedAction = delegate(bool b)
 				{
 					_settings.ShowCornerIcon.Value = b;
@@ -1160,7 +1160,7 @@ namespace Kenedia.Modules.Characters.Views
 
 		public void OnLanguageChanged(object s = null, EventArgs e = null)
 		{
-			base.Name = string.Format(strings.ItemSettings, BaseModule<Characters, MainWindow, Settings, PathCollection>.ModuleName ?? "");
+			base.Name = string.Format(strings.ItemSettings, BaseModule<Characters, MainWindow, Settings, PathCollection, StaticHosting>.ModuleName ?? "");
 		}
 
 		public override void UpdateContainer(GameTime gameTime)

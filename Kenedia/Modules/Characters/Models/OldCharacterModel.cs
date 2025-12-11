@@ -63,7 +63,7 @@ namespace Kenedia.Modules.Characters.Models
 					{
 						if (File.Exists(basePath + "\\" + old.Icon) && !File.Exists(imagePath + old.Icon))
 						{
-							BaseModule<Characters, MainWindow, Settings, PathCollection>.Logger.Info("Copy Icon for " + old.Name + " from old path '" + basePath + "\\" + old.Icon + "' to '" + imagePath + old.Icon + "'.");
+							BaseModule<Characters, MainWindow, Settings, PathCollection, StaticHosting>.Logger.Info("Copy Icon for " + old.Name + " from old path '" + basePath + "\\" + old.Icon + "' to '" + imagePath + old.Icon + "'.");
 							File.Copy(basePath + "\\" + old.Icon, imagePath + old.Icon);
 						}
 					}

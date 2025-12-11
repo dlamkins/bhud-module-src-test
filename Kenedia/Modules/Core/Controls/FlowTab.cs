@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Blish_HUD.Controls;
 using Microsoft.Xna.Framework;
 
@@ -8,21 +9,20 @@ namespace Kenedia.Modules.Core.Controls
 {
 	public class FlowTab : PanelTab
 	{
-		private ControlFlowDirection _flowDirection;
-
 		private Vector2 _outerControlPadding = Vector2.get_Zero();
 
 		private Vector2 _controlPadding = Vector2.get_Zero();
 
 		public ControlFlowDirection FlowDirection
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _flowDirection;
+				return _003CFlowDirection_003Ek__BackingField;
 			}
 			set
 			{
-				SetProperty(ref _flowDirection, value, invalidateLayout: true, "FlowDirection");
+				SetProperty(ref _003CFlowDirection_003Ek__BackingField, value, invalidateLayout: true, "FlowDirection");
 			}
 		}
 
@@ -63,7 +63,7 @@ namespace Kenedia.Modules.Core.Controls
 		private void ReflowChildLayout(IEnumerable<Control> allChildren)
 		{
 			IEnumerable<Control> filteredChildren = allChildren.Where((Control c) => c.GetType() != typeof(Scrollbar) && c.Visible);
-			switch (_flowDirection)
+			switch (FlowDirection)
 			{
 			case ControlFlowDirection.LeftToRight:
 				ReflowChildLayoutLeftToRight(filteredChildren);

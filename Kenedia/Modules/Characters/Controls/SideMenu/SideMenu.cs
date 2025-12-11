@@ -5,6 +5,7 @@ using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
+using Kenedia.Modules.Characters.Models;
 using Kenedia.Modules.Characters.Res;
 using Kenedia.Modules.Characters.Services;
 using Kenedia.Modules.Core.Controls;
@@ -75,7 +76,7 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 			};
 			TabsButtonPanel.Location = new Point(0, _headerPanel.Bottom);
 			CreateHeaderButtons();
-			int eliteSpecializationsCount = data.Specializations.Values.Where((Data.Specialization x) => (int)x.Profession == 1).Count();
+			int eliteSpecializationsCount = data.Specializations.Values.Where((Specialization x) => (int)x.Profession == 1).Count();
 			int cols = 2 + eliteSpecializationsCount + 1 + 1;
 			base.Width = 250;
 			base.Width = cols * 35 + 5;

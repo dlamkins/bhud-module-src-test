@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
-using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Gw2Sharp.Models;
+using Gw2Sharp.WebApi.V2.Models;
 using Kenedia.Modules.Characters.Models;
 using Kenedia.Modules.Characters.Res;
 using Kenedia.Modules.Characters.Services;
@@ -24,7 +24,7 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 
 		private readonly TagFlowPanel _tagFlowPanel;
 
-		private readonly List<KeyValuePair<ImageColorToggle, Action>> _toggles = new List<KeyValuePair<ImageColorToggle, Action>>();
+		private readonly List<ImageColorToggle> _toggles = new List<ImageColorToggle>();
 
 		private readonly TextureManager _textureManager;
 
@@ -79,9 +79,7 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 			};
 			CreateToggles();
 			CreateTags();
-			GameService.Overlay.UserLocale.SettingChanged += OnLanguageChanged;
 			_allTags.CollectionChanged += Tags_CollectionChanged;
-			OnLanguageChanged();
 		}
 
 		public void ResetToggles()
@@ -90,9 +88,9 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 			{
 				t.SetActive(active: false);
 			});
-			_toggles.ForEach(delegate(KeyValuePair<ImageColorToggle, Action> t)
+			_toggles.ForEach(delegate(ImageColorToggle t)
 			{
-				t.Key.Active = false;
+				t.Active = false;
 			});
 			foreach (KeyValuePair<string, SearchFilter<Character_Model>> searchFilter in _searchFilters)
 			{
@@ -166,26 +164,30 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 
 		private void CreateToggles()
 		{
+			//IL_0143: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0171: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03fa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05b4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0699: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0705: Unknown result type (might be due to invalid IL or missing references)
-			//IL_085a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0945: Unknown result type (might be due to invalid IL or missing references)
-			Dictionary<ProfessionType, Data.Profession> profs = _data.Professions.ToDictionary<KeyValuePair<ProfessionType, Data.Profession>, ProfessionType, Data.Profession>((KeyValuePair<ProfessionType, Data.Profession> entry) => entry.Key, (KeyValuePair<ProfessionType, Data.Profession> entry) => entry.Value);
+			//IL_017b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0327: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0442: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0448: Invalid comparison between Unknown and I4
+			//IL_0485: Unknown result type (might be due to invalid IL or missing references)
+			//IL_048b: Invalid comparison between Unknown and I4
+			//IL_0493: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_054f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05ba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0750: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07bd: Unknown result type (might be due to invalid IL or missing references)
+			Dictionary<ProfessionType, Profession> profs = _data.Professions.ToDictionary<KeyValuePair<ProfessionType, Profession>, ProfessionType, Profession>((KeyValuePair<ProfessionType, Profession> entry) => entry.Key, (KeyValuePair<ProfessionType, Profession> entry) => entry.Value);
 			profs = (from e in profs
-				orderby e.Value.WeightClass, e.Value.APIId
-				select e).ToDictionary((KeyValuePair<ProfessionType, Data.Profession> e) => e.Key, (KeyValuePair<ProfessionType, Data.Profession> e) => e.Value);
-			foreach (KeyValuePair<ProfessionType, Data.Profession> profession2 in profs)
+				orderby e.Value.WeightClass, e.Value.Id
+				select e).ToDictionary((KeyValuePair<ProfessionType, Profession> e) => e.Key, (KeyValuePair<ProfessionType, Profession> e) => e.Value);
+			foreach (KeyValuePair<ProfessionType, Profession> profession2 in profs)
 			{
-				ImageColorToggle t6 = new ImageColorToggle(delegate(bool b)
+				ImageColorToggle t5 = new ImageColorToggle(delegate(bool b)
 				{
 					action(b, "Core " + profession2.Value.Name);
 				})
@@ -196,35 +198,28 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 					ColorHovered = profession2.Value.Color,
 					ColorInActive = profession2.Value.Color * 0.5f,
 					Active = _searchFilters["Core " + profession2.Value.Name].IsEnabled,
-					BasicTooltipText = "Core " + profession2.Value.Name,
+					SetLocalizedTooltip = () => "Core " + profession2.Value.Name,
 					Alpha = 0.7f
 				};
-				KeyValuePair<ImageColorToggle, Action> tt = new KeyValuePair<ImageColorToggle, Action>(t6, delegate
-				{
-					t6.BasicTooltipText = "Core " + profession2.Value.Name;
-				});
-				_toggles.Add(tt);
+				_toggles.Add(t5);
 			}
-			foreach (KeyValuePair<ProfessionType, Data.Profession> profession in profs)
+			foreach (KeyValuePair<ProfessionType, Profession> profession in profs)
 			{
-				ImageColorToggle t5 = new ImageColorToggle(delegate(bool b)
+				ImageColorToggle t4 = new ImageColorToggle(delegate(bool b)
 				{
 					action(b, profession.Value.Name);
 				})
 				{
 					Texture = profession.Value.IconBig,
 					Active = _searchFilters[profession.Value.Name].IsEnabled,
-					BasicTooltipText = profession.Value.Name
+					SetLocalizedTooltip = () => profession.Value.Name
 				};
-				_toggles.Add(new KeyValuePair<ImageColorToggle, Action>(t5, delegate
-				{
-					t5.BasicTooltipText = profession.Value.Name;
-				}));
+				_toggles.Add(t4);
 			}
-			List<KeyValuePair<ImageColorToggle, Action>> specToggles = new List<KeyValuePair<ImageColorToggle, Action>>();
-			foreach (KeyValuePair<SpecializationType, Data.Specialization> specialization in _data.Specializations)
+			List<ImageColorToggle> specToggles = new List<ImageColorToggle>();
+			foreach (KeyValuePair<int, Specialization> specialization in _data.Specializations)
 			{
-				ImageColorToggle t4 = new ImageColorToggle(delegate(bool b)
+				ImageColorToggle t3 = new ImageColorToggle(delegate(bool b)
 				{
 					action(b, specialization.Value.Name);
 				})
@@ -232,27 +227,24 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 					Texture = specialization.Value.IconBig,
 					Profession = specialization.Value.Profession,
 					Active = _searchFilters[specialization.Value.Name].IsEnabled,
-					BasicTooltipText = specialization.Value.Name
+					SetLocalizedTooltip = () => specialization.Value.Name
 				};
-				specToggles.Add(new KeyValuePair<ImageColorToggle, Action>(t4, delegate
-				{
-					t4.BasicTooltipText = specialization.Value.Name;
-				}));
+				specToggles.Add(t3);
 			}
 			for (int i = 0; i < 4; i++)
 			{
-				foreach (KeyValuePair<ProfessionType, Data.Profession> p in profs)
+				foreach (KeyValuePair<ProfessionType, Profession> p in profs)
 				{
-					KeyValuePair<ImageColorToggle, Action> t = specToggles.Find((KeyValuePair<ImageColorToggle, Action> e) => p.Key == e.Key.Profession && !_toggles.Contains(e));
-					if (t.Key != null)
+					ImageColorToggle t = specToggles.Find((ImageColorToggle e) => p.Key == e.Profession && !_toggles.Contains(e));
+					if (t != null)
 					{
 						_toggles.Add(t);
 					}
 				}
 			}
-			foreach (KeyValuePair<int, Data.CraftingProfession> crafting in _data.CrafingProfessions)
+			foreach (KeyValuePair<CraftingDisciplineType, CraftingProfession> crafting in _data.CraftingProfessions)
 			{
-				if (crafting.Key > 0)
+				if ((int)crafting.Key > 0)
 				{
 					ImageColorToggle img = new ImageColorToggle(delegate(bool b)
 					{
@@ -261,15 +253,12 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 					{
 						Texture = crafting.Value.Icon,
 						UseGrayScale = false,
-						TextureRectangle = ((crafting.Key > 0) ? new Rectangle(8, 7, 17, 19) : new Rectangle(4, 4, 24, 24)),
+						TextureRectangle = (((int)crafting.Key > 0) ? new Rectangle(8, 7, 17, 19) : new Rectangle(4, 4, 24, 24)),
 						SizeRectangle = new Rectangle(4, 4, 20, 20),
 						Active = _searchFilters[crafting.Value.Name].IsEnabled,
-						BasicTooltipText = crafting.Value.Name
+						SetLocalizedTooltip = () => crafting.Value.Name
 					};
-					_toggles.Add(new KeyValuePair<ImageColorToggle, Action>(img, delegate
-					{
-						img.BasicTooltipText = crafting.Value.Name;
-					}));
+					_toggles.Add(img);
 				}
 			}
 			ImageColorToggle hidden = new ImageColorToggle(delegate(bool b)
@@ -280,12 +269,9 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 				Texture = AsyncTexture2D.FromAssetId(605021),
 				UseGrayScale = true,
 				TextureRectangle = new Rectangle(4, 4, 24, 24),
-				BasicTooltipText = strings.ShowHidden_Tooltip
+				SetLocalizedTooltip = () => strings.ShowHidden_Tooltip
 			};
-			_toggles.Add(new KeyValuePair<ImageColorToggle, Action>(hidden, delegate
-			{
-				hidden.BasicTooltipText = strings.ShowHidden_Tooltip;
-			}));
+			_toggles.Add(hidden);
 			ImageColorToggle birthday = new ImageColorToggle(delegate(bool b)
 			{
 				action(b, "Birthday");
@@ -294,27 +280,24 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 				Texture = AsyncTexture2D.FromAssetId(593864),
 				UseGrayScale = true,
 				TextureRectangle = new Rectangle(1, 0, 30, 32),
-				BasicTooltipText = strings.Show_Birthday_Tooltip
+				SetLocalizedTooltip = () => strings.Show_Birthday_Tooltip
 			};
-			_toggles.Add(new KeyValuePair<ImageColorToggle, Action>(birthday, delegate
+			_toggles.Add(birthday);
+			foreach (Race race in _data.Races.Values)
 			{
-				birthday.BasicTooltipText = strings.Show_Birthday_Tooltip;
-			}));
-			foreach (KeyValuePair<RaceType, Data.Race> race in _data.Races)
-			{
-				ImageColorToggle t3 = new ImageColorToggle(delegate(bool b)
+				if (race.Id != Races.None)
 				{
-					action(b, race.Value.Name);
-				})
-				{
-					Texture = race.Value.Icon,
-					UseGrayScale = true,
-					BasicTooltipText = race.Value.Name
-				};
-				_toggles.Add(new KeyValuePair<ImageColorToggle, Action>(t3, delegate
-				{
-					t3.BasicTooltipText = race.Value.Name;
-				}));
+					ImageColorToggle t2 = new ImageColorToggle(delegate(bool b)
+					{
+						action(b, race.Name);
+					})
+					{
+						Texture = race.Icon,
+						UseGrayScale = true,
+						SetLocalizedTooltip = () => race.Name
+					};
+					_toggles.Add(t2);
+				}
 			}
 			ImageColorToggle male = new ImageColorToggle(delegate(bool b)
 			{
@@ -324,12 +307,9 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 				Texture = (AsyncTexture2D)_textureManager.GetIcon(TextureManager.Icons.Male),
 				UseGrayScale = true,
 				TextureRectangle = new Rectangle(1, 0, 30, 32),
-				BasicTooltipText = strings.Show_Birthday_Tooltip
+				SetLocalizedTooltip = () => strings.Male
 			};
-			_toggles.Add(new KeyValuePair<ImageColorToggle, Action>(male, delegate
-			{
-				male.BasicTooltipText = strings.Male;
-			}));
+			_toggles.Add(male);
 			ImageColorToggle female = new ImageColorToggle(delegate(bool b)
 			{
 				action(b, "Female");
@@ -338,32 +318,21 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 				Texture = (AsyncTexture2D)_textureManager.GetIcon(TextureManager.Icons.Female),
 				UseGrayScale = true,
 				TextureRectangle = new Rectangle(1, 0, 30, 32),
-				BasicTooltipText = strings.Show_Birthday_Tooltip
+				SetLocalizedTooltip = () => strings.Female
 			};
-			_toggles.Add(new KeyValuePair<ImageColorToggle, Action>(female, delegate
-			{
-				female.BasicTooltipText = strings.Female;
-			}));
+			_toggles.Add(female);
 			int j = 0;
-			foreach (KeyValuePair<ImageColorToggle, Action> t2 in _toggles)
+			foreach (ImageColorToggle toggle in _toggles)
 			{
 				j++;
-				t2.Key.Parent = _toggleFlowPanel;
-				t2.Key.Size = new Point(29, 29);
+				toggle.Parent = _toggleFlowPanel;
+				toggle.Size = new Point(29, 29);
 			}
 			void action(bool active, string entry)
 			{
 				_searchFilters[entry].IsEnabled = active;
 				_onFilterChanged?.Invoke();
 			}
-		}
-
-		public void OnLanguageChanged(object s = null, EventArgs e = null)
-		{
-			_toggles.ForEach(delegate(KeyValuePair<ImageColorToggle, Action> t)
-			{
-				t.Value();
-			});
 		}
 
 		public void OnTogglesChanged(object s = null, EventArgs e = null)
@@ -374,7 +343,6 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 		protected override void DisposeControl()
 		{
 			base.DisposeControl();
-			GameService.Overlay.UserLocale.SettingChanged -= OnLanguageChanged;
 			_allTags.CollectionChanged -= Tags_CollectionChanged;
 			_tagFilters.Clear();
 		}
