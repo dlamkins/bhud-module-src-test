@@ -54,26 +54,27 @@ namespace flakysalt.CharacterKeybinds.Views.UiElements
 		public KeybindFlowContainer()
 			: this()
 		{
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0099: Expected O, but got Unknown
-			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0180: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0187: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a4: Expected O, but got Unknown
+			//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0186: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0192: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0197: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a6: Expected O, but got Unknown
-			//IL_01a7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ac: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b1: Expected O, but got Unknown
+			//IL_01b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b7: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d2: Expected O, but got Unknown
+			//IL_01c9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01dd: Expected O, but got Unknown
+			_oldCharacterKeymap = new Keymap();
 			((FlowPanel)this).set_OuterControlPadding(new Vector2(10f, 0f));
 			((FlowPanel)this).set_ControlPadding(new Vector2(2f, 0f));
 			((FlowPanel)this).set_FlowDirection((ControlFlowDirection)0);
@@ -162,7 +163,7 @@ namespace flakysalt.CharacterKeybinds.Views.UiElements
 
 		public void SetValues(Keymap keymap)
 		{
-			_oldCharacterKeymap = keymap;
+			_oldCharacterKeymap = new Keymap(keymap);
 			CharacterNameDropdown.SelectedItem = (string.IsNullOrEmpty(keymap.CharacterName) ? DefaultCharacterEntry : keymap.CharacterName);
 			switch (keymap.SpecialisationId)
 			{
@@ -226,7 +227,7 @@ namespace flakysalt.CharacterKeybinds.Views.UiElements
 			}
 			return new Keymap
 			{
-				CharacterName = (CharacterNameDropdown.Items.Contains(CharacterNameDropdown.SelectedItem) ? CharacterNameDropdown.SelectedItem : null),
+				CharacterName = (CharacterNameDropdown.SelectedItem.Equals(DefaultCharacterEntry) ? null : CharacterNameDropdown.SelectedItem),
 				SpecialisationId = specialisationId,
 				KeymapName = (KeymapDropdown.Items.Contains(KeymapDropdown.SelectedItem) ? KeymapDropdown.SelectedItem : null)
 			};
@@ -259,7 +260,7 @@ namespace flakysalt.CharacterKeybinds.Views.UiElements
 
 		private void OnRemoveClick(object sender, MouseEventArgs args)
 		{
-			this.OnRemove?.Invoke(0, GetKeymap());
+			this.OnRemove?.Invoke(0, _oldCharacterKeymap);
 			DisposeEvents();
 			((Control)this).Dispose();
 		}

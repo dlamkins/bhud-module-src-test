@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Graphics.UI;
@@ -136,20 +135,23 @@ namespace flakysalt.CharacterKeybinds.Presenter
 
 		protected override void UpdateView()
 		{
-			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
 			try
 			{
 				base.get_View()?.ClearKeybindEntries();
 				string keybindsFolder = base.get_Model().GetKeybindsFolder();
 				base.get_View()?.SetDefaultKeybindOptions(CharacterKeybindFileUtil.GetKeybindFiles(keybindsFolder), base.get_Model().GetDefaultKeybind());
-				IEnumerable<Keymap> keymaps = base.get_Model().GetKeymaps();
-				foreach (Keymap keymap in keymaps ?? Enumerable.Empty<Keymap>())
+				foreach (Keymap keymap in base.get_Model().GetKeymaps())
 				{
-					int iconAssetId = 0;
 					Character character = base.get_Model().GetCharacter(keymap.CharacterName);
+					if (keymap.CharacterName != null && character == null)
+					{
+						continue;
+					}
+					int iconAssetId = 0;
 					if (character != null)
 					{
 						Specialization spec = base.get_Model().GetSpecializationById(keymap.SpecialisationId);

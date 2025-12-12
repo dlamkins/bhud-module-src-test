@@ -16,5 +16,16 @@ namespace flakysalt.CharacterKeybinds.Data
 		public const int AllSpecializationId = -2;
 
 		public const int Invalid = -10;
+
+		public Keymap(Keymap map)
+		{
+			CharacterName = map.CharacterName;
+			SpecialisationId = map.SpecialisationId;
+			KeymapName = map.KeymapName;
+		}
+
+		public Keymap()
+		{
+		}
 	}
 }
