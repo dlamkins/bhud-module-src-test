@@ -638,31 +638,38 @@ namespace Kenedia.Modules.Characters
 
 		private void CreateToggleCategories()
 		{
-			new List<SearchFilter<Character_Model>>();
+			//IL_016f: Unknown result type (might be due to invalid IL or missing references)
 			foreach (KeyValuePair<ProfessionType, Profession> e4 in Data.Professions)
 			{
-				SearchFilters.Add(e4.Value.Name, new SearchFilter<Character_Model>((Character_Model c) => (base.Settings.DisplayToggles.Value["Profession"]?.Check ?? false) && c.Profession == e4.Key));
-				SearchFilters.Add("Core " + e4.Value.Name, new SearchFilter<Character_Model>((Character_Model c) => base.Settings.DisplayToggles.Value["Profession"].Check && c.Profession == e4.Key));
+				SearchFilters.AddOrUpdate(e4.Value.Name, new SearchFilter<Character_Model>((Character_Model c) => (base.Settings.DisplayToggles.Value["Profession"]?.Check ?? false) && c.Profession == e4.Key));
+				SearchFilters.AddOrUpdate("Core " + e4.Value.Name, new SearchFilter<Character_Model>((Character_Model c) => base.Settings.DisplayToggles.Value["Profession"].Check && c.Profession == e4.Key));
 			}
 			foreach (KeyValuePair<int, Specialization> e3 in Data.Specializations)
 			{
-				SearchFilters.Add(e3.Value.Name, new SearchFilter<Character_Model>((Character_Model c) => (base.Settings.DisplayToggles.Value["Profession"]?.Check ?? false) && c.Specialization == e3.Key));
+				if (e3.Value.Id != 0)
+				{
+					SearchFilters.AddOrUpdate(e3.Value.Name, new SearchFilter<Character_Model>((Character_Model c) => (base.Settings.DisplayToggles.Value["Profession"]?.Check ?? false) && c.Specialization == e3.Key));
+				}
 			}
 			foreach (KeyValuePair<CraftingDisciplineType, CraftingProfession> e2 in Data.CraftingProfessions)
 			{
-				SearchFilters.Add(e2.Value.Name, new SearchFilter<Character_Model>((Character_Model c) => c.Crafting.Find((CharacterCrafting p) => base.Settings.DisplayToggles.Value["CraftingProfession"].Check && p.Id == e2.Value.Id && (!base.Settings.DisplayToggles.Value["OnlyMaxCrafting"].Check || p.Rating >= e2.Value.MaxRating)) != null));
+				if ((int)e2.Value.Id == 0)
+				{
+					continue;
+				}
+				SearchFilters.AddOrUpdate(e2.Value.Name, new SearchFilter<Character_Model>((Character_Model c) => c.Crafting.Find((CharacterCrafting p) => base.Settings.DisplayToggles.Value["CraftingProfession"].Check && p.Id == e2.Value.Id && (!base.Settings.DisplayToggles.Value["OnlyMaxCrafting"].Check || p.Rating >= e2.Value.MaxRating)) != null));
 			}
 			foreach (KeyValuePair<Races, Race> e in Data.Races)
 			{
 				if (e.Value.Id != Races.None)
 				{
-					SearchFilters.Add(e.Value.Name, new SearchFilter<Character_Model>((Character_Model c) => (base.Settings.DisplayToggles.Value["Race"]?.Check ?? false) && c.Race == e.Key));
+					SearchFilters.AddOrUpdate(e.Value.Name, new SearchFilter<Character_Model>((Character_Model c) => (base.Settings.DisplayToggles.Value["Race"]?.Check ?? false) && c.Race == e.Key));
 				}
 			}
-			SearchFilters.Add("Birthday", new SearchFilter<Character_Model>((Character_Model c) => c.HasBirthdayPresent));
-			SearchFilters.Add("Hidden", new SearchFilter<Character_Model>((Character_Model c) => !c.Show || (!Data.StaticInfo.IsBeta && c.Beta)));
-			SearchFilters.Add("Female", new SearchFilter<Character_Model>((Character_Model c) => (int)c.Gender == 2));
-			SearchFilters.Add("Male", new SearchFilter<Character_Model>((Character_Model c) => (int)c.Gender == 1));
+			SearchFilters.AddOrUpdate("Birthday", new SearchFilter<Character_Model>((Character_Model c) => c.HasBirthdayPresent));
+			SearchFilters.AddOrUpdate("Hidden", new SearchFilter<Character_Model>((Character_Model c) => !c.Show || (!Data.StaticInfo.IsBeta && c.Beta)));
+			SearchFilters.AddOrUpdate("Female", new SearchFilter<Character_Model>((Character_Model c) => (int)c.Gender == 2));
+			SearchFilters.AddOrUpdate("Male", new SearchFilter<Character_Model>((Character_Model c) => (int)c.Gender == 1));
 		}
 
 		private async void AddOrUpdateCharacters(IApiV2ObjectList<Character> characters)

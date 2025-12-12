@@ -155,7 +155,7 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 				};
 				if (!_tagFilters.ContainsKey(tag))
 				{
-					_tagFilters.Add(tag, new SearchFilter<Character_Model>((Character_Model c) => c.Tags.Contains(tag)));
+					_tagFilters.AddOrUpdate(tag, new SearchFilter<Character_Model>((Character_Model c) => c.Tags.Contains(tag)));
 				}
 				t.SetActive(active: false);
 			}
