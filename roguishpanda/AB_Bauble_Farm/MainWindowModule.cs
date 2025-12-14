@@ -2076,19 +2076,19 @@ namespace roguishpanda.AB_Bauble_Farm
 		{
 			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
 			//IL_020f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0214: Unknown result type (might be due to invalid IL or missing references)
 			//IL_021f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0325: Unknown result type (might be due to invalid IL or missing references)
-			//IL_032a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0335: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0374: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0379: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0384: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03a7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0328: Unknown result type (might be due to invalid IL or missing references)
+			//IL_032d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0338: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0377: Unknown result type (might be due to invalid IL or missing references)
+			//IL_037c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0387: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03b5: Unknown result type (might be due to invalid IL or missing references)
 			elapsedDateTime = DateTime.Now;
 			if (elapsedDateTime - initialDateTime >= TimeSpan.FromMinutes(1.0))
 			{
@@ -2099,90 +2099,104 @@ namespace roguishpanda.AB_Bauble_Farm
 				_endTimeValue.set_Text(EndofBaubleWeek.ToString("hh:mm tt (MMMM dd, yyyy)"));
 				initialDateTime = DateTime.Now;
 			}
-			TimeSpan[] CurrentElapsedTime = new TimeSpan[TimerRowNum];
-			for (int i = 0; i < TimerRowNum; i++)
+			try
 			{
-				string DropdownValue = _customDropdownTimers[i].get_SelectedItem();
-				TimeSpan remaining = TimeSpan.FromMinutes(0.0);
-				if (_timerRunning[i] && _timerStartTimes[i].HasValue)
+				TimeSpan[] CurrentElapsedTime = new TimeSpan[TimerRowNum];
+				for (int i = 0; i < TimerRowNum; i++)
 				{
-					TimeSpan elapsed = DateTime.Now - _timerStartTimes[i].Value;
-					remaining = ((!(DropdownValue == "Default")) ? (_timerDurationOverride[i] - elapsed) : (_timerDurationDefaults[i] - elapsed));
-					_timerLabels[i].set_Text($"{remaining:mm\\:ss}");
-					if (remaining.TotalSeconds <= -3600.0)
+					string DropdownValue = _customDropdownTimers[i].get_SelectedItem();
+					TimeSpan remaining = TimeSpan.FromMinutes(0.0);
+					if (_timerRunning[i] && _timerStartTimes[i].HasValue)
+					{
+						TimeSpan elapsed = DateTime.Now - _timerStartTimes[i].Value;
+						remaining = ((!(DropdownValue == "Default")) ? (_timerDurationOverride[i] - elapsed) : (_timerDurationDefaults[i] - elapsed));
+						_timerLabels[i].set_Text($"{remaining:mm\\:ss}");
+						if (remaining.TotalSeconds <= -3600.0)
+						{
+							if (DropdownValue == "Default")
+							{
+								_timerLabels[i].set_Text($"{_timerDurationDefaults[i]:mm\\:ss}");
+							}
+							else
+							{
+								_timerLabels[i].set_Text($"{_timerDurationOverride[i]:mm\\:ss}");
+							}
+							_timerRunning[i] = false;
+							TimerColors selectedEnum4 = _TimerColorDefault.get_Value();
+							Color actualColor4 = _colorMap[selectedEnum4];
+							_timerLabels[i].set_TextColor(actualColor4);
+							((Control)_resetButtons[i]).set_Enabled(true);
+						}
+						else if (remaining.TotalSeconds <= 0.0)
+						{
+							_timerLabels[i].set_Text("-" + _timerLabels[i].get_Text());
+						}
+						if (remaining.TotalSeconds <= 0.0 && _timerTTSTriggered[i])
+						{
+							TTSAlert(i);
+							_timerTTSTriggered[i] = false;
+							UpdateTimerJsonEvents();
+						}
+					}
+					if (!_timerRunning[i])
 					{
 						if (DropdownValue == "Default")
 						{
-							_timerLabels[i].set_Text($"{_timerDurationDefaults[i]:mm\\:ss}");
+							CurrentElapsedTime[i] = _timerDurationDefaults[i];
 						}
 						else
 						{
-							_timerLabels[i].set_Text($"{_timerDurationOverride[i]:mm\\:ss}");
+							CurrentElapsedTime[i] = _timerDurationOverride[i];
 						}
-						_timerRunning[i] = false;
-						TimerColors selectedEnum4 = _TimerColorDefault.get_Value();
-						Color actualColor4 = _colorMap[selectedEnum4];
-						_timerLabels[i].set_TextColor(actualColor4);
-						((Control)_resetButtons[i]).set_Enabled(true);
+						continue;
 					}
-					else if (remaining.TotalSeconds <= 0.0)
+					CurrentElapsedTime[i] = remaining;
+					if (remaining.TotalSeconds < (double)_timerLowDefault.get_Value())
 					{
-						_timerLabels[i].set_Text("-" + _timerLabels[i].get_Text());
+						TimerColors selectedEnum3 = _LowTimerColorDefault.get_Value();
+						Color actualColor3 = _colorMap[selectedEnum3];
+						_timerLabels[i].set_TextColor(actualColor3);
 					}
-					if (remaining.TotalSeconds <= 0.0 && _timerTTSTriggered[i])
+					else if (remaining.TotalSeconds < (double)(_timerLowDefault.get_Value() + _timerIntermediateLowDefault.get_Value()))
 					{
-						TTSAlert(i);
-						_timerTTSTriggered[i] = false;
-						UpdateTimerJsonEvents();
-					}
-				}
-				if (!_timerRunning[i])
-				{
-					if (DropdownValue == "Default")
-					{
-						CurrentElapsedTime[i] = _timerDurationDefaults[i];
+						TimerColors selectedEnum2 = _IntermediateLowTimerColorDefault.get_Value();
+						Color actualColor2 = _colorMap[selectedEnum2];
+						_timerLabels[i].set_TextColor(actualColor2);
 					}
 					else
 					{
-						CurrentElapsedTime[i] = _timerDurationOverride[i];
+						TimerColors selectedEnum = _TimerColorDefault.get_Value();
+						Color actualColor = _colorMap[selectedEnum];
+						_timerLabels[i].set_TextColor(actualColor);
 					}
-					continue;
 				}
-				CurrentElapsedTime[i] = remaining;
-				if (remaining.TotalSeconds < (double)_timerLowDefault.get_Value())
+				if (_InOrdercheckbox.get_Checked())
 				{
-					TimerColors selectedEnum3 = _LowTimerColorDefault.get_Value();
-					Color actualColor3 = _colorMap[selectedEnum3];
-					_timerLabels[i].set_TextColor(actualColor3);
-				}
-				else if (remaining.TotalSeconds < (double)(_timerLowDefault.get_Value() + _timerIntermediateLowDefault.get_Value()))
-				{
-					TimerColors selectedEnum2 = _IntermediateLowTimerColorDefault.get_Value();
-					Color actualColor2 = _colorMap[selectedEnum2];
-					_timerLabels[i].set_TextColor(actualColor2);
-				}
-				else
-				{
-					TimerColors selectedEnum = _TimerColorDefault.get_Value();
-					Color actualColor = _colorMap[selectedEnum];
-					_timerLabels[i].set_TextColor(actualColor);
+					OrderPanelsByTime(CurrentElapsedTime);
 				}
 			}
-			if (_InOrdercheckbox.get_Checked())
+			catch (Exception ex)
 			{
-				OrderPanelsByTime(CurrentElapsedTime);
+				Logger.Warn("Failed GameUpdate timer calculation error: " + ex.Message);
 			}
 		}
 
 		private void TTSAlert(int index)
 		{
-			string TTSText = _timerEvents[index].TTSText;
-			if (_timerEvents[index].TTSActive || TTSText != "")
+			try
 			{
-				SpeechSynthesizer speechSynthesizer = new SpeechSynthesizer();
-				speechSynthesizer.Rate = _timerTTSSpeedDefault.get_Value();
-				speechSynthesizer.Volume = _timerTTSVolumeDefault.get_Value();
-				speechSynthesizer.SpeakAsync(TTSText);
+				string TTSText = _timerEvents[index].TTSText;
+				if (_timerEvents[index].TTSActive && TTSText != "" && TTSText != null)
+				{
+					SpeechSynthesizer speechSynthesizer = new SpeechSynthesizer();
+					speechSynthesizer.Rate = _timerTTSSpeedDefault.get_Value();
+					speechSynthesizer.Volume = _timerTTSVolumeDefault.get_Value();
+					speechSynthesizer.SpeakAsync(TTSText);
+				}
+			}
+			catch (Exception ex)
+			{
+				Logger.Warn("TTS Failed due to: " + ex.Message);
 			}
 		}
 
