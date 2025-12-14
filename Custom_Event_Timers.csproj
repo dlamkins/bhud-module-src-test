@@ -15,9 +15,10 @@
   <ItemGroup>
     <Reference Include="Blish HUD" />
     <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="System.Text.Json" />
     <Reference Include="MonoGame.Framework" />
+    <Reference Include="System.Text.Json" />
     <Reference Include="System.Core" />
     <Reference Include="MonoGame.Extended" />
+    <Reference Include="System.Speech" />
   </ItemGroup>
 </Project>

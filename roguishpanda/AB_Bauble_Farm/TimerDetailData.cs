@@ -12,6 +12,10 @@ namespace roguishpanda.AB_Bauble_Farm
 
 		public double Seconds { get; set; }
 
+		public string TTSText { get; set; }
+
+		public bool TTSActive { get; set; }
+
 		public List<NotesData> WaypointData { get; set; }
 
 		public List<NotesData> NotesData { get; set; }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Speech.Synthesis;
 using System.Text;
 using System.Text.Json;
 using Blish_HUD;
@@ -102,6 +103,20 @@ namespace roguishpanda.AB_Bauble_Farm
 		private Label[] _NotesLabel;
 
 		private MultilineTextBox[] _NotesTextbox;
+
+		private Label _TTSLabel;
+
+		private TextBox _TTSTextbox;
+
+		private Checkbox _TTSCheckbox;
+
+		private StandardButton _TTSTest;
+
+		private SettingCollection _Settings;
+
+		private SettingEntry<int> _TTSVolumeSettingEntry;
+
+		private SettingEntry<int> _TTSSpeedSettingEntry;
 
 		public readonly JsonSerializerOptions _jsonOptions;
 
@@ -413,6 +428,8 @@ namespace roguishpanda.AB_Bauble_Farm
 					Description = ((TextInputBase)_textNewEvent).get_Text(),
 					Minutes = 8.0,
 					Seconds = 30.0,
+					TTSText = "",
+					TTSActive = false,
 					WaypointData = new List<NotesData>
 					{
 						new NotesData
@@ -541,6 +558,8 @@ namespace roguishpanda.AB_Bauble_Farm
 					Description = note.Description,
 					Minutes = note.Minutes,
 					Seconds = note.Seconds,
+					TTSText = note.TTSText,
+					TTSActive = note.TTSActive,
 					WaypointData = note.WaypointData,
 					NotesData = note.NotesData
 				}).ToList();
@@ -896,9 +915,44 @@ namespace roguishpanda.AB_Bauble_Farm
 			//IL_06ab: Unknown result type (might be due to invalid IL or missing references)
 			//IL_06b5: Unknown result type (might be due to invalid IL or missing references)
 			//IL_06c2: Expected O, but got Unknown
-			//IL_07c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07f0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_082b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07b0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07b5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07d0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07e7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07f8: Expected O, but got Unknown
+			//IL_07f9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07fe: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0806: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0810: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0818: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0822: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0832: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0843: Expected O, but got Unknown
+			//IL_0844: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0849: Unknown result type (might be due to invalid IL or missing references)
+			//IL_084e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0858: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0860: Unknown result type (might be due to invalid IL or missing references)
+			//IL_086a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0881: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0892: Expected O, but got Unknown
+			//IL_08f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0905: Unknown result type (might be due to invalid IL or missing references)
+			//IL_090a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0914: Unknown result type (might be due to invalid IL or missing references)
+			//IL_091f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0929: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0930: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0941: Expected O, but got Unknown
+			//IL_0a14: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0a3d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0a78: Unknown result type (might be due to invalid IL or missing references)
 			try
 			{
 				object[] timerEventsPanels = _timerEventsPanels;
@@ -1043,6 +1097,62 @@ namespace roguishpanda.AB_Bauble_Farm
 					}
 					currentControlCount++;
 				}
+				Label val11 = new Label();
+				val11.set_Text("TTS:");
+				((Control)val11).set_Size(new Point(70, 40));
+				((Control)val11).set_Location(new Point(0, 500));
+				val11.set_HorizontalAlignment((HorizontalAlignment)2);
+				val11.set_Font(GameService.Content.get_DefaultFont16());
+				((Control)val11).set_Parent((Container)(object)_SettingsControlPanel);
+				_TTSLabel = val11;
+				TextBox val12 = new TextBox();
+				((Control)val12).set_Size(new Point(350, 40));
+				((Control)val12).set_Location(new Point(110, 500));
+				((TextInputBase)val12).set_Font(GameService.Content.get_DefaultFont16());
+				((Control)val12).set_Parent((Container)(object)_SettingsControlPanel);
+				_TTSTextbox = val12;
+				Checkbox val13 = new Checkbox();
+				((Control)val13).set_Size(new Point(32, 32));
+				((Control)val13).set_Location(new Point(80, 504));
+				val13.set_Checked(eventNotes[senderIndex].TTSActive);
+				((Control)val13).set_Parent((Container)(object)_SettingsControlPanel);
+				_TTSCheckbox = val13;
+				if (eventNotes[senderIndex].TTSText != null)
+				{
+					((TextInputBase)_TTSTextbox).set_Text(eventNotes[senderIndex].TTSText.ToString());
+				}
+				((TextInputBase)_TTSTextbox).add_TextChanged((EventHandler<EventArgs>)_TTSTextbox_TextChanged);
+				_TTSCheckbox.add_CheckedChanged((EventHandler<CheckChangedEvent>)_TTSCheckbox_CheckedChanged);
+				StandardButton val14 = new StandardButton();
+				val14.set_Text("Test");
+				((Control)val14).set_Size(new Point(60, 40));
+				((Control)val14).set_Location(new Point(470, 500));
+				((Control)val14).set_Visible(true);
+				((Control)val14).set_Parent((Container)(object)_SettingsControlPanel);
+				_TTSTest = val14;
+				_Settings = _BaubleFarmModule._settings;
+				SettingCollection obj = _Settings.AddSubCollection("MainSettings", false);
+				_TTSSpeedSettingEntry = null;
+				int TTSSpeed = 0;
+				obj.TryGetSetting<int>("TTSSpeedDefaultTimer", ref _TTSSpeedSettingEntry);
+				if (_TTSSpeedSettingEntry != null)
+				{
+					TTSSpeed = _TTSSpeedSettingEntry.get_Value();
+				}
+				_TTSVolumeSettingEntry = null;
+				int TTSVolume = 100;
+				obj.TryGetSetting<int>("TTSVolumeDefaultTimer", ref _TTSVolumeSettingEntry);
+				if (_TTSVolumeSettingEntry != null)
+				{
+					TTSVolume = _TTSVolumeSettingEntry.get_Value();
+				}
+				((Control)_TTSTest).add_Click((EventHandler<MouseEventArgs>)delegate
+				{
+					SpeechSynthesizer speechSynthesizer = new SpeechSynthesizer();
+					speechSynthesizer.Rate = TTSSpeed;
+					speechSynthesizer.Volume = TTSVolume;
+					speechSynthesizer.SpeakAsync(((TextInputBase)_TTSTextbox).get_Text().ToString());
+				});
 				for (int j = 0; j < TimerRowNum; j++)
 				{
 					if (j % 2 == 0)
@@ -1075,6 +1185,18 @@ namespace roguishpanda.AB_Bauble_Farm
 			{
 				Logger.Warn("Failed to load event details when clicking event panel: " + ex.Message);
 			}
+		}
+
+		private void _TTSCheckbox_CheckedChanged(object sender, CheckChangedEvent e)
+		{
+			_eventNotes[_CurrentEventSelected].TTSActive = _TTSCheckbox.get_Checked();
+			((Control)_buttonSaveEvents).set_Visible(true);
+		}
+
+		private void _TTSTextbox_TextChanged(object sender, EventArgs e)
+		{
+			_eventNotes[_CurrentEventSelected].TTSText = ((TextInputBase)_TTSTextbox).get_Text().ToString();
+			((Control)_buttonSaveEvents).set_Visible(true);
 		}
 
 		private void _WaypointsTextbox_TextChanged(object sender, EventArgs e)

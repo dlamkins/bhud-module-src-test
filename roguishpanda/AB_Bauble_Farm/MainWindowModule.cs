@@ -4,6 +4,7 @@ using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Speech.Synthesis;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -107,6 +108,8 @@ namespace roguishpanda.AB_Bauble_Farm
 
 		public bool[] _timerRunning;
 
+		public bool[] _timerTTSTriggered;
+
 		public TimeSpan[] _timerDurationDefaults;
 
 		public List<List<string>> _staticWaypoints;
@@ -169,9 +172,21 @@ namespace roguishpanda.AB_Bauble_Farm
 
 		public SettingEntry<bool> _hideStaticEventsDefault;
 
+		private SettingEntry<bool> _DisableStartDefault;
+
 		public SettingEntry<float> _OpacityDefault;
 
 		public SettingEntry<int> _timerLowDefault;
+
+		private SettingEntry<int> _timerIntermediateLowDefault;
+
+		private SettingEntry<TargetChats> _TargetChatDefault;
+
+		private SettingEntry<TimerColors> _TimerColorDefault;
+
+		private SettingEntry<TimerColors> _LowTimerColorDefault;
+
+		private SettingEntry<TimerColors> _IntermediateLowTimerColorDefault;
 
 		public AsyncTexture2D _asyncTimertexture;
 
@@ -209,7 +224,13 @@ namespace roguishpanda.AB_Bauble_Farm
 
 		public SettingEntry<string> _PackageSettingEntry;
 
+		private Dictionary<TimerColors, Color> _colorMap;
+
 		public string _CurrentPackage;
+
+		private SettingEntry<int> _timerTTSVolumeDefault;
+
+		private SettingEntry<int> _timerTTSSpeedDefault;
 
 		public readonly JsonSerializerOptions _jsonOptions;
 
@@ -244,23 +265,36 @@ namespace roguishpanda.AB_Bauble_Farm
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
-			//IL_01c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_020e: Expected O, but got Unknown
-			//IL_0263: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ab: Expected O, but got Unknown
-			//IL_02fd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0345: Expected O, but got Unknown
-			//IL_0397: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03df: Expected O, but got Unknown
+			//IL_0347: Unknown result type (might be due to invalid IL or missing references)
+			//IL_038f: Expected O, but got Unknown
+			//IL_03e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_042c: Expected O, but got Unknown
+			//IL_047e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04c6: Expected O, but got Unknown
+			//IL_0518: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0560: Expected O, but got Unknown
+			//IL_0716: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0722: Unknown result type (might be due to invalid IL or missing references)
+			//IL_072e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_073a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0746: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0752: Unknown result type (might be due to invalid IL or missing references)
 			_MainSettingsCollection = settings.AddSubCollection("MainSettings", false);
 			_PackageSettingsCollection = settings.AddSubCollection("PackageSettings", false);
 			_InOrdercheckboxDefault = _MainSettingsCollection.DefineSetting<bool>("InOrdercheckboxDefault", false, (Func<string>)(() => "Order by Timer"), (Func<string>)(() => "Check this box if you want to order your timers by time."));
 			_hideStaticEventsDefault = _MainSettingsCollection.DefineSetting<bool>("hideStaticEventsDefault", false, (Func<string>)(() => "Hide Static Events"), (Func<string>)(() => "Check this box to hide static events that are completed."));
-			_timerLowDefault = _MainSettingsCollection.DefineSetting<int>("LowTimerDefaultTimer", 30, (Func<string>)(() => "Low Timer"), (Func<string>)(() => "Set timer for when timer gets below certain threshold in seconds."));
+			_DisableStartDefault = _MainSettingsCollection.DefineSetting<bool>("_DisableStartDefault", false, (Func<string>)(() => "Disable Start Button When Pressed"), (Func<string>)(() => "Check this box to change Start button into Resart button."));
+			_timerLowDefault = _MainSettingsCollection.DefineSetting<int>("LowTimerDefaultTimer", 30, (Func<string>)(() => "Low Timer"), (Func<string>)(() => "This timer setting (in seconds) will trigger when the low timer value is lower than the current timer value."));
 			SettingComplianceExtensions.SetRange(_timerLowDefault, 1, 120);
+			_timerIntermediateLowDefault = _MainSettingsCollection.DefineSetting<int>("IntermediateLowTimerDefaultTimer", 60, (Func<string>)(() => "Intermediate Timer"), (Func<string>)(() => "This timer setting (in seconds) will trigger when the low and intermediate combined values are lower than the current timer value."));
+			SettingComplianceExtensions.SetRange(_timerIntermediateLowDefault, 1, 120);
 			_OpacityDefault = _MainSettingsCollection.DefineSetting<float>("OpacityDefault", 1f, (Func<string>)(() => "Window Opacity"), (Func<string>)(() => "Changing the opacity will adjust how translucent the windows are."));
 			SettingComplianceExtensions.SetRange(_OpacityDefault, 0.1f, 1f);
 			_OpacityDefault.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)ChangeOpacity_Activated);
+			_timerTTSVolumeDefault = _MainSettingsCollection.DefineSetting<int>("TTSVolumeDefaultTimer", 50, (Func<string>)(() => "TTS Volume"), (Func<string>)(() => "This controls the TTS volume."));
+			SettingComplianceExtensions.SetRange(_timerTTSVolumeDefault, 0, 100);
+			_timerTTSSpeedDefault = _MainSettingsCollection.DefineSetting<int>("TTSSpeedDefaultTimer", 0, (Func<string>)(() => "TTS Speed"), (Func<string>)(() => "This controls the TTS speaker's speed."));
+			SettingComplianceExtensions.SetRange(_timerTTSSpeedDefault, -10, 10);
 			_toggleTimerWindowKeybind = _MainSettingsCollection.DefineSetting<KeyBinding>("TimerKeybinding", new KeyBinding((ModifierKeys)4, (Keys)76), (Func<string>)(() => "Timer Window"), (Func<string>)(() => "Keybind to show or hide the Timer window."));
 			_toggleTimerWindowKeybind.get_Value().set_BlockSequenceFromGw2(true);
 			_toggleTimerWindowKeybind.get_Value().set_Enabled(true);
@@ -277,6 +311,38 @@ namespace roguishpanda.AB_Bauble_Farm
 			_cancelNotesKeybind.get_Value().set_BlockSequenceFromGw2(true);
 			_cancelNotesKeybind.get_Value().set_Enabled(true);
 			_cancelNotesKeybind.get_Value().add_BindingChanged((EventHandler<EventArgs>)CancelNotes_BindingChanged);
+			_TargetChatDefault = _MainSettingsCollection.DefineSetting<TargetChats>("TargetChatDefault", TargetChats.None, (Func<string>)(() => "Target Chat"), (Func<string>)(() => "Pick the default chat shorts targeted chat."));
+			_TimerColorDefault = _MainSettingsCollection.DefineSetting<TimerColors>("TimerColorDefault", TimerColors.Green, (Func<string>)(() => "Timer Color"), (Func<string>)(() => "Pick the color for the timer."));
+			_TimerColorDefault.add_SettingChanged((EventHandler<ValueChangedEventArgs<TimerColors>>)_TimerColorDefault_SettingChanged);
+			_LowTimerColorDefault = _MainSettingsCollection.DefineSetting<TimerColors>("LowTimerColorDefault", TimerColors.Red, (Func<string>)(() => "Low Timer Color"), (Func<string>)(() => "Pick the color for the low timer."));
+			_IntermediateLowTimerColorDefault = _MainSettingsCollection.DefineSetting<TimerColors>("IntermediateLowTimerColorDefault", TimerColors.Orange, (Func<string>)(() => "Intermediate Timer Color"), (Func<string>)(() => "Pick the color for the intermediate timer."));
+			_colorMap = new Dictionary<TimerColors, Color>
+			{
+				{
+					TimerColors.Red,
+					Color.get_Red()
+				},
+				{
+					TimerColors.Green,
+					Color.get_GreenYellow()
+				},
+				{
+					TimerColors.Orange,
+					Color.get_Orange()
+				},
+				{
+					TimerColors.Blue,
+					Color.get_LightBlue()
+				},
+				{
+					TimerColors.Yellow,
+					Color.get_Yellow()
+				},
+				{
+					TimerColors.White,
+					Color.get_White()
+				}
+			};
 			_CurrentPackageSelection = _PackageSettingsCollection.DefineSetting<string>("CurrentPackageSelection", "Default", (Func<string>)(() => "Current Package"), (Func<string>)(() => "This is the current package selection"));
 			_settings = settings;
 		}
@@ -284,6 +350,19 @@ namespace roguishpanda.AB_Bauble_Farm
 		public override IView GetSettingsView()
 		{
 			return (IView)(object)new ModuleSettingsView();
+		}
+
+		private void _TimerColorDefault_SettingChanged(object sender, ValueChangedEventArgs<TimerColors> e)
+		{
+			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+			for (int timerIndex = 0; timerIndex < TimerRowNum; timerIndex++)
+			{
+				TimerColors selectedEnum = _TimerColorDefault.get_Value();
+				Color actualColor = _colorMap[selectedEnum];
+				_timerLabels[timerIndex].set_TextColor(actualColor);
+			}
 		}
 
 		private void CancelNotes_BindingChanged(object sender, EventArgs e)
@@ -653,7 +732,34 @@ namespace roguishpanda.AB_Bauble_Farm
 				SendKey(13u);
 			}
 			Thread.Sleep(100);
-			CopyToClipboard(notesData.Notes);
+			string TargetChat = _TargetChatDefault.get_Value().ToString();
+			if (TargetChat != "None")
+			{
+				string chatPrefix = "";
+				switch (TargetChat)
+				{
+				case "Squad":
+					chatPrefix = "/d ";
+					break;
+				case "Party":
+					chatPrefix = "/p ";
+					break;
+				case "Guild":
+					chatPrefix = "/g ";
+					break;
+				case "Map":
+					chatPrefix = "/m ";
+					break;
+				case "Say":
+					chatPrefix = "/s ";
+					break;
+				}
+				CopyToClipboard(chatPrefix + notesData.Notes);
+			}
+			else
+			{
+				CopyToClipboard(notesData.Notes);
+			}
 			Thread.Sleep(100);
 			SendCtrlV();
 			Thread.Sleep(100);
@@ -907,8 +1013,12 @@ namespace roguishpanda.AB_Bauble_Farm
 			string DropdownValue = _customDropdownTimers[timerIndex].get_SelectedItem();
 			_timerStartTimes[timerIndex] = DateTime.Now;
 			_timerRunning[timerIndex] = true;
-			((Control)_resetButtons[timerIndex]).set_Enabled(false);
-			((Control)_customDropdownTimers[timerIndex]).set_Enabled(false);
+			_timerTTSTriggered[timerIndex] = true;
+			if (_DisableStartDefault.get_Value())
+			{
+				((Control)_resetButtons[timerIndex]).set_Enabled(false);
+				((Control)_customDropdownTimers[timerIndex]).set_Enabled(false);
+			}
 			if (DropdownValue != "Default" && int.TryParse(DropdownValue, out var totalMinutes))
 			{
 				_timerDurationOverride[timerIndex] = TimeSpan.FromMinutes(totalMinutes);
@@ -918,7 +1028,9 @@ namespace roguishpanda.AB_Bauble_Farm
 
 		private void stopButtons_Click(int timerIndex)
 		{
-			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
 			string DropdownValue = _customDropdownTimers[timerIndex].get_SelectedItem();
 			if (_timerStartTimes[timerIndex].HasValue)
 			{
@@ -931,7 +1043,10 @@ namespace roguishpanda.AB_Bauble_Farm
 					_timerLabels[timerIndex].set_Text($"{_timerDurationOverride[timerIndex]:mm\\:ss}");
 				}
 				_timerRunning[timerIndex] = false;
-				_timerLabels[timerIndex].set_TextColor(Color.get_GreenYellow());
+				_timerTTSTriggered[timerIndex] = false;
+				TimerColors selectedEnum = _TimerColorDefault.get_Value();
+				Color actualColor = _colorMap[selectedEnum];
+				_timerLabels[timerIndex].set_TextColor(actualColor);
 				((Control)_resetButtons[timerIndex]).set_Enabled(true);
 				((Control)_customDropdownTimers[timerIndex]).set_Enabled(true);
 			}
@@ -940,7 +1055,9 @@ namespace roguishpanda.AB_Bauble_Farm
 
 		private void StopButton_Click()
 		{
-			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
 			for (int timerIndex = 0; timerIndex < TimerRowNum; timerIndex++)
 			{
 				string DropdownValue = _customDropdownTimers[timerIndex].get_SelectedItem();
@@ -955,7 +1072,10 @@ namespace roguishpanda.AB_Bauble_Farm
 						_timerLabels[timerIndex].set_Text($"{_timerDurationOverride[timerIndex]:mm\\:ss}");
 					}
 					_timerRunning[timerIndex] = false;
-					_timerLabels[timerIndex].set_TextColor(Color.get_GreenYellow());
+					_timerTTSTriggered[timerIndex] = false;
+					TimerColors selectedEnum = _TimerColorDefault.get_Value();
+					Color actualColor = _colorMap[selectedEnum];
+					_timerLabels[timerIndex].set_TextColor(actualColor);
 					((Control)_resetButtons[timerIndex]).set_Enabled(true);
 					((Control)_customDropdownTimers[timerIndex]).set_Enabled(true);
 				}
@@ -994,7 +1114,8 @@ namespace roguishpanda.AB_Bauble_Farm
 					ID = i,
 					Description = (_timerLabelDescriptions[i].get_Text() ?? ""),
 					StartTime = startTime,
-					IsActive = _timerRunning[i]
+					IsActive = _timerRunning[i],
+					TTSTriggered = _timerTTSTriggered[i]
 				});
 			}
 			try
@@ -1066,6 +1187,7 @@ namespace roguishpanda.AB_Bauble_Farm
 				}
 				_timerStartTimes = new DateTime?[TimerRowNum];
 				_timerRunning = new bool[TimerRowNum];
+				_timerTTSTriggered = new bool[TimerRowNum];
 				_timerLabelDescriptions = (Label[])(object)new Label[TimerRowNum];
 				_timerNotesIcon = (Image[])(object)new Image[TimerRowNum];
 				_timerWaypointIcon = (Image[])(object)new Image[TimerRowNum];
@@ -1109,6 +1231,7 @@ namespace roguishpanda.AB_Bauble_Farm
 				_timerLabels[l] = new Label();
 				_timerStartTimes[l] = null;
 				_timerRunning[l] = false;
+				_timerTTSTriggered[l] = false;
 			}
 			LoadTimerDefaults(TimerRowNum);
 			for (int m = 0; m < StaticRowNum; m++)
@@ -1473,8 +1596,10 @@ namespace roguishpanda.AB_Bauble_Farm
 					((Control)_timerLabels[n]).set_Location(new Point(130, 0));
 					_timerLabels[n].set_HorizontalAlignment((HorizontalAlignment)1);
 					_timerLabels[n].set_Font(GameService.Content.get_DefaultFont16());
-					_timerLabels[n].set_TextColor(Color.get_GreenYellow());
 					((Control)_timerLabels[n]).set_Parent((Container)(object)_TimerWindowsOrdered[n]);
+					TimerColors selectedEnum = _TimerColorDefault.get_Value();
+					Color actualColor = _colorMap[selectedEnum];
+					_timerLabels[n].set_TextColor(actualColor);
 					StandardButton[] resetButtons = _resetButtons;
 					int num5 = n;
 					StandardButton val24 = new StandardButton();
@@ -1782,6 +1907,7 @@ namespace roguishpanda.AB_Bauble_Farm
 							{
 								_timerStartTimes[j] = eventData2[j].StartTime;
 								_timerRunning[j] = eventData2[j].IsActive;
+								_timerTTSTriggered[j] = eventData2[j].TTSTriggered;
 								((Control)_resetButtons[j]).set_Enabled(false);
 								((Control)_customDropdownTimers[j]).set_Enabled(false);
 							}
@@ -1789,6 +1915,7 @@ namespace roguishpanda.AB_Bauble_Farm
 							{
 								_timerStartTimes[j] = null;
 								_timerRunning[j] = false;
+								_timerTTSTriggered[j] = false;
 							}
 						}
 					}
@@ -1950,9 +2077,18 @@ namespace roguishpanda.AB_Bauble_Farm
 			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0203: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0214: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0325: Unknown result type (might be due to invalid IL or missing references)
+			//IL_032a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0335: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0374: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0379: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0384: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03b2: Unknown result type (might be due to invalid IL or missing references)
 			elapsedDateTime = DateTime.Now;
 			if (elapsedDateTime - initialDateTime >= TimeSpan.FromMinutes(1.0))
 			{
@@ -1984,12 +2120,20 @@ namespace roguishpanda.AB_Bauble_Farm
 							_timerLabels[i].set_Text($"{_timerDurationOverride[i]:mm\\:ss}");
 						}
 						_timerRunning[i] = false;
-						_timerLabels[i].set_TextColor(Color.get_GreenYellow());
+						TimerColors selectedEnum4 = _TimerColorDefault.get_Value();
+						Color actualColor4 = _colorMap[selectedEnum4];
+						_timerLabels[i].set_TextColor(actualColor4);
 						((Control)_resetButtons[i]).set_Enabled(true);
 					}
 					else if (remaining.TotalSeconds <= 0.0)
 					{
 						_timerLabels[i].set_Text("-" + _timerLabels[i].get_Text());
+					}
+					if (remaining.TotalSeconds <= 0.0 && _timerTTSTriggered[i])
+					{
+						TTSAlert(i);
+						_timerTTSTriggered[i] = false;
+						UpdateTimerJsonEvents();
 					}
 				}
 				if (!_timerRunning[i])
@@ -2007,16 +2151,38 @@ namespace roguishpanda.AB_Bauble_Farm
 				CurrentElapsedTime[i] = remaining;
 				if (remaining.TotalSeconds < (double)_timerLowDefault.get_Value())
 				{
-					_timerLabels[i].set_TextColor(Color.get_Red());
+					TimerColors selectedEnum3 = _LowTimerColorDefault.get_Value();
+					Color actualColor3 = _colorMap[selectedEnum3];
+					_timerLabels[i].set_TextColor(actualColor3);
+				}
+				else if (remaining.TotalSeconds < (double)(_timerLowDefault.get_Value() + _timerIntermediateLowDefault.get_Value()))
+				{
+					TimerColors selectedEnum2 = _IntermediateLowTimerColorDefault.get_Value();
+					Color actualColor2 = _colorMap[selectedEnum2];
+					_timerLabels[i].set_TextColor(actualColor2);
 				}
 				else
 				{
-					_timerLabels[i].set_TextColor(Color.get_GreenYellow());
+					TimerColors selectedEnum = _TimerColorDefault.get_Value();
+					Color actualColor = _colorMap[selectedEnum];
+					_timerLabels[i].set_TextColor(actualColor);
 				}
 			}
 			if (_InOrdercheckbox.get_Checked())
 			{
 				OrderPanelsByTime(CurrentElapsedTime);
+			}
+		}
+
+		private void TTSAlert(int index)
+		{
+			string TTSText = _timerEvents[index].TTSText;
+			if (_timerEvents[index].TTSActive || TTSText != "")
+			{
+				SpeechSynthesizer speechSynthesizer = new SpeechSynthesizer();
+				speechSynthesizer.Rate = _timerTTSSpeedDefault.get_Value();
+				speechSynthesizer.Volume = _timerTTSVolumeDefault.get_Value();
+				speechSynthesizer.SpeakAsync(TTSText);
 			}
 		}
 

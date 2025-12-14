@@ -11,5 +11,7 @@ namespace roguishpanda.AB_Bauble_Farm
 		public DateTime? StartTime { get; set; }
 
 		public bool IsActive { get; set; }
+
+		public bool TTSTriggered { get; set; }
 	}
 }

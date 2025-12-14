@@ -21,11 +21,23 @@ namespace roguishpanda.AB_Bauble_Farm
 
 		private Label _LowTimerLabelDisplay;
 
+		private Label _IntermediateLowTimerLabelDisplay;
+
 		private Label _OpacityLabelDisplay;
+
+		private Label _TTSVolumeLabelDisplay;
+
+		private Label _TTSSpeedLabelDisplay;
 
 		private SettingEntry<int> _LowTimerSettingEntry;
 
+		private SettingEntry<int> _IntermediateLowTimerSettingEntry;
+
 		private SettingEntry<float> _OpacityDefaultSettingEntry;
+
+		private SettingEntry<int> _TTSVolumeSettingEntry;
+
+		private SettingEntry<int> _TTSSpeedSettingEntry;
 
 		private SettingCollection _Settings;
 
@@ -78,25 +90,49 @@ namespace roguishpanda.AB_Bauble_Farm
 			//IL_0180: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0190: Unknown result type (might be due to invalid IL or missing references)
 			//IL_019c: Expected O, but got Unknown
-			//IL_02a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ac: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02d9: Expected O, but got Unknown
-			//IL_02da: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02df: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02f2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02fc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0300: Unknown result type (might be due to invalid IL or missing references)
-			//IL_030a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_031a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_031b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0325: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0336: Expected O, but got Unknown
+			//IL_019d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01bc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e2: Expected O, but got Unknown
+			//IL_01e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ed: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0202: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0228: Expected O, but got Unknown
+			//IL_0229: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0233: Unknown result type (might be due to invalid IL or missing references)
+			//IL_023d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0248: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0252: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0262: Unknown result type (might be due to invalid IL or missing references)
+			//IL_026e: Expected O, but got Unknown
+			//IL_048b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0490: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0497: Unknown result type (might be due to invalid IL or missing references)
+			//IL_049f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04a9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04ae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04c4: Expected O, but got Unknown
+			//IL_04c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04d5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04e7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04eb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0505: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0506: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0510: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0521: Expected O, but got Unknown
 			_BaubleFarmModule = MainWindowModule.ModuleInstance;
 			Panel val = new Panel();
 			((Control)val).set_Parent(buildPanel);
@@ -115,22 +151,40 @@ namespace roguishpanda.AB_Bauble_Farm
 			((Control)val2).set_Parent((Container)(object)listSettingsPanel);
 			((Control)val2).set_Padding(new Thickness(50f, 50f, 50f, 50f));
 			((Control)val2).set_Location(new Point(100, 100));
-			((Control)val2).set_Size(new Point(500, 300));
+			((Control)val2).set_Size(new Point(500, 600));
 			_settingsViewContainer = val2;
 			SettingsView settingsView = new SettingsView(mainSettingsCollection, -1);
 			_settingsViewContainer.Show((IView)(object)settingsView);
 			Label val3 = new Label();
 			((Control)val3).set_Size(new Point(100, 40));
-			((Control)val3).set_Location(new Point(580, 150));
+			((Control)val3).set_Location(new Point(580, 170));
 			val3.set_Font(GameService.Content.get_DefaultFont16());
 			((Control)val3).set_Parent((Container)(object)listSettingsPanel);
 			_LowTimerLabelDisplay = val3;
 			Label val4 = new Label();
 			((Control)val4).set_Size(new Point(100, 40));
-			((Control)val4).set_Location(new Point(580, 175));
+			((Control)val4).set_Location(new Point(580, 195));
 			val4.set_Font(GameService.Content.get_DefaultFont16());
 			((Control)val4).set_Parent((Container)(object)listSettingsPanel);
-			_OpacityLabelDisplay = val4;
+			_IntermediateLowTimerLabelDisplay = val4;
+			Label val5 = new Label();
+			((Control)val5).set_Size(new Point(100, 40));
+			((Control)val5).set_Location(new Point(580, 220));
+			val5.set_Font(GameService.Content.get_DefaultFont16());
+			((Control)val5).set_Parent((Container)(object)listSettingsPanel);
+			_OpacityLabelDisplay = val5;
+			Label val6 = new Label();
+			((Control)val6).set_Size(new Point(100, 40));
+			((Control)val6).set_Location(new Point(580, 245));
+			val6.set_Font(GameService.Content.get_DefaultFont16());
+			((Control)val6).set_Parent((Container)(object)listSettingsPanel);
+			_TTSVolumeLabelDisplay = val6;
+			Label val7 = new Label();
+			((Control)val7).set_Size(new Point(100, 40));
+			((Control)val7).set_Location(new Point(580, 270));
+			val7.set_Font(GameService.Content.get_DefaultFont16());
+			((Control)val7).set_Parent((Container)(object)listSettingsPanel);
+			_TTSSpeedLabelDisplay = val7;
 			_Settings = _BaubleFarmModule._settings;
 			SettingCollection TimerCollector = _Settings.AddSubCollection("MainSettings", false);
 			if (TimerCollector != null)
@@ -142,6 +196,13 @@ namespace roguishpanda.AB_Bauble_Farm
 					_LowTimerSettingEntry.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)LowTimerSettingEntry_SettingChanged);
 					_LowTimerLabelDisplay.set_Text(_LowTimerSettingEntry.get_Value() + " seconds");
 				}
+				_IntermediateLowTimerSettingEntry = null;
+				TimerCollector.TryGetSetting<int>("IntermediateLowTimerDefaultTimer", ref _IntermediateLowTimerSettingEntry);
+				if (_IntermediateLowTimerSettingEntry != null)
+				{
+					_IntermediateLowTimerSettingEntry.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)IntermediateLowTimerSettingEntry_SettingChanged);
+					_IntermediateLowTimerLabelDisplay.set_Text(_IntermediateLowTimerSettingEntry.get_Value() + " seconds");
+				}
 				_OpacityDefaultSettingEntry = null;
 				TimerCollector.TryGetSetting<float>("OpacityDefault", ref _OpacityDefaultSettingEntry);
 				if (_OpacityDefaultSettingEntry != null)
@@ -149,22 +210,46 @@ namespace roguishpanda.AB_Bauble_Farm
 					_OpacityDefaultSettingEntry.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)OpacityDefaultSettingEntry_SettingChanged);
 					_OpacityLabelDisplay.set_Text(Math.Round(_OpacityDefaultSettingEntry.get_Value() * 100f, 0) + "%");
 				}
+				_TTSVolumeSettingEntry = null;
+				TimerCollector.TryGetSetting<int>("TTSVolumeDefaultTimer", ref _TTSVolumeSettingEntry);
+				if (_TTSVolumeSettingEntry != null)
+				{
+					_TTSVolumeSettingEntry.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)TTSVolumeDefaultSettingEntry_SettingChanged);
+					_TTSVolumeLabelDisplay.set_Text(_TTSVolumeSettingEntry.get_Value() + "%");
+				}
+				_TTSSpeedSettingEntry = null;
+				TimerCollector.TryGetSetting<int>("TTSSpeedDefaultTimer", ref _TTSSpeedSettingEntry);
+				if (_TTSSpeedSettingEntry != null)
+				{
+					_TTSSpeedSettingEntry.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)TTSSpeedDefaultSettingEntry_SettingChanged);
+					_TTSSpeedLabelDisplay.set_Text(_TTSSpeedSettingEntry.get_Value().ToString());
+				}
 			}
 			AsyncTexture2D TitleTexture = AsyncTexture2D.FromAssetId(1234872);
-			Panel val5 = new Panel();
-			((Control)val5).set_Parent((Container)(object)listSettingsPanel);
-			((Control)val5).set_Size(new Point(700, 40));
-			((Control)val5).set_Location(new Point(102, 60));
-			val5.set_BackgroundTexture(TitleTexture);
-			_timerEventsTitlePanel = val5;
-			Label val6 = new Label();
-			val6.set_Text("General Settings");
-			((Control)val6).set_Size(new Point(300, 40));
-			((Control)val6).set_Location(new Point(10, 0));
-			val6.set_Font(GameService.Content.get_DefaultFont16());
-			val6.set_TextColor(Color.get_White());
-			((Control)val6).set_Parent((Container)(object)_timerEventsTitlePanel);
-			_timerEventsTitleLabel = val6;
+			Panel val8 = new Panel();
+			((Control)val8).set_Parent((Container)(object)listSettingsPanel);
+			((Control)val8).set_Size(new Point(700, 40));
+			((Control)val8).set_Location(new Point(102, 60));
+			val8.set_BackgroundTexture(TitleTexture);
+			_timerEventsTitlePanel = val8;
+			Label val9 = new Label();
+			val9.set_Text("General Settings");
+			((Control)val9).set_Size(new Point(300, 40));
+			((Control)val9).set_Location(new Point(10, 0));
+			val9.set_Font(GameService.Content.get_DefaultFont16());
+			val9.set_TextColor(Color.get_White());
+			((Control)val9).set_Parent((Container)(object)_timerEventsTitlePanel);
+			_timerEventsTitleLabel = val9;
+		}
+
+		private void TTSVolumeDefaultSettingEntry_SettingChanged(object sender, ValueChangedEventArgs<int> e)
+		{
+			_TTSVolumeLabelDisplay.set_Text(_TTSVolumeSettingEntry.get_Value() + "%");
+		}
+
+		private void TTSSpeedDefaultSettingEntry_SettingChanged(object sender, ValueChangedEventArgs<int> e)
+		{
+			_TTSSpeedLabelDisplay.set_Text(_TTSSpeedSettingEntry.get_Value().ToString());
 		}
 
 		private void OpacityDefaultSettingEntry_SettingChanged(object sender, ValueChangedEventArgs<float> e)
@@ -175,6 +260,11 @@ namespace roguishpanda.AB_Bauble_Farm
 		private void LowTimerSettingEntry_SettingChanged(object sender, ValueChangedEventArgs<int> e)
 		{
 			_LowTimerLabelDisplay.set_Text(_LowTimerSettingEntry.get_Value() + " seconds");
+		}
+
+		private void IntermediateLowTimerSettingEntry_SettingChanged(object sender, ValueChangedEventArgs<int> e)
+		{
+			_IntermediateLowTimerLabelDisplay.set_Text(_IntermediateLowTimerSettingEntry.get_Value() + " seconds");
 		}
 
 		public ListSettingsTabView()
