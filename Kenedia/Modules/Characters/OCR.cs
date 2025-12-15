@@ -56,7 +56,10 @@ namespace Kenedia.Modules.Characters
 			}
 			set
 			{
-				Common.SetProperty(ref _003CMainWindow_003Ek__BackingField, value, new PropertyChangedEventHandler(MainWindowChanged), triggerOnUpdate: true, "MainWindow");
+				Common.SetProperty(_003CMainWindow_003Ek__BackingField, value, delegate(MainWindow v)
+				{
+					_003CMainWindow_003Ek__BackingField = v;
+				}, new PropertyChangedEventHandler(MainWindowChanged), triggerOnUpdate: true, "MainWindow");
 			}
 		}
 

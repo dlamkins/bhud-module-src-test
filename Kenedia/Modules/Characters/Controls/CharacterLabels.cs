@@ -82,7 +82,10 @@ namespace Kenedia.Modules.Characters.Controls
 			}
 			set
 			{
-				Common.SetProperty(ref _003CData_003Ek__BackingField, value, new PropertyChangedEventHandler(OnDataChanged), triggerOnUpdate: true, "Data");
+				Common.SetProperty(_003CData_003Ek__BackingField, value, delegate(Data v)
+				{
+					_003CData_003Ek__BackingField = v;
+				}, new PropertyChangedEventHandler(OnDataChanged), triggerOnUpdate: true, "Data");
 			}
 		}
 
@@ -96,7 +99,10 @@ namespace Kenedia.Modules.Characters.Controls
 			set
 			{
 				Settings temp = _003CSettings_003Ek__BackingField;
-				if (Common.SetProperty(ref _003CSettings_003Ek__BackingField, value, new PropertyChangedEventHandler(OnSettingsChanged), triggerOnUpdate: true, "Settings"))
+				if (Common.SetProperty(_003CSettings_003Ek__BackingField, value, delegate(Settings v)
+				{
+					_003CSettings_003Ek__BackingField = v;
+				}, new PropertyChangedEventHandler(OnSettingsChanged), triggerOnUpdate: true, "Settings"))
 				{
 					if (temp != null)
 					{
@@ -119,7 +125,10 @@ namespace Kenedia.Modules.Characters.Controls
 			}
 			set
 			{
-				Common.SetProperty(ref _003CTextureManager_003Ek__BackingField, value, new PropertyChangedEventHandler(OnTextureManagerAdded), triggerOnUpdate: true, "TextureManager");
+				Common.SetProperty(_003CTextureManager_003Ek__BackingField, value, delegate(TextureManager v)
+				{
+					_003CTextureManager_003Ek__BackingField = v;
+				}, new PropertyChangedEventHandler(OnTextureManagerAdded), triggerOnUpdate: true, "TextureManager");
 			}
 		}
 

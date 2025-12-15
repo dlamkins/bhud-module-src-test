@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Blish_HUD.Controls;
+using Kenedia.Modules.Core.Models;
+using Kenedia.Modules.Core.Utility;
 using Microsoft.Xna.Framework;
 
 namespace Kenedia.Modules.Core.Controls
@@ -22,7 +24,10 @@ namespace Kenedia.Modules.Core.Controls
 			}
 			set
 			{
-				SetProperty(ref _003CFlowDirection_003Ek__BackingField, value, invalidateLayout: true, "FlowDirection");
+				Common.SetProperty(_003CFlowDirection_003Ek__BackingField, value, delegate(ControlFlowDirection v)
+				{
+					_003CFlowDirection_003Ek__BackingField = v;
+				}, new ValueChangedEventHandler<ControlFlowDirection>(OnFlowDirectionChanged));
 			}
 		}
 
@@ -52,6 +57,11 @@ namespace Kenedia.Modules.Core.Controls
 				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 				SetProperty(ref _outerControlPadding, value, invalidateLayout: true, "OuterControlPadding");
 			}
+		}
+
+		private void OnFlowDirectionChanged(object sender, ValueChangedEventArgs<ControlFlowDirection> e)
+		{
+			OnPropertyChanged("FlowDirection", invalidateLayout: true);
 		}
 
 		public override void RecalculateLayout()

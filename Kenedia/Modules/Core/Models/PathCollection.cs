@@ -22,7 +22,10 @@ namespace Kenedia.Modules.Core.Models
 			}
 			set
 			{
-				Common.SetProperty(ref _003CAccountName_003Ek__BackingField, value, new Action(AddAccountFolder), !string.IsNullOrEmpty(value));
+				Common.SetProperty(_003CAccountName_003Ek__BackingField, value, delegate(string v)
+				{
+					_003CAccountName_003Ek__BackingField = v;
+				}, new Action(AddAccountFolder), !string.IsNullOrEmpty(value));
 			}
 		}
 

@@ -60,7 +60,10 @@ namespace Kenedia.Modules.Core.Controls
 			}
 			set
 			{
-				Common.SetProperty(ref _003CAnchor_003Ek__BackingField, value, new ValueChangedEventHandler<Control>(OnAnchorChanged));
+				Common.SetProperty(_003CAnchor_003Ek__BackingField, value, delegate(Control v)
+				{
+					_003CAnchor_003Ek__BackingField = v;
+				}, new ValueChangedEventHandler<Control>(OnAnchorChanged));
 			}
 		}
 

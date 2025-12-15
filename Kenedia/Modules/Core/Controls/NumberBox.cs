@@ -83,7 +83,10 @@ namespace Kenedia.Modules.Core.Controls
 			}
 			set
 			{
-				Common.SetProperty(ref _003CShowButtons_003Ek__BackingField, value, new Action(RecalculateLayout));
+				Common.SetProperty(_003CShowButtons_003Ek__BackingField, value, delegate(bool v)
+				{
+					_003CShowButtons_003Ek__BackingField = v;
+				}, new Action(RecalculateLayout));
 			}
 		}
 

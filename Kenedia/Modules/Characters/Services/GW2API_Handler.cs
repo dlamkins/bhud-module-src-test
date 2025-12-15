@@ -64,7 +64,10 @@ namespace Kenedia.Modules.Characters.Services
 			set
 			{
 				Account temp = _003CAccount_003Ek__BackingField;
-				if (Common.SetProperty(ref _003CAccount_003Ek__BackingField, value, this.AccountChanged, triggerOnUpdate: true, "Account"))
+				if (Common.SetProperty(_003CAccount_003Ek__BackingField, value, delegate(Account v)
+				{
+					_003CAccount_003Ek__BackingField = v;
+				}, this.AccountChanged, triggerOnUpdate: true, "Account"))
 				{
 					_paths.AccountName = ((value != null) ? value.get_Name() : null);
 					BaseModule<Characters, Kenedia.Modules.Characters.Views.MainWindow, Settings, PathCollection, StaticHosting>.Logger.Info("Account changed from " + (((temp != null) ? temp.get_Name() : null) ?? "No Account") + " to " + (((value != null) ? value.get_Name() : null) ?? "No Account") + "!");

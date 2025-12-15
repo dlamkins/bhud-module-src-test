@@ -50,7 +50,10 @@ namespace Kenedia.Modules.Core.Controls
 			}
 			set
 			{
-				Common.SetProperty(ref _003CExpandType_003Ek__BackingField, value, new ValueChangedEventHandler<ExpandType>(OnExpandTypeChanged));
+				Common.SetProperty(_003CExpandType_003Ek__BackingField, value, delegate(ExpandType v)
+				{
+					_003CExpandType_003Ek__BackingField = v;
+				}, new ValueChangedEventHandler<ExpandType>(OnExpandTypeChanged));
 			}
 		}
 
@@ -63,7 +66,10 @@ namespace Kenedia.Modules.Core.Controls
 			}
 			set
 			{
-				Common.SetProperty(ref _003CSortType_003Ek__BackingField, value, new ValueChangedEventHandler<SortType>(OnSortTypeCanged));
+				Common.SetProperty(_003CSortType_003Ek__BackingField, value, delegate(SortType v)
+				{
+					_003CSortType_003Ek__BackingField = v;
+				}, new ValueChangedEventHandler<SortType>(OnSortTypeCanged));
 			}
 		}
 
@@ -76,7 +82,10 @@ namespace Kenedia.Modules.Core.Controls
 			}
 			set
 			{
-				Common.SetProperty(ref _003CExpandBar_003Ek__BackingField, value, new ValueChangedEventHandler<bool>(OnExpandChanged));
+				Common.SetProperty(_003CExpandBar_003Ek__BackingField, value, delegate(bool v)
+				{
+					_003CExpandBar_003Ek__BackingField = v;
+				}, new ValueChangedEventHandler<bool>(OnExpandChanged));
 			}
 		}
 

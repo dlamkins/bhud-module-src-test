@@ -28,7 +28,10 @@ namespace Kenedia.Modules.Core.Controls
 			}
 			set
 			{
-				Common.SetProperty(ref _003CChecked_003Ek__BackingField, value, new ValueChangedEventHandler<bool>(On_CheckChanged));
+				Common.SetProperty(_003CChecked_003Ek__BackingField, value, delegate(bool v)
+				{
+					_003CChecked_003Ek__BackingField = v;
+				}, new ValueChangedEventHandler<bool>(On_CheckChanged));
 			}
 		}
 

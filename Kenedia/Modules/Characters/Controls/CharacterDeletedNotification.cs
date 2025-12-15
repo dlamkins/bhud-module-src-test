@@ -33,7 +33,10 @@ namespace Kenedia.Modules.Characters.Controls
 			}
 			set
 			{
-				Common.SetProperty(ref _003CMarkedCharacter_003Ek__BackingField, value, new Action(RecalculateLayout));
+				Common.SetProperty(_003CMarkedCharacter_003Ek__BackingField, value, delegate(Character_Model v)
+				{
+					_003CMarkedCharacter_003Ek__BackingField = v;
+				}, new Action(RecalculateLayout));
 			}
 		}
 

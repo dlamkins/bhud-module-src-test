@@ -25,7 +25,10 @@ namespace Kenedia.Modules.Core.Controls
 			}
 			set
 			{
-				Common.SetProperty(ref _003CCoveredControl_003Ek__BackingField, value, new ValueChangedEventHandler<Control>(OnCoveredControlChanged));
+				Common.SetProperty(_003CCoveredControl_003Ek__BackingField, value, delegate(Control v)
+				{
+					_003CCoveredControl_003Ek__BackingField = v;
+				}, new ValueChangedEventHandler<Control>(OnCoveredControlChanged));
 			}
 		}
 
