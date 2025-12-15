@@ -25,7 +25,10 @@ namespace Kenedia.Modules.BuildsManager.Models
 			}
 			set
 			{
-				Common.SetProperty(ref _003CPriority_003Ek__BackingField, value, new ValueChangedEventHandler<int>(OnPriorityChanged));
+				Common.SetProperty(_003CPriority_003Ek__BackingField, value, delegate(int v)
+				{
+					_003CPriority_003Ek__BackingField = v;
+				}, new ValueChangedEventHandler<int>(OnPriorityChanged));
 			}
 		}
 
@@ -39,7 +42,10 @@ namespace Kenedia.Modules.BuildsManager.Models
 			}
 			set
 			{
-				Common.SetProperty(ref _003CName_003Ek__BackingField, value, new ValueChangedEventHandler<string>(OnNameChanged));
+				Common.SetProperty(_003CName_003Ek__BackingField, value, delegate(string v)
+				{
+					_003CName_003Ek__BackingField = v;
+				}, new ValueChangedEventHandler<string>(OnNameChanged));
 			}
 		}
 
@@ -56,7 +62,10 @@ namespace Kenedia.Modules.BuildsManager.Models
 			}
 			set
 			{
-				Common.SetProperty(ref _003CAssetId_003Ek__BackingField, value, new ValueChangedEventHandler<int>(OnAssetIdChanged));
+				Common.SetProperty(_003CAssetId_003Ek__BackingField, value, delegate(int v)
+				{
+					_003CAssetId_003Ek__BackingField = v;
+				}, new ValueChangedEventHandler<int>(OnAssetIdChanged));
 			}
 		}
 

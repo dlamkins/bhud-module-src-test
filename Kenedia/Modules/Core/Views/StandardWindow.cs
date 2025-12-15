@@ -48,7 +48,10 @@ namespace Kenedia.Modules.Core.Views
 			}
 			set
 			{
-				Common.SetProperty(ref _003CVersion_003Ek__BackingField, value, new Action(RecalculateLayout));
+				Common.SetProperty(_003CVersion_003Ek__BackingField, value, delegate(Version v)
+				{
+					_003CVersion_003Ek__BackingField = v;
+				}, new Action(RecalculateLayout));
 			}
 		}
 
@@ -61,7 +64,10 @@ namespace Kenedia.Modules.Core.Views
 			}
 			set
 			{
-				Common.SetProperty(ref _003CName_003Ek__BackingField, value, new Action(RecalculateLayout));
+				Common.SetProperty(_003CName_003Ek__BackingField, value, delegate(string v)
+				{
+					_003CName_003Ek__BackingField = v;
+				}, new Action(RecalculateLayout));
 			}
 		}
 
@@ -74,7 +80,10 @@ namespace Kenedia.Modules.Core.Views
 			}
 			set
 			{
-				Common.SetProperty(ref _003CSubName_003Ek__BackingField, value, new Action(RecalculateLayout));
+				Common.SetProperty(_003CSubName_003Ek__BackingField, value, delegate(string v)
+				{
+					_003CSubName_003Ek__BackingField = v;
+				}, new Action(RecalculateLayout));
 			}
 		}
 

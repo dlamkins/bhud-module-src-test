@@ -24,7 +24,10 @@ namespace Kenedia.Modules.BuildsManager.TemplateEntries
 			}
 			set
 			{
-				Common.SetProperty(ref _003CItem_003Ek__BackingField, value, new ValueChangedEventHandler<BaseItem>(OnItemChanged));
+				Common.SetProperty(_003CItem_003Ek__BackingField, value, delegate(BaseItem v)
+				{
+					_003CItem_003Ek__BackingField = v;
+				}, new ValueChangedEventHandler<BaseItem>(OnItemChanged));
 			}
 		}
 

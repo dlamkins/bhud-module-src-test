@@ -19,6 +19,55 @@ namespace Kenedia.Modules.Core.Utility
 
 		public static double Now => GameService.Overlay.CurrentGameTime.get_TotalGameTime().TotalMilliseconds;
 
+		public static bool SetProperty<T>(T oldValue, T newValue, Action<T> assign)
+		{
+			if (object.Equals(oldValue, newValue))
+			{
+				return false;
+			}
+			assign(newValue);
+			return true;
+		}
+
+		public static bool SetProperty<T>(T oldValue, T newValue, Action<T> assign, ValueChangedEventHandler<T> onUpdated, bool triggerOnUpdate = true)
+		{
+			if (SetProperty(oldValue, newValue, assign))
+			{
+				if (triggerOnUpdate)
+				{
+					onUpdated?.Invoke(null, new Kenedia.Modules.Core.Models.ValueChangedEventArgs<T>(oldValue, newValue));
+				}
+				return true;
+			}
+			return false;
+		}
+
+		public static bool SetProperty<T>(T oldValue, T newValue, Action<T> assign, Action onUpdated, bool triggerOnUpdate = true)
+		{
+			if (SetProperty(oldValue, newValue, assign))
+			{
+				if (triggerOnUpdate)
+				{
+					onUpdated?.Invoke();
+				}
+				return true;
+			}
+			return false;
+		}
+
+		public static bool SetProperty<T>(T property, T newValue, Action<T> assign, PropertyChangedEventHandler OnUpdated, bool triggerOnUpdate = true, [CallerMemberName] string propName = null)
+		{
+			if (SetProperty(property, newValue, assign))
+			{
+				if (triggerOnUpdate)
+				{
+					OnUpdated?.Invoke(property, new PropertyChangedEventArgs(propName));
+				}
+				return true;
+			}
+			return false;
+		}
+
 		public static bool SetProperty<T>(ref T property, T newValue, ValueChangedEventHandler<T> OnUpdated, bool triggerOnUpdate = true)
 		{
 			T temp = property;

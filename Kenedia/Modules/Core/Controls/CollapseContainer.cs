@@ -178,7 +178,10 @@ namespace Kenedia.Modules.Core.Controls
 			}
 			set
 			{
-				Common.SetProperty(ref _003CTitle_003Ek__BackingField, value, new Action(RecalculateLayout));
+				Common.SetProperty(_003CTitle_003Ek__BackingField, value, delegate(string v)
+				{
+					_003CTitle_003Ek__BackingField = v;
+				}, new Action(RecalculateLayout));
 			}
 		}
 

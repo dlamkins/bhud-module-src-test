@@ -78,7 +78,10 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 			}
 			set
 			{
-				Common.SetProperty(ref _003CItem_003Ek__BackingField, value, new Action(SetItem));
+				Common.SetProperty(_003CItem_003Ek__BackingField, value, delegate(BaseItem v)
+				{
+					_003CItem_003Ek__BackingField = v;
+				}, new Action(SetItem));
 			}
 		}
 

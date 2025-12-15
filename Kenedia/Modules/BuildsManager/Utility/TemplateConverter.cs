@@ -29,10 +29,14 @@ namespace Kenedia.Modules.BuildsManager.Utility
 		public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
 		{
 			JObject jo = JObject.Load(reader);
-			UniqueObservableCollection<string> tags;
+			UniqueObservableCollection<string> tags = new UniqueObservableCollection<string>();
 			try
 			{
-				tags = jo.get_Item("Tags").ToObject<UniqueObservableCollection<string>>(serializer);
+				JToken tagToken = default(JToken);
+				if (jo.TryGetValue("Tags", StringComparison.OrdinalIgnoreCase, ref tagToken) && tagToken != null)
+				{
+					tags = tagToken.ToObject<UniqueObservableCollection<string>>(serializer);
+				}
 			}
 			catch
 			{

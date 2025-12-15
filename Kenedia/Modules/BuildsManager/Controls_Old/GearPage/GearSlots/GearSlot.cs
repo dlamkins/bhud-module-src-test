@@ -65,7 +65,10 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 			}
 			set
 			{
-				Common.SetProperty(ref _003CSlot_003Ek__BackingField, value, new Action(ApplySlot));
+				Common.SetProperty(_003CSlot_003Ek__BackingField, value, delegate(TemplateSlotType v)
+				{
+					_003CSlot_003Ek__BackingField = v;
+				}, new Action(ApplySlot));
 			}
 		}
 
@@ -84,7 +87,10 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 			}
 			private set
 			{
-				Common.SetProperty(ref _003CTemplatePresenter_003Ek__BackingField, value, new ValueChangedEventHandler<TemplatePresenter>(OnTemplatePresenterChanged));
+				Common.SetProperty(_003CTemplatePresenter_003Ek__BackingField, value, delegate(TemplatePresenter v)
+				{
+					_003CTemplatePresenter_003Ek__BackingField = v;
+				}, new ValueChangedEventHandler<TemplatePresenter>(OnTemplatePresenterChanged));
 			}
 		}
 

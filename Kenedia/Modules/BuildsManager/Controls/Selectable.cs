@@ -32,7 +32,10 @@ namespace Kenedia.Modules.BuildsManager.Controls
 			}
 			set
 			{
-				Common.SetProperty(ref _003CSelected_003Ek__BackingField, value, new ValueChangedEventHandler<bool>(OnSelectedChanged));
+				Common.SetProperty(_003CSelected_003Ek__BackingField, value, delegate(bool v)
+				{
+					_003CSelected_003Ek__BackingField = v;
+				}, new ValueChangedEventHandler<bool>(OnSelectedChanged));
 			}
 		}
 

@@ -36,7 +36,10 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 			}
 			set
 			{
-				Common.SetProperty(ref _003CStat_003Ek__BackingField, value, new ValueChangedEventHandler<Stat>(OnStatChanged));
+				Common.SetProperty(_003CStat_003Ek__BackingField, value, delegate(Stat v)
+				{
+					_003CStat_003Ek__BackingField = v;
+				}, new ValueChangedEventHandler<Stat>(OnStatChanged));
 			}
 		}
 
@@ -49,7 +52,10 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 			}
 			set
 			{
-				Common.SetProperty(ref _003CEnrichment_003Ek__BackingField, value, new ValueChangedEventHandler<Enrichment>(OnEnrichmentChanged));
+				Common.SetProperty(_003CEnrichment_003Ek__BackingField, value, delegate(Enrichment v)
+				{
+					_003CEnrichment_003Ek__BackingField = v;
+				}, new ValueChangedEventHandler<Enrichment>(OnEnrichmentChanged));
 			}
 		}
 

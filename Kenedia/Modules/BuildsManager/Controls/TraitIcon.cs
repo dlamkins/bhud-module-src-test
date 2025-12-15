@@ -19,7 +19,10 @@ namespace Kenedia.Modules.BuildsManager.Controls
 			}
 			set
 			{
-				Common.SetProperty(ref _003CTrait_003Ek__BackingField, value, new Action(ApplyTrait));
+				Common.SetProperty(_003CTrait_003Ek__BackingField, value, delegate(Trait v)
+				{
+					_003CTrait_003Ek__BackingField = v;
+				}, new Action(ApplyTrait));
 			}
 		}
 

@@ -40,7 +40,10 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage
 			}
 			set
 			{
-				Common.SetProperty<BaseItem>(ref _003CItem_003Ek__BackingField, value, new ValueChangedEventHandler<BaseItem>(ApplyItem));
+				Common.SetProperty(_003CItem_003Ek__BackingField, value, delegate(BaseItem v)
+				{
+					_003CItem_003Ek__BackingField = v;
+				}, new ValueChangedEventHandler<BaseItem>(ApplyItem));
 			}
 		}
 
@@ -53,7 +56,10 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage
 			}
 			set
 			{
-				Common.SetProperty<Stat>(ref _003CStat_003Ek__BackingField, value, new ValueChangedEventHandler<Stat>(ApplyStat));
+				Common.SetProperty(_003CStat_003Ek__BackingField, value, delegate(Stat v)
+				{
+					_003CStat_003Ek__BackingField = v;
+				}, new ValueChangedEventHandler<Stat>(ApplyStat));
 			}
 		}
 
@@ -66,7 +72,10 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage
 			}
 			set
 			{
-				Common.SetProperty(ref _003CComment_003Ek__BackingField, value, new ValueChangedEventHandler<string>(ApplyComment));
+				Common.SetProperty(_003CComment_003Ek__BackingField, value, delegate(string v)
+				{
+					_003CComment_003Ek__BackingField = v;
+				}, new ValueChangedEventHandler<string>(ApplyComment));
 			}
 		}
 
@@ -79,7 +88,10 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage
 			}
 			set
 			{
-				Common.SetProperty<Func<string>>(ref _003CSetLocalizedComment_003Ek__BackingField, value, new ValueChangedEventHandler<Func<string>>(ApplyLocalizedComment));
+				Common.SetProperty(_003CSetLocalizedComment_003Ek__BackingField, value, delegate(Func<string> v)
+				{
+					_003CSetLocalizedComment_003Ek__BackingField = v;
+				}, new ValueChangedEventHandler<Func<string>>(ApplyLocalizedComment));
 			}
 		}
 

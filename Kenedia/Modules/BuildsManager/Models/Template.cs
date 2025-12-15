@@ -100,7 +100,10 @@ namespace Kenedia.Modules.BuildsManager.Models
 			}
 			private set
 			{
-				Common.SetProperty<UniqueObservableCollection<string>>(ref _003CTags_003Ek__BackingField, value, new ValueChangedEventHandler<UniqueObservableCollection<string>>(OnTagsListChanged));
+				Common.SetProperty(_003CTags_003Ek__BackingField, value, delegate(UniqueObservableCollection<string> v)
+				{
+					_003CTags_003Ek__BackingField = v;
+				}, new ValueChangedEventHandler<UniqueObservableCollection<string>>(OnTagsListChanged));
 			}
 		}
 
@@ -273,7 +276,10 @@ namespace Kenedia.Modules.BuildsManager.Models
 			}
 			set
 			{
-				Common.SetProperty(ref _003CLastModified_003Ek__BackingField, value, new ValueChangedEventHandler<string>(OnLastModifiedChanged));
+				Common.SetProperty(_003CLastModified_003Ek__BackingField, value, delegate(string v)
+				{
+					_003CLastModified_003Ek__BackingField = v;
+				}, new ValueChangedEventHandler<string>(OnLastModifiedChanged));
 			}
 		}
 

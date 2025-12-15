@@ -104,7 +104,10 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 			set
 			{
 				Template temp = _003CTemplate_003Ek__BackingField;
-				if (Common.SetProperty(ref _003CTemplate_003Ek__BackingField, value, new Action(ApplyTemplate)))
+				if (Common.SetProperty(_003CTemplate_003Ek__BackingField, value, delegate(Template v)
+				{
+					_003CTemplate_003Ek__BackingField = v;
+				}, new Action(ApplyTemplate)))
 				{
 					if (temp != null)
 					{

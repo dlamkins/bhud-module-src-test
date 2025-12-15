@@ -37,7 +37,10 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 			}
 			set
 			{
-				Common.SetProperty(ref _003CStat_003Ek__BackingField, value, new Action(OnStatChanged));
+				Common.SetProperty(_003CStat_003Ek__BackingField, value, delegate(Stat v)
+				{
+					_003CStat_003Ek__BackingField = v;
+				}, new Action(OnStatChanged));
 			}
 		}
 
@@ -50,7 +53,10 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 			}
 			set
 			{
-				Common.SetProperty(ref _003CAttributeAdjustment_003Ek__BackingField, value, new Action(OnMultiplierChanged));
+				Common.SetProperty(_003CAttributeAdjustment_003Ek__BackingField, value, delegate(double v)
+				{
+					_003CAttributeAdjustment_003Ek__BackingField = v;
+				}, new Action(OnMultiplierChanged));
 			}
 		}
 

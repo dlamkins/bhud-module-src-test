@@ -114,7 +114,10 @@ namespace Kenedia.Modules.BuildsManager.Controls
 			}
 			set
 			{
-				Common.SetProperty<Kenedia.Modules.BuildsManager.DataModels.Professions.Skill>(ref _003CSkill_003Ek__BackingField, value, new ValueChangedEventHandler<Kenedia.Modules.BuildsManager.DataModels.Professions.Skill>(OnSkillChanged));
+				Common.SetProperty(_003CSkill_003Ek__BackingField, value, delegate(Kenedia.Modules.BuildsManager.DataModels.Professions.Skill v)
+				{
+					_003CSkill_003Ek__BackingField = v;
+				}, new ValueChangedEventHandler<Kenedia.Modules.BuildsManager.DataModels.Professions.Skill>(OnSkillChanged));
 			}
 		}
 

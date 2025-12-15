@@ -29,7 +29,10 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selectables
 			}
 			set
 			{
-				Common.SetProperty<IBaseApiData>(ref _003CData_003Ek__BackingField, value, new ValueChangedEventHandler<IBaseApiData>(ApplyData));
+				Common.SetProperty(_003CData_003Ek__BackingField, value, delegate(IBaseApiData v)
+				{
+					_003CData_003Ek__BackingField = v;
+				}, new ValueChangedEventHandler<IBaseApiData>(ApplyData));
 			}
 		}
 

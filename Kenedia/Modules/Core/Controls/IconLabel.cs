@@ -33,7 +33,10 @@ namespace Kenedia.Modules.Core.Controls
 			}
 			set
 			{
-				Common.SetProperty(ref _003CText_003Ek__BackingField, value, new Action(RecalculateLayout));
+				Common.SetProperty(_003CText_003Ek__BackingField, value, delegate(string v)
+				{
+					_003CText_003Ek__BackingField = v;
+				}, new Action(RecalculateLayout));
 			}
 		}
 
@@ -46,7 +49,10 @@ namespace Kenedia.Modules.Core.Controls
 			}
 			set
 			{
-				Common.SetProperty(ref _003CTexture_003Ek__BackingField, value, new Action(RecalculateLayout));
+				Common.SetProperty(_003CTexture_003Ek__BackingField, value, delegate(DetailedTexture v)
+				{
+					_003CTexture_003Ek__BackingField = v;
+				}, new Action(RecalculateLayout));
 			}
 		}
 
@@ -71,7 +77,10 @@ namespace Kenedia.Modules.Core.Controls
 			}
 			set
 			{
-				Common.SetProperty(ref _003CInnerPadding_003Ek__BackingField, value, new Action(RecalculateLayout));
+				Common.SetProperty(_003CInnerPadding_003Ek__BackingField, value, delegate(int v)
+				{
+					_003CInnerPadding_003Ek__BackingField = v;
+				}, new Action(RecalculateLayout));
 			}
 		}
 
@@ -84,7 +93,10 @@ namespace Kenedia.Modules.Core.Controls
 			}
 			set
 			{
-				Common.SetProperty(ref _003CFont_003Ek__BackingField, value, new Action(RecalculateLayout));
+				Common.SetProperty(_003CFont_003Ek__BackingField, value, delegate(BitmapFont v)
+				{
+					_003CFont_003Ek__BackingField = v;
+				}, new Action(RecalculateLayout));
 			}
 		}
 
@@ -103,7 +115,10 @@ namespace Kenedia.Modules.Core.Controls
 			}
 			set
 			{
-				Common.SetProperty(ref _003CShowIcon_003Ek__BackingField, value, new Action(RecalculateLayout));
+				Common.SetProperty(_003CShowIcon_003Ek__BackingField, value, delegate(bool v)
+				{
+					_003CShowIcon_003Ek__BackingField = v;
+				}, new Action(RecalculateLayout));
 			}
 		}
 

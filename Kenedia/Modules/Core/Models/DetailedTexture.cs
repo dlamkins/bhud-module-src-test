@@ -24,7 +24,10 @@ namespace Kenedia.Modules.Core.Models
 			}
 			set
 			{
-				Common.SetProperty(ref _003CTexture_003Ek__BackingField, value, (Action)delegate
+				Common.SetProperty(_003CTexture_003Ek__BackingField, value, (Action<AsyncTexture2D>)delegate(AsyncTexture2D v)
+				{
+					_003CTexture_003Ek__BackingField = v;
+				}, (Action)delegate
 				{
 					ApplyBounds();
 				}, value != null);
@@ -40,7 +43,10 @@ namespace Kenedia.Modules.Core.Models
 			}
 			set
 			{
-				Common.SetProperty(ref _003CHoveredTexture_003Ek__BackingField, value, (Action)delegate
+				Common.SetProperty(_003CHoveredTexture_003Ek__BackingField, value, (Action<AsyncTexture2D>)delegate(AsyncTexture2D v)
+				{
+					_003CHoveredTexture_003Ek__BackingField = v;
+				}, (Action)delegate
 				{
 					ApplyBounds();
 				}, value != null);
@@ -56,7 +62,10 @@ namespace Kenedia.Modules.Core.Models
 			}
 			set
 			{
-				Common.SetProperty(ref _003CFallBackTexture_003Ek__BackingField, value, (Action)delegate
+				Common.SetProperty(_003CFallBackTexture_003Ek__BackingField, value, (Action<AsyncTexture2D>)delegate(AsyncTexture2D v)
+				{
+					_003CFallBackTexture_003Ek__BackingField = v;
+				}, (Action)delegate
 				{
 					ApplyBounds();
 				}, value != null);

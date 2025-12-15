@@ -30,8 +30,6 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		private Rectangle _textBounds;
 
-		private BitmapFont _font = Control.Content.DefaultFont14;
-
 		public TemplateTag Tag
 		{
 			[CompilerGenerated]
@@ -41,19 +39,26 @@ namespace Kenedia.Modules.BuildsManager.Controls
 			}
 			set
 			{
-				Common.SetProperty(ref _003CTag_003Ek__BackingField, value, new ValueChangedEventHandler<TemplateTag>(OnTagChanged));
+				Common.SetProperty(_003CTag_003Ek__BackingField, value, delegate(TemplateTag v)
+				{
+					_003CTag_003Ek__BackingField = v;
+				}, new ValueChangedEventHandler<TemplateTag>(OnTagChanged));
 			}
 		}
 
 		public BitmapFont Font
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _font;
+				return _003CFont_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _font, value, new ValueChangedEventHandler<BitmapFont>(OnFontChanged));
+				Common.SetProperty(_003CFont_003Ek__BackingField, value, delegate(BitmapFont v)
+				{
+					_003CFont_003Ek__BackingField = v;
+				}, new ValueChangedEventHandler<BitmapFont>(OnFontChanged));
 			}
 		}
 
@@ -61,17 +66,13 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		public Action<bool> OnClicked { get; set; }
 
-		public Color HoverColor { get; set; } = Color.get_White() * 0.2f;
+		public Color HoverColor { get; set; }
 
+		public Color DisabledColor { get; set; }
 
-		public Color DisabledColor { get; set; } = Color.get_Transparent();
+		public Color ActiveColor { get; set; }
 
-
-		public Color ActiveColor { get; set; } = Color.get_Lime() * 0.2f;
-
-
-		public int FontPadding { get; set; } = 4;
-
+		public int FontPadding { get; set; }
 
 		public Action OnEditClicked { get; set; }
 
@@ -85,14 +86,20 @@ namespace Kenedia.Modules.BuildsManager.Controls
 			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+			_003CFont_003Ek__BackingField = Control.Content.DefaultFont14;
+			HoverColor = Color.get_White() * 0.2f;
+			DisabledColor = Color.get_Transparent();
+			ActiveColor = Color.get_Lime() * 0.2f;
+			FontPadding = 4;
+			base._002Ector();
 			base.Height = Font.get_LineHeight() + FontPadding * 2;
 		}
 
 		private void OnFontChanged(object sender, Kenedia.Modules.Core.Models.ValueChangedEventArgs<BitmapFont> e)
 		{
-			if (_font == null)
+			if (Font == null)
 			{
-				_font = Control.Content.DefaultFont14;
+				BitmapFont val = (Font = Control.Content.DefaultFont14);
 			}
 			base.Height = Font.get_LineHeight() + FontPadding * 2;
 			ApplyTag();

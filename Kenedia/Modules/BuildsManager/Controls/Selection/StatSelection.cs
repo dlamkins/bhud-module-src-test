@@ -36,7 +36,10 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 			}
 			set
 			{
-				Common.SetProperty(ref _003CStatChoices_003Ek__BackingField, value, new ValueChangedEventHandler<IReadOnlyList<int>>(OnStatChoicesChanged));
+				Common.SetProperty(_003CStatChoices_003Ek__BackingField, value, delegate(IReadOnlyList<int> v)
+				{
+					_003CStatChoices_003Ek__BackingField = v;
+				}, new ValueChangedEventHandler<IReadOnlyList<int>>(OnStatChoicesChanged));
 			}
 		}
 
@@ -49,7 +52,10 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 			}
 			set
 			{
-				Common.SetProperty(ref _003CAttributeAdjustments_003Ek__BackingField, value, new ValueChangedEventHandler<double>(OnAttributeAdjustmentsChanged));
+				Common.SetProperty(_003CAttributeAdjustments_003Ek__BackingField, value, delegate(double v)
+				{
+					_003CAttributeAdjustments_003Ek__BackingField = v;
+				}, new ValueChangedEventHandler<double>(OnAttributeAdjustmentsChanged));
 			}
 		}
 

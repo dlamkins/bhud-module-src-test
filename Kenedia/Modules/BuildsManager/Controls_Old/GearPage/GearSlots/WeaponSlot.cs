@@ -65,7 +65,10 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 			}
 			set
 			{
-				Common.SetProperty(ref _003CStat_003Ek__BackingField, value, new ValueChangedEventHandler<Stat>(OnStatChanged));
+				Common.SetProperty(_003CStat_003Ek__BackingField, value, delegate(Stat v)
+				{
+					_003CStat_003Ek__BackingField = v;
+				}, new ValueChangedEventHandler<Stat>(OnStatChanged));
 			}
 		}
 
@@ -78,7 +81,10 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 			}
 			set
 			{
-				Common.SetProperty(ref _003CSigil_003Ek__BackingField, value, new ValueChangedEventHandler<Sigil>(OnSigilChanged));
+				Common.SetProperty(_003CSigil_003Ek__BackingField, value, delegate(Sigil v)
+				{
+					_003CSigil_003Ek__BackingField = v;
+				}, new ValueChangedEventHandler<Sigil>(OnSigilChanged));
 			}
 		}
 
@@ -91,7 +97,10 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 			}
 			set
 			{
-				Common.SetProperty(ref _003CPvpSigil_003Ek__BackingField, value, new ValueChangedEventHandler<Sigil>(OnPvpSigilChanged));
+				Common.SetProperty(_003CPvpSigil_003Ek__BackingField, value, delegate(Sigil v)
+				{
+					_003CPvpSigil_003Ek__BackingField = v;
+				}, new ValueChangedEventHandler<Sigil>(OnPvpSigilChanged));
 			}
 		}
 
@@ -104,7 +113,10 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 			}
 			set
 			{
-				Common.SetProperty(ref _003CInfusion_003Ek__BackingField, value, new ValueChangedEventHandler<Infusion>(OnInfusionChanged));
+				Common.SetProperty(_003CInfusion_003Ek__BackingField, value, delegate(Infusion v)
+				{
+					_003CInfusion_003Ek__BackingField = v;
+				}, new ValueChangedEventHandler<Infusion>(OnInfusionChanged));
 			}
 		}
 

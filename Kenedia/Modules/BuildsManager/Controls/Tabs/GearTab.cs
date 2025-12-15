@@ -67,7 +67,10 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 			}
 			private set
 			{
-				Common.SetProperty(ref _003CTemplatePresenter_003Ek__BackingField, value, new ValueChangedEventHandler<TemplatePresenter>(OnTemplatePresenterChanged));
+				Common.SetProperty(_003CTemplatePresenter_003Ek__BackingField, value, delegate(TemplatePresenter v)
+				{
+					_003CTemplatePresenter_003Ek__BackingField = v;
+				}, new ValueChangedEventHandler<TemplatePresenter>(OnTemplatePresenterChanged));
 			}
 		}
 

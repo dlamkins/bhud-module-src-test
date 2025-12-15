@@ -56,7 +56,10 @@ namespace Kenedia.Modules.BuildsManager.Views
 			}
 			set
 			{
-				Common.SetProperty(ref _003CTag_003Ek__BackingField, value, new ValueChangedEventHandler<TemplateTag>(OnTagChanged));
+				Common.SetProperty(_003CTag_003Ek__BackingField, value, delegate(TemplateTag v)
+				{
+					_003CTag_003Ek__BackingField = v;
+				}, new ValueChangedEventHandler<TemplateTag>(OnTagChanged));
 			}
 		}
 

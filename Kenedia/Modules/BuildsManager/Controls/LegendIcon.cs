@@ -43,7 +43,10 @@ namespace Kenedia.Modules.BuildsManager.Controls
 			}
 			set
 			{
-				Common.SetProperty(ref _003CLegend_003Ek__BackingField, value, new Action(ApplyLegend));
+				Common.SetProperty(_003CLegend_003Ek__BackingField, value, delegate(Legend v)
+				{
+					_003CLegend_003Ek__BackingField = v;
+				}, new Action(ApplyLegend));
 			}
 		}
 

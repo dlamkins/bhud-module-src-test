@@ -1,11 +1,8 @@
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using Blish_HUD.Content;
 using Kenedia.Modules.BuildsManager.Res;
 using Kenedia.Modules.Core.Models;
-using Kenedia.Modules.Core.Res;
-using Kenedia.Modules.Core.Services;
 using Kenedia.Modules.Core.Utility;
 using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
@@ -22,7 +19,6 @@ namespace Kenedia.Modules.BuildsManager.Models
 
 		public static string DefaultName => strings.NewTemplate;
 
-		[JsonIgnore]
 		public string Group
 		{
 			[CompilerGenerated]
@@ -32,11 +28,13 @@ namespace Kenedia.Modules.BuildsManager.Models
 			}
 			set
 			{
-				Common.SetProperty(ref _003CGroup_003Ek__BackingField, value, new ValueChangedEventHandler<string>(OnGroupChanged));
+				Common.SetProperty(_003CGroup_003Ek__BackingField, value, delegate(string v)
+				{
+					_003CGroup_003Ek__BackingField = v;
+				}, new ValueChangedEventHandler<string>(OnGroupChanged));
 			}
 		}
 
-		[JsonIgnore]
 		public int Priority
 		{
 			[CompilerGenerated]
@@ -46,7 +44,10 @@ namespace Kenedia.Modules.BuildsManager.Models
 			}
 			set
 			{
-				Common.SetProperty(ref _003CPriority_003Ek__BackingField, value, new ValueChangedEventHandler<int>(OnPriorityChanged));
+				Common.SetProperty(_003CPriority_003Ek__BackingField, value, delegate(int v)
+				{
+					_003CPriority_003Ek__BackingField = v;
+				}, new ValueChangedEventHandler<int>(OnPriorityChanged));
 			}
 		}
 
@@ -66,7 +67,6 @@ namespace Kenedia.Modules.BuildsManager.Models
 		[JsonIgnore]
 		public DetailedTexture Icon { get; set; }
 
-		[JsonIgnore]
 		public int AssetId
 		{
 			[CompilerGenerated]
@@ -76,7 +76,10 @@ namespace Kenedia.Modules.BuildsManager.Models
 			}
 			set
 			{
-				Common.SetProperty(ref _003CAssetId_003Ek__BackingField, value, new ValueChangedEventHandler<int>(OnAssetIdChanged));
+				Common.SetProperty(_003CAssetId_003Ek__BackingField, value, delegate(int v)
+				{
+					_003CAssetId_003Ek__BackingField = v;
+				}, new ValueChangedEventHandler<int>(OnAssetIdChanged));
 			}
 		}
 
@@ -98,9 +101,13 @@ namespace Kenedia.Modules.BuildsManager.Models
 		public TemplateTag()
 		{
 			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
 			_003CGroup_003Ek__BackingField = string.Empty;
 			_003CPriority_003Ek__BackingField = 1;
-			Icon = new DetailedTexture((AsyncTexture2D)TexturesService.GetTextureFromRef(textures_common.Tag, "Tag"));
+			Icon = new DetailedTexture(156025)
+			{
+				TextureRegion = new Rectangle(32, 32, 64, 64)
+			};
 			_003CAssetId_003Ek__BackingField = 156025;
 			base._002Ector();
 		}
@@ -108,9 +115,13 @@ namespace Kenedia.Modules.BuildsManager.Models
 		public TemplateTag(string name)
 		{
 			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
 			_003CGroup_003Ek__BackingField = string.Empty;
 			_003CPriority_003Ek__BackingField = 1;
-			Icon = new DetailedTexture((AsyncTexture2D)TexturesService.GetTextureFromRef(textures_common.Tag, "Tag"));
+			Icon = new DetailedTexture(156025)
+			{
+				TextureRegion = new Rectangle(32, 32, 64, 64)
+			};
 			_003CAssetId_003Ek__BackingField = 156025;
 			base._002Ector();
 			if (!string.IsNullOrEmpty(name))
@@ -127,16 +138,18 @@ namespace Kenedia.Modules.BuildsManager.Models
 			Icon = new DetailedTexture(e.NewValue);
 			Icon.TextureRegion = (Rectangle)(((_003F?)TextureRegion) ?? Icon.Texture?.Bounds ?? Rectangle.get_Empty());
 			this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("AssetId"));
+			this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Icon"));
 		}
 
 		private void OnTextureRegionChanged(object sender, ValueChangedEventArgs<Rectangle?> e)
 		{
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			if (Icon != null)
+			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+			DetailedTexture icon = Icon;
+			if (icon != null)
 			{
-				Icon.TextureRegion = (Rectangle)(((_003F?)e.NewValue) ?? Icon.Texture?.Bounds ?? Rectangle.get_Empty());
+				icon.TextureRegion = (Rectangle)(((_003F?)e.NewValue) ?? Icon.Texture?.Bounds ?? Rectangle.get_Empty());
 			}
 			this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("TextureRegion"));
 		}

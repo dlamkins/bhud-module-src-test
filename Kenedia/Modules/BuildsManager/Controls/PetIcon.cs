@@ -31,7 +31,10 @@ namespace Kenedia.Modules.BuildsManager.Controls
 			}
 			set
 			{
-				Common.SetProperty(ref _003CPet_003Ek__BackingField, value, new Action(ApplyPet));
+				Common.SetProperty(_003CPet_003Ek__BackingField, value, delegate(Pet v)
+				{
+					_003CPet_003Ek__BackingField = v;
+				}, new Action(ApplyPet));
 			}
 		}
 

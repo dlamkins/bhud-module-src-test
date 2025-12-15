@@ -37,7 +37,10 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 			}
 			set
 			{
-				Common.SetProperty(ref _003CValue_003Ek__BackingField, value, new PropertyChangedEventHandler(SetValue), triggerOnUpdate: true, "Value");
+				Common.SetProperty(_003CValue_003Ek__BackingField, value, delegate(Enum v)
+				{
+					_003CValue_003Ek__BackingField = v;
+				}, new PropertyChangedEventHandler(SetValue), triggerOnUpdate: true, "Value");
 			}
 		}
 
@@ -52,7 +55,10 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 			}
 			set
 			{
-				Common.SetProperty(ref _003CSelectionType_003Ek__BackingField, value, (Action)delegate
+				Common.SetProperty(_003CSelectionType_003Ek__BackingField, value, (Action<ProfessionRaceSelection.SelectionType>)delegate(ProfessionRaceSelection.SelectionType v)
+				{
+					_003CSelectionType_003Ek__BackingField = v;
+				}, (Action)delegate
 				{
 					Value = null;
 				}, triggerOnUpdate: true);

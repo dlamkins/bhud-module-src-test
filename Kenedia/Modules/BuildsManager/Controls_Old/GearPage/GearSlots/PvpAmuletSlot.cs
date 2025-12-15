@@ -38,7 +38,10 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 			}
 			set
 			{
-				Common.SetProperty<Rune>(ref _003CRune_003Ek__BackingField, value, new ValueChangedEventHandler<Rune>(OnRuneChanged));
+				Common.SetProperty(_003CRune_003Ek__BackingField, value, delegate(Rune v)
+				{
+					_003CRune_003Ek__BackingField = v;
+				}, new ValueChangedEventHandler<Rune>(OnRuneChanged));
 			}
 		}
 

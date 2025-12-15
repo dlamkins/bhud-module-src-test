@@ -21,7 +21,10 @@ namespace Kenedia.Modules.BuildsManager.Models
 			}
 			private set
 			{
-				Common.SetProperty(ref _003CTemplate_003Ek__BackingField, value, new ValueChangedEventHandler<Template>(On_TemplateChanged));
+				Common.SetProperty(_003CTemplate_003Ek__BackingField, value, delegate(Template v)
+				{
+					_003CTemplate_003Ek__BackingField = v;
+				}, new ValueChangedEventHandler<Template>(On_TemplateChanged));
 			}
 		}
 
@@ -60,7 +63,10 @@ namespace Kenedia.Modules.BuildsManager.Models
 			}
 			set
 			{
-				Common.SetProperty(ref _003CLegendSlot_003Ek__BackingField, value, new ValueChangedEventHandler<LegendSlotType>(OnLegendSlotChanged));
+				Common.SetProperty(_003CLegendSlot_003Ek__BackingField, value, delegate(LegendSlotType v)
+				{
+					_003CLegendSlot_003Ek__BackingField = v;
+				}, new ValueChangedEventHandler<LegendSlotType>(OnLegendSlotChanged));
 			}
 		}
 
@@ -73,7 +79,10 @@ namespace Kenedia.Modules.BuildsManager.Models
 			}
 			set
 			{
-				Common.SetProperty(ref _003CGameMode_003Ek__BackingField, value, new ValueChangedEventHandler<GameModeType>(On_GameModeChanged));
+				Common.SetProperty(_003CGameMode_003Ek__BackingField, value, delegate(GameModeType v)
+				{
+					_003CGameMode_003Ek__BackingField = v;
+				}, new ValueChangedEventHandler<GameModeType>(On_GameModeChanged));
 			}
 		}
 

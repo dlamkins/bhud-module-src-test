@@ -37,7 +37,10 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 			}
 			set
 			{
-				Common.SetProperty(ref _003CType_003Ek__BackingField, value, new PropertyChangedEventHandler(OnTypeChanged), triggerOnUpdate: true, "Type");
+				Common.SetProperty(_003CType_003Ek__BackingField, value, delegate(SelectionType v)
+				{
+					_003CType_003Ek__BackingField = v;
+				}, new PropertyChangedEventHandler(OnTypeChanged), triggerOnUpdate: true, "Type");
 			}
 		}
 

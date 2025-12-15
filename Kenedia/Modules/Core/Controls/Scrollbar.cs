@@ -6,6 +6,7 @@ using Blish_HUD.Controls;
 using Blish_HUD.Controls.Resources;
 using Blish_HUD.Input;
 using Glide;
+using Kenedia.Modules.Core.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -135,8 +136,12 @@ namespace Kenedia.Modules.Core.Controls
 			}
 			set
 			{
-				if (SetProperty(ref _003CScrollbarHeight_003Ek__BackingField, value, invalidateLayout: true, "ScrollbarHeight"))
+				if (Common.SetProperty(_003CScrollbarHeight_003Ek__BackingField, value, delegate(int v)
 				{
+					_003CScrollbarHeight_003Ek__BackingField = v;
+				}))
+				{
+					Invalidate();
 					RecalculateScrollbarSize();
 					UpdateAssocContainer();
 				}

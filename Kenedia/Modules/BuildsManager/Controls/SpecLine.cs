@@ -140,7 +140,10 @@ namespace Kenedia.Modules.BuildsManager.Controls
 			}
 			set
 			{
-				Common.SetProperty(ref _003CSelectorOpen_003Ek__BackingField, value, new ValueChangedEventHandler<bool>(OnSelectorToggled));
+				Common.SetProperty(_003CSelectorOpen_003Ek__BackingField, value, delegate(bool v)
+				{
+					_003CSelectorOpen_003Ek__BackingField = v;
+				}, new ValueChangedEventHandler<bool>(OnSelectorToggled));
 			}
 		}
 

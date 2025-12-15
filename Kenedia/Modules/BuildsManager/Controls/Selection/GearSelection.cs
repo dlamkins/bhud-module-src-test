@@ -66,7 +66,10 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 			}
 			private set
 			{
-				Common.SetProperty(ref _003CTemplatePresenter_003Ek__BackingField, value, new ValueChangedEventHandler<TemplatePresenter>(OnTemplatePresenterChanged));
+				Common.SetProperty(_003CTemplatePresenter_003Ek__BackingField, value, delegate(TemplatePresenter v)
+				{
+					_003CTemplatePresenter_003Ek__BackingField = v;
+				}, new ValueChangedEventHandler<TemplatePresenter>(OnTemplatePresenterChanged));
 			}
 		}
 
@@ -81,7 +84,10 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 			}
 			set
 			{
-				Common.SetProperty(ref _003CActiveSlot_003Ek__BackingField, value, new Action(ApplySlot));
+				Common.SetProperty(_003CActiveSlot_003Ek__BackingField, value, delegate(TemplateSlotType v)
+				{
+					_003CActiveSlot_003Ek__BackingField = v;
+				}, new Action(ApplySlot));
 			}
 		}
 
@@ -94,7 +100,10 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 			}
 			set
 			{
-				Common.SetProperty(ref _003CSubSlotType_003Ek__BackingField, value, new PropertyChangedEventHandler(ApplySubSlot), triggerOnUpdate: true, "SubSlotType");
+				Common.SetProperty(_003CSubSlotType_003Ek__BackingField, value, delegate(GearSubSlotType v)
+				{
+					_003CSubSlotType_003Ek__BackingField = v;
+				}, new PropertyChangedEventHandler(ApplySubSlot), triggerOnUpdate: true, "SubSlotType");
 			}
 		}
 

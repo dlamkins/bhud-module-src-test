@@ -29,7 +29,10 @@ namespace Kenedia.Modules.BuildsManager.Controls
 			}
 			set
 			{
-				Common.SetProperty(ref _003CSkill_003Ek__BackingField, value, new Action(ApplySkill));
+				Common.SetProperty(_003CSkill_003Ek__BackingField, value, delegate(Skill v)
+				{
+					_003CSkill_003Ek__BackingField = v;
+				}, new Action(ApplySkill));
 			}
 		}
 

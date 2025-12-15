@@ -47,7 +47,10 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selectables
 			}
 			set
 			{
-				Common.SetProperty(ref _003CSelectedItem_003Ek__BackingField, value, new ValueChangedEventHandler<T>(ApplySelected));
+				Common.SetProperty(_003CSelectedItem_003Ek__BackingField, value, delegate(T v)
+				{
+					_003CSelectedItem_003Ek__BackingField = v;
+				}, new ValueChangedEventHandler<T>(ApplySelected));
 			}
 		}
 
@@ -63,7 +66,10 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selectables
 			}
 			set
 			{
-				Common.SetProperty(ref _003COnClickAction_003Ek__BackingField, value, new ValueChangedEventHandler<Action<T>>(ApplyAction));
+				Common.SetProperty(_003COnClickAction_003Ek__BackingField, value, delegate(Action<T> v)
+				{
+					_003COnClickAction_003Ek__BackingField = v;
+				}, new ValueChangedEventHandler<Action<T>>(ApplyAction));
 			}
 		}
 
@@ -76,7 +82,10 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selectables
 			}
 			set
 			{
-				Common.SetProperty(ref _003CSelectablePerRow_003Ek__BackingField, value, new Action(RecalculateLayout));
+				Common.SetProperty(_003CSelectablePerRow_003Ek__BackingField, value, delegate(int v)
+				{
+					_003CSelectablePerRow_003Ek__BackingField = v;
+				}, new Action(RecalculateLayout));
 			}
 		}
 
@@ -103,7 +112,10 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selectables
 			}
 			set
 			{
-				Common.SetProperty(ref _003CAnchor_003Ek__BackingField, value, new Action(RecalculateLayout));
+				Common.SetProperty(_003CAnchor_003Ek__BackingField, value, delegate(Control v)
+				{
+					_003CAnchor_003Ek__BackingField = v;
+				}, new Action(RecalculateLayout));
 			}
 		}
 

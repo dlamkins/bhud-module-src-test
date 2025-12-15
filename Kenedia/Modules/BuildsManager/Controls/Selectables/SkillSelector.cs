@@ -24,7 +24,10 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selectables
 			}
 			set
 			{
-				Common.SetProperty(ref _003CEnviroment_003Ek__BackingField, value, new ValueChangedEventHandler<Enviroment>(OnEnviromentChanged));
+				Common.SetProperty(_003CEnviroment_003Ek__BackingField, value, delegate(Enviroment v)
+				{
+					_003CEnviroment_003Ek__BackingField = v;
+				}, new ValueChangedEventHandler<Enviroment>(OnEnviromentChanged));
 			}
 		}
 
