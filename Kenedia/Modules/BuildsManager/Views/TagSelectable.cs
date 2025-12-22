@@ -61,15 +61,15 @@ namespace Kenedia.Modules.BuildsManager.Views
 		protected override void DrawItem(SpriteBatch spriteBatch, Rectangle bounds)
 		{
 			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
 			if (Tag.Icon.Texture != null)
 			{
-				spriteBatch.DrawOnCtrl((Control)this, (Texture2D)Tag.Icon.Texture, IconBounds);
+				spriteBatch.DrawOnCtrl(this, Tag.Icon.Texture, IconBounds, Tag.TextureRegion);
 			}
 			spriteBatch.DrawStringOnCtrl(this, string.Format("{1}", Tag.Priority, Tag.Name), Control.Content.DefaultFont14, TextBounds, Color.get_White());
 			spriteBatch.DrawStringOnCtrl(this, $"{(string.IsNullOrEmpty(Tag.Group) ? TagGroup.DefaultName : Tag.Group)}", Control.Content.DefaultFont12, GroupTextBounds, Color.get_Gray());

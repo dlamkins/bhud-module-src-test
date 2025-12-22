@@ -243,21 +243,26 @@ namespace Kenedia.Modules.BuildsManager.Services
 			return GetEnumerator();
 		}
 
-		public async Task<bool> Load(bool force)
+		public async Task<bool> Load(bool force, bool raiseEvent)
 		{
 			if (force)
 			{
 				LastLoadAttempt = double.MinValue;
 			}
-			return await Load();
+			return await Load(raiseEvent);
 		}
 
 		public async Task<bool> Load(Locale locale)
 		{
-			return await Load(!LoadedLocales.Contains(locale));
+			return await Load(!LoadedLocales.Contains(locale), raiseEvent: false);
 		}
 
-		public unsafe async Task<bool> Load()
+		public async Task<bool> Load()
+		{
+			return await Load(raiseEvent: true);
+		}
+
+		public unsafe async Task<bool> Load(bool raiseEvent = true)
 		{
 			if (Common.Now - LastLoadAttempt <= 180000.0)
 			{
@@ -349,11 +354,11 @@ namespace Kenedia.Modules.BuildsManager.Services
 							if (awaiter2 == null)
 							{
 								INotifyCompletion awaiter3 = (INotifyCompletion)awaiter;
-								asyncTaskMethodBuilder.AwaitOnCompleted(ref awaiter3, ref *(_003CLoad_003Ed__94*)/*Error near IL_06d2: stateMachine*/);
+								asyncTaskMethodBuilder.AwaitOnCompleted(ref awaiter3, ref *(_003CLoad_003Ed__95*)/*Error near IL_06d2: stateMachine*/);
 							}
 							else
 							{
-								asyncTaskMethodBuilder.AwaitUnsafeOnCompleted(ref awaiter2, ref *(_003CLoad_003Ed__94*)/*Error near IL_06e5: stateMachine*/);
+								asyncTaskMethodBuilder.AwaitUnsafeOnCompleted(ref awaiter2, ref *(_003CLoad_003Ed__95*)/*Error near IL_06e5: stateMachine*/);
 							}
 							/*Error near IL_06ee: leave MoveNext - await not detected correctly*/;
 						}
@@ -398,10 +403,13 @@ namespace Kenedia.Modules.BuildsManager.Services
 				if (!failed)
 				{
 					BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths, Kenedia.Modules.BuildsManager.Services.StaticHosting>.Logger.Info("All data loaded!");
-					GameService.Graphics.QueueMainThreadRender(delegate
+					if (raiseEvent)
 					{
-						this.Loaded?.Invoke(this, EventArgs.Empty);
-					});
+						GameService.Graphics.QueueMainThreadRender(delegate
+						{
+							this.Loaded?.Invoke(this, EventArgs.Empty);
+						});
+					}
 				}
 				else
 				{

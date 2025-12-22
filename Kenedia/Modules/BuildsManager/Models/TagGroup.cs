@@ -10,12 +10,8 @@ namespace Kenedia.Modules.BuildsManager.Models
 {
 	public class TagGroup
 	{
-		[JsonProperty("TextureRegion")]
-		private Rectangle? _textureRegion;
-
 		public static string DefaultName => strings.GroupNotDefined;
 
-		[JsonIgnore]
 		public int Priority
 		{
 			[CompilerGenerated]
@@ -32,7 +28,6 @@ namespace Kenedia.Modules.BuildsManager.Models
 			}
 		}
 
-		[JsonIgnore]
 		public string Name
 		{
 			[CompilerGenerated]
@@ -52,7 +47,6 @@ namespace Kenedia.Modules.BuildsManager.Models
 		[JsonIgnore]
 		public DetailedTexture Icon { get; set; }
 
-		[JsonIgnore]
 		public int AssetId
 		{
 			[CompilerGenerated]
@@ -69,16 +63,19 @@ namespace Kenedia.Modules.BuildsManager.Models
 			}
 		}
 
-		[JsonIgnore]
 		public Rectangle? TextureRegion
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _textureRegion;
+				return _003CTextureRegion_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _textureRegion, value, new ValueChangedEventHandler<Rectangle?>(OnTextureRegionChanged));
+				Common.SetProperty(_003CTextureRegion_003Ek__BackingField, value, delegate(Rectangle? v)
+				{
+					_003CTextureRegion_003Ek__BackingField = v;
+				}, new ValueChangedEventHandler<Rectangle?>(OnTextureRegionChanged));
 			}
 		}
 

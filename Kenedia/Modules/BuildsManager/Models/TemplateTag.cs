@@ -11,12 +11,6 @@ namespace Kenedia.Modules.BuildsManager.Models
 {
 	public class TemplateTag
 	{
-		[JsonProperty("Name")]
-		private string _name = DefaultName;
-
-		[JsonProperty("TextureRegion")]
-		private Rectangle? _textureRegion = new Rectangle(0, 0, 32, 32);
-
 		public static string DefaultName => strings.NewTemplate;
 
 		public string Group
@@ -51,16 +45,19 @@ namespace Kenedia.Modules.BuildsManager.Models
 			}
 		}
 
-		[JsonIgnore]
 		public string Name
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _name;
+				return _003CName_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _name, value, new ValueChangedEventHandler<string>(OnNameChanged));
+				Common.SetProperty(_003CName_003Ek__BackingField, value, delegate(string v)
+				{
+					_003CName_003Ek__BackingField = v;
+				}, new ValueChangedEventHandler<string>(OnNameChanged));
 			}
 		}
 
@@ -83,16 +80,19 @@ namespace Kenedia.Modules.BuildsManager.Models
 			}
 		}
 
-		[JsonIgnore]
 		public Rectangle? TextureRegion
 		{
+			[CompilerGenerated]
 			get
 			{
-				return _textureRegion;
+				return _003CTextureRegion_003Ek__BackingField;
 			}
 			set
 			{
-				Common.SetProperty(ref _textureRegion, value, new ValueChangedEventHandler<Rectangle?>(OnTextureRegionChanged));
+				Common.SetProperty(_003CTextureRegion_003Ek__BackingField, value, delegate(Rectangle? v)
+				{
+					_003CTextureRegion_003Ek__BackingField = v;
+				}, new ValueChangedEventHandler<Rectangle?>(OnTextureRegionChanged));
 			}
 		}
 
@@ -100,10 +100,10 @@ namespace Kenedia.Modules.BuildsManager.Models
 
 		public TemplateTag()
 		{
-			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
 			_003CGroup_003Ek__BackingField = string.Empty;
 			_003CPriority_003Ek__BackingField = 1;
+			_003CName_003Ek__BackingField = DefaultName;
 			Icon = new DetailedTexture(156025)
 			{
 				TextureRegion = new Rectangle(32, 32, 64, 64)
@@ -114,10 +114,10 @@ namespace Kenedia.Modules.BuildsManager.Models
 
 		public TemplateTag(string name)
 		{
-			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
 			_003CGroup_003Ek__BackingField = string.Empty;
 			_003CPriority_003Ek__BackingField = 1;
+			_003CName_003Ek__BackingField = DefaultName;
 			Icon = new DetailedTexture(156025)
 			{
 				TextureRegion = new Rectangle(32, 32, 64, 64)
@@ -126,7 +126,7 @@ namespace Kenedia.Modules.BuildsManager.Models
 			base._002Ector();
 			if (!string.IsNullOrEmpty(name))
 			{
-				_name = name;
+				Name = name;
 			}
 		}
 

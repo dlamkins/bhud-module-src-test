@@ -277,7 +277,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 				SetLocalizedText = () => "Check for updated data",
 				ClickAction = async delegate
 				{
-					await Data.Load(force: true);
+					await Data.Load(force: true, raiseEvent: false);
 				}
 			};
 		}

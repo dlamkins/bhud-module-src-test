@@ -91,6 +91,7 @@ namespace Kenedia.Modules.BuildsManager.Models
 			}
 		}
 
+		[DataMember]
 		public UniqueObservableCollection<string> Tags
 		{
 			[CompilerGenerated]
@@ -267,6 +268,7 @@ namespace Kenedia.Modules.BuildsManager.Models
 
 		public bool TriggerAutoSave { get; set; }
 
+		[DataMember]
 		public string LastModified
 		{
 			[CompilerGenerated]

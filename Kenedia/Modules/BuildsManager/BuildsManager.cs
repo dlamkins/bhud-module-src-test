@@ -269,7 +269,7 @@ namespace Kenedia.Modules.BuildsManager
 					{
 						if (!Data.IsLoaded)
 						{
-							Task.Run(() => Data.Load(force: true));
+							Task.Run(() => Data.Load(raiseEvent: true));
 						}
 						else
 						{
@@ -309,7 +309,7 @@ namespace Kenedia.Modules.BuildsManager
 					Visible = false,
 					ClickAction = async delegate
 					{
-						await Data.Load(force: true);
+						await Data.Load(raiseEvent: true);
 					}
 				};
 				NotificationBadge notificationBadge = obj3;

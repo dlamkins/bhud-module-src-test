@@ -111,13 +111,13 @@ namespace Kenedia.Modules.BuildsManager.Views
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
 			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
 			AsyncTexture2D texture = (Selected ? _textureEnabled : _textureDisabled);
 			if (texture != null)
 			{
-				spriteBatch.DrawOnCtrl((Control)this, (Texture2D)texture, bounds, Selected ? Color.get_White() : (Color.get_Gray() * 0.5f));
+				spriteBatch.DrawOnCtrl(this, texture, bounds, Tag.TextureRegion, Selected ? Color.get_White() : (Color.get_Gray() * 0.5f));
 			}
 		}
 
