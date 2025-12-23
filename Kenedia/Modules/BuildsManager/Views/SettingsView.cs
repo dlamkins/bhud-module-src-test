@@ -269,17 +269,6 @@ namespace Kenedia.Modules.BuildsManager.Views
 				ControlPadding = new Vector2(10f, 5f),
 				FlowDirection = ControlFlowDirection.TopToBottom
 			};
-			new Button
-			{
-				Parent = fp,
-				Width = 200,
-				Height = 30,
-				SetLocalizedText = () => "Check for updated data",
-				ClickAction = async delegate
-				{
-					await Data.Load(force: true, raiseEvent: false);
-				}
-			};
 		}
 	}
 }

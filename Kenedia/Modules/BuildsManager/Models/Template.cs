@@ -54,8 +54,6 @@ namespace Kenedia.Modules.BuildsManager.Models
 
 		private CancellationTokenSource? _cancellationTokenSource;
 
-		private bool _saveRequested;
-
 		private List<BuildSpecialization> _specializations;
 
 		public static Template Empty { get; } = new Template();
@@ -287,6 +285,8 @@ namespace Kenedia.Modules.BuildsManager.Models
 
 		public bool Loaded { get; set; }
 
+		public bool SaveRequested { get; set; }
+
 		public Kenedia.Modules.BuildsManager.DataModels.Professions.Skill? this[SkillSlotType slot] => Skills[slot];
 
 		public event EventHandler? GearCodeChanged;
@@ -445,7 +445,7 @@ namespace Kenedia.Modules.BuildsManager.Models
 
 		private async void OnTimerElapsed(object sender, ElapsedEventArgs e)
 		{
-			if (_saveRequested)
+			if (SaveRequested)
 			{
 				_timer.Stop();
 				await Save();
@@ -454,8 +454,8 @@ namespace Kenedia.Modules.BuildsManager.Models
 
 		public void RequestSave([CallerMemberName] string name = "unkown")
 		{
-			_saveRequested = !string.IsNullOrEmpty(Name) && TriggerAutoSave && Loaded;
-			if (_saveRequested)
+			SaveRequested = !string.IsNullOrEmpty(Name) && TriggerAutoSave && Loaded;
+			if (SaveRequested)
 			{
 				_timer.Stop();
 				_timer.Start();
@@ -859,7 +859,7 @@ namespace Kenedia.Modules.BuildsManager.Models
 					string filePath = path + "\\" + Common.MakeValidFileName(Name.Trim(), '_') + ".json";
 					System.IO.File.WriteAllText(filePath, json);
 					BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug("Saved " + Name + " in " + filePath);
-					_saveRequested = false;
+					SaveRequested = false;
 					_timer.Stop();
 				}
 			}

@@ -143,6 +143,7 @@ namespace Kenedia.Modules.BuildsManager.Models
 				{
 					using StreamReader reader = new StreamReader(file);
 					Template template = JsonConvert.DeserializeObject<Template>(await reader.ReadToEndAsync(), settings);
+					template.SaveRequested = false;
 					_templates.Add(template);
 				}
 				if (_templates.Count == 0)

@@ -121,9 +121,6 @@ namespace Kenedia.Modules.BuildsManager
 
 		private async void Data_Loaded(object sender, EventArgs e)
 		{
-			await base.ServiceProvider.GetService<TagGroups>().Load();
-			await TemplateTags.Load();
-			await Templates.Load();
 		}
 
 		protected override void DefineSettings(SettingCollection settings)
@@ -157,7 +154,7 @@ namespace Kenedia.Modules.BuildsManager
 			if (GW2API != null)
 			{
 				Locale newValue = e.NewValue;
-				if (newValue != Locale.Korean && newValue != Locale.Chinese && !Data.LoadedLocales.Contains(e.NewValue))
+				if (newValue != Locale.Korean && newValue != Locale.Chinese)
 				{
 					await Data.Load(e.NewValue);
 				}
@@ -169,6 +166,9 @@ namespace Kenedia.Modules.BuildsManager
 		{
 			LoadingSpinner?.Show();
 			await base.LoadAsync();
+			await base.ServiceProvider.GetService<TagGroups>().Load();
+			await TemplateTags.Load();
+			await Templates.Load();
 			await Data.Load();
 		}
 
@@ -269,7 +269,7 @@ namespace Kenedia.Modules.BuildsManager
 					{
 						if (!Data.IsLoaded)
 						{
-							Task.Run(() => Data.Load(raiseEvent: true));
+							Task.Run(() => Data.Load(force: true));
 						}
 						else
 						{
@@ -309,7 +309,7 @@ namespace Kenedia.Modules.BuildsManager
 					Visible = false,
 					ClickAction = async delegate
 					{
-						await Data.Load(raiseEvent: true);
+						await Data.Load(force: true);
 					}
 				};
 				NotificationBadge notificationBadge = obj3;

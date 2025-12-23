@@ -16,7 +16,7 @@ namespace Kenedia.Modules.BuildsManager.Services
 		{
 		}
 
-		public async Task<StaticStats> GetStaticStats()
+		public async Task<StaticStats?> GetStaticStats()
 		{
 			try
 			{
@@ -26,10 +26,10 @@ namespace Kenedia.Modules.BuildsManager.Services
 			{
 				base.Logger.Warn($"{ex}");
 			}
-			return new StaticStats();
+			return null;
 		}
 
-		public async Task<StaticVersion> GetStaticVersion()
+		public async Task<StaticVersion?> GetStaticVersion()
 		{
 			try
 			{
@@ -39,7 +39,7 @@ namespace Kenedia.Modules.BuildsManager.Services
 			{
 				base.Logger.Warn($"{ex}");
 			}
-			return new StaticVersion();
+			return null;
 		}
 	}
 }

@@ -9,8 +9,6 @@ namespace Kenedia.Modules.BuildsManager.Models
 	{
 		public string TemplatesPath => base.BasePath + "\\" + ModuleName + "\\templates\\";
 
-		public string ItemMapPath => base.ModuleDataPath + "\\itemmap\\";
-
 		public Paths()
 		{
 		}
@@ -21,10 +19,6 @@ namespace Kenedia.Modules.BuildsManager.Models
 			if (!Directory.Exists(TemplatesPath))
 			{
 				Directory.CreateDirectory(TemplatesPath);
-			}
-			if (!Directory.Exists(ItemMapPath))
-			{
-				Directory.CreateDirectory(ItemMapPath);
 			}
 		}
 	}

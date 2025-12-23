@@ -54,6 +54,8 @@ namespace Kenedia.Modules.BuildsManager.DataModels.Stats
 			}
 		}
 
+		private static DetailedTexture s_placeHolder = new DetailedTexture(440025);
+
 		private bool _isDisposed;
 
 		public static List<StatTextureMapInfo> StatTextureMap { get; set; } = new List<StatTextureMapInfo>();
@@ -91,7 +93,11 @@ namespace Kenedia.Modules.BuildsManager.DataModels.Stats
 		{
 			get
 			{
-				//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+				if (TextureInfo == null)
+				{
+					return s_placeHolder;
+				}
 				if (_003CIcon_003Ek__BackingField == null)
 				{
 					_003CIcon_003Ek__BackingField = new DetailedTexture(TexturesService.GetTextureFromDisk(Path.Combine(BuildsManager.Data.Paths.ModuleDataPath, "stat_map.png")))

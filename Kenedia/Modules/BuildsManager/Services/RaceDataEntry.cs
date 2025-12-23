@@ -38,56 +38,89 @@ namespace Kenedia.Modules.BuildsManager.Services
 			race.Names[Locale.Spanish] = "Cualquier raza";
 		}
 
-		public override async Task<bool> LoadAndUpdate(string name, ByteIntMap map, string path, Gw2ApiManager gw2ApiManager, CancellationToken cancellationToken)
+		public override async Task<bool> LoadCached(string name, string path, CancellationToken token)
+		{
+			if (token.IsCancellationRequested)
+			{
+				return false;
+			}
+			if (!System.IO.File.Exists(path))
+			{
+				BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug("No local data for " + name + " found at '" + Path.GetFileName(path) + "'");
+				return false;
+			}
+			BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug("Loading local data for " + name + " from '" + Path.GetFileName(path) + "'");
+			if (System.IO.File.Exists(path))
+			{
+				string json = System.IO.File.ReadAllText(path);
+				if (token.IsCancellationRequested)
+				{
+					return false;
+				}
+				RaceDataEntry loaded = JsonConvert.DeserializeObject<RaceDataEntry>(json, SerializerSettings.Default);
+				if (loaded != null)
+				{
+					base.Map = loaded.Map;
+					base.Items = loaded.Items;
+					base.Version = loaded.Version;
+					DataLoaded = true;
+					BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug($"Loaded local data for {name} with {base.Items.Count} entries. Version {base.Version}");
+					return true;
+				}
+			}
+			return false;
+		}
+
+		public override async Task<(bool, List<object>)> IsIncomplete(string name, ByteIntMap map, string path, Gw2ApiManager gw2ApiManager, CancellationToken token)
+		{
+			base.Map = map;
+			try
+			{
+				if (base.Ids == null)
+				{
+					base.Ids = (await gw2ApiManager.Gw2ApiClient.V2.Races.IdsAsync(token)).Select((string value) => (!Enum.TryParse<Races>(value, out var result)) ? Races.None : result).Distinct().ToList();
+				}
+				if (token.IsCancellationRequested)
+				{
+					return (true, new List<object>());
+				}
+				Locale value2 = GameService.Overlay.UserLocale.Value;
+				bool flag = (((uint)(value2 - 4) <= 1u) ? true : false);
+				Locale lang = ((!flag) ? GameService.Overlay.UserLocale.Value : Locale.English);
+				Kenedia.Modules.BuildsManager.DataModels.Race value3;
+				IEnumerable<string> missing = ((map.Version > base.Version) ? base.Ids.Select((Races x) => x.ToString()) : (from id in base.Ids
+					where !base.Items.TryGetValue(id, out value3) || value3.Names[lang] == null
+					select id into x
+					select x.ToString()));
+				return (missing.Any(), missing.Cast<object>().ToList());
+			}
+			catch (Exception ex)
+			{
+				BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Warn(ex, "Failed to check completeness of " + name + " data.");
+			}
+			return (true, new List<object>());
+		}
+
+		public override async Task<bool> Update(string name, ByteIntMap map, string path, Gw2ApiManager gw2ApiManager, CancellationToken token)
 		{
 			_ = 3;
 			try
 			{
-				bool saveRequired = false;
-				RaceDataEntry loaded = null;
-				BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug("Load and if required update " + name);
-				if (!DataLoaded && System.IO.File.Exists(path))
-				{
-					BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug("Load " + name + ".json");
-					loaded = JsonConvert.DeserializeObject<RaceDataEntry>(System.IO.File.ReadAllText(path), SerializerSettings.Default);
-					DataLoaded = true;
-				}
-				base.Map = map;
-				base.Items = loaded?.Items ?? base.Items;
-				base.Version = loaded?.Version ?? base.Version;
-				BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug($"{name} Version {base.Version} | version {map.Version}");
-				BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug("Check for missing values for " + name);
-				IApiV2ObjectList<string> raceIds = await gw2ApiManager.Gw2ApiClient.V2.Races.IdsAsync(cancellationToken);
-				if (cancellationToken.IsCancellationRequested)
+				if (token.IsCancellationRequested)
 				{
 					return false;
 				}
-				Locale value = GameService.Overlay.UserLocale.Value;
-				bool flag = (((uint)(value - 4) <= 1u) ? true : false);
-				Locale lang = ((!flag) ? GameService.Overlay.UserLocale.Value : Locale.English);
-				IEnumerable<string> localeMissing = base.Items.Values.Where((Kenedia.Modules.BuildsManager.DataModels.Race item) => item.Names[lang] == null)?.Select((Kenedia.Modules.BuildsManager.DataModels.Race e) => $"{e.Id}");
-				IEnumerable<string> missing = raceIds.Except(base.Items.Keys.Select((Races e) => $"{e}")).Concat(localeMissing).Except(new string[1] { $"{Races.None}" });
-				if (map.Version > base.Version)
+				List<object> missing = (await IsIncomplete(name, map, path, gw2ApiManager, token)).Item2;
+				if (missing.Any() && missing.All((object item) => item is string))
 				{
-					base.Version = map.Version;
-					missing = raceIds;
-					BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug("The current version does not match the map version. Updating all values for " + name + ".");
-				}
-				if (missing.Count() > 0)
-				{
-					List<List<string>> idSets = missing.ToList().ChunkBy(200);
-					saveRequired = saveRequired || idSets.Count > 0;
-					BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug($"Fetch a total of {missing.Count()} {name} in {idSets.Count} sets.");
-					IApiV2ObjectList<Skill> apiSkills = await gw2ApiManager.Gw2ApiClient.V2.Skills.AllAsync(cancellationToken);
-					Profession profession = await gw2ApiManager.Gw2ApiClient.V2.Professions.GetAsync(ProfessionType.Guardian, cancellationToken);
-					if (cancellationToken.IsCancellationRequested)
-					{
-						return false;
-					}
+					List<List<string>> idSets = missing.Cast<string>().ToList().ChunkBy(200);
+					BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug($"{name} updating {missing.Count()} entries in {idSets.Count} sets.");
+					IApiV2ObjectList<Skill> apiSkills = await gw2ApiManager.Gw2ApiClient.V2.Skills.AllAsync(token);
+					Profession profession = await gw2ApiManager.Gw2ApiClient.V2.Professions.GetAsync(ProfessionType.Guardian, token);
 					foreach (List<string> ids in idSets)
 					{
-						IReadOnlyList<Gw2Sharp.WebApi.V2.Models.Race> items = await gw2ApiManager.Gw2ApiClient.V2.Races.ManyAsync(ids, cancellationToken);
-						if (cancellationToken.IsCancellationRequested)
+						IReadOnlyList<Gw2Sharp.WebApi.V2.Models.Race> items = await gw2ApiManager.Gw2ApiClient.V2.Races.ManyAsync(ids, token);
+						if (token.IsCancellationRequested)
 						{
 							return false;
 						}
@@ -106,21 +139,19 @@ namespace Kenedia.Modules.BuildsManager.Services
 							}
 						}
 					}
-				}
-				if (saveRequired)
-				{
-					BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug("Saving " + name + ".json");
+					base.Version = base.Map.Version;
+					BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug($"Saving updated {name} data with {missing.Count()} updated entries. Version {base.Version}");
 					string json = JsonConvert.SerializeObject((object)this, SerializerSettings.Default);
 					System.IO.File.WriteAllText(path, json);
+					DataLoaded = true;
+					return true;
 				}
-				DataLoaded = DataLoaded || base.Items.Count > 0;
-				return true;
 			}
 			catch (Exception ex)
 			{
-				BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Warn(ex, "Failed to load " + name + " data.");
-				return false;
+				BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Warn(ex, "Failed to update " + name + " data.");
 			}
+			return false;
 		}
 	}
 }

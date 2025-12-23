@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Modules.Managers;
 using Gw2Sharp.WebApi;
-using Gw2Sharp.WebApi.V2;
 using Gw2Sharp.WebApi.V2.Models;
 using Kenedia.Modules.BuildsManager.DataModels.Professions;
 using Kenedia.Modules.BuildsManager.Models;
@@ -20,83 +19,125 @@ namespace Kenedia.Modules.BuildsManager.Services
 {
 	public class PetDataEntry : MappedDataEntry<int, Kenedia.Modules.BuildsManager.DataModels.Professions.Pet>
 	{
-		public override async Task<bool> LoadAndUpdate(string name, ByteIntMap map, string path, Gw2ApiManager gw2ApiManager, CancellationToken cancellationToken)
+		public override async Task<bool> LoadCached(string name, string path, CancellationToken token)
 		{
-			_ = 1;
-			try
+			if (token.IsCancellationRequested)
 			{
-				bool saveRequired = false;
-				PetDataEntry loaded = null;
-				BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug("Load and if required update " + name);
-				if (!DataLoaded && System.IO.File.Exists(path))
-				{
-					BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug("Load " + name + ".json");
-					loaded = JsonConvert.DeserializeObject<PetDataEntry>(System.IO.File.ReadAllText(path), SerializerSettings.Default);
-					DataLoaded = true;
-				}
-				base.Map = map;
-				base.Items = loaded?.Items ?? base.Items;
-				base.Version = loaded?.Version ?? base.Version;
-				BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug($"{name} Version {base.Version} | version {map.Version}");
-				BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug("Check for missing values for " + name);
-				IApiV2ObjectList<int> petIds = await gw2ApiManager.Gw2ApiClient.V2.Pets.IdsAsync(cancellationToken);
-				if (cancellationToken.IsCancellationRequested)
+				return false;
+			}
+			if (!System.IO.File.Exists(path))
+			{
+				BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug("No local data for " + name + " found at '" + Path.GetFileName(path) + "'");
+				return false;
+			}
+			BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug("Loading local data for " + name + " from '" + Path.GetFileName(path) + "'");
+			if (System.IO.File.Exists(path))
+			{
+				string json = System.IO.File.ReadAllText(path);
+				if (token.IsCancellationRequested)
 				{
 					return false;
+				}
+				PetDataEntry loaded = JsonConvert.DeserializeObject<PetDataEntry>(json, SerializerSettings.Default);
+				if (loaded != null)
+				{
+					base.Map = loaded.Map;
+					base.Items = loaded.Items;
+					base.Version = loaded.Version;
+					DataLoaded = true;
+					BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug($"Loaded local data for {name} with {base.Items.Count} entries. Version {base.Version}");
+					return true;
+				}
+			}
+			return false;
+		}
+
+		public override async Task<(bool, List<object>)> IsIncomplete(string name, ByteIntMap map, string path, Gw2ApiManager gw2ApiManager, CancellationToken token)
+		{
+			base.Map = map;
+			try
+			{
+				if (base.Ids == null)
+				{
+					base.Ids = (await gw2ApiManager.Gw2ApiClient.V2.Pets.IdsAsync(token)).ToList();
+				}
+				if (token.IsCancellationRequested)
+				{
+					base.Ids = null;
+					return (true, new List<object>());
 				}
 				Locale value = GameService.Overlay.UserLocale.Value;
 				bool flag = (((uint)(value - 4) <= 1u) ? true : false);
 				Locale lang = ((!flag) ? GameService.Overlay.UserLocale.Value : Locale.English);
-				IEnumerable<int> localeMissing = base.Items.Values.Where((Kenedia.Modules.BuildsManager.DataModels.Professions.Pet item) => item.Names[lang] == null)?.Select((Kenedia.Modules.BuildsManager.DataModels.Professions.Pet e) => e.Id);
-				IEnumerable<int> missing = petIds.Except(base.Items.Keys).Concat(localeMissing);
-				if (map.Version > base.Version)
+				IEnumerable<int> enumerable;
+				if (!(map.Version > base.Version))
 				{
-					base.Version = map.Version;
-					missing = petIds;
-					BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug("The current version does not match the map version. Updating all values for " + name + ".");
+					enumerable = base.Ids.Where((int id) => !base.Items.TryGetValue(id, out var value2) || value2.Names[lang] == null);
 				}
-				if (missing.Count() > 0)
+				else
 				{
-					List<List<int>> idSets = missing.ToList().ChunkBy(200);
-					saveRequired = saveRequired || idSets.Count > 0;
-					BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug($"Fetch a total of {missing.Count()} {name} in {idSets.Count} sets.");
+					IEnumerable<int> ids = base.Ids;
+					enumerable = ids;
+				}
+				IEnumerable<int> missing = enumerable;
+				return (missing.Any(), missing.Cast<object>().ToList());
+			}
+			catch (Exception ex)
+			{
+				BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Warn(ex, "Failed to check completeness of " + name + " data.");
+			}
+			return (true, new List<object>());
+		}
+
+		public override async Task<bool> Update(string name, ByteIntMap map, string path, Gw2ApiManager gw2ApiManager, CancellationToken token)
+		{
+			_ = 1;
+			try
+			{
+				if (token.IsCancellationRequested)
+				{
+					return false;
+				}
+				List<object> missing = (await IsIncomplete(name, map, path, gw2ApiManager, token)).Item2;
+				if (missing.Any() && missing.All((object i) => i is int))
+				{
+					List<List<int>> idSets = missing.Cast<int>().ToList().ChunkBy(200);
+					BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug($"{name} updating {missing.Count()} entries in {idSets.Count} sets.");
 					foreach (List<int> ids in idSets)
 					{
-						IReadOnlyList<Gw2Sharp.WebApi.V2.Models.Pet> items = await gw2ApiManager.Gw2ApiClient.V2.Pets.ManyAsync(ids, cancellationToken);
-						if (cancellationToken.IsCancellationRequested)
+						IReadOnlyList<Gw2Sharp.WebApi.V2.Models.Pet> items = await gw2ApiManager.Gw2ApiClient.V2.Pets.ManyAsync(ids, token);
+						if (token.IsCancellationRequested)
 						{
 							return false;
 						}
-						foreach (Gw2Sharp.WebApi.V2.Models.Pet item2 in items)
+						foreach (Gw2Sharp.WebApi.V2.Models.Pet item in items)
 						{
 							Kenedia.Modules.BuildsManager.DataModels.Professions.Pet entryItem;
-							bool num = base.Items.TryGetValue(item2.Id, out entryItem);
+							bool num = base.Items.TryGetValue(item.Id, out entryItem);
 							if (entryItem == null)
 							{
 								entryItem = new Kenedia.Modules.BuildsManager.DataModels.Professions.Pet();
 							}
-							entryItem.Apply(item2);
+							entryItem.Apply(item);
 							if (!num)
 							{
-								base.Items.Add(item2.Id, entryItem);
+								base.Items.Add(item.Id, entryItem);
 							}
 						}
 					}
-				}
-				if (saveRequired)
-				{
-					BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug("Saving " + name + ".json");
+					base.Version = base.Map.Version;
+					BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug($"Saving updated {name} data with {missing.Count()} updated entries. Version {base.Version}");
 					string json = JsonConvert.SerializeObject((object)this, SerializerSettings.Default);
 					System.IO.File.WriteAllText(path, json);
+					DataLoaded = true;
+					return true;
 				}
-				DataLoaded = DataLoaded || base.Items.Count > 0;
-				return true;
 			}
 			catch (Exception ex)
 			{
-				BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Warn(ex, "Failed to load " + name + " data.");
-				return false;
+				BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Warn(ex, "Failed to update " + name + " data.");
 			}
+			return false;
 		}
 	}
 }

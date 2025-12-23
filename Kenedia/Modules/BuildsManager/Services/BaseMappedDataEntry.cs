@@ -31,7 +31,7 @@ namespace Kenedia.Modules.BuildsManager.Services
 
 		public ByteIntMap Map { get; set; }
 
-		public virtual Task<bool> LoadAndUpdate(string name, ByteIntMap map, string path, Gw2ApiManager gw2ApiManager, CancellationToken token)
+		public virtual Task<bool> LoadCached(string name, string path, CancellationToken token)
 		{
 			return Task.FromResult(result: false);
 		}
@@ -43,6 +43,16 @@ namespace Kenedia.Modules.BuildsManager.Services
 				Version = entry.Version,
 				Items = entry.Items.ToDictionary<KeyValuePair<Key, T>, string, object>((KeyValuePair<Key, T> kvp) => $"{kvp.Key}", (KeyValuePair<Key, T> kvp) => kvp.Value)
 			};
+		}
+
+		public virtual Task<(bool, List<object>)> IsIncomplete(string name, ByteIntMap map, string path, Gw2ApiManager gw2ApiManager, CancellationToken token)
+		{
+			return Task.FromResult((false, new List<object>()));
+		}
+
+		public virtual Task<bool> Update(string name, ByteIntMap map, string path, Gw2ApiManager gw2ApiManager, CancellationToken token)
+		{
+			return Task.FromResult(result: false);
 		}
 
 		public void Dispose()

@@ -128,10 +128,6 @@ namespace Kenedia.Modules.BuildsManager.Services
 		public double LastLoadAttempt { get; private set; } = double.MinValue;
 
 
-		public List<Locale> LoadedLocales => (from x in Professions.Values.FirstOrDefault()?.Names
-			where !string.IsNullOrEmpty(x.Value)
-			select x.Key).ToList();
-
 		[EnumeratorMember]
 		public ProfessionDataEntry Professions { get; } = new ProfessionDataEntry();
 
@@ -218,21 +214,28 @@ namespace Kenedia.Modules.BuildsManager.Services
 
 		public StaticHosting StaticHosting { get; }
 
+		public ContentsManager ContentsManager { get; }
+
+		public StaticStats? StatsMap { get; private set; }
+
+		public StaticVersion? Versions { get; private set; }
+
 		public event EventHandler Loaded;
 
-		public Data(Paths paths, Gw2ApiManager gw2ApiManager, Func<NotificationBadge> notificationBadge, Func<LoadingSpinner> spinner, StaticHosting staticHosting)
+		public Data(Paths paths, Gw2ApiManager gw2ApiManager, Func<NotificationBadge> notificationBadge, Func<LoadingSpinner> spinner, StaticHosting staticHosting, ContentsManager contentsManager)
 		{
 			Paths = paths;
 			Gw2ApiManager = gw2ApiManager;
 			StaticHosting = staticHosting;
+			ContentsManager = contentsManager;
 			_getSpinner = spinner;
 			_getNotificationBadge = notificationBadge;
 		}
 
-		[IteratorStateMachine(typeof(_003CGetEnumerator_003Ed__90))]
+		[IteratorStateMachine(typeof(_003CGetEnumerator_003Ed__99))]
 		public IEnumerator<(string name, BaseMappedDataEntry map)> GetEnumerator()
 		{
-			return new _003CGetEnumerator_003Ed__90(0)
+			return new _003CGetEnumerator_003Ed__99(0)
 			{
 				_003C_003E4__this = this
 			};
@@ -243,26 +246,21 @@ namespace Kenedia.Modules.BuildsManager.Services
 			return GetEnumerator();
 		}
 
-		public async Task<bool> Load(bool force, bool raiseEvent)
+		public async Task<bool> Load(bool force)
 		{
 			if (force)
 			{
 				LastLoadAttempt = double.MinValue;
 			}
-			return await Load(raiseEvent);
+			return await Load();
 		}
 
-		public async Task<bool> Load(Locale locale)
+		public async Task<bool> Load(Locale _)
 		{
-			return await Load(!LoadedLocales.Contains(locale), raiseEvent: false);
+			return await Load(force: true);
 		}
 
 		public async Task<bool> Load()
-		{
-			return await Load(raiseEvent: true);
-		}
-
-		public unsafe async Task<bool> Load(bool raiseEvent = true)
 		{
 			if (Common.Now - LastLoadAttempt <= 180000.0)
 			{
@@ -271,103 +269,206 @@ namespace Kenedia.Modules.BuildsManager.Services
 			LoadingSpinner spinner = Spinner;
 			LastLoadAttempt = Common.Now;
 			BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths, Kenedia.Modules.BuildsManager.Services.StaticHosting>.Logger.Info("Loading data");
+			spinner?.Show();
+			NotificationBadge?.Notifications?.Clear();
 			try
 			{
 				_cancellationTokenSource?.Cancel();
 				_cancellationTokenSource = new CancellationTokenSource();
-				StaticVersion versions = await StaticHosting.GetStaticVersion();
-				if (versions == null)
+				if (Versions == null)
 				{
-					NotificationBadge badge2 = NotificationBadge;
-					if (badge2 != null)
-					{
-						DateTime endTime3 = DateTime.Now.AddMinutes(3.0);
-						badge2.AddNotification(new ConditionalNotification
-						{
-							NotificationText = $"Failed to get the version file. Retry at {DateTime.Now.AddMinutes(3.0):T}",
-							Condition = () => DateTime.Now >= endTime3
-						});
-					}
-					spinner?.Hide();
-					return false;
+					Versions = await StaticHosting.GetStaticVersion();
 				}
-				StaticStats stats = await StaticHosting.GetStaticStats();
-				BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths, Kenedia.Modules.BuildsManager.Services.StaticHosting>.Logger.Info("Latest static stats version: " + (object)stats?.Version);
-				if (stats == null)
+				if (StatsMap == null)
 				{
-					BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths, Kenedia.Modules.BuildsManager.Services.StaticHosting>.Logger.Info("Failed to get the stats file.");
-					NotificationBadge badge3 = NotificationBadge;
-					if (badge3 != null)
-					{
-						DateTime endTime2 = DateTime.Now.AddMinutes(3.0);
-						badge3.AddNotification(new ConditionalNotification
-						{
-							NotificationText = $"Failed to get the stats file. Retry at {DateTime.Now.AddMinutes(3.0):T}",
-							Condition = () => DateTime.Now >= endTime2
-						});
-					}
-					spinner?.Hide();
-					return false;
+					StatsMap = await StaticHosting.GetStaticStats();
 				}
-				BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths, Kenedia.Modules.BuildsManager.Services.StaticHosting>.Logger.Info($"Latest static stats version: {stats.Version}");
+				DateTime endTime = DateTime.Now.AddMinutes(3.0);
+				string error_text = ((Versions == null) ? $"Failed to get the version file. Using locally cached data only.\nRetry at {DateTime.Now.AddMinutes(3.0):T}" : ((StatsMap == null) ? $"Failed to get the stats file. Using locally cached data only.\nRetry at {DateTime.Now.AddMinutes(3.0):T}" : null));
+				if (!string.IsNullOrEmpty(error_text))
+				{
+					NotificationBadge?.AddNotification(new ConditionalNotification
+					{
+						NotificationText = error_text,
+						Condition = () => DateTime.Now >= endTime
+					});
+				}
+				BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths, Kenedia.Modules.BuildsManager.Services.StaticHosting>.Logger.Info((Versions == null) ? "Version file could not be fetched." : "Versions file fetched from static hosting.");
+				BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths, Kenedia.Modules.BuildsManager.Services.StaticHosting>.Logger.Info((StatsMap == null) ? "Stats file could not be fetched." : "Stats file fetched from static hosting.");
+				List<string> files = new List<string>(2) { "stat_map.png", "static_stats.json" };
+				List<string> list = new List<string>();
+				list.AddRange(files);
+				list.AddRange(this.Select<(string, BaseMappedDataEntry), string>(((string name, BaseMappedDataEntry map) e) => e.name + ".json"));
+				files = list;
+				foreach (string file in files)
+				{
+					string path3 = Path.Combine(Paths.ModuleDataPath, file);
+					if (File.Exists(path3))
+					{
+						continue;
+					}
+					BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths, Kenedia.Modules.BuildsManager.Services.StaticHosting>.Logger.Info("Exporting default data for " + file + "...");
+					using Stream target = File.Create(path3);
+					using Stream source = ContentsManager.GetFileStream("data\\default_api_data\\" + file);
+					source.Seek(0L, SeekOrigin.Begin);
+					source.CopyTo(target);
+				}
+				bool localDataLoaded = true;
+				List<string> failedLocalParts = new List<string>();
 				StaticStats localStats = (File.Exists(Path.Combine(Paths.ModuleDataPath, "static_stats.json")) ? JsonConvert.DeserializeObject<StaticStats>(File.ReadAllText(Path.Combine(Paths.ModuleDataPath, "static_stats.json"))) : null);
-				if (localStats == null || localStats.Version < stats.Version)
+				bool statsImageExists = File.Exists(Path.Combine(BuildsManager.Data.Paths.ModuleDataPath, "stat_map.png"));
+				if (localStats != null && statsImageExists)
 				{
-					BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths, Kenedia.Modules.BuildsManager.Services.StaticHosting>.Logger.Info("Updating local static stats file...");
-					File.WriteAllText(Path.Combine(Paths.ModuleDataPath, "static_stats.json"), JsonConvert.SerializeObject((object)stats, (Formatting)1));
-					string url = stats.ImageUrl;
-					HttpClient client = new HttpClient();
-					try
+					Stat.StatTextureMap = localStats.TextureMapInfo;
+				}
+				using (IEnumerator<(string name, BaseMappedDataEntry map)> enumerator2 = GetEnumerator())
+				{
+					while (enumerator2.MoveNext())
 					{
-						BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths, Kenedia.Modules.BuildsManager.Services.StaticHosting>.Logger.Info("Downloading stat map image from " + url + "...");
-						byte[] data = await client.GetByteArrayAsync(url);
-						File.WriteAllBytes(Path.Combine(Paths.ModuleDataPath, "stat_map.png"), data);
-					}
-					finally
-					{
-						((IDisposable)client)?.Dispose();
+						var (name2, map2) = enumerator2.Current;
+						if (_cancellationTokenSource.IsCancellationRequested)
+						{
+							localDataLoaded = false;
+							failedLocalParts.Add(name2);
+						}
+						else if (!map2.IsLoaded)
+						{
+							string path2 = Path.Combine(Paths.ModuleDataPath, name2 + ".json");
+							bool success = await map2.LoadCached(name2, path2, _cancellationTokenSource.Token);
+							localDataLoaded = localDataLoaded && success;
+							if (!success)
+							{
+								failedLocalParts.Add(name2);
+							}
+						}
 					}
 				}
-				BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths, Kenedia.Modules.BuildsManager.Services.StaticHosting>.Logger.Info("Apply stat texture map...");
-				Stat.StatTextureMap = stats.TextureMapInfo;
-				List<int> itemIds = new List<int>();
-				using (IEnumerator<(string name, BaseMappedDataEntry map)> enumerator = GetEnumerator())
+				if (!localDataLoaded)
 				{
-					AsyncTaskMethodBuilder<bool> asyncTaskMethodBuilder = default(AsyncTaskMethodBuilder<bool>);
-					while (enumerator.MoveNext())
+					BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths, Kenedia.Modules.BuildsManager.Services.StaticHosting>.Logger.Info("Local data failed to load: " + string.Join(", ", failedLocalParts));
+				}
+				else
+				{
+					BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths, Kenedia.Modules.BuildsManager.Services.StaticHosting>.Logger.Info("All local data loaded successfully.");
+				}
+				bool remoteDataLoaded = true;
+				List<string> remoteFailedParts = new List<string>();
+				if (Versions != null && StatsMap != null)
+				{
+					BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths, Kenedia.Modules.BuildsManager.Services.StaticHosting>.Logger.Info("Loading remote data...");
+					if (localStats == null || localStats.Version < StatsMap!.Version)
 					{
-						var (name2, map2) = enumerator.Current;
-						if (!map2.GetType().IsGenericType || !(map2.GetType().GetGenericTypeDefinition() == typeof(ItemMappedDataEntry<>)))
+						File.WriteAllText(Path.Combine(Paths.ModuleDataPath, "static_stats.json"), JsonConvert.SerializeObject((object)StatsMap, (Formatting)1));
+						string url = StatsMap!.ImageUrl;
+						HttpClient client = new HttpClient();
+						try
 						{
-							continue;
+							BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths, Kenedia.Modules.BuildsManager.Services.StaticHosting>.Logger.Info("Downloading stat map image from " + url + "...");
+							byte[] data = await client.GetByteArrayAsync(url);
+							File.WriteAllBytes(Path.Combine(Paths.ModuleDataPath, "stat_map.png"), data);
+							Stat.StatTextureMap = StatsMap!.TextureMapInfo;
 						}
-						Type innerType = map2.GetType().GetGenericArguments()[0];
-						if (!typeof(BaseItem).IsAssignableFrom(innerType))
+						finally
 						{
-							continue;
+							((IDisposable)client)?.Dispose();
 						}
-						dynamic dynMap = map2;
-						dynamic awaiter = dynMap.LoadAndGetPending(name2, versions[name2], Path.Combine(Paths.ModuleDataPath, name2 + ".json")).GetAwaiter();
-						if (!(bool)awaiter.IsCompleted)
+					}
+					Locale value = GameService.Overlay.UserLocale.Value;
+					bool flag = (((uint)(value - 4) <= 1u) ? true : false);
+					Locale lang = ((!flag) ? GameService.Overlay.UserLocale.Value : Locale.English);
+					await PreFetchItemIds(Versions);
+					using (IEnumerator<(string name, BaseMappedDataEntry map)> enumerator2 = GetEnumerator())
+					{
+						while (enumerator2.MoveNext())
 						{
-							ICriticalNotifyCompletion awaiter2 = awaiter as ICriticalNotifyCompletion;
-							if (awaiter2 == null)
+							var (name2, map) = enumerator2.Current;
+							if (_cancellationTokenSource.IsCancellationRequested)
 							{
-								INotifyCompletion awaiter3 = (INotifyCompletion)awaiter;
-								asyncTaskMethodBuilder.AwaitOnCompleted(ref awaiter3, ref *(_003CLoad_003Ed__95*)/*Error near IL_06d2: stateMachine*/);
+								remoteDataLoaded = false;
+								remoteFailedParts.Add(name2);
+								continue;
 							}
-							else
+							string path = Path.Combine(Paths.ModuleDataPath, name2 + ".json");
+							if (!(await map.IsIncomplete(name2, Versions![name2], path, Gw2ApiManager, _cancellationTokenSource.Token)).Item1)
 							{
-								asyncTaskMethodBuilder.AwaitUnsafeOnCompleted(ref awaiter2, ref *(_003CLoad_003Ed__95*)/*Error near IL_06e5: stateMachine*/);
+								continue;
 							}
-							/*Error near IL_06ee: leave MoveNext - await not detected correctly*/;
+							if (_cancellationTokenSource.IsCancellationRequested)
+							{
+								remoteDataLoaded = false;
+								remoteFailedParts.Add(name2);
+								continue;
+							}
+							BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths, Kenedia.Modules.BuildsManager.Services.StaticHosting>.Logger.Info("Updating data for " + name2 + " " + ((map.Version < Versions![name2].Version) ? $"from version {map.Version} to {Versions![name2].Version}" : $"for {lang} locale..."));
+							bool updated = await map.Update(name2, Versions![name2], path, Gw2ApiManager, _cancellationTokenSource.Token);
+							remoteDataLoaded = remoteDataLoaded && updated;
+							if (!updated)
+							{
+								remoteFailedParts.Add(name2);
+							}
 						}
-						object ids = awaiter.GetResult();
-						List<int> idList = ids as List<int>;
-						itemIds = ((idList != null) ? itemIds.Union(idList).ToList() : itemIds);
+					}
+					if (!remoteDataLoaded)
+					{
+						BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths, Kenedia.Modules.BuildsManager.Services.StaticHosting>.Logger.Info("Remote data failed to load: " + string.Join(", ", remoteFailedParts));
+					}
+					else
+					{
+						BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths, Kenedia.Modules.BuildsManager.Services.StaticHosting>.Logger.Info("All remote data loaded successfully.");
 					}
 				}
-				List<List<int>> idSets = itemIds.ToList().ChunkBy(200);
+				if (localDataLoaded || remoteDataLoaded)
+				{
+					GameService.Graphics.QueueMainThreadRender(delegate
+					{
+						this.Loaded?.Invoke(this, EventArgs.Empty);
+					});
+					spinner?.Hide();
+					return true;
+				}
+				string txt = $"Failed to load local and remote data. Click to retry.{Environment.NewLine}Automatic retry at {endTime:T}" + Environment.NewLine + "Failed to load locally: " + string.Join(", ", failedLocalParts) + Environment.NewLine + "Failed to load remotely: " + string.Join(", ", remoteFailedParts);
+				NotificationBadge?.AddNotification(new ConditionalNotification
+				{
+					NotificationText = txt,
+					Condition = () => DateTime.Now >= endTime || IsLoaded
+				});
+				BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths, Kenedia.Modules.BuildsManager.Services.StaticHosting>.Logger.Info(txt);
+			}
+			catch (Exception ex)
+			{
+				BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths, Kenedia.Modules.BuildsManager.Services.StaticHosting>.Logger.Info(ex, "An error occurred while loading data.");
+				BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths, Kenedia.Modules.BuildsManager.Services.StaticHosting>.Logger.Info(ex.Message);
+				BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths, Kenedia.Modules.BuildsManager.Services.StaticHosting>.Logger.Info(ex.InnerException.Message);
+			}
+			return false;
+		}
+
+		private async Task<bool> PreFetchItemIds(StaticVersion versions)
+		{
+			List<int> itemIds = new List<int>();
+			using (IEnumerator<(string name, BaseMappedDataEntry map)> enumerator = GetEnumerator())
+			{
+				while (enumerator.MoveNext())
+				{
+					var (name, map) = enumerator.Current;
+					if (!map.GetType().IsGenericType || !(map.GetType().GetGenericTypeDefinition() == typeof(ItemMappedDataEntry<>)))
+					{
+						continue;
+					}
+					Type innerType = map.GetType().GetGenericArguments()[0];
+					if (typeof(BaseItem).IsAssignableFrom(innerType))
+					{
+						var (isIncomplete, ids) = await map.IsIncomplete(name, versions[name], Path.Combine(Paths.ModuleDataPath, name + ".json"), Gw2ApiManager, _cancellationTokenSource.Token);
+						if (ids.Any() && ids.All((object e) => e is int))
+						{
+							itemIds = (isIncomplete ? itemIds.Union(ids.Cast<int>()).ToList() : itemIds);
+						}
+					}
+				}
+			}
+			List<List<int>> idSets = itemIds.ToList().ChunkBy(200);
+			if (itemIds.Count > 0)
+			{
 				BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths, Kenedia.Modules.BuildsManager.Services.StaticHosting>.Logger.Info($"Pre-Fetching {itemIds.Count} items from API...");
 				int count = 0;
 				foreach (List<int> idSet in idSets)
@@ -380,59 +481,8 @@ namespace Kenedia.Modules.BuildsManager.Services
 					BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths, Kenedia.Modules.BuildsManager.Services.StaticHosting>.Logger.Info($"Fetching {count}/{itemIds.Count} items...");
 					await Gw2ApiManager.Gw2ApiClient.V2.Items.ManyAsync(idSet);
 				}
-				bool failed = false;
-				string loadStatus = string.Empty;
-				using (IEnumerator<(string name, BaseMappedDataEntry map)> enumerator = GetEnumerator())
-				{
-					while (enumerator.MoveNext())
-					{
-						var (name, map) = enumerator.Current;
-						if (_cancellationTokenSource.IsCancellationRequested)
-						{
-							return false;
-						}
-						string path = Path.Combine(Paths.ModuleDataPath, name + ".json");
-						bool success = await map.LoadAndUpdate(name, versions[name], path, Gw2ApiManager, _cancellationTokenSource.Token);
-						failed = failed || !success;
-						if (failed)
-						{
-							loadStatus += string.Format("{0}{1}: {2} [{3} | {4}] ", Environment.NewLine, name, success, ((object)map?.Version)?.ToString() ?? "0.0.0", versions[name].Version);
-						}
-					}
-				}
-				if (!failed)
-				{
-					BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths, Kenedia.Modules.BuildsManager.Services.StaticHosting>.Logger.Info("All data loaded!");
-					if (raiseEvent)
-					{
-						GameService.Graphics.QueueMainThreadRender(delegate
-						{
-							this.Loaded?.Invoke(this, EventArgs.Empty);
-						});
-					}
-				}
-				else
-				{
-					NotificationBadge badge = NotificationBadge;
-					if (badge != null)
-					{
-						string txt = $"Failed to load some data. Click to retry.{Environment.NewLine}Automatic retry at {DateTime.Now.AddMinutes(3.0):T}{loadStatus}";
-						DateTime endTime = DateTime.Now.AddMinutes(3.0);
-						badge.AddNotification(new ConditionalNotification
-						{
-							NotificationText = txt,
-							Condition = () => DateTime.Now >= endTime || IsLoaded
-						});
-						BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths, Kenedia.Modules.BuildsManager.Services.StaticHosting>.Logger.Info(txt);
-					}
-				}
-				spinner?.Hide();
-				return !failed;
 			}
-			catch
-			{
-			}
-			return false;
+			return true;
 		}
 
 		public void Dispose()

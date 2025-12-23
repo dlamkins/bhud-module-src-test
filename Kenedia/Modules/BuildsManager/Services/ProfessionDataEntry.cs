@@ -21,69 +21,119 @@ namespace Kenedia.Modules.BuildsManager.Services
 {
 	public class ProfessionDataEntry : MappedDataEntry<ProfessionType, Kenedia.Modules.BuildsManager.DataModels.Professions.Profession>
 	{
-		public override async Task<bool> LoadAndUpdate(string name, ByteIntMap map, string path, Gw2ApiManager gw2ApiManager, CancellationToken cancellationToken)
+		public override async Task<bool> LoadCached(string name, string path, CancellationToken token)
 		{
-			_ = 5;
-			try
+			if (token.IsCancellationRequested)
 			{
-				bool saveRequired = false;
-				ProfessionDataEntry loaded = null;
-				BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug("Load and if required update " + name);
-				if (!DataLoaded && System.IO.File.Exists(path))
-				{
-					BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug("Load " + name + ".json");
-					loaded = JsonConvert.DeserializeObject<ProfessionDataEntry>(System.IO.File.ReadAllText(path), SerializerSettings.Default);
-					DataLoaded = true;
-				}
-				base.Map = map;
-				base.Items = loaded?.Items ?? base.Items;
-				base.Version = loaded?.Version ?? base.Version;
-				BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug($"{name} Version {base.Version} | version {map.Version}");
-				BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug("Check for missing values for " + name);
-				IApiV2ObjectList<string> professionIds = await gw2ApiManager.Gw2ApiClient.V2.Professions.IdsAsync(cancellationToken);
-				if (cancellationToken.IsCancellationRequested)
+				return false;
+			}
+			if (!System.IO.File.Exists(path))
+			{
+				BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug("No local data for " + name + " found at '" + Path.GetFileName(path) + "'");
+				return false;
+			}
+			BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug("Loading local data for " + name + " from '" + Path.GetFileName(path) + "'");
+			if (System.IO.File.Exists(path))
+			{
+				string json = System.IO.File.ReadAllText(path);
+				if (token.IsCancellationRequested)
 				{
 					return false;
 				}
-				ProfessionType result;
-				IEnumerable<ProfessionType> professionTypes = professionIds?.Select((string value) => (!Enum.TryParse<ProfessionType>(value, out result)) ? ProfessionType.Guardian : result).Distinct();
+				ProfessionDataEntry loaded = JsonConvert.DeserializeObject<ProfessionDataEntry>(json, SerializerSettings.Default);
+				if (loaded != null)
+				{
+					base.Map = loaded.Map;
+					base.Items = loaded.Items;
+					base.Version = loaded.Version;
+					DataLoaded = true;
+					BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug($"Loaded local data for {name} with {base.Items.Count} entries. Version {base.Version}");
+					return true;
+				}
+			}
+			else
+			{
+				BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug("No local data for " + name + " found at '" + Path.GetFileName(path) + "'");
+			}
+			return false;
+		}
+
+		public override async Task<(bool, List<object>)> IsIncomplete(string name, ByteIntMap map, string path, Gw2ApiManager gw2ApiManager, CancellationToken token)
+		{
+			base.Map = map;
+			try
+			{
+				if (base.Ids == null)
+				{
+					base.Ids = (await gw2ApiManager.Gw2ApiClient.V2.Professions.IdsAsync(token)).Select((string value) => (!Enum.TryParse<ProfessionType>(value, out var result)) ? ProfessionType.Guardian : result).Distinct().ToList();
+				}
+				if (token.IsCancellationRequested)
+				{
+					return (true, new List<object>());
+				}
 				Locale value2 = GameService.Overlay.UserLocale.Value;
 				bool flag = (((uint)(value2 - 4) <= 1u) ? true : false);
 				Locale lang = ((!flag) ? GameService.Overlay.UserLocale.Value : Locale.English);
-				IEnumerable<ProfessionType> localeMissing = base.Items.Values.Where((Kenedia.Modules.BuildsManager.DataModels.Professions.Profession item) => item.Names[lang] == null)?.Select((Kenedia.Modules.BuildsManager.DataModels.Professions.Profession e) => e.Id);
-				IEnumerable<ProfessionType> missing = professionTypes.Except(base.Items.Keys).Concat(localeMissing);
-				if (map.Version > base.Version)
+				IEnumerable<ProfessionType> enumerable;
+				if (!(map.Version > base.Version))
 				{
-					base.Version = map.Version;
-					missing = professionTypes;
-					BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug("The current version does not match the map version. Updating all values for " + name + ".");
+					enumerable = base.Ids.Where((ProfessionType professionId) => !base.Items.TryGetValue(professionId, out var value3) || value3.Names[lang] == null);
 				}
-				if (missing.Count() > 0)
+				else
 				{
-					List<List<ProfessionType>> idSets = missing.ToList().ChunkBy(200);
-					saveRequired = saveRequired || idSets.Count > 0;
-					BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug($"Fetch a total of {missing.Count()} {name} in {idSets.Count} sets.");
-					IApiV2ObjectList<Gw2Sharp.WebApi.V2.Models.Specialization> apiSpecializations = await gw2ApiManager.Gw2ApiClient.V2.Specializations.AllAsync(cancellationToken);
-					IApiV2ObjectList<Gw2Sharp.WebApi.V2.Models.Legend> apiV2ObjectList = ((!missing.Contains(ProfessionType.Revenant)) ? null : (await gw2ApiManager.Gw2ApiClient.V2.Legends.AllAsync(cancellationToken)));
+					IEnumerable<ProfessionType> ids = base.Ids;
+					enumerable = ids;
+				}
+				IEnumerable<ProfessionType> missing = enumerable;
+				return (missing.Any(), missing.Cast<object>().ToList());
+			}
+			catch (Exception ex)
+			{
+				BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Warn(ex, "Failed to check completeness of " + name + " data.");
+			}
+			return (true, new List<object>());
+		}
+
+		public override async Task<bool> Update(string name, ByteIntMap map, string path, Gw2ApiManager gw2ApiManager, CancellationToken token)
+		{
+			_ = 6;
+			try
+			{
+				if (token.IsCancellationRequested)
+				{
+					return false;
+				}
+				await gw2ApiManager.Gw2ApiClient.V2.Professions.IdsAsync(token);
+				if (token.IsCancellationRequested)
+				{
+					return false;
+				}
+				List<object> missing = (await IsIncomplete(name, map, path, gw2ApiManager, token)).Item2;
+				if (missing.Any() && missing.All((object item) => item is ProfessionType))
+				{
+					List<List<ProfessionType>> idSets = missing.Cast<ProfessionType>().ToList().ChunkBy(200);
+					BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug($"{name} updating {missing.Count()} entries in {idSets.Count} sets.");
+					IApiV2ObjectList<Gw2Sharp.WebApi.V2.Models.Specialization> apiSpecializations = await gw2ApiManager.Gw2ApiClient.V2.Specializations.AllAsync(token);
+					IApiV2ObjectList<Gw2Sharp.WebApi.V2.Models.Legend> apiV2ObjectList = ((!missing.Contains(ProfessionType.Revenant)) ? null : (await gw2ApiManager.Gw2ApiClient.V2.Legends.AllAsync(token)));
 					IApiV2ObjectList<Gw2Sharp.WebApi.V2.Models.Legend> apiLegends = apiV2ObjectList;
-					IApiV2ObjectList<Gw2Sharp.WebApi.V2.Models.Trait> apiTraits = await gw2ApiManager.Gw2ApiClient.V2.Traits.AllAsync(cancellationToken);
-					IApiV2ObjectList<Gw2Sharp.WebApi.V2.Models.Skill> apiSkills = await gw2ApiManager.Gw2ApiClient.V2.Skills.AllAsync(cancellationToken);
+					IApiV2ObjectList<Gw2Sharp.WebApi.V2.Models.Trait> apiTraits = await gw2ApiManager.Gw2ApiClient.V2.Traits.AllAsync(token);
+					IApiV2ObjectList<Gw2Sharp.WebApi.V2.Models.Skill> apiSkills = await gw2ApiManager.Gw2ApiClient.V2.Skills.AllAsync(token);
 					IEnumerable<Gw2Sharp.WebApi.V2.Models.Legend> allLegends = apiLegends.Append<Gw2Sharp.WebApi.V2.Models.Legend>(new Gw2Sharp.WebApi.V2.Models.Legend
 					{
 						Id = "Legend7",
 						Swap = 62891,
 						Heal = 62719,
 						Elite = 62942,
-						Utilities = new List<int> { 62832, 62962, 62878 }
+						Utilities = new _003C_003Ez__ReadOnlyArray<int>(new int[3] { 62832, 62962, 62878 })
 					});
-					if (cancellationToken.IsCancellationRequested)
+					if (token.IsCancellationRequested)
 					{
 						return false;
 					}
 					foreach (List<ProfessionType> ids in idSets)
 					{
-						IReadOnlyList<Gw2Sharp.WebApi.V2.Models.Profession> items = await gw2ApiManager.Gw2ApiClient.V2.Professions.ManyAsync(ids, cancellationToken);
-						if (cancellationToken.IsCancellationRequested)
+						IReadOnlyList<Gw2Sharp.WebApi.V2.Models.Profession> items = await gw2ApiManager.Gw2ApiClient.V2.Professions.ManyAsync(ids, token);
+						if (token.IsCancellationRequested)
 						{
 							return false;
 						}
@@ -102,21 +152,19 @@ namespace Kenedia.Modules.BuildsManager.Services
 							}
 						}
 					}
-				}
-				if (saveRequired)
-				{
-					BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug("Saving " + name + ".json");
+					base.Version = base.Map.Version;
+					BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug($"Saving updated {name} data with {missing.Count()} updated entries. Version {base.Version}");
 					string json = JsonConvert.SerializeObject((object)this, SerializerSettings.Default);
 					System.IO.File.WriteAllText(path, json);
+					DataLoaded = true;
+					return true;
 				}
-				DataLoaded = DataLoaded || base.Items.Count > 0;
-				return true;
 			}
 			catch (Exception ex)
 			{
-				BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Warn(ex, "Failed to load " + name + " data.");
-				return false;
+				BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Warn(ex, "Failed to update " + name + " data.");
 			}
+			return false;
 		}
 	}
 }

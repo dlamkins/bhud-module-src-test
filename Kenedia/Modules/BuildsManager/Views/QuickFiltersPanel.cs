@@ -551,6 +551,16 @@ namespace Kenedia.Modules.BuildsManager.Views
 
 		private void CreateTagControls()
 		{
+			foreach (TagGroupPanel panel in _tagControls.Keys)
+			{
+				foreach (Control item in panel.Children.ToList())
+				{
+					item?.Dispose();
+				}
+				panel.ClearChildren();
+				panel.Dispose();
+			}
+			_tagControls.Clear();
 			List<TemplateTag> list = TemplateTags.ToList();
 			list.Sort(new TemplateTagComparer(TagGroups));
 			List<string> added = new List<string>();

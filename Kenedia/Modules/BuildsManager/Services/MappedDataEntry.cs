@@ -1,16 +1,14 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using System.Threading;
-using System.Threading.Tasks;
-using Blish_HUD.Modules.Managers;
 using Kenedia.Modules.BuildsManager.DataModels.Items;
-using Kenedia.Modules.BuildsManager.Models;
 using Newtonsoft.Json;
 
 namespace Kenedia.Modules.BuildsManager.Services
 {
 	public class MappedDataEntry<Key, T> : BaseMappedDataEntry where T : IDataMember, new()
 	{
+		protected List<Key>? Ids { get; set; }
+
 		[DataMember]
 		public new Dictionary<Key, T> Items { get; protected set; } = new Dictionary<Key, T>();
 
@@ -63,11 +61,6 @@ namespace Kenedia.Modules.BuildsManager.Services
 		public bool TryGetValue(Key key, out T value)
 		{
 			return Items.TryGetValue(key, out value);
-		}
-
-		public override async Task<bool> LoadAndUpdate(string name, ByteIntMap map, string path, Gw2ApiManager gw2ApiManager, CancellationToken cancellationToken)
-		{
-			return await Task.FromResult(DataLoaded);
 		}
 	}
 }
