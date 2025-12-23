@@ -197,10 +197,10 @@ namespace Kenedia.Modules.Characters.Controls
 			spriteBatch.Draw((Texture2D)texture, relativeCenter, (Rectangle?)texture.Bounds, color, 0f, Vector2.get_Zero(), scale, (SpriteEffects)0, 1f);
 			if (contains_mouse)
 			{
+				_selected = character;
 				if (_settings.Radial_ShowAdvancedTooltip.Value)
 				{
 					base.BasicTooltipText = string.Empty;
-					_selected = character;
 					_tooltip.Character = character;
 					_tooltip.Show();
 				}
