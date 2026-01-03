@@ -11,6 +11,8 @@ namespace HexedHero.Blish_HUD.MarkerPackAssistant
 	[Export(typeof(Module))]
 	public class MarkerPackAssistant : Module
 	{
+		private SettingCollection _settingsCollection;
+
 		public readonly Logger Logger = Logger.GetLogger(typeof(MarkerPackAssistant));
 
 		public static MarkerPackAssistant Instance { get; private set; }
@@ -33,6 +35,7 @@ namespace HexedHero.Blish_HUD.MarkerPackAssistant
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
+			_settingsCollection = settings;
 			ModuleSettingsManager.Instance.DefineSettings(settings);
 		}
 
@@ -45,11 +48,10 @@ namespace HexedHero.Blish_HUD.MarkerPackAssistant
 
 		public override IView GetSettingsView()
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000c: Expected O, but got Unknown
-			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000d: Expected O, but got Unknown
-			return (IView)new SettingsView(new SettingCollection(false), -1);
+			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0017: Expected O, but got Unknown
+			return (IView)new SettingsView((SettingCollection)(((object)_settingsCollection) ?? ((object)new SettingCollection(false))), -1);
 		}
 	}
 }

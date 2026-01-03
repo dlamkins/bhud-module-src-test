@@ -196,6 +196,7 @@ namespace HexedHero.Blish_HUD.MarkerPackAssistant.Objects
 				((Control)pOIButton).Dispose();
 			}
 			UpdaterTaskToken?.Cancel();
+			ModuleSettingsManager.Instance.DisableKeybinds();
 		}
 
 		protected override void Build(Container container)
@@ -398,12 +399,7 @@ namespace HexedHero.Blish_HUD.MarkerPackAssistant.Objects
 			MapIDButton = val4;
 			((Control)MapIDButton).add_Click((EventHandler<MouseEventArgs>)async delegate
 			{
-				MapIDButton.set_Text("Copied");
-				((Control)MapIDButton).set_Enabled(false);
-				ClipboardUtil.get_WindowsClipboardService().SetTextAsync(MapID.ToString());
-				await Task.Delay(333);
-				MapIDButton.set_Text("Copy");
-				((Control)MapIDButton).set_Enabled(true);
+				await CopyMapID();
 			});
 			Image val5 = new Image();
 			((Control)val5).set_Location(new Point(0, 0));
@@ -430,12 +426,7 @@ namespace HexedHero.Blish_HUD.MarkerPackAssistant.Objects
 			CordsButton = val8;
 			((Control)CordsButton).add_Click((EventHandler<MouseEventArgs>)async delegate
 			{
-				CordsButton.set_Text("Copied");
-				((Control)CordsButton).set_Enabled(false);
-				ClipboardUtil.get_WindowsClipboardService().SetTextAsync(FormattableString.Invariant($"xpos=\"{CharX}\" ypos=\"{CharY}\" zpos=\"{CharZ}\""));
-				await Task.Delay(333);
-				CordsButton.set_Text("Copy");
-				((Control)CordsButton).set_Enabled(true);
+				await CopyCords();
 			});
 			Image val9 = new Image();
 			((Control)val9).set_Location(new Point(0, 0));
@@ -468,44 +459,7 @@ namespace HexedHero.Blish_HUD.MarkerPackAssistant.Objects
 			RunButton = val13;
 			((Control)RunButton).add_Click((EventHandler<MouseEventArgs>)async delegate
 			{
-				RunButton.set_Text("Running");
-				((Control)RunButton).set_Enabled(false);
-				await Task.Run(async delegate
-				{
-					string path = ModuleSettingsManager.Instance.ModuleSettings.MarkerPackBuildPath.get_Value();
-					if (File.Exists(path) && Path.GetExtension(path).Equals(".bat"))
-					{
-						Process process = new Process();
-						process.StartInfo.WorkingDirectory = Path.GetDirectoryName(path);
-						process.StartInfo.FileName = path;
-						process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-						process.StartInfo.CreateNoWindow = true;
-						process.Start();
-						if (!process.WaitForExit(30000))
-						{
-							process.Kill();
-							RunButton.set_Text("KILLED");
-							await Task.Delay(3000);
-						}
-						await Task.Delay(25);
-						foreach (ModuleManager moduleManager in GameService.Module.get_Modules())
-						{
-							if (moduleManager.get_Manifest().get_Namespace().ToLower()
-								.Equals("bh.community.pathing") && moduleManager.get_Enabled())
-							{
-								Reflection.ReloadPathingMarkers(moduleManager);
-								await Task.Delay(250);
-							}
-						}
-					}
-					else
-					{
-						RunButton.set_Text("INVALID");
-						await Task.Delay(1000);
-					}
-				});
-				RunButton.set_Text("Run");
-				((Control)RunButton).set_Enabled(true);
+				await RunBat();
 			});
 			Image val14 = new Image();
 			((Control)val14).set_Location(new Point(0, 0));
@@ -537,12 +491,7 @@ namespace HexedHero.Blish_HUD.MarkerPackAssistant.Objects
 			RandomGUIDButton = val17;
 			((Control)RandomGUIDButton).add_Click((EventHandler<MouseEventArgs>)async delegate
 			{
-				RandomGUIDButton.set_Text("Copied");
-				((Control)RandomGUIDButton).set_Enabled(false);
-				ClipboardUtil.get_WindowsClipboardService().SetTextAsync(Common.GetRandomGUID());
-				await Task.Delay(333);
-				RandomGUIDButton.set_Text("Copy");
-				((Control)RandomGUIDButton).set_Enabled(true);
+				await CopyRandomGUID();
 			});
 			Image val18 = new Image();
 			((Control)val18).set_Location(new Point(0, 0));
@@ -569,15 +518,7 @@ namespace HexedHero.Blish_HUD.MarkerPackAssistant.Objects
 			POIButton = val21;
 			((Control)POIButton).add_Click((EventHandler<MouseEventArgs>)async delegate
 			{
-				POIButton.set_Text("Copied");
-				((Control)POIButton).set_Enabled(false);
-				string Map = $"{MapID}";
-				string Position = FormattableString.Invariant($"xpos=\"{CharX}\" ypos=\"{CharY}\" zpos=\"{CharZ}\"");
-				string randomGUID = Common.GetRandomGUID();
-				ClipboardUtil.get_WindowsClipboardService().SetTextAsync("<POI MapID=\"" + Map + "\" " + Position + " GUID=\"" + randomGUID + "\"/>");
-				await Task.Delay(333);
-				POIButton.set_Text("Copy");
-				((Control)POIButton).set_Enabled(true);
+				await CopyPOI();
 			});
 			Image val22 = new Image();
 			((Control)val22).set_Location(new Point(0, 0));
@@ -602,6 +543,7 @@ namespace HexedHero.Blish_HUD.MarkerPackAssistant.Objects
 					await Task.Delay(25, UpdaterTaskToken.Token);
 				}
 			});
+			ModuleSettingsManager.Instance.EnableKeybinds();
 		}
 
 		public void UpdateMapID(object sender, ValueEventArgs<int> e)
@@ -619,6 +561,91 @@ namespace HexedHero.Blish_HUD.MarkerPackAssistant.Objects
 			CharY = GameService.Gw2Mumble.get_PlayerCharacter().get_Position().Z;
 			CharZ = GameService.Gw2Mumble.get_PlayerCharacter().get_Position().Y;
 			CordsLabel.set_Text("XYZ: %location%".Replace("%location%", CharX.ToString("F2") + ", " + CharY.ToString("F2") + ", " + CharZ.ToString("F2")));
+		}
+
+		public async Task CopyMapID()
+		{
+			MapIDButton.set_Text("Copied");
+			((Control)MapIDButton).set_Enabled(false);
+			ClipboardUtil.get_WindowsClipboardService().SetTextAsync(MapID.ToString());
+			await Task.Delay(333);
+			MapIDButton.set_Text("Copy");
+			((Control)MapIDButton).set_Enabled(true);
+		}
+
+		public async Task CopyCords()
+		{
+			CordsButton.set_Text("Copied");
+			((Control)CordsButton).set_Enabled(false);
+			ClipboardUtil.get_WindowsClipboardService().SetTextAsync(FormattableString.Invariant($"xpos=\"{CharX}\" ypos=\"{CharY}\" zpos=\"{CharZ}\""));
+			await Task.Delay(333);
+			CordsButton.set_Text("Copy");
+			((Control)CordsButton).set_Enabled(true);
+		}
+
+		public async Task CopyRandomGUID()
+		{
+			RandomGUIDButton.set_Text("Copied");
+			((Control)RandomGUIDButton).set_Enabled(false);
+			ClipboardUtil.get_WindowsClipboardService().SetTextAsync(Common.GetRandomGUID());
+			await Task.Delay(333);
+			RandomGUIDButton.set_Text("Copy");
+			((Control)RandomGUIDButton).set_Enabled(true);
+		}
+
+		public async Task RunBat()
+		{
+			RunButton.set_Text("Running");
+			((Control)RunButton).set_Enabled(false);
+			await Task.Run(async delegate
+			{
+				string path = ModuleSettingsManager.Instance.ModuleSettings.MarkerPackBuildPath.get_Value();
+				if (File.Exists(path) && Path.GetExtension(path).Equals(".bat"))
+				{
+					Process process = new Process();
+					process.StartInfo.WorkingDirectory = Path.GetDirectoryName(path);
+					process.StartInfo.FileName = path;
+					process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+					process.StartInfo.CreateNoWindow = true;
+					process.Start();
+					if (!process.WaitForExit(30000))
+					{
+						process.Kill();
+						RunButton.set_Text("KILLED");
+						await Task.Delay(3000);
+					}
+					await Task.Delay(25);
+					foreach (ModuleManager moduleManager in GameService.Module.get_Modules())
+					{
+						if (moduleManager.get_Manifest().get_Namespace().ToLower()
+							.Equals("bh.community.pathing") && moduleManager.get_Enabled())
+						{
+							Reflection.ReloadPathingMarkers(moduleManager);
+							await Task.Delay(250);
+						}
+					}
+				}
+				else
+				{
+					RunButton.set_Text("INVALID");
+					await Task.Delay(1000);
+				}
+			});
+			RunButton.set_Text("Run");
+			((Control)RunButton).set_Enabled(true);
+		}
+
+		public async Task CopyPOI()
+		{
+			POIButton.set_Text("Copied");
+			((Control)POIButton).set_Enabled(false);
+			string Map = $"{MapID}";
+			string Position = FormattableString.Invariant($"xpos=\"{CharX}\" ypos=\"{CharY}\" zpos=\"{CharZ}\"");
+			string randomGUID = Common.GetRandomGUID();
+			ClipboardUtil.get_WindowsClipboardService().SetTextAsync("<POI MapID=\"" + Map + "\" " + Position + " GUID=\"" + randomGUID + "\"/>");
+			await Task.Delay(333);
+			POIButton.set_Text("Copy");
+			((Control)POIButton).set_Enabled(true);
 		}
 	}
 }
