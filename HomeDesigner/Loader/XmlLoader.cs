@@ -184,10 +184,10 @@ namespace HomeDesigner.Loader
 
 		public static XDocument SaveBlueprintObjectsToXml(List<BlueprintObject> objects, string mapId)
 		{
-			//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0105: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0101: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0178: Unknown result type (might be due to invalid IL or missing references)
 			if (objects == null)
 			{
 				return null;
@@ -201,7 +201,7 @@ namespace HomeDesigner.Loader
 			{
 				mapName = "Hearth's Glow";
 			}
-			XDocument doc = new XDocument(new XDeclaration("1.0", "UTF-8", null), new XElement("Decorations", new XAttribute("version", "1"), new XAttribute("mapId", "1596"), new XAttribute("mapName", mapName), new XAttribute("type", "0")));
+			XDocument doc = new XDocument(new XDeclaration("1.0", "UTF-8", null), new XElement("Decorations", new XAttribute("version", "1"), new XAttribute("mapId", mapId), new XAttribute("mapName", mapName), new XAttribute("type", "0")));
 			XElement root = doc.Root;
 			foreach (BlueprintObject obj in objects)
 			{
