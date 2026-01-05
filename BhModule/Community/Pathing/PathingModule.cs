@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using BhModule.Community.Pathing.Entity;
 using BhModule.Community.Pathing.MarkerPackRepo;
@@ -83,39 +84,13 @@ namespace BhModule.Community.Pathing
 			Settings = new ModuleSettings(this, settings);
 		}
 
+		[IteratorStateMachine(typeof(_003CGetPathingMenuItems_003Ed__66))]
 		private IEnumerable<ContextMenuStripItem> GetPathingMenuItems()
 		{
-			if (PackInitiator != null)
+			return new _003CGetPathingMenuItems_003Ed__66(-2)
 			{
-				foreach (ContextMenuStripItem menuItem in PackInitiator.GetPackMenuItems())
-				{
-					((Control)menuItem).set_Enabled(((Control)menuItem).get_Enabled() && !_packsLoading);
-					yield return menuItem;
-				}
-			}
-			if (Settings.ScriptsConsoleEnabled.get_Value() || ((Enum)GameService.Input.get_Keyboard().get_ActiveModifiers()).HasFlag((Enum)(object)(ModifierKeys)4))
-			{
-				ContextMenuStripItem val = new ContextMenuStripItem();
-				val.set_Text("Script Console");
-				ContextMenuStripItem scriptConsole = val;
-				((Control)scriptConsole).add_Click((EventHandler<MouseEventArgs>)delegate
-				{
-					ShowScriptWindow();
-				});
-				yield return scriptConsole;
-			}
-			ContextMenuStripItem val2 = new ContextMenuStripItem();
-			val2.set_Text("Pathing Module Settings");
-			ContextMenuStripItem openSettings = val2;
-			((Control)openSettings).add_Click((EventHandler<MouseEventArgs>)delegate
-			{
-				if (SettingsWindow.get_SelectedTab() == MarkerRepoTab || SettingsWindow.get_SelectedTab() == CategoryTreeTab)
-				{
-					SettingsWindow.set_SelectedTab(PackSettingsTab);
-				}
-				((Control)SettingsWindow).Show();
-			});
-			yield return openSettings;
+				_003C_003E4__this = this
+			};
 		}
 
 		protected override void Initialize()

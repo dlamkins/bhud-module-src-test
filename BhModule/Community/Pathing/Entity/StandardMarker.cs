@@ -1062,7 +1062,6 @@ namespace BhModule.Community.Pathing.Entity
 			Populate_InvertBehavior(collection, resourceManager);
 			Populate_TacOMisc(collection, resourceManager);
 			Populate_Behaviors(collection, resourceManager);
-			Populate_EditTag(collection, resourceManager);
 		}
 
 		public override void Update(GameTime gameTime)

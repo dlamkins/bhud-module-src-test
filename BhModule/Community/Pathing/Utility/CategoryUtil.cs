@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using BhModule.Community.Pathing.Entity;
 using BhModule.Community.Pathing.State;
 using Blish_HUD;
@@ -24,16 +25,13 @@ namespace BhModule.Community.Pathing.Utility
 			return active;
 		}
 
+		[IteratorStateMachine(typeof(_003CFlattenCategories_003Ed__1))]
 		public static IEnumerable<PathingCategory> FlattenCategories(PathingCategory category)
 		{
-			yield return category;
-			foreach (PathingCategory subCategory in category)
+			return new _003CFlattenCategories_003Ed__1(-2)
 			{
-				foreach (PathingCategory item in FlattenCategories(subCategory))
-				{
-					yield return item;
-				}
-			}
+				_003C_003E3__category = category
+			};
 		}
 
 		public static string GetPath(this PathingCategory category)

@@ -76,7 +76,7 @@ namespace BhModule.Community.Pathing.State
 
 		private Dictionary<int, MapDetails> _mapDetails = new Dictionary<int, MapDetails>();
 
-		private const double METERCONVERSION = 39.37007874015748;
+		private const float METERCONVERSION = 39.37f;
 
 		private MapDetails? _currentMapDetails;
 
@@ -146,8 +146,8 @@ namespace BhModule.Community.Pathing.State
 		{
 			if (_currentMapDetails.HasValue)
 			{
-				outX = _currentMapDetails.Value.ContinentRectTopLeftX + (eventCoordsX * 39.37007874015748 - _currentMapDetails.Value.MapRectTopLeftX) / _currentMapDetails.Value.MapRectWidth * _currentMapDetails.Value.ContinentRectWidth;
-				outY = _currentMapDetails.Value.ContinentRectTopLeftY + (0.0 - (eventCoordsY * 39.37007874015748 - _currentMapDetails.Value.MapRectTopLeftY)) / _currentMapDetails.Value.MapRectHeight * _currentMapDetails.Value.ContinentRectHeight;
+				outX = _currentMapDetails.Value.ContinentRectTopLeftX + (eventCoordsX * 39.369998931884766 - _currentMapDetails.Value.MapRectTopLeftX) / _currentMapDetails.Value.MapRectWidth * _currentMapDetails.Value.ContinentRectWidth;
+				outY = _currentMapDetails.Value.ContinentRectTopLeftY + (0.0 - (eventCoordsY * 39.369998931884766 - _currentMapDetails.Value.MapRectTopLeftY)) / _currentMapDetails.Value.MapRectHeight * _currentMapDetails.Value.ContinentRectHeight;
 			}
 			else
 			{

@@ -21,6 +21,8 @@ namespace BhModule.Community.Pathing.Scripting
 
 		private Lua _lua;
 
+		private LuaCompileOptions _debugCompileOptions;
+
 		private TraceLineDebugger _stackTraceDebugger;
 
 		private readonly RingBuffer<TimeSpan> _frameExecutionTime = new RingBuffer<TimeSpan>(10);
@@ -68,6 +70,10 @@ namespace BhModule.Community.Pathing.Scripting
 			StandardTrailScriptExtensions.SetPackInitiator(Module.PackInitiator);
 			PathingCategoryScriptExtensions.SetPackInitiator(Module.PackInitiator);
 			_stackTraceDebugger = new TraceLineDebugger();
+			_debugCompileOptions = new LuaCompileOptions
+			{
+				DebugEngine = _stackTraceDebugger
+			};
 			Global = _lua.CreateEnvironment<PathingGlobal>();
 			Global.ScriptEngine = this;
 			PushMessage("Loaded new environment.", ScriptMessageLogLevel.System);
@@ -172,10 +178,8 @@ namespace BhModule.Community.Pathing.Scripting
 			{
 				using StreamReader scriptReader = new StreamReader(await resourceManager.LoadResourceStreamAsync(scriptName).ConfigureAwait(continueOnCapturedContext: false));
 				string scriptSource = await scriptReader.ReadToEndAsync().ConfigureAwait(continueOnCapturedContext: false);
-				LuaChunk chunk = _lua.CompileChunk(scriptSource, scriptName, new LuaCompileOptions
-				{
-					DebugEngine = _stackTraceDebugger
-				}, new KeyValuePair<string, Type>("Pack", typeof(PackContext)));
+				LuaCompileOptions cos = ((Module.Settings.ScriptsEnabled.get_Value() && Module.Settings.ScriptsConsoleEnabled.get_Value()) ? _debugCompileOptions : null);
+				LuaChunk chunk = _lua.CompileChunk(scriptSource, scriptName, cos, new KeyValuePair<string, Type>("Pack", typeof(PackContext)));
 				ScriptState newScript = new ScriptState(chunk);
 				newScript.Run(Global, new PackContext(this, resourceManager));
 				Scripts.Add(newScript);
@@ -198,10 +202,7 @@ namespace BhModule.Community.Pathing.Scripting
 		{
 			try
 			{
-				LuaChunk chunk = _lua.CompileChunk(script, "eval", new LuaCompileOptions
-				{
-					DebugEngine = _stackTraceDebugger
-				});
+				LuaChunk chunk = _lua.CompileChunk(script, "eval", _debugCompileOptions);
 				(LuaResult, bool) scriptResult = WrapScriptCall(() => chunk.Run(Global));
 				if (scriptResult.Item2)
 				{

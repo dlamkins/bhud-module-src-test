@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using BhModule.Community.Pathing.State;
-using BhModule.Community.Pathing.UI.Controls;
-using BhModule.Community.Pathing.Utility;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Settings;
@@ -68,71 +67,23 @@ namespace BhModule.Community.Pathing
 			}
 		}
 
+		[IteratorStateMachine(typeof(_003CGetPackLoadSettings_003Ed__24))]
 		private IEnumerable<ContextMenuStripItem> GetPackLoadSettings(PackWrapper pack)
 		{
-			yield return (ContextMenuStripItem)(object)new SimpleContextMenuStripItem("Always Load", delegate(bool e)
+			return new _003CGetPackLoadSettings_003Ed__24(-2)
 			{
-				pack.AlwaysLoad.set_Value(e);
-			}, pack.AlwaysLoad.get_Value());
-			if (pack.IsLoaded)
-			{
-				ContextMenuStripItem val = new ContextMenuStripItem();
-				val.set_Text($"Loaded in {pack.LoadTime} milliseconds");
-				((Control)val).set_Enabled(false);
-				yield return val;
-			}
-			else
-			{
-				yield return (ContextMenuStripItem)(object)new SimpleContextMenuStripItem("Load Marker Pack", delegate
-				{
-					pack.ForceLoad = true;
-					ReloadPacks();
-				});
-			}
-			SimpleContextMenuStripItem simpleContextMenuStripItem = new SimpleContextMenuStripItem("Delete Pack", delegate
-			{
-				if (pack.Package != null)
-				{
-					PackHandlingUtil.DeletePack(_module, pack.Package);
-				}
-			});
-			((Control)simpleContextMenuStripItem).set_Enabled(pack.Package != null);
-			yield return (ContextMenuStripItem)(object)simpleContextMenuStripItem;
+				_003C_003E4__this = this,
+				_003C_003E3__pack = pack
+			};
 		}
 
+		[IteratorStateMachine(typeof(_003CGetPackToggles_003Ed__25))]
 		private IEnumerable<ContextMenuStripItem> GetPackToggles()
 		{
-			PackWrapper[] packs = _packs.ToArray();
-			foreach (PackWrapper pack in packs.OrderBy((PackWrapper p) => p.Package?.Name ?? p.Pack.Name))
+			return new _003CGetPackToggles_003Ed__25(-2)
 			{
-				if (!(pack.Pack.Name == "markers"))
-				{
-					string packName = pack.Package?.Name ?? pack.Pack.Name;
-					ContextMenuStripItem val = new ContextMenuStripItem();
-					val.set_Text(packName);
-					val.set_Submenu(new ContextMenuStrip((Func<IEnumerable<ContextMenuStripItem>>)(() => GetPackLoadSettings(pack))));
-					yield return val;
-				}
-			}
-			yield return (ContextMenuStripItem)(object)new ContextMenuStripDivider();
-			SimpleContextMenuStripItem simpleContextMenuStripItem = new SimpleContextMenuStripItem("Reload Marker Packs", ReloadPacks);
-			((Control)simpleContextMenuStripItem).set_Enabled(!IsLoading && _packState.CurrentMapId > 0);
-			((Control)simpleContextMenuStripItem).set_BasicTooltipText(((int)_module.Settings.KeyBindReloadMarkerPacks.get_Value().get_PrimaryKey() != 0) ? ("Keybind: " + _module.Settings.KeyBindReloadMarkerPacks.get_Value().GetBindingDisplayText()) : null);
-			yield return (ContextMenuStripItem)(object)simpleContextMenuStripItem;
-			SimpleContextMenuStripItem simpleContextMenuStripItem2 = new SimpleContextMenuStripItem("Unload Marker Packs", async delegate
-			{
-				if (_packState.CurrentMapId >= 0)
-				{
-					await UnloadStateAndCollection();
-				}
-			});
-			((Control)simpleContextMenuStripItem2).set_Enabled(!IsLoading && _packState.CurrentMapId > 0);
-			yield return (ContextMenuStripItem)(object)simpleContextMenuStripItem2;
-			yield return (ContextMenuStripItem)(object)new SimpleContextMenuStripItem("Download Marker Packs", delegate
-			{
-				_module.SettingsWindow.set_SelectedTab(_module.MarkerRepoTab);
-				((Control)_module.SettingsWindow).Show();
-			});
+				_003C_003E4__this = this
+			};
 		}
 
 		public PathingCategory GetAllMarkersCategories()
@@ -140,29 +91,13 @@ namespace BhModule.Community.Pathing
 			return _sharedPackCollection?.Categories;
 		}
 
+		[IteratorStateMachine(typeof(_003CGetPackMenuItems_003Ed__27))]
 		public IEnumerable<ContextMenuStripItem> GetPackMenuItems()
 		{
-			bool isAnyMarkers = !IsLoading && _sharedPackCollection != null && _sharedPackCollection.Categories != null && _sharedPackCollection.Categories.Any((PathingCategory category) => !string.IsNullOrWhiteSpace(category.DisplayName));
-			ContextMenuStripItem val = new ContextMenuStripItem();
-			val.set_Text("All Markers");
-			val.set_CanCheck(true);
-			val.set_Checked(_module.Settings.GlobalPathablesEnabled.get_Value());
-			val.set_Submenu((ContextMenuStrip)(object)(isAnyMarkers ? new CategoryContextMenuStrip(_packState, _sharedPackCollection.Categories, forceShowAll: false) : null));
-			ContextMenuStripItem allMarkers = val;
-			allMarkers.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate(object _, CheckChangedEvent e)
+			return new _003CGetPackMenuItems_003Ed__27(-2)
 			{
-				_module.Settings.GlobalPathablesEnabled.set_Value(e.get_Checked());
-			});
-			ContextMenuStripItem val2 = new ContextMenuStripItem();
-			val2.set_Text("Manage Marker Packs");
-			val2.set_Submenu(new ContextMenuStrip((Func<IEnumerable<ContextMenuStripItem>>)GetPackToggles));
-			ContextMenuStripItem packs = val2;
-			if (_module.Settings.ScriptsEnabled.get_Value() && _module.ScriptEngine.Global != null && _module.ScriptEngine.Global.Menu.Menus.Any())
-			{
-				yield return _module.ScriptEngine.Global.Menu.BuildMenu();
-			}
-			yield return allMarkers;
-			yield return packs;
+				_003C_003E4__this = this
+			};
 		}
 
 		public async Task Init()

@@ -44,8 +44,11 @@ namespace BhModule.Community.Pathing.Behavior.Modifier
 
 		public static IBehavior BuildFromAttributes(AttributeCollection attributes, StandardMarker marker, IPackState packState)
 		{
-			IAttribute valueAttr;
-			return new InfoModifier(marker, attributes.TryGetAttribute("info", out valueAttr) ? valueAttr.GetValueAsString() : "", packState);
+			if (!attributes.TryGetAttribute("info", out var valueAttr))
+			{
+				return null;
+			}
+			return new InfoModifier(marker, valueAttr.GetValueAsString(), packState);
 		}
 
 		public void Focus()

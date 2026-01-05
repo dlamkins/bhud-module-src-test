@@ -119,11 +119,17 @@ namespace BhModule.Community.Pathing.Scripting.Console
 				ToolStripStatusLabel toolStripStatusLabel = tsslScriptFrameTime;
 				double totalMilliseconds = _module.ScriptEngine.FrameExecutionTime.TotalMilliseconds;
 				Color color2 = (toolStripStatusLabel.ForeColor = ((totalMilliseconds > 3.0) ? Color.IndianRed : ((!(totalMilliseconds > 1.0)) ? Color.Black : Color.Orange)));
-				KeyValuePair<string, object>[] array = _module.ScriptEngine.Global.Debug.WatchValues.ToArray();
-				for (int i = 0; i < array.Length; i++)
+				try
 				{
-					KeyValuePair<string, object> watchValue = array[i];
-					CreateOrUpdateNode(watchValue.Key).Refresh(watchValue.Value);
+					KeyValuePair<string, object>[] array = _module.ScriptEngine.Global.Debug.WatchValues.ToArray();
+					for (int i = 0; i < array.Length; i++)
+					{
+						KeyValuePair<string, object> watchValue = array[i];
+						CreateOrUpdateNode(watchValue.Key).Refresh(watchValue.Value);
+					}
+				}
+				catch (Exception)
+				{
 				}
 				if (_lastLogMessage > _module.ScriptEngine.OutputMessages.Count)
 				{

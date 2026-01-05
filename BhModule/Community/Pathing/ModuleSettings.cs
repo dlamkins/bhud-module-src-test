@@ -2,7 +2,6 @@ using System;
 using Blish_HUD.Common.Gw2;
 using Blish_HUD.Input;
 using Blish_HUD.Settings;
-using Microsoft.Xna.Framework.Input;
 
 namespace BhModule.Community.Pathing
 {
@@ -176,19 +175,19 @@ namespace BhModule.Community.Pathing
 
 		private void InitKeyBindSettings(SettingCollection settings)
 		{
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006c: Expected O, but got Unknown
-			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cb: Expected O, but got Unknown
-			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012a: Expected O, but got Unknown
-			//IL_013e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0186: Expected O, but got Unknown
+			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0066: Expected O, but got Unknown
+			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bf: Expected O, but got Unknown
+			//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0118: Expected O, but got Unknown
+			//IL_0129: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0171: Expected O, but got Unknown
 			KeyBindSettings = settings.AddSubCollection("keybind-settings", false);
-			KeyBindTogglePathables = KeyBindSettings.DefineSetting<KeyBinding>("KeyBindTogglePathables", new KeyBinding((ModifierKeys)6, (Keys)220), (Func<string>)(() => "Toggle Markers"), (Func<string>)(() => ""));
-			KeyBindToggleWorldPathables = KeyBindSettings.DefineSetting<KeyBinding>("KeyBindToggleWorldPathables", new KeyBinding((ModifierKeys)6, (Keys)219), (Func<string>)(() => "Toggle Markers in World"), (Func<string>)(() => ""));
-			KeyBindToggleMapPathables = KeyBindSettings.DefineSetting<KeyBinding>("KeyBindToggleMapPathables", new KeyBinding((ModifierKeys)6, (Keys)221), (Func<string>)(() => "Toggle Markers on Map"), (Func<string>)(() => ""));
-			KeyBindReloadMarkerPacks = KeyBindSettings.DefineSetting<KeyBinding>("KeyBindReloadMarkerPacks", new KeyBinding((ModifierKeys)6, (Keys)82), (Func<string>)(() => "Reload Marker Packs"), (Func<string>)(() => ""));
+			KeyBindTogglePathables = KeyBindSettings.DefineSetting<KeyBinding>("KeyBindTogglePathables", new KeyBinding(), (Func<string>)(() => "Toggle Markers"), (Func<string>)(() => ""));
+			KeyBindToggleWorldPathables = KeyBindSettings.DefineSetting<KeyBinding>("KeyBindToggleWorldPathables", new KeyBinding(), (Func<string>)(() => "Toggle Markers in World"), (Func<string>)(() => ""));
+			KeyBindToggleMapPathables = KeyBindSettings.DefineSetting<KeyBinding>("KeyBindToggleMapPathables", new KeyBinding(), (Func<string>)(() => "Toggle Markers on Map"), (Func<string>)(() => ""));
+			KeyBindReloadMarkerPacks = KeyBindSettings.DefineSetting<KeyBinding>("KeyBindReloadMarkerPacks", new KeyBinding(), (Func<string>)(() => "Reload Marker Packs"), (Func<string>)(() => ""));
 			HandleInternalKeyBinds();
 		}
 

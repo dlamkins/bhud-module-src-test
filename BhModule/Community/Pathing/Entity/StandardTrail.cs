@@ -71,7 +71,7 @@ namespace BhModule.Community.Pathing.Entity
 
 		private static readonly Logger Logger = Logger.GetLogger<StandardTrail>();
 
-		private Vector3[][] _sectionPoints;
+		internal Vector3[][] _sectionPoints;
 
 		public float Alpha { get; set; }
 
@@ -126,22 +126,22 @@ namespace BhModule.Community.Pathing.Entity
 
 		public override RectangleF? RenderToMiniMap(SpriteBatch spriteBatch, Rectangle bounds, double offsetX, double offsetY, double scale, float opacity)
 		{
-			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0124: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0192: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01bd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01dd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01fe: Unknown result type (might be due to invalid IL or missing references)
-			if (IsFiltered(EntityRenderTarget.Map) || Texture == null)
+			//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0127: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0135: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0206: Unknown result type (might be due to invalid IL or missing references)
+			if (IsFiltered(EntityRenderTarget.Map) || Texture == null || _sectionPoints == null)
 			{
 				return null;
 			}
@@ -334,6 +334,27 @@ namespace BhModule.Community.Pathing.Entity
 					{
 						buffers.Add(processedBuffer);
 					}
+				}
+			}
+			finally
+			{
+				((GraphicsDeviceContext)(ref gdctx)).Dispose();
+			}
+			_sectionBuffers = buffers.ToArray();
+		}
+
+		internal void BuildBuffers(Vector3[] trail)
+		{
+			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			List<VertexBuffer> buffers = new List<VertexBuffer>();
+			GraphicsDeviceContext gdctx = GameService.Graphics.LendGraphicsDeviceContext();
+			try
+			{
+				VertexBuffer processedBuffer = PostProcessTrailSection(((GraphicsDeviceContext)(ref gdctx)).get_GraphicsDevice(), ((IEnumerable<Vector3>)trail).Select((Func<Vector3, Vector3>)((Vector3 v) => new Vector3(v.X, v.Y, v.Z))));
+				if (processedBuffer != null)
+				{
+					buffers.Add(processedBuffer);
 				}
 			}
 			finally
@@ -649,7 +670,7 @@ namespace BhModule.Community.Pathing.Entity
 			}
 		}
 
-		private IEnumerable<Vector3> PostProcessing_DouglasPeucker(IEnumerable<Vector3> points, float error = 0.2f)
+		internal IEnumerable<Vector3> PostProcessing_DouglasPeucker(IEnumerable<Vector3> points, float error = 0.2f)
 		{
 			Vector3[] vectors = points.ToArray();
 			if (vectors.Length < 3)
@@ -722,227 +743,19 @@ namespace BhModule.Community.Pathing.Entity
 			}
 		}
 
+		[IteratorStateMachine(typeof(_003CPostProcessing_HermiteCurve_003Ed__99))]
 		private IEnumerable<Vector3> PostProcessing_HermiteCurve(IEnumerable<Vector3> points, float resolution = 0.15f, float tension = 0.5f, bool smartSampling = true, float curvatureLowerBound = 0.05f, float curvatureUpperBound = 2f, uint upsampleCount = 10u)
 		{
-			tension = MathHelper.Clamp(tension, 0f, 1f);
-			Vector3[] pointsArr = points.ToArray();
-			Vector3 val;
-			Vector3 prevPoint = (val = pointsArr[0]);
-			yield return val;
-			_003C_003Ec__DisplayClass98_0 CS_0024_003C_003E8__locals0 = default(_003C_003Ec__DisplayClass98_0);
-			for (int j = 0; j < pointsArr.Length - 1; j++)
+			return new _003CPostProcessing_HermiteCurve_003Ed__99(-2)
 			{
-				Vector3 p0 = pointsArr[j];
-				Vector3 p1 = pointsArr[j + 1];
-				Vector3 m0;
-				if (j > 0)
-				{
-					m0 = tension * (p1 - pointsArr[j - 1]);
-				}
-				else
-				{
-					m0 = p1 - p0;
-				}
-				Vector3 m1;
-				if (j < pointsArr.Length - 2)
-				{
-					m1 = tension * (pointsArr[j + 2] - p0);
-				}
-				else
-				{
-					m1 = p1 - p0;
-				}
-				uint numPoints = (uint)(SplineLength() / resolution);
-				float kappa = 0f;
-				for (int i = 0; i < numPoints; i++)
-				{
-					float t2 = (float)i * (1f / (float)numPoints);
-					if (smartSampling)
-					{
-						kappa = GetCurvature(t2);
-					}
-					Vector3 sampledPoint = H00(t2) * p0 + H10(t2) * m0 + H01(t2) * p1 + H11(t2) * m1;
-					if (smartSampling && kappa < curvatureLowerBound)
-					{
-						val = prevPoint - sampledPoint;
-						if (((Vector3)(ref val)).Length() < 10f)
-						{
-							continue;
-						}
-					}
-					prevPoint = sampledPoint;
-					yield return sampledPoint;
-					if (smartSampling && kappa > curvatureUpperBound)
-					{
-						float t3 = (float)(i + 1) * (1f / (float)numPoints);
-						float delta = 1f / (float)upsampleCount;
-						for (float k = delta; k < 1f; k += delta)
-						{
-							float dt = (t3 - t2) * k;
-							yield return H00(t2 + dt) * p0 + H10(t2 + dt) * m0 + H01(t2 + dt) * p1 + H11(t2 + dt) * m1;
-						}
-					}
-				}
-				float GetCurvature(float t0)
-				{
-					//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-					//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-					//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-					//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-					//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-					//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-					//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-					//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-					//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-					//IL_009c: Unknown result type (might be due to invalid IL or missing references)
-					//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
-					//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-					//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-					//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-					//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-					//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
-					//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-					//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
-					//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
-					//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
-					//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-					//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
-					//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0102: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0107: Unknown result type (might be due to invalid IL or missing references)
-					Vector3 val2 = Vector3.Cross(H00dt(t0) * p0 + H10dt(t0) * m0 + H01dt(t0) * p1 + H11dt(t0) * m1, H00dt2(t0) * p0 + H10dt2(t0) * m0 + H01dt2(t0) * p1 + H11dt2(t0) * m1);
-					double num = ((Vector3)(ref val2)).Length();
-					val2 = H00dt(t0) * p0 + H10dt(t0) * m0 + H01dt(t0) * p1 + H11dt(t0) * m1;
-					return (float)(num / Math.Pow(((Vector3)(ref val2)).Length(), 3.0));
-				}
-				float SplineLength()
-				{
-					//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-					//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-					//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-					//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-					//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-					//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-					//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-					//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-					//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-					//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-					//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
-					//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
-					//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0119: Unknown result type (might be due to invalid IL or missing references)
-					//IL_011e: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0129: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0138: Unknown result type (might be due to invalid IL or missing references)
-					//IL_013d: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0146: Unknown result type (might be due to invalid IL or missing references)
-					Vector3 c1 = 6f * (p1 - p0) - 4f * m0 - 2f * m1;
-					Vector3 c2 = 6f * (p0 - p1) + 3f * (m1 + m0);
-					List<Vector2> obj = new List<Vector2>
-					{
-						new Vector2(0f, 128f / 225f),
-						new Vector2(-0.5384693f, 0.47862867f),
-						new Vector2(0.5384693f, 0.47862867f),
-						new Vector2(-0.90617985f, 0.23692688f),
-						new Vector2(0.90617985f, 0.23692688f)
-					};
-					float length = 0f;
-					foreach (Vector2 coeff in obj)
-					{
-						float t4 = 0.5f * (1f + coeff.X);
-						float num2 = length;
-						Vector3 val3 = Derivative(t4);
-						length = num2 + ((Vector3)(ref val3)).Length() * coeff.Y;
-					}
-					return 0.5f * length;
-					Vector3 Derivative(float t)
-					{
-						//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-						//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-						//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-						//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-						//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-						//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-						//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-						return (Vector3)CS_0024_003C_003E8__locals0 + t * (c1 + t * c2);
-					}
-				}
-			}
-			yield return pointsArr.Last();
-			static float H00(float t)
-			{
-				return (1f + 2f * t) * (float)Math.Pow(1f - t, 2.0);
-			}
-			static float H00dt(float t)
-			{
-				return 6f * t * t - 6f * t;
-			}
-			static float H00dt2(float t)
-			{
-				return 12f * t - 6f;
-			}
-			static float H01(float t)
-			{
-				return (float)Math.Pow(t, 2.0) * (3f - 2f * t);
-			}
-			static float H01dt(float t)
-			{
-				return -6f * t * t + 6f * t;
-			}
-			static float H01dt2(float t)
-			{
-				return -12f * t + 6f;
-			}
-			static float H10(float t)
-			{
-				return t * (float)Math.Pow(1f - t, 2.0);
-			}
-			static float H10dt(float t)
-			{
-				return 3f * t * t - 4f * t + 1f;
-			}
-			static float H10dt2(float t)
-			{
-				return 6f * t - 4f;
-			}
-			static float H11(float t)
-			{
-				return (float)Math.Pow(t, 2.0) * (t - 1f);
-			}
-			static float H11dt(float t)
-			{
-				return 3f * t * t - 2f * t;
-			}
-			static float H11dt2(float t)
-			{
-				return 6f * t - 2f;
-			}
+				_003C_003E3__points = points,
+				_003C_003E3__resolution = resolution,
+				_003C_003E3__tension = tension,
+				_003C_003E3__smartSampling = smartSampling,
+				_003C_003E3__curvatureLowerBound = curvatureLowerBound,
+				_003C_003E3__curvatureUpperBound = curvatureUpperBound,
+				_003C_003E3__upsampleCount = upsampleCount
+			};
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -955,29 +768,14 @@ namespace BhModule.Community.Pathing.Entity
 			}
 		}
 
+		[IteratorStateMachine(typeof(_003CPostProcessing_SetTrailResolution_003Ed__107))]
 		private IEnumerable<Vector3> PostProcessing_SetTrailResolution(IEnumerable<Vector3> points, float resolution = 30f)
 		{
-			Vector3[] pointsArr = (points as Vector3[]) ?? points.ToArray();
-			if (pointsArr.Length < 1)
+			return new _003CPostProcessing_SetTrailResolution_003Ed__107(-2)
 			{
-				yield break;
-			}
-			Vector3 val;
-			Vector3 prevPoint = (val = pointsArr[0]);
-			yield return val;
-			for (int i = 1; i < pointsArr.Length; i++)
-			{
-				Vector3 curPoint = pointsArr[i];
-				float dist = Vector3.Distance(prevPoint, curPoint);
-				float s = dist / resolution;
-				float inc = 1f / s;
-				for (float v = inc; v < s - inc; v += inc)
-				{
-					yield return Vector3.Lerp(prevPoint, curPoint, v / s);
-				}
-				prevPoint = curPoint;
-				yield return curPoint;
-			}
+				_003C_003E3__points = points,
+				_003C_003E3__resolution = resolution
+			};
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1011,19 +809,25 @@ namespace BhModule.Community.Pathing.Entity
 			Populate_CanFade(collection, resourceManager);
 			Populate_IsWall(collection, resourceManager);
 			Populate_Behaviors(collection, resourceManager);
-			Populate_EditTag(collection, resourceManager);
 		}
 
 		private void Initialize(ITrail trail)
 		{
-			List<Vector3[]> trailSections = new List<Vector3[]>(trail.TrailSections.Count());
-			foreach (ITrailSection trailSection in trail.TrailSections)
-			{
-				trailSections.Add(PostProcessing_DouglasPeucker(trailSection.TrailPoints.Select((Func<Vector3, Vector3>)((Vector3 v) => new Vector3(v.X, v.Y, v.Z))), _packState.UserResourceStates.Advanced.MapTrailDouglasPeuckerError).ToArray());
-			}
-			_sectionPoints = trailSections.ToArray();
 			Populate(trail.GetAggregatedAttributes(), TextureResourceManager.GetTextureResourceManager(trail.ResourceManager));
-			BuildBuffers(trail);
+			if (trail.TrailSections != null)
+			{
+				List<Vector3[]> trailSections = new List<Vector3[]>(trail.TrailSections.Count());
+				foreach (ITrailSection trailSection in trail.TrailSections)
+				{
+					trailSections.Add(PostProcessing_DouglasPeucker(trailSection.TrailPoints.Select((Func<Vector3, Vector3>)((Vector3 v) => new Vector3(v.X, v.Y, v.Z))), _packState.UserResourceStates.Advanced.MapTrailDouglasPeuckerError).ToArray());
+				}
+				_sectionPoints = trailSections.ToArray();
+				BuildBuffers(trail);
+			}
+			else
+			{
+				_sectionBuffers = Array.Empty<VertexBuffer>();
+			}
 			FadeIn();
 		}
 	}

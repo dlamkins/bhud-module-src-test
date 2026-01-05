@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Numerics;
 using System.Threading.Tasks;
 using BhModule.Community.Pathing.Content;
 using BhModule.Community.Pathing.Entity;
@@ -19,6 +20,18 @@ namespace BhModule.Community.Pathing.Scripting.Lib
 {
 	public class Instance
 	{
+		internal class TrailProxy : PointOfInterest, ITrail, IPointOfInterest, IAggregatesAttributes, ITrailSection
+		{
+			public IEnumerable<ITrailSection> TrailSections => null;
+
+			public IEnumerable<Vector3> TrailPoints => null;
+
+			public TrailProxy(IPackResourceManager resourceManager, AttributeCollection explicitAttributes, PathingCategory rootPathingCategory)
+				: base(resourceManager, PointOfInterestType.Trail, explicitAttributes, rootPathingCategory)
+			{
+			}
+		}
+
 		private readonly PathingGlobal _global;
 
 		internal Instance(PathingGlobal global)
@@ -52,6 +65,17 @@ namespace BhModule.Community.Pathing.Scripting.Lib
 				marker.MapId = GameService.Gw2Mumble.get_CurrentMap().get_Id();
 			}
 			return marker;
+		}
+
+		public StandardTrail Trail(IPackResourceManager resourceManager, LuaTable attributes = null)
+		{
+			TrailProxy poi = new TrailProxy(resourceManager, (attributes != null) ? AttributeCollectionFromLuaTable(attributes) : new AttributeCollection(), _global.ScriptEngine.Module.PackInitiator.PackState.RootCategory);
+			StandardTrail trail = _global.ScriptEngine.Module.PackInitiator.PackState.InitPointOfInterest(poi) as StandardTrail;
+			if (trail.MapId < 0)
+			{
+				trail.MapId = GameService.Gw2Mumble.get_CurrentMap().get_Id();
+			}
+			return trail;
 		}
 
 		public Guid Guid(string base64)
