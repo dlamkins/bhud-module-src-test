@@ -17,9 +17,12 @@
     <EmbeddedResource Include="Maestro\Data.songs.bin" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Blish HUD" />
+    <Reference Include="Blish HUD">
+      <HintPath>..\..\working\Blish HUD.exe</HintPath>
+    </Reference>
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="MonoGame.Framework" />
+    <Reference Include="System.Core" />
     <Reference Include="Newtonsoft.Json" />
     <Reference Include="MessagePack">
       <HintPath>..\..\working\MessagePack.dll</HintPath>
@@ -27,7 +30,6 @@
     <Reference Include="MessagePack.Annotations">
       <HintPath>..\..\working\MessagePack.Annotations.dll</HintPath>
     </Reference>
-    <Reference Include="System.Core" />
     <Reference Include="MonoGame.Extended" />
   </ItemGroup>
 </Project>

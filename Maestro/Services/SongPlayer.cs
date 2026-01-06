@@ -17,8 +17,6 @@ namespace Maestro.Services
 
 		private Task _playbackTask;
 
-		private bool _isPaused;
-
 		private readonly object _pauseLock = new object();
 
 		public Song CurrentSong { get; private set; }
@@ -37,7 +35,7 @@ namespace Maestro.Services
 			}
 		}
 
-		public bool IsPaused => _isPaused;
+		public bool IsPaused { get; private set; }
 
 		public bool IsAdjustingOctave { get; private set; }
 
@@ -61,8 +59,9 @@ namespace Maestro.Services
 			Stop();
 			CurrentSong = song;
 			CurrentCommandIndex = 0;
-			_isPaused = false;
+			IsPaused = false;
 			_cancellationTokenSource = new CancellationTokenSource();
+			_keyboardService.StartDebugLog(song.DisplayName);
 			_playbackTask = Task.Run(() => PlaybackLoop(_cancellationTokenSource.Token));
 			this.OnStarted?.Invoke(this, EventArgs.Empty);
 			Logger.Info($"Started playing: {song.DisplayName} ({song.Commands.Count} commands)");
@@ -70,11 +69,11 @@ namespace Maestro.Services
 
 		public void Pause()
 		{
-			if (IsPlaying && !_isPaused)
+			if (IsPlaying && !IsPaused)
 			{
 				lock (_pauseLock)
 				{
-					_isPaused = true;
+					IsPaused = true;
 				}
 				this.OnPaused?.Invoke(this, EventArgs.Empty);
 				Logger.Info("Playback paused");
@@ -83,11 +82,11 @@ namespace Maestro.Services
 
 		public void Resume()
 		{
-			if (IsPlaying && _isPaused)
+			if (IsPlaying && IsPaused)
 			{
 				lock (_pauseLock)
 				{
-					_isPaused = false;
+					IsPaused = false;
 					Monitor.Pulse(_pauseLock);
 				}
 				this.OnResumed?.Invoke(this, EventArgs.Empty);
@@ -97,7 +96,7 @@ namespace Maestro.Services
 
 		public void TogglePause()
 		{
-			if (_isPaused)
+			if (IsPaused)
 			{
 				Resume();
 			}
@@ -114,7 +113,7 @@ namespace Maestro.Services
 				_cancellationTokenSource.Cancel();
 				lock (_pauseLock)
 				{
-					_isPaused = false;
+					IsPaused = false;
 					Monitor.Pulse(_pauseLock);
 				}
 				try
@@ -127,6 +126,7 @@ namespace Maestro.Services
 				_cancellationTokenSource.Dispose();
 				_cancellationTokenSource = null;
 			}
+			_keyboardService.StopDebugLog();
 			CurrentSong = null;
 			CurrentCommandIndex = 0;
 			this.OnStopped?.Invoke(this, EventArgs.Empty);
@@ -148,7 +148,7 @@ namespace Maestro.Services
 					}
 					lock (_pauseLock)
 					{
-						while (_isPaused && !cancellationToken.IsCancellationRequested)
+						while (IsPaused && !cancellationToken.IsCancellationRequested)
 						{
 							Monitor.Wait(_pauseLock, 100);
 						}
@@ -202,7 +202,7 @@ namespace Maestro.Services
 		{
 			IsAdjustingOctave = true;
 			Logger.Debug("Resetting octave...");
-			for (int i = 0; i < 3; i++)
+			for (int i = 0; i < 5; i++)
 			{
 				_keyboardService.KeyDown((Keys)96);
 				_keyboardService.KeyUp((Keys)96);

@@ -1,86 +1,121 @@
 using System.Collections.Generic;
-using Blish_HUD;
 using Blish_HUD.Controls.Extern;
 using Blish_HUD.Controls.Intern;
+using Blish_HUD.Input;
+using Blish_HUD.Settings;
 using Microsoft.Xna.Framework.Input;
 
 namespace Maestro.Services
 {
 	public class KeyboardService
 	{
-		private static readonly Logger Logger = Logger.GetLogger<KeyboardService>();
+		private readonly Dictionary<Keys, SettingEntry<KeyBinding>> _keyRemappings;
 
-		private static readonly Dictionary<Keys, VirtualKeyShort> KeyMapping = new Dictionary<Keys, VirtualKeyShort>
+		private readonly Dictionary<Keys, SettingEntry<KeyBinding>> _sharpRemappings;
+
+		private readonly HashSet<Keys> _activeSharpKeys;
+
+		private readonly DebugLogger _debugLogger = new DebugLogger();
+
+		private bool _altHeld;
+
+		public KeyboardService(Dictionary<Keys, SettingEntry<KeyBinding>> keyRemappings, Dictionary<Keys, SettingEntry<KeyBinding>> sharpRemappings)
 		{
-			{
-				(Keys)96,
-				(VirtualKeyShort)96
-			},
-			{
-				(Keys)97,
-				(VirtualKeyShort)97
-			},
-			{
-				(Keys)98,
-				(VirtualKeyShort)98
-			},
-			{
-				(Keys)99,
-				(VirtualKeyShort)99
-			},
-			{
-				(Keys)100,
-				(VirtualKeyShort)100
-			},
-			{
-				(Keys)101,
-				(VirtualKeyShort)101
-			},
-			{
-				(Keys)102,
-				(VirtualKeyShort)102
-			},
-			{
-				(Keys)103,
-				(VirtualKeyShort)103
-			},
-			{
-				(Keys)104,
-				(VirtualKeyShort)104
-			},
-			{
-				(Keys)105,
-				(VirtualKeyShort)105
-			}
-		};
+			_keyRemappings = keyRemappings;
+			_sharpRemappings = sharpRemappings;
+			_activeSharpKeys = new HashSet<Keys>();
+		}
+
+		public void StartDebugLog(string songName)
+		{
+		}
+
+		public void StopDebugLog()
+		{
+		}
 
 		public void KeyDown(Keys key)
 		{
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-			if (!KeyMapping.TryGetValue(key, out var virtualKey))
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Invalid comparison between Unknown and I4
+			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
+			SettingEntry<KeyBinding> sharpSetting;
+			SettingEntry<KeyBinding> setting;
+			if ((int)key == 164)
 			{
-				Logger.Warn($"Unknown key: {key}");
+				_altHeld = true;
 			}
-			else
+			else if (_altHeld && _sharpRemappings.TryGetValue(key, out sharpSetting))
 			{
-				Keyboard.Press(virtualKey, true);
+				_activeSharpKeys.Add(key);
+				SendKeyBindingDown(sharpSetting.Value);
+			}
+			else if (_keyRemappings.TryGetValue(key, out setting))
+			{
+				Keyboard.Press((VirtualKeyShort)setting.Value.PrimaryKey, sendToSystem: true);
 			}
 		}
 
 		public void KeyUp(Keys key)
 		{
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-			if (!KeyMapping.TryGetValue(key, out var virtualKey))
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Invalid comparison between Unknown and I4
+			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
+			SettingEntry<KeyBinding> sharpSetting;
+			SettingEntry<KeyBinding> setting;
+			if ((int)key == 164)
 			{
-				Logger.Warn($"Unknown key: {key}");
+				_altHeld = false;
 			}
-			else
+			else if (_activeSharpKeys.Remove(key) && _sharpRemappings.TryGetValue(key, out sharpSetting))
 			{
-				Keyboard.Release(virtualKey, true);
+				SendKeyBindingUp(sharpSetting.Value);
+			}
+			else if (_keyRemappings.TryGetValue(key, out setting))
+			{
+				Keyboard.Release((VirtualKeyShort)setting.Value.PrimaryKey, sendToSystem: true);
+			}
+		}
+
+		private static void SendKeyBindingDown(KeyBinding binding)
+		{
+			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
+			if (binding.ModifierKeys.HasFlag(ModifierKeys.Alt))
+			{
+				Keyboard.Press(VirtualKeyShort.LMENU, sendToSystem: true);
+			}
+			if (binding.ModifierKeys.HasFlag(ModifierKeys.Ctrl))
+			{
+				Keyboard.Press(VirtualKeyShort.LCONTROL, sendToSystem: true);
+			}
+			if (binding.ModifierKeys.HasFlag(ModifierKeys.Shift))
+			{
+				Keyboard.Press(VirtualKeyShort.LSHIFT, sendToSystem: true);
+			}
+			Keyboard.Press((VirtualKeyShort)binding.PrimaryKey, sendToSystem: true);
+		}
+
+		private static void SendKeyBindingUp(KeyBinding binding)
+		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			Keyboard.Release((VirtualKeyShort)binding.PrimaryKey, sendToSystem: true);
+			if (binding.ModifierKeys.HasFlag(ModifierKeys.Shift))
+			{
+				Keyboard.Release(VirtualKeyShort.LSHIFT, sendToSystem: true);
+			}
+			if (binding.ModifierKeys.HasFlag(ModifierKeys.Ctrl))
+			{
+				Keyboard.Release(VirtualKeyShort.LCONTROL, sendToSystem: true);
+			}
+			if (binding.ModifierKeys.HasFlag(ModifierKeys.Alt))
+			{
+				Keyboard.Release(VirtualKeyShort.LMENU, sendToSystem: true);
 			}
 		}
 	}

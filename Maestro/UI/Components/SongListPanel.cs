@@ -36,30 +36,30 @@ namespace Maestro.UI.Components
 		public event EventHandler<int> CountChanged;
 
 		public SongListPanel(SongPlayer songPlayer, int width, int height)
-			: this()
 		{
 			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
 			_songPlayer = songPlayer;
 			_cardWidth = width - 20 - 4;
-			((Control)this).set_Size(new Point(width, height));
-			((FlowPanel)this).set_FlowDirection((ControlFlowDirection)3);
-			((Panel)this).set_CanScroll(true);
-			((Panel)this).set_ShowBorder(true);
-			((FlowPanel)this).set_ControlPadding(new Vector2(0f, 4f));
-			((FlowPanel)this).set_OuterControlPadding(new Vector2(4f, 4f));
+			base.Size = new Point(width, height);
+			base.FlowDirection = ControlFlowDirection.SingleTopToBottom;
+			base.CanScroll = true;
+			base.ShowBorder = true;
+			base.ControlPadding = new Vector2(0f, 4f);
+			base.OuterControlPadding = new Vector2(4f, 4f);
 		}
 
 		public void RefreshSongs(IEnumerable<Song> songs)
 		{
-			((Container)this).ClearChildren();
+			ClearChildren();
 			_songCards.Clear();
 			foreach (Song song in songs)
 			{
-				SongCard songCard = new SongCard(song, _cardWidth);
-				((Control)songCard).set_Parent((Container)(object)this);
-				SongCard card = songCard;
+				SongCard card = new SongCard(song, _cardWidth)
+				{
+					Parent = this
+				};
 				card.PlayClicked += OnCardPlayClicked;
 				card.CardClicked += OnCardClicked;
 				_songCards[song] = card;
@@ -111,10 +111,10 @@ namespace Maestro.UI.Components
 			{
 				value.PlayClicked -= OnCardPlayClicked;
 				value.CardClicked -= OnCardClicked;
-				((Control)value).Dispose();
+				value.Dispose();
 			}
 			_songCards.Clear();
-			((FlowPanel)this).DisposeControl();
+			base.DisposeControl();
 		}
 	}
 }

@@ -81,106 +81,75 @@ namespace Maestro.UI.Components
 		public event EventHandler<MouseEventArgs> CardClicked;
 
 		public SongCard(Song song, int width)
-			: this()
 		{
 			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0066: Expected O, but got Unknown
-			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b8: Expected O, but got Unknown
-			//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010d: Expected O, but got Unknown
-			//IL_010e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0113: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0126: Unknown result type (might be due to invalid IL or missing references)
 			//IL_012b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0135: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0142: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0152: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0153: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0162: Expected O, but got Unknown
-			//IL_0163: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0168: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0184: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019b: Expected O, but got Unknown
 			_song = song;
-			((Control)this).set_Size(new Point(width, 70));
-			((Control)this).set_BackgroundColor(MaestroColors.PanelBackground);
+			base.Size = new Point(width, 70);
+			base.BackgroundColor = MaestroColors.PanelBackground;
 			Color instrumentColor = GetInstrumentColor(song.Instrument);
-			Panel val = new Panel();
-			((Control)val).set_Parent((Container)(object)this);
-			((Control)val).set_Location(new Point(0, 0));
-			((Control)val).set_Size(new Point(4, 70));
-			((Control)val).set_BackgroundColor(instrumentColor);
-			_indicator = val;
-			Label val2 = new Label();
-			((Control)val2).set_Parent((Container)(object)this);
-			val2.set_Text($"[{song.Instrument}]");
-			((Control)val2).set_Location(new Point(12, 4));
-			val2.set_Font(GameService.Content.get_DefaultFont12());
-			val2.set_TextColor(instrumentColor);
-			_instrumentLabel = val2;
-			Label val3 = new Label();
-			((Control)val3).set_Parent((Container)(object)this);
-			val3.set_Text(song.Name);
-			((Control)val3).set_Location(new Point(12, 22));
-			((Control)val3).set_Width(width - Layout.LabelRightMargin);
-			val3.set_Font(GameService.Content.get_DefaultFont14());
-			val3.set_TextColor(MaestroColors.CreamWhite);
-			_titleLabel = val3;
-			Label val4 = new Label();
-			((Control)val4).set_Parent((Container)(object)this);
-			val4.set_Text(song.Artist);
-			((Control)val4).set_Location(new Point(12, 40));
-			((Control)val4).set_Width(width - Layout.LabelRightMargin);
-			val4.set_Font(GameService.Content.get_DefaultFont12());
-			val4.set_TextColor(MaestroColors.MutedCream);
-			_artistLabel = val4;
-			StandardButton val5 = new StandardButton();
-			((Control)val5).set_Parent((Container)(object)this);
-			val5.set_Text(">");
-			((Control)val5).set_Location(new Point(width - 40 - 15, 14));
-			((Control)val5).set_Width(40);
-			_playButton = val5;
-			((Control)_playButton).add_Click((EventHandler<MouseEventArgs>)delegate(object s, MouseEventArgs e)
+			_indicator = new Panel
+			{
+				Parent = this,
+				Location = new Point(0, 0),
+				Size = new Point(4, 70),
+				BackgroundColor = instrumentColor
+			};
+			_instrumentLabel = new Label
+			{
+				Parent = this,
+				Text = $"[{song.Instrument}]",
+				Location = new Point(12, 4),
+				Font = GameService.Content.DefaultFont12,
+				TextColor = instrumentColor
+			};
+			_titleLabel = new Label
+			{
+				Parent = this,
+				Text = song.Name,
+				Location = new Point(12, 22),
+				Width = width - Layout.LabelRightMargin,
+				Font = GameService.Content.DefaultFont14,
+				TextColor = MaestroColors.CreamWhite
+			};
+			_artistLabel = new Label
+			{
+				Parent = this,
+				Text = song.Artist,
+				Location = new Point(12, 40),
+				Width = width - Layout.LabelRightMargin,
+				Font = GameService.Content.DefaultFont12,
+				TextColor = MaestroColors.MutedCream
+			};
+			_playButton = new StandardButton
+			{
+				Parent = this,
+				Text = ">",
+				Location = new Point(width - 40 - 15, 14),
+				Width = 40
+			};
+			_playButton.Click += delegate(object s, MouseEventArgs e)
 			{
 				this.PlayClicked?.Invoke(this, e);
-			});
-			((Control)this).add_Click((EventHandler<MouseEventArgs>)delegate(object s, MouseEventArgs e)
+			};
+			base.Click += delegate(object s, MouseEventArgs e)
 			{
 				this.CardClicked?.Invoke(this, e);
-			});
-			((Control)this).add_MouseEntered((EventHandler<MouseEventArgs>)OnMouseEntered);
-			((Control)this).add_MouseLeft((EventHandler<MouseEventArgs>)OnMouseLeft);
+			};
+			base.MouseEntered += OnMouseEntered;
+			base.MouseLeft += OnMouseLeft;
 		}
 
 		private void OnMouseEntered(object sender, MouseEventArgs e)
@@ -188,7 +157,7 @@ namespace Maestro.UI.Components
 			//IL_0009: Unknown result type (might be due to invalid IL or missing references)
 			if (!_isSelected)
 			{
-				((Control)this).set_BackgroundColor(MaestroColors.PanelHover);
+				base.BackgroundColor = MaestroColors.PanelHover;
 			}
 		}
 
@@ -197,7 +166,7 @@ namespace Maestro.UI.Components
 			//IL_0009: Unknown result type (might be due to invalid IL or missing references)
 			if (!_isSelected)
 			{
-				((Control)this).set_BackgroundColor(MaestroColors.PanelBackground);
+				base.BackgroundColor = MaestroColors.PanelBackground;
 			}
 		}
 
@@ -207,11 +176,11 @@ namespace Maestro.UI.Components
 			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
 			if (_isSelected)
 			{
-				((Control)this).set_BackgroundColor(MaestroColors.PanelSelected);
+				base.BackgroundColor = MaestroColors.PanelSelected;
 			}
 			else
 			{
-				((Control)this).set_BackgroundColor(MaestroColors.PanelBackground);
+				base.BackgroundColor = MaestroColors.PanelBackground;
 			}
 		}
 
@@ -234,34 +203,14 @@ namespace Maestro.UI.Components
 
 		protected override void DisposeControl()
 		{
-			((Control)this).remove_MouseEntered((EventHandler<MouseEventArgs>)OnMouseEntered);
-			((Control)this).remove_MouseLeft((EventHandler<MouseEventArgs>)OnMouseLeft);
-			Panel indicator = _indicator;
-			if (indicator != null)
-			{
-				((Control)indicator).Dispose();
-			}
-			Label instrumentLabel = _instrumentLabel;
-			if (instrumentLabel != null)
-			{
-				((Control)instrumentLabel).Dispose();
-			}
-			Label titleLabel = _titleLabel;
-			if (titleLabel != null)
-			{
-				((Control)titleLabel).Dispose();
-			}
-			Label artistLabel = _artistLabel;
-			if (artistLabel != null)
-			{
-				((Control)artistLabel).Dispose();
-			}
-			StandardButton playButton = _playButton;
-			if (playButton != null)
-			{
-				((Control)playButton).Dispose();
-			}
-			((Panel)this).DisposeControl();
+			base.MouseEntered -= OnMouseEntered;
+			base.MouseLeft -= OnMouseLeft;
+			_indicator?.Dispose();
+			_instrumentLabel?.Dispose();
+			_titleLabel?.Dispose();
+			_artistLabel?.Dispose();
+			_playButton?.Dispose();
+			base.DisposeControl();
 		}
 	}
 }

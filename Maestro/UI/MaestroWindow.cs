@@ -47,19 +47,19 @@ namespace Maestro.UI
 		private StatusBar _statusBar;
 
 		public MaestroWindow(Texture2D background, SongPlayer songPlayer, List<Song> songs)
-			: this(background, new Rectangle(0, 0, 420, 460), new Rectangle(15, 30, 390, 420))
+			: base(background, new Rectangle(0, 0, 420, 460), new Rectangle(15, 30, 390, 420))
 		{
 			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
 			_songPlayer = songPlayer;
 			_allSongs = songs;
-			((WindowBase2)this).set_Title("Maestro");
-			((WindowBase2)this).set_Subtitle("Music player");
-			((WindowBase2)this).set_Emblem(Module.Instance.ContentsManager.GetTexture("emblem.png"));
-			((WindowBase2)this).set_SavesPosition(true);
-			((WindowBase2)this).set_Id("MaestroWindow_v3");
-			((WindowBase2)this).set_CanResize(false);
-			((Control)this).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+			base.Title = "Maestro";
+			base.Subtitle = "Music player";
+			base.Emblem = Module.Instance.ContentsManager.GetTexture("emblem.png");
+			base.SavesPosition = true;
+			base.Id = "MaestroWindow_v3";
+			base.CanResize = false;
+			base.Parent = GameService.Graphics.SpriteScreen;
 			BuildUi();
 			SubscribeToEvents();
 		}
@@ -70,26 +70,30 @@ namespace Maestro.UI
 			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
-			NowPlayingPanel nowPlayingPanel = new NowPlayingPanel(_songPlayer, 390);
-			((Control)nowPlayingPanel).set_Parent((Container)(object)this);
-			((Control)nowPlayingPanel).set_Location(new Point(0, 0));
-			_nowPlayingPanel = nowPlayingPanel;
-			SongFilterBar songFilterBar = new SongFilterBar(390);
-			((Control)songFilterBar).set_Parent((Container)(object)this);
-			((Control)songFilterBar).set_Location(new Point(0, Layout.FilterBarY));
-			_filterBar = songFilterBar;
+			_nowPlayingPanel = new NowPlayingPanel(_songPlayer, 390)
+			{
+				Parent = this,
+				Location = new Point(0, 0)
+			};
+			_filterBar = new SongFilterBar(390)
+			{
+				Parent = this,
+				Location = new Point(0, Layout.FilterBarY)
+			};
 			_filterBar.SearchChanged += OnFilterChanged;
 			_filterBar.FilterChanged += OnFilterChanged;
-			SongListPanel songListPanel = new SongListPanel(_songPlayer, 390, Layout.SongListHeight);
-			((Control)songListPanel).set_Parent((Container)(object)this);
-			((Control)songListPanel).set_Location(new Point(0, Layout.SongListY));
-			_songListPanel = songListPanel;
+			_songListPanel = new SongListPanel(_songPlayer, 390, Layout.SongListHeight)
+			{
+				Parent = this,
+				Location = new Point(0, Layout.SongListY)
+			};
 			_songListPanel.SongPlayRequested += OnSongPlayRequested;
 			_songListPanel.CountChanged += OnCountChanged;
-			StatusBar statusBar = new StatusBar(390);
-			((Control)statusBar).set_Parent((Container)(object)this);
-			((Control)statusBar).set_Location(new Point(0, Layout.StatusBarY));
-			_statusBar = statusBar;
+			_statusBar = new StatusBar(390)
+			{
+				Parent = this,
+				Location = new Point(0, Layout.StatusBarY)
+			};
 			_statusBar.TotalCount = _allSongs.Count;
 			RefreshSongList();
 		}
@@ -160,27 +164,11 @@ namespace Maestro.UI
 			_songListPanel.SongPlayRequested -= OnSongPlayRequested;
 			_songListPanel.CountChanged -= OnCountChanged;
 			_songPlayer.Stop();
-			NowPlayingPanel nowPlayingPanel = _nowPlayingPanel;
-			if (nowPlayingPanel != null)
-			{
-				((Control)nowPlayingPanel).Dispose();
-			}
-			SongFilterBar filterBar = _filterBar;
-			if (filterBar != null)
-			{
-				((Control)filterBar).Dispose();
-			}
-			SongListPanel songListPanel = _songListPanel;
-			if (songListPanel != null)
-			{
-				((Control)songListPanel).Dispose();
-			}
-			StatusBar statusBar = _statusBar;
-			if (statusBar != null)
-			{
-				((Control)statusBar).Dispose();
-			}
-			((WindowBase2)this).DisposeControl();
+			_nowPlayingPanel?.Dispose();
+			_filterBar?.Dispose();
+			_songListPanel?.Dispose();
+			_statusBar?.Dispose();
+			base.DisposeControl();
 		}
 	}
 }
