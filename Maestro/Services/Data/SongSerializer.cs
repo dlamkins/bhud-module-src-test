@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Maestro.Models;
-using Microsoft.Xna.Framework.Input;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -10,38 +9,6 @@ namespace Maestro.Services.Data
 {
 	public static class SongSerializer
 	{
-		private class SongJsonDto
-		{
-			[JsonProperty("name")]
-			public string Name { get; set; }
-
-			[JsonProperty("artist")]
-			public string Artist { get; set; }
-
-			[JsonProperty("instrument")]
-			public string Instrument { get; set; }
-
-			[JsonProperty("bpm")]
-			public int? Bpm { get; set; }
-
-			[JsonProperty("commands")]
-			public List<CommandJsonDto> Commands { get; set; }
-		}
-
-		private class CommandJsonDto
-		{
-			[JsonProperty("type")]
-			[JsonConverter(typeof(StringEnumConverter))]
-			public CommandType Type { get; set; }
-
-			[JsonProperty("key")]
-			[JsonConverter(typeof(StringEnumConverter))]
-			public Keys Key { get; set; }
-
-			[JsonProperty("duration")]
-			public int Duration { get; set; }
-		}
-
 		private class SongCompactJsonDto
 		{
 			[JsonProperty("name")]
@@ -64,44 +31,10 @@ namespace Maestro.Services.Data
 
 		public static Song DeserializeJson(string filePath)
 		{
-			string json = File.ReadAllText(filePath);
-			Dictionary<string, object> rawObject = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
-			if (rawObject != null && rawObject.ContainsKey("notes"))
-			{
-				return DeserializeCompactFormat(json);
-			}
-			return DeserializeLegacyFormat(json);
+			return DeserializeJsonContent(File.ReadAllText(filePath));
 		}
 
-		private static Song DeserializeLegacyFormat(string json)
-		{
-			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-			SongJsonDto dto = JsonConvert.DeserializeObject<SongJsonDto>(json, JsonSettings);
-			Enum.TryParse<InstrumentType>(dto.Instrument, out var instrument);
-			Song song = new Song
-			{
-				Name = dto.Name,
-				Artist = dto.Artist,
-				Instrument = instrument,
-				Bpm = dto.Bpm
-			};
-			if (dto.Commands != null)
-			{
-				foreach (CommandJsonDto cmd in dto.Commands)
-				{
-					song.Commands.Add(new SongCommand
-					{
-						Type = cmd.Type,
-						Key = cmd.Key,
-						Duration = cmd.Duration
-					});
-				}
-				return song;
-			}
-			return song;
-		}
-
-		private static Song DeserializeCompactFormat(string json)
+		public static Song DeserializeJsonContent(string json)
 		{
 			SongCompactJsonDto dto = JsonConvert.DeserializeObject<SongCompactJsonDto>(json, JsonSettings);
 			Enum.TryParse<InstrumentType>(dto.Instrument, out var instrument);
@@ -120,28 +53,32 @@ namespace Maestro.Services.Data
 			return song;
 		}
 
-		public static void SerializeJson(Song song, string filePath)
+		public static List<Song> DeserializeJsonArray(string json)
 		{
-			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-			SongJsonDto dto = new SongJsonDto
+			List<Song> songs = new List<Song>();
+			List<SongCompactJsonDto> dtos = JsonConvert.DeserializeObject<List<SongCompactJsonDto>>(json, JsonSettings);
+			if (dtos == null)
 			{
-				Name = song.Name,
-				Artist = song.Artist,
-				Instrument = song.Instrument.ToString(),
-				Bpm = song.Bpm,
-				Commands = new List<CommandJsonDto>()
-			};
-			foreach (SongCommand cmd in song.Commands)
-			{
-				dto.Commands.Add(new CommandJsonDto
-				{
-					Type = cmd.Type,
-					Key = cmd.Key,
-					Duration = cmd.Duration
-				});
+				return songs;
 			}
-			string json = JsonConvert.SerializeObject((object)dto, JsonSettings);
-			File.WriteAllText(filePath, json);
+			foreach (SongCompactJsonDto dto in dtos)
+			{
+				Enum.TryParse<InstrumentType>(dto.Instrument, out var instrument);
+				Song song = new Song
+				{
+					Name = dto.Name,
+					Artist = dto.Artist,
+					Instrument = instrument,
+					Bpm = dto.Bpm
+				};
+				if (dto.Notes != null && dto.Bpm.HasValue)
+				{
+					List<SongCommand> commands = NoteParser.Parse(dto.Notes, dto.Bpm.Value);
+					song.Commands.AddRange(commands);
+				}
+				songs.Add(song);
+			}
+			return songs;
 		}
 
 		static SongSerializer()

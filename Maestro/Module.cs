@@ -70,35 +70,16 @@ namespace Maestro
 
 		protected override async Task LoadAsync()
 		{
-			_songs = await SongLoader.LoadAllAsync(GetSongsDirectory());
-		}
-
-		private string GetSongsDirectory()
-		{
-			try
-			{
-				string assemblyLocation = GetType().Assembly.Location;
-				if (!string.IsNullOrEmpty(assemblyLocation))
-				{
-					string embeddedSongsPath = Path.Combine(Path.GetDirectoryName(assemblyLocation), "Songs");
-					if (Directory.Exists(embeddedSongsPath))
-					{
-						Logger.Info("Using embedded songs path: " + embeddedSongsPath);
-						return embeddedSongsPath;
-					}
-				}
-			}
-			catch (Exception ex)
-			{
-				Logger.Debug("Could not get assembly location: " + ex.Message);
-			}
 			if (Directory.Exists("C:\\git\\Maestro\\Songs"))
 			{
-				Logger.Info("Using debug songs path");
-				return "C:\\git\\Maestro\\Songs";
+				Logger.Info("Debug mode: Loading songs from directory");
+				_songs = await SongLoader.LoadFromDirectoryAsync("C:\\git\\Maestro\\Songs");
 			}
-			Logger.Warn("No songs directory found");
-			return "C:\\git\\Maestro\\Songs";
+			else
+			{
+				Logger.Info("Production mode: Loading songs from ContentsManager");
+				_songs = await SongLoader.LoadFromContentsManagerAsync(ContentsManager);
+			}
 		}
 
 		protected override void OnModuleLoaded(EventArgs e)
