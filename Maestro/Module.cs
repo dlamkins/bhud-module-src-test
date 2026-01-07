@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.IO;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Controls;
@@ -10,7 +11,8 @@ using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
 using Maestro.Models;
-using Maestro.Services;
+using Maestro.Services.Data;
+using Maestro.Services.Playback;
 using Maestro.Settings;
 using Maestro.UI;
 using Microsoft.Xna.Framework;
@@ -68,7 +70,35 @@ namespace Maestro
 
 		protected override async Task LoadAsync()
 		{
-			_songs = await SongLoader.LoadAllAsync();
+			_songs = await SongLoader.LoadAllAsync(GetSongsDirectory());
+		}
+
+		private string GetSongsDirectory()
+		{
+			try
+			{
+				string assemblyLocation = GetType().Assembly.Location;
+				if (!string.IsNullOrEmpty(assemblyLocation))
+				{
+					string embeddedSongsPath = Path.Combine(Path.GetDirectoryName(assemblyLocation), "Songs");
+					if (Directory.Exists(embeddedSongsPath))
+					{
+						Logger.Info("Using embedded songs path: " + embeddedSongsPath);
+						return embeddedSongsPath;
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Logger.Debug("Could not get assembly location: " + ex.Message);
+			}
+			if (Directory.Exists("C:\\git\\Maestro\\Songs"))
+			{
+				Logger.Info("Using debug songs path");
+				return "C:\\git\\Maestro\\Songs";
+			}
+			Logger.Warn("No songs directory found");
+			return "C:\\git\\Maestro\\Songs";
 		}
 
 		protected override void OnModuleLoaded(EventArgs e)

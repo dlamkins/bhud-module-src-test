@@ -5,7 +5,7 @@ using Blish_HUD.Input;
 using Blish_HUD.Settings;
 using Microsoft.Xna.Framework.Input;
 
-namespace Maestro.Services
+namespace Maestro.Services.Playback
 {
 	public class KeyboardService
 	{

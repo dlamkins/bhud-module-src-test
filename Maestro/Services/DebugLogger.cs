@@ -13,7 +13,7 @@ namespace Maestro.Services
 	{
 		private static readonly Logger Logger = Logger.GetLogger<DebugLogger>();
 
-		private const string LOG_PATH = "C:\\git\\Maestro\\debug_keys.txt";
+		private const string DEBUG_FOLDER = "C:\\git\\Maestro\\Debug";
 
 		private readonly StringBuilder _log = new StringBuilder();
 
@@ -33,19 +33,38 @@ namespace Maestro.Services
 		public void Stop()
 		{
 			_enabled = false;
-			if (_log.Length != 0)
+			if (_log.Length == 0)
 			{
-				try
-				{
-					string header = "=== Debug Log for: " + _songName + " ===\n" + $"=== Time: {DateTime.Now:yyyy-MM-dd HH:mm:ss} ===\n\n";
-					File.WriteAllText("C:\\git\\Maestro\\debug_keys.txt", header + _log);
-					Logger.Info("Debug log written to: C:\\git\\Maestro\\debug_keys.txt");
-				}
-				catch (Exception ex)
-				{
-					Logger.Warn(ex, "Failed to write debug log");
-				}
+				return;
 			}
+			try
+			{
+				if (!Directory.Exists("C:\\git\\Maestro\\Debug"))
+				{
+					Directory.CreateDirectory("C:\\git\\Maestro\\Debug");
+				}
+				string safeFileName = SanitizeFileName(_songName);
+				string logPath = Path.Combine("C:\\git\\Maestro\\Debug", safeFileName + ".txt");
+				string header = "=== Debug Log for: " + _songName + " ===\n" + $"=== Time: {DateTime.Now:yyyy-MM-dd HH:mm:ss} ===\n\n";
+				File.WriteAllText(logPath, header + _log);
+				Logger.Info("Debug log written to: " + logPath);
+			}
+			catch (Exception ex)
+			{
+				Logger.Warn(ex, "Failed to write debug log");
+			}
+		}
+
+		private static string SanitizeFileName(string name)
+		{
+			char[] invalidFileNameChars = Path.GetInvalidFileNameChars();
+			StringBuilder sanitized = new StringBuilder(name);
+			char[] array = invalidFileNameChars;
+			foreach (char c in array)
+			{
+				sanitized.Replace(c, '_');
+			}
+			return sanitized.ToString();
 		}
 
 		[Conditional("DEBUG")]
