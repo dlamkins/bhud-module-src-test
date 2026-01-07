@@ -345,7 +345,10 @@ namespace BhModule.Community.Pathing.UI.Controls.TreeView
 
 		protected override void DisposeControl()
 		{
-			PackInitiator.PackState.UserConfiguration.GlobalPathablesEnabled.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)GlobalPathablesEnabledOnSettingChanged);
+			if (PackInitiator != null)
+			{
+				PackInitiator.PackState.UserConfiguration.GlobalPathablesEnabled.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)GlobalPathablesEnabledOnSettingChanged);
+			}
 			((Container)this).DisposeControl();
 		}
 	}

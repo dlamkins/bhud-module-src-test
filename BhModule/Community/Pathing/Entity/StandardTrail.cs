@@ -124,6 +124,8 @@ namespace BhModule.Community.Pathing.Entity
 
 		public override float DrawOrder => float.MaxValue;
 
+		public TextureResourceManager TextureResourceManager { get; }
+
 		public override RectangleF? RenderToMiniMap(SpriteBatch spriteBatch, Rectangle bounds, double offsetX, double offsetY, double scale, float opacity)
 		{
 			//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
@@ -792,6 +794,7 @@ namespace BhModule.Community.Pathing.Entity
 		{
 			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+			TextureResourceManager = TextureResourceManager.GetTextureResourceManager(trail.ResourceManager);
 			Initialize(trail);
 		}
 

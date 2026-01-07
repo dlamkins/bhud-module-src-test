@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BhModule.Community.Pathing.Behavior;
 using BhModule.Community.Pathing.Entity;
+using BhModule.Community.Pathing.Scripting.Lib;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Microsoft.Xna.Framework;
@@ -35,7 +36,7 @@ namespace BhModule.Community.Pathing.Scripting.Extensions
 
 		public static void SetTexture(this StandardTrail trail, string texturePath)
 		{
-			throw new NotImplementedException("This method has not been implemented yet.");
+			trail.Texture = Instance.Texture(trail.TextureResourceManager, texturePath);
 		}
 
 		public static void SetTexture(this StandardTrail trail, int textureId)

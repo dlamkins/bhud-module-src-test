@@ -4,7 +4,6 @@ using System.Linq;
 using BhModule.Community.Pathing.Scripting.Lib;
 using BhModule.Community.Pathing.Scripting.Lib.Std;
 using Blish_HUD;
-using Blish_HUD.Modules;
 using Microsoft.Xna.Framework;
 using Neo.IronLua;
 using TmfLib;
@@ -22,7 +21,10 @@ namespace BhModule.Community.Pathing.Scripting
 		internal ScriptEngine ScriptEngine { get; set; }
 
 		[LuaMember("PathingVersion", false)]
-		public string PathingVersion => ((Module)ScriptEngine.Module).get_Version().Clean();
+		public string PathingVersion => Pathing.Version;
+
+		[LuaMember("Pathing", false)]
+		public BhModule.Community.Pathing.Scripting.Lib.Pathing Pathing { get; }
 
 		[LuaMember("World", false)]
 		public World World { get; }
@@ -87,6 +89,7 @@ namespace BhModule.Community.Pathing.Scripting
 		public PathingGlobal(Lua lua)
 		{
 			_sandboxedGlobal = new LuaGlobal(lua);
+			Pathing = new BhModule.Community.Pathing.Scripting.Lib.Pathing(this);
 			Debug = new Debug(this);
 			Event = new Event(this);
 			User = new User(this);
