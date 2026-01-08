@@ -34,6 +34,18 @@ namespace Maestro.Services.Data
 			return DeserializeJsonContent(File.ReadAllText(filePath));
 		}
 
+		public static string SerializeToJson(Song song)
+		{
+			return JsonConvert.SerializeObject((object)new SongCompactJsonDto
+			{
+				Name = song.Name,
+				Artist = song.Artist,
+				Instrument = song.Instrument.ToString(),
+				Bpm = song.Bpm,
+				Notes = song.Notes
+			}, JsonSettings);
+		}
+
 		public static Song DeserializeJsonContent(string json)
 		{
 			SongCompactJsonDto dto = JsonConvert.DeserializeObject<SongCompactJsonDto>(json, JsonSettings);

@@ -1,6 +1,7 @@
 using System;
 using Blish_HUD;
 using Blish_HUD.Controls;
+using Blish_HUD.Controls.Effects;
 using Blish_HUD.Input;
 using Maestro.Models;
 using Microsoft.Xna.Framework;
@@ -25,7 +26,9 @@ namespace Maestro.UI.Components
 
 			public const int PlayButtonWidth = 40;
 
-			public const int PlayButtonY = 14;
+			public const int PlayButtonHeight = 26;
+
+			public const int PlayButtonY = 22;
 
 			public const int PlayButtonRightMargin = 15;
 
@@ -43,6 +46,8 @@ namespace Maestro.UI.Components
 		private readonly Label _artistLabel;
 
 		private readonly StandardButton _playButton;
+
+		private readonly ScrollingHighlightEffect _highlightEffect;
 
 		private bool _isSelected;
 
@@ -80,25 +85,29 @@ namespace Maestro.UI.Components
 
 		public event EventHandler<MouseEventArgs> CardClicked;
 
+		public event EventHandler DeleteRequested;
+
 		public SongCard(Song song, int width)
 		{
 			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0153: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0184: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0116: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0143: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019c: Unknown result type (might be due to invalid IL or missing references)
 			_song = song;
 			base.Size = new Point(width, 70);
-			base.BackgroundColor = MaestroColors.PanelBackground;
+			base.BackgroundColor = MaestroTheme.PanelBackground;
+			_highlightEffect = new ScrollingHighlightEffect(this);
+			base.EffectBehind = _highlightEffect;
 			Color instrumentColor = GetInstrumentColor(song.Instrument);
 			_indicator = new Panel
 			{
@@ -122,7 +131,7 @@ namespace Maestro.UI.Components
 				Location = new Point(12, 22),
 				Width = width - Layout.LabelRightMargin,
 				Font = GameService.Content.DefaultFont14,
-				TextColor = MaestroColors.CreamWhite
+				TextColor = MaestroTheme.CreamWhite
 			};
 			_artistLabel = new Label
 			{
@@ -131,57 +140,42 @@ namespace Maestro.UI.Components
 				Location = new Point(12, 40),
 				Width = width - Layout.LabelRightMargin,
 				Font = GameService.Content.DefaultFont12,
-				TextColor = MaestroColors.MutedCream
+				TextColor = MaestroTheme.MutedCream
 			};
 			_playButton = new StandardButton
 			{
 				Parent = this,
 				Text = ">",
-				Location = new Point(width - 40 - 15, 14),
+				Location = new Point(width - 40 - 15, 22),
 				Width = 40
 			};
 			_playButton.Click += delegate(object s, MouseEventArgs e)
 			{
 				this.PlayClicked?.Invoke(this, e);
 			};
+			if (song.IsUserImported)
+			{
+				ContextMenuStrip contextMenu = new ContextMenuStrip();
+				contextMenu.AddMenuItem("Delete Song").Click += delegate
+				{
+					this.DeleteRequested?.Invoke(this, EventArgs.Empty);
+				};
+				base.Menu = contextMenu;
+				base.BasicTooltipText = "Right-click for options";
+				_indicator.BasicTooltipText = "Right-click for options";
+				_instrumentLabel.BasicTooltipText = "Right-click for options";
+				_titleLabel.BasicTooltipText = "Right-click for options";
+				_artistLabel.BasicTooltipText = "Right-click for options";
+			}
 			base.Click += delegate(object s, MouseEventArgs e)
 			{
 				this.CardClicked?.Invoke(this, e);
 			};
-			base.MouseEntered += OnMouseEntered;
-			base.MouseLeft += OnMouseLeft;
-		}
-
-		private void OnMouseEntered(object sender, MouseEventArgs e)
-		{
-			//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-			if (!_isSelected)
-			{
-				base.BackgroundColor = MaestroColors.PanelHover;
-			}
-		}
-
-		private void OnMouseLeft(object sender, MouseEventArgs e)
-		{
-			//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-			if (!_isSelected)
-			{
-				base.BackgroundColor = MaestroColors.PanelBackground;
-			}
 		}
 
 		private void UpdateVisualState()
 		{
-			//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			if (_isSelected)
-			{
-				base.BackgroundColor = MaestroColors.PanelSelected;
-			}
-			else
-			{
-				base.BackgroundColor = MaestroColors.PanelBackground;
-			}
+			_highlightEffect.ForceActive = _isSelected;
 		}
 
 		private static Color GetInstrumentColor(InstrumentType instrument)
@@ -193,18 +187,16 @@ namespace Maestro.UI.Components
 			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
 			return (Color)(instrument switch
 			{
-				InstrumentType.Piano => MaestroColors.Piano, 
-				InstrumentType.Harp => MaestroColors.Harp, 
-				InstrumentType.Lute => MaestroColors.Lute, 
-				InstrumentType.Bass => MaestroColors.Bass, 
-				_ => MaestroColors.AmberGold, 
+				InstrumentType.Piano => MaestroTheme.Piano, 
+				InstrumentType.Harp => MaestroTheme.Harp, 
+				InstrumentType.Lute => MaestroTheme.Lute, 
+				InstrumentType.Bass => MaestroTheme.Bass, 
+				_ => MaestroTheme.AmberGold, 
 			});
 		}
 
 		protected override void DisposeControl()
 		{
-			base.MouseEntered -= OnMouseEntered;
-			base.MouseLeft -= OnMouseLeft;
 			_indicator?.Dispose();
 			_instrumentLabel?.Dispose();
 			_titleLabel?.Dispose();

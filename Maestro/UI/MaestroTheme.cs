@@ -1,8 +1,11 @@
+using Blish_HUD;
+using Blish_HUD.Graphics;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Maestro.UI
 {
-	public static class MaestroColors
+	public static class MaestroTheme
 	{
 		public static readonly Color AmberGold = new Color(212, 166, 86);
 
@@ -38,16 +41,51 @@ namespace Maestro.UI
 
 		public static readonly Color Bass = new Color(212, 132, 140);
 
-		public static readonly Color PanelBackground = WithAlpha(SlateGray, 180);
+		public static readonly Color PanelBackground = new Color(45, 45, 45, 180);
 
-		public static readonly Color PanelHover = WithAlpha(MediumGray, 200);
+		public static readonly Color PanelHover = new Color(64, 64, 64, 200);
 
 		public static readonly Color PanelSelected = new Color(51, 51, 51, 220);
+
+		public const int ActionButtonWidth = 90;
+
+		public const int ActionButtonHeight = 26;
+
+		public const int InputSpacing = 7;
+
+		public const int PaddingContentBottom = 20;
+
+		public const int PaddingContentTop = 2;
+
+		private static readonly Color WindowBackground = new Color(30, 30, 30, 255);
+
+		private const int BACKGROUND_X_OFFSET = 1;
+
+		private const int BACKGROUND_Y_OFFSET = 13;
 
 		public static Color WithAlpha(Color color, int alpha)
 		{
 			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
 			return new Color((int)((Color)(ref color)).get_R(), (int)((Color)(ref color)).get_G(), (int)((Color)(ref color)).get_B(), alpha);
+		}
+
+		public static Texture2D CreateWindowBackground(int windowWidth, int windowHeight)
+		{
+			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0023: Expected O, but got Unknown
+			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+			int width = windowWidth - 1;
+			int height = windowHeight - 13;
+			using GraphicsDeviceContext context = GameService.Graphics.LendGraphicsDeviceContext();
+			Texture2D texture = new Texture2D(context.GraphicsDevice, width, height);
+			Color[] data = (Color[])(object)new Color[width * height];
+			for (int i = 0; i < data.Length; i++)
+			{
+				data[i] = WindowBackground;
+			}
+			texture.SetData<Color>(data);
+			return texture;
 		}
 	}
 }

@@ -9,8 +9,17 @@
     <LangVersion>Preview</LangVersion>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
-  <PropertyGroup />
-  <ItemGroup />
+  <PropertyGroup>
+    <RootNamespace />
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="Maestro\ref.emblem.png" />
+    <None Remove="Maestro\ref.icon.png" />
+    <None Remove="Maestro\ref.import.png" />
+    <EmbeddedResource Include="Maestro\ref.emblem.png" />
+    <EmbeddedResource Include="Maestro\ref.icon.png" />
+    <EmbeddedResource Include="Maestro\ref.import.png" />
+  </ItemGroup>
   <ItemGroup>
     <Reference Include="Blish HUD">
       <HintPath>..\..\working\Blish HUD.exe</HintPath>

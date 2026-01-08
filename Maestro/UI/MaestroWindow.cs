@@ -13,26 +13,16 @@ namespace Maestro.UI
 {
 	public class MaestroWindow : StandardWindow
 	{
-		public static class Layout
+		private static class Layout
 		{
+			public const int WindowWidth = 420;
+
+			public const int WindowHeight = 470;
+
 			public const int ContentWidth = 390;
 
 			public const int ContentHeight = 420;
-
-			public const int ComponentGap = 5;
-
-			public const int NowPlayingY = 0;
-
-			public static int FilterBarY => 75;
-
-			public static int SongListY => FilterBarY + 36 - 1;
-
-			public static int StatusBarY => 396;
-
-			public static int SongListHeight => 420 - SongListY - 24;
 		}
-
-		private static readonly Logger Logger = Logger.GetLogger<MaestroWindow>();
 
 		private readonly SongPlayer _songPlayer;
 
@@ -46,11 +36,22 @@ namespace Maestro.UI
 
 		private StatusBar _statusBar;
 
-		public MaestroWindow(Texture2D background, SongPlayer songPlayer, List<Song> songs)
-			: base(background, new Rectangle(0, 0, 420, 460), new Rectangle(15, 30, 390, 420))
+		private static Texture2D _backgroundTexture;
+
+		public event EventHandler ImportRequested;
+
+		public event EventHandler<Song> SongDeleteRequested;
+
+		private static Texture2D GetBackground()
 		{
-			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+			return _backgroundTexture ?? (_backgroundTexture = MaestroTheme.CreateWindowBackground(420, 470));
+		}
+
+		public MaestroWindow(SongPlayer songPlayer, List<Song> songs)
+			: base(GetBackground(), new Rectangle(0, 0, 420, 470), new Rectangle(15, 30, 390, 420))
+		{
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
 			_songPlayer = songPlayer;
 			_allSongs = songs;
 			base.Title = "Maestro";
@@ -66,35 +67,41 @@ namespace Maestro.UI
 
 		private void BuildUi()
 		{
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0114: Unknown result type (might be due to invalid IL or missing references)
+			int currentY = 2;
 			_nowPlayingPanel = new NowPlayingPanel(_songPlayer, 390)
 			{
 				Parent = this,
-				Location = new Point(0, 0)
+				Location = new Point(0, currentY)
 			};
+			currentY += 77;
 			_filterBar = new SongFilterBar(390)
 			{
 				Parent = this,
-				Location = new Point(0, Layout.FilterBarY)
+				Location = new Point(0, currentY)
 			};
 			_filterBar.SearchChanged += OnFilterChanged;
 			_filterBar.FilterChanged += OnFilterChanged;
-			_songListPanel = new SongListPanel(_songPlayer, 390, Layout.SongListHeight)
+			currentY += 40;
+			_songListPanel = new SongListPanel(_songPlayer, 390)
 			{
 				Parent = this,
-				Location = new Point(0, Layout.SongListY)
+				Location = new Point(0, currentY)
 			};
 			_songListPanel.SongPlayRequested += OnSongPlayRequested;
+			_songListPanel.SongDeleteRequested += OnSongDeleteRequested;
 			_songListPanel.CountChanged += OnCountChanged;
+			currentY += 287;
 			_statusBar = new StatusBar(390)
 			{
 				Parent = this,
-				Location = new Point(0, Layout.StatusBarY)
+				Location = new Point(0, currentY)
 			};
 			_statusBar.TotalCount = _allSongs.Count;
+			_statusBar.ImportClicked += OnImportClicked;
 			RefreshSongList();
 		}
 
@@ -125,6 +132,34 @@ namespace Maestro.UI
 		private void OnCountChanged(object sender, int count)
 		{
 			_statusBar.VisibleCount = count;
+		}
+
+		private void OnImportClicked(object sender, EventArgs e)
+		{
+			this.ImportRequested?.Invoke(this, EventArgs.Empty);
+		}
+
+		public void AddImportedSong(Song song)
+		{
+			_allSongs.Add(song);
+			_statusBar.TotalCount = _allSongs.Count;
+			RefreshSongList();
+		}
+
+		private void OnSongDeleteRequested(object sender, Song song)
+		{
+			this.SongDeleteRequested?.Invoke(this, song);
+		}
+
+		public void RemoveSong(Song song)
+		{
+			if (_songPlayer.CurrentSong == song)
+			{
+				_songPlayer.Stop();
+			}
+			_allSongs.Remove(song);
+			_statusBar.TotalCount = _allSongs.Count;
+			RefreshSongList();
 		}
 
 		private void RefreshSongList()
@@ -162,7 +197,9 @@ namespace Maestro.UI
 			_filterBar.SearchChanged -= OnFilterChanged;
 			_filterBar.FilterChanged -= OnFilterChanged;
 			_songListPanel.SongPlayRequested -= OnSongPlayRequested;
+			_songListPanel.SongDeleteRequested -= OnSongDeleteRequested;
 			_songListPanel.CountChanged -= OnCountChanged;
+			_statusBar.ImportClicked -= OnImportClicked;
 			_songPlayer.Stop();
 			_nowPlayingPanel?.Dispose();
 			_filterBar?.Dispose();

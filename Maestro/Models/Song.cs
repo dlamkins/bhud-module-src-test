@@ -15,6 +15,11 @@ namespace Maestro.Models
 		public List<SongCommand> Commands { get; set; } = new List<SongCommand>();
 
 
+		public List<string> Notes { get; set; } = new List<string>();
+
+
+		public bool IsUserImported { get; set; }
+
 		public string DisplayName => Name + " - " + Artist;
 	}
 }
