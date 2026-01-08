@@ -44,7 +44,7 @@ namespace Ideka.CustomCombatText
 						showMessage(null);
 						continue;
 					}
-					MessageView merge2 = _shownMessages.OrderByDescending((MessageView x) => x.LastTime).FirstOrDefault((MessageView x) => x.CanMerge(receiver, message) && x.WithinMergeTimeout(gameTime2.get_TotalGameTime()));
+					MessageView merge2 = _shownMessages.Where((MessageView x) => x.CanMerge(receiver, message) && x.WithinMergeTimeout(gameTime2.get_TotalGameTime())).MaxByOrDefault((MessageView x) => x.LastTime);
 					if (merge2 != null)
 					{
 						showMessage(merge2);
@@ -57,17 +57,19 @@ namespace Ideka.CustomCombatText
 					if (timeUntilNextMessageCanBeShown <= TimeSpan.Zero)
 					{
 						showMessage(null);
-						continue;
 					}
-					if (_messageQueue.Count <= Settings.MaxQueueSize)
+					else
 					{
-						break;
+						if (_messageQueue.Count <= Settings.MaxQueueSize)
+						{
+							continue;
+						}
+						foreach (MessageView shownMessage in _shownMessages)
+						{
+							shownMessage.Time -= timeUntilNextMessageCanBeShown;
+						}
+						showMessage(null);
 					}
-					foreach (MessageView shownMessage in _shownMessages)
-					{
-						shownMessage.Time -= timeUntilNextMessageCanBeShown;
-					}
-					showMessage(null);
 					void showMessage(MessageView? merge)
 					{
 						_messageQueue.Dequeue();

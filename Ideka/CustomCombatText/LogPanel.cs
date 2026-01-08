@@ -2,8 +2,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
+using Blish_HUD.GameServices.ArcDps.V2.Models;
 using Blish_HUD.Input;
 using Ideka.BHUDCommon;
 using Microsoft.Xna.Framework;
@@ -142,46 +144,19 @@ namespace Ideka.CustomCombatText
 					}
 				});
 				menu.Show((Control)(object)_filterButton);
+				[IteratorStateMachine(typeof(_003C_003C_002Dctor_003Eg__build_007C17_9_003Ed))]
 				IEnumerable<ContextMenuStripItem> build()
 				{
-					yield return forBool("Unique skills only", () => CTextModule.Settings.LogPanelUniqueSkillsOnly.Value, delegate(bool value)
+					return new _003C_003C_002Dctor_003Eg__build_007C17_9_003Ed(-2)
 					{
-						CTextModule.Settings.LogPanelUniqueSkillsOnly.Value = value;
-						_messagesMenu.Refresh();
-					});
-					yield return forBool("Show incoming", () => CTextModule.Settings.LogPanelShowIncoming.Value, delegate(bool value)
-					{
-						CTextModule.Settings.LogPanelShowIncoming.Value = value;
-						_messagesMenu.Refresh();
-					});
-					yield return forBool("Show outgoing", () => CTextModule.Settings.LogPanelShowOutgoing.Value, delegate(bool value)
-					{
-						CTextModule.Settings.LogPanelShowOutgoing.Value = value;
-						_messagesMenu.Refresh();
-					});
-					static ContextMenuStripItem forBool(string text, Func<bool> get, Action<bool> set)
-					{
-						//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-						//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-						//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-						//IL_002c: Expected O, but got Unknown
-						Action<bool> set2 = set;
-						ContextMenuStripItem val4 = new ContextMenuStripItem(text);
-						val4.set_CanCheck(true);
-						val4.set_Checked(get());
-						ContextMenuStripItem item = val4;
-						item.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
-						{
-							set2(item.get_Checked());
-						});
-						return item;
-					}
+						_003C_003E4__this = this
+					};
 				}
 			});
 			_messagesMenu.Filter = delegate(IEnumerable<MessagesMenu.MessageKey> list)
 			{
 				HashSet<uint> skills = new HashSet<uint>();
-				return list.Where((MessagesMenu.MessageKey x) => (!CTextModule.Settings.LogPanelUniqueSkillsOnly.Value || skills.Add(x.Message.Ev.get_SkillId())) && (CTextModule.Settings.LogPanelShowIncoming.Value || !x.Message.IsIn) && (CTextModule.Settings.LogPanelShowOutgoing.Value || !x.Message.IsOut));
+				return list.Where((MessagesMenu.MessageKey x) => (!CTextModule.Settings.LogPanelUniqueSkillsOnly.Value || skills.Add(((CombatEvent)(ref x.Message.Ev)).get_SkillId())) && (CTextModule.Settings.LogPanelShowIncoming.Value || !x.Message.IsIn) && (CTextModule.Settings.LogPanelShowOutgoing.Value || !x.Message.IsOut));
 			};
 		}
 

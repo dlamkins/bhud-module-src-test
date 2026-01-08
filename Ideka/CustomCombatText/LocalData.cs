@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Ideka.BHUDCommon;
 using Newtonsoft.Json;
@@ -60,42 +61,22 @@ namespace Ideka.CustomCombatText
 			File.WriteAllText(Path.Combine(CTextModule.BasePath, CTextModule.ViewsDataPath), JsonConvert.SerializeObject(models, _serializerSettings));
 		}
 
+		[IteratorStateMachine(typeof(_003CModelsToViews_003Ed__12))]
 		private static IEnumerable<AreaView> ModelsToViews(IEnumerable<AreaModel> models)
 		{
-			foreach (AreaModel model in models)
+			return new _003CModelsToViews_003Ed__12(-2)
 			{
-				if (model == null)
-				{
-					Logger.Warn("Found null model, ignoring.");
-					continue;
-				}
-				AreaViewType viewType = model.ModelType.CreateView(model);
-				if (viewType == null)
-				{
-					Logger.Warn("Found invalid view type for: \"" + model.Describe + "\", ignoring.");
-					continue;
-				}
-				AreaView view = new AreaView(viewType);
-				foreach (AreaView child in ModelsToViews(model.Children))
-				{
-					view.AddChild(child);
-				}
-				model.Children.Clear();
-				yield return view;
-			}
+				_003C_003E3__models = models
+			};
 		}
 
+		[IteratorStateMachine(typeof(_003CViewsToModels_003Ed__13))]
 		private static IEnumerable<AreaModel> ViewsToModels(IEnumerable<AreaView> views)
 		{
-			foreach (AreaView view in views)
+			return new _003CViewsToModels_003Ed__13(-2)
 			{
-				view.Model.Children.Clear();
-				foreach (AreaModel child in ViewsToModels(view.GetChildren()))
-				{
-					view.Model.Children.Add(child);
-				}
-				yield return view.Model;
-			}
+				_003C_003E3__views = views
+			};
 		}
 	}
 }

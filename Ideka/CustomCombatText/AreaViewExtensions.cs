@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Ideka.BHUDCommon.AnchoredRect;
 
 namespace Ideka.CustomCombatText
@@ -25,12 +26,13 @@ namespace Ideka.CustomCombatText
 			return areaView.GetAreaViewChildren();
 		}
 
+		[IteratorStateMachine(typeof(_003CGetAncestors_003Ed__3))]
 		public static IEnumerable<AreaView> GetAncestors(this AreaView areaView)
 		{
-			for (AreaView view = areaView; view != null; view = view.GetParent())
+			return new _003CGetAncestors_003Ed__3(-2)
 			{
-				yield return view;
-			}
+				_003C_003E3__areaView = areaView
+			};
 		}
 
 		public static IEnumerable<AreaView> GetSiblings(this AreaView areaView)

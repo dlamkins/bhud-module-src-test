@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Ideka.BHUDCommon;
 using Ideka.BHUDCommon.AnchoredRect;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace Ideka.CustomCombatText
 {
@@ -103,31 +103,31 @@ namespace Ideka.CustomCombatText
 			UpdateLayout();
 			((Control)_moveUpButton).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				AreaView target3 = Target;
-				if (target3 != null)
-				{
-					AnchoredRect parent3 = Target!.Parent;
-					if (parent3 != null)
-					{
-						int index2 = (parent3.IndexOfChild(target3) - 1 + parent3.Children.Count) % parent3.Children.Count;
-						parent3.RemoveChild(target3);
-						parent3.InsertChild(index2, target3);
-						this.HierarchyChanged?.Invoke(target3, parent3);
-					}
-				}
-			});
-			((Control)_moveDownButton).add_Click((EventHandler<MouseEventArgs>)delegate
-			{
 				AreaView target2 = Target;
 				if (target2 != null)
 				{
 					AnchoredRect parent2 = Target!.Parent;
 					if (parent2 != null)
 					{
-						int index = (parent2.IndexOfChild(target2) + 1) % parent2.Children.Count;
+						int index2 = (parent2.IndexOfChild(target2) - 1 + parent2.Children.Count) % parent2.Children.Count;
 						parent2.RemoveChild(target2);
-						parent2.InsertChild(index, target2);
+						parent2.InsertChild(index2, target2);
 						this.HierarchyChanged?.Invoke(target2, parent2);
+					}
+				}
+			});
+			((Control)_moveDownButton).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				AreaView target = Target;
+				if (target != null)
+				{
+					AnchoredRect parent = Target!.Parent;
+					if (parent != null)
+					{
+						int index = (parent.IndexOfChild(target) + 1) % parent.Children.Count;
+						parent.RemoveChild(target);
+						parent.InsertChild(index, target);
+						this.HierarchyChanged?.Invoke(target, parent);
 					}
 				}
 			});
@@ -135,12 +135,13 @@ namespace Ideka.CustomCombatText
 			{
 				//IL_0059: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0063: Expected O, but got Unknown
-				AreaView target = Target;
-				AnchoredRect parent;
-				if (target != null)
+				_003C_003Ec__DisplayClass22_0 CS_0024_003C_003E8__locals0 = new _003C_003Ec__DisplayClass22_0();
+				CS_0024_003C_003E8__locals0._003C_003E4__this = this;
+				CS_0024_003C_003E8__locals0.target = Target;
+				if (CS_0024_003C_003E8__locals0.target != null)
 				{
-					parent = Target!.Parent;
-					if (parent != null)
+					CS_0024_003C_003E8__locals0.parent = Target!.Parent;
+					if (CS_0024_003C_003E8__locals0.parent != null)
 					{
 						ContextMenuStrip? containerMenu = _containerMenu;
 						if (containerMenu != null)
@@ -151,66 +152,13 @@ namespace Ideka.CustomCombatText
 						_containerMenu!.Show((Control)(object)_changeContainerButton);
 					}
 				}
+				[IteratorStateMachine(typeof(_003C_003Ec__DisplayClass22_0._003C_003C_002Dctor_003Eg__menu_007C4_003Ed))]
 				IEnumerable<ContextMenuStripItem> menu()
 				{
-					bool isRoot = parent == CTextModule.LocalData.AreaViewParent;
-					AreaView parentArea = parent as AreaView;
-					ContextMenuStripItem val5 = new ContextMenuStripItem("Move to root");
-					((Control)val5).set_Enabled(!isRoot);
-					((Control)val5).set_BasicTooltipText(isRoot ? "This area is already in the root" : "Remove this area from all containers");
-					ContextMenuStripItem root = val5;
-					((Control)root).add_Click((EventHandler<MouseEventArgs>)delegate
+					return new _003C_003Ec__DisplayClass22_0._003C_003C_002Dctor_003Eg__menu_007C4_003Ed(-2)
 					{
-						reparent(CTextModule.LocalData.AreaViewParent);
-					});
-					yield return root;
-					ContextMenuStripItem val6 = new ContextMenuStripItem("Move out of \"" + (parentArea?.Model.Describe ?? "(root)") + "\"");
-					((Control)val6).set_Enabled(!isRoot);
-					((Control)val6).set_BasicTooltipText(isRoot ? "Can't move out of the root" : "Move this area out of its container and put it alongside it");
-					ContextMenuStripItem @out = val6;
-					((Control)@out).add_Click((EventHandler<MouseEventArgs>)delegate
-					{
-						AnchoredRect anchoredRect = parentArea?.Parent;
-						if (anchoredRect == null)
-						{
-							ScreenNotification.ShowNotification("Move out failed (null parent)", (NotificationType)2, (Texture2D)null, 4);
-						}
-						else
-						{
-							reparent(anchoredRect);
-						}
-					});
-					yield return @out;
-					foreach (AreaView sibling in Siblings)
-					{
-						if (sibling != target)
-						{
-							ContextMenuStripItem move = new ContextMenuStripItem("Move into \"" + sibling.Model.Describe + "\"");
-							((Control)move).add_Click((EventHandler<MouseEventArgs>)delegate
-							{
-								reparent(sibling);
-							});
-							yield return move;
-						}
-					}
-				}
-				void reparent(AnchoredRect newParent)
-				{
-					AnchoredRect newParent2 = newParent;
-					if (GetKeepAbsolutePosition?.Invoke() ?? false)
-					{
-						target.KeepingAbsolute(delegate
-						{
-							parent.RemoveChild(target);
-							newParent2.AddChild(target);
-						});
-					}
-					else
-					{
-						parent.RemoveChild(target);
-						newParent2.AddChild(target);
-					}
-					this.HierarchyChanged?.Invoke(target, parent);
+						_003C_003E4__this = CS_0024_003C_003E8__locals0
+					};
 				}
 			});
 			Target = null;

@@ -274,7 +274,7 @@ namespace Ideka.CustomCombatText
 					ValueControl.AlignLabels(_anchorMinY, _anchorMaxY, _pivotY, _positionY, _sizeDeltaY);
 					((Container)(object)this).MatchHeightToBottom((Control)(object)_sizeDeltaX, 10);
 				}
-				void arrangeAndFillOut(Control[] others)
+				void arrangeAndFillOut(params Control[] others)
 				{
 					//IL_000a: Unknown result type (might be due to invalid IL or missing references)
 					if (others.Any())
@@ -602,7 +602,7 @@ namespace Ideka.CustomCombatText
 					ValueControl.AlignLabels(_positionY, _sizeDeltaY);
 					((Container)(object)this).MatchHeightToBottom((Control)(object)_sizeDeltaX, 10);
 				}
-				void arrangeAndFillOut(Control[] others)
+				void arrangeAndFillOut(params Control[] others)
 				{
 					//IL_000a: Unknown result type (might be due to invalid IL or missing references)
 					if (others.Any())

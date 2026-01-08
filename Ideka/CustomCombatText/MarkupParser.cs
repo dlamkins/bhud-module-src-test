@@ -68,8 +68,8 @@ namespace Ideka.CustomCombatText
 				}
 				else
 				{
-					ref T reference = ref frag;
-					reference.Text += sub[0];
+					T val = frag;
+					val.Text += sub[0];
 					i++;
 				}
 			}

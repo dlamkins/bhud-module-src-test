@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Ideka.BHUDCommon;
@@ -214,8 +215,10 @@ namespace Ideka.CustomCombatText
 			{
 				//IL_0040: Unknown result type (might be due to invalid IL or missing references)
 				//IL_004a: Expected O, but got Unknown
-				List<MessageReceiver> receivers5 = Receivers;
-				if (receivers5 != null)
+				_003C_003Ec__DisplayClass22_0 CS_0024_003C_003E8__locals0 = new _003C_003Ec__DisplayClass22_0();
+				CS_0024_003C_003E8__locals0._003C_003E4__this = this;
+				CS_0024_003C_003E8__locals0.receivers = Receivers;
+				if (CS_0024_003C_003E8__locals0.receivers != null)
 				{
 					ContextMenuStrip? receiverMenu = _receiverMenu;
 					if (receiverMenu != null)
@@ -225,17 +228,13 @@ namespace Ideka.CustomCombatText
 					_receiverMenu = new ContextMenuStrip((Func<IEnumerable<ContextMenuStripItem>>)menu);
 					_receiverMenu!.Show((Control)(object)_selectButton);
 				}
+				[IteratorStateMachine(typeof(_003C_003Ec__DisplayClass22_0._003C_003C_002Dctor_003Eg__menu_007C11_003Ed))]
 				IEnumerable<ContextMenuStripItem> menu()
 				{
-					foreach (MessageReceiver receiver in receivers5)
+					return new _003C_003Ec__DisplayClass22_0._003C_003C_002Dctor_003Eg__menu_007C11_003Ed(-2)
 					{
-						ContextMenuStripItem item = new ContextMenuStripItem(receiver.Describe + ((receiver == Target) ? " (selected)" : ""));
-						((Control)item).add_Click((EventHandler<MouseEventArgs>)delegate
-						{
-							Target = receiver;
-						});
-						yield return item;
-					}
+						_003C_003E4__this = CS_0024_003C_003E8__locals0
+					};
 				}
 			});
 			((Control)_addNewButton).add_Click((EventHandler<MouseEventArgs>)delegate

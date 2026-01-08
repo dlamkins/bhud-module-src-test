@@ -169,17 +169,11 @@ namespace Ideka.CustomCombatText
 					FactBlock overrideBlock = @override.Blocks[j];
 					if (result.Blocks.Count <= j)
 					{
-						List<FactBlock> blocks = result.Blocks;
-						int index = j;
-						FactBlock obj = new FactBlock
+						result.Blocks[j] = new FactBlock
 						{
-							Description = overrideBlock.Description
+							Description = overrideBlock.Description,
+							TraitRequirements = overrideBlock.TraitRequirements.ToList()
 						};
-						List<int> traitRequirements = overrideBlock.TraitRequirements;
-						List<int> list = new List<int>(traitRequirements.Count);
-						list.AddRange(traitRequirements);
-						obj.TraitRequirements = list;
-						blocks[index] = obj;
 					}
 					if (!overrideBlock.Facts.Any())
 					{

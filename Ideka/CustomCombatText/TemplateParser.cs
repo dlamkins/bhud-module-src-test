@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Blish_HUD;
-using Blish_HUD.ArcDps.Models;
 using Blish_HUD.Content;
 using Gw2Sharp.Models;
 using Ideka.BHUDCommon.AnchoredRect;
@@ -264,7 +263,7 @@ namespace Ideka.CustomCombatText
 					27u => new(int, bool)?((1128573, true)), 
 					62u => new(int, bool)?((1770211, true)), 
 					65u => new(int, bool)?((2479354, true)), 
-					81u => new(int, bool)?((3680069, true)), 
+					81u => new(int, bool)?((3680070, true)), 
 					_ => new(int, bool)?((156634, false)), 
 				}, 
 				1 => eliteId switch
@@ -273,7 +272,7 @@ namespace Ideka.CustomCombatText
 					18u => new(int, bool)?((1128567, true)), 
 					61u => new(int, bool)?((1770223, true)), 
 					68u => new(int, bool)?((2491566, true)), 
-					74u => new(int, bool)?((3680093, true)), 
+					74u => new(int, bool)?((3680094, true)), 
 					_ => new(int, bool)?((156643, false)), 
 				}, 
 				2 => eliteId switch
@@ -282,7 +281,7 @@ namespace Ideka.CustomCombatText
 					43u => new(int, bool)?((1128581, true)), 
 					57u => new(int, bool)?((1770225, true)), 
 					70u => new(int, bool)?((2503659, true)), 
-					75u => new(int, bool)?((3680065, true)), 
+					75u => new(int, bool)?((3680066, true)), 
 					_ => new(int, bool)?((156632, false)), 
 				}, 
 				3 => eliteId switch
@@ -291,7 +290,7 @@ namespace Ideka.CustomCombatText
 					5u => new(int, bool)?((1128575, true)), 
 					55u => new(int, bool)?((1770215, true)), 
 					72u => new(int, bool)?((2503663, true)), 
-					78u => new(int, bool)?((3680081, true)), 
+					78u => new(int, bool)?((3680082, true)), 
 					_ => new(int, bool)?((156640, false)), 
 				}, 
 				4 => eliteId switch
@@ -300,7 +299,7 @@ namespace Ideka.CustomCombatText
 					7u => new(int, bool)?((1128571, true)), 
 					58u => new(int, bool)?((1770213, true)), 
 					71u => new(int, bool)?((2503667, true)), 
-					77u => new(int, bool)?((3680089, true)), 
+					77u => new(int, bool)?((3680090, true)), 
 					_ => new(int, bool)?((156641, false)), 
 				}, 
 				5 => eliteId switch
@@ -309,7 +308,7 @@ namespace Ideka.CustomCombatText
 					48u => new(int, bool)?((1128583, true)), 
 					56u => new(int, bool)?((1670506, true)), 
 					67u => new(int, bool)?((2491558, true)), 
-					80u => new(int, bool)?((3680061, true)), 
+					80u => new(int, bool)?((3680062, true)), 
 					_ => new(int, bool)?((156630, false)), 
 				}, 
 				6 => eliteId switch
@@ -318,7 +317,7 @@ namespace Ideka.CustomCombatText
 					40u => new(int, bool)?((1128569, true)), 
 					59u => new(int, bool)?((1770217, true)), 
 					66u => new(int, bool)?((2479358, true)), 
-					73u => new(int, bool)?((3680073, true)), 
+					73u => new(int, bool)?((3680074, true)), 
 					_ => new(int, bool)?((156636, false)), 
 				}, 
 				7 => eliteId switch
@@ -327,7 +326,7 @@ namespace Ideka.CustomCombatText
 					34u => new(int, bool)?((1128579, true)), 
 					60u => new(int, bool)?((1770221, true)), 
 					64u => new(int, bool)?((2479362, true)), 
-					76u => new(int, bool)?((3680077, true)), 
+					76u => new(int, bool)?((3680078, true)), 
 					_ => new(int, bool)?((156638, false)), 
 				}, 
 				8 => eliteId switch
@@ -336,7 +335,7 @@ namespace Ideka.CustomCombatText
 					52u => new(int, bool)?((1128577, true)), 
 					63u => new(int, bool)?((1770219, true)), 
 					69u => new(int, bool)?((2491562, true)), 
-					79u => new(int, bool)?((3680085, true)), 
+					79u => new(int, bool)?((3680086, true)), 
 					_ => new(int, bool)?((961390, false)), 
 				}, 
 				_ => null, 
@@ -352,234 +351,17 @@ namespace Ideka.CustomCombatText
 			return format;
 		}
 
+		[IteratorStateMachine(typeof(_003CFinalParse_003Ed__6))]
 		public static IEnumerable<Fragment> FinalParse(IEnumerable<MarkupFragment> markupFrags, Color? receiverColor, BitmapFont font, Message lastMessage, IReadOnlyList<Message> allMessages)
 		{
-			BitmapFont font2 = font;
-			List<List<Message>> resultGroups;
-			Style.ResultFormat x2;
-			Style.ResultFormat resultFormat = (byGroup<EventResult, Style.ResultFormat>(allMessages, (Message x) => x.Result, CTextModule.Style.ResultFormats, out resultGroups, out x2) ? x2 : null);
-			List<List<Message>> groups2;
-			Color x3;
-			Color srcProfColor = (byGroup<ProfessionType, Color>(allMessages, (Message x) => (ProfessionType)(byte)x.Src.get_Profession(), CTextModule.Style.ProfessionColors, out groups2, out x3) ? x3 : CTextModule.Style.DefaultEntityColor);
-			Color? petColor3 = CTextModule.Style.PetColor;
-			if (petColor3.HasValue)
+			return new _003CFinalParse_003Ed__6(-2)
 			{
-				Color petColor = petColor3.GetValueOrDefault();
-				if ((from x in groups2.First()
-					where !x.SrcIsPet
-					select x).Count() < allMessages.Where((Message x) => x.SrcIsPet).Count())
-				{
-					srcProfColor = petColor;
-				}
-			}
-			List<List<Message>> groups3;
-			Color x4;
-			Color dstProfColor = (byGroup<ProfessionType, Color>(allMessages, (Message x) => (ProfessionType)(byte)x.Dst.get_Profession(), CTextModule.Style.ProfessionColors, out groups3, out x4) ? x4 : CTextModule.Style.DefaultEntityColor);
-			petColor3 = CTextModule.Style.PetColor;
-			if (petColor3.HasValue)
-			{
-				Color petColor2 = petColor3.GetValueOrDefault();
-				if ((from x in groups3.First()
-					where !x.DstIsPet
-					select x).Count() < allMessages.Where((Message x) => x.DstIsPet).Count())
-				{
-					dstProfColor = petColor2;
-				}
-			}
-			byGroup<(uint, uint), object>(allMessages, (Message x) => (x.Src.get_Profession(), x.Src.get_Elite()), new Dictionary<(uint, uint), object>(), out var groups4, out var value4);
-			(ProfessionType, uint) srcSpec = ((ProfessionType)(byte)groups4[0][0].Src.get_Profession(), groups4[0][0].Src.get_Elite());
-			byGroup<(uint, uint), object>(allMessages, (Message x) => (x.Dst.get_Profession(), x.Dst.get_Elite()), new Dictionary<(uint, uint), object>(), out var groups5, out value4);
-			(ProfessionType, uint) dstSpec = ((ProfessionType)(byte)groups5[0][0].Dst.get_Profession(), groups5[0][0].Dst.get_Elite());
-			Dictionary<string, (List<Fragment> result, bool isSignificant)> templates = new Dictionary<string, (List<Fragment>, bool)>();
-			int value3 = allMessages.Sum((Message x) => x.Value);
-			templates["%v"] = (new List<Fragment>(1) { newString($"{value3:N0}", resultFormat?.Color) }, value3 != 0 || allMessages.Any((Message x) => x.LandedDamage));
-			int value2 = allMessages.Sum((Message x) => x.Barrier);
-			templates["%b"] = (new List<Fragment>(1) { newString(string.Format("{0}{1:N0}{2}", "{", value2, "}"), CTextModule.Style.BarrierColor) }, value2 != 0);
-			string text2 = ((resultGroups.Count != 1) ? null : GetResultFormat(lastMessage.Result)?.Text);
-			templates["%r"] = (new List<Fragment>(1) { newString(text2 ?? "", resultFormat?.Color) }, text2 != null);
-			templates["%f"] = combinedAgents(allMessages.Select((Message x) => x.Src), srcProfColor, "sources");
-			templates["%t"] = combinedAgents(allMessages.Select((Message x) => x.Dst), dstProfColor, "targets");
-			templates["%s"] = (new List<Fragment>(1) { newString(lastMessage.SkillName ?? $"(({(int)lastMessage.Ev.get_SkillId()}))") }, lastMessage.SkillName != null && !lastMessage.IsBoonOrCondi);
-			IEnumerable<(string, Color?)> parts = resultGroups.SelectMany((List<Message> x) => new List<(string, Color?)>
-			{
-				("/", null),
-				($"{x.Count}", GetResultFormat(x.First().Result)?.Color)
-			});
-			templates["%n"] = ((from x in parts.Skip(1)
-				select newString(x.text, x.color)).Cast<Fragment>().ToList(), allMessages.Skip(1).Any());
-			MultiIconFragment mi = new MultiIconFragment(font2.get_LineHeight())
-			{
-				Inner = allMessages.DistinctBy((Message x) => x.SkillId).Select(delegate(Message message)
-				{
-					AsyncTexture2D icon3 = ((!message.SkillIconId.HasValue) ? null : AsyncTexture2D.FromAssetId(message.SkillIconId.Value));
-					return new IconFragment(font2.get_LineHeight())
-					{
-						Icon = icon3,
-						Autocropped = true,
-						AssetId = message.SkillIconId
-					};
-				}).ToArray()
+				_003C_003E3__markupFrags = markupFrags,
+				_003C_003E3__receiverColor = receiverColor,
+				_003C_003E3__font = font,
+				_003C_003E3__lastMessage = lastMessage,
+				_003C_003E3__allMessages = allMessages
 			};
-			templates["%i"] = (new List<Fragment>(1) { mi }, mi.Inner.Any(delegate(IconFragment x)
-			{
-				AsyncTexture2D? icon2 = x.Icon;
-				return ((icon2 != null) ? icon2!.get_Texture() : null) != null;
-			}));
-			templates["%m"] = agentIcon(allMessages.Select((Message x) => x.Src), srcSpec);
-			templates["%o"] = agentIcon(allMessages.Select((Message x) => x.Dst), dstSpec);
-			foreach (MarkupFragment markupFrag in markupFrags)
-			{
-				MarkupFragment mFrag = markupFrag;
-				Color? fragColor = (mFrag.IsProfessionColor ? new Color?(srcProfColor) : mFrag.Color);
-				foreach (Fragment frag in process())
-				{
-					StringFragment str = frag as StringFragment;
-					if (str != null)
-					{
-						if (str.Text == "")
-						{
-							continue;
-						}
-						str.Color = (Color)(((_003F?)fragColor) ?? str.Color);
-					}
-					yield return frag;
-				}
-				IEnumerable<Fragment> process()
-				{
-					StringFragment frag2 = newString();
-					int optionStart = -1;
-					int templateStart = -1;
-					for (int i = 0; i < mFrag.Text.Length; i++)
-					{
-						char chr = mFrag.Text[i];
-						if (chr == ']' && optionStart >= 0 && templateStart > 0 && templates.TryGetValue(mFrag.Text.Substring(templateStart, 2), out var template))
-						{
-							if (template.isSignificant)
-							{
-								frag2.Text += mFrag.Text.Substring(optionStart + 1, templateStart - optionStart - 1);
-								yield return frag2;
-								foreach (Fragment item in template.result)
-								{
-									yield return item;
-								}
-								frag2 = newString();
-								frag2.Text += mFrag.Text.Substring(templateStart + 2, i - templateStart - 2);
-							}
-							templateStart = -1;
-							optionStart = -1;
-						}
-						else
-						{
-							template = default((List<Fragment>, bool));
-							if (chr == '%' && i + 1 < mFrag.Text.Length)
-							{
-								templateStart = i;
-								if (optionStart >= 0)
-								{
-									i++;
-									continue;
-								}
-								if (templates.TryGetValue(mFrag.Text.Substring(templateStart, 2), out template))
-								{
-									yield return frag2;
-									frag2 = newString();
-									foreach (Fragment item2 in template.result)
-									{
-										yield return item2;
-									}
-									templateStart = -1;
-									i++;
-									continue;
-								}
-								template = default((List<Fragment>, bool));
-							}
-							if (chr == '[')
-							{
-								optionStart = i;
-							}
-							else if (optionStart < 0)
-							{
-								frag2.Text += chr;
-							}
-						}
-					}
-					yield return frag2;
-				}
-			}
-			(List<Fragment> result, bool isSignificant) agentIcon(IEnumerable<Ag> agents, (ProfessionType prof, uint eliteId) spec)
-			{
-				//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-				bool isSelf = agents.DistinctBy((Ag x) => x.get_Id()).Count() == 1 && agents.First().get_Self() == 1;
-				(int, bool)? profIcon = GetProfIcon(spec.prof, spec.eliteId);
-				AsyncTexture2D icon = ((!profIcon.HasValue) ? null : AsyncTexture2D.FromAssetId(profIcon.Value.Item1));
-				return (new List<Fragment>(1)
-				{
-					new IconFragment(font2.get_LineHeight())
-					{
-						Icon = icon,
-						Autocropped = false,
-						Color = ((profIcon.HasValue && !profIcon.GetValueOrDefault().Item2) ? CTextModule.Style.DefaultEntityColor : Color.get_White()),
-						AssetId = profIcon?.Item1
-					}
-				}, ((icon != null) ? icon.get_Texture() : null) != null && !isSelf);
-			}
-			static bool byGroup<TKey, TValue>(IEnumerable<Message> source, Func<Message, TKey> selector, IReadOnlyDictionary<TKey, TValue> dict, out List<List<Message>> groups, out TValue value) where TKey : notnull where TValue : notnull
-			{
-				List<List<Message>> list = new List<List<Message>>();
-				list.AddRange(from x in source.GroupBy<Message, TKey>(selector)
-					select x.ToList() into x
-					orderby x.Count descending
-					select x);
-				groups = list;
-				TKey mostCommonResult = selector(groups[0][0]);
-				return dict.TryGetValue(mostCommonResult, out value);
-			}
-			(List<Fragment> result, bool isSignificant) combinedAgents(IEnumerable<Ag> agents, Color color, string plural)
-			{
-				//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
-				int count = agents.DistinctBy((Ag x) => x.get_Id()).Count();
-				string obj = ((count == 1 && agents.First().get_Name() != "0") ? agents.First().get_Name() : null);
-				bool isSelf2 = count == 1 && agents.First().get_Self() == 1;
-				string j = obj;
-				int c = count;
-				(string, bool) tuple;
-				if (j == null || j == "")
-				{
-					if (c != 1)
-					{
-						goto IL_00aa;
-					}
-					tuple = ("???", false);
-				}
-				else
-				{
-					if (c != 1)
-					{
-						goto IL_00aa;
-					}
-					tuple = (j, true);
-				}
-				goto IL_00c4;
-				IL_00aa:
-				tuple = ($"({c} {plural})", true);
-				goto IL_00c4;
-				IL_00c4:
-				var (value5, known) = tuple;
-				return (new List<Fragment>(1) { newString(value5, color) }, (count > 1 || known) && !isSelf2);
-			}
-			StringFragment newString(string text = "", Color? color = null)
-			{
-				//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-				//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-				return new StringFragment(font2)
-				{
-					Text = text,
-					Color = (Color)(((_003F?)color) ?? ((_003F?)receiverColor) ?? CTextModule.Style.BaseColor)
-				};
-			}
 		}
 
 		public static void DrawFragments(this AnchoredRect.RectTarget target, IEnumerable<Fragment> text, float alpha, bool shadow, Vector2 shadowDistance, bool stroke, float strokeDistance = 1f)

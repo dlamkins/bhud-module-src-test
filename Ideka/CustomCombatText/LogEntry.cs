@@ -1,32 +1,34 @@
 using System;
 using System.Collections.Generic;
-using Blish_HUD.ArcDps.Models;
-using Ideka.CustomCombatText.Bridge;
+using Blish_HUD.GameServices.ArcDps.V2.Models;
 using Newtonsoft.Json;
 
 namespace Ideka.CustomCombatText
 {
 	public class LogEntry
 	{
-		public byte[] Data { get; init; }
+		public CombatCallback Combat { get; init; }
 
 		public MessageContext Context { get; init; }
 
 		[JsonConverter(typeof(DateTimeAsUnixMillisecondsJC))]
 		public DateTime Timestamp { get; init; }
 
-		public LogEntry(byte[] data, MessageContext context)
+		public LogEntry(CombatCallback cbt, MessageContext context)
 		{
-			Data = data;
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+			Combat = cbt;
 			Context = context;
 			Timestamp = DateTime.UtcNow;
 			base._002Ector();
 		}
 
-		public (CombatEvent cbt, IEnumerable<Message> messages) ProcessAndInterpret()
+		public (CombatCallback cbt, IEnumerable<Message> messages) ProcessAndInterpret()
 		{
-			CombatEvent obj = CombatParser.ProcessCombat(Data, 1);
-			return (obj, MessageContext.Interpret(obj, Context));
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+			return (Combat, MessageContext.Interpret(Combat, Context));
 		}
 	}
 }

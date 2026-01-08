@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Blish_HUD.GameServices.ArcDps.V2.Models;
 using Ideka.BHUDCommon.AnchoredRect;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended;
@@ -28,10 +29,6 @@ namespace Ideka.CustomCombatText
 
 		public float Alpha { get; set; } = 1f;
 
-
-		public bool Stroke { get; set; }
-
-		public int StrokeDistance { get; set; }
 
 		public bool Shadow { get; set; } = true;
 
@@ -81,7 +78,7 @@ namespace Ideka.CustomCombatText
 		public bool WithinMergeTimeout(TimeSpan totalGameTime)
 		{
 			double passed = totalGameTime.TotalMilliseconds - LastTime.TotalMilliseconds;
-			return _messages.Any((Message x) => passed < (double)(x.Ev.get_Buff() ? CTextModule.Settings.MergeMaxMsBuffs.Value : CTextModule.Settings.MergeMaxMsStrikes.Value));
+			return _messages.Any((Message x) => passed < (double)(((CombatEvent)(ref x.Ev)).get_Buff() ? CTextModule.Settings.MergeMaxMsBuffs.Value : CTextModule.Settings.MergeMaxMsStrikes.Value));
 		}
 
 		public bool CanMerge(MessageReceiver receiver, Message message)

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Blish_HUD.ArcDps.Models;
+using Blish_HUD.GameServices.ArcDps.V2.Models;
 using Gw2Sharp.Models;
 using Gw2Sharp.WebApi;
 using Gw2Sharp.WebApi.V2.Models;
@@ -13,11 +13,11 @@ namespace Ideka.CustomCombatText
 {
 	public class Message
 	{
-		public readonly Ev Ev;
+		public readonly CombatEvent Ev;
 
-		public readonly Ag Src;
+		public readonly Agent Src;
 
-		public readonly Ag Dst;
+		public readonly Agent Dst;
 
 		public readonly int SkillId;
 
@@ -134,22 +134,29 @@ namespace Ideka.CustomCombatText
 			}
 		}
 
-		public Message(CombatEvent cbt, MessageContext ctx)
+		public Message(CombatCallback cbt, MessageContext ctx)
 		{
-			//IL_035e: Unknown result type (might be due to invalid IL or missing references)
-			CombatEvent cbt2 = cbt;
-			base._002Ector();
+			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0395: Unknown result type (might be due to invalid IL or missing references)
 			Message message = this;
-			Ev = cbt2.get_Ev();
-			Src = cbt2.get_Src();
-			Dst = cbt2.get_Dst();
-			SkillId = (StaticData.SkillRedirects.TryGetValue((int)Ev.get_SkillId(), out var id) ? id : ((int)Ev.get_SkillId()));
+			Ev = ((CombatCallback)(ref cbt)).get_Event();
+			Src = ((CombatCallback)(ref cbt)).get_Source();
+			Dst = ((CombatCallback)(ref cbt)).get_Destination();
+			SkillId = (StaticData.SkillRedirects.TryGetValue((int)((CombatEvent)(ref Ev)).get_SkillId(), out var id) ? id : ((int)((CombatEvent)(ref Ev)).get_SkillId()));
 			Skill = (CTextModule.SkillData.Items.TryGetValue(SkillId, out var x4) ? x4 : null);
 			HsSkill = (CTextModule.HsSkillData.Items.TryGetValue(SkillId, out var x3) ? x3 : null);
 			HsInfo = HsSkill?.Palettes.SelectMany((int paletteId) => (!CTextModule.HsPaletteData.Items.TryGetValue(paletteId, out var palette)) ? Array.Empty<(Palette, SlotGroup, SkillInfo)>() : palette.Groups.SelectMany((SlotGroup group) => from info in @group.Candidates
 				where info.Skill == message.SkillId
 				select (palette, @group, info))).ToArray() ?? Array.Empty<(Palette, SlotGroup, SkillInfo)>();
-			PreviousSkillChainIds = new HashSet<uint>(((IEnumerable<(Palette, SlotGroup, SkillInfo)>)HsInfo).Select((Func<(Palette, SlotGroup, SkillInfo), uint?>)delegate((Palette palette, SlotGroup group, SkillInfo info) x)
+			HashSet<uint> hashSet = new HashSet<uint>();
+			foreach (uint item in ((IEnumerable<(Palette, SlotGroup, SkillInfo)>)HsInfo).Select((Func<(Palette, SlotGroup, SkillInfo), uint?>)delegate((Palette palette, SlotGroup group, SkillInfo info) x)
 			{
 				int? previousChainSkillIndex = x.info.PreviousChainSkillIndex;
 				if (previousChainSkillIndex.HasValue)
@@ -162,15 +169,30 @@ namespace Ideka.CustomCombatText
 					}
 				}
 				return null;
-			}).WhereNotNull());
-			Trait = CTextModule.TraitData.Items.Values.FirstOrDefault((Trait x) => x.get_Name() == cbt2.get_SkillName() && CTextModule.SpecData.Items.TryGetValue(x.get_Specialization(), out var value) && value.get_Profession() == $"{(object)(ProfessionType)(byte)cbt2.get_Src().get_Profession()}");
+			}).WhereNotNull())
+			{
+				hashSet.Add(item);
+			}
+			PreviousSkillChainIds = hashSet;
+			Trait = CTextModule.TraitData.Items.Values.FirstOrDefault(delegate(Trait x)
+			{
+				//IL_0042: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+				if (x.get_Name() == ((CombatCallback)(ref cbt)).get_SkillName() && CTextModule.SpecData.Items.TryGetValue(x.get_Specialization(), out var value))
+				{
+					string profession = value.get_Profession();
+					Agent source = ((CombatCallback)(ref cbt)).get_Source();
+					return profession == $"{(object)(ProfessionType)(byte)((Agent)(ref source)).get_Profession()}";
+				}
+				return false;
+			});
 			IsBoonOrCondi = StaticData.BoonAndCondi.Contains(SkillId);
-			IsSelf = Src.get_Id() == Dst.get_Id() || (CTextModule.Settings.PetToMasterIsSelf.Value && Ev.get_SrcMasterInstId() == Ev.get_DstInstId()) || (CTextModule.Settings.MasterToPetIsSelf.Value && Ev.get_DstMasterInstId() == Ev.get_SrcInstId());
-			SrcIsPet = Ev.get_SrcMasterInstId() == ctx.SelfInstId;
-			DstIsPet = Ev.get_DstMasterInstId() == ctx.SelfInstId;
-			IsOnTarget = Dst.get_Id() == ctx.TargetId;
-			IsFromTarget = Src.get_Id() == ctx.TargetId;
-			string rawName = ((cbt2.get_SkillName().All(char.IsDigit) || cbt2.get_SkillName() == "") ? null : cbt2.get_SkillName());
+			IsSelf = ((Agent)(ref Src)).get_Id() == ((Agent)(ref Dst)).get_Id() || (CTextModule.Settings.PetToMasterIsSelf.Value && ((CombatEvent)(ref Ev)).get_SourceMasterInstanceId() == ((CombatEvent)(ref Ev)).get_DestinationInstanceId()) || (CTextModule.Settings.MasterToPetIsSelf.Value && ((CombatEvent)(ref Ev)).get_DestinationMasterInstanceId() == ((CombatEvent)(ref Ev)).get_SourceInstanceId());
+			SrcIsPet = ((CombatEvent)(ref Ev)).get_SourceMasterInstanceId() == ctx.SelfInstId;
+			DstIsPet = ((CombatEvent)(ref Ev)).get_DestinationMasterInstanceId() == ctx.SelfInstId;
+			IsOnTarget = ((Agent)(ref Dst)).get_Id() == ctx.TargetId;
+			IsFromTarget = ((Agent)(ref Src)).get_Id() == ctx.TargetId;
+			string rawName = ((((CombatCallback)(ref cbt)).get_SkillName().All(char.IsDigit) || ((CombatCallback)(ref cbt)).get_SkillName() == "") ? null : ((CombatCallback)(ref cbt)).get_SkillName());
 			Skill? skill = Skill;
 			string name = ((skill != null) ? skill!.get_Name() : null) ?? rawName ?? HsSkill?.Name;
 			SkillName = (string.IsNullOrEmpty(name) ? null : name);
@@ -206,7 +228,7 @@ namespace Ideka.CustomCombatText
 
 		public bool CanMerge(Message other)
 		{
-			if ((SkillId == other.SkillId || (CTextModule.Settings.MergeAttackChains.Value && other.PreviousSkillChainIds.Contains(Ev.get_SkillId()) && Src.get_Id() == other.Src.get_Id())) && (Category == other.Category || (IsOut && other.IsOut)))
+			if ((SkillId == other.SkillId || (CTextModule.Settings.MergeAttackChains.Value && other.PreviousSkillChainIds.Contains(((CombatEvent)(ref Ev)).get_SkillId()) && ((Agent)(ref Src)).get_Id() == ((Agent)(ref other.Src)).get_Id())) && (Category == other.Category || (IsOut && other.IsOut)))
 			{
 				if (Result != other.Result && (!LandedStrike || !other.LandedStrike))
 				{

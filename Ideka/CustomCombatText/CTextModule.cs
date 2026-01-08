@@ -7,18 +7,16 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
-using Blish_HUD.ArcDps;
-using Blish_HUD.ArcDps.Models;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
+using Blish_HUD.GameServices.ArcDps.V2;
+using Blish_HUD.GameServices.ArcDps.V2.Models;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
 using Ideka.BHUDCommon;
-using Ideka.CustomCombatText.Bridge;
 using Ideka.NetCommon;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Ideka.CustomCombatText
@@ -59,10 +57,6 @@ namespace Ideka.CustomCombatText
 		private PanelStack _panelStack;
 
 		private readonly FixedSizedQueue<LogEntry> _log = new FixedSizedQueue<LogEntry>();
-
-		private BridgeService _bridgeService;
-
-		private SettingsView? _settingsView;
 
 		private static CTextModule Instance { get; set; } = null;
 
@@ -164,7 +158,7 @@ namespace Ideka.CustomCombatText
 
 		public override IView GetSettingsView()
 		{
-			return (IView)(object)(_settingsView = new SettingsView(base.ModuleParameters.get_SettingsManager().get_ModuleSettings()));
+			return (IView)(object)new SettingsView(base.ModuleParameters.get_SettingsManager().get_ModuleSettings());
 		}
 
 		protected override void Initialize()
@@ -203,43 +197,39 @@ namespace Ideka.CustomCombatText
 			{
 				_log.Size = x;
 			}));
-			_bridgeService = _dc.Add(new BridgeService());
-			_bridgeService.RawCombatEvent += new BridgeService.CombatEventDelegate(ArcDpsEvent);
-		}
-
-		protected override void Update(GameTime gameTime)
-		{
-			((Module)this).Update(gameTime);
-			if (_settingsView != null)
+			GameService.ArcDpsV2.RegisterMessageType<CombatCallback>((IArcDpsMessageListener<CombatCallback>)(object)new ArcDpsMessageListener<CombatCallback>((MessageType)3, (Func<CombatCallback, CancellationToken, Task>)delegate(CombatCallback cbt, CancellationToken _)
 			{
-				_settingsView!.Status = "Bridge Status: " + (_bridgeService.IsActive ? "active" : "inactive") + "\n" + $"Restarts: {_bridgeService.Loops}";
-			}
-		}
-
-		private void ArcDpsEvent(ArraySegment<byte> data, CombatEventType type, CombatEvent cbt)
-		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0002: Invalid comparison between Unknown and I4
-			if ((int)type != 1)
+				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+				rawCombatEvent(cbt);
+				return Task.CompletedTask;
+			}));
+			GameService.ArcDpsV2.RegisterMessageType<CombatCallback>((IArcDpsMessageListener<CombatCallback>)(object)new ArcDpsMessageListener<CombatCallback>((MessageType)2, (Func<CombatCallback, CancellationToken, Task>)delegate(CombatCallback cbt, CancellationToken _)
 			{
-				Ev ev = cbt.get_Ev();
-				if (((ev != null) ? new byte?(ev.get_Result()) : null) != 10)
+				//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+				CombatEvent @event = ((CombatCallback)(ref cbt)).get_Event();
+				if (((CombatEvent)(ref @event)).get_Result() == 10)
 				{
-					return;
+					rawCombatEvent(cbt);
 				}
-			}
-			IEnumerable<Message> enumerable = MessageContext.Interpret(cbt);
-			if (enumerable.Any())
+				return Task.CompletedTask;
+			}));
+			void rawCombatEvent(CombatCallback cbt)
 			{
-				byte[] buffer = new byte[data.Count];
-				Array.Copy(data.Array, data.Offset, buffer, 0, data.Count);
-				LogEntry entry = MessageContext.Log(buffer);
-				_log.Enqueue(entry);
-				CTextModule.EntryLogged?.Invoke(entry);
-			}
-			foreach (Message message in enumerable)
-			{
-				_viewControl.ReceiveMessage(message);
+				//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+				//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+				IEnumerable<Message> enumerable = MessageContext.Interpret(cbt);
+				if (enumerable.Any())
+				{
+					LogEntry entry = MessageContext.Log(cbt);
+					_log.Enqueue(entry);
+					CTextModule.EntryLogged?.Invoke(entry);
+				}
+				foreach (Message message in enumerable)
+				{
+					_viewControl.ReceiveMessage(message);
+				}
 			}
 		}
 

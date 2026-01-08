@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Controls;
+using Blish_HUD.GameServices.ArcDps.V2.Models;
 using Blish_HUD.Input;
 using Gw2Sharp.Models;
-using Gw2Sharp.WebApi.V2.Models;
 using Ideka.BHUDCommon.AnchoredRect;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -56,40 +57,13 @@ namespace Ideka.CustomCombatText
 				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 				new ContextMenuStrip((Func<IEnumerable<ContextMenuStripItem>>)build).Show(e.get_MousePosition());
+				[IteratorStateMachine(typeof(_003C_003C_002Dctor_003Eg__build_007C11_1_003Ed))]
 				IEnumerable<ContextMenuStripItem> build()
 				{
-					ContextMenuStripItem val = new ContextMenuStripItem(Key.Message.SkillName ?? "(unknown)");
-					((Control)val).set_Enabled(false);
-					yield return val;
-					yield return create($"Copy skill chat link ({Key.Message.SkillId})", null, ChatLinkUtil.Skill(Key.Message.SkillId));
-					if (Key.Message.SkillId != Key.Message.Ev.get_SkillId())
+					return new _003C_003C_002Dctor_003Eg__build_007C11_1_003Ed(-2)
 					{
-						yield return create($"Copy base skill chat link ({Key.Message.Ev.get_SkillId()})", "This skill is overriden by another.", ChatLinkUtil.Skill((int)Key.Message.Ev.get_SkillId()));
-					}
-					Trait trait = Key.Message.Trait;
-					if (trait != null)
-					{
-						yield return create($"Copy trait chat link ({trait.get_Id()})", null, ChatLinkUtil.Trait(trait.get_Id()));
-					}
-					static ContextMenuStripItem create(string text, string? tooltipText, string chatCode)
-					{
-						//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-						//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-						//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-						//IL_002d: Expected O, but got Unknown
-						string chatCode2 = chatCode;
-						ContextMenuStripItem val2 = new ContextMenuStripItem(text);
-						((Control)val2).set_BasicTooltipText(tooltipText);
-						((Control)val2).add_Click((EventHandler<MouseEventArgs>)async delegate
-						{
-							await ClipboardUtil.get_WindowsClipboardService().SetTextAsync(chatCode2);
-							GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate
-							{
-								ScreenNotification.ShowNotification("Chat link copied to clipboard", (NotificationType)0, (Texture2D)null, 4);
-							});
-						});
-						return val2;
-					}
+						_003C_003E4__this = this
+					};
 				}
 			});
 		}
@@ -112,12 +86,30 @@ namespace Ideka.CustomCombatText
 
 		public void UpdateVisuals(List<TemplateParser.MarkupFragment> mFrags, int fontSize)
 		{
-			_rect.ParsedFragments = TemplateParser.FinalParse(mFrags, null, CTextModule.FontAssets.Get(null, fontSize), Key.Message, new _003C_003Ez__ReadOnlyArray<Message>(new Message[1] { Key.Message })).ToList();
+			_rect.ParsedFragments = TemplateParser.FinalParse(mFrags, null, CTextModule.FontAssets.Get(null, fontSize), Key.Message, new _003C_003Ez__ReadOnlySingleElementList<Message>(Key.Message)).ToList();
 			InnerHeight = (_rect.ParsedFragments.Any() ? _rect.ParsedFragments.Max((TemplateParser.Fragment x) => x.Size.Height) : 0f) + 5f;
 		}
 
 		public void CreateDebugTooltip()
 		{
+			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0106: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0151: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0156: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0180: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01cf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0233: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0238: Unknown result type (might be due to invalid IL or missing references)
+			//IL_025d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0262: Unknown result type (might be due to invalid IL or missing references)
 			if (((Control)this).get_BasicTooltipText() == null)
 			{
 				Tooltip tooltip = ((Control)this).get_Tooltip();
@@ -126,7 +118,56 @@ namespace Ideka.CustomCombatText
 					((Control)tooltip).Dispose();
 				}
 				((Control)this).set_Tooltip((Tooltip)null);
-				((Control)this).set_BasicTooltipText($"ID: {Key.Cbt.get_Id()}\n" + $"Skill ID: raw: {Key.Cbt.get_Ev().get_SkillId()} used: {Key.Message.SkillId}\n" + "Raw skill name: " + Key.Cbt.get_SkillName() + "\n" + $"Icon ID: {Key.Message.SkillIconId}\n" + "\n" + $"Src ID: {Key.Cbt.get_Src().get_Id()} / {Key.Cbt.get_Ev().get_SrcInstId()} (self: {Key.Message.Src.get_Self() == 1})\n" + "Src raw name: " + Key.Cbt.get_Src().get_Name() + "\n" + $"Src prof: {(object)(ProfessionType)(byte)Key.Cbt.get_Src().get_Profession()} / {Key.Message.Src.get_Elite()}\n" + "\n" + $"Dst ID: {Key.Cbt.get_Dst().get_Id()} / {Key.Cbt.get_Ev().get_DstInstId()} (self: {Key.Message.Dst.get_Self() == 1})\n" + "Dst raw name: " + Key.Cbt.get_Dst().get_Name() + "\n" + $"Dst prof: {(object)(ProfessionType)(byte)Key.Cbt.get_Dst().get_Profession()} / {Key.Message.Dst.get_Elite()}");
+				string[] obj = new string[18]
+				{
+					$"ID: {((CombatCallback)(ref Key.Cbt)).get_Id()}\n",
+					null,
+					null,
+					null,
+					null,
+					null,
+					null,
+					null,
+					null,
+					null,
+					null,
+					null,
+					null,
+					null,
+					null,
+					null,
+					null,
+					null
+				};
+				CombatEvent @event = ((CombatCallback)(ref Key.Cbt)).get_Event();
+				obj[1] = $"Skill ID: raw: {((CombatEvent)(ref @event)).get_SkillId()} used: {Key.Message.SkillId}\n";
+				obj[2] = "Raw skill name: ";
+				obj[3] = ((CombatCallback)(ref Key.Cbt)).get_SkillName();
+				obj[4] = "\n";
+				obj[5] = $"Icon ID: {Key.Message.SkillIconId}\n";
+				obj[6] = "\n";
+				Agent val = ((CombatCallback)(ref Key.Cbt)).get_Source();
+				object arg = ((Agent)(ref val)).get_Id();
+				@event = ((CombatCallback)(ref Key.Cbt)).get_Event();
+				obj[7] = $"Src ID: {arg} / {((CombatEvent)(ref @event)).get_SourceInstanceId()} (self: {((Agent)(ref Key.Message.Src)).get_Self() == 1})\n";
+				obj[8] = "Src raw name: ";
+				val = ((CombatCallback)(ref Key.Cbt)).get_Source();
+				obj[9] = ((Agent)(ref val)).get_Name();
+				obj[10] = "\n";
+				val = ((CombatCallback)(ref Key.Cbt)).get_Source();
+				obj[11] = $"Src prof: {(object)(ProfessionType)(byte)((Agent)(ref val)).get_Profession()} / {((Agent)(ref Key.Message.Src)).get_Elite()}\n";
+				obj[12] = "\n";
+				val = ((CombatCallback)(ref Key.Cbt)).get_Destination();
+				object arg2 = ((Agent)(ref val)).get_Id();
+				@event = ((CombatCallback)(ref Key.Cbt)).get_Event();
+				obj[13] = $"Dst ID: {arg2} / {((CombatEvent)(ref @event)).get_DestinationInstanceId()} (self: {((Agent)(ref Key.Message.Dst)).get_Self() == 1})\n";
+				obj[14] = "Dst raw name: ";
+				val = ((CombatCallback)(ref Key.Cbt)).get_Destination();
+				obj[15] = ((Agent)(ref val)).get_Name();
+				obj[16] = "\n";
+				val = ((CombatCallback)(ref Key.Cbt)).get_Destination();
+				obj[17] = $"Dst prof: {(object)(ProfessionType)(byte)((Agent)(ref val)).get_Profession()} / {((Agent)(ref Key.Message.Dst)).get_Elite()}";
+				((Control)this).set_BasicTooltipText(string.Concat(obj));
 			}
 		}
 

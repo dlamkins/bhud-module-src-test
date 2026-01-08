@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Blish_HUD.ArcDps.Models;
 using Blish_HUD.Controls;
+using Blish_HUD.GameServices.ArcDps.V2.Models;
 using Blish_HUD.Input;
 
 namespace Ideka.CustomCombatText
@@ -13,12 +13,14 @@ namespace Ideka.CustomCombatText
 		{
 			public readonly LogEntry LogEntry;
 
-			public readonly CombatEvent Cbt;
+			public readonly CombatCallback Cbt;
 
 			public readonly Message Message;
 
-			public MessageKey(LogEntry entry, CombatEvent cbt, Message message)
+			public MessageKey(LogEntry entry, CombatCallback cbt, Message message)
 			{
+				//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0009: Unknown result type (might be due to invalid IL or missing references)
 				LogEntry = entry;
 				Cbt = cbt;
 				Message = message;
@@ -118,6 +120,9 @@ namespace Ideka.CustomCombatText
 
 		public void PushEntry(LogEntry entry)
 		{
+			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
 			if (base.Empty)
 			{
 				base.MenuItemHeight = 1;

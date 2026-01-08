@@ -9,7 +9,7 @@ namespace Ideka.CustomCombatText
 		public HashSet<int> SkillIds { get; set; } = new HashSet<int>();
 
 
-		public bool Matches(int skillId)
+		public bool Allows(int skillId)
 		{
 			return Blacklist ^ SkillIds.Contains(skillId);
 		}

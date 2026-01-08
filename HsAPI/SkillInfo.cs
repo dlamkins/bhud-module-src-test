@@ -20,9 +20,9 @@ namespace HsAPI
 
 		public WeaponType? WeaponOffhand { get; init; }
 
-		public ProfessionState? ProfessionState { get; init; }
+		public string? ProfessionState { get; init; }
 
-		public ProfessionState? ProfessionState2 { get; init; }
+		public string? ProfessionState2 { get; init; }
 
 		public int? Specialization { get; init; }
 

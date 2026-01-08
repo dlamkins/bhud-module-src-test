@@ -62,7 +62,7 @@ namespace Ideka.CustomCombatText
 				{
 					ProfessionId? professionId = (tooltipContext.Profession = group3.Profession);
 				}
-				if (group3.Profession == ProfessionId.Thief)
+				if (group3.Profession.GetValueOrDefault() == ProfessionId.Thief)
 				{
 					InitiativeCost = skill2.ResourceCost.GetValueOrDefault();
 					break;
@@ -109,7 +109,7 @@ namespace Ideka.CustomCombatText
 					{
 						if (type != SkillPaletteType.Bundle)
 						{
-							goto IL_04ed;
+							goto IL_04df;
 						}
 						num = 922.5;
 					}
@@ -120,120 +120,120 @@ namespace Ideka.CustomCombatText
 						case WeaponType.BundleLarge:
 							break;
 						case WeaponType.Focus:
-							goto IL_03cb;
+							goto IL_03bd;
 						case WeaponType.Shield:
-							goto IL_03db;
+							goto IL_03cd;
 						case WeaponType.Torch:
-							goto IL_03eb;
+							goto IL_03dd;
 						case WeaponType.Warhorn:
-							goto IL_03fb;
+							goto IL_03ed;
 						case WeaponType.Greatsword:
-							goto IL_040b;
+							goto IL_03fd;
 						case WeaponType.Hammer:
-							goto IL_041b;
+							goto IL_040d;
 						case WeaponType.Staff:
-							goto IL_042b;
+							goto IL_041d;
 						case WeaponType.Longbow:
-							goto IL_043b;
+							goto IL_042d;
 						case WeaponType.Rifle:
-							goto IL_044b;
+							goto IL_043d;
 						case WeaponType.Shortbow:
-							goto IL_045b;
+							goto IL_044d;
 						case WeaponType.Axe:
-							goto IL_046b;
+							goto IL_045d;
 						case WeaponType.Sword:
-							goto IL_0478;
+							goto IL_046a;
 						case WeaponType.Dagger:
-							goto IL_0485;
+							goto IL_0477;
 						case WeaponType.Pistol:
-							goto IL_0492;
+							goto IL_0484;
 						case WeaponType.Scepter:
-							goto IL_049f;
+							goto IL_0491;
 						case WeaponType.Mace:
-							goto IL_04ac;
+							goto IL_049e;
 						case WeaponType.Spear:
-							goto IL_04b9;
+							goto IL_04ab;
 						case WeaponType.Speargun:
-							goto IL_04c6;
+							goto IL_04b8;
 						case WeaponType.Trident:
-							goto IL_04d3;
+							goto IL_04c5;
 						case WeaponType.Standard:
-							goto IL_04e0;
+							goto IL_04d2;
 						default:
-							goto IL_04ed;
+							goto IL_04df;
 						}
 						num = 0.0;
 					}
-					goto IL_04f5;
+					goto IL_04e7;
 				}
 				i++;
 				continue;
-				IL_045b:
+				IL_044d:
 				num = 1000.0;
-				goto IL_04f5;
-				IL_043b:
+				goto IL_04e7;
+				IL_042d:
 				num = 1050.0;
-				goto IL_04f5;
-				IL_042b:
+				goto IL_04e7;
+				IL_041d:
 				num = 1100.0;
-				goto IL_04f5;
-				IL_044b:
+				goto IL_04e7;
+				IL_043d:
 				num = 1150.0;
-				goto IL_04f5;
-				IL_040b:
+				goto IL_04e7;
+				IL_03fd:
 				num = 1100.0;
-				goto IL_04f5;
-				IL_03fb:
+				goto IL_04e7;
+				IL_03ed:
 				num = 900.0;
-				goto IL_04f5;
-				IL_041b:
+				goto IL_04e7;
+				IL_040d:
 				num = 1100.0;
-				goto IL_04f5;
-				IL_03eb:
+				goto IL_04e7;
+				IL_03dd:
 				num = 900.0;
-				goto IL_04f5;
-				IL_03cb:
+				goto IL_04e7;
+				IL_03bd:
 				num = 900.0;
-				goto IL_04f5;
-				IL_04f5:
+				goto IL_04e7;
+				IL_04e7:
 				weaponStrength = num;
 				break;
-				IL_03db:
+				IL_03cd:
 				num = 900.0;
-				goto IL_04f5;
-				IL_04ed:
+				goto IL_04e7;
+				IL_04df:
 				num = weaponStrength;
-				goto IL_04f5;
-				IL_04e0:
+				goto IL_04e7;
+				IL_04d2:
 				num = 690.5;
-				goto IL_04f5;
-				IL_04d3:
+				goto IL_04e7;
+				IL_04c5:
 				num = 1000.0;
-				goto IL_04f5;
-				IL_04c6:
+				goto IL_04e7;
+				IL_04b8:
 				num = 1000.0;
-				goto IL_04f5;
-				IL_04b9:
+				goto IL_04e7;
+				IL_04ab:
 				num = 1000.0;
-				goto IL_04f5;
-				IL_04ac:
+				goto IL_04e7;
+				IL_049e:
 				num = 1000.0;
-				goto IL_04f5;
-				IL_049f:
+				goto IL_04e7;
+				IL_0491:
 				num = 1000.0;
-				goto IL_04f5;
-				IL_0492:
+				goto IL_04e7;
+				IL_0484:
 				num = 1000.0;
-				goto IL_04f5;
-				IL_0485:
+				goto IL_04e7;
+				IL_0477:
 				num = 1000.0;
-				goto IL_04f5;
-				IL_0478:
+				goto IL_04e7;
+				IL_046a:
 				num = 1000.0;
-				goto IL_04f5;
-				IL_046b:
+				goto IL_04e7;
+				IL_045d:
 				num = 1000.0;
-				goto IL_04f5;
+				goto IL_04e7;
 			}
 			Blocks = (from x in skill2.Blocks
 				where !x.TraitRequirements.Any()

@@ -68,7 +68,7 @@ namespace Ideka.CustomCombatText
 		{
 			if (Enabled && (!Categories.Any() || Categories.Contains(message.Category)) && (!Results.Any() || Results.Contains(message.Result)) && (EntityFilter != EntityFilter.TargetOnly || message.IsOnTarget || message.IsFromTarget) && (EntityFilter != EntityFilter.NonSelf || !message.IsSelf))
 			{
-				return SkillFilter?.Matches(message.SkillId) ?? true;
+				return SkillFilter?.Allows(message.SkillId) ?? true;
 			}
 			return false;
 		}

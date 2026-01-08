@@ -6,7 +6,7 @@ using System.Runtime.Versioning;
 [assembly: AssemblyCompany("CustomCombatText")]
 [assembly: AssemblyConfiguration("Release")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
-[assembly: AssemblyInformationalVersion("1.0.0+37ba9c1e4567d0073366deb814b85882aa3017b9")]
+[assembly: AssemblyInformationalVersion("1.0.0+caf44d769c054f65b2448f1df04362a13d52cc39")]
 [assembly: AssemblyProduct("CustomCombatText")]
 [assembly: AssemblyTitle("CustomCombatText")]
 [assembly: AssemblyVersion("1.0.0.0")]
