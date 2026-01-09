@@ -17,6 +17,10 @@ namespace Maestro.Services
 
 		private readonly StringBuilder _log = new StringBuilder();
 
+		private readonly Stopwatch _stopwatch = new Stopwatch();
+
+		private long _lastEventMs;
+
 		private bool _enabled;
 
 		private string _songName;
@@ -27,11 +31,14 @@ namespace Maestro.Services
 			_log.Clear();
 			_songName = songName;
 			_enabled = true;
+			_lastEventMs = 0L;
+			_stopwatch.Restart();
 		}
 
 		[Conditional("DEBUG")]
 		public void Stop()
 		{
+			_stopwatch.Stop();
 			_enabled = false;
 			if (_log.Length == 0)
 			{
@@ -79,22 +86,37 @@ namespace Maestro.Services
 		[Conditional("DEBUG")]
 		public void LogNote(Keys key, Keys targetKey)
 		{
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
 			if (_enabled)
 			{
-				_log.AppendLine($"NOTE: {key} -> {FormatKey(targetKey)}");
+				long currentMs = _stopwatch.ElapsedMilliseconds;
+				long deltaMs = currentMs - _lastEventMs;
+				_lastEventMs = currentMs;
+				_log.AppendLine(string.Format("[+{0,4}ms] NOTE: {1} -> {2}", deltaMs, key, FormatKey(targetKey)));
 			}
 		}
 
 		[Conditional("DEBUG")]
 		public void LogSharp(Keys key, KeyBinding binding)
 		{
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
 			if (_enabled)
 			{
-				_log.AppendLine($"SHARP: {key} -> {FormatModifiers(binding.ModifierKeys)}+{FormatKey(binding.PrimaryKey)}");
+				long currentMs = _stopwatch.ElapsedMilliseconds;
+				long deltaMs = currentMs - _lastEventMs;
+				_lastEventMs = currentMs;
+				_log.AppendLine(string.Format("[+{0,4}ms] SHARP: {1} -> {2}+{3}", deltaMs, key, FormatModifiers(binding.ModifierKeys), FormatKey(binding.PrimaryKey)));
+			}
+		}
+
+		[Conditional("DEBUG")]
+		public void LogDelay(int delayMs)
+		{
+			if (_enabled)
+			{
+				_log.AppendLine($"         DELAY: {delayMs}ms");
 			}
 		}
 

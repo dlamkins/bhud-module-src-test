@@ -17,14 +17,17 @@ namespace Maestro.Services.Data
 			[JsonProperty("artist")]
 			public string Artist { get; set; }
 
+			[JsonProperty("transcriber")]
+			public string Transcriber { get; set; }
+
 			[JsonProperty("instrument")]
 			public string Instrument { get; set; }
 
-			[JsonProperty("bpm")]
-			public int? Bpm { get; set; }
-
 			[JsonProperty("notes")]
 			public List<string> Notes { get; set; }
+
+			[JsonProperty("skipOctaveReset")]
+			public bool SkipOctaveReset { get; set; }
 		}
 
 		private static readonly JsonSerializerSettings JsonSettings;
@@ -40,8 +43,8 @@ namespace Maestro.Services.Data
 			{
 				Name = song.Name,
 				Artist = song.Artist,
+				Transcriber = song.Transcriber,
 				Instrument = song.Instrument.ToString(),
-				Bpm = song.Bpm,
 				Notes = song.Notes
 			}, JsonSettings);
 		}
@@ -54,12 +57,13 @@ namespace Maestro.Services.Data
 			{
 				Name = dto.Name,
 				Artist = dto.Artist,
+				Transcriber = dto.Transcriber,
 				Instrument = instrument,
-				Bpm = dto.Bpm
+				SkipOctaveReset = dto.SkipOctaveReset
 			};
-			if (dto.Notes != null && dto.Bpm.HasValue)
+			if (dto.Notes != null)
 			{
-				List<SongCommand> commands = NoteParser.Parse(dto.Notes, dto.Bpm.Value);
+				List<SongCommand> commands = NoteParser.Parse(dto.Notes);
 				song.Commands.AddRange(commands);
 			}
 			return song;
@@ -80,12 +84,13 @@ namespace Maestro.Services.Data
 				{
 					Name = dto.Name,
 					Artist = dto.Artist,
+					Transcriber = dto.Transcriber,
 					Instrument = instrument,
-					Bpm = dto.Bpm
+					SkipOctaveReset = dto.SkipOctaveReset
 				};
-				if (dto.Notes != null && dto.Bpm.HasValue)
+				if (dto.Notes != null)
 				{
-					List<SongCommand> commands = NoteParser.Parse(dto.Notes, dto.Bpm.Value);
+					List<SongCommand> commands = NoteParser.Parse(dto.Notes);
 					song.Commands.AddRange(commands);
 				}
 				songs.Add(song);

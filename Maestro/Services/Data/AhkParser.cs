@@ -24,7 +24,7 @@ namespace Maestro.Services.Data
 
 		private static readonly Regex SleepPattern = new Regex("Sleep,\\s*(\\d+)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-		public static List<string> ParseToCompact(string ahkContent, int bpm)
+		public static List<string> ParseToCompact(string ahkContent)
 		{
 			string[] array = ahkContent.Split(new char[2] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
 			List<string> result = new List<string>();
@@ -34,6 +34,10 @@ namespace Maestro.Services.Data
 			for (int i = 0; i < array2.Length; i++)
 			{
 				string trimmed = array2[i].Trim();
+				if (trimmed.StartsWith("PlaySong", StringComparison.OrdinalIgnoreCase) || trimmed == "{" || trimmed == "}")
+				{
+					continue;
+				}
 				Match keyDownMatch = KeyDownPattern.Match(trimmed);
 				if (keyDownMatch.Success)
 				{
@@ -62,11 +66,8 @@ namespace Maestro.Services.Data
 				Match sleepMatch = SleepPattern.Match(trimmed);
 				if (sleepMatch.Success && currentNotes.Count > 0)
 				{
-					(int duration, bool isDotted) closestNoteDuration = GetClosestNoteDuration(int.Parse(sleepMatch.Groups[1].Value), bpm);
-					int duration = closestNoteDuration.duration;
-					bool isDotted = closestNoteDuration.isDotted;
-					string durationStr = duration + (isDotted ? "." : "");
-					string noteLine = string.Join(" ", currentNotes.ConvertAll((string n) => n + ":" + durationStr));
+					string durationMs = sleepMatch.Groups[1].Value;
+					string noteLine = string.Join(" ", currentNotes.ConvertAll((string n) => n + ":" + durationMs));
 					result.Add(noteLine);
 					currentNotes.Clear();
 				}
@@ -86,35 +87,6 @@ namespace Maestro.Services.Data
 				return "C^" + modifier;
 			}
 			return note + modifier;
-		}
-
-		private static (int duration, bool isDotted) GetClosestNoteDuration(int delayMs, int bpm)
-		{
-			int[] obj = new int[6] { 1, 2, 4, 8, 16, 32 };
-			int closest = 4;
-			bool isDotted = false;
-			int minDiff = int.MaxValue;
-			int[] array = obj;
-			foreach (int dur in array)
-			{
-				int expectedMs = (int)(60000.0 / (double)bpm * (4.0 / (double)dur));
-				int diff = Math.Abs(delayMs - expectedMs);
-				if (diff < minDiff)
-				{
-					minDiff = diff;
-					closest = dur;
-					isDotted = false;
-				}
-				int dottedMs = (int)((double)expectedMs * 1.5);
-				diff = Math.Abs(delayMs - dottedMs);
-				if (diff < minDiff)
-				{
-					minDiff = diff;
-					closest = dur;
-					isDotted = true;
-				}
-			}
-			return (closest, isDotted);
 		}
 	}
 }

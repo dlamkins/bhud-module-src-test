@@ -49,8 +49,6 @@ namespace Maestro.UI
 
 		private static Texture2D _backgroundTexture;
 
-		private const int DefaultBpm = 120;
-
 		public event EventHandler<Song> SongImported;
 
 		private static Texture2D GetBackground()
@@ -205,7 +203,7 @@ namespace Maestro.UI
 		{
 			try
 			{
-				List<string> notes = AhkParser.ParseToCompact(_scriptInput.Text, 120);
+				List<string> notes = AhkParser.ParseToCompact(_scriptInput.Text);
 				if (notes.Count == 0)
 				{
 					ScreenNotification.ShowNotification("No notes found in AHK script", ScreenNotification.NotificationType.Error);
@@ -216,12 +214,12 @@ namespace Maestro.UI
 				{
 					Name = _titleInput.Text.Trim(),
 					Artist = (string.IsNullOrWhiteSpace(_artistInput.Text) ? "Unknown" : _artistInput.Text.Trim()),
+					Transcriber = (string.IsNullOrWhiteSpace(_transcriberInput.Text) ? null : _transcriberInput.Text.Trim()),
 					Instrument = instrument,
-					Bpm = 120,
 					IsUserImported = true
 				};
 				song.Notes.AddRange(notes);
-				List<SongCommand> commands = NoteParser.Parse(notes, 120);
+				List<SongCommand> commands = NoteParser.Parse(notes);
 				song.Commands.AddRange(commands);
 				ScreenNotification.ShowNotification($"Imported {notes.Count} notes, {song.Commands.Count} commands");
 				return song;

@@ -8,9 +8,9 @@ namespace Maestro.Models
 
 		public string Artist { get; set; }
 
-		public InstrumentType Instrument { get; set; }
+		public string Transcriber { get; set; }
 
-		public int? Bpm { get; set; }
+		public InstrumentType Instrument { get; set; }
 
 		public List<SongCommand> Commands { get; set; } = new List<SongCommand>();
 
@@ -19,6 +19,8 @@ namespace Maestro.Models
 
 
 		public bool IsUserImported { get; set; }
+
+		public bool SkipOctaveReset { get; set; }
 
 		public string DisplayName => Name + " - " + Artist;
 	}

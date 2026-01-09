@@ -100,9 +100,9 @@ namespace Maestro.UI.Components
 			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0116: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0143: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0192: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c3: Unknown result type (might be due to invalid IL or missing references)
 			_song = song;
 			base.Size = new Point(width, 70);
 			base.BackgroundColor = MaestroTheme.PanelBackground;
@@ -133,10 +133,11 @@ namespace Maestro.UI.Components
 				Font = GameService.Content.DefaultFont14,
 				TextColor = MaestroTheme.CreamWhite
 			};
+			string artistText = (string.IsNullOrWhiteSpace(song.Transcriber) ? song.Artist : (song.Artist + " - " + song.Transcriber));
 			_artistLabel = new Label
 			{
 				Parent = this,
-				Text = song.Artist,
+				Text = artistText,
 				Location = new Point(12, 40),
 				Width = width - Layout.LabelRightMargin,
 				Font = GameService.Content.DefaultFont12,
