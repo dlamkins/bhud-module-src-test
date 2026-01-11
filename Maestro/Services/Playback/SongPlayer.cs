@@ -19,7 +19,37 @@ namespace Maestro.Services.Playback
 
 		private readonly object _pauseLock = new object();
 
+		private float _playbackSpeed = 1f;
+
+		private static bool Gw2HasFocus => GameService.GameIntegration.Gw2Instance.Gw2HasFocus;
+
+		private static bool IsTextInputFocused => GameService.Gw2Mumble.UI.IsTextInputFocused;
+
+		private static bool ShouldPauseForInput
+		{
+			get
+			{
+				if (Gw2HasFocus)
+				{
+					return IsTextInputFocused;
+				}
+				return true;
+			}
+		}
+
 		public Song CurrentSong { get; private set; }
+
+		public float PlaybackSpeed
+		{
+			get
+			{
+				return _playbackSpeed;
+			}
+			set
+			{
+				_playbackSpeed = Math.Max(0.1f, Math.Min(2f, value));
+			}
+		}
 
 		public int CurrentCommandIndex { get; private set; }
 
@@ -36,6 +66,18 @@ namespace Maestro.Services.Playback
 		}
 
 		public bool IsPaused { get; private set; }
+
+		public bool IsWaitingForInput
+		{
+			get
+			{
+				if (IsPlaying && !IsPaused)
+				{
+					return ShouldPauseForInput;
+				}
+				return false;
+			}
+		}
 
 		public bool IsAdjustingOctave { get; private set; }
 
@@ -151,7 +193,7 @@ namespace Maestro.Services.Playback
 					}
 					lock (_pauseLock)
 					{
-						while (IsPaused && !cancellationToken.IsCancellationRequested)
+						while ((IsPaused || ShouldPauseForInput) && !cancellationToken.IsCancellationRequested)
 						{
 							Monitor.Wait(_pauseLock, 100);
 						}
@@ -165,7 +207,7 @@ namespace Maestro.Services.Playback
 					ExecuteCommand(command);
 					if (command.Type == CommandType.Wait && command.Duration > 0)
 					{
-						await Task.Delay(command.Duration, cancellationToken);
+						await Task.Delay((int)((float)command.Duration / _playbackSpeed), cancellationToken);
 					}
 				}
 				if (!cancellationToken.IsCancellationRequested)

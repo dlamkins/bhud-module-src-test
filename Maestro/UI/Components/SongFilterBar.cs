@@ -16,20 +16,22 @@ namespace Maestro.UI.Components
 
 			public const int SearchBoxWidth = 180;
 
-			public const int DropdownWidth = 150;
+			public const int FilterButtonWidth = 180;
 		}
 
 		private readonly TextBox _searchBox;
 
-		private readonly Dropdown _instrumentFilter;
+		private readonly FilterButton _filterButton;
 
 		public string SearchText => _searchBox.Text?.Trim().ToLower() ?? string.Empty;
 
-		public string SelectedInstrument => _instrumentFilter.SelectedItem;
+		public string SelectedSource => _filterButton.SelectedSource;
+
+		public string SelectedInstrument => _filterButton.SelectedInstrument;
 
 		public event EventHandler SearchChanged;
 
-		public event EventHandler<ValueChangedEventArgs> FilterChanged;
+		public event EventHandler FilterChanged;
 
 		public SongFilterBar(int width)
 		{
@@ -50,28 +52,22 @@ namespace Maestro.UI.Components
 			{
 				this.SearchChanged?.Invoke(this, EventArgs.Empty);
 			};
-			_instrumentFilter = new Dropdown
+			_filterButton = new FilterButton
 			{
 				Parent = this,
-				Location = new Point(width - 150, 4),
-				Width = 150
+				Location = new Point(width - 180, 4),
+				Width = 180
 			};
-			_instrumentFilter.Items.Add("All Instruments");
-			_instrumentFilter.Items.Add("Piano");
-			_instrumentFilter.Items.Add("Harp");
-			_instrumentFilter.Items.Add("Lute");
-			_instrumentFilter.Items.Add("Bass");
-			_instrumentFilter.SelectedItem = "All Instruments";
-			_instrumentFilter.ValueChanged += delegate(object s, ValueChangedEventArgs e)
+			_filterButton.FilterChanged += delegate
 			{
-				this.FilterChanged?.Invoke(this, e);
+				this.FilterChanged?.Invoke(this, EventArgs.Empty);
 			};
 		}
 
 		protected override void DisposeControl()
 		{
 			_searchBox?.Dispose();
-			_instrumentFilter?.Dispose();
+			_filterButton?.Dispose();
 			base.DisposeControl();
 		}
 	}

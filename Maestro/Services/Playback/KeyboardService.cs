@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Blish_HUD;
 using Blish_HUD.Controls.Extern;
 using Blish_HUD.Controls.Intern;
 using Blish_HUD.Input;
@@ -19,6 +20,18 @@ namespace Maestro.Services.Playback
 
 		private bool _altHeld;
 
+		private static bool ShouldSendKeys
+		{
+			get
+			{
+				if (GameService.GameIntegration.Gw2Instance.Gw2HasFocus)
+				{
+					return !GameService.Gw2Mumble.UI.IsTextInputFocused;
+				}
+				return false;
+			}
+		}
+
 		public KeyboardService(Dictionary<Keys, SettingEntry<KeyBinding>> keyRemappings, Dictionary<Keys, SettingEntry<KeyBinding>> sharpRemappings)
 		{
 			_keyRemappings = keyRemappings;
@@ -36,26 +49,29 @@ namespace Maestro.Services.Playback
 
 		public void KeyDown(Keys key)
 		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Invalid comparison between Unknown and I4
-			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-			SettingEntry<KeyBinding> sharpSetting;
-			SettingEntry<KeyBinding> setting;
-			if ((int)key == 164)
+			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000e: Invalid comparison between Unknown and I4
+			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
+			if (ShouldSendKeys)
 			{
-				_altHeld = true;
-			}
-			else if (_altHeld && _sharpRemappings.TryGetValue(key, out sharpSetting))
-			{
-				_activeSharpKeys.Add(key);
-				SendKeyBindingDown(sharpSetting.Value);
-			}
-			else if (_keyRemappings.TryGetValue(key, out setting))
-			{
-				Keyboard.Press((VirtualKeyShort)setting.Value.PrimaryKey, sendToSystem: true);
+				SettingEntry<KeyBinding> sharpSetting;
+				SettingEntry<KeyBinding> setting;
+				if ((int)key == 164)
+				{
+					_altHeld = true;
+				}
+				else if (_altHeld && _sharpRemappings.TryGetValue(key, out sharpSetting))
+				{
+					_activeSharpKeys.Add(key);
+					SendKeyBindingDown(sharpSetting.Value);
+				}
+				else if (_keyRemappings.TryGetValue(key, out setting))
+				{
+					Keyboard.Press((VirtualKeyShort)setting.Value.PrimaryKey, sendToSystem: true);
+				}
 			}
 		}
 

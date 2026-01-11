@@ -12,7 +12,7 @@ namespace Maestro.UI.Components
 	{
 		public static class Layout
 		{
-			public const int Height = 70;
+			public const int Height = 95;
 
 			public const int ButtonY = 18;
 
@@ -31,6 +31,18 @@ namespace Maestro.UI.Components
 			public const int ProgressLabelY = 28;
 
 			public const int LabelWidth = 300;
+
+			public const int SpeedLabelX = 8;
+
+			public const int SpeedLabelY = 52;
+
+			public const int SpeedSliderX = 60;
+
+			public const int SpeedSliderY = 55;
+
+			public const int SpeedSliderWidth = 180;
+
+			public const int SpeedValueX = 248;
 		}
 
 		private readonly SongPlayer _songPlayer;
@@ -43,6 +55,12 @@ namespace Maestro.UI.Components
 
 		private readonly Label _progressLabel;
 
+		private readonly Label _speedLabel;
+
+		private readonly TrackBar _speedSlider;
+
+		private readonly Label _speedValueLabel;
+
 		public NowPlayingPanel(SongPlayer songPlayer, int width)
 		{
 			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
@@ -54,8 +72,13 @@ namespace Maestro.UI.Components
 			//IL_011d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0149: Unknown result type (might be due to invalid IL or missing references)
 			//IL_016f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01bc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0256: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0278: Unknown result type (might be due to invalid IL or missing references)
 			_songPlayer = songPlayer;
-			base.Size = new Point(width, 70);
+			base.Size = new Point(width, 95);
 			base.BackgroundColor = MaestroTheme.WithAlpha(MaestroTheme.SlateGray, 150);
 			base.ShowBorder = true;
 			_pauseButton = new StandardButton
@@ -94,6 +117,35 @@ namespace Maestro.UI.Components
 				Font = GameService.Content.DefaultFont12,
 				TextColor = MaestroTheme.MutedCream
 			};
+			_speedLabel = new Label
+			{
+				Parent = this,
+				Text = "Speed:",
+				Location = new Point(8, 52),
+				AutoSizeWidth = true,
+				Font = GameService.Content.DefaultFont12,
+				TextColor = MaestroTheme.MutedCream
+			};
+			_speedSlider = new TrackBar
+			{
+				Parent = this,
+				Location = new Point(60, 55),
+				Width = 180,
+				MinValue = 1f,
+				MaxValue = 20f,
+				Value = 10f,
+				SmallStep = true
+			};
+			_speedSlider.ValueChanged += OnSpeedSliderChanged;
+			_speedValueLabel = new Label
+			{
+				Parent = this,
+				Text = "1.0x",
+				Location = new Point(248, 52),
+				AutoSizeWidth = true,
+				Font = GameService.Content.DefaultFont12,
+				TextColor = MaestroTheme.CreamWhite
+			};
 			SubscribeToEvents();
 		}
 
@@ -119,6 +171,13 @@ namespace Maestro.UI.Components
 		private void OnStopClicked(object sender, MouseEventArgs e)
 		{
 			_songPlayer.Stop();
+		}
+
+		private void OnSpeedSliderChanged(object sender, ValueEventArgs<float> e)
+		{
+			float speed = e.Value / 10f;
+			_songPlayer.PlaybackSpeed = speed;
+			_speedValueLabel.Text = $"{speed:F1}x";
 		}
 
 		public void UpdatePlaybackState()
@@ -199,10 +258,17 @@ namespace Maestro.UI.Components
 		public override void UpdateContainer(GameTime gameTime)
 		{
 			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011d: Unknown result type (might be due to invalid IL or missing references)
 			base.UpdateContainer(gameTime);
 			if (!_songPlayer.IsPlaying || _songPlayer.IsPaused)
 			{
+				return;
+			}
+			if (_songPlayer.IsWaitingForInput)
+			{
+				_progressLabel.Text = "Paused";
+				_progressLabel.TextColor = MaestroTheme.Paused;
 				return;
 			}
 			if (_songPlayer.IsAdjustingOctave)
@@ -235,6 +301,9 @@ namespace Maestro.UI.Components
 			_stopButton?.Dispose();
 			_nowPlayingLabel?.Dispose();
 			_progressLabel?.Dispose();
+			_speedLabel?.Dispose();
+			_speedSlider?.Dispose();
+			_speedValueLabel?.Dispose();
 			base.DisposeControl();
 		}
 	}

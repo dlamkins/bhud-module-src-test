@@ -17,11 +17,11 @@ namespace Maestro.UI
 		{
 			public const int WindowWidth = 420;
 
-			public const int WindowHeight = 470;
+			public const int WindowHeight = 495;
 
 			public const int ContentWidth = 390;
 
-			public const int ContentHeight = 420;
+			public const int ContentHeight = 445;
 		}
 
 		private readonly SongPlayer _songPlayer;
@@ -44,11 +44,11 @@ namespace Maestro.UI
 
 		private static Texture2D GetBackground()
 		{
-			return _backgroundTexture ?? (_backgroundTexture = MaestroTheme.CreateWindowBackground(420, 470));
+			return _backgroundTexture ?? (_backgroundTexture = MaestroTheme.CreateWindowBackground(420, 495));
 		}
 
 		public MaestroWindow(SongPlayer songPlayer, List<Song> songs)
-			: base(GetBackground(), new Rectangle(0, 0, 420, 470), new Rectangle(15, 30, 390, 420))
+			: base(GetBackground(), new Rectangle(0, 0, 420, 495), new Rectangle(15, 30, 390, 445))
 		{
 			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
@@ -77,7 +77,7 @@ namespace Maestro.UI
 				Parent = this,
 				Location = new Point(0, currentY)
 			};
-			currentY += 77;
+			currentY += 102;
 			_filterBar = new SongFilterBar(390)
 			{
 				Parent = this,
@@ -171,8 +171,17 @@ namespace Maestro.UI
 		private IEnumerable<Song> GetFilteredSongs()
 		{
 			IEnumerable<Song> songs = _allSongs.AsEnumerable();
+			string source = _filterBar.SelectedSource;
+			if (source == "Bundled")
+			{
+				songs = songs.Where((Song s) => !s.IsUserImported);
+			}
+			else if (source == "Imported")
+			{
+				songs = songs.Where((Song s) => s.IsUserImported);
+			}
 			string filter = _filterBar.SelectedInstrument;
-			if (filter != "All Instruments")
+			if (filter != "All")
 			{
 				if (Enum.TryParse<InstrumentType>(filter, out var instrument))
 				{
