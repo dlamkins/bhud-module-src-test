@@ -117,6 +117,7 @@ namespace Maestro.Services.Playback
 				{
 					IsPaused = true;
 				}
+				_keyboardService.ReleaseAllKeys();
 				this.OnPaused?.Invoke(this, EventArgs.Empty);
 				Logger.Info("Playback paused");
 			}
@@ -168,6 +169,7 @@ namespace Maestro.Services.Playback
 				_cancellationTokenSource.Dispose();
 				_cancellationTokenSource = null;
 			}
+			_keyboardService.ReleaseAllKeys();
 			_keyboardService.StopDebugLog();
 			CurrentSong = null;
 			CurrentCommandIndex = 0;

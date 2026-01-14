@@ -18,7 +18,20 @@ namespace Maestro.Services.Data
 			{ "Numpad8", "C^" }
 		};
 
-		private static readonly Regex KeyDownPattern = new Regex("SendInput\\s*\\{(Numpad\\d)\\s+down\\}", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+		private static readonly Dictionary<string, string> NumpadToSharp = new Dictionary<string, string>
+		{
+			{ "Numpad1", "C#" },
+			{ "Numpad2", "D#" },
+			{ "Numpad3", "F#" },
+			{ "Numpad4", "G#" },
+			{ "Numpad5", "A#" }
+		};
+
+		private static readonly Regex KeyDownPattern = new Regex("\\{(Numpad[1-8])\\s+down\\}", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+		private static readonly Regex AltDownPattern = new Regex("LAlt\\s+down", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+		private static readonly Regex AltUpPattern = new Regex("LAlt\\s+up", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
 		private static readonly Regex QuickPressPattern = new Regex("SendInput\\s*\\{(Numpad[09])\\}", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
@@ -30,6 +43,7 @@ namespace Maestro.Services.Data
 			List<string> result = new List<string>();
 			List<string> currentNotes = new List<string>();
 			int currentOctave = 0;
+			bool altHeld = false;
 			string[] array2 = array;
 			for (int i = 0; i < array2.Length; i++)
 			{
@@ -38,16 +52,34 @@ namespace Maestro.Services.Data
 				{
 					continue;
 				}
-				Match keyDownMatch = KeyDownPattern.Match(trimmed);
-				if (keyDownMatch.Success)
+				if (AltDownPattern.IsMatch(trimmed))
 				{
-					string numpad2 = keyDownMatch.Groups[1].Value;
-					if (NumpadToNote.TryGetValue(numpad2, out var note))
+					altHeld = true;
+				}
+				if (AltUpPattern.IsMatch(trimmed))
+				{
+					altHeld = false;
+				}
+				MatchCollection matchCollection = KeyDownPattern.Matches(trimmed);
+				bool hasAltOnLine = AltDownPattern.IsMatch(trimmed);
+				foreach (Match item in matchCollection)
+				{
+					string numpad2 = item.Groups[1].Value;
+					string note;
+					if ((altHeld || hasAltOnLine) && NumpadToSharp.TryGetValue(numpad2, out var sharpNote))
 					{
-						string noteWithOctave = ApplyOctaveModifier(note, currentOctave);
-						currentNotes.Add(noteWithOctave);
+						note = sharpNote;
 					}
-					continue;
+					else
+					{
+						if (!NumpadToNote.TryGetValue(numpad2, out var naturalNote))
+						{
+							continue;
+						}
+						note = naturalNote;
+					}
+					string noteWithOctave = ApplyOctaveModifier(note, currentOctave);
+					currentNotes.Add(noteWithOctave);
 				}
 				Match quickPressMatch = QuickPressPattern.Match(trimmed);
 				if (quickPressMatch.Success)
@@ -61,7 +93,6 @@ namespace Maestro.Services.Data
 					{
 						currentOctave--;
 					}
-					continue;
 				}
 				Match sleepMatch = SleepPattern.Match(trimmed);
 				if (sleepMatch.Success && currentNotes.Count > 0)
@@ -82,10 +113,6 @@ namespace Maestro.Services.Data
 				return note;
 			}
 			string modifier = ((octave > 0) ? "+" : "-");
-			if (note == "C^")
-			{
-				return "C^" + modifier;
-			}
 			return note + modifier;
 		}
 	}

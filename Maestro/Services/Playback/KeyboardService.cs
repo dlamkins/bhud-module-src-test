@@ -16,6 +16,8 @@ namespace Maestro.Services.Playback
 
 		private readonly HashSet<Keys> _activeSharpKeys;
 
+		private readonly HashSet<Keys> _heldKeys;
+
 		private readonly DebugLogger _debugLogger = new DebugLogger();
 
 		private bool _altHeld;
@@ -37,6 +39,7 @@ namespace Maestro.Services.Playback
 			_keyRemappings = keyRemappings;
 			_sharpRemappings = sharpRemappings;
 			_activeSharpKeys = new HashSet<Keys>();
+			_heldKeys = new HashSet<Keys>();
 		}
 
 		public void StartDebugLog(string songName)
@@ -55,6 +58,7 @@ namespace Maestro.Services.Playback
 			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
 			if (ShouldSendKeys)
 			{
 				SettingEntry<KeyBinding> sharpSetting;
@@ -70,6 +74,7 @@ namespace Maestro.Services.Playback
 				}
 				else if (_keyRemappings.TryGetValue(key, out setting))
 				{
+					_heldKeys.Add(key);
 					Keyboard.Press((VirtualKeyShort)setting.Value.PrimaryKey, sendToSystem: true);
 				}
 			}
@@ -83,6 +88,7 @@ namespace Maestro.Services.Playback
 			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
 			SettingEntry<KeyBinding> sharpSetting;
 			SettingEntry<KeyBinding> setting;
 			if ((int)key == 164)
@@ -95,8 +101,37 @@ namespace Maestro.Services.Playback
 			}
 			else if (_keyRemappings.TryGetValue(key, out setting))
 			{
+				_heldKeys.Remove(key);
 				Keyboard.Release((VirtualKeyShort)setting.Value.PrimaryKey, sendToSystem: true);
 			}
+		}
+
+		public void ReleaseAllKeys()
+		{
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
+			foreach (Keys key2 in _heldKeys)
+			{
+				if (_keyRemappings.TryGetValue(key2, out var setting))
+				{
+					Keyboard.Release((VirtualKeyShort)setting.Value.PrimaryKey, sendToSystem: true);
+				}
+			}
+			_heldKeys.Clear();
+			foreach (Keys key in _activeSharpKeys)
+			{
+				if (_sharpRemappings.TryGetValue(key, out var sharpSetting))
+				{
+					SendKeyBindingUp(sharpSetting.Value);
+				}
+			}
+			_activeSharpKeys.Clear();
+			_altHeld = false;
 		}
 
 		private static void SendKeyBindingDown(KeyBinding binding)

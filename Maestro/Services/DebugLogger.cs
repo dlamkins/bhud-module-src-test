@@ -13,7 +13,7 @@ namespace Maestro.Services
 	{
 		private static readonly Logger Logger = Logger.GetLogger<DebugLogger>();
 
-		private const string DEBUG_FOLDER = "C:\\git\\Maestro\\Debug";
+		private const string DEBUG_FOLDER = "C:\\git\\perso\\Maestro\\SongsDebug";
 
 		private readonly StringBuilder _log = new StringBuilder();
 
@@ -46,12 +46,12 @@ namespace Maestro.Services
 			}
 			try
 			{
-				if (!Directory.Exists("C:\\git\\Maestro\\Debug"))
+				if (!Directory.Exists("C:\\git\\perso\\Maestro\\SongsDebug"))
 				{
-					Directory.CreateDirectory("C:\\git\\Maestro\\Debug");
+					Directory.CreateDirectory("C:\\git\\perso\\Maestro\\SongsDebug");
 				}
 				string safeFileName = SanitizeFileName(_songName);
-				string logPath = Path.Combine("C:\\git\\Maestro\\Debug", safeFileName + ".txt");
+				string logPath = Path.Combine("C:\\git\\perso\\Maestro\\SongsDebug", safeFileName + ".txt");
 				string header = "=== Debug Log for: " + _songName + " ===\n" + $"=== Time: {DateTime.Now:yyyy-MM-dd HH:mm:ss} ===\n\n";
 				File.WriteAllText(logPath, header + _log);
 				Logger.Info("Debug log written to: " + logPath);
