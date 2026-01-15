@@ -4,6 +4,7 @@ using Blish_HUD.Controls.Extern;
 using Blish_HUD.Controls.Intern;
 using Blish_HUD.Input;
 using Blish_HUD.Settings;
+using Maestro.UI.Components;
 using Microsoft.Xna.Framework.Input;
 
 namespace Maestro.Services.Playback
@@ -26,9 +27,9 @@ namespace Maestro.Services.Playback
 		{
 			get
 			{
-				if (GameService.GameIntegration.Gw2Instance.Gw2HasFocus)
+				if (GameService.GameIntegration.Gw2Instance.Gw2HasFocus && !GameService.Gw2Mumble.UI.IsTextInputFocused)
 				{
-					return !GameService.Gw2Mumble.UI.IsTextInputFocused;
+					return !SongFilterBar.IsTextInputFocused;
 				}
 				return false;
 			}

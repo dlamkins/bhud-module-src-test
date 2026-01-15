@@ -16,9 +16,11 @@
     <None Remove="Maestro\ref.emblem.png" />
     <None Remove="Maestro\ref.icon.png" />
     <None Remove="Maestro\ref.import.png" />
+    <None Remove="Maestro\ref.songs.json" />
     <EmbeddedResource Include="Maestro\ref.emblem.png" />
     <EmbeddedResource Include="Maestro\ref.icon.png" />
     <EmbeddedResource Include="Maestro\ref.import.png" />
+    <EmbeddedResource Include="Maestro\ref.songs.json" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Blish HUD">

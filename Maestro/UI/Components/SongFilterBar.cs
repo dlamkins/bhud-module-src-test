@@ -1,4 +1,5 @@
 using System;
+using Blish_HUD;
 using Blish_HUD.Controls;
 using Microsoft.Xna.Framework;
 
@@ -29,6 +30,10 @@ namespace Maestro.UI.Components
 
 		public string SelectedInstrument => _filterButton.SelectedInstrument;
 
+		public static bool IsTextInputFocused { get; private set; }
+
+		public static bool WasJustUnfocused { get; set; }
+
 		public event EventHandler SearchChanged;
 
 		public event EventHandler FilterChanged;
@@ -38,7 +43,7 @@ namespace Maestro.UI.Components
 			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
 			base.Size = new Point(width, 36);
 			base.BackgroundColor = Color.get_Transparent();
 			_searchBox = new TextBox
@@ -51,6 +56,14 @@ namespace Maestro.UI.Components
 			_searchBox.TextChanged += delegate
 			{
 				this.SearchChanged?.Invoke(this, EventArgs.Empty);
+			};
+			_searchBox.InputFocusChanged += delegate(object s, ValueEventArgs<bool> e)
+			{
+				if (!e.Value && IsTextInputFocused)
+				{
+					WasJustUnfocused = true;
+				}
+				IsTextInputFocused = e.Value;
 			};
 			_filterButton = new FilterButton
 			{

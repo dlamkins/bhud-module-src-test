@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Maestro.Models;
+using Maestro.UI.Components;
 using Microsoft.Xna.Framework.Input;
 
 namespace Maestro.Services.Playback
@@ -23,15 +24,17 @@ namespace Maestro.Services.Playback
 
 		private static bool Gw2HasFocus => GameService.GameIntegration.Gw2Instance.Gw2HasFocus;
 
-		private static bool IsTextInputFocused => GameService.Gw2Mumble.UI.IsTextInputFocused;
+		private static bool IsGw2TextInputFocused => GameService.Gw2Mumble.UI.IsTextInputFocused;
+
+		private static bool IsOverlayTextInputFocused => SongFilterBar.IsTextInputFocused;
 
 		private static bool ShouldPauseForInput
 		{
 			get
 			{
-				if (Gw2HasFocus)
+				if (Gw2HasFocus && !IsGw2TextInputFocused)
 				{
-					return IsTextInputFocused;
+					return IsOverlayTextInputFocused;
 				}
 				return true;
 			}

@@ -165,12 +165,29 @@ namespace Maestro.UI.Components
 
 		private void OnPauseClicked(object sender, MouseEventArgs e)
 		{
-			_songPlayer.TogglePause();
+			if (SongFilterBar.WasJustUnfocused)
+			{
+				SongFilterBar.WasJustUnfocused = false;
+			}
+			else
+			{
+				_songPlayer.TogglePause();
+			}
 		}
 
 		private void OnStopClicked(object sender, MouseEventArgs e)
 		{
+			ClearTextInputFocus();
 			_songPlayer.Stop();
+		}
+
+		private static void ClearTextInputFocus()
+		{
+			TextInputBase textInput = Control.FocusedControl as TextInputBase;
+			if (textInput != null)
+			{
+				textInput.Focused = false;
+			}
 		}
 
 		private void OnSpeedSliderChanged(object sender, ValueEventArgs<float> e)
@@ -257,9 +274,9 @@ namespace Maestro.UI.Components
 
 		public override void UpdateContainer(GameTime gameTime)
 		{
-			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013d: Unknown result type (might be due to invalid IL or missing references)
 			base.UpdateContainer(gameTime);
 			if (!_songPlayer.IsPlaying || _songPlayer.IsPaused)
 			{
@@ -267,6 +284,7 @@ namespace Maestro.UI.Components
 			}
 			if (_songPlayer.IsWaitingForInput)
 			{
+				_pauseButton.Text = ">";
 				_progressLabel.Text = "Paused";
 				_progressLabel.TextColor = MaestroTheme.Paused;
 				return;
@@ -277,6 +295,7 @@ namespace Maestro.UI.Components
 				_progressLabel.TextColor = MaestroTheme.Paused;
 				return;
 			}
+			_pauseButton.Text = "||";
 			Song song = _songPlayer.CurrentSong;
 			if (song != null && _songPlayer.CurrentCommandIndex >= song.Commands.Count)
 			{

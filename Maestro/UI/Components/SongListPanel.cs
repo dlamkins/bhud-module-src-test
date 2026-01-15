@@ -73,6 +73,11 @@ namespace Maestro.UI.Components
 
 		private void OnCardPlayClicked(object sender, MouseEventArgs e)
 		{
+			TextInputBase textInput = Control.FocusedControl as TextInputBase;
+			if (textInput != null)
+			{
+				textInput.Focused = false;
+			}
 			SongCard card = sender as SongCard;
 			if (card?.Song != null)
 			{
@@ -83,6 +88,11 @@ namespace Maestro.UI.Components
 
 		private void OnCardClicked(object sender, MouseEventArgs e)
 		{
+			TextInputBase textInput = Control.FocusedControl as TextInputBase;
+			if (textInput != null)
+			{
+				textInput.Focused = false;
+			}
 			SongCard card = sender as SongCard;
 			if (card?.Song != null)
 			{
