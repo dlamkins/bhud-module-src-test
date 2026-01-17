@@ -6,7 +6,7 @@ namespace LoreBridge.Translation.Language
 {
 	public static class LanguagesInfo
 	{
-		public static readonly List<LanguageInfo> List = new List<LanguageInfo>(28)
+		public static readonly List<LanguageInfo> List = new List<LanguageInfo>(29)
 		{
 			new LanguageInfo
 			{
@@ -203,6 +203,13 @@ namespace LoreBridge.Translation.Language
 				Code = "uk-UA",
 				IsoCode = "uk",
 				Name = "Ukrainian"
+			},
+			new LanguageInfo
+			{
+				Language = Languages.Vietnamese,
+				Code = "vi-VN",
+				IsoCode = "vi",
+				Name = "Vietnamese"
 			}
 		};
 

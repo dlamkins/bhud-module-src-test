@@ -6,7 +6,7 @@ using System.Runtime.Versioning;
 [assembly: AssemblyCompany("LoreBridge")]
 [assembly: AssemblyConfiguration("Release")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
-[assembly: AssemblyInformationalVersion("1.0.0+ba8a6bc643404d508b732642a19c8a1824238241")]
+[assembly: AssemblyInformationalVersion("1.0.0+4d4c325e044baedeb89cb3941099d314d5b1910b")]
 [assembly: AssemblyProduct("LoreBridge")]
 [assembly: AssemblyTitle("LoreBridge")]
 [assembly: AssemblyVersion("1.0.0.0")]

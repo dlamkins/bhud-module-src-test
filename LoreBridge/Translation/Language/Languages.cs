@@ -29,6 +29,7 @@ namespace LoreBridge.Translation.Language
 		Swedish = 26,
 		Korean = 10,
 		Turkish = 22,
-		Ukrainian = 23
+		Ukrainian = 23,
+		Vietnamese = 30
 	}
 }
