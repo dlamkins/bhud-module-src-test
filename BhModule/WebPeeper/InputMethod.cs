@@ -65,25 +65,28 @@ namespace BhModule.WebPeeper
 
 		protected override void WndProc(ref Message m)
 		{
-			_m = m;
-			switch (m.Msg)
+			if (Browser != null)
 			{
-			case 256:
-			case 257:
-			case 258:
-				SendKey();
-				break;
-			case 271:
-				SetCefComposition();
-				return;
-			case 270:
-				Browser?.GetBrowserHost().ImeSetComposition("", Array.Empty<CompositionUnderline>(), new Range(int.MaxValue, int.MaxValue), new Range(0, 0));
-				Browser?.GetBrowserHost().ImeFinishComposingText(keepSelection: false);
-				return;
-			case 269:
-				return;
+				_m = m;
+				switch (m.Msg)
+				{
+				case 256:
+				case 257:
+				case 258:
+					SendKey();
+					break;
+				case 271:
+					SetCefComposition();
+					return;
+				case 270:
+					Browser?.GetBrowserHost().ImeSetComposition("", Array.Empty<CompositionUnderline>(), new Range(int.MaxValue, int.MaxValue), new Range(0, 0));
+					Browser?.GetBrowserHost().ImeFinishComposingText(keepSelection: false);
+					return;
+				case 269:
+					return;
+				}
+				_m = default(Message);
 			}
-			_m = default(Message);
 			base.WndProc(ref m);
 		}
 
@@ -130,7 +133,7 @@ namespace BhModule.WebPeeper
 				_ => (KeyEventType)(-1), 
 			};
 			KeyEvent keyEvent2 = keyEvent;
-			Browser.GetBrowserHost().SendKeyEvent(keyEvent2);
+			Browser?.GetBrowserHost().SendKeyEvent(keyEvent2);
 		}
 
 		private static bool IsKeyDown(VK wparam)

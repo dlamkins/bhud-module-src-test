@@ -37,7 +37,7 @@ namespace BhModule.WebPeeper
 
 		public SettingEntry<bool> IsAutoPauseWeb { get; private set; }
 
-		public SettingEntry<bool> IsAutoQuitPrcess { get; private set; }
+		public SettingEntry<bool> IsAutoQuitProcess { get; private set; }
 
 		public SettingEntry<bool> IsMobileLayout { get; private set; }
 
@@ -151,13 +151,13 @@ namespace BhModule.WebPeeper
 				WebPeeperSettingsView.UpdateWebWindowOpacityTitle();
 			});
 			IsAutoPauseWeb = settings.DefineSetting<bool>("IsAutoPauseWeb", false, (Func<string>)(() => "Pause the Web Process while Close the Web Window"), (Func<string>)(() => ""));
-			IsAutoQuitPrcess = settings.DefineSetting<bool>("IsAutoQuitPrcess", false, (Func<string>)(() => "Quit the Web Process while Close the Web Window"), (Func<string>)(() => ""));
-			IsAutoQuitPrcess.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)delegate(object sender, ValueChangedEventArgs<bool> e)
+			IsAutoQuitProcess = settings.DefineSetting<bool>("IsAutoQuitProcess", false, (Func<string>)(() => "Quit the Web Process while Close the Web Window"), (Func<string>)(() => ""));
+			IsAutoQuitProcess.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)delegate(object sender, ValueChangedEventArgs<bool> e)
 			{
 				SettingComplianceExtensions.SetDisabled((SettingEntry)(object)IsAutoPauseWeb, e.get_NewValue());
 				WebPeeperSettingsView.UpdateIsAutoPauseWebState();
 			});
-			SettingComplianceExtensions.SetDisabled((SettingEntry)(object)IsAutoPauseWeb, IsAutoQuitPrcess.get_Value());
+			SettingComplianceExtensions.SetDisabled((SettingEntry)(object)IsAutoPauseWeb, IsAutoQuitProcess.get_Value());
 			IsMobileLayout = settings.DefineSetting<bool>("IsMobileLayout", true, (Func<string>)(() => "Use Mobile Website"), (Func<string>)(() => "Whether use mobile User-Agent."));
 			IsMobileLayout.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)delegate
 			{
@@ -190,8 +190,22 @@ namespace BhModule.WebPeeper
 
 		private void FocusBHWindow(object sender, EventArgs e)
 		{
-			Utils.SetForegroundWindow(WebPeeperModule.BlishHudInstance.get_FormHandle());
-			WebPeeperModule.Instance.CefService?.FocusBlurredElement();
+			UIService uIService = WebPeeperModule.Instance.UIService;
+			int num;
+			if (uIService == null)
+			{
+				num = 0;
+			}
+			else
+			{
+				BrowserWindow browserWindow = uIService.BrowserWindow;
+				num = ((((browserWindow != null) ? new bool?(((Control)browserWindow).get_Visible()) : null) == false) ? 1 : 0);
+			}
+			if (num == 0)
+			{
+				Utils.SetForegroundWindow(WebPeeperModule.BlishHudInstance.get_FormHandle());
+				WebPeeperModule.Instance.CefService?.FocusBlurredElement();
+			}
 		}
 
 		private void ZoomInWeb(object sender, EventArgs e)

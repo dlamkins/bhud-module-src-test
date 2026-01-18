@@ -81,7 +81,10 @@ namespace BhModule.WebPeeper
 			: this()
 		{
 			Instance = this;
-			WebBrowser.Paint += CefOnPaint;
+			if (WebBrowser != null)
+			{
+				WebBrowser.Paint += CefOnPaint;
+			}
 			GameService.Input.get_Keyboard().add_KeyStateChanged((EventHandler<KeyboardEventArgs>)KeyboardHandler);
 			ApplyBgTexture();
 		}
@@ -331,7 +334,13 @@ namespace BhModule.WebPeeper
 		{
 			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-			_webBackgroundColor = ColorHelper.FromHex(Settings.WebBgColor.get_Value());
+			try
+			{
+				_webBackgroundColor = ColorHelper.FromHex(Settings.WebBgColor.get_Value());
+			}
+			catch
+			{
+			}
 		}
 
 		private void SetErrorTextureRect()
@@ -352,7 +361,7 @@ namespace BhModule.WebPeeper
 
 		private void SetBrowserSize()
 		{
-			WebBrowser.ResizeAsync(((Control)this).get_Width(), ((Control)this).get_Height());
+			WebBrowser?.ResizeAsync(((Control)this).get_Width(), ((Control)this).get_Height());
 		}
 
 		private void KeyboardHandler(object sender, KeyboardEventArgs e)
@@ -413,7 +422,10 @@ namespace BhModule.WebPeeper
 		protected override void DisposeControl()
 		{
 			GameService.Input.get_Keyboard().remove_KeyStateChanged((EventHandler<KeyboardEventArgs>)KeyboardHandler);
-			WebBrowser.Paint -= CefOnPaint;
+			if (WebBrowser != null)
+			{
+				WebBrowser.Paint -= CefOnPaint;
+			}
 			_cefPaintProcess?.Dispose();
 		}
 

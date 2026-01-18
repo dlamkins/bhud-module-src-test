@@ -34,6 +34,13 @@ namespace BhModule.WebPeeper
 		public NavigationBar()
 			: this()
 		{
+			Instance = this;
+			((Control)this).set_Height(30);
+			SetChildren();
+			if (WebBrowser == null)
+			{
+				return;
+			}
 			if (WebBrowser.CanExecuteJavascriptInMainFrame)
 			{
 				WebBrowser.EvaluateScriptAsync("document.fullscreen").ContinueWith(delegate(Task<JavascriptResponse> t)
@@ -41,9 +48,6 @@ namespace BhModule.WebPeeper
 					((Control)this).set_Visible(!(bool)t.Result.Result);
 				});
 			}
-			Instance = this;
-			((Control)this).set_Height(30);
-			SetChildren();
 			WebBrowser.LoadingStateChanged += HandleLoading;
 			WebBrowser.AddressChanged += HandleAddress;
 		}
@@ -58,34 +62,34 @@ namespace BhModule.WebPeeper
 
 		private void SetChildren()
 		{
-			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f3: Expected O, but got Unknown
-			//IL_0138: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0155: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0101: Expected O, but got Unknown
+			//IL_0156: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0173: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0182: Expected O, but got Unknown
+			//IL_017a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0181: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0198: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a7: Expected O, but got Unknown
 			IconButton iconButton = new IconButton(_btnTexture, ((Control)this).get_Height(), 2);
 			((Control)iconButton).set_Parent((Container)(object)this);
-			((Control)iconButton).set_Visible(WebBrowser.CanGoBack);
+			((Control)iconButton).set_Visible(WebBrowser?.CanGoBack ?? false);
 			_backBtn = iconButton;
 			((Control)_backBtn).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				WebBrowser.Back();
+				WebBrowser?.Back();
 			});
 			IconButton iconButton2 = new IconButton(_btnTexture, ((Control)this).get_Height(), 2);
 			((Control)iconButton2).set_Parent((Container)(object)this);
-			((Control)iconButton2).set_Visible(WebBrowser.CanGoForward);
+			((Control)iconButton2).set_Visible(WebBrowser?.CanGoForward ?? false);
 			iconButton2.IconRotation = MathHelper.ToRadians(180f);
 			_fowardBtn = iconButton2;
 			((Control)_fowardBtn).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				WebBrowser.Forward();
+				WebBrowser?.Forward();
 			});
 			IconButton iconButton3 = new IconButton(_bookmarkBtnTexture, ((Control)this).get_Height(), 2);
 			((Control)iconButton3).set_Parent((Container)(object)this);
@@ -103,18 +107,24 @@ namespace BhModule.WebPeeper
 				CancellationTokenSource cts;
 				if (string.IsNullOrWhiteSpace(((TextInputBase)_addressInput).get_Text()))
 				{
-					((TextInputBase)_addressInput).set_Text(WebBrowser.Address);
+					((TextInputBase)_addressInput).set_Text(WebBrowser?.Address ?? "");
 				}
 				else
 				{
 					HandleLoading(this, new LoadingStateChangedEventArgs(null, canGoBack: true, canGoForward: false, isLoading: true));
 					WebPeeperModule.Instance.CefService.LastAddressInputText = ((TextInputBase)_addressInput).get_Text();
 					cts = new CancellationTokenSource();
-					WebBrowser.LoadingStateChanged += stopManuallyErrTrigger;
-					WebBrowser.LoadUrlAsync(WebPeeperModule.Instance.CefService.LastAddressInputText);
+					if (WebBrowser != null)
+					{
+						WebBrowser.LoadingStateChanged += stopManuallyErrTrigger;
+					}
+					WebBrowser?.LoadUrlAsync(WebPeeperModule.Instance.CefService.LastAddressInputText);
 					Task.Delay(1000, cts.Token).ContinueWith(delegate(Task t)
 					{
-						WebBrowser.LoadingStateChanged -= stopManuallyErrTrigger;
+						if (WebBrowser != null)
+						{
+							WebBrowser.LoadingStateChanged -= stopManuallyErrTrigger;
+						}
 						if (!t.IsCanceled && !t.IsFaulted)
 						{
 							HandleLoading(this, new LoadingStateChangedEventArgs(null, canGoBack: true, canGoForward: false, isLoading: false));
@@ -134,12 +144,12 @@ namespace BhModule.WebPeeper
 				((TextInputBase)_addressInput).set_SelectionEnd(((TextInputBase)_addressInput).get_Text().Length);
 				if (!e.get_Value() && ((TextInputBase)_addressInput).get_Text().Length == 0)
 				{
-					((TextInputBase)_addressInput).set_Text(WebBrowser.Address);
+					((TextInputBase)_addressInput).set_Text(WebBrowser?.Address ?? "");
 				}
 			});
-			((TextInputBase)_addressInput).set_Text(WebBrowser.Address);
+			((TextInputBase)_addressInput).set_Text(WebBrowser?.Address ?? "");
 			LoadingSpinner val2 = new LoadingSpinner();
-			((Control)val2).set_Visible(WebBrowser.IsLoading);
+			((Control)val2).set_Visible(WebBrowser?.IsLoading ?? false);
 			((Control)val2).set_Enabled(false);
 			((Control)val2).set_Parent((Container)(object)this);
 			((Control)val2).set_Size(new Point(((Control)_addressInput).get_Height(), ((Control)_addressInput).get_Height()));
@@ -208,8 +218,11 @@ namespace BhModule.WebPeeper
 
 		protected override void DisposeControl()
 		{
-			WebBrowser.LoadingStateChanged -= HandleLoading;
-			WebBrowser.AddressChanged -= HandleAddress;
+			if (WebBrowser != null)
+			{
+				WebBrowser.LoadingStateChanged -= HandleLoading;
+				WebBrowser.AddressChanged -= HandleAddress;
+			}
 			this.BookmarkBtnClicked = null;
 		}
 	}

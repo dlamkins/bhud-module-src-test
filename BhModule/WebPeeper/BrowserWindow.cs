@@ -25,7 +25,7 @@ namespace BhModule.WebPeeper
 
 		private static readonly Rectangle _contentRegionParam = new Rectangle(50, 20, _windowSize.X - 30, _windowSize.Y - 5);
 
-		private static readonly Texture2D _bg = BuildBg();
+		private static Texture2D _bg;
 
 		private Rectangle _titleBounds;
 
@@ -54,7 +54,7 @@ namespace BhModule.WebPeeper
 		private ModuleSettings Settings => WebPeeperModule.Instance.Settings;
 
 		public BrowserWindow()
-			: this(_bg, _windowRegionParam, _contentRegionParam)
+			: this(BuildBg(), _windowRegionParam, _contentRegionParam)
 		{
 			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
@@ -111,7 +111,7 @@ namespace BhModule.WebPeeper
 			//IL_01be: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01c4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01c9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d3: Expected O, but got Unknown
+			//IL_01d6: Expected O, but got Unknown
 			GraphicsService graphics = GameService.Graphics;
 			Texture2D texture = GameService.Content.GetTexture("controls/window/502049");
 			Color[] array = (Color[])(object)new Color[texture.get_Width() * texture.get_Height()];
@@ -144,7 +144,8 @@ namespace BhModule.WebPeeper
 			{
 				Texture2D val4 = new Texture2D(((GraphicsDeviceContext)(ref val3)).get_GraphicsDevice(), val.X, val.Y);
 				val4.SetData<Color>(array2);
-				return val4;
+				_bg = val4;
+				return _bg;
 			}
 			finally
 			{
@@ -168,7 +169,13 @@ namespace BhModule.WebPeeper
 		{
 			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, _titleWithEllipsis, Control.get_Content().get_DefaultFont16(), _titleBounds, Colors.ColonialWhite, false, (HorizontalAlignment)0, (VerticalAlignment)1);
+			try
+			{
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, _titleWithEllipsis, Control.get_Content().get_DefaultFont16(), _titleBounds, Colors.ColonialWhite, false, (HorizontalAlignment)0, (VerticalAlignment)1);
+			}
+			catch
+			{
+			}
 		}
 
 		private void PaintPin(SpriteBatch spriteBatch)
@@ -237,7 +244,7 @@ namespace BhModule.WebPeeper
 				{
 					CefService.WebBrowser.ExecuteScriptAsync("webPeeper_blur()");
 				}
-				if (Settings.IsAutoQuitPrcess.get_Value())
+				if (Settings.IsAutoQuitProcess.get_Value())
 				{
 					CefService.CloseWebBrowser();
 				}
@@ -331,11 +338,7 @@ namespace BhModule.WebPeeper
 		protected override void DisposeControl()
 		{
 			WebPainter.DisposeWebTexture();
-			Texture2D bg = _bg;
-			if (bg != null)
-			{
-				((GraphicsResource)bg).Dispose();
-			}
+			((GraphicsResource)_bg).Dispose();
 			((WindowBase2)this).DisposeControl();
 		}
 	}

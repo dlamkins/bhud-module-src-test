@@ -4,6 +4,7 @@ using System.Linq;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
+using CefSharp.OffScreen;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -110,9 +111,10 @@ namespace BhModule.WebPeeper
 
 		protected override void OnClick(MouseEventArgs e)
 		{
-			if (!_editing)
+			ChromiumWebBrowser webBrowser = WebPeeperModule.Instance.CefService.WebBrowser;
+			if (!_editing && webBrowser != null)
 			{
-				WebPeeperModule.Instance.CefService.WebBrowser.Load(_bookmark.URL);
+				webBrowser.Load(_bookmark.URL);
 				((Control)((Control)((Control)this).get_Parent()).get_Parent()).Hide();
 			}
 			((MenuItem)this).OnClick(e);

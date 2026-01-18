@@ -84,7 +84,7 @@ namespace BhModule.WebPeeper
 			_addBtn = iconButton2;
 			((Control)_addBtn).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				if (WebBrowser.CanExecuteJavascriptInMainFrame)
+				if (WebBrowser != null && WebBrowser.CanExecuteJavascriptInMainFrame)
 				{
 					Task<JavascriptResponse> task = WebBrowser.EvaluateScriptAsync("document.title");
 					task.Wait(TimeSpan.FromSeconds(1.0));
@@ -125,13 +125,20 @@ namespace BhModule.WebPeeper
 				}
 			});
 			_jsonPath = Path.Combine(CefService.CefSettingFolder, "bookmarks.json");
-			if (File.Exists(_jsonPath))
+			if (!File.Exists(_jsonPath))
+			{
+				return;
+			}
+			try
 			{
 				Bookmark[] array = JsonConvert.DeserializeObject<Bookmark[]>(File.ReadAllText(_jsonPath));
 				foreach (Bookmark bookmark in array)
 				{
 					_bookmarkMenuItems[bookmark] = CreateBookmarkItem(bookmark);
 				}
+			}
+			catch
+			{
 			}
 		}
 

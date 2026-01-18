@@ -120,8 +120,14 @@ namespace BhModule.WebPeeper
 				string path = Path.Combine(CefSharpDllPath, text);
 				Directory.CreateDirectory(Path.GetDirectoryName(path));
 				byte[] fileBytes = WebPeeperModule.InstanceModuleManager.get_DataReader().GetFileBytes(text);
-				using FileStream fileStream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.Write, 4096);
-				fileStream.Write(fileBytes, 0, fileBytes.Length);
+				try
+				{
+					using FileStream fileStream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.Write, 4096);
+					fileStream.Write(fileBytes, 0, fileBytes.Length);
+				}
+				catch
+				{
+				}
 			}
 		}
 
@@ -144,7 +150,7 @@ namespace BhModule.WebPeeper
 
 		public void FocusBlurredElement()
 		{
-			if (_webBrowser.CanExecuteJavascriptInMainFrame)
+			if (_webBrowser != null && _webBrowser.CanExecuteJavascriptInMainFrame)
 			{
 				_webBrowser.ExecuteScriptAsync("webPeeper_focusBlurredElement()");
 			}
@@ -172,7 +178,7 @@ namespace BhModule.WebPeeper
 
 		private void OnBlishHudExiting(object sender, EventArgs e)
 		{
-			_webBrowser.Dispose();
+			_webBrowser?.Dispose();
 		}
 
 		private (Stream, string) OnBlishHudSchemeRequested(IRequest request)

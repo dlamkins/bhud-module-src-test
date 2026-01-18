@@ -41,7 +41,13 @@ namespace BhModule.WebPeeper
 		{
 			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			_colorPreview.Color = ColorHelper.FromHex(((SettingView<string>)this).get_Value());
+			try
+			{
+				_colorPreview.Color = ColorHelper.FromHex(((SettingView<string>)this).get_Value());
+			}
+			catch
+			{
+			}
 		}
 	}
 }
