@@ -62,90 +62,139 @@ namespace Maestro.UI.Components
 		private readonly Label _speedValueLabel;
 
 		public NowPlayingPanel(SongPlayer songPlayer, int width)
+			: this()
 		{
 			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0071: Expected O, but got Unknown
+			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c3: Expected O, but got Unknown
+			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0101: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_011d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012c: Expected O, but got Unknown
+			//IL_012d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0132: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0139: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0144: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0149: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0153: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_016f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017e: Expected O, but got Unknown
+			//IL_017f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0184: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0196: Unknown result type (might be due to invalid IL or missing references)
 			//IL_019a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01bb: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01bc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01cb: Expected O, but got Unknown
+			//IL_01cc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d8: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01fd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0208: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0213: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021f: Expected O, but got Unknown
+			//IL_0237: Unknown result type (might be due to invalid IL or missing references)
+			//IL_023c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0243: Unknown result type (might be due to invalid IL or missing references)
+			//IL_024e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0256: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0260: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0267: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0277: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0278: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0287: Expected O, but got Unknown
 			_songPlayer = songPlayer;
-			base.Size = new Point(width, 95);
-			base.BackgroundColor = MaestroTheme.WithAlpha(MaestroTheme.SlateGray, 150);
-			base.ShowBorder = true;
-			_pauseButton = new StandardButton
-			{
-				Parent = this,
-				Text = "||",
-				Location = new Point(8, 18),
-				Width = 40,
-				Enabled = false
-			};
-			_pauseButton.Click += OnPauseClicked;
-			_stopButton = new StandardButton
-			{
-				Parent = this,
-				Text = "X",
-				Location = new Point(52, 18),
-				Width = 40,
-				Enabled = false
-			};
-			_stopButton.Click += OnStopClicked;
-			_nowPlayingLabel = new Label
-			{
-				Parent = this,
-				Text = "No song playing",
-				Location = new Point(100, 21),
-				Width = 300,
-				Font = GameService.Content.DefaultFont14,
-				TextColor = MaestroTheme.MutedCream
-			};
-			_progressLabel = new Label
-			{
-				Parent = this,
-				Text = "",
-				Location = new Point(100, 28),
-				Width = 300,
-				Font = GameService.Content.DefaultFont12,
-				TextColor = MaestroTheme.MutedCream
-			};
-			_speedLabel = new Label
-			{
-				Parent = this,
-				Text = "Speed:",
-				Location = new Point(8, 52),
-				AutoSizeWidth = true,
-				Font = GameService.Content.DefaultFont12,
-				TextColor = MaestroTheme.MutedCream
-			};
-			_speedSlider = new TrackBar
-			{
-				Parent = this,
-				Location = new Point(60, 55),
-				Width = 180,
-				MinValue = 1f,
-				MaxValue = 20f,
-				Value = 10f,
-				SmallStep = true
-			};
-			_speedSlider.ValueChanged += OnSpeedSliderChanged;
-			_speedValueLabel = new Label
-			{
-				Parent = this,
-				Text = "1.0x",
-				Location = new Point(248, 52),
-				AutoSizeWidth = true,
-				Font = GameService.Content.DefaultFont12,
-				TextColor = MaestroTheme.CreamWhite
-			};
+			((Control)this).set_Size(new Point(width, 95));
+			((Control)this).set_BackgroundColor(MaestroTheme.WithAlpha(MaestroTheme.SlateGray, 150));
+			((Panel)this).set_ShowBorder(true);
+			StandardButton val = new StandardButton();
+			((Control)val).set_Parent((Container)(object)this);
+			val.set_Text("||");
+			((Control)val).set_Location(new Point(8, 18));
+			((Control)val).set_Width(40);
+			((Control)val).set_Enabled(false);
+			_pauseButton = val;
+			((Control)_pauseButton).add_Click((EventHandler<MouseEventArgs>)OnPauseClicked);
+			StandardButton val2 = new StandardButton();
+			((Control)val2).set_Parent((Container)(object)this);
+			val2.set_Text("X");
+			((Control)val2).set_Location(new Point(52, 18));
+			((Control)val2).set_Width(40);
+			((Control)val2).set_Enabled(false);
+			_stopButton = val2;
+			((Control)_stopButton).add_Click((EventHandler<MouseEventArgs>)OnStopClicked);
+			Label val3 = new Label();
+			((Control)val3).set_Parent((Container)(object)this);
+			val3.set_Text("No song playing");
+			((Control)val3).set_Location(new Point(100, 21));
+			((Control)val3).set_Width(300);
+			val3.set_Font(GameService.Content.get_DefaultFont14());
+			val3.set_TextColor(MaestroTheme.MutedCream);
+			_nowPlayingLabel = val3;
+			Label val4 = new Label();
+			((Control)val4).set_Parent((Container)(object)this);
+			val4.set_Text("");
+			((Control)val4).set_Location(new Point(100, 28));
+			((Control)val4).set_Width(300);
+			val4.set_Font(GameService.Content.get_DefaultFont12());
+			val4.set_TextColor(MaestroTheme.MutedCream);
+			_progressLabel = val4;
+			Label val5 = new Label();
+			((Control)val5).set_Parent((Container)(object)this);
+			val5.set_Text("Speed:");
+			((Control)val5).set_Location(new Point(8, 52));
+			val5.set_AutoSizeWidth(true);
+			val5.set_Font(GameService.Content.get_DefaultFont12());
+			val5.set_TextColor(MaestroTheme.MutedCream);
+			_speedLabel = val5;
+			TrackBar val6 = new TrackBar();
+			((Control)val6).set_Parent((Container)(object)this);
+			((Control)val6).set_Location(new Point(60, 55));
+			((Control)val6).set_Width(180);
+			val6.set_MinValue(1f);
+			val6.set_MaxValue(20f);
+			val6.set_Value(10f);
+			val6.set_SmallStep(true);
+			_speedSlider = val6;
+			_speedSlider.add_ValueChanged((EventHandler<ValueEventArgs<float>>)OnSpeedSliderChanged);
+			Label val7 = new Label();
+			((Control)val7).set_Parent((Container)(object)this);
+			val7.set_Text("1.0x");
+			((Control)val7).set_Location(new Point(248, 52));
+			val7.set_AutoSizeWidth(true);
+			val7.set_Font(GameService.Content.get_DefaultFont12());
+			val7.set_TextColor(MaestroTheme.CreamWhite);
+			_speedValueLabel = val7;
 			SubscribeToEvents();
 		}
 
@@ -183,18 +232,19 @@ namespace Maestro.UI.Components
 
 		private static void ClearTextInputFocus()
 		{
-			TextInputBase textInput = Control.FocusedControl as TextInputBase;
+			Control focusedControl = Control.get_FocusedControl();
+			TextInputBase textInput = (TextInputBase)(object)((focusedControl is TextInputBase) ? focusedControl : null);
 			if (textInput != null)
 			{
-				textInput.Focused = false;
+				textInput.set_Focused(false);
 			}
 		}
 
 		private void OnSpeedSliderChanged(object sender, ValueEventArgs<float> e)
 		{
-			float speed = e.Value / 10f;
+			float speed = e.get_Value() / 10f;
 			_songPlayer.PlaybackSpeed = speed;
-			_speedValueLabel.Text = $"{speed:F1}x";
+			_speedValueLabel.set_Text($"{speed:F1}x");
 		}
 
 		public void UpdatePlaybackState()
@@ -213,62 +263,62 @@ namespace Maestro.UI.Components
 			if (_songPlayer.IsPlaying)
 			{
 				Song song2 = _songPlayer.CurrentSong;
-				_nowPlayingLabel.Text = song2?.DisplayName ?? "Unknown";
-				_nowPlayingLabel.Location = new Point(100, 8);
+				_nowPlayingLabel.set_Text(song2?.DisplayName ?? "Unknown");
+				((Control)_nowPlayingLabel).set_Location(new Point(100, 8));
 				if (_songPlayer.IsPaused)
 				{
-					_pauseButton.Text = ">";
-					_nowPlayingLabel.TextColor = MaestroTheme.CreamWhite;
-					_progressLabel.Text = "Paused";
-					_progressLabel.TextColor = MaestroTheme.Paused;
+					_pauseButton.set_Text(">");
+					_nowPlayingLabel.set_TextColor(MaestroTheme.CreamWhite);
+					_progressLabel.set_Text("Paused");
+					_progressLabel.set_TextColor(MaestroTheme.Paused);
 				}
 				else
 				{
-					_pauseButton.Text = "||";
-					_nowPlayingLabel.TextColor = MaestroTheme.CreamWhite;
+					_pauseButton.set_Text("||");
+					_nowPlayingLabel.set_TextColor(MaestroTheme.CreamWhite);
 					if (_songPlayer.IsAdjustingOctave)
 					{
-						_progressLabel.Text = "Adjusting...";
-						_progressLabel.TextColor = MaestroTheme.Paused;
+						_progressLabel.set_Text("Adjusting...");
+						_progressLabel.set_TextColor(MaestroTheme.Paused);
 					}
 					else
 					{
 						if (song2 != null && _songPlayer.CurrentCommandIndex >= song2.Commands.Count)
 						{
-							_progressLabel.Text = "Done!";
+							_progressLabel.set_Text("Done!");
 						}
 						else
 						{
 							float progress = ((song2 != null && song2.Commands.Count > 0) ? ((float)_songPlayer.CurrentCommandIndex / (float)song2.Commands.Count * 100f) : 0f);
-							_progressLabel.Text = $"Playing... {progress:F0}%";
+							_progressLabel.set_Text($"Playing... {progress:F0}%");
 						}
-						_progressLabel.TextColor = MaestroTheme.MutedCream;
+						_progressLabel.set_TextColor(MaestroTheme.MutedCream);
 					}
 				}
-				_pauseButton.Enabled = true;
-				_stopButton.Enabled = true;
+				((Control)_pauseButton).set_Enabled(true);
+				((Control)_stopButton).set_Enabled(true);
 			}
 			else
 			{
 				Song song = _songPlayer.CurrentSong;
 				if (song != null && _songPlayer.CurrentCommandIndex >= song.Commands.Count)
 				{
-					_nowPlayingLabel.Text = song.DisplayName;
-					_nowPlayingLabel.Location = new Point(100, 8);
-					_nowPlayingLabel.TextColor = MaestroTheme.CreamWhite;
-					_progressLabel.Text = "Done!";
-					_progressLabel.TextColor = MaestroTheme.MutedCream;
+					_nowPlayingLabel.set_Text(song.DisplayName);
+					((Control)_nowPlayingLabel).set_Location(new Point(100, 8));
+					_nowPlayingLabel.set_TextColor(MaestroTheme.CreamWhite);
+					_progressLabel.set_Text("Done!");
+					_progressLabel.set_TextColor(MaestroTheme.MutedCream);
 				}
 				else
 				{
-					_nowPlayingLabel.Text = "No song playing";
-					_nowPlayingLabel.Location = new Point(100, 21);
-					_nowPlayingLabel.TextColor = MaestroTheme.MutedCream;
-					_progressLabel.Text = "";
+					_nowPlayingLabel.set_Text("No song playing");
+					((Control)_nowPlayingLabel).set_Location(new Point(100, 21));
+					_nowPlayingLabel.set_TextColor(MaestroTheme.MutedCream);
+					_progressLabel.set_Text("");
 				}
-				_pauseButton.Text = "||";
-				_pauseButton.Enabled = false;
-				_stopButton.Enabled = false;
+				_pauseButton.set_Text("||");
+				((Control)_pauseButton).set_Enabled(false);
+				((Control)_stopButton).set_Enabled(false);
 			}
 		}
 
@@ -277,36 +327,36 @@ namespace Maestro.UI.Components
 			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
 			//IL_013d: Unknown result type (might be due to invalid IL or missing references)
-			base.UpdateContainer(gameTime);
+			((Container)this).UpdateContainer(gameTime);
 			if (!_songPlayer.IsPlaying || _songPlayer.IsPaused)
 			{
 				return;
 			}
 			if (_songPlayer.IsWaitingForInput)
 			{
-				_pauseButton.Text = ">";
-				_progressLabel.Text = "Paused";
-				_progressLabel.TextColor = MaestroTheme.Paused;
+				_pauseButton.set_Text(">");
+				_progressLabel.set_Text("Paused");
+				_progressLabel.set_TextColor(MaestroTheme.Paused);
 				return;
 			}
 			if (_songPlayer.IsAdjustingOctave)
 			{
-				_progressLabel.Text = "Adjusting...";
-				_progressLabel.TextColor = MaestroTheme.Paused;
+				_progressLabel.set_Text("Adjusting...");
+				_progressLabel.set_TextColor(MaestroTheme.Paused);
 				return;
 			}
-			_pauseButton.Text = "||";
+			_pauseButton.set_Text("||");
 			Song song = _songPlayer.CurrentSong;
 			if (song != null && _songPlayer.CurrentCommandIndex >= song.Commands.Count)
 			{
-				_progressLabel.Text = "Done!";
+				_progressLabel.set_Text("Done!");
 			}
 			else
 			{
 				float progress = ((song != null && song.Commands.Count > 0) ? ((float)_songPlayer.CurrentCommandIndex / (float)song.Commands.Count * 100f) : 0f);
-				_progressLabel.Text = $"Playing... {progress:F0}%";
+				_progressLabel.set_Text($"Playing... {progress:F0}%");
 			}
-			_progressLabel.TextColor = MaestroTheme.MutedCream;
+			_progressLabel.set_TextColor(MaestroTheme.MutedCream);
 		}
 
 		protected override void DisposeControl()
@@ -316,14 +366,42 @@ namespace Maestro.UI.Components
 			_songPlayer.OnResumed -= OnPlaybackStateChanged;
 			_songPlayer.OnStopped -= OnPlaybackStateChanged;
 			_songPlayer.OnCompleted -= OnPlaybackStateChanged;
-			_pauseButton?.Dispose();
-			_stopButton?.Dispose();
-			_nowPlayingLabel?.Dispose();
-			_progressLabel?.Dispose();
-			_speedLabel?.Dispose();
-			_speedSlider?.Dispose();
-			_speedValueLabel?.Dispose();
-			base.DisposeControl();
+			StandardButton pauseButton = _pauseButton;
+			if (pauseButton != null)
+			{
+				((Control)pauseButton).Dispose();
+			}
+			StandardButton stopButton = _stopButton;
+			if (stopButton != null)
+			{
+				((Control)stopButton).Dispose();
+			}
+			Label nowPlayingLabel = _nowPlayingLabel;
+			if (nowPlayingLabel != null)
+			{
+				((Control)nowPlayingLabel).Dispose();
+			}
+			Label progressLabel = _progressLabel;
+			if (progressLabel != null)
+			{
+				((Control)progressLabel).Dispose();
+			}
+			Label speedLabel = _speedLabel;
+			if (speedLabel != null)
+			{
+				((Control)speedLabel).Dispose();
+			}
+			TrackBar speedSlider = _speedSlider;
+			if (speedSlider != null)
+			{
+				((Control)speedSlider).Dispose();
+			}
+			Label speedValueLabel = _speedValueLabel;
+			if (speedValueLabel != null)
+			{
+				((Control)speedValueLabel).Dispose();
+			}
+			((Panel)this).DisposeControl();
 		}
 	}
 }

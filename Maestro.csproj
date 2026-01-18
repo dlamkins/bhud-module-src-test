@@ -13,23 +13,27 @@
     <RootNamespace />
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="Maestro\ref.emblem.png" />
+    <None Remove="Maestro\ref.community-emblem.png" />
     <None Remove="Maestro\ref.icon.png" />
     <None Remove="Maestro\ref.import.png" />
+    <None Remove="Maestro\ref.maestro-emblem.png" />
     <None Remove="Maestro\ref.songs.json" />
-    <EmbeddedResource Include="Maestro\ref.emblem.png" />
+    <EmbeddedResource Include="Maestro\ref.community-emblem.png" />
     <EmbeddedResource Include="Maestro\ref.icon.png" />
     <EmbeddedResource Include="Maestro\ref.import.png" />
+    <EmbeddedResource Include="Maestro\ref.maestro-emblem.png" />
     <EmbeddedResource Include="Maestro\ref.songs.json" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Blish HUD">
-      <HintPath>..\..\working\Blish HUD.exe</HintPath>
-    </Reference>
+    <Reference Include="Blish HUD" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="MonoGame.Framework" />
-    <Reference Include="Newtonsoft.Json" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="LiteDB">
+      <HintPath>..\..\working\LiteDB.dll</HintPath>
+    </Reference>
     <Reference Include="System.Core" />
+    <Reference Include="Newtonsoft.Json" />
     <Reference Include="MonoGame.Extended" />
   </ItemGroup>
 </Project>

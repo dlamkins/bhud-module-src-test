@@ -71,21 +71,30 @@ namespace Maestro.UI
 
 		public static Texture2D CreateWindowBackground(int windowWidth, int windowHeight)
 		{
+			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0023: Expected O, but got Unknown
 			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
 			int width = windowWidth - 1;
 			int height = windowHeight - 13;
-			using GraphicsDeviceContext context = GameService.Graphics.LendGraphicsDeviceContext();
-			Texture2D texture = new Texture2D(context.GraphicsDevice, width, height);
-			Color[] data = (Color[])(object)new Color[width * height];
-			for (int i = 0; i < data.Length; i++)
+			GraphicsDeviceContext context = GameService.Graphics.LendGraphicsDeviceContext();
+			try
 			{
-				data[i] = WindowBackground;
+				Texture2D texture = new Texture2D(((GraphicsDeviceContext)(ref context)).get_GraphicsDevice(), width, height);
+				Color[] data = (Color[])(object)new Color[width * height];
+				for (int i = 0; i < data.Length; i++)
+				{
+					data[i] = WindowBackground;
+				}
+				texture.SetData<Color>(data);
+				return texture;
 			}
-			texture.SetData<Color>(data);
-			return texture;
+			finally
+			{
+				((GraphicsDeviceContext)(ref context)).Dispose();
+			}
 		}
 	}
 }

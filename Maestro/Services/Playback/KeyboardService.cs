@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Blish_HUD;
 using Blish_HUD.Controls.Extern;
@@ -27,7 +28,7 @@ namespace Maestro.Services.Playback
 		{
 			get
 			{
-				if (GameService.GameIntegration.Gw2Instance.Gw2HasFocus && !GameService.Gw2Mumble.UI.IsTextInputFocused)
+				if (GameService.GameIntegration.get_Gw2Instance().get_Gw2HasFocus() && !GameService.Gw2Mumble.get_UI().get_IsTextInputFocused())
 				{
 					return !SongFilterBar.IsTextInputFocused;
 				}
@@ -71,12 +72,12 @@ namespace Maestro.Services.Playback
 				else if (_altHeld && _sharpRemappings.TryGetValue(key, out sharpSetting))
 				{
 					_activeSharpKeys.Add(key);
-					SendKeyBindingDown(sharpSetting.Value);
+					SendKeyBindingDown(sharpSetting.get_Value());
 				}
 				else if (_keyRemappings.TryGetValue(key, out setting))
 				{
 					_heldKeys.Add(key);
-					Keyboard.Press((VirtualKeyShort)setting.Value.PrimaryKey, sendToSystem: true);
+					Keyboard.Press((VirtualKeyShort)(short)setting.get_Value().get_PrimaryKey(), true);
 				}
 			}
 		}
@@ -98,12 +99,12 @@ namespace Maestro.Services.Playback
 			}
 			else if (_activeSharpKeys.Remove(key) && _sharpRemappings.TryGetValue(key, out sharpSetting))
 			{
-				SendKeyBindingUp(sharpSetting.Value);
+				SendKeyBindingUp(sharpSetting.get_Value());
 			}
 			else if (_keyRemappings.TryGetValue(key, out setting))
 			{
 				_heldKeys.Remove(key);
-				Keyboard.Release((VirtualKeyShort)setting.Value.PrimaryKey, sendToSystem: true);
+				Keyboard.Release((VirtualKeyShort)(short)setting.get_Value().get_PrimaryKey(), true);
 			}
 		}
 
@@ -120,7 +121,7 @@ namespace Maestro.Services.Playback
 			{
 				if (_keyRemappings.TryGetValue(key2, out var setting))
 				{
-					Keyboard.Release((VirtualKeyShort)setting.Value.PrimaryKey, sendToSystem: true);
+					Keyboard.Release((VirtualKeyShort)(short)setting.get_Value().get_PrimaryKey(), true);
 				}
 			}
 			_heldKeys.Clear();
@@ -128,7 +129,7 @@ namespace Maestro.Services.Playback
 			{
 				if (_sharpRemappings.TryGetValue(key, out var sharpSetting))
 				{
-					SendKeyBindingUp(sharpSetting.Value);
+					SendKeyBindingUp(sharpSetting.get_Value());
 				}
 			}
 			_activeSharpKeys.Clear();
@@ -137,37 +138,43 @@ namespace Maestro.Services.Playback
 
 		private static void SendKeyBindingDown(KeyBinding binding)
 		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
 			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-			if (binding.ModifierKeys.HasFlag(ModifierKeys.Alt))
+			if (((Enum)binding.get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)2))
 			{
-				Keyboard.Press(VirtualKeyShort.LMENU, sendToSystem: true);
+				Keyboard.Press((VirtualKeyShort)164, true);
 			}
-			if (binding.ModifierKeys.HasFlag(ModifierKeys.Ctrl))
+			if (((Enum)binding.get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)1))
 			{
-				Keyboard.Press(VirtualKeyShort.LCONTROL, sendToSystem: true);
+				Keyboard.Press((VirtualKeyShort)162, true);
 			}
-			if (binding.ModifierKeys.HasFlag(ModifierKeys.Shift))
+			if (((Enum)binding.get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)4))
 			{
-				Keyboard.Press(VirtualKeyShort.LSHIFT, sendToSystem: true);
+				Keyboard.Press((VirtualKeyShort)160, true);
 			}
-			Keyboard.Press((VirtualKeyShort)binding.PrimaryKey, sendToSystem: true);
+			Keyboard.Press((VirtualKeyShort)(short)binding.get_PrimaryKey(), true);
 		}
 
 		private static void SendKeyBindingUp(KeyBinding binding)
 		{
 			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			Keyboard.Release((VirtualKeyShort)binding.PrimaryKey, sendToSystem: true);
-			if (binding.ModifierKeys.HasFlag(ModifierKeys.Shift))
+			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
+			Keyboard.Release((VirtualKeyShort)(short)binding.get_PrimaryKey(), true);
+			if (((Enum)binding.get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)4))
 			{
-				Keyboard.Release(VirtualKeyShort.LSHIFT, sendToSystem: true);
+				Keyboard.Release((VirtualKeyShort)160, true);
 			}
-			if (binding.ModifierKeys.HasFlag(ModifierKeys.Ctrl))
+			if (((Enum)binding.get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)1))
 			{
-				Keyboard.Release(VirtualKeyShort.LCONTROL, sendToSystem: true);
+				Keyboard.Release((VirtualKeyShort)162, true);
 			}
-			if (binding.ModifierKeys.HasFlag(ModifierKeys.Alt))
+			if (((Enum)binding.get_ModifierKeys()).HasFlag((Enum)(object)(ModifierKeys)2))
 			{
-				Keyboard.Release(VirtualKeyShort.LMENU, sendToSystem: true);
+				Keyboard.Release((VirtualKeyShort)164, true);
 			}
 		}
 	}

@@ -25,9 +25,9 @@ namespace Maestro.Services.Data
 					Logger.Info($"Loaded {list.Count} songs from ContentsManager");
 					return list;
 				}
-				catch (Exception exception)
+				catch (Exception ex)
 				{
-					Logger.Warn(exception, "Failed to load songs from ContentsManager");
+					Logger.Warn(ex, "Failed to load songs from ContentsManager");
 					return list;
 				}
 			});
@@ -52,9 +52,9 @@ namespace Maestro.Services.Data
 					Logger.Info($"Total songs loaded: {list.Count}");
 					return list;
 				}
-				catch (Exception exception)
+				catch (Exception ex)
 				{
-					Logger.Warn(exception, "Failed to load songs - module will continue with empty song list");
+					Logger.Warn(ex, "Failed to load songs - module will continue with empty song list");
 					return list;
 				}
 			});
@@ -62,7 +62,7 @@ namespace Maestro.Services.Data
 
 		private static void LoadFromDirectory(List<Song> songs, string path)
 		{
-			string[] jsonFiles = Directory.GetFiles(path, "*.json");
+			string[] jsonFiles = Directory.GetFiles(path, "*.json", SearchOption.AllDirectories);
 			Logger.Info($"Found {jsonFiles.Length} .json files in {path}");
 			string[] array = jsonFiles;
 			foreach (string file in array)

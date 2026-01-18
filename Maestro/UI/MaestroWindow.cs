@@ -41,6 +41,8 @@ namespace Maestro.UI
 
 		public event EventHandler ImportRequested;
 
+		public event EventHandler CommunityRequested;
+
 		public event EventHandler<Song> SongDeleteRequested;
 
 		private static Texture2D GetBackground()
@@ -49,30 +51,31 @@ namespace Maestro.UI
 		}
 
 		public MaestroWindow(SongPlayer songPlayer, List<Song> songs)
-			: base(GetBackground(), new Rectangle(0, 0, 420, 495), new Rectangle(15, 30, 390, 445))
+			: this(GetBackground(), new Rectangle(0, 0, 420, 495), new Rectangle(15, 30, 390, 445))
 		{
 			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
 			_songPlayer = songPlayer;
 			_allSongs = songs;
-			base.Title = "Maestro";
-			base.Subtitle = "Music player";
-			base.Emblem = Module.Instance.ContentsManager.GetTexture("emblem.png");
-			base.SavesPosition = true;
-			base.Id = "MaestroWindow_v3";
-			base.CanResize = false;
-			base.Parent = GameService.Graphics.SpriteScreen;
+			((WindowBase2)this).set_Title("Maestro");
+			((WindowBase2)this).set_Subtitle("Music player");
+			((WindowBase2)this).set_Emblem(Module.Instance.ContentsManager.GetTexture("maestro-emblem.png"));
+			((WindowBase2)this).set_SavesPosition(true);
+			((WindowBase2)this).set_Id("MaestroWindow_v3");
+			((WindowBase2)this).set_CanResize(false);
+			((Control)this).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			BuildUi();
 			SubscribeToEvents();
-			base.LeftMouseButtonPressed += OnWindowClicked;
+			((Control)this).add_LeftMouseButtonPressed((EventHandler<MouseEventArgs>)OnWindowClicked);
 		}
 
 		private void OnWindowClicked(object sender, MouseEventArgs e)
 		{
-			TextInputBase textInput = Control.FocusedControl as TextInputBase;
-			if (textInput != null && !textInput.MouseOver)
+			Control focusedControl = Control.get_FocusedControl();
+			TextInputBase textInput = (TextInputBase)(object)((focusedControl is TextInputBase) ? focusedControl : null);
+			if (textInput != null && !((Control)textInput).get_MouseOver())
 			{
-				textInput.Focused = false;
+				textInput.set_Focused(false);
 			}
 		}
 
@@ -83,36 +86,33 @@ namespace Maestro.UI
 			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0114: Unknown result type (might be due to invalid IL or missing references)
 			int currentY = 2;
-			_nowPlayingPanel = new NowPlayingPanel(_songPlayer, 390)
-			{
-				Parent = this,
-				Location = new Point(0, currentY)
-			};
+			NowPlayingPanel nowPlayingPanel = new NowPlayingPanel(_songPlayer, 390);
+			((Control)nowPlayingPanel).set_Parent((Container)(object)this);
+			((Control)nowPlayingPanel).set_Location(new Point(0, currentY));
+			_nowPlayingPanel = nowPlayingPanel;
 			currentY += 102;
-			_filterBar = new SongFilterBar(390)
-			{
-				Parent = this,
-				Location = new Point(0, currentY)
-			};
+			SongFilterBar songFilterBar = new SongFilterBar(390);
+			((Control)songFilterBar).set_Parent((Container)(object)this);
+			((Control)songFilterBar).set_Location(new Point(0, currentY));
+			_filterBar = songFilterBar;
 			_filterBar.SearchChanged += OnFilterChanged;
 			_filterBar.FilterChanged += OnFilterChanged;
 			currentY += 40;
-			_songListPanel = new SongListPanel(_songPlayer, 390)
-			{
-				Parent = this,
-				Location = new Point(0, currentY)
-			};
+			SongListPanel songListPanel = new SongListPanel(_songPlayer, 390);
+			((Control)songListPanel).set_Parent((Container)(object)this);
+			((Control)songListPanel).set_Location(new Point(0, currentY));
+			_songListPanel = songListPanel;
 			_songListPanel.SongPlayRequested += OnSongPlayRequested;
 			_songListPanel.SongDeleteRequested += OnSongDeleteRequested;
 			_songListPanel.CountChanged += OnCountChanged;
 			currentY += 287;
-			_statusBar = new StatusBar(390)
-			{
-				Parent = this,
-				Location = new Point(0, currentY)
-			};
+			StatusBar statusBar = new StatusBar(390);
+			((Control)statusBar).set_Parent((Container)(object)this);
+			((Control)statusBar).set_Location(new Point(0, currentY));
+			_statusBar = statusBar;
 			_statusBar.TotalCount = _allSongs.Count;
 			_statusBar.ImportClicked += OnImportClicked;
+			_statusBar.CommunityClicked += OnCommunityClicked;
 			RefreshSongList();
 		}
 
@@ -150,9 +150,20 @@ namespace Maestro.UI
 			this.ImportRequested?.Invoke(this, EventArgs.Empty);
 		}
 
+		private void OnCommunityClicked(object sender, EventArgs e)
+		{
+			this.CommunityRequested?.Invoke(this, EventArgs.Empty);
+		}
+
 		public void AddImportedSong(Song song)
 		{
 			_allSongs.Add(song);
+			_statusBar.TotalCount = _allSongs.Count;
+			RefreshSongList();
+		}
+
+		public void RefreshAfterCommunityDownload()
+		{
 			_statusBar.TotalCount = _allSongs.Count;
 			RefreshSongList();
 		}
@@ -182,14 +193,17 @@ namespace Maestro.UI
 		private IEnumerable<Song> GetFilteredSongs()
 		{
 			IEnumerable<Song> songs = _allSongs.AsEnumerable();
-			string source = _filterBar.SelectedSource;
-			if (source == "Bundled")
+			switch (_filterBar.SelectedSource)
 			{
-				songs = songs.Where((Song s) => !s.IsUserImported);
-			}
-			else if (source == "Imported")
-			{
+			case "Bundled":
+				songs = songs.Where((Song s) => !s.IsUserImported && !s.IsCommunityDownloaded);
+				break;
+			case "Community":
+				songs = songs.Where((Song s) => s.IsCommunityDownloaded);
+				break;
+			case "Imported":
 				songs = songs.Where((Song s) => s.IsUserImported);
+				break;
 			}
 			string filter = _filterBar.SelectedInstrument;
 			if (filter != "All")
@@ -220,12 +234,29 @@ namespace Maestro.UI
 			_songListPanel.SongDeleteRequested -= OnSongDeleteRequested;
 			_songListPanel.CountChanged -= OnCountChanged;
 			_statusBar.ImportClicked -= OnImportClicked;
+			_statusBar.CommunityClicked -= OnCommunityClicked;
 			_songPlayer.Stop();
-			_nowPlayingPanel?.Dispose();
-			_filterBar?.Dispose();
-			_songListPanel?.Dispose();
-			_statusBar?.Dispose();
-			base.DisposeControl();
+			NowPlayingPanel nowPlayingPanel = _nowPlayingPanel;
+			if (nowPlayingPanel != null)
+			{
+				((Control)nowPlayingPanel).Dispose();
+			}
+			SongFilterBar filterBar = _filterBar;
+			if (filterBar != null)
+			{
+				((Control)filterBar).Dispose();
+			}
+			SongListPanel songListPanel = _songListPanel;
+			if (songListPanel != null)
+			{
+				((Control)songListPanel).Dispose();
+			}
+			StatusBar statusBar = _statusBar;
+			if (statusBar != null)
+			{
+				((Control)statusBar).Dispose();
+			}
+			((WindowBase2)this).DisposeControl();
 		}
 	}
 }

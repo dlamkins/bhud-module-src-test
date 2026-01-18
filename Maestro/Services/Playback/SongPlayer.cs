@@ -22,9 +22,9 @@ namespace Maestro.Services.Playback
 
 		private float _playbackSpeed = 1f;
 
-		private static bool Gw2HasFocus => GameService.GameIntegration.Gw2Instance.Gw2HasFocus;
+		private static bool Gw2HasFocus => GameService.GameIntegration.get_Gw2Instance().get_Gw2HasFocus();
 
-		private static bool IsGw2TextInputFocused => GameService.Gw2Mumble.UI.IsTextInputFocused;
+		private static bool IsGw2TextInputFocused => GameService.Gw2Mumble.get_UI().get_IsTextInputFocused();
 
 		private static bool IsOverlayTextInputFocused => SongFilterBar.IsTextInputFocused;
 

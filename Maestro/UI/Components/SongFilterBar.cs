@@ -24,7 +24,7 @@ namespace Maestro.UI.Components
 
 		private readonly FilterButton _filterButton;
 
-		public string SearchText => _searchBox.Text?.Trim().ToLower() ?? string.Empty;
+		public string SearchText => ((TextInputBase)_searchBox).get_Text()?.Trim().ToLower() ?? string.Empty;
 
 		public string SelectedSource => _filterButton.SelectedSource;
 
@@ -39,38 +39,43 @@ namespace Maestro.UI.Components
 		public event EventHandler FilterChanged;
 
 		public SongFilterBar(int width)
+			: this()
 		{
 			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0054: Expected O, but got Unknown
 			//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-			base.Size = new Point(width, 36);
-			base.BackgroundColor = Color.get_Transparent();
-			_searchBox = new TextBox
-			{
-				Parent = this,
-				Location = new Point(0, 4),
-				Width = 180,
-				PlaceholderText = "Search songs..."
-			};
-			_searchBox.TextChanged += delegate
+			((Control)this).set_Size(new Point(width, 36));
+			((Control)this).set_BackgroundColor(Color.get_Transparent());
+			TextBox val = new TextBox();
+			((Control)val).set_Parent((Container)(object)this);
+			((Control)val).set_Location(new Point(0, 4));
+			((Control)val).set_Width(180);
+			((TextInputBase)val).set_PlaceholderText("Search songs...");
+			_searchBox = val;
+			((TextInputBase)_searchBox).add_TextChanged((EventHandler<EventArgs>)delegate
 			{
 				this.SearchChanged?.Invoke(this, EventArgs.Empty);
-			};
-			_searchBox.InputFocusChanged += delegate(object s, ValueEventArgs<bool> e)
+			});
+			((TextInputBase)_searchBox).add_InputFocusChanged((EventHandler<ValueEventArgs<bool>>)delegate(object s, ValueEventArgs<bool> e)
 			{
-				if (!e.Value && IsTextInputFocused)
+				if (!e.get_Value() && IsTextInputFocused)
 				{
 					WasJustUnfocused = true;
 				}
-				IsTextInputFocused = e.Value;
-			};
-			_filterButton = new FilterButton
-			{
-				Parent = this,
-				Location = new Point(width - 180, 4),
-				Width = 180
-			};
+				IsTextInputFocused = e.get_Value();
+			});
+			FilterButton filterButton = new FilterButton();
+			((Control)filterButton).set_Parent((Container)(object)this);
+			((Control)filterButton).set_Location(new Point(width - 180, 4));
+			((Control)filterButton).set_Width(180);
+			_filterButton = filterButton;
 			_filterButton.FilterChanged += delegate
 			{
 				this.FilterChanged?.Invoke(this, EventArgs.Empty);
@@ -79,9 +84,17 @@ namespace Maestro.UI.Components
 
 		protected override void DisposeControl()
 		{
-			_searchBox?.Dispose();
-			_filterButton?.Dispose();
-			base.DisposeControl();
+			TextBox searchBox = _searchBox;
+			if (searchBox != null)
+			{
+				((Control)searchBox).Dispose();
+			}
+			FilterButton filterButton = _filterButton;
+			if (filterButton != null)
+			{
+				((Control)filterButton).Dispose();
+			}
+			((Panel)this).DisposeControl();
 		}
 	}
 }

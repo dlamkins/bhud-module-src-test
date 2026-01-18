@@ -4,12 +4,14 @@ using System.ComponentModel.Composition;
 using System.IO;
 using System.Threading.Tasks;
 using Blish_HUD;
+using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
 using Maestro.Models;
+using Maestro.Services.Community;
 using Maestro.Services.Data;
 using Maestro.Services.Playback;
 using Maestro.Settings;
@@ -19,8 +21,8 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Maestro
 {
-	[Export(typeof(Blish_HUD.Modules.Module))]
-	public class Module : Blish_HUD.Modules.Module
+	[Export(typeof(Module))]
+	public class Module : Module
 	{
 		private static readonly Logger Logger = Logger.GetLogger<Module>();
 
@@ -30,11 +32,17 @@ namespace Maestro
 
 		private SongPlayer _songPlayer;
 
+		private CommunitySongCache _songCache;
+
 		private UserSongStorage _userSongStorage;
+
+		private CommunityService _communityService;
 
 		private MaestroWindow _maestroWindow;
 
 		private ImportWindow _importWindow;
+
+		private CommunityWindow _communityWindow;
 
 		private CornerIcon _cornerIcon;
 
@@ -42,17 +50,17 @@ namespace Maestro
 
 		internal static Module Instance { get; private set; }
 
-		internal SettingsManager SettingsManager => ModuleParameters.SettingsManager;
+		internal SettingsManager SettingsManager => base.ModuleParameters.get_SettingsManager();
 
-		internal ContentsManager ContentsManager => ModuleParameters.ContentsManager;
+		internal ContentsManager ContentsManager => base.ModuleParameters.get_ContentsManager();
 
-		internal DirectoriesManager DirectoriesManager => ModuleParameters.DirectoriesManager;
+		internal DirectoriesManager DirectoriesManager => base.ModuleParameters.get_DirectoriesManager();
 
-		internal Gw2ApiManager Gw2ApiManager => ModuleParameters.Gw2ApiManager;
+		internal Gw2ApiManager Gw2ApiManager => base.ModuleParameters.get_Gw2ApiManager();
 
 		[ImportingConstructor]
 		public Module([Import("ModuleParameters")] ModuleParameters moduleParameters)
-			: base(moduleParameters)
+			: this(moduleParameters)
 		{
 			Instance = this;
 		}
@@ -71,11 +79,12 @@ namespace Maestro
 
 		protected override async Task LoadAsync()
 		{
-			_userSongStorage = new UserSongStorage(DirectoriesManager);
-			if (Directory.Exists("C:\\git\\Maestro\\Songs"))
+			_songCache = new CommunitySongCache(DirectoriesManager);
+			_userSongStorage = new UserSongStorage(_songCache);
+			if (Directory.Exists("C:\\git\\perso\\Maestro\\Songs"))
 			{
 				Logger.Info("Debug mode: Loading songs from directory");
-				_songs = await SongLoader.LoadFromDirectoryAsync("C:\\git\\Maestro\\Songs");
+				_songs = await SongLoader.LoadFromDirectoryAsync("C:\\git\\perso\\Maestro\\Songs");
 			}
 			else
 			{
@@ -84,31 +93,39 @@ namespace Maestro
 			}
 			List<Song> userSongs = await _userSongStorage.LoadUserSongsAsync();
 			_songs.AddRange(userSongs);
+			_communityService = new CommunityService(_songCache, _songs);
+			_communityService.LoadCachedSongsIntoMainList();
 		}
 
 		protected override void OnModuleLoaded(EventArgs e)
 		{
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003c: Expected O, but got Unknown
+			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008c: Expected O, but got Unknown
 			try
 			{
 				Texture2D iconTexture = ContentsManager.GetTexture("icon.png");
-				_cornerIcon = new CornerIcon
-				{
-					Icon = (iconTexture ?? ContentService.Textures.Error),
-					BasicTooltipText = "Maestro - Music Player"
-				};
-				_cornerIcon.Click += OnCornerIconClick;
+				CornerIcon val = new CornerIcon();
+				val.set_Icon(AsyncTexture2D.op_Implicit(iconTexture ?? Textures.get_Error()));
+				((Control)val).set_BasicTooltipText("Maestro - Music Player");
+				_cornerIcon = val;
+				((Control)_cornerIcon).add_Click((EventHandler<MouseEventArgs>)OnCornerIconClick);
 			}
 			catch (Exception ex)
 			{
 				Logger.Warn(ex, "Failed to load icon, using default");
-				_cornerIcon = new CornerIcon
-				{
-					Icon = ContentService.Textures.Error,
-					BasicTooltipText = "Maestro - Music Player"
-				};
-				_cornerIcon.Click += OnCornerIconClick;
+				CornerIcon val2 = new CornerIcon();
+				val2.set_Icon(AsyncTexture2D.op_Implicit(Textures.get_Error()));
+				((Control)val2).set_BasicTooltipText("Maestro - Music Player");
+				_cornerIcon = val2;
+				((Control)_cornerIcon).add_Click((EventHandler<MouseEventArgs>)OnCornerIconClick);
 			}
-			base.OnModuleLoaded(e);
+			((Module)this).OnModuleLoaded(e);
 		}
 
 		private void OnCornerIconClick(object sender, MouseEventArgs e)
@@ -117,9 +134,10 @@ namespace Maestro
 			{
 				_maestroWindow = new MaestroWindow(_songPlayer, _songs);
 				_maestroWindow.ImportRequested += OnImportRequested;
+				_maestroWindow.CommunityRequested += OnCommunityRequested;
 				_maestroWindow.SongDeleteRequested += OnSongDeleteRequested;
 			}
-			_maestroWindow.ToggleWindow();
+			((WindowBase2)_maestroWindow).ToggleWindow();
 		}
 
 		private void OnImportRequested(object sender, EventArgs e)
@@ -129,7 +147,45 @@ namespace Maestro
 				_importWindow = new ImportWindow();
 				_importWindow.SongImported += OnSongImported;
 			}
-			_importWindow.Show();
+			if (((Control)_importWindow).get_Visible())
+			{
+				((Control)_importWindow).Hide();
+			}
+			else
+			{
+				((Control)_importWindow).Show();
+			}
+		}
+
+		private void OnCommunityRequested(object sender, EventArgs e)
+		{
+			if (_communityWindow == null)
+			{
+				_communityWindow = new CommunityWindow(_communityService);
+				_communityWindow.SongDownloaded += OnCommunitySongDownloaded;
+				_communityWindow.SongDeleteRequested += OnCommunitySongDeleteRequested;
+			}
+			if (((Control)_communityWindow).get_Visible())
+			{
+				((Control)_communityWindow).Hide();
+				return;
+			}
+			((Control)_communityWindow).Show();
+			_communityWindow.LoadContent();
+		}
+
+		private void OnCommunitySongDownloaded(object sender, Song song)
+		{
+			_maestroWindow?.RefreshAfterCommunityDownload();
+		}
+
+		private void OnCommunitySongDeleteRequested(object sender, string communityId)
+		{
+			Song song = _songs.Find((Song s) => s.CommunityId == communityId);
+			if (song != null)
+			{
+				OnSongDeleteRequested(this, song);
+			}
 		}
 
 		private async void OnSongImported(object sender, Song song)
@@ -143,25 +199,32 @@ namespace Maestro
 			catch (Exception ex)
 			{
 				Logger.Error(ex, "Failed to save imported song: " + song.Name);
-				ScreenNotification.ShowNotification("Failed to save song", ScreenNotification.NotificationType.Error);
+				ScreenNotification.ShowNotification("Failed to save song", (NotificationType)2, (Texture2D)null, 4);
 			}
 		}
 
 		private void OnSongDeleteRequested(object sender, Song song)
 		{
-			if (song.IsUserImported)
+			try
 			{
-				try
+				if (song.IsUserImported)
 				{
 					_userSongStorage.DeleteSong(song);
 					_maestroWindow?.RemoveSong(song);
-					Logger.Info("Deleted song: " + song.Name + " by " + song.Artist);
+					Logger.Info("Deleted user song: " + song.Name + " by " + song.Artist);
 				}
-				catch (Exception ex)
+				else if (song.IsCommunityDownloaded)
 				{
-					Logger.Error(ex, "Failed to delete song: " + song.Name);
-					ScreenNotification.ShowNotification("Failed to delete song", ScreenNotification.NotificationType.Error);
+					_communityService.DeleteDownloadedSong(song);
+					_maestroWindow?.RemoveSong(song);
+					_communityWindow?.MarkSongAsDeleted(song.CommunityId);
+					Logger.Info("Deleted community song: " + song.Name + " by " + song.Artist);
 				}
+			}
+			catch (Exception ex)
+			{
+				Logger.Error(ex, "Failed to delete song: " + song.Name);
+				ScreenNotification.ShowNotification("Failed to delete song", (NotificationType)2, (Texture2D)null, 4);
 			}
 		}
 
@@ -172,9 +235,28 @@ namespace Maestro
 		protected override void Unload()
 		{
 			_songPlayer?.Stop();
-			_importWindow?.Dispose();
-			_maestroWindow?.Dispose();
-			_cornerIcon?.Dispose();
+			CommunityWindow communityWindow = _communityWindow;
+			if (communityWindow != null)
+			{
+				((Control)communityWindow).Dispose();
+			}
+			ImportWindow importWindow = _importWindow;
+			if (importWindow != null)
+			{
+				((Control)importWindow).Dispose();
+			}
+			MaestroWindow maestroWindow = _maestroWindow;
+			if (maestroWindow != null)
+			{
+				((Control)maestroWindow).Dispose();
+			}
+			_communityService?.Dispose();
+			_songCache?.Dispose();
+			CornerIcon cornerIcon = _cornerIcon;
+			if (cornerIcon != null)
+			{
+				((Control)cornerIcon).Dispose();
+			}
 			Instance = null;
 		}
 	}

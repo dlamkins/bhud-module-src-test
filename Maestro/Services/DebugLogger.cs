@@ -101,13 +101,14 @@ namespace Maestro.Services
 		public void LogSharp(Keys key, KeyBinding binding)
 		{
 			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
 			if (_enabled)
 			{
 				long currentMs = _stopwatch.ElapsedMilliseconds;
 				long deltaMs = currentMs - _lastEventMs;
 				_lastEventMs = currentMs;
-				_log.AppendLine(string.Format("[+{0,4}ms] SHARP: {1} -> {2}+{3}", deltaMs, key, FormatModifiers(binding.ModifierKeys), FormatKey(binding.PrimaryKey)));
+				_log.AppendLine(string.Format("[+{0,4}ms] SHARP: {1} -> {2}+{3}", deltaMs, key, FormatModifiers(binding.get_ModifierKeys()), FormatKey(binding.get_PrimaryKey())));
 			}
 		}
 
@@ -136,16 +137,19 @@ namespace Maestro.Services
 
 		private static string FormatModifiers(ModifierKeys mods)
 		{
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
 			List<string> parts = new List<string>();
-			if (mods.HasFlag(ModifierKeys.Ctrl))
+			if (((Enum)mods).HasFlag((Enum)(object)(ModifierKeys)1))
 			{
 				parts.Add("Ctrl");
 			}
-			if (mods.HasFlag(ModifierKeys.Alt))
+			if (((Enum)mods).HasFlag((Enum)(object)(ModifierKeys)2))
 			{
 				parts.Add("Alt");
 			}
-			if (mods.HasFlag(ModifierKeys.Shift))
+			if (((Enum)mods).HasFlag((Enum)(object)(ModifierKeys)4))
 			{
 				parts.Add("Shift");
 			}

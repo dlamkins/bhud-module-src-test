@@ -38,30 +38,30 @@ namespace Maestro.UI.Components
 		public event EventHandler<int> CountChanged;
 
 		public SongListPanel(SongPlayer songPlayer, int contentWidth)
+			: this()
 		{
 			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
 			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
 			_songPlayer = songPlayer;
 			_cardWidth = contentWidth - 12 - 4;
-			base.Size = new Point(contentWidth, 280);
-			base.FlowDirection = ControlFlowDirection.SingleTopToBottom;
-			base.CanScroll = true;
-			base.ShowBorder = true;
-			base.ControlPadding = new Vector2(0f, 4f);
-			base.OuterControlPadding = new Vector2(4f, 4f);
+			((Control)this).set_Size(new Point(contentWidth, 280));
+			((FlowPanel)this).set_FlowDirection((ControlFlowDirection)3);
+			((Panel)this).set_CanScroll(true);
+			((Panel)this).set_ShowBorder(true);
+			((FlowPanel)this).set_ControlPadding(new Vector2(0f, 4f));
+			((FlowPanel)this).set_OuterControlPadding(new Vector2(4f, 4f));
 		}
 
 		public void RefreshSongs(IEnumerable<Song> songs)
 		{
-			ClearChildren();
+			((Container)this).ClearChildren();
 			_songCards.Clear();
 			foreach (Song song in songs)
 			{
-				SongCard card = new SongCard(song, _cardWidth)
-				{
-					Parent = this
-				};
+				SongCard songCard = new SongCard(song, _cardWidth);
+				((Control)songCard).set_Parent((Container)(object)this);
+				SongCard card = songCard;
 				card.PlayClicked += OnCardPlayClicked;
 				card.CardClicked += OnCardClicked;
 				card.DeleteRequested += OnCardDeleteRequested;
@@ -73,10 +73,11 @@ namespace Maestro.UI.Components
 
 		private void OnCardPlayClicked(object sender, MouseEventArgs e)
 		{
-			TextInputBase textInput = Control.FocusedControl as TextInputBase;
+			Control focusedControl = Control.get_FocusedControl();
+			TextInputBase textInput = (TextInputBase)(object)((focusedControl is TextInputBase) ? focusedControl : null);
 			if (textInput != null)
 			{
-				textInput.Focused = false;
+				textInput.set_Focused(false);
 			}
 			SongCard card = sender as SongCard;
 			if (card?.Song != null)
@@ -88,10 +89,11 @@ namespace Maestro.UI.Components
 
 		private void OnCardClicked(object sender, MouseEventArgs e)
 		{
-			TextInputBase textInput = Control.FocusedControl as TextInputBase;
+			Control focusedControl = Control.get_FocusedControl();
+			TextInputBase textInput = (TextInputBase)(object)((focusedControl is TextInputBase) ? focusedControl : null);
 			if (textInput != null)
 			{
-				textInput.Focused = false;
+				textInput.set_Focused(false);
 			}
 			SongCard card = sender as SongCard;
 			if (card?.Song != null)
@@ -134,10 +136,10 @@ namespace Maestro.UI.Components
 				value.PlayClicked -= OnCardPlayClicked;
 				value.CardClicked -= OnCardClicked;
 				value.DeleteRequested -= OnCardDeleteRequested;
-				value.Dispose();
+				((Control)value).Dispose();
 			}
 			_songCards.Clear();
-			base.DisposeControl();
+			((FlowPanel)this).DisposeControl();
 		}
 	}
 }
