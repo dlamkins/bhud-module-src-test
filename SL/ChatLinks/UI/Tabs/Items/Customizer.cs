@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using GuildWars2;
 using GuildWars2.Hero;
 using GuildWars2.Items;
 using Microsoft.EntityFrameworkCore;
@@ -90,28 +91,40 @@ namespace SL.ChatLinks.UI.Tabs.Items
 					queryable = context.Set<UpgradeComponent>().FromSqlRaw("SELECT *\r\nFROM Items\r\nWHERE Type in ('upgrade_component', 'gem')\r\n\tAND UpgradeComponentFlags -> '$.Trinket' = 'true'\r\n\tAND InfusionUpgradeFlags -> '$.infusion' = 'false'\r\n\tAND InfusionUpgradeFlags -> '$.enrichment' = 'false'");
 					break;
 				}
-				if (targetItem is Backpack)
+				if (targetItem is BackItem)
 				{
 					queryable = context.Set<UpgradeComponent>().FromSqlRaw("SELECT *\r\nFROM Items\r\nWHERE Type = 'gem'\r\n\tAND InfusionUpgradeFlags -> '$.infusion' = 'false'\r\n\tAND InfusionUpgradeFlags -> '$.enrichment' = 'false'");
 					break;
 				}
 				Armor armor3 = targetItem as Armor;
-				if ((object)armor3 != null && armor3.WeightClass == WeightClass.Heavy)
+				if ((object)armor3 != null)
 				{
-					queryable = context.Set<UpgradeComponent>().FromSqlRaw("SELECT *\r\nFROM Items\r\nWHERE Type in ('upgrade_component', 'gem', 'rune')\r\n\tAND UpgradeComponentFlags -> '$.HeavyArmor' = 'true'\r\n\tAND InfusionUpgradeFlags -> '$.infusion' = 'false'\r\n\tAND InfusionUpgradeFlags -> '$.enrichment' = 'false'");
-					break;
+					Extensible<WeightClass> left = armor3.WeightClass;
+					if (left == WeightClass.Heavy)
+					{
+						queryable = context.Set<UpgradeComponent>().FromSqlRaw("SELECT *\r\nFROM Items\r\nWHERE Type in ('upgrade_component', 'gem', 'rune')\r\n\tAND UpgradeComponentFlags -> '$.HeavyArmor' = 'true'\r\n\tAND InfusionUpgradeFlags -> '$.infusion' = 'false'\r\n\tAND InfusionUpgradeFlags -> '$.enrichment' = 'false'");
+						break;
+					}
 				}
 				Armor armor2 = targetItem as Armor;
-				if ((object)armor2 != null && armor2.WeightClass == WeightClass.Medium)
+				if ((object)armor2 != null)
 				{
-					queryable = context.Set<UpgradeComponent>().FromSqlRaw("SELECT *\r\nFROM Items\r\nWHERE Type in ('upgrade_component', 'gem', 'rune')\r\n\tAND UpgradeComponentFlags -> '$.MediumArmor' = 'true'\r\n\tAND InfusionUpgradeFlags -> '$.infusion' = 'false'\r\n\tAND InfusionUpgradeFlags -> '$.enrichment' = 'false'");
-					break;
+					Extensible<WeightClass> left = armor2.WeightClass;
+					if (left == WeightClass.Medium)
+					{
+						queryable = context.Set<UpgradeComponent>().FromSqlRaw("SELECT *\r\nFROM Items\r\nWHERE Type in ('upgrade_component', 'gem', 'rune')\r\n\tAND UpgradeComponentFlags -> '$.MediumArmor' = 'true'\r\n\tAND InfusionUpgradeFlags -> '$.infusion' = 'false'\r\n\tAND InfusionUpgradeFlags -> '$.enrichment' = 'false'");
+						break;
+					}
 				}
 				Armor armor = targetItem as Armor;
-				if ((object)armor != null && armor.WeightClass == WeightClass.Light)
+				if ((object)armor != null)
 				{
-					queryable = context.Set<UpgradeComponent>().FromSqlRaw("SELECT *\r\nFROM Items\r\nWHERE Type in ('upgrade_component', 'gem', 'rune')\r\n\tAND UpgradeComponentFlags -> '$.LightArmor' = 'true'\r\n\tAND InfusionUpgradeFlags -> '$.infusion' = 'false'\r\n\tAND InfusionUpgradeFlags -> '$.enrichment' = 'false'");
-					break;
+					Extensible<WeightClass> left = armor.WeightClass;
+					if (left == WeightClass.Light)
+					{
+						queryable = context.Set<UpgradeComponent>().FromSqlRaw("SELECT *\r\nFROM Items\r\nWHERE Type in ('upgrade_component', 'gem', 'rune')\r\n\tAND UpgradeComponentFlags -> '$.LightArmor' = 'true'\r\n\tAND InfusionUpgradeFlags -> '$.infusion' = 'false'\r\n\tAND InfusionUpgradeFlags -> '$.enrichment' = 'false'");
+						break;
+					}
 				}
 				if (targetItem is Axe)
 				{
@@ -145,7 +158,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 				}
 				if (targetItem is Longbow)
 				{
-					queryable = context.Set<UpgradeComponent>().FromSqlRaw("SELECT *\r\nFROM Items\r\nWHERE Type in ('upgrade_component', 'gem', 'sigil')\r\n\tAND UpgradeComponentFlags -> '$.LongBow' = 'true'\r\n\tAND InfusionUpgradeFlags -> '$.infusion' = 'false'\r\n\tAND InfusionUpgradeFlags -> '$.enrichment' = 'false'");
+					queryable = context.Set<UpgradeComponent>().FromSqlRaw("SELECT *\r\nFROM Items\r\nWHERE Type in ('upgrade_component', 'gem', 'sigil')\r\n\tAND UpgradeComponentFlags -> '$.Longbow' = 'true'\r\n\tAND InfusionUpgradeFlags -> '$.infusion' = 'false'\r\n\tAND InfusionUpgradeFlags -> '$.enrichment' = 'false'");
 					break;
 				}
 				if (targetItem is Mace)
@@ -173,7 +186,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 					queryable = context.Set<UpgradeComponent>().FromSqlRaw("SELECT *\r\nFROM Items\r\nWHERE Type in ('upgrade_component', 'gem', 'sigil')\r\n\tAND UpgradeComponentFlags -> '$.Shield' = 'true'\r\n\tAND InfusionUpgradeFlags -> '$.infusion' = 'false'\r\n\tAND InfusionUpgradeFlags -> '$.enrichment' = 'false'");
 					break;
 				}
-				if (targetItem is Shortbow)
+				if (targetItem is ShortBow)
 				{
 					queryable = context.Set<UpgradeComponent>().FromSqlRaw("SELECT *\r\nFROM Items\r\nWHERE Type in ('upgrade_component', 'gem', 'sigil')\r\n\tAND UpgradeComponentFlags -> '$.ShortBow' = 'true'\r\n\tAND InfusionUpgradeFlags -> '$.infusion' = 'false'\r\n\tAND InfusionUpgradeFlags -> '$.enrichment' = 'false'");
 					break;

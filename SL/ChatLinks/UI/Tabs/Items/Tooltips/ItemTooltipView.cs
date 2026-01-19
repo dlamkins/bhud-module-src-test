@@ -10,6 +10,7 @@ using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using GuildWars2;
+using GuildWars2.Collections;
 using GuildWars2.Hero;
 using GuildWars2.Hero.Equipment.Wardrobe;
 using GuildWars2.Items;
@@ -112,7 +113,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 			PrintVendorValue();
 		}
 
-		private void PrintBackpack(Backpack back)
+		private void PrintBackItem(BackItem back)
 		{
 			PrintHeader();
 			PrintAttributes(back.Attributes.ToDictionary((KeyValuePair<Extensible<AttributeName>, int> stat) => ViewModel.Localizer[stat.Key.ToString()].ToString(), (KeyValuePair<Extensible<AttributeName>, int> stat) => stat.Value));
@@ -141,26 +142,6 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 
 		private void PrintConsumable(Consumable consumable)
 		{
-			//IL_0315: Unknown result type (might be due to invalid IL or missing references)
-			//IL_033c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_036d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_040b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0432: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0463: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0501: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0528: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0559: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05f7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_061e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_064f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_070d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0734: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0765: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0823: Unknown result type (might be due to invalid IL or missing references)
-			//IL_084a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_087b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0951: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0982: Unknown result type (might be due to invalid IL or missing references)
 			PrintHeader();
 			if (consumable is Currency || consumable is Service)
 			{
@@ -234,39 +215,35 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 											if ((object)unlocker6 == null)
 											{
 												RecipeSheet unlocker7 = consumable as RecipeSheet;
-												if ((object)unlocker7 != null)
+												if ((object)unlocker7 == null)
+												{
+													ConjuredDoorwayUnlocker unlocker8 = consumable as ConjuredDoorwayUnlocker;
+													if ((object)unlocker8 != null)
+													{
+														if (!string.IsNullOrEmpty(unlocker8.Description))
+														{
+															PrintPlainText(" ");
+														}
+														PrintUnlocked(string.Format("{0}\r\n", ViewModel.Localizer["You have already unlocked this conjured doorway skin"]), ViewModel.LockedOtherText + "\r\n");
+														PrintPlainText((string)ViewModel.Localizer["Consumable"]);
+													}
+													else if (string.IsNullOrEmpty(consumable.Description))
+													{
+														PrintPlainText((string)ViewModel.Localizer["Consumable"]);
+													}
+													else
+													{
+														PrintPlainText("\r\n" + ViewModel.Localizer["Consumable"]);
+													}
+												}
+												else
 												{
 													if (!string.IsNullOrEmpty(unlocker7.Description))
 													{
 														PrintPlainText(" ");
 													}
-													if (ViewModel.DefaultLocked)
-													{
-														if (ViewModel.Unlocked.HasValue)
-														{
-															if (ViewModel.Unlocked.Value)
-															{
-																PrintPlainText(ViewModel.UnlockedText + "\r\n", ViewModel.UnlockedTextColor);
-															}
-														}
-														else
-														{
-															PrintPlainText(ViewModel.AuthorizationText + "\r\n", Gray);
-														}
-													}
-													else
-													{
-														PrintPlainText(string.Format("{0}\r\n", ViewModel.Localizer["Unlock status unknown"]), Gray);
-													}
+													PrintUnlocked(ViewModel.UnlockedText + "\r\n", ViewModel.LockedOtherText + "\r\n", ViewModel.UnlockedTextColor);
 													PrintPlainText((string)ViewModel.Localizer["Consumable"]);
-												}
-												else if (string.IsNullOrEmpty(consumable.Description))
-												{
-													PrintPlainText((string)ViewModel.Localizer["Consumable"]);
-												}
-												else
-												{
-													PrintPlainText("\r\n" + ViewModel.Localizer["Consumable"]);
 												}
 											}
 											else
@@ -275,24 +252,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 												{
 													PrintPlainText(" ");
 												}
-												if (ViewModel.DefaultLocked)
-												{
-													if (ViewModel.Unlocked.HasValue)
-													{
-														if (ViewModel.Unlocked.Value)
-														{
-															PrintPlainText(string.Format("{0}\r\n", ViewModel.Localizer["You have already unlocked this outfit"]), Color.get_Red());
-														}
-													}
-													else
-													{
-														PrintPlainText(ViewModel.AuthorizationText + "\r\n", Gray);
-													}
-												}
-												else
-												{
-													PrintPlainText(string.Format("{0}\r\n", ViewModel.Localizer["Unlock status unknown"]), Gray);
-												}
+												PrintUnlocked(string.Format("{0}\r\n", ViewModel.Localizer["You have already unlocked this outfit"]), ViewModel.LockedOtherText + "\r\n");
 												PrintPlainText((string)ViewModel.Localizer["Consumable"]);
 											}
 										}
@@ -302,24 +262,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 											{
 												PrintPlainText(" ");
 											}
-											if (ViewModel.DefaultLocked)
-											{
-												if (ViewModel.Unlocked.HasValue)
-												{
-													if (ViewModel.Unlocked.Value)
-													{
-														PrintPlainText(string.Format("{0}\r\n", ViewModel.Localizer["You have already unlocked this outfit"]), Color.get_Red());
-													}
-												}
-												else
-												{
-													PrintPlainText(ViewModel.AuthorizationText + "\r\n", Gray);
-												}
-											}
-											else
-											{
-												PrintPlainText(string.Format("{0}\r\n", ViewModel.Localizer["Unlock status unknown"]), Gray);
-											}
+											PrintUnlocked(string.Format("{0}\r\n", ViewModel.Localizer["You have already unlocked this outfit"]), ViewModel.LockedOtherText + "\r\n");
 											PrintPlainText((string)ViewModel.Localizer["Consumable"]);
 										}
 									}
@@ -329,24 +272,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 										{
 											PrintPlainText(" ");
 										}
-										if (ViewModel.DefaultLocked)
-										{
-											if (ViewModel.Unlocked.HasValue)
-											{
-												if (ViewModel.Unlocked.Value)
-												{
-													PrintPlainText("You have already unlocked this Jade Bot!\r\n", Color.get_Red());
-												}
-											}
-											else
-											{
-												PrintPlainText(ViewModel.AuthorizationText + "\r\n", Gray);
-											}
-										}
-										else
-										{
-											PrintPlainText(string.Format("{0}\r\n", ViewModel.Localizer["Unlock status unknown"]), Gray);
-										}
+										PrintUnlocked(string.Format("{0}\r\n", ViewModel.Localizer["You have already unlocked this Jade Bot"]), ViewModel.LockedOtherText + "\r\n");
 										PrintPlainText((string)ViewModel.Localizer["Consumable"]);
 									}
 								}
@@ -356,24 +282,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 									{
 										PrintPlainText(" ");
 									}
-									if (ViewModel.DefaultLocked)
-									{
-										if (ViewModel.Unlocked.HasValue)
-										{
-											if (ViewModel.Unlocked.Value)
-											{
-												PrintPlainText("You have already unlocked this glider!\r\n", Color.get_Red());
-											}
-										}
-										else
-										{
-											PrintPlainText(ViewModel.AuthorizationText + "\r\n", Gray);
-										}
-									}
-									else
-									{
-										PrintPlainText(string.Format("{0}\r\n", ViewModel.Localizer["Unlock status unknown"]), Gray);
-									}
+									PrintUnlocked(string.Format("{0}\r\n", ViewModel.Localizer["You have already unlocked this glider"]), ViewModel.LockedOtherText + "\r\n");
 									PrintPlainText((string)ViewModel.Localizer["Consumable"]);
 								}
 							}
@@ -383,24 +292,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 								{
 									PrintPlainText(" ");
 								}
-								if (ViewModel.DefaultLocked)
-								{
-									if (ViewModel.Unlocked.HasValue)
-									{
-										if (ViewModel.Unlocked.Value)
-										{
-											PrintPlainText("You have already unlocked this dye!\r\n", Color.get_Red());
-										}
-									}
-									else
-									{
-										PrintPlainText(ViewModel.AuthorizationText + "\r\n", Gray);
-									}
-								}
-								else
-								{
-									PrintPlainText(string.Format("{0}\r\n", ViewModel.Localizer["Unlock status unknown"]), Gray);
-								}
+								PrintUnlocked(string.Format("{0}\r\n", ViewModel.Localizer["You have already unlocked this dye"]), ViewModel.LockedOtherText + "\r\n");
 								PrintPlainText((string)ViewModel.Localizer["Consumable"]);
 							}
 						}
@@ -410,24 +302,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 							{
 								PrintPlainText(" ");
 							}
-							if (ViewModel.DefaultLocked)
-							{
-								if (ViewModel.Unlocked.HasValue)
-								{
-									if (ViewModel.Unlocked.Value)
-									{
-										PrintPlainText(string.Format("{0}\r\n", ViewModel.Localizer["You already have that content unlocked"]), Color.get_Red());
-									}
-								}
-								else
-								{
-									PrintPlainText(ViewModel.AuthorizationText + "\r\n", Gray);
-								}
-							}
-							else
-							{
-								PrintPlainText(string.Format("{0}\r\n", ViewModel.Localizer["Unlock status unknown"]), Gray);
-							}
+							PrintUnlocked(string.Format("{0}\r\n", ViewModel.Localizer["You already have that content unlocked"]), ViewModel.LockedOtherText + "\r\n");
 							PrintPlainText((string)ViewModel.Localizer["Consumable"]);
 						}
 					}
@@ -530,27 +405,11 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 
 		private void PrintGizmo(Gizmo gizmo)
 		{
-			//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
 			PrintHeader();
 			PrintDescription(gizmo.Description, gizmo.Level > 0);
 			if (ViewModel.DefaultLocked)
 			{
-				if (ViewModel.Unlocked.HasValue)
-				{
-					if (ViewModel.Unlocked.Value)
-					{
-						PrintPlainText(string.Format("\r\n{0}", ViewModel.Localizer["Novelty Unlocked"]));
-					}
-					else
-					{
-						PrintPlainText(string.Format("\r\n{0}", ViewModel.Localizer["Novelty Locked"]), Gray);
-					}
-				}
-				else
-				{
-					PrintPlainText("\r\n" + ViewModel.AuthorizationText, Gray);
-				}
+				PrintLockedUnlocked(string.Format("\r\n{0}", ViewModel.Localizer["Novelty Locked"]), string.Format("\r\n{0}", ViewModel.Localizer["Novelty Unlocked"]), "\r\n" + ViewModel.LockedOtherText);
 				PrintPlainText(string.Format("\r\n{0}", ViewModel.Localizer["Consumable"]));
 			}
 			PrintRequiredLevel(gizmo.Level);
@@ -574,30 +433,11 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 			PrintVendorValue();
 		}
 
-		private void PrintMiniature(Miniature miniature)
+		private void PrintMiniature(MiniatureItem miniature)
 		{
-			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
 			PrintHeader();
 			PrintDescription(miniature.Description);
-			if (ViewModel.DefaultLocked)
-			{
-				if (ViewModel.Unlocked.HasValue)
-				{
-					if (ViewModel.Unlocked.Value)
-					{
-						PrintPlainText(string.Format("\r\n{0}\r\n", ViewModel.Localizer["Mini Unlocked"]));
-					}
-					else
-					{
-						PrintPlainText(string.Format("\r\n{0}\r\n", ViewModel.Localizer["Mini Locked"]), Gray);
-					}
-				}
-				else
-				{
-					PrintPlainText("\r\n" + ViewModel.AuthorizationText + "\r\n", Gray);
-				}
-			}
+			PrintLockedUnlocked(string.Format("\r\n{0}\r\n", ViewModel.Localizer["Mini Locked"]), string.Format("\r\n{0}\r\n", ViewModel.Localizer["Mini Unlocked"]), "\r\n" + ViewModel.LockedOtherText + "\r\n");
 			PrintPlainText((string)ViewModel.Localizer["Mini"]);
 			PrintInBank();
 			PrintUniqueness();
@@ -661,7 +501,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 			Rune rune = upgradeComponent as Rune;
 			if ((object)rune != null)
 			{
-				PrintBonuses(rune.Bonuses ?? Array.Empty<string>());
+				PrintBonuses(rune.Bonuses ?? ImmutableValueList.Create(default(ReadOnlySpan<string>)));
 			}
 			else
 			{
@@ -672,13 +512,13 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 					if (description != null && description.Length > 0)
 					{
 						PrintBuff(upgradeComponent.Buff);
-						goto IL_008e;
+						goto IL_0097;
 					}
 				}
 				PrintAttributes(upgradeComponent.Attributes.ToDictionary((KeyValuePair<Extensible<AttributeName>, int> stat) => ViewModel.Localizer[stat.Key.ToString()].ToString(), (KeyValuePair<Extensible<AttributeName>, int> stat) => stat.Value));
 			}
-			goto IL_008e;
-			IL_008e:
+			goto IL_0097;
+			IL_0097:
 			PrintDescription(upgradeComponent.Description);
 			PrintRequiredLevel(upgradeComponent.Level);
 			PrintInBank();
@@ -722,7 +562,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 														{
 															if (!(weapon is Shield))
 															{
-																if (!(weapon is Shortbow))
+																if (!(weapon is ShortBow))
 																{
 																	if (!(weapon is SmallBundle))
 																	{
@@ -780,7 +620,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 																}
 																else
 																{
-																	PrintPlainText((string)ViewModel.Localizer["Shortbow"]);
+																	PrintPlainText((string)ViewModel.Localizer["Short Bow"]);
 																}
 															}
 															else
@@ -952,7 +792,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 		private void PrintUpgrades()
 		{
 			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01df: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e9: Unknown result type (might be due to invalid IL or missing references)
 			using IEnumerator<UpgradeSlot> enumerator = ViewModel.UpgradesSlots.GetEnumerator();
 			FormattedLabelBuilder builder;
 			for (; enumerator.MoveNext(); ((Control)builder.Build()).set_Parent((Container)(object)_layout))
@@ -978,7 +818,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 					Rune rune = slot.UpgradeComponent as Rune;
 					if ((object)rune != null)
 					{
-						foreach (var (bonus, ordinal) in (rune.Bonuses ?? Array.Empty<string>()).Select((string value, int index) => (value, index + 1)))
+						foreach (var (bonus, ordinal) in (rune.Bonuses ?? ImmutableValueList.Create(default(ReadOnlySpan<string>))).Select((string value, int index) => (value, index + 1)))
 						{
 							builder.CreatePart($"\r\n({ordinal:0}): {bonus}", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder part)
 							{
@@ -1059,57 +899,76 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 
 		private void PrintItemSkin()
 		{
-			//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
-			if (!ViewModel.DefaultLocked)
+			string skinName = ViewModel.DefaultSkin?.Name;
+			if (!string.IsNullOrEmpty(skinName))
 			{
-				return;
-			}
-			if (ViewModel.Unlocked.HasValue)
-			{
-				if (ViewModel.Unlocked.Value)
-				{
-					PrintPlainText(string.Format("\r\n{0}\r\n{1}", ViewModel.Localizer["Skin Unlocked"], ViewModel.DefaultSkin?.Name));
-				}
-				else
-				{
-					PrintPlainText(string.Format("\r\n{0}\r\n{1}", ViewModel.Localizer["Skin Locked"], ViewModel.DefaultSkin?.Name), Gray);
-				}
-			}
-			else
-			{
-				PrintPlainText("\r\n" + ViewModel.AuthorizationText + "\r\n" + ViewModel.DefaultSkin?.Name, Gray);
+				PrintLockedUnlocked(string.Format("\r\n{0}\r\n{1}", ViewModel.Localizer["Skin Locked"], skinName), string.Format("\r\n{0}\r\n{1}", ViewModel.Localizer["Skin Unlocked"], skinName), "\r\n" + ViewModel.LockedOtherText + "\r\n" + skinName);
 			}
 		}
 
 		private void PrintTransmutation()
 		{
-			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00af: Unknown result type (might be due to invalid IL or missing references)
-			if (!ViewModel.DefaultLocked)
+			PrintLockedUnlocked(string.Format("\r\n{0}", ViewModel.Localizer["Skin Locked"]), string.Format("\r\n{0}", ViewModel.Localizer["Skin Unlocked"]), "\r\n" + ViewModel.LockedOtherText);
+		}
+
+		private void PrintUnlocked(string unlockedText, string? other = null, Color? unlockedTextColor = null)
+		{
+			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
+			if (ViewModel.DefaultLocked)
 			{
-				return;
-			}
-			if (ViewModel.Unlocked.HasValue)
-			{
-				if (ViewModel.Unlocked.Value)
+				if (ViewModel.Unlocked.HasValue)
 				{
-					PrintPlainText(string.Format("\r\n{0}", ViewModel.Localizer["Skin Unlocked"]));
+					if (ViewModel.Unlocked.Value)
+					{
+						PrintPlainText(unlockedText, (Color)(((_003F?)unlockedTextColor) ?? Color.get_Red()));
+					}
 				}
-				else
+				else if (!string.IsNullOrEmpty(other))
 				{
-					PrintPlainText(string.Format("\r\n{0}", ViewModel.Localizer["Skin Locked"]), Gray);
+					PrintPlainText(other, Gray);
 				}
 			}
-			else
+			else if (!string.IsNullOrEmpty(other))
 			{
-				PrintPlainText("\r\n" + ViewModel.AuthorizationText, Gray);
+				PrintPlainText(other, Gray);
+			}
+		}
+
+		private void PrintLockedUnlocked(string lockedText, string unlockedText, string? other = null)
+		{
+			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
+			if (ViewModel.DefaultLocked)
+			{
+				if (ViewModel.Unlocked.HasValue)
+				{
+					if (ViewModel.Unlocked.Value)
+					{
+						PrintPlainText(unlockedText);
+					}
+					else
+					{
+						PrintPlainText(lockedText, Gray);
+					}
+				}
+				else if (!string.IsNullOrEmpty(other))
+				{
+					PrintPlainText(other, Gray);
+				}
+			}
+			else if (!string.IsNullOrEmpty(other))
+			{
+				PrintPlainText(other, Gray);
 			}
 		}
 
 		private void PrintItemRarity(Extensible<Rarity> rarity)
 		{
-			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
 			if (rarity == Rarity.Basic)
 			{
 				PrintPlainText(" ");
@@ -1270,14 +1129,14 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
 			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0121: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0128: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0137: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0145: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0151: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0161: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0194: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d4: Unknown result type (might be due to invalid IL or missing references)
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Parent((Container)(object)_layout);
 			val.set_FlowDirection((ControlFlowDirection)2);
@@ -1297,7 +1156,8 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 			if (effect.Duration > TimeSpan.Zero)
 			{
 				IFormatProvider currentCulture = CultureInfo.CurrentCulture;
-				string arg = ((effect.Duration.Hours < 1) ? $"{effect.Duration.TotalMinutes} m" : $"{effect.Duration.TotalHours} h");
+				TimeSpan duration = effect.Duration;
+				string arg = ((duration.TotalDays >= 1.0) ? $"{effect.Duration.Days} d" : ((duration.TotalHours >= 1.0) ? $"{effect.Duration.Hours} h" : ((!(duration.TotalMinutes >= 1.0)) ? $"{effect.Duration.Seconds}s" : $"{effect.Duration.Minutes} m")));
 				builder.AppendFormat(currentCulture, " ({0})", arg);
 			}
 			builder.Append(": ");
@@ -1384,7 +1244,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 			Armor armor = item as Armor;
 			if ((object)armor == null)
 			{
-				Backpack back = item as Backpack;
+				BackItem back = item as BackItem;
 				if ((object)back == null)
 				{
 					Bag bag = item as Bag;
@@ -1411,7 +1271,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 												JadeTechModule jadeTechModule = item as JadeTechModule;
 												if ((object)jadeTechModule == null)
 												{
-													Miniature miniature = item as Miniature;
+													MiniatureItem miniature = item as MiniatureItem;
 													if ((object)miniature == null)
 													{
 														PowerCore powerCore = item as PowerCore;
@@ -1511,7 +1371,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 				}
 				else
 				{
-					PrintBackpack(back);
+					PrintBackItem(back);
 				}
 			}
 			else

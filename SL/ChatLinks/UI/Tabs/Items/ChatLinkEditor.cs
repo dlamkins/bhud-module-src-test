@@ -245,7 +245,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 			_chatLink = val11;
 			Binder.Bind(ViewModel, (ChatLinkEditorViewModel vm) => vm.ChatLink, _chatLink, BindingMode.ToView);
 			((Control)_chatLink).add_Click((EventHandler<MouseEventArgs>)ChatLinkClicked);
-			((Control)_chatLink).set_Menu(new ContextMenuStrip((Func<IEnumerable<ContextMenuStripItem>>)(() => new _003C_003Ez__ReadOnlyArray<ContextMenuStripItem>((ContextMenuStripItem[])(object)new ContextMenuStripItem[1] { viewModel2.CopyChatLinkCommand.ToMenuItem(() => viewModel2.CopyChatLinkLabel) }))));
+			((Control)_chatLink).set_Menu(new ContextMenuStrip((Func<IEnumerable<ContextMenuStripItem>>)(() => new _003C_003Ez__ReadOnlySingleElementList<ContextMenuStripItem>(viewModel2.CopyChatLinkCommand.ToMenuItem(() => viewModel2.CopyChatLinkLabel)))));
 			GlowButton val12 = new GlowButton();
 			((Control)val12).set_Parent((Container)(object)chatLinkGroup);
 			val12.set_Icon(AsyncTexture2D.FromAssetId(2208345));

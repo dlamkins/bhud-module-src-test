@@ -12,7 +12,6 @@ using Microsoft.Extensions.Primitives;
 using Microsoft.Xna.Framework.Graphics;
 using SL.ChatLinks.Storage;
 using SL.Common;
-using SL.Common.Controls;
 using SL.Common.ModelBinding;
 
 namespace SL.ChatLinks.UI
@@ -205,30 +204,13 @@ namespace SL.ChatLinks.UI
 			OnPropertyChanged("RaiseStackSizeLabel");
 		}
 
+		[IteratorStateMachine(typeof(_003CContextMenuItems_003Ed__52))]
 		public IEnumerable<ContextMenuStripItem> ContextMenuItems()
 		{
-			ContextMenuStripItem val = new ContextMenuStripItem(BananaModeLabel);
-			val.set_CanCheck(true);
-			val.set_Checked(BananaMode);
-			ContextMenuStripItem bananaModeItem = val;
-			bananaModeItem.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate(object sender, CheckChangedEvent args)
+			return new _003CContextMenuItems_003Ed__52(-2)
 			{
-				BananaMode = args.get_Checked();
-			});
-			ContextMenuStripItem val2 = new ContextMenuStripItem(RaiseStackSizeLabel);
-			val2.set_CanCheck(true);
-			val2.set_Checked(RaiseStackSize);
-			ContextMenuStripItem raiseStackSizeItem = val2;
-			raiseStackSizeItem.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate(object sender, CheckChangedEvent args)
-			{
-				RaiseStackSize = args.get_Checked();
-			});
-			ContextMenuStripItem syncItem = SyncCommand.ToMenuItem(() => SyncLabel);
-			ContextMenuStripItem koFiItem = KoFiCommand.ToMenuItem(() => KoFiLabel);
-			yield return bananaModeItem;
-			yield return raiseStackSizeItem;
-			yield return syncItem;
-			yield return koFiItem;
+				_003C_003E4__this = this
+			};
 		}
 
 		public void Dispose()

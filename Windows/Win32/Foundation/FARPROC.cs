@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 
 namespace Windows.Win32.Foundation
 {
-	[GeneratedCode("Microsoft.Windows.CsWin32", "0.3.183+73e6125f79.RR")]
+	[GeneratedCode("Microsoft.Windows.CsWin32", "0.3.269+368685089b.RR")]
 	internal struct FARPROC
 	{
 		internal IntPtr Value;

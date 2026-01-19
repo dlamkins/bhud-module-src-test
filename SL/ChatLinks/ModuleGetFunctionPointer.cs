@@ -25,11 +25,9 @@ namespace SL.ChatLinks
 		public static ProcessModule GetModule(string moduleName)
 		{
 			string moduleName2 = moduleName;
-			List<ProcessModule> list = new List<ProcessModule>();
-			list.AddRange(from ProcessModule e in Process.GetCurrentProcess().Modules
+			List<ProcessModule> modules = (from ProcessModule e in Process.GetCurrentProcess().Modules
 				where Path.GetFileNameWithoutExtension(e.ModuleName) == moduleName2
-				select e);
-			List<ProcessModule> modules = list;
+				select e).ToList();
 			if (modules != null)
 			{
 				switch (modules.Count)

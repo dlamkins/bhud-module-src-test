@@ -290,9 +290,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 			_clipboard = clipboard;
 			_item = item;
 			ItemNameColor = ItemColors.Rarity(item.Rarity);
-			List<UpgradeEditorViewModel> list = new List<UpgradeEditorViewModel>();
-			list.AddRange(CreateUpgradeEditorViewModels());
-			_upgradeEditorViewModels = list;
+			_upgradeEditorViewModels = CreateUpgradeEditorViewModels().ToList();
 			foreach (var item2 in _upgradeEditorViewModels.Select((UpgradeEditorViewModel vm, int index) => (index + 1, vm)))
 			{
 				var (slot, vm2) = item2;
@@ -396,51 +394,13 @@ namespace SL.ChatLinks.UI.Tabs.Items
 			return _icons.GetIcon(Item.IconUrl);
 		}
 
+		[IteratorStateMachine(typeof(_003CCreateUpgradeEditorViewModels_003Ed__83))]
 		private IEnumerable<UpgradeEditorViewModel> CreateUpgradeEditorViewModels()
 		{
-			Item item = Item;
-			IUpgradable upgradable = item as IUpgradable;
-			if (upgradable == null)
+			return new _003CCreateUpgradeEditorViewModels_003Ed__83(-2)
 			{
-				if (_options.CurrentValue.BananaMode)
-				{
-					yield return _upgradeEditorViewModelFactory(Item, UpgradeSlotType.Banana, null);
-				}
-				yield break;
-			}
-			foreach (int? defaultUpgradeComponentId in upgradable.UpgradeSlots)
-			{
-				yield return _upgradeEditorViewModelFactory(Item, UpgradeSlotType.Default, _customizer.GetUpgradeComponent(defaultUpgradeComponentId));
-			}
-			foreach (InfusionSlot infusionSlot in upgradable.InfusionSlots)
-			{
-				UpgradeEditorViewModel.Factory upgradeEditorViewModelFactory = _upgradeEditorViewModelFactory;
-				item = Item;
-				InfusionSlotFlags flags = infusionSlot.Flags;
-				if ((object)flags == null)
-				{
-					goto IL_017d;
-				}
-				UpgradeSlotType slotType;
-				if (!flags.Enrichment)
-				{
-					if (!flags.Infusion)
-					{
-						goto IL_017d;
-					}
-					slotType = UpgradeSlotType.Infusion;
-				}
-				else
-				{
-					slotType = UpgradeSlotType.Enrichment;
-				}
-				goto IL_0180;
-				IL_017d:
-				slotType = UpgradeSlotType.Default;
-				goto IL_0180;
-				IL_0180:
-				yield return upgradeEditorViewModelFactory(item, slotType, _customizer.GetUpgradeComponent(infusionSlot.ItemId));
-			}
+				_003C_003E4__this = this
+			};
 		}
 
 		public void Dispose()

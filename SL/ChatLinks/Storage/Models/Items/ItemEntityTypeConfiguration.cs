@@ -1,8 +1,6 @@
-using GuildWars2;
 using GuildWars2.Items;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using SL.ChatLinks.Storage.Comparers;
 using SL.ChatLinks.Storage.Converters;
 using SL.Common;
 
@@ -18,18 +16,17 @@ namespace SL.ChatLinks.Storage.Models.Items
 			builder.Property((Item item) => item.Id).ValueGeneratedNever();
 			builder.Property((Item item) => item.Rarity).HasConversion(new ExtensibleEnumConverter<Rarity>());
 			builder.Property((Item item) => item.VendorValue).HasConversion(new CoinConverter());
-			builder.Property((Item item) => item.GameTypes).HasJsonValueConversion().Metadata.SetValueComparer(new CollectionComparer<Extensible<GameType>>());
+			builder.Property((Item item) => item.GameTypes).HasJsonValueConversion();
 			builder.Property((Item item) => item.Flags).HasJsonValueConversion();
 			builder.Property((Item item) => item.Restrictions).HasJsonValueConversion();
-			builder.Ignore((Item item) => item.IconHref);
 			builder.HasDiscriminator<string>("Type").HasValue<Item>("item").HasValue<CraftingMaterial>("crafting_material")
 				.HasValue<JadeTechModule>("jade_tech_module")
 				.HasValue<PowerCore>("power_core")
 				.HasValue<Bag>("bag")
 				.HasValue<Relic>("relic")
-				.HasValue<Miniature>("miniature")
+				.HasValue<MiniatureItem>("miniature")
 				.HasValue<Trophy>("trophy")
-				.HasValue<Backpack>("back")
+				.HasValue<BackItem>("back")
 				.HasValue<SalvageTool>("salvage_tool")
 				.HasValue<Container>("container")
 				.HasValue<ImmediateContainer>("immediate_container")
@@ -57,7 +54,7 @@ namespace SL.ChatLinks.Storage.Models.Items
 				.HasValue<Staff>("staff")
 				.HasValue<HarpoonGun>("harpoon_gun")
 				.HasValue<Longbow>("longbow")
-				.HasValue<Shortbow>("shortbow")
+				.HasValue<ShortBow>("short_bow")
 				.HasValue<SmallBundle>("small_bundle")
 				.HasValue<LargeBundle>("large_bundle")
 				.HasValue<Pistol>("pistol")
@@ -117,7 +114,8 @@ namespace SL.ChatLinks.Storage.Models.Items
 				.HasValue<MiniatureUnlocker>("miniature_unlocker")
 				.HasValue<SharedInventorySlot>("shared_inventory_slot")
 				.HasValue<MistChampionSkinUnlocker>("mist_champion_skin_unlocker")
-				.HasValue<JadeBotSkinUnlocker>("jade_bot_skin_unlocker");
+				.HasValue<JadeBotSkinUnlocker>("jade_bot_skin_unlocker")
+				.HasValue<ConjuredDoorwayUnlocker>("conjured_doorway_unlocker");
 		}
 	}
 }

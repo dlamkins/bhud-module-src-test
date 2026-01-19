@@ -1,9 +1,5 @@
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Text.Json;
-using GuildWars2;
-using GuildWars2.Hero;
 using GuildWars2.Hero.Achievements;
 using GuildWars2.Hero.Achievements.Categories;
 using GuildWars2.Hero.Achievements.Groups;
@@ -20,10 +16,7 @@ using GuildWars2.Hero.Equipment.Wardrobe;
 using GuildWars2.Items;
 using GuildWars2.Pvp.MistChampions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using SL.ChatLinks.Storage.Comparers;
 using SL.ChatLinks.Storage.Models.Hero.Achievements;
 using SL.ChatLinks.Storage.Models.Hero.Crafting;
 using SL.ChatLinks.Storage.Models.Hero.Equipment.Dyes;
@@ -43,7 +36,7 @@ namespace SL.ChatLinks.Storage
 {
 	public class ChatLinksContext : DbContext
 	{
-		public static int SchemaVersion => 6;
+		public static int SchemaVersion => 7;
 
 		public DbSet<Item> Items => Set<Item>();
 
@@ -65,7 +58,7 @@ namespace SL.ChatLinks.Storage
 
 		public DbSet<Novelty> Novelties => Set<Novelty>();
 
-		public DbSet<GuildWars2.Hero.Equipment.Miniatures.Miniature> Miniatures => Set<GuildWars2.Hero.Equipment.Miniatures.Miniature>();
+		public DbSet<Miniature> Miniatures => Set<Miniature>();
 
 		public DbSet<Outfit> Outfits => Set<Outfit>();
 
@@ -104,25 +97,15 @@ namespace SL.ChatLinks.Storage
 		{
 			ThrowHelper.ThrowIfNull(modelBuilder, "modelBuilder");
 			modelBuilder.ApplyConfiguration(new ItemEntityTypeConfiguration());
-			ValueConverter<IDictionary<Extensible<AttributeName>, int>, string> attributesConverter = new ValueConverter<IDictionary<Extensible<AttributeName>, int>, string>((IDictionary<Extensible<AttributeName>, int> attr) => Serialize(attr.ToDictionary((KeyValuePair<Extensible<AttributeName>, int> pair) => ((object)pair.Key).ToString(), (KeyValuePair<Extensible<AttributeName>, int> pair) => pair.Value)), (string json) => Deserialize<Dictionary<string, int>>(json).ToDictionary((KeyValuePair<string, int> pair) => new Extensible<AttributeName>(pair.Key), (KeyValuePair<string, int> pair) => pair.Value));
-			ValueComparer<IDictionary<Extensible<AttributeName>, int>> attributesComparer = new DictionaryComparer<Extensible<AttributeName>, int>();
-			ValueComparer<Buff> buffComparer = new ValueObjectComparer<Buff>((Buff buff) => new Buff
-			{
-				Description = buff.Description,
-				SkillId = buff.SkillId
-			});
-			ValueComparer<IReadOnlyList<InfusionSlot>> infusionSlotsComparer = new ListComparer<InfusionSlot>();
-			ValueComparer<IReadOnlyCollection<InfusionSlotUpgradeSource>> upgradeSourceComparer = new CollectionComparer<InfusionSlotUpgradeSource>();
-			ValueComparer<IReadOnlyCollection<InfusionSlotUpgradePath>> upgradePathComparer = new CollectionComparer<InfusionSlotUpgradePath>();
-			modelBuilder.ApplyConfiguration(new ArmorEntityTypeConfiguration(attributesConverter, attributesComparer, buffComparer, infusionSlotsComparer));
-			modelBuilder.ApplyConfiguration(new TrinketEntityTypeConfiguration(attributesConverter, attributesComparer, buffComparer, infusionSlotsComparer));
-			modelBuilder.ApplyConfiguration(new RingEntityTypeConfiguration(upgradeSourceComparer, upgradePathComparer));
-			modelBuilder.ApplyConfiguration(new WeaponEntityTypeConfiguration(attributesConverter, attributesComparer, buffComparer, infusionSlotsComparer));
-			modelBuilder.ApplyConfiguration(new WeaponEntityTypeConfiguration(attributesConverter, attributesComparer, buffComparer, infusionSlotsComparer));
-			modelBuilder.ApplyConfiguration(new BackItemEntityTypeConfiguration(attributesConverter, attributesComparer, buffComparer, infusionSlotsComparer, upgradeSourceComparer, upgradePathComparer));
-			modelBuilder.ApplyConfiguration(new UpgradeComponentEntityTypeConfiguration(attributesConverter, attributesComparer, buffComparer, upgradePathComparer));
+			modelBuilder.ApplyConfiguration(new ArmorEntityTypeConfiguration());
+			modelBuilder.ApplyConfiguration(new TrinketEntityTypeConfiguration());
+			modelBuilder.ApplyConfiguration(new RingEntityTypeConfiguration());
+			modelBuilder.ApplyConfiguration(new WeaponEntityTypeConfiguration());
+			modelBuilder.ApplyConfiguration(new WeaponEntityTypeConfiguration());
+			modelBuilder.ApplyConfiguration(new BackItemEntityTypeConfiguration());
+			modelBuilder.ApplyConfiguration(new UpgradeComponentEntityTypeConfiguration());
 			modelBuilder.ApplyConfiguration(new RuneEntityTypeConfiguration());
-			modelBuilder.ApplyConfiguration(new CraftingMaterialEntityTypeConfiguration(upgradePathComparer));
+			modelBuilder.ApplyConfiguration(new CraftingMaterialEntityTypeConfiguration());
 			modelBuilder.ApplyConfiguration(new RecipeSheetEntityTypeConfiguration());
 			modelBuilder.ApplyConfiguration(new TransmutationEntityTypeConfiguration());
 			modelBuilder.ApplyConfiguration(new FoodEntityTypeConfiguration());

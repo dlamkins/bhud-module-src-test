@@ -26,9 +26,7 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 			}
 			if (achievement2.Prerequisites.Count > 0)
 			{
-				List<AccountAchievement> list = new List<AccountAchievement>();
-				list.AddRange(achievement2.Prerequisites.Select((int pre) => progression2?.SingleOrDefault((AccountAchievement progress) => progress.Id == pre)));
-				return !list.All((AccountAchievement progress) => progress?.Done ?? false);
+				return !achievement2.Prerequisites.Select((int pre) => progression2?.SingleOrDefault((AccountAchievement progress) => progress.Id == pre)).ToList().All((AccountAchievement progress) => progress?.Done ?? false);
 			}
 			return false;
 		}

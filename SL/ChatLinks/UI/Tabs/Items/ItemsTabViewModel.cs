@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -79,7 +80,10 @@ namespace SL.ChatLinks.UI.Tabs.Items
 			}
 			set
 			{
-				SetField(ref _selectedItem, value, "SelectedItem");
+				if (SetField(ref _selectedItem, value, "SelectedItem"))
+				{
+					OnPropertyChanged("SelectedItem");
+				}
 			}
 		}
 
@@ -163,10 +167,15 @@ namespace SL.ChatLinks.UI.Tabs.Items
 
 		public string ContentTitle => _area.GetTitle();
 
-		public RelayCommand BackCommand => new RelayCommand(delegate
+		public RelayCommand BackCommand => new RelayCommand(async delegate
 		{
 			if ((object)SelectedItem != null)
 			{
+				ItemsListViewModel selected = SearchResults.FirstOrDefault((ItemsListViewModel vm) => vm.Item.Id == SelectedItem!.Id);
+				if (selected != null)
+				{
+					selected.IsSelected = false;
+				}
 				SelectedItem = null;
 				Area = Area.Back();
 			}
@@ -331,7 +340,7 @@ namespace SL.ChatLinks.UI.Tabs.Items
 						},
 						new ItemCategoryMenuItem
 						{
-							Id = "shortbow",
+							Id = "short_bow",
 							Label = (string)_003Clocalizer_003EP["Short Bows"]
 						},
 						new ItemCategoryMenuItem
@@ -646,6 +655,11 @@ namespace SL.ChatLinks.UI.Tabs.Items
 						{
 							Id = "expansions",
 							Label = (string)_003Clocalizer_003EP["Expansions"]
+						},
+						new ItemCategoryMenuItem
+						{
+							Id = "conjured_doorway_unlocker",
+							Label = (string)_003Clocalizer_003EP["Conjured Doorway Unlockers"]
 						},
 						new ItemCategoryMenuItem
 						{

@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using GuildWars2.Collections;
 using GuildWars2.Hero.Achievements;
 using Microsoft.Extensions.Localization;
 using SL.Common;
@@ -24,7 +24,7 @@ namespace SL.ChatLinks.UI.Tabs.Achievements.Tooltips
 				string requirement = _003Cachievement_003EP.Requirement;
 				if (_003Cachievement_003EP.Tiers.Count > 0)
 				{
-					IReadOnlyList<AchievementTier> tiers = _003Cachievement_003EP.Tiers;
+					IImmutableValueList<AchievementTier> tiers = _003Cachievement_003EP.Tiers;
 					AchievementTier tier = tiers[tiers.Count - 1];
 					if ((object)tier != null)
 					{

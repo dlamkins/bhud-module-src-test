@@ -126,7 +126,7 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 			}
 		}
 
-		public AccountAchievement? Progress => Progression.SingleOrDefault((AccountAchievement accountAchievement) => accountAchievement.Id == Achievement.Id);
+		public AccountAchievement? Progress => Progression?.SingleOrDefault((AccountAchievement accountAchievement) => accountAchievement.Id == Achievement.Id);
 
 		public bool Locked => Achievement.IsLocked(Group, Progression);
 

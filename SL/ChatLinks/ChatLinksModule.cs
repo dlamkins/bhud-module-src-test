@@ -97,7 +97,8 @@ namespace SL.ChatLinks
 			services.AddTransient(delegate
 			{
 				string currentMumbleMapName = GameService.Gw2Mumble.get_CurrentMumbleMapName();
-				return GameLink.Open(default(TimeSpan), currentMumbleMapName);
+				TimeSpan refreshInterval = default(TimeSpan);
+				return GameLink.Open(in refreshInterval, currentMumbleMapName);
 			});
 			services.AddTransient<MumbleListener>();
 			services.AddLogging(delegate(ILoggingBuilder builder)

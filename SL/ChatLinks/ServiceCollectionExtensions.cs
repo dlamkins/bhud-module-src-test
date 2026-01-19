@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -16,16 +15,11 @@ namespace SL.ChatLinks
 			{
 				throw new ArgumentException("The delegate must have a return type.", "TDelegate");
 			}
-			Type returnType = invokeMethod.ReturnType;
-			List<Type> list = new List<Type>();
-			list.AddRange(from p in invokeMethod.GetParameters()
-				select p.ParameterType);
-			ConstantExpression instance = Expression.Constant(ActivatorUtilities.CreateFactory(returnType, list.ToArray()));
+			ConstantExpression instance = Expression.Constant(ActivatorUtilities.CreateFactory(invokeMethod.ReturnType, (from p in invokeMethod.GetParameters()
+				select p.ParameterType).ToArray()));
 			MethodInfo factoryMethod = typeof(ObjectFactory).GetMethod("Invoke");
-			List<ParameterExpression> list2 = new List<ParameterExpression>();
-			list2.AddRange(from p in invokeMethod.GetParameters()
-				select Expression.Parameter(p.ParameterType));
-			ParameterExpression[] parameterExpressions = list2.ToArray();
+			ParameterExpression[] parameterExpressions = (from p in invokeMethod.GetParameters()
+				select Expression.Parameter(p.ParameterType)).ToArray();
 			NewArrayExpression arrayExpression = Expression.NewArrayInit(initializers: parameterExpressions.Select((ParameterExpression p) => Expression.TypeAs(p, typeof(object))), type: typeof(object));
 			ParameterExpression serviceProviderParameterExpression = Expression.Parameter(typeof(IServiceProvider));
 			Func<IServiceProvider, object> compiledDelegateFactory = Expression.Lambda<Func<IServiceProvider, object>>(Expression.Lambda<TDelegate>(Expression.Convert(Expression.Call(instance, factoryMethod, serviceProviderParameterExpression, arrayExpression), invokeMethod.ReturnType), parameterExpressions), new ParameterExpression[1] { serviceProviderParameterExpression }).Compile();

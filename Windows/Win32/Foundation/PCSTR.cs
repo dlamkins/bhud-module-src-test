@@ -1,10 +1,12 @@
 using System;
+using System.CodeDom.Compiler;
 using System.Diagnostics;
 using System.Text;
 
 namespace Windows.Win32.Foundation
 {
 	[DebuggerDisplay("{DebuggerDisplay}")]
+	[GeneratedCode("Microsoft.Windows.CsWin32", "0.3.269+368685089b.RR")]
 	internal readonly struct PCSTR : IEquatable<PCSTR>
 	{
 		internal unsafe readonly byte* Value;

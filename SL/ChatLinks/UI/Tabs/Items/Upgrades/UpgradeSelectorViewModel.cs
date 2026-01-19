@@ -159,6 +159,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Upgrades
 							Rarity.Exotic => 5, 
 							Rarity.Ascended => 6, 
 							Rarity.Legendary => 7, 
+							Rarity.None => 99, 
 							_ => 99, 
 						}));
 						return new { upgrade, rank };

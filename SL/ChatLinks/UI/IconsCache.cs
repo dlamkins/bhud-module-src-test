@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using Blish_HUD.Content;
 
 namespace SL.ChatLinks.UI
@@ -16,10 +17,7 @@ namespace SL.ChatLinks.UI
 
 		public void Dispose()
 		{
-			ConcurrentDictionary<Uri, AsyncTexture2D> webCache = _webCache;
-			List<KeyValuePair<Uri, AsyncTexture2D>> list = new List<KeyValuePair<Uri, AsyncTexture2D>>(webCache.Count);
-			list.AddRange(webCache);
-			foreach (KeyValuePair<Uri, AsyncTexture2D> item in list)
+			foreach (KeyValuePair<Uri, AsyncTexture2D> item in _webCache.ToList())
 			{
 				item.Value.Dispose();
 			}

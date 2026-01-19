@@ -14,7 +14,6 @@ namespace SL.ChatLinks.Storage.Models.Hero.Equipment.Miniatures
 			builder.HasKey((Miniature mini) => mini.Id);
 			builder.HasIndex((Miniature mini) => mini.Name);
 			builder.HasIndex((Miniature mini) => mini.ItemId);
-			builder.Ignore((Miniature mini) => mini.IconHref);
 		}
 	}
 }

@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using GuildWars2;
+using GuildWars2.Collections;
 using GuildWars2.Hero.Achievements;
 using GuildWars2.Hero.Achievements.Categories;
 using GuildWars2.Hero.Achievements.Groups;
@@ -128,7 +129,7 @@ namespace SL.ChatLinks
 			{
 				string path = Path.Combine(_options.Value.Directory, "manifest.json");
 				using FileStream stream = File.OpenWrite(path);
-				await JsonSerializer.SerializeAsync((Stream)stream, manifest, (JsonSerializerOptions?)null, default(CancellationToken)).ConfigureAwait(continueOnCapturedContext: false);
+				await JsonSerializer.SerializeAsync(stream, manifest).ConfigureAwait(continueOnCapturedContext: false);
 			}
 			catch (Exception reason)
 			{
@@ -316,6 +317,8 @@ namespace SL.ChatLinks
 					{
 						await context.Database.MigrateAsync().ConfigureAwait(continueOnCapturedContext: false);
 						await Seed(context, language, CancellationToken.None).ConfigureAwait(continueOnCapturedContext: false);
+						await Vacuum(language, CancellationToken.None).ConfigureAwait(continueOnCapturedContext: false);
+						await Optimize(language, CancellationToken.None).ConfigureAwait(continueOnCapturedContext: false);
 					}
 					finally
 					{
@@ -370,9 +373,9 @@ namespace SL.ChatLinks
 		private async Task<int> SeedItems(ChatLinksContext context, Language language, CancellationToken cancellationToken)
 		{
 			_logger.LogInformation("Start seeding items.");
-			HashSet<int> index = await _gw2Client.Items.GetItemsIndex(cancellationToken).ValueOnly().ConfigureAwait(continueOnCapturedContext: false);
+			IImmutableValueSet<int> index = await _gw2Client.Items.GetItemsIndex(cancellationToken).ValueOnly().ConfigureAwait(continueOnCapturedContext: false);
 			_logger.LogDebug("Found {Count} items in the API.", index.Count);
-			index.ExceptWith(await context.Items.Select((Item item) => item.Id).ToListAsync(cancellationToken).ConfigureAwait(continueOnCapturedContext: false));
+			index = index.Except(await context.Items.Select((Item item) => item.Id).ToListAsync(cancellationToken).ConfigureAwait(continueOnCapturedContext: false));
 			if (index.Count != 0)
 			{
 				_logger.LogDebug("Start seeding {Count} items.", index.Count);
@@ -381,7 +384,7 @@ namespace SL.ChatLinks
 					_eventAggregator.Publish(new DatabaseSyncProgress("items", report));
 				});
 				int count = 0;
-				await foreach (Item item2 in _gw2Client.Items.GetItemsBulk(index, language, MissingMemberBehavior.Undefined, 3, 200, bulkProgress, cancellationToken).ValueOnly(cancellationToken).ConfigureAwait(continueOnCapturedContext: false))
+				await foreach (Item item2 in _gw2Client.Items.GetItemsBulk(index, language, MissingMemberBehavior.Undefined, 3, 200, bulkProgress, in cancellationToken).ValueOnly(cancellationToken).ConfigureAwait(continueOnCapturedContext: false))
 				{
 					context.Add(item2);
 					int num = count + 1;
@@ -402,9 +405,9 @@ namespace SL.ChatLinks
 		private async Task<int> SeedSkins(ChatLinksContext context, Language language, CancellationToken cancellationToken)
 		{
 			_logger.LogInformation("Start seeding skins.");
-			HashSet<int> index = await _gw2Client.Hero.Equipment.Wardrobe.GetSkinsIndex(cancellationToken).ValueOnly().ConfigureAwait(continueOnCapturedContext: false);
+			IImmutableValueSet<int> index = await _gw2Client.Hero.Equipment.Wardrobe.GetSkinsIndex(cancellationToken).ValueOnly().ConfigureAwait(continueOnCapturedContext: false);
 			_logger.LogDebug("Found {Count} skins in the API.", index.Count);
-			index.ExceptWith(await context.Skins.Select((EquipmentSkin skin) => skin.Id).ToListAsync(cancellationToken).ConfigureAwait(continueOnCapturedContext: false));
+			index = index.Except(await context.Skins.Select((EquipmentSkin skin) => skin.Id).ToListAsync(cancellationToken).ConfigureAwait(continueOnCapturedContext: false));
 			if (index.Count != 0)
 			{
 				_logger.LogDebug("Start seeding {Count} skins.", index.Count);
@@ -413,7 +416,7 @@ namespace SL.ChatLinks
 					_eventAggregator.Publish(new DatabaseSyncProgress("skins", report));
 				});
 				int count = 0;
-				await foreach (EquipmentSkin skin2 in _gw2Client.Hero.Equipment.Wardrobe.GetSkinsBulk(index, language, MissingMemberBehavior.Undefined, 3, 200, bulkProgress, cancellationToken).ValueOnly(cancellationToken).ConfigureAwait(continueOnCapturedContext: false))
+				await foreach (EquipmentSkin skin2 in _gw2Client.Hero.Equipment.Wardrobe.GetSkinsBulk(index, language, MissingMemberBehavior.Undefined, 3, 200, bulkProgress, in cancellationToken).ValueOnly(cancellationToken).ConfigureAwait(continueOnCapturedContext: false))
 				{
 					context.Add(skin2);
 					int num = count + 1;
@@ -434,10 +437,10 @@ namespace SL.ChatLinks
 		private async Task<int> SeedColors(ChatLinksContext context, Language language, CancellationToken cancellationToken)
 		{
 			_logger.LogInformation("Start seeding colors.");
-			HashSet<int> index = await _gw2Client.Hero.Equipment.Dyes.GetColorsIndex(cancellationToken).ValueOnly().ConfigureAwait(continueOnCapturedContext: false);
+			IImmutableValueSet<int> index = await _gw2Client.Hero.Equipment.Dyes.GetColorsIndex(cancellationToken).ValueOnly().ConfigureAwait(continueOnCapturedContext: false);
 			_logger.LogDebug("Found {Count} colors in the API.", index.Count);
 			List<int> existing = await context.Colors.Select((DyeColor color) => color.Id).ToListAsync(cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
-			index.ExceptWith(existing);
+			index = index.Except(existing);
 			if (index.Count != 0)
 			{
 				_logger.LogDebug("Start seeding {Count} colors.", index.Count);
@@ -452,9 +455,9 @@ namespace SL.ChatLinks
 		private async Task<int> SeedRecipes(ChatLinksContext context, CancellationToken cancellationToken)
 		{
 			_logger.LogInformation("Start seeding recipes.");
-			HashSet<int> index = await _gw2Client.Hero.Crafting.Recipes.GetRecipesIndex(cancellationToken).ValueOnly().ConfigureAwait(continueOnCapturedContext: false);
+			IImmutableValueSet<int> index = await _gw2Client.Hero.Crafting.Recipes.GetRecipesIndex(cancellationToken).ValueOnly().ConfigureAwait(continueOnCapturedContext: false);
 			_logger.LogDebug("Found {Count} recipes in the API.", index.Count);
-			index.ExceptWith(await context.Recipes.Select((Recipe recipe) => recipe.Id).ToListAsync(cancellationToken).ConfigureAwait(continueOnCapturedContext: false));
+			index = index.Except(await context.Recipes.Select((Recipe recipe) => recipe.Id).ToListAsync(cancellationToken).ConfigureAwait(continueOnCapturedContext: false));
 			if (index.Count != 0)
 			{
 				_logger.LogDebug("Start seeding {Count} recipes.", index.Count);
@@ -463,7 +466,7 @@ namespace SL.ChatLinks
 					_eventAggregator.Publish(new DatabaseSyncProgress("recipes", report));
 				});
 				int count = 0;
-				await foreach (Recipe recipe2 in _gw2Client.Hero.Crafting.Recipes.GetRecipesBulk(index, MissingMemberBehavior.Undefined, 3, 200, bulkProgress, cancellationToken).ValueOnly(cancellationToken).ConfigureAwait(continueOnCapturedContext: false))
+				await foreach (Recipe recipe2 in _gw2Client.Hero.Crafting.Recipes.GetRecipesBulk(index, MissingMemberBehavior.Undefined, 3, 200, bulkProgress, in cancellationToken).ValueOnly(cancellationToken).ConfigureAwait(continueOnCapturedContext: false))
 				{
 					context.Add(recipe2);
 					int num = count + 1;
@@ -484,9 +487,9 @@ namespace SL.ChatLinks
 		private async Task<int> SeedFinishers(ChatLinksContext context, Language language, CancellationToken cancellationToken)
 		{
 			_logger.LogInformation("Start seeding finishers.");
-			HashSet<int> index = await _gw2Client.Hero.Equipment.Finishers.GetFinishersIndex(cancellationToken).ValueOnly().ConfigureAwait(continueOnCapturedContext: false);
+			IImmutableValueSet<int> index = await _gw2Client.Hero.Equipment.Finishers.GetFinishersIndex(cancellationToken).ValueOnly().ConfigureAwait(continueOnCapturedContext: false);
 			_logger.LogDebug("Found {Count} finishers in the API.", index.Count);
-			index.ExceptWith(await context.Finishers.Select((Finisher finisher) => finisher.Id).ToListAsync(cancellationToken).ConfigureAwait(continueOnCapturedContext: false));
+			index = index.Except(await context.Finishers.Select((Finisher finisher) => finisher.Id).ToListAsync(cancellationToken).ConfigureAwait(continueOnCapturedContext: false));
 			if (index.Count != 0)
 			{
 				_logger.LogDebug("Start seeding {Count} finishers.", index.Count);
@@ -501,9 +504,9 @@ namespace SL.ChatLinks
 		private async Task<int> SeedGliders(ChatLinksContext context, Language language, CancellationToken cancellationToken)
 		{
 			_logger.LogInformation("Start seeding gliders.");
-			HashSet<int> index = await _gw2Client.Hero.Equipment.Gliders.GetGliderSkinsIndex(cancellationToken).ValueOnly().ConfigureAwait(continueOnCapturedContext: false);
+			IImmutableValueSet<int> index = await _gw2Client.Hero.Equipment.Gliders.GetGliderSkinsIndex(cancellationToken).ValueOnly().ConfigureAwait(continueOnCapturedContext: false);
 			_logger.LogDebug("Found {Count} gliders in the API.", index.Count);
-			index.ExceptWith(await context.Gliders.Select((GliderSkin glider) => glider.Id).ToListAsync(cancellationToken).ConfigureAwait(continueOnCapturedContext: false));
+			index = index.Except(await context.Gliders.Select((GliderSkin glider) => glider.Id).ToListAsync(cancellationToken).ConfigureAwait(continueOnCapturedContext: false));
 			if (index.Count != 0)
 			{
 				_logger.LogDebug("Start seeding {Count} gliders.", index.Count);
@@ -518,9 +521,9 @@ namespace SL.ChatLinks
 		private async Task<int> SeedJadeBots(ChatLinksContext context, Language language, CancellationToken cancellationToken)
 		{
 			_logger.LogInformation("Start seeding jade bots.");
-			HashSet<int> index = await _gw2Client.Hero.Equipment.JadeBots.GetJadeBotSkinsIndex(cancellationToken).ValueOnly().ConfigureAwait(continueOnCapturedContext: false);
+			IImmutableValueSet<int> index = await _gw2Client.Hero.Equipment.JadeBots.GetJadeBotSkinsIndex(cancellationToken).ValueOnly().ConfigureAwait(continueOnCapturedContext: false);
 			_logger.LogDebug("Found {Count} jade bots in the API.", index.Count);
-			index.ExceptWith(await context.JadeBots.Select((JadeBotSkin jadeBot) => jadeBot.Id).ToListAsync(cancellationToken).ConfigureAwait(continueOnCapturedContext: false));
+			index = index.Except(await context.JadeBots.Select((JadeBotSkin jadeBot) => jadeBot.Id).ToListAsync(cancellationToken).ConfigureAwait(continueOnCapturedContext: false));
 			if (index.Count != 0)
 			{
 				_logger.LogDebug("Start seeding {Count} jade bots.", index.Count);
@@ -535,9 +538,9 @@ namespace SL.ChatLinks
 		private async Task<int> SeedMailCarriers(ChatLinksContext context, Language language, CancellationToken cancellationToken)
 		{
 			_logger.LogInformation("Start seeding mail carriers.");
-			HashSet<int> index = await _gw2Client.Hero.Equipment.MailCarriers.GetMailCarriersIndex(cancellationToken).ValueOnly().ConfigureAwait(continueOnCapturedContext: false);
+			IImmutableValueSet<int> index = await _gw2Client.Hero.Equipment.MailCarriers.GetMailCarriersIndex(cancellationToken).ValueOnly().ConfigureAwait(continueOnCapturedContext: false);
 			_logger.LogDebug("Found {Count} mail carriers in the API.", index.Count);
-			index.ExceptWith(await context.MailCarrriers.Select((MailCarrier mailCarrier) => mailCarrier.Id).ToListAsync(cancellationToken).ConfigureAwait(continueOnCapturedContext: false));
+			index = index.Except(await context.MailCarrriers.Select((MailCarrier mailCarrier) => mailCarrier.Id).ToListAsync(cancellationToken).ConfigureAwait(continueOnCapturedContext: false));
 			if (index.Count != 0)
 			{
 				_logger.LogDebug("Start seeding {Count} mail carriers.", index.Count);
@@ -552,14 +555,14 @@ namespace SL.ChatLinks
 		private async Task<int> SeedMiniatures(ChatLinksContext context, Language language, CancellationToken cancellationToken)
 		{
 			_logger.LogInformation("Start seeding miniatures.");
-			HashSet<int> index = await _gw2Client.Hero.Equipment.Miniatures.GetMiniaturesIndex(cancellationToken).ValueOnly().ConfigureAwait(continueOnCapturedContext: false);
+			IImmutableValueSet<int> index = await _gw2Client.Hero.Equipment.Miniatures.GetMiniaturesIndex(cancellationToken).ValueOnly().ConfigureAwait(continueOnCapturedContext: false);
 			_logger.LogDebug("Found {Count} miniatures in the API.", index.Count);
-			List<int> existing = await context.Miniatures.Select((GuildWars2.Hero.Equipment.Miniatures.Miniature miniature) => miniature.Id).ToListAsync(cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
-			index.ExceptWith(existing);
+			List<int> existing = await context.Miniatures.Select((Miniature miniature) => miniature.Id).ToListAsync(cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
+			index = index.Except(existing);
 			if (index.Count != 0)
 			{
 				_logger.LogDebug("Start seeding {Count} miniatures.", index.Count);
-				await context.AddRangeAsync((await _gw2Client.Hero.Equipment.Miniatures.GetMiniatures(language, MissingMemberBehavior.Undefined, cancellationToken).ValueOnly().ConfigureAwait(continueOnCapturedContext: false)).Where((GuildWars2.Hero.Equipment.Miniatures.Miniature miniature) => index.Contains(miniature.Id)), cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
+				await context.AddRangeAsync((await _gw2Client.Hero.Equipment.Miniatures.GetMiniatures(language, MissingMemberBehavior.Undefined, cancellationToken).ValueOnly().ConfigureAwait(continueOnCapturedContext: false)).Where((Miniature miniature) => index.Contains(miniature.Id)), cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
 				await context.SaveChangesAsync(cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
 				DetachAllEntities(context);
 			}
@@ -570,24 +573,17 @@ namespace SL.ChatLinks
 		private async Task<int> SeedMistChampions(ChatLinksContext context, Language language, CancellationToken cancellationToken)
 		{
 			_logger.LogInformation("Start seeding mist champions.");
-			HashSet<MistChampion> champions = await _gw2Client.Pvp.GetMistChampions(language, MissingMemberBehavior.Undefined, cancellationToken).ValueOnly().ConfigureAwait(continueOnCapturedContext: false);
-			HashSet<int> hashSet = new HashSet<int>();
-			foreach (int item in champions.SelectMany((MistChampion champion) => champion.Skins.Select((MistChampionSkin skin) => skin.Id)))
-			{
-				hashSet.Add(item);
-			}
-			HashSet<int> index = hashSet;
+			IImmutableValueSet<MistChampion> champions = await _gw2Client.Pvp.GetMistChampions(language, MissingMemberBehavior.Undefined, cancellationToken).ValueOnly().ConfigureAwait(continueOnCapturedContext: false);
+			IImmutableValueSet<int> index = ImmutableValueSet.Create(new ReadOnlySpan<int>(champions.SelectMany((MistChampion champion) => champion.Skins.Select((MistChampionSkin skin) => skin.Id)).ToArray()));
 			_logger.LogDebug("Found {Count} mist champions in the API.", index.Count);
 			List<int> existing = await context.MistChampions.Select((MistChampionSkin mistChampion) => mistChampion.Id).ToListAsync(cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
-			index.ExceptWith(existing);
+			index = index.Except(existing);
 			if (index.Count != 0)
 			{
 				_logger.LogDebug("Start seeding {Count} mist champions.", index.Count);
-				List<MistChampionSkin> list = new List<MistChampionSkin>();
-				list.AddRange(from skin in champions.SelectMany((MistChampion champion) => champion.Skins)
+				List<MistChampionSkin> mistChampions = (from skin in champions.SelectMany((MistChampion champion) => champion.Skins)
 					where index.Contains(skin.Id)
-					select skin);
-				List<MistChampionSkin> mistChampions = list;
+					select skin).ToList();
 				await context.AddRangeAsync(mistChampions, cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
 				await context.SaveChangesAsync(cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
 				DetachAllEntities(context);
@@ -599,10 +595,10 @@ namespace SL.ChatLinks
 		private async Task<int> SeedNovelties(ChatLinksContext context, Language language, CancellationToken cancellationToken)
 		{
 			_logger.LogInformation("Start seeding novelties.");
-			HashSet<int> index = await _gw2Client.Hero.Equipment.Novelties.GetNoveltiesIndex(cancellationToken).ValueOnly().ConfigureAwait(continueOnCapturedContext: false);
+			IImmutableValueSet<int> index = await _gw2Client.Hero.Equipment.Novelties.GetNoveltiesIndex(cancellationToken).ValueOnly().ConfigureAwait(continueOnCapturedContext: false);
 			_logger.LogDebug("Found {Count} novelties in the API.", index.Count);
 			List<int> existing = await context.Novelties.Select((Novelty novelty) => novelty.Id).ToListAsync(cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
-			index.ExceptWith(existing);
+			index = index.Except(existing);
 			if (index.Count != 0)
 			{
 				_logger.LogDebug("Start seeding {Count} novelties.", index.Count);
@@ -617,10 +613,10 @@ namespace SL.ChatLinks
 		private async Task<int> SeedOutfits(ChatLinksContext context, Language language, CancellationToken cancellationToken)
 		{
 			_logger.LogInformation("Start seeding outfits.");
-			HashSet<int> index = await _gw2Client.Hero.Equipment.Outfits.GetOutfitsIndex(cancellationToken).ValueOnly().ConfigureAwait(continueOnCapturedContext: false);
+			IImmutableValueSet<int> index = await _gw2Client.Hero.Equipment.Outfits.GetOutfitsIndex(cancellationToken).ValueOnly().ConfigureAwait(continueOnCapturedContext: false);
 			_logger.LogDebug("Found {Count} outfits in the API.", index.Count);
 			List<int> existing = await context.Outfits.Select((Outfit outfit) => outfit.Id).ToListAsync(cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
-			index.ExceptWith(existing);
+			index = index.Except(existing);
 			if (index.Count != 0)
 			{
 				_logger.LogDebug("Start seeding {Count} outfits.", index.Count);
@@ -635,9 +631,9 @@ namespace SL.ChatLinks
 		private async Task<int> SeedAchievements(ChatLinksContext context, Language language, CancellationToken cancellationToken)
 		{
 			_logger.LogInformation("Start seeding achievements.");
-			HashSet<int> index = await _gw2Client.Hero.Achievements.GetAchievementsIndex(cancellationToken).ValueOnly().ConfigureAwait(continueOnCapturedContext: false);
+			IImmutableValueSet<int> index = await _gw2Client.Hero.Achievements.GetAchievementsIndex(cancellationToken).ValueOnly().ConfigureAwait(continueOnCapturedContext: false);
 			_logger.LogDebug("Found {Count} achievements in the API.", index.Count);
-			index.ExceptWith(await context.Achievements.Select((Achievement achievement) => achievement.Id).ToListAsync(cancellationToken).ConfigureAwait(continueOnCapturedContext: false));
+			index = index.Except(await context.Achievements.Select((Achievement achievement) => achievement.Id).ToListAsync(cancellationToken).ConfigureAwait(continueOnCapturedContext: false));
 			if (index.Count != 0)
 			{
 				_logger.LogDebug("Start seeding {Count} achievements.", index.Count);
@@ -646,7 +642,7 @@ namespace SL.ChatLinks
 					_eventAggregator.Publish(new DatabaseSyncProgress("achievements", report));
 				});
 				int count = 0;
-				await foreach (Achievement achievement2 in _gw2Client.Hero.Achievements.GetAchievementsBulk(index, language, MissingMemberBehavior.Undefined, 3, 200, bulkProgress, cancellationToken).ValueOnly(cancellationToken).ConfigureAwait(continueOnCapturedContext: false))
+				await foreach (Achievement achievement2 in _gw2Client.Hero.Achievements.GetAchievementsBulk(index, language, MissingMemberBehavior.Undefined, 3, 200, bulkProgress, in cancellationToken).ValueOnly(cancellationToken).ConfigureAwait(continueOnCapturedContext: false))
 				{
 					context.Add(achievement2);
 					int num = count + 1;
@@ -667,7 +663,7 @@ namespace SL.ChatLinks
 		private async Task<int> SeedAchievementCategories(ChatLinksContext context, Language language, CancellationToken cancellationToken)
 		{
 			_logger.LogInformation("Start seeding achievement categories.");
-			HashSet<int> index = await _gw2Client.Hero.Achievements.GetAchievementCategoriesIndex(cancellationToken).ValueOnly().ConfigureAwait(continueOnCapturedContext: false);
+			IImmutableValueSet<int> index = await _gw2Client.Hero.Achievements.GetAchievementCategoriesIndex(cancellationToken).ValueOnly().ConfigureAwait(continueOnCapturedContext: false);
 			_logger.LogDebug("Found {Count} achievement categories in the API.", index.Count);
 			List<int> existing = await context.AchievementCategories.Select((AchievementCategory category) => category.Id).ToListAsync(cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
 			_logger.LogDebug("Start seeding {Count} achievement categories.", index.Count);
@@ -684,7 +680,7 @@ namespace SL.ChatLinks
 		private async Task<int> SeedAchievementGroups(ChatLinksContext context, Language language, CancellationToken cancellationToken)
 		{
 			_logger.LogInformation("Start seeding achievement groups.");
-			HashSet<string> index = await _gw2Client.Hero.Achievements.GetAchievementGroupsIndex(cancellationToken).ValueOnly().ConfigureAwait(continueOnCapturedContext: false);
+			IImmutableValueSet<string> index = await _gw2Client.Hero.Achievements.GetAchievementGroupsIndex(cancellationToken).ValueOnly().ConfigureAwait(continueOnCapturedContext: false);
 			_logger.LogDebug("Found {Count} achievement groups in the API.", index.Count);
 			List<string> existing = await context.AchievementGroups.Select((AchievementGroup group) => group.Id).ToListAsync(cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
 			_logger.LogDebug("Start seeding {Count} achievement groups.", index.Count);
@@ -700,9 +696,7 @@ namespace SL.ChatLinks
 
 		private static void DetachAllEntities(ChatLinksContext context)
 		{
-			List<EntityEntry> list = new List<EntityEntry>();
-			list.AddRange(context.ChangeTracker.Entries());
-			foreach (EntityEntry item in list)
+			foreach (EntityEntry item in context.ChangeTracker.Entries().ToList())
 			{
 				item.State = EntityState.Detached;
 			}

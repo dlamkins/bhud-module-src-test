@@ -1,10 +1,6 @@
-using GuildWars2;
-using GuildWars2.Hero.Crafting;
-using GuildWars2.Hero.Crafting.Disciplines;
 using GuildWars2.Hero.Crafting.Recipes;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using SL.ChatLinks.Storage.Comparers;
 using SL.ChatLinks.Storage.Converters;
 using SL.Common;
 
@@ -19,12 +15,12 @@ namespace SL.ChatLinks.Storage.Models.Hero.Crafting
 			builder.HasKey((Recipe recipe) => recipe.Id);
 			builder.HasIndex((Recipe recipe) => recipe.ChatLink);
 			builder.HasIndex((Recipe recipe) => recipe.OutputItemId);
-			builder.Property((Recipe recipe) => recipe.Disciplines).HasJsonValueConversion().Metadata.SetValueComparer(new CollectionComparer<Extensible<CraftingDisciplineName>>());
+			builder.Property((Recipe recipe) => recipe.Disciplines).HasJsonValueConversion();
 			builder.Property((Recipe recipe) => recipe.Flags).HasJsonValueConversion();
-			builder.Property((Recipe recipe) => recipe.Ingredients).HasJsonValueConversion().Metadata.SetValueComparer(new ListComparer<Ingredient>());
+			builder.Property((Recipe recipe) => recipe.Ingredients).HasJsonValueConversion();
 			builder.HasDiscriminator<string>("Type").HasValue<Recipe>("recipe").HasValue<AmuletRecipe>("amulet")
 				.HasValue<AxeRecipe>("axe")
-				.HasValue<BackpackRecipe>("backpack")
+				.HasValue<BackItemRecipe>("back")
 				.HasValue<BagRecipe>("bag")
 				.HasValue<BootsRecipe>("boots")
 				.HasValue<BulkRecipe>("bulk")
@@ -63,7 +59,7 @@ namespace SL.ChatLinks.Storage.Models.Hero.Crafting
 				.HasValue<ScepterRecipe>("scepter")
 				.HasValue<SeasoningRecipe>("seasoning")
 				.HasValue<ShieldRecipe>("shield")
-				.HasValue<ShortbowRecipe>("shortbow")
+				.HasValue<ShortBowRecipe>("short_bow")
 				.HasValue<ShouldersRecipe>("shoulders")
 				.HasValue<SnackRecipe>("snack")
 				.HasValue<SoupRecipe>("soup")

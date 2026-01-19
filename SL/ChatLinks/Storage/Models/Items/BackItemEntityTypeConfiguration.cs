@@ -1,68 +1,28 @@
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using GuildWars2;
 using GuildWars2.Hero;
 using GuildWars2.Items;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using SL.ChatLinks.Storage.Comparers;
 using SL.ChatLinks.Storage.Converters;
 using SL.Common;
 
 namespace SL.ChatLinks.Storage.Models.Items
 {
-	public sealed class BackItemEntityTypeConfiguration : IEntityTypeConfiguration<Backpack>
+	public sealed class BackItemEntityTypeConfiguration : IEntityTypeConfiguration<BackItem>
 	{
-		[CompilerGenerated]
-		private ValueConverter<IDictionary<Extensible<AttributeName>, int>, string> _003CattributesConverter_003EP;
-
-		[CompilerGenerated]
-		private ValueComparer<IDictionary<Extensible<AttributeName>, int>> _003CattributesComparer_003EP;
-
-		[CompilerGenerated]
-		private ValueComparer<Buff> _003CbuffComparer_003EP;
-
-		[CompilerGenerated]
-		private ValueComparer<IReadOnlyList<InfusionSlot>> _003CinfusionSlotsComparer_003EP;
-
-		[CompilerGenerated]
-		private ValueComparer<IReadOnlyCollection<InfusionSlotUpgradeSource>> _003CupgradeSourceComparer_003EP;
-
-		[CompilerGenerated]
-		private ValueComparer<IReadOnlyCollection<InfusionSlotUpgradePath>> _003CupgradePathComparer_003EP;
-
-		public BackItemEntityTypeConfiguration(ValueConverter<IDictionary<Extensible<AttributeName>, int>, string> attributesConverter, ValueComparer<IDictionary<Extensible<AttributeName>, int>> attributesComparer, ValueComparer<Buff> buffComparer, ValueComparer<IReadOnlyList<InfusionSlot>> infusionSlotsComparer, ValueComparer<IReadOnlyCollection<InfusionSlotUpgradeSource>> upgradeSourceComparer, ValueComparer<IReadOnlyCollection<InfusionSlotUpgradePath>> upgradePathComparer)
-		{
-			_003CattributesConverter_003EP = attributesConverter;
-			_003CattributesComparer_003EP = attributesComparer;
-			_003CbuffComparer_003EP = buffComparer;
-			_003CinfusionSlotsComparer_003EP = infusionSlotsComparer;
-			_003CupgradeSourceComparer_003EP = upgradeSourceComparer;
-			_003CupgradePathComparer_003EP = upgradePathComparer;
-			base._002Ector();
-		}
-
-		public void Configure(EntityTypeBuilder<Backpack> builder)
+		public void Configure(EntityTypeBuilder<BackItem> builder)
 		{
 			ThrowHelper.ThrowIfNull(builder, "builder");
-			builder.Property((Backpack backpack) => backpack.DefaultSkinId).HasColumnName("DefaultSkinId");
-			builder.Property((Backpack backpack) => backpack.SuffixItemId).HasColumnName("SuffixItemId");
-			builder.Property((Backpack backpack) => backpack.AttributeCombinationId).HasColumnName("AttributeCombinationId");
-			builder.Property((Backpack backpack) => backpack.Attributes).HasColumnName("Attributes").HasConversion(_003CattributesConverter_003EP)
-				.Metadata.SetValueComparer(_003CattributesComparer_003EP);
-			builder.Property((Backpack backpack) => backpack.AttributeAdjustment).HasColumnName("AttributeAdjustment");
-			builder.Property((Backpack backpack) => backpack.StatChoices).HasColumnName("StatChoices").HasJsonValueConversion()
-				.Metadata.SetValueComparer(new ListComparer<int>());
-			builder.Property((Backpack backpack) => backpack.InfusionSlots).HasColumnName("InfusionSlots").HasJsonValueConversion()
-				.Metadata.SetValueComparer(_003CinfusionSlotsComparer_003EP);
-			builder.Property((Backpack backpack) => backpack.Buff).HasColumnName("Buff").HasJsonValueConversion()
-				.Metadata.SetValueComparer(_003CbuffComparer_003EP);
-			builder.Property((Backpack backpack) => backpack.UpgradesFrom).HasColumnName("UpgradesFrom").HasJsonValueConversion()
-				.Metadata.SetValueComparer(_003CupgradeSourceComparer_003EP);
-			builder.Property((Backpack backpack) => backpack.UpgradesInto).HasColumnName("UpgradesInto").HasJsonValueConversion()
-				.Metadata.SetValueComparer(_003CupgradePathComparer_003EP);
+			builder.Property((BackItem back) => back.DefaultSkinId).HasColumnName("DefaultSkinId");
+			builder.Property((BackItem back) => back.SuffixItemId).HasColumnName("SuffixItemId");
+			builder.Property((BackItem back) => back.AttributeCombinationId).HasColumnName("AttributeCombinationId");
+			builder.Property((BackItem back) => back.Attributes).HasColumnName("Attributes").HasImmutableValueDictionaryConverter((string key) => new Extensible<AttributeName>(key), (Extensible<AttributeName> ext) => ext.ToString());
+			builder.Property((BackItem back) => back.AttributeAdjustment).HasColumnName("AttributeAdjustment");
+			builder.Property((BackItem back) => back.StatChoices).HasColumnName("StatChoices").HasJsonValueConversion();
+			builder.Property((BackItem back) => back.InfusionSlots).HasColumnName("InfusionSlots").HasJsonValueConversion();
+			builder.Property((BackItem back) => back.Buff).HasColumnName("Buff").HasJsonValueConversion();
+			builder.Property((BackItem back) => back.UpgradesFrom).HasColumnName("UpgradesFrom").HasJsonValueConversion();
+			builder.Property((BackItem back) => back.UpgradesInto).HasColumnName("UpgradesInto").HasJsonValueConversion();
 		}
 	}
 }

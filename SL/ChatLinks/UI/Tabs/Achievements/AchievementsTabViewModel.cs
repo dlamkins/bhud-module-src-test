@@ -9,6 +9,7 @@ using System.Windows.Input;
 using Blish_HUD;
 using Blish_HUD.Content;
 using GuildWars2.Authorization;
+using GuildWars2.Collections;
 using GuildWars2.Hero.Achievements;
 using GuildWars2.Hero.Achievements.Categories;
 using GuildWars2.Hero.Achievements.Groups;
@@ -170,57 +171,57 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 			{
 				List<AchievementGroup> groups2 = await context.AchievementGroups.OrderBy((AchievementGroup groups) => groups.Order).ToListAsync().ConfigureAwait(continueOnCapturedContext: false);
 				List<AchievementCategory> categories = await context.AchievementCategories.OrderBy((AchievementCategory category) => category.Order).ToListAsync().ConfigureAwait(continueOnCapturedContext: false);
-				List<int> list = new List<int>();
-				list.AddRange(categories.SelectMany(delegate(AchievementCategory c)
+				List<int> categorizedIds = categories.SelectMany(delegate(AchievementCategory c)
 				{
-					List<int> list4 = new List<int>();
-					list4.AddRange(c.Achievements.Select((AchievementRef a) => a.Id));
-					list4.AddRange(c.Tomorrow?.Select((AchievementRef a) => a.Id) ?? Array.Empty<int>());
-					return list4;
-				}));
-				List<int> categorizedIds = list;
+					List<int> list = new List<int>();
+					list.AddRange(c.Achievements.Select((AchievementRef a) => a.Id));
+					list.AddRange(c.Tomorrow?.Select((AchievementRef a) => a.Id) ?? Array.Empty<int>());
+					return list;
+				}).ToList();
 				var achievements = await context.Achievements.Select((Achievement a) => new { a.Id, a.Flags }).ToListAsync().ConfigureAwait(continueOnCapturedContext: false);
-				List<AchievementCategory> list2 = categories;
-				AchievementCategory obj = new AchievementCategory
+				categories.Add(new AchievementCategory
 				{
 					Id = -1,
 					Name = (string)_003Clocalizer_003EP["Uncategorized"],
 					Description = "",
 					IconUrl = null,
-					IconHref = "",
-					Order = int.MaxValue
-				};
-				List<AchievementRef> list3 = new List<AchievementRef>();
-				list3.AddRange(from a in achievements
-					where !a.Flags.Daily
-					where !a.Flags.Weekly
-					where !categorizedIds.Contains(a.Id)
-					select new AchievementRef
-					{
-						Id = a.Id,
-						Level = new LevelRequirement
+					Order = int.MaxValue,
+					Achievements = ImmutableValueList.Create(new ReadOnlySpan<AchievementRef>((from a in achievements
+						where !a.Flags.Daily
+						where !a.Flags.Weekly
+						where !categorizedIds.Contains(a.Id)
+						select new AchievementRef
 						{
-							Min = 0,
-							Max = 0
-						},
-						Flags = new GuildWars2.Hero.Achievements.Categories.AchievementFlags
-						{
-							PvE = !a.Flags.Pvp,
-							SpecialEvent = false,
-							Other = Array.Empty<string>()
-						}
-					});
-				obj.Achievements = new _003C_003Ez__ReadOnlyList<AchievementRef>(list3);
-				obj.Tomorrow = Array.Empty<AchievementRef>();
-				list2.Add(obj);
-				groups2.Add(new AchievementGroup
+							Id = a.Id,
+							Level = new LevelRequirement
+							{
+								Min = 0,
+								Max = 0
+							},
+							Flags = new GuildWars2.Hero.Achievements.Categories.AchievementFlags
+							{
+								PvE = !a.Flags.Pvp,
+								SpecialEvent = false,
+								Other = ImmutableValueList.Create(default(ReadOnlySpan<string>))
+							}
+						}).ToArray())),
+					Tomorrow = ImmutableValueList.Create(default(ReadOnlySpan<AchievementRef>))
+				});
+				AchievementGroup achievementGroup = new AchievementGroup
 				{
 					Id = "",
 					Name = (string)_003Clocalizer_003EP["Uncategorized"],
 					Description = "",
-					Order = int.MaxValue,
-					Categories = new _003C_003Ez__ReadOnlyArray<int>(new int[1] { -1 })
-				});
+					Order = int.MaxValue
+				};
+				object obj = _003CPrivateImplementationDetails_003E.AD95131BC0B799C0B1AF477FB14FCF26A6A9F76079E48BF090ACB7E8367BFD0E_A6;
+				if (obj == null)
+				{
+					obj = new int[1] { -1 };
+					_003CPrivateImplementationDetails_003E.AD95131BC0B799C0B1AF477FB14FCF26A6A9F76079E48BF090ACB7E8367BFD0E_A6 = (int[])obj;
+				}
+				achievementGroup.Categories = ImmutableValueList.Create(new ReadOnlySpan<int>((int[])obj));
+				groups2.Add(achievementGroup);
 				ObservableCollection<AchievementGroupMenuItem> observableCollection = new ObservableCollection<AchievementGroupMenuItem>();
 				foreach (AchievementGroupMenuItem item in groups2.Select((AchievementGroup group) => new AchievementGroupMenuItem
 				{
@@ -295,15 +296,12 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 							List<AccountAchievement> progression = null;
 							if (_003Caccount_003EP.HasPermission(Permission.Progression))
 							{
-								IReadOnlyList<AccountAchievement> readOnlyList = await _003Caccount_003EP.GetAchievementProgress(CancellationToken.None).ConfigureAwait(continueOnCapturedContext: false);
-								List<AccountAchievement> list = new List<AccountAchievement>(readOnlyList.Count);
-								list.AddRange(readOnlyList);
-								progression = list;
+								progression = (await _003Caccount_003EP.GetAchievementProgress(CancellationToken.None).ConfigureAwait(continueOnCapturedContext: false)).ToList();
 							}
 							achievements2 = SortAchievements(achievements2, categories, groups, progression);
 							foreach (Achievement achievement2 in achievements2)
 							{
-								AchievementCategory category2 = categories.FirstOrDefault((AchievementCategory category) => category.IsParentOf(achievement2.Id) == true);
+								AchievementCategory category2 = categories.FirstOrDefault((AchievementCategory category) => category.IsParentOf(achievement2.Id).GetValueOrDefault());
 								AchievementGroup group2 = null;
 								if ((object)category2 != null)
 								{
@@ -339,9 +337,7 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 			try
 			{
 				List<AchievementGroup> groups = await context.AchievementGroups.ToListAsync().ConfigureAwait(continueOnCapturedContext: false);
-				List<AchievementGroup> list = new List<AchievementGroup>();
-				list.AddRange(groups.Where((AchievementGroup group) => group.Categories.Contains(category2.Id)));
-				groups = list;
+				groups = groups.Where((AchievementGroup group) => group.Categories.Contains(category2.Id)).ToList();
 				IEnumerable<int> ids = category2.Achievements.Select((AchievementRef achievement) => achievement.Id);
 				List<Achievement> achievements2 = await (from achievement in context.Achievements
 					where ids.Contains(achievement.Id)
@@ -350,10 +346,7 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 				List<AccountAchievement> progression = null;
 				if (_003Caccount_003EP.HasPermission(Permission.Progression))
 				{
-					IReadOnlyList<AccountAchievement> readOnlyList = await _003Caccount_003EP.GetAchievementProgress(CancellationToken.None).ConfigureAwait(continueOnCapturedContext: false);
-					List<AccountAchievement> list2 = new List<AccountAchievement>(readOnlyList.Count);
-					list2.AddRange(readOnlyList);
-					progression = list2;
+					progression = (await _003Caccount_003EP.GetAchievementProgress(CancellationToken.None).ConfigureAwait(continueOnCapturedContext: false)).ToList();
 				}
 				achievements2 = SortAchievements(achievements2, new List<AchievementCategory>(1) { category2 }, groups, progression);
 				HeaderText = ((!string.IsNullOrEmpty(category2.Name)) ? category2.Name : null);
@@ -380,15 +373,13 @@ namespace SL.ChatLinks.UI.Tabs.Achievements
 			List<AchievementCategory> categories2 = categories;
 			List<AchievementGroup> groups2 = groups;
 			List<AccountAchievement> progression2 = progression;
-			List<Achievement> list = new List<Achievement>();
-			list.AddRange(from achievement in achievements
-				let category = categories2.FirstOrDefault((AchievementCategory category) => category.IsParentOf(achievement.Id) == true)
+			return (from achievement in achievements
+				let category = categories2.FirstOrDefault((AchievementCategory category) => category.IsParentOf(achievement.Id).GetValueOrDefault())
 				let @group = groups2.FirstOrDefault((AchievementGroup x) => (object)category != null && x.Categories.Contains(category.Id))
 				let locked = achievement.IsLocked(@group, progression2)
 				let hidden = achievement.IsHidden(progression2)
 				orderby hidden, locked, @group?.Order ?? int.MaxValue, category?.Order ?? int.MaxValue, achievement.Flags.CategoryDisplay descending, achievement.Flags.MoveToTop descending
-				select achievement);
-			return list;
+				select achievement).ToList();
 		}
 
 		public AsyncTexture2D GetIcon(Uri? iconUrl)

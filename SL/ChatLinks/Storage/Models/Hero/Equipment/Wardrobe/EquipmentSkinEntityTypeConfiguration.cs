@@ -1,10 +1,7 @@
-using GuildWars2;
-using GuildWars2.Hero;
 using GuildWars2.Hero.Equipment.Wardrobe;
 using GuildWars2.Items;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using SL.ChatLinks.Storage.Comparers;
 using SL.ChatLinks.Storage.Converters;
 using SL.Common;
 
@@ -19,9 +16,8 @@ namespace SL.ChatLinks.Storage.Models.Hero.Equipment.Wardrobe
 			builder.HasKey((EquipmentSkin skin) => skin.Id);
 			builder.HasIndex((EquipmentSkin skin) => skin.Name);
 			builder.Property((EquipmentSkin skin) => skin.Flags).HasJsonValueConversion();
-			builder.Property((EquipmentSkin skin) => skin.Races).HasJsonValueConversion().Metadata.SetValueComparer(new ListComparer<Extensible<RaceName>>());
+			builder.Property((EquipmentSkin skin) => skin.Races).HasJsonValueConversion();
 			builder.Property((EquipmentSkin skin) => skin.Rarity).HasConversion(new ExtensibleEnumConverter<Rarity>());
-			builder.Ignore((EquipmentSkin skin) => skin.IconHref);
 			DiscriminatorBuilder<string> discriminatorBuilder = builder.HasDiscriminator<string>("Type");
 			discriminatorBuilder.HasValue<EquipmentSkin>("skin");
 			discriminatorBuilder.HasValue<ArmorSkin>("armor").HasValue<BootsSkin>("boots").HasValue<CoatSkin>("coat")
@@ -30,7 +26,7 @@ namespace SL.ChatLinks.Storage.Models.Hero.Equipment.Wardrobe
 				.HasValue<HelmSkin>("helm")
 				.HasValue<LeggingsSkin>("leggings")
 				.HasValue<ShouldersSkin>("shoulders");
-			discriminatorBuilder.HasValue<BackpackSkin>("back");
+			discriminatorBuilder.HasValue<BackItemSkin>("back");
 			discriminatorBuilder.HasValue<GatheringToolSkin>("gathering_tool").HasValue<FishingToolSkin>("fishing_tool").HasValue<ForagingToolSkin>("foraging_tool")
 				.HasValue<LoggingToolSkin>("logging_tool")
 				.HasValue<MiningToolSkin>("mining_tool");
@@ -46,7 +42,7 @@ namespace SL.ChatLinks.Storage.Models.Hero.Equipment.Wardrobe
 				.HasValue<RifleSkin>("rifle")
 				.HasValue<ScepterSkin>("scepter")
 				.HasValue<ShieldSkin>("shield")
-				.HasValue<ShortbowSkin>("shortbow")
+				.HasValue<ShortBowSkin>("short_bow")
 				.HasValue<SmallBundleSkin>("small_bundle")
 				.HasValue<SpearSkin>("spear")
 				.HasValue<StaffSkin>("staff")

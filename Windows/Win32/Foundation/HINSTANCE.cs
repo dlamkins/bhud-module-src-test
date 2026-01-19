@@ -5,7 +5,7 @@ using System.Diagnostics;
 namespace Windows.Win32.Foundation
 {
 	[DebuggerDisplay("{Value}")]
-	[GeneratedCode("Microsoft.Windows.CsWin32", "0.3.183+73e6125f79.RR")]
+	[GeneratedCode("Microsoft.Windows.CsWin32", "0.3.269+368685089b.RR")]
 	internal readonly struct HINSTANCE : IEquatable<HINSTANCE>
 	{
 		internal unsafe readonly void* Value;
