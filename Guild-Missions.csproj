@@ -20,7 +20,7 @@
     <Reference Include="Gw2Sharp" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="MonoGame.Extended" />
-    <Reference Include="System.Core" />
     <Reference Include="AsyncClipboardService" />
+    <Reference Include="System.Core" />
   </ItemGroup>
 </Project>
