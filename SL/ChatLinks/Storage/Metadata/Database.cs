@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Text;
-using System.Text.Json.Serialization;
 
 namespace SL.ChatLinks.Storage.Metadata
 {
 	[System.Runtime.CompilerServices.RequiredMember]
-	[JsonConverter(typeof(DataManifestJsonConverter))]
-	public sealed record DataManifest
+	public sealed record Database
 	{
 		[CompilerGenerated]
 		private Type EqualityContract
@@ -17,21 +15,21 @@ namespace SL.ChatLinks.Storage.Metadata
 			[CompilerGenerated]
 			get
 			{
-				return typeof(DataManifest);
+				return typeof(Database);
 			}
 		}
 
 		[System.Runtime.CompilerServices.RequiredMember]
-		public int Version { get; set; }
+		public string Name { get; set; }
 
 		[System.Runtime.CompilerServices.RequiredMember]
-		public Dictionary<string, Database> Databases { get; set; }
+		public int SchemaVersion { get; set; }
 
 		[CompilerGenerated]
 		public override string ToString()
 		{
 			StringBuilder stringBuilder = new StringBuilder();
-			stringBuilder.Append("DataManifest");
+			stringBuilder.Append("Database");
 			stringBuilder.Append(" { ");
 			if (PrintMembers(stringBuilder))
 			{
@@ -45,27 +43,27 @@ namespace SL.ChatLinks.Storage.Metadata
 		private bool PrintMembers(StringBuilder builder)
 		{
 			RuntimeHelpers.EnsureSufficientExecutionStack();
-			builder.Append("Version = ");
-			builder.Append(Version.ToString());
-			builder.Append(", Databases = ");
-			builder.Append(Databases);
+			builder.Append("Name = ");
+			builder.Append((object)Name);
+			builder.Append(", SchemaVersion = ");
+			builder.Append(SchemaVersion.ToString());
 			return true;
 		}
 
 		[CompilerGenerated]
 		public override int GetHashCode()
 		{
-			return (EqualityComparer<Type>.Default.GetHashCode(EqualityContract) * -1521134295 + EqualityComparer<int>.Default.GetHashCode(Version)) * -1521134295 + EqualityComparer<Dictionary<string, Database>>.Default.GetHashCode(Databases);
+			return (EqualityComparer<Type>.Default.GetHashCode(EqualityContract) * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name)) * -1521134295 + EqualityComparer<int>.Default.GetHashCode(SchemaVersion);
 		}
 
 		[CompilerGenerated]
-		public bool Equals(DataManifest? other)
+		public bool Equals(Database? other)
 		{
 			if ((object)this != other)
 			{
-				if ((object)other != null && EqualityContract == other!.EqualityContract && EqualityComparer<int>.Default.Equals(Version, other!.Version))
+				if ((object)other != null && EqualityContract == other!.EqualityContract && EqualityComparer<string>.Default.Equals(Name, other!.Name))
 				{
-					return EqualityComparer<Dictionary<string, Database>>.Default.Equals(Databases, other!.Databases);
+					return EqualityComparer<int>.Default.Equals(SchemaVersion, other!.SchemaVersion);
 				}
 				return false;
 			}
@@ -74,15 +72,15 @@ namespace SL.ChatLinks.Storage.Metadata
 
 		[CompilerGenerated]
 		[System.Diagnostics.CodeAnalysis.SetsRequiredMembers]
-		private DataManifest(DataManifest original)
+		private Database(Database original)
 		{
-			Version = original.Version;
-			Databases = original.Databases;
+			Name = original.Name;
+			SchemaVersion = original.SchemaVersion;
 		}
 
 		[Obsolete("Constructors of types with required members are not supported in this version of your compiler.", true)]
 		[System.Runtime.CompilerServices.CompilerFeatureRequired("RequiredMembers")]
-		public DataManifest()
+		public Database()
 		{
 		}
 	}
