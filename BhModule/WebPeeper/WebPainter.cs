@@ -24,13 +24,13 @@ namespace BhModule.WebPeeper
 
 		private byte[] _webTextureBufferBytes = Array.Empty<byte>();
 
-		private Rectangle _webTextureRect;
+		private Rectangle _webTextureRect = Rectangle.get_Empty();
 
 		private bool _isLeftMouseButtonPressed;
 
 		private bool _isRightMouseButtonPressed;
 
-		private static bool _isError;
+		private static bool _isError = false;
 
 		private static readonly Texture2D _errorTexture = WebPeeperModule.Instance.ContentsManager.GetTexture("error.png");
 
@@ -38,9 +38,9 @@ namespace BhModule.WebPeeper
 
 		private static readonly Color _errorTextureColor = new Color(2155905152u);
 
-		private Rectangle _errorTextureRect;
+		private Rectangle _errorTextureRect = Rectangle.get_Empty();
 
-		private Rectangle _quesTextureRect;
+		private Rectangle _questionTextureRect = Rectangle.get_Empty();
 
 		private Process _cefPaintProcess;
 
@@ -80,6 +80,12 @@ namespace BhModule.WebPeeper
 		public WebPainter()
 			: this()
 		{
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
 			Instance = this;
 			if (WebBrowser != null)
 			{
@@ -87,6 +93,17 @@ namespace BhModule.WebPeeper
 			}
 			GameService.Input.get_Keyboard().add_KeyStateChanged((EventHandler<KeyboardEventArgs>)KeyboardHandler);
 			ApplyBgTexture();
+			if (_webTexture != null)
+			{
+				return;
+			}
+			CefService.GetScreenshot().ContinueWith(delegate(Task<Texture2D> t)
+			{
+				if (_webTexture == null)
+				{
+					_webTexture = t.Result;
+				}
+			});
 		}
 
 		public override Control TriggerMouseInput(MouseEventType mouseEventType, MouseState ms)
@@ -243,12 +260,9 @@ namespace BhModule.WebPeeper
 
 		protected override void OnResized(ResizedEventArgs e)
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			_webTextureRect = new Rectangle(Point.get_Zero(), ((Control)this).get_Size());
-			SetBrowserSize();
+			((Rectangle)(ref _webTextureRect)).set_Size(((Control)this).get_Size());
+			CefService.SetBrowserSize(((Control)this).get_Width(), ((Control)this).get_Height());
 			SetErrorTextureRect();
 			((Control)this).OnResized(e);
 		}
@@ -274,7 +288,7 @@ namespace BhModule.WebPeeper
 			else if (_isError)
 			{
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _errorTexture, _errorTextureRect, _errorTextureColor);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _quesTexture, _quesTextureRect, (Rectangle?)_quesTexture.get_Bounds(), _errorTextureColor, MathHelper.ToRadians(30f), Vector2.get_Zero(), (SpriteEffects)0);
+				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _quesTexture, _questionTextureRect, (Rectangle?)_quesTexture.get_Bounds(), _errorTextureColor, MathHelper.ToRadians(30f), Vector2.get_Zero(), (SpriteEffects)0);
 			}
 			else
 			{
@@ -285,12 +299,13 @@ namespace BhModule.WebPeeper
 
 		private void CefOnPaint(object sender, OnPaintEventArgs e)
 		{
-			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0084: Invalid comparison between Unknown and I4
-			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e5: Expected O, but got Unknown
+			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008b: Invalid comparison between Unknown and I4
+			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ec: Expected O, but got Unknown
+			e.Handled = true;
 			if (!((Control)WebPeeperModule.Instance.UIService.BrowserWindow).get_Visible())
 			{
 				return;
@@ -356,12 +371,7 @@ namespace BhModule.WebPeeper
 			int num = MathHelper.Min((int)((double)((Control)this).get_Size().X * 0.6), (int)((double)((Control)this).get_Size().Y * 0.6));
 			_errorTextureRect = new Rectangle(0, ((Control)this).get_Size().Y - num, num, num);
 			int num2 = (int)((double)num * 0.2);
-			_quesTextureRect = new Rectangle((int)((double)num * 0.7), ((Control)this).get_Size().Y - (int)((double)num * 1.05), num2, num2);
-		}
-
-		private void SetBrowserSize()
-		{
-			WebBrowser?.ResizeAsync(((Control)this).get_Width(), ((Control)this).get_Height());
+			_questionTextureRect = new Rectangle((int)((double)num * 0.7), ((Control)this).get_Size().Y - (int)((double)num * 1.05), num2, num2);
 		}
 
 		private void KeyboardHandler(object sender, KeyboardEventArgs e)

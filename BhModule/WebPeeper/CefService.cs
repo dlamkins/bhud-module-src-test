@@ -12,6 +12,7 @@ using CefSharp;
 using CefSharp.DevTools;
 using CefSharp.OffScreen;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace BhModule.WebPeeper
 {
@@ -154,6 +155,40 @@ namespace BhModule.WebPeeper
 			{
 				_webBrowser.ExecuteScriptAsync("webPeeper_focusBlurredElement()");
 			}
+		}
+
+		public Task SetBrowserSize(int w, int h)
+		{
+			if (WebBrowser == null)
+			{
+				return Task.FromResult(result: false);
+			}
+			return WebBrowser.ResizeAsync(w, h);
+		}
+
+		public Task<Texture2D> GetScreenshot()
+		{
+			if (WebBrowser == null)
+			{
+				return Task.FromResult<Texture2D>(null);
+			}
+			return WebBrowser.CaptureScreenshotAsync().ContinueWith(delegate(Task<byte[]> t)
+			{
+				//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+				int count = t.Result.Length;
+				GraphicsDeviceContext val = GameService.Graphics.LendGraphicsDeviceContext();
+				try
+				{
+					using MemoryStream memoryStream = new MemoryStream();
+					memoryStream.Write(t.Result, 0, count);
+					return Texture2D.FromStream(((GraphicsDeviceContext)(ref val)).get_GraphicsDevice(), (Stream)memoryStream);
+				}
+				finally
+				{
+					((GraphicsDeviceContext)(ref val)).Dispose();
+				}
+			});
 		}
 
 		public async void CloseWebBrowser()

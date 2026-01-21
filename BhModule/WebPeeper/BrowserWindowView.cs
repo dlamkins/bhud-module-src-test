@@ -18,14 +18,13 @@ namespace BhModule.WebPeeper
 			{
 				WebPeeperModule.BlishHudInstance.get_Form().SafeInvoke(delegate
 				{
-					//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-					//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+					//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+					//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+					//IL_0019: Unknown result type (might be due to invalid IL or missing references)
 					BrowserWindowView browserWindowView = this;
-					WindowContent windowContent = new WindowContent();
-					((Control)windowContent).set_Parent(window);
 					Rectangle contentRegion = _window.get_ContentRegion();
-					((Control)windowContent).set_Size(((Rectangle)(ref contentRegion)).get_Size());
+					WindowContent windowContent = new WindowContent(((Rectangle)(ref contentRegion)).get_Size());
+					((Control)windowContent).set_Parent(window);
 					browserWindowView._windowContent = windowContent;
 					((Control)_window).add_Resized((EventHandler<ResizedEventArgs>)OnWindowResize);
 				});
