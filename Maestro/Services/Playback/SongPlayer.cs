@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Maestro.Models;
-using Maestro.UI.Components;
+using Maestro.UI.Main;
 using Microsoft.Xna.Framework.Input;
 
 namespace Maestro.Services.Playback
@@ -256,16 +256,15 @@ namespace Maestro.Services.Playback
 			{
 				_keyboardService.KeyDown((Keys)96);
 				_keyboardService.KeyUp((Keys)96);
-				Thread.Sleep(150);
+				Thread.Sleep(100);
 			}
 			Song currentSong = CurrentSong;
 			if (currentSong == null || currentSong.Instrument != InstrumentType.Bass)
 			{
 				_keyboardService.KeyDown((Keys)105);
 				_keyboardService.KeyUp((Keys)105);
-				Thread.Sleep(150);
+				Thread.Sleep(100);
 			}
-			Thread.Sleep(200);
 			IsAdjustingOctave = false;
 			Logger logger = Logger;
 			Song currentSong2 = CurrentSong;

@@ -14,7 +14,7 @@ namespace Maestro.Services.Community
 	{
 		private static readonly Logger Logger = Logger.GetLogger<CommunityApiClient>();
 
-		private const string BaseUrl = "https://raw.githubusercontent.com/uwponcel/maestro-songs/master";
+		private const string BASE_URL = "https://raw.githubusercontent.com/uwponcel/maestro-songs/master";
 
 		private readonly HttpClient _httpClient;
 

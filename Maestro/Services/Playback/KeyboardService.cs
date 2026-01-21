@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using Blish_HUD;
 using Blish_HUD.Controls.Extern;
 using Blish_HUD.Controls.Intern;
 using Blish_HUD.Input;
 using Blish_HUD.Settings;
-using Maestro.UI.Components;
+using Maestro.Models;
+using Maestro.UI.Main;
 using Microsoft.Xna.Framework.Input;
 
 namespace Maestro.Services.Playback
@@ -134,6 +136,92 @@ namespace Maestro.Services.Playback
 			}
 			_activeSharpKeys.Clear();
 			_altHeld = false;
+		}
+
+		public void PlayNote(Keys key, bool isSharp = false)
+		{
+			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+			if (ShouldSendKeys)
+			{
+				if (isSharp && _sharpRemappings.TryGetValue(key, out var sharpSetting))
+				{
+					SendKeyBindingDown(sharpSetting.get_Value());
+					SendKeyBindingUp(sharpSetting.get_Value());
+				}
+				else
+				{
+					KeyDown(key);
+					KeyUp(key);
+				}
+			}
+		}
+
+		public void PlayNoteByName(string note, bool isSharp = false, bool isHighC = false)
+		{
+			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+			if (!ShouldSendKeys)
+			{
+				return;
+			}
+			if (isHighC)
+			{
+				PlayNote((Keys)104);
+			}
+			else
+			{
+				if (!NoteMapping.TryParse(note, out var noteName))
+				{
+					return;
+				}
+				if (isSharp)
+				{
+					Keys? sharpKey = NoteMapping.GetSharpKey(noteName);
+					if (sharpKey.HasValue)
+					{
+						PlayNote(sharpKey.Value, isSharp: true);
+					}
+				}
+				else
+				{
+					Keys? naturalKey = NoteMapping.GetNaturalKey(noteName);
+					if (naturalKey.HasValue)
+					{
+						PlayNote(naturalKey.Value);
+					}
+				}
+			}
+		}
+
+		public void PlayOctaveChange(bool up)
+		{
+			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+			if (ShouldSendKeys)
+			{
+				Keys key = (Keys)(up ? 105 : 96);
+				KeyDown(key);
+				KeyUp(key);
+			}
+		}
+
+		public void ResetToMiddleOctave()
+		{
+			if (ShouldSendKeys)
+			{
+				for (int i = 0; i < 5; i++)
+				{
+					KeyDown((Keys)96);
+					KeyUp((Keys)96);
+					Thread.Sleep(100);
+				}
+				KeyDown((Keys)105);
+				KeyUp((Keys)105);
+				Thread.Sleep(100);
+			}
 		}
 
 		private static void SendKeyBindingDown(KeyBinding binding)

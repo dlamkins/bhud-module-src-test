@@ -22,62 +22,6 @@ namespace Maestro.Services.Data
 			public bool IsRest { get; set; }
 		}
 
-		private static readonly Dictionary<string, Keys> NoteToKey = new Dictionary<string, Keys>
-		{
-			{
-				"C",
-				(Keys)97
-			},
-			{
-				"D",
-				(Keys)98
-			},
-			{
-				"E",
-				(Keys)99
-			},
-			{
-				"F",
-				(Keys)100
-			},
-			{
-				"G",
-				(Keys)101
-			},
-			{
-				"A",
-				(Keys)102
-			},
-			{
-				"B",
-				(Keys)103
-			}
-		};
-
-		private static readonly Dictionary<string, Keys> SharpToKey = new Dictionary<string, Keys>
-		{
-			{
-				"C#",
-				(Keys)97
-			},
-			{
-				"D#",
-				(Keys)98
-			},
-			{
-				"F#",
-				(Keys)99
-			},
-			{
-				"G#",
-				(Keys)100
-			},
-			{
-				"A#",
-				(Keys)101
-			}
-		};
-
 		private static readonly Regex NotePattern = new Regex("([A-GR])(\\^|#)?([+-])?:(\\d+)", RegexOptions.Compiled);
 
 		public static List<SongCommand> Parse(List<string> noteLines)
@@ -85,8 +29,8 @@ namespace Maestro.Services.Data
 			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0114: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0121: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019c: Unknown result type (might be due to invalid IL or missing references)
 			List<SongCommand> commands = new List<SongCommand>();
 			int currentOctave = 0;
 			foreach (string noteLine in noteLines)
@@ -111,6 +55,7 @@ namespace Maestro.Services.Data
 						{
 							commands.Add(SongCommand.KeyDownCmd(octaveKey));
 							commands.Add(SongCommand.KeyUpCmd(octaveKey));
+							commands.Add(SongCommand.WaitCmd(100));
 						}
 						currentOctave = note2.TargetOctave;
 					}
@@ -135,8 +80,12 @@ namespace Maestro.Services.Data
 
 		private static List<ParsedNote> ParseNotesFromLine(string line)
 		{
-			//IL_012a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0166: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0153: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0158: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0182: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018b: Unknown result type (might be due to invalid IL or missing references)
 			List<ParsedNote> notes = new List<ParsedNote>();
 			foreach (Match match in NotePattern.Matches(line))
 			{
@@ -165,15 +114,30 @@ namespace Maestro.Services.Data
 				}
 				else if (isSharp)
 				{
-					if (!SharpToKey.TryGetValue(note + "#", out noteKey))
+					if (!NoteMapping.TryParse(note, out var sharpNoteName))
 					{
 						continue;
 					}
+					Keys? sharpKey = NoteMapping.GetSharpKey(sharpNoteName);
+					if (!sharpKey.HasValue)
+					{
+						continue;
+					}
+					noteKey = sharpKey.Value;
 					needsAlt = true;
 				}
-				else if (!NoteToKey.TryGetValue(note, out noteKey))
+				else
 				{
-					continue;
+					if (!NoteMapping.TryParse(note, out var naturalNoteName))
+					{
+						continue;
+					}
+					Keys? naturalKey = NoteMapping.GetNaturalKey(naturalNoteName);
+					if (!naturalKey.HasValue)
+					{
+						continue;
+					}
+					noteKey = naturalKey.Value;
 				}
 				notes.Add(new ParsedNote
 				{

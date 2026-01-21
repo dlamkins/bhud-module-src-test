@@ -6,11 +6,10 @@ using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Maestro.Models;
 using Maestro.Services.Community;
-using Maestro.UI.Components;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Maestro.UI
+namespace Maestro.UI.Community
 {
 	public class CommunityWindow : StandardWindow
 	{

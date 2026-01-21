@@ -6,11 +6,10 @@ using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Maestro.Models;
 using Maestro.Services.Playback;
-using Maestro.UI.Components;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Maestro.UI
+namespace Maestro.UI.Main
 {
 	public class MaestroWindow : StandardWindow
 	{
@@ -42,6 +41,8 @@ namespace Maestro.UI
 		public event EventHandler ImportRequested;
 
 		public event EventHandler CommunityRequested;
+
+		public event EventHandler<InstrumentType> CreateRequested;
 
 		public event EventHandler<Song> SongDeleteRequested;
 
@@ -113,6 +114,7 @@ namespace Maestro.UI
 			_statusBar.TotalCount = _allSongs.Count;
 			_statusBar.ImportClicked += OnImportClicked;
 			_statusBar.CommunityClicked += OnCommunityClicked;
+			_statusBar.CreateClicked += OnCreateClicked;
 			RefreshSongList();
 		}
 
@@ -155,6 +157,11 @@ namespace Maestro.UI
 			this.CommunityRequested?.Invoke(this, EventArgs.Empty);
 		}
 
+		private void OnCreateClicked(object sender, InstrumentType instrument)
+		{
+			this.CreateRequested?.Invoke(this, instrument);
+		}
+
 		public void AddImportedSong(Song song)
 		{
 			_allSongs.Add(song);
@@ -166,6 +173,11 @@ namespace Maestro.UI
 		{
 			_statusBar.TotalCount = _allSongs.Count;
 			RefreshSongList();
+		}
+
+		public void SetCreateButtonEnabled(bool enabled)
+		{
+			_statusBar.SetCreateButtonEnabled(enabled);
 		}
 
 		private void OnSongDeleteRequested(object sender, Song song)
@@ -235,6 +247,7 @@ namespace Maestro.UI
 			_songListPanel.CountChanged -= OnCountChanged;
 			_statusBar.ImportClicked -= OnImportClicked;
 			_statusBar.CommunityClicked -= OnCommunityClicked;
+			_statusBar.CreateClicked -= OnCreateClicked;
 			_songPlayer.Stop();
 			NowPlayingPanel nowPlayingPanel = _nowPlayingPanel;
 			if (nowPlayingPanel != null)

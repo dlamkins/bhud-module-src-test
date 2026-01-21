@@ -5,19 +5,19 @@ using Blish_HUD.Input;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Maestro.UI.Components
+namespace Maestro.UI.Main
 {
 	public class FilterButton : Control
 	{
 		private class FilterPanel : Control
 		{
-			private const int ItemHeight = 24;
+			private const int ITEM_HEIGHT = 24;
 
-			private const int SeparatorHeight = 8;
+			private const int SEPARATOR_HEIGHT = 8;
 
-			private const int PaddingX = 8;
+			private const int PADDING_X = 8;
 
-			private static readonly string[] SourceItems = new string[4] { "All", "Bundled", "Community", "Imported" };
+			private static readonly string[] SourceItems = new string[3] { "All", "Bundled", "Imported" };
 
 			private static readonly string[] InstrumentItems = new string[5] { "All", "Piano", "Harp", "Lute", "Bass" };
 
