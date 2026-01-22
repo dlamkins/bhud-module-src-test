@@ -26,6 +26,8 @@ namespace NpcFinder.Util
 			}
 		}
 
+		private static readonly bool DEBUG_LOGS = false;
+
 		private static readonly Logger Log = Logger.GetLogger(typeof(MumbleReader));
 
 		private static object _uiObj;
@@ -95,37 +97,47 @@ namespace NpcFinder.Util
 				UI ui = ((gw2Mumble != null) ? gw2Mumble.get_UI() : null);
 				if (ui == null)
 				{
-					Log.Warn("[MumbleUI] GameService.Gw2Mumble.UI is null");
-					return;
-				}
-				Log.Warn("[MumbleUI] UI type=" + ((object)ui).GetType().FullName);
-				DumpProp(ui, "IsMapOpen");
-				DumpProp(ui, "IsCompassTopRight");
-				DumpProp(ui, "MapCenter");
-				DumpProp(ui, "MapScale");
-				DumpProp(ui, "MapRotation");
-				DumpProp(ui, "CompassRotation");
-				PropertyInfo[] properties = ((object)ui).GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public);
-				foreach (PropertyInfo p in properties)
-				{
-					string i = p.Name.ToLowerInvariant();
-					if (i.Contains("map") || i.Contains("compass") || i.Contains("scale") || i.Contains("center") || i.Contains("zoom") || i.Contains("rotation"))
+					if (DEBUG_LOGS)
 					{
-						object val = null;
-						try
-						{
-							val = p.GetValue(ui);
-						}
-						catch
-						{
-						}
-						Log.Warn("[MumbleUI] " + p.Name + " = " + Fmt(val));
+						Log.Warn("[MumbleUI] GameService.Gw2Mumble.UI is null");
 					}
+				}
+				else
+				{
+					if (!DEBUG_LOGS)
+					{
+						return;
+					}
+					Log.Warn("[MumbleUI] UI type=" + ((object)ui).GetType().FullName);
+					DumpProp(ui, "IsMapOpen");
+					DumpProp(ui, "IsCompassTopRight");
+					DumpProp(ui, "MapCenter");
+					DumpProp(ui, "MapScale");
+					DumpProp(ui, "MapRotation");
+					DumpProp(ui, "CompassRotation");
+					PropertyInfo[] properties = ((object)ui).GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public);
+					foreach (PropertyInfo p in properties)
+					{
+						string i = p.Name.ToLowerInvariant();
+						if (i.Contains("map") || i.Contains("compass") || i.Contains("scale") || i.Contains("center") || i.Contains("zoom") || i.Contains("rotation"))
+						{
+							object val = null;
+							try
+							{
+								val = p.GetValue(ui);
+							}
+							catch
+							{
+							}
+							Log.Warn("[MumbleUI] " + p.Name + " = " + Fmt(val));
+						}
+					}
+					return;
 				}
 			}
 			catch (Exception ex)
 			{
-				Log.Warn("[MumbleUI] Dump failed: " + ex);
+				Log.Warn("Exception [MumbleUI] Dump failed: " + ex);
 			}
 		}
 
@@ -169,6 +181,10 @@ namespace NpcFinder.Util
 
 		public static void DumpUiOncePerSecond(bool requireMapOpen = true)
 		{
+			if (!DEBUG_LOGS)
+			{
+				return;
+			}
 			try
 			{
 				Gw2MumbleService gw2Mumble = GameService.Gw2Mumble;
@@ -271,40 +287,6 @@ namespace NpcFinder.Util
 			}
 		}
 
-		private static bool TryGetVec2(object obj, string[] names, out float x, out float y)
-		{
-			x = (y = 0f);
-			if (!TryGetObj(obj, names, out var vec) || vec == null)
-			{
-				return false;
-			}
-			if (TryGetFloat(vec, new string[2] { "X", "x" }, out x))
-			{
-				return TryGetFloat(vec, new string[2] { "Y", "y" }, out y);
-			}
-			return false;
-		}
-
-		private static bool TryGetBool(object obj, string[] names, out bool val)
-		{
-			val = false;
-			foreach (string i in names)
-			{
-				PropertyInfo p = obj.GetType().GetProperty(i);
-				if (!(p == null))
-				{
-					object o = p.GetValue(obj);
-					if (o is bool)
-					{
-						bool b = (bool)o;
-						val = b;
-						return true;
-					}
-				}
-			}
-			return false;
-		}
-
 		private static void EnsureDiscovered()
 		{
 			if (_discovered)
@@ -323,7 +305,10 @@ namespace NpcFinder.Util
 						new string[2] { "MapCenterX", "mapCenterX" }
 					});
 					_mapIdObj = FindBestContainer(deepRoot, new string[3] { "MapId", "CurrentMapId", "mapId" }, null, null);
-					Log.Debug("[MumbleReader] discovery: root=" + ((object)deepRoot).GetType().FullName + " uiObj=" + (_uiObj?.GetType().FullName ?? "null") + " mapIdObj=" + (_mapIdObj?.GetType().FullName ?? "null"));
+					if (DEBUG_LOGS)
+					{
+						Log.Debug("[MumbleReader] discovery: root=" + ((object)deepRoot).GetType().FullName + " uiObj=" + (_uiObj?.GetType().FullName ?? "null") + " mapIdObj=" + (_mapIdObj?.GetType().FullName ?? "null"));
+					}
 				}
 			}
 			catch (Exception ex)
@@ -517,11 +502,14 @@ namespace NpcFinder.Util
 
 		private static void WarnOccasionally(string msg)
 		{
-			DateTime now = DateTime.UtcNow;
-			if (!((now - _lastWarn).TotalSeconds < 2.0))
+			if (DEBUG_LOGS)
 			{
-				_lastWarn = now;
-				Log.Warn(msg);
+				DateTime now = DateTime.UtcNow;
+				if (!((now - _lastWarn).TotalSeconds < 2.0))
+				{
+					_lastWarn = now;
+					Log.Warn(msg);
+				}
 			}
 		}
 

@@ -24,6 +24,12 @@ namespace NpcFinder
 	{
 		internal static NpcFinderModule ExampleModuleInstance;
 
+		private static readonly bool DEBUG_LOGS = false;
+
+		private ChangelogWindow _changelogWindow;
+
+		private const string CHANGELOG_TEXT = "v1.1.0\r\n- Huge performance improvements\r\n- Much better precision (works for most of the NPCs now)\r\n- Added Suggestions panel\r\n- Added a marker that displays on the corner if it's off-screen\r\n- Stopped it from opening by itself.\r\n- Added changelog window\r\n- Improved NPC title suggestions (prefix + search + scoring)\r\n- Anchors fallback restored when no coordinates are parsed\r\n- Better caching system\r\n- UI improvements\r\n\r\n! Some NPCs may take a bit longer to resolve the position the first time \r\n(due to caching) -> be patient (around max 2-3 minutes)\r\n\r\n** For the next version (v1.2.0) I'm planning to add a feature to search by MAP \r\nand to display all the NPCs on that map ** \r\n\r\n** Also I will try to fix the small offset of the marker when moving the map \r\nin the next version **\r\n";
+
 		private static readonly Logger Logger = Logger.GetLogger<NpcFinderModule>();
 
 		private string _cacheDirPath;
@@ -53,8 +59,6 @@ namespace NpcFinder
 		private NpcMerchantResolverService _merchantResolver;
 
 		private NpcFinderWindow _npcWindow;
-
-		private BigMapOverlayControl _overlay;
 
 		private BigMapOverlayControl _bigMapOverlay;
 
@@ -93,7 +97,10 @@ namespace NpcFinder
 			{
 				((Control)bigMapOverlay).Invalidate();
 			}
-			Logger.Warn("[Target] CLEARED (currentTarget=null)");
+			if (DEBUG_LOGS)
+			{
+				Logger.Warn("[Target] CLEARED (currentTarget=null)");
+			}
 		}
 
 		private void DeleteAllNpcFinderCache()
@@ -119,11 +126,29 @@ namespace NpcFinder
 				{
 					Directory.CreateDirectory(_merchantCacheDirPath);
 				}
-				Logger.Warn("[Cache] Deleted and recreated: " + _cacheDirPath + " (merchant=" + (_merchantCacheDirPath ?? "null") + ")");
+				if (DEBUG_LOGS)
+				{
+					Logger.Warn("[Cache] Deleted and recreated: " + _cacheDirPath + " (merchant=" + (_merchantCacheDirPath ?? "null") + ")");
+				}
 			}
 			catch (Exception ex)
 			{
-				Logger.Warn("[Cache] Delete failed: " + ex);
+				Logger.Warn("Exception [Cache] Delete failed: " + ex);
+			}
+		}
+
+		private void EnsureChangelogWindow()
+		{
+			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+			if (_changelogWindow == null)
+			{
+				AsyncTexture2D bg = AsyncTexture2D.FromAssetId(155997);
+				ChangelogWindow changelogWindow = new ChangelogWindow(bg, "v1.1.0\r\n- Huge performance improvements\r\n- Much better precision (works for most of the NPCs now)\r\n- Added Suggestions panel\r\n- Added a marker that displays on the corner if it's off-screen\r\n- Stopped it from opening by itself.\r\n- Added changelog window\r\n- Improved NPC title suggestions (prefix + search + scoring)\r\n- Anchors fallback restored when no coordinates are parsed\r\n- Better caching system\r\n- UI improvements\r\n\r\n! Some NPCs may take a bit longer to resolve the position the first time \r\n(due to caching) -> be patient (around max 2-3 minutes)\r\n\r\n** For the next version (v1.2.0) I'm planning to add a feature to search by MAP \r\nand to display all the NPCs on that map ** \r\n\r\n** Also I will try to fix the small offset of the marker when moving the map \r\nin the next version **\r\n");
+				((Control)changelogWindow).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+				((Control)changelogWindow).set_Location(new Point(340, 240));
+				((WindowBase2)changelogWindow).set_Id("NpcFinderModule_ChangelogWindow");
+				((WindowBase2)changelogWindow).set_SavesPosition(true);
+				_changelogWindow = changelogWindow;
 			}
 		}
 
@@ -145,8 +170,11 @@ namespace NpcFinder
 			}
 			_cacheDirPath = Path.Combine(rootDir ?? Path.GetTempPath(), "NpcFinderCache");
 			_cache = new CacheStore(_cacheDirPath);
-			Logger.Info("[Cache] rootDir='" + (rootDir ?? "(null)") + "'");
-			Logger.Info("[Cache] cachePath='" + Path.Combine(rootDir ?? Path.GetTempPath(), "NpcFinderCache") + "'");
+			if (DEBUG_LOGS)
+			{
+				Logger.Info("[Cache] rootDir='" + (rootDir ?? "(null)") + "'");
+				Logger.Info("[Cache] cachePath='" + Path.Combine(rootDir ?? Path.GetTempPath(), "NpcFinderCache") + "'");
+			}
 			_rate = new RateLimiter(250);
 			_wiki = new WikiNpcService(_rate, _cache);
 			_mapIndex = new Gw2MapIndexService(Gw2ApiManager.get_Gw2ApiClient().get_V2(), _cache);
@@ -170,7 +198,10 @@ namespace NpcFinder
 				{
 					((Control)bigMapOverlay).Invalidate();
 				}
-				Logger.Warn("[Target] SET: " + ((t == null) ? "null" : $"{t.MapName} cont={t.TargetContinentId} cx={t.TargetContinentX} cy={t.TargetContinentY}"));
+				if (DEBUG_LOGS)
+				{
+					Logger.Warn("[Target] SET: " + ((t == null) ? "null" : $"{t.MapName} cont={t.TargetContinentId} cx={t.TargetContinentX} cy={t.TargetContinentY}"));
+				}
 			}, delegate
 			{
 				ClearCurrentMarker();
@@ -200,7 +231,6 @@ namespace NpcFinder
 				((Control)_bigMapOverlay).set_Size(((Control)GameService.Graphics.get_SpriteScreen()).get_Size());
 			});
 			CreateCornerIconWithContextMenu();
-			((Control)_npcWindow).Show();
 			await Task.CompletedTask;
 		}
 
@@ -222,11 +252,6 @@ namespace NpcFinder
 				}
 			}
 			MumbleReader.DumpUiOncePerSecond();
-			BigMapOverlayControl overlay = _overlay;
-			if (overlay != null)
-			{
-				((Control)overlay).Invalidate();
-			}
 			if (!MumbleReader.TryGetMapId(out var mapId) || mapId == _lastMapId)
 			{
 				return;
@@ -260,10 +285,10 @@ namespace NpcFinder
 			{
 				((Control)npcWindow).Dispose();
 			}
-			BigMapOverlayControl overlay = _overlay;
-			if (overlay != null)
+			ChangelogWindow changelogWindow = _changelogWindow;
+			if (changelogWindow != null)
 			{
-				((Control)overlay).Dispose();
+				((Control)changelogWindow).Dispose();
 			}
 			BigMapOverlayControl bigMapOverlay = _bigMapOverlay;
 			if (bigMapOverlay != null)
@@ -326,18 +351,27 @@ namespace NpcFinder
 				}
 			});
 			_contextMenuStrip = new ContextMenuStrip();
-			((Control)_contextMenuStrip.AddMenuItem("NPC Finder (toggle)")).add_Click((EventHandler<MouseEventArgs>)delegate
+			((Control)_contextMenuStrip.AddMenuItem("Changelog / Patch notes")).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				if (_npcWindow != null)
+				try
 				{
-					if (!((Control)_npcWindow).get_Visible())
+					EnsureChangelogWindow();
+					if (((Control)_changelogWindow).get_Parent() == null)
 					{
-						((Control)_npcWindow).Show();
+						((Control)_changelogWindow).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+					}
+					if (!((Control)_changelogWindow).get_Visible())
+					{
+						((Control)_changelogWindow).Show();
 					}
 					else
 					{
-						((WindowBase2)_npcWindow).ToggleWindow();
+						((WindowBase2)_changelogWindow).ToggleWindow();
 					}
+				}
+				catch (Exception ex)
+				{
+					Logger.Warn("[Changelog] Failed to open: " + ex);
 				}
 			});
 			((Control)_cornerIcon).set_Menu(_contextMenuStrip);

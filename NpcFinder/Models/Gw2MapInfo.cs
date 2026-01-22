@@ -12,6 +12,8 @@ namespace NpcFinder.Models
 
 		public int DefaultFloor { get; set; }
 
+		public int RegionId { get; set; }
+
 		public int[] Floors { get; set; } = Array.Empty<int>();
 
 

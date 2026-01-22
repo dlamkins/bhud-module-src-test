@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
@@ -20,7 +21,11 @@ namespace NpcFinder.Services
 
 		}
 
+		private static readonly bool DEBUG_LOGS = false;
+
 		private static readonly Logger Logger = Logger.GetLogger<Gw2MapDetailsService>();
+
+		private const string CACHE_VER = "v5";
 
 		private static readonly HttpClient Http = new HttpClient();
 
@@ -41,58 +46,86 @@ namespace NpcFinder.Services
 			}
 		}
 
-		public async Task<PoiWpFloorResult> GetPoisAndWaypointsWithFloorFallbackAsync(int continentId, int defaultFloorId, int[] preferredFloors, int mapId, CancellationToken ct)
+		private async Task<PoiWpFloorResult> TryContinentFloorsAsync(int continentId, int defaultFloorId, int[] preferredFloors, int mapId, int regionIdHint, CancellationToken ct)
 		{
-			List<int> continentsToTry = new List<int>();
-			AddUniqueInt(continentsToTry, continentId);
-			List<int> allContinents = await GetAllContinentsAsync(ct).ConfigureAwait(continueOnCapturedContext: false);
-			for (int j = 0; j < allContinents.Count; j++)
+			List<int> floorsToTry = new List<int>();
+			AddUniqueFloors(floorsToTry, preferredFloors);
+			if (defaultFloorId >= 0)
 			{
-				AddUniqueInt(continentsToTry, allContinents[j]);
+				AddUniqueInt(floorsToTry, defaultFloorId);
 			}
-			for (int ci = 0; ci < continentsToTry.Count; ci++)
+			AddUniqueInt(floorsToTry, 1);
+			AddUniqueInt(floorsToTry, 0);
+			if (floorsToTry.Count < 6)
 			{
-				int cTry = continentsToTry[ci];
-				List<int> floorsToTry = new List<int>();
-				AddUniqueFloors(floorsToTry, preferredFloors);
-				if (defaultFloorId >= 0)
+				List<int> discovered = await GetContinentFloorsAsync(continentId, ct).ConfigureAwait(continueOnCapturedContext: false);
+				for (int i = 0; i < discovered.Count; i++)
 				{
-					AddUniqueInt(floorsToTry, defaultFloorId);
-				}
-				AddUniqueInt(floorsToTry, 1);
-				AddUniqueInt(floorsToTry, 0);
-				if (floorsToTry.Count < 8)
-				{
-					List<int> discovered = await GetContinentFloorsAsync(cTry, ct).ConfigureAwait(continueOnCapturedContext: false);
-					for (int i = 0; i < discovered.Count; i++)
+					if (floorsToTry.Count >= 6)
 					{
-						if (floorsToTry.Count >= 10)
-						{
-							break;
-						}
-						AddUniqueInt(floorsToTry, discovered[i]);
+						break;
+					}
+					int f = discovered[i];
+					if (f <= 3 || f < 0)
+					{
+						AddUniqueInt(floorsToTry, f);
 					}
 				}
-				Logger.Debug(string.Format("[MapDetails] mapId={0} trying continent={1} floors=[{2}]", mapId, cTry, string.Join(",", floorsToTry)));
-				for (int fi = 0; fi < floorsToTry.Count; fi++)
+			}
+			if (DEBUG_LOGS)
+			{
+				Logger.Debug(string.Format("[MapDetails] mapId={0} trying continent={1} floors=[{2}] regionIdHint={3}", mapId, continentId, string.Join(",", floorsToTry), regionIdHint));
+			}
+			for (int fi2 = 0; fi2 < floorsToTry.Count; fi2++)
+			{
+				int floor = floorsToTry[fi2];
+				ct.ThrowIfCancellationRequested();
+				Tuple<List<Tuple<string, int, int>>, List<Tuple<string, int, int>>> data = await GetPoisAndWaypointsByRegionAsync(continentId, floor, mapId, regionIdHint, allowScan: false, ct).ConfigureAwait(continueOnCapturedContext: false);
+				if (data != null)
 				{
-					int floor = floorsToTry[fi];
-					try
+					return new PoiWpFloorResult
 					{
-						Tuple<List<Tuple<string, int, int>>, List<Tuple<string, int, int>>> data = await GetPoisAndWaypointsByRegionAsync(cTry, floor, mapId, ct).ConfigureAwait(continueOnCapturedContext: false);
-						if (data != null)
-						{
-							return new PoiWpFloorResult
-							{
-								UsedFloor = floor,
-								Pois = data.Item1,
-								Waypoints = data.Item2
-							};
-						}
-					}
-					catch (Exception ex)
+						UsedFloor = floor,
+						Pois = data.Item1,
+						Waypoints = data.Item2
+					};
+				}
+			}
+			for (int fi2 = 0; fi2 < floorsToTry.Count; fi2++)
+			{
+				int floor = floorsToTry[fi2];
+				ct.ThrowIfCancellationRequested();
+				Tuple<List<Tuple<string, int, int>>, List<Tuple<string, int, int>>> data2 = await GetPoisAndWaypointsByRegionAsync(continentId, floor, mapId, regionIdHint, allowScan: true, ct).ConfigureAwait(continueOnCapturedContext: false);
+				if (data2 != null)
+				{
+					return new PoiWpFloorResult
 					{
-						Logger.Warn($"[MapDetails] mapId={mapId} continent={cTry} floor={floor} failed: {ex.Message}");
+						UsedFloor = floor,
+						Pois = data2.Item1,
+						Waypoints = data2.Item2
+					};
+				}
+			}
+			return null;
+		}
+
+		public async Task<PoiWpFloorResult> GetPoisAndWaypointsWithFloorFallbackAsync(int continentId, int defaultFloorId, int[] preferredFloors, int mapId, int regionId, CancellationToken ct)
+		{
+			PoiWpFloorResult primary = await TryContinentFloorsAsync(continentId, defaultFloorId, preferredFloors, mapId, regionId, ct).ConfigureAwait(continueOnCapturedContext: false);
+			if (primary != null)
+			{
+				return primary;
+			}
+			List<int> allContinents = await GetAllContinentsAsync(ct).ConfigureAwait(continueOnCapturedContext: false);
+			for (int i = 0; i < allContinents.Count; i++)
+			{
+				int cTry = allContinents[i];
+				if (cTry != continentId)
+				{
+					PoiWpFloorResult fallback = await TryContinentFloorsAsync(cTry, defaultFloorId, preferredFloors, mapId, regionId, ct).ConfigureAwait(continueOnCapturedContext: false);
+					if (fallback != null)
+					{
+						return fallback;
 					}
 				}
 			}
@@ -102,111 +135,200 @@ namespace NpcFinder.Services
 			};
 		}
 
-		private async Task<Tuple<List<Tuple<string, int, int>>, List<Tuple<string, int, int>>>> GetPoisAndWaypointsByRegionAsync(int continentId, int floorId, int mapId, CancellationToken ct)
+		private async Task<Tuple<List<Tuple<string, int, int>>, List<Tuple<string, int, int>>>> GetPoisAndWaypointsByRegionAsync(int continentId, int floorId, int mapId, int regionIdFromMapInfo, bool allowScan, CancellationToken ct)
 		{
-			string regionCacheKey = $"regionForMap-c{continentId}-f{floorId}-m{mapId}-v2";
-			if (!_cache.TryLoad<int>(regionCacheKey, out var regionId) || regionId == 0)
+			if (regionIdFromMapInfo > 0)
 			{
-				regionId = await FindRegionContainingMapAsync(continentId, floorId, mapId, ct).ConfigureAwait(continueOnCapturedContext: false);
-				if (regionId == 0)
+				string hintedMapDetailsKey = string.Format("mapdetails-c{0}-f{1}-r{2}-m{3}-{4}", continentId, floorId, regionIdFromMapInfo, mapId, "v5");
+				if (_cache.TryLoad<MapDetailsCache>(hintedMapDetailsKey, out var hintedCached) && hintedCached != null)
 				{
-					Logger.Debug($"[MapDetails] mapId={mapId} not found on c={continentId} f={floorId}");
-					return null;
+					return Tuple.Create(hintedCached.Pois, hintedCached.Waypoints);
 				}
-				_cache.Save(regionCacheKey, regionId);
-				Logger.Debug($"[MapDetails] resolved regionId={regionId} for mapId={mapId} on c={continentId} f={floorId}");
 			}
-			string cacheKey = $"mapdetails-c{continentId}-f{floorId}-r{regionId}-m{mapId}-v2";
-			if (_cache.TryLoad<MapDetailsCache>(cacheKey, out var cached) && cached != null)
+			HttpResponseMessage resp2;
+			if (regionIdFromMapInfo > 0)
 			{
-				return Tuple.Create(cached.Pois, cached.Waypoints);
-			}
-			string url = $"https://api.guildwars2.com/v2/continents/{continentId}/floors/{floorId}/regions/{regionId}/maps/{mapId}";
-			Logger.Debug("[MapDetails] HTTP GET " + url);
-			HttpResponseMessage resp = await Http.GetAsync(url, (HttpCompletionOption)0, ct).ConfigureAwait(continueOnCapturedContext: false);
-			try
-			{
-				Logger.Debug($"[MapDetails] HTTP {(int)resp.get_StatusCode()} {resp.get_ReasonPhrase()}");
-				if (!resp.get_IsSuccessStatusCode())
+				string url = $"https://api.guildwars2.com/v2/continents/{continentId}/floors/{floorId}/regions/{regionIdFromMapInfo}/maps/{mapId}";
+				if (DEBUG_LOGS)
 				{
-					return null;
+					Logger.Debug("[MapDetails] HTTP GET " + url);
 				}
-				string obj = await resp.get_Content().ReadAsStringAsync().ConfigureAwait(continueOnCapturedContext: false);
-				List<Tuple<string, int, int>> pois = new List<Tuple<string, int, int>>();
-				List<Tuple<string, int, int>> wps = new List<Tuple<string, int, int>>();
-				JsonDocument doc = JsonDocument.Parse(obj, default(JsonDocumentOptions));
+				resp2 = await Http.GetAsync(url, (HttpCompletionOption)0, ct).ConfigureAwait(continueOnCapturedContext: false);
 				try
 				{
-					JsonElement root = doc.get_RootElement();
-					JsonElement poiObj = default(JsonElement);
-					if (((JsonElement)(ref root)).TryGetProperty("points_of_interest", ref poiObj) && (int)((JsonElement)(ref poiObj)).get_ValueKind() == 1)
+					if (DEBUG_LOGS)
 					{
-						ObjectEnumerator val = ((JsonElement)(ref poiObj)).EnumerateObject();
-						ObjectEnumerator enumerator = ((ObjectEnumerator)(ref val)).GetEnumerator();
-						try
-						{
-							JsonElement i = default(JsonElement);
-							JsonElement coord = default(JsonElement);
-							JsonElement t = default(JsonElement);
-							while (((ObjectEnumerator)(ref enumerator)).MoveNext())
-							{
-								JsonProperty prop = ((ObjectEnumerator)(ref enumerator)).get_Current();
-								JsonElement poi = ((JsonProperty)(ref prop)).get_Value();
-								string name = "";
-								if (((JsonElement)(ref poi)).TryGetProperty("name", ref i) && (int)((JsonElement)(ref i)).get_ValueKind() == 3)
-								{
-									name = ((JsonElement)(ref i)).GetString() ?? "";
-								}
-								if (((JsonElement)(ref poi)).TryGetProperty("coord", ref coord) && (int)((JsonElement)(ref coord)).get_ValueKind() == 2 && ((JsonElement)(ref coord)).GetArrayLength() == 2)
-								{
-									JsonElement val2 = ((JsonElement)(ref coord)).get_Item(0);
-									int x = (int)((JsonElement)(ref val2)).GetDouble();
-									val2 = ((JsonElement)(ref coord)).get_Item(1);
-									int y = (int)((JsonElement)(ref val2)).GetDouble();
-									string type = "";
-									if (((JsonElement)(ref poi)).TryGetProperty("type", ref t) && (int)((JsonElement)(ref t)).get_ValueKind() == 3)
-									{
-										type = ((JsonElement)(ref t)).GetString() ?? "";
-									}
-									if (string.Equals(type, "waypoint", StringComparison.OrdinalIgnoreCase))
-									{
-										wps.Add(Tuple.Create(name, x, y));
-									}
-									else
-									{
-										pois.Add(Tuple.Create(name, x, y));
-									}
-								}
-							}
-						}
-						finally
-						{
-							((IDisposable)(ObjectEnumerator)(ref enumerator)).Dispose();
-						}
+						Logger.Debug($"[MapDetails] HTTP {(int)resp2.get_StatusCode()} {resp2.get_ReasonPhrase()}");
+					}
+					if (resp2.get_IsSuccessStatusCode())
+					{
+						return ParseAndCache(continentId, floorId, regionIdFromMapInfo, mapId, await resp2.get_Content().ReadAsStringAsync().ConfigureAwait(continueOnCapturedContext: false));
+					}
+					if (!allowScan)
+					{
+						return null;
+					}
+					if (resp2.get_StatusCode() != HttpStatusCode.NotFound)
+					{
+						return null;
 					}
 				}
 				finally
 				{
-					((IDisposable)doc)?.Dispose();
+					((IDisposable)resp2)?.Dispose();
 				}
-				_cache.Save(cacheKey, new MapDetailsCache
+			}
+			else if (!allowScan)
+			{
+				return null;
+			}
+			string regionCacheKey = string.Format("regionForMap-c{0}-f{1}-m{2}-{3}", continentId, floorId, mapId, "v5");
+			if (!_cache.TryLoad<int>(regionCacheKey, out var scannedRegionId) || scannedRegionId == 0)
+			{
+				scannedRegionId = await FindRegionContainingMapAsync(continentId, floorId, mapId, ct).ConfigureAwait(continueOnCapturedContext: false);
+				if (scannedRegionId == 0)
 				{
-					Pois = pois,
-					Waypoints = wps
-				});
-				Logger.Debug($"[MapDetails] parsed pois={pois.Count} wps={wps.Count}");
-				return Tuple.Create(pois, wps);
+					if (DEBUG_LOGS)
+					{
+						Logger.Debug($"[MapDetails] mapId={mapId} not found on c={continentId} f={floorId}");
+					}
+					return null;
+				}
+				_cache.Save(regionCacheKey, scannedRegionId);
+				if (DEBUG_LOGS)
+				{
+					Logger.Debug($"[MapDetails] resolved regionId={scannedRegionId} for mapId={mapId} on c={continentId} f={floorId}");
+				}
+			}
+			string scannedMapDetailsKey = string.Format("mapdetails-c{0}-f{1}-r{2}-m{3}-{4}", continentId, floorId, scannedRegionId, mapId, "v5");
+			if (_cache.TryLoad<MapDetailsCache>(scannedMapDetailsKey, out var scannedCached) && scannedCached != null)
+			{
+				return Tuple.Create(scannedCached.Pois, scannedCached.Waypoints);
+			}
+			string retryUrl = $"https://api.guildwars2.com/v2/continents/{continentId}/floors/{floorId}/regions/{scannedRegionId}/maps/{mapId}";
+			if (DEBUG_LOGS)
+			{
+				Logger.Debug("[MapDetails] retry -> " + retryUrl);
+			}
+			resp2 = await Http.GetAsync(retryUrl, (HttpCompletionOption)0, ct).ConfigureAwait(continueOnCapturedContext: false);
+			try
+			{
+				if (!resp2.get_IsSuccessStatusCode())
+				{
+					return null;
+				}
+				string retryJson = await resp2.get_Content().ReadAsStringAsync().ConfigureAwait(continueOnCapturedContext: false);
+				return ParseAndCache(continentId, floorId, scannedRegionId, mapId, retryJson);
 			}
 			finally
 			{
-				((IDisposable)resp)?.Dispose();
+				((IDisposable)resp2)?.Dispose();
 			}
+		}
+
+		private Tuple<List<Tuple<string, int, int>>, List<Tuple<string, int, int>>> ParseAndCache(int continentId, int floorId, int regionId, int mapId, string json)
+		{
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0041: Invalid comparison between Unknown and I4
+			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008e: Invalid comparison between Unknown and I4
+			//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bd: Invalid comparison between Unknown and I4
+			//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0110: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0116: Invalid comparison between Unknown and I4
+			List<Tuple<string, int, int>> pois = new List<Tuple<string, int, int>>();
+			List<Tuple<string, int, int>> wps = new List<Tuple<string, int, int>>();
+			JsonDocument doc = JsonDocument.Parse(json, default(JsonDocumentOptions));
+			try
+			{
+				JsonElement root = doc.get_RootElement();
+				JsonElement poiObj = default(JsonElement);
+				if (((JsonElement)(ref root)).TryGetProperty("points_of_interest", ref poiObj) && (int)((JsonElement)(ref poiObj)).get_ValueKind() == 1)
+				{
+					ObjectEnumerator val = ((JsonElement)(ref poiObj)).EnumerateObject();
+					ObjectEnumerator enumerator = ((ObjectEnumerator)(ref val)).GetEnumerator();
+					try
+					{
+						JsonElement i = default(JsonElement);
+						JsonElement coord = default(JsonElement);
+						JsonElement t = default(JsonElement);
+						while (((ObjectEnumerator)(ref enumerator)).MoveNext())
+						{
+							JsonProperty prop = ((ObjectEnumerator)(ref enumerator)).get_Current();
+							JsonElement poi = ((JsonProperty)(ref prop)).get_Value();
+							string name = "";
+							if (((JsonElement)(ref poi)).TryGetProperty("name", ref i) && (int)((JsonElement)(ref i)).get_ValueKind() == 3)
+							{
+								name = ((JsonElement)(ref i)).GetString() ?? "";
+							}
+							if (((JsonElement)(ref poi)).TryGetProperty("coord", ref coord) && (int)((JsonElement)(ref coord)).get_ValueKind() == 2 && ((JsonElement)(ref coord)).GetArrayLength() == 2)
+							{
+								JsonElement val2 = ((JsonElement)(ref coord)).get_Item(0);
+								int x = (int)((JsonElement)(ref val2)).GetDouble();
+								val2 = ((JsonElement)(ref coord)).get_Item(1);
+								int y = (int)((JsonElement)(ref val2)).GetDouble();
+								string type = "";
+								if (((JsonElement)(ref poi)).TryGetProperty("type", ref t) && (int)((JsonElement)(ref t)).get_ValueKind() == 3)
+								{
+									type = ((JsonElement)(ref t)).GetString() ?? "";
+								}
+								if (string.Equals(type, "waypoint", StringComparison.OrdinalIgnoreCase))
+								{
+									wps.Add(Tuple.Create(name, x, y));
+								}
+								else
+								{
+									pois.Add(Tuple.Create(name, x, y));
+								}
+							}
+						}
+					}
+					finally
+					{
+						((IDisposable)(ObjectEnumerator)(ref enumerator)).Dispose();
+					}
+				}
+			}
+			finally
+			{
+				((IDisposable)doc)?.Dispose();
+			}
+			string cacheKey = string.Format("mapdetails-c{0}-f{1}-r{2}-m{3}-{4}", continentId, floorId, regionId, mapId, "v5");
+			_cache.Save(cacheKey, new MapDetailsCache
+			{
+				Pois = pois,
+				Waypoints = wps
+			});
+			if (DEBUG_LOGS)
+			{
+				Logger.Debug($"[MapDetails] parsed pois={pois.Count} wps={wps.Count}");
+			}
+			return Tuple.Create(pois, wps);
 		}
 
 		private async Task<int> FindRegionContainingMapAsync(int continentId, int floorId, int mapId, CancellationToken ct)
 		{
 			string regionsUrl = $"https://api.guildwars2.com/v2/continents/{continentId}/floors/{floorId}/regions";
-			Logger.Debug("[MapDetails] HTTP GET " + regionsUrl);
+			if (DEBUG_LOGS)
+			{
+				Logger.Debug("[MapDetails] HTTP GET " + regionsUrl);
+			}
 			HttpResponseMessage resp = await Http.GetAsync(regionsUrl, (HttpCompletionOption)0, ct).ConfigureAwait(continueOnCapturedContext: false);
 			try
 			{

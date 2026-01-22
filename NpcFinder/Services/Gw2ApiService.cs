@@ -15,6 +15,8 @@ namespace NpcFinder.Services
 {
 	public class Gw2ApiService
 	{
+		private static readonly bool DEBUG_LOGS;
+
 		private readonly IGw2WebApiV2Client _v2;
 
 		private readonly CacheStore _cache;
@@ -47,32 +49,61 @@ namespace NpcFinder.Services
 			{
 				return null;
 			}
+			int regionId = ReadIntProp(map, "RegionId");
 			int[] floors = ReadIntArrayProp(map, "Floors");
 			Logger log = Logger.GetLogger<Gw2ApiService>();
 			try
 			{
-				log.Info("MapRect type: " + ((object)map.get_MapRect()).GetType().FullName);
-				log.Info("ContinentRect type: " + ((object)map.get_ContinentRect()).GetType().FullName);
-				log.Info("Floors extracted: " + ((floors == null) ? "null" : string.Join(",", floors)));
+				if (DEBUG_LOGS)
+				{
+					log.Info("MapRect type: " + ((object)map.get_MapRect()).GetType().FullName);
+					log.Info("ContinentRect type: " + ((object)map.get_ContinentRect()).GetType().FullName);
+					log.Info("Floors extracted: " + ((floors == null) ? "null" : string.Join(",", floors)));
+				}
 			}
 			catch
 			{
 			}
 			Rect2D mapRect = ReadRectAny(map.get_MapRect());
 			Rect2D contRect = ReadRectAny(map.get_ContinentRect());
-			log.Warn($"[RectParse] mapRect=({mapRect.X1},{mapRect.Y1},{mapRect.X2},{mapRect.Y2}) " + $"contRect=({contRect.X1},{contRect.Y1},{contRect.X2},{contRect.Y2}) " + "types: mapRectType=" + ((object)map.get_MapRect()).GetType().FullName + " contRectType=" + ((object)map.get_ContinentRect()).GetType().FullName);
+			if (DEBUG_LOGS)
+			{
+				log.Warn($"[RectParse] mapRect=({mapRect.X1},{mapRect.Y1},{mapRect.X2},{mapRect.Y2}) " + $"contRect=({contRect.X1},{contRect.Y1},{contRect.X2},{contRect.Y2}) " + "types: mapRectType=" + ((object)map.get_MapRect()).GetType().FullName + " contRectType=" + ((object)map.get_ContinentRect()).GetType().FullName);
+			}
 			Gw2MapInfo info = new Gw2MapInfo
 			{
 				Id = map.get_Id(),
 				Name = map.get_Name(),
 				ContinentId = map.get_ContinentId(),
 				DefaultFloor = map.get_DefaultFloor(),
+				RegionId = regionId,
 				Floors = (floors ?? Array.Empty<int>()),
 				MapRect = mapRect,
 				ContinentRect = contRect
 			};
 			_cache.Save(key, info);
 			return info;
+		}
+
+		private static int ReadIntProp(object obj, string propName)
+		{
+			if (obj == null)
+			{
+				return 0;
+			}
+			PropertyInfo p = obj.GetType().GetProperty(propName, BindingFlags.Instance | BindingFlags.Public);
+			if (p == null)
+			{
+				return 0;
+			}
+			try
+			{
+				return Convert.ToInt32(p.GetValue(obj));
+			}
+			catch
+			{
+				return 0;
+			}
 		}
 
 		private static int[] ReadIntArrayProp(object obj, string propName)

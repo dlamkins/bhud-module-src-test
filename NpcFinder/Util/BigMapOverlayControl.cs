@@ -10,6 +10,8 @@ namespace NpcFinder.Util
 {
 	public class BigMapOverlayControl : Control
 	{
+		private static readonly bool DEBUG_LOGS = false;
+
 		private Texture2D _pixel;
 
 		public Func<NpcTarget> TargetProvider;
@@ -63,85 +65,6 @@ namespace NpcFinder.Util
 			float px = val.X + dx / scale;
 			float py = val.Y + dy / scale;
 			return new Vector2(px, py);
-		}
-
-		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
-		{
-			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0157: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0182: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018c: Expected O, but got Unknown
-			//IL_019a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ab: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cd: Unknown result type (might be due to invalid IL or missing references)
-			Func<NpcTarget> tp = TargetProvider;
-			if (tp == null)
-			{
-				return;
-			}
-			NpcTarget target;
-			try
-			{
-				target = tp();
-			}
-			catch
-			{
-				return;
-			}
-			if (target == null)
-			{
-				return;
-			}
-			if (CurrentContinentIdProvider != null)
-			{
-				int curCont = CurrentContinentIdProvider();
-				if (curCont != 0 && target.TargetContinentId != 0 && curCont != target.TargetContinentId)
-				{
-					return;
-				}
-			}
-			Gw2MumbleService gw2Mumble = GameService.Gw2Mumble;
-			bool? obj2;
-			if (gw2Mumble == null)
-			{
-				obj2 = null;
-			}
-			else
-			{
-				UI uI = gw2Mumble.get_UI();
-				obj2 = ((uI != null) ? new bool?(uI.get_IsMapOpen()) : null);
-			}
-			bool? flag = obj2;
-			if (!flag.GetValueOrDefault())
-			{
-				return;
-			}
-			Vector2? screenPos = ContinentToScreen(target.TargetContinentX, target.TargetContinentY, bounds);
-			if (!screenPos.HasValue)
-			{
-				return;
-			}
-			Vector2 pos = screenPos.Value;
-			if (MumbleReader.TryGetWorldMapUi(out var centerX, out var centerY, out var scale))
-			{
-				if (_dbgEvery++ % 60 == 0)
-				{
-					Log.Warn($"[OverlayDbg] center=({centerX},{centerY}) scale={scale} " + $"target=({target.TargetContinentX},{target.TargetContinentY}) " + $"dxdy=({(float)target.TargetContinentX - centerX},{(float)target.TargetContinentY - centerY}) " + $"screen=({pos.X},{pos.Y})");
-				}
-				if (_pixel == null)
-				{
-					_pixel = new Texture2D(((GraphicsResource)spriteBatch).get_GraphicsDevice(), 1, 1);
-					_pixel.SetData<Color>((Color[])(object)new Color[1] { Color.get_White() });
-				}
-				DrawRing(spriteBatch, pos, 22f, 3f, Color.get_Yellow());
-				DrawCross(spriteBatch, pos, 10f, 2f, Color.get_Yellow());
-			}
 		}
 
 		private void DrawRing(SpriteBatch sb, Vector2 center, float radius, float thickness, Color color)
@@ -206,49 +129,178 @@ namespace NpcFinder.Util
 			sb.Draw(_pixel, new Rectangle((int)start.X, (int)start.Y, (int)length, (int)thickness), (Rectangle?)null, color, angle, new Vector2(0f, 0.5f), (SpriteEffects)0, 0f);
 		}
 
-		private static bool ContinentToMap(NpcTarget target, out float mapX, out float mapY)
+		private static Vector2 ClampToBounds(Vector2 p, Rectangle b, float margin)
 		{
-			mapX = (mapY = 0f);
-			Gw2MapInfo mi = target?.MapInfo;
-			if (mi == null)
-			{
-				return false;
-			}
-			Rect2D mr = mi.MapRect;
-			Rect2D cr = mi.ContinentRect;
-			double cMinX = Math.Min(cr.X1, cr.X2);
-			double cMaxX = Math.Max(cr.X1, cr.X2);
-			double cMinY = Math.Min(cr.Y1, cr.Y2);
-			double cMaxY = Math.Max(cr.Y1, cr.Y2);
-			double mMinX = Math.Min(mr.X1, mr.X2);
-			double mMaxX = Math.Max(mr.X1, mr.X2);
-			double mMinY = Math.Min(mr.Y1, mr.Y2);
-			double num = Math.Max(mr.Y1, mr.Y2);
-			double cW = cMaxX - cMinX;
-			double cH = cMaxY - cMinY;
-			double mW = mMaxX - mMinX;
-			double mH = num - mMinY;
-			if (cW <= 1E-06 || cH <= 1E-06 || mW <= 1E-06 || mH <= 1E-06)
-			{
-				return false;
-			}
-			double u = (target.TargetContinentX - cMinX) / cW;
-			double v = (target.TargetContinentY - cMinY) / cH;
-			u = Math.Max(0.0, Math.Min(1.0, u));
-			v = Math.Max(0.0, Math.Min(1.0, v));
-			v = 1.0 - v;
-			mapX = (float)(mMinX + u * mW);
-			mapY = (float)(mMinY + v * mH);
-			return true;
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+			float num = MathHelper.Clamp(p.X, (float)((Rectangle)(ref b)).get_Left() + margin, (float)((Rectangle)(ref b)).get_Right() - margin);
+			float y = MathHelper.Clamp(p.Y, (float)((Rectangle)(ref b)).get_Top() + margin, (float)((Rectangle)(ref b)).get_Bottom() - margin);
+			return new Vector2(num, y);
 		}
 
-		private static void LogOncePerSecond(Logger log, string msg)
+		private void DrawArrow(SpriteBatch sb, Vector2 tip, Vector2 dir, float size, float thickness, Color color)
 		{
-			DateTime now = DateTime.UtcNow;
-			if (!((now - _lastLog).TotalSeconds < 1.0))
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+			Vector2 left = Rotate(dir, 2.6f);
+			Vector2 right = Rotate(dir, -2.6f);
+			Vector2 a = tip - left * size;
+			Vector2 b = tip - right * size;
+			DrawLine(sb, a, tip, thickness, color);
+			DrawLine(sb, b, tip, thickness, color);
+		}
+
+		private static Vector2 Rotate(Vector2 v, float radians)
+		{
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+			float c = (float)Math.Cos(radians);
+			float s = (float)Math.Sin(radians);
+			return new Vector2(v.X * c - v.Y * s, v.X * s + v.Y * c);
+		}
+
+		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
+		{
+			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0175: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0181: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b7: Expected O, but got Unknown
+			//IL_01c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01eb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0202: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0219: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0238: Unknown result type (might be due to invalid IL or missing references)
+			//IL_023a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0240: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0245: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0249: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0250: Unknown result type (might be due to invalid IL or missing references)
+			//IL_025e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0265: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0278: Unknown result type (might be due to invalid IL or missing references)
+			//IL_027a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_027c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0281: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02c7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02f8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0304: Unknown result type (might be due to invalid IL or missing references)
+			Gw2MumbleService gw2Mumble = GameService.Gw2Mumble;
+			bool? obj;
+			if (gw2Mumble == null)
 			{
-				_lastLog = now;
-				log.Warn(msg);
+				obj = null;
+			}
+			else
+			{
+				UI uI = gw2Mumble.get_UI();
+				obj = ((uI != null) ? new bool?(uI.get_IsMapOpen()) : null);
+			}
+			bool? flag = obj;
+			if (!flag.GetValueOrDefault())
+			{
+				return;
+			}
+			Func<NpcTarget> tp = TargetProvider;
+			if (tp == null)
+			{
+				return;
+			}
+			NpcTarget target;
+			try
+			{
+				target = tp();
+			}
+			catch
+			{
+				return;
+			}
+			if (target == null)
+			{
+				return;
+			}
+			if (CurrentContinentIdProvider != null)
+			{
+				int curCont = CurrentContinentIdProvider();
+				if (curCont != 0 && target.TargetContinentId != 0 && curCont != target.TargetContinentId)
+				{
+					return;
+				}
+			}
+			if (!MumbleReader.TryGetWorldMapUi(out var centerX, out var centerY, out var scale) || float.IsNaN(scale) || float.IsInfinity(scale) || Math.Abs(scale) < 1E-06f)
+			{
+				return;
+			}
+			Vector2? screenPos = ContinentToScreen(target.TargetContinentX, target.TargetContinentY, bounds);
+			if (!screenPos.HasValue)
+			{
+				return;
+			}
+			Vector2 pos = screenPos.Value;
+			if (_dbgEvery++ % 60 == 0 && DEBUG_LOGS)
+			{
+				Log.Warn($"[OverlayDbg] center=({centerX},{centerY}) scale={scale} " + $"target=({target.TargetContinentX},{target.TargetContinentY}) " + $"dxdy=({(float)target.TargetContinentX - centerX},{(float)target.TargetContinentY - centerY}) " + $"screen=({pos.X},{pos.Y})");
+			}
+			if (_pixel == null)
+			{
+				_pixel = new Texture2D(((GraphicsResource)spriteBatch).get_GraphicsDevice(), 1, 1);
+				_pixel.SetData<Color>((Color[])(object)new Color[1] { Color.get_White() });
+			}
+			if (pos.X < (float)((Rectangle)(ref bounds)).get_Left() + 18f || pos.X > (float)((Rectangle)(ref bounds)).get_Right() - 18f || pos.Y < (float)((Rectangle)(ref bounds)).get_Top() + 18f || pos.Y > (float)((Rectangle)(ref bounds)).get_Bottom() - 18f)
+			{
+				Vector2 clamped = ClampToBounds(pos, bounds, 18f);
+				Vector2 mapCenter = default(Vector2);
+				((Vector2)(ref mapCenter))._002Ector((float)bounds.X + (float)bounds.Width / 2f, (float)bounds.Y + (float)bounds.Height / 2f);
+				Vector2 dir = pos - mapCenter;
+				if (((Vector2)(ref dir)).LengthSquared() < 0.001f)
+				{
+					((Vector2)(ref dir))._002Ector(1f, 0f);
+				}
+				else
+				{
+					((Vector2)(ref dir)).Normalize();
+				}
+				DrawRing(spriteBatch, clamped, 18f, 3f, Color.get_Yellow());
+				DrawArrow(spriteBatch, clamped, dir, 16f, 3f, Color.get_Yellow());
+			}
+			else
+			{
+				DrawRing(spriteBatch, pos, 22f, 3f, Color.get_Yellow());
+				DrawCross(spriteBatch, pos, 10f, 2f, Color.get_Yellow());
 			}
 		}
 	}
