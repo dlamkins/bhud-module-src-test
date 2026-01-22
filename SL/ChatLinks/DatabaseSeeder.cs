@@ -23,6 +23,7 @@ using GuildWars2.Hero.Equipment.Outfits;
 using GuildWars2.Hero.Equipment.Wardrobe;
 using GuildWars2.Items;
 using GuildWars2.Pvp.MistChampions;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Logging;
@@ -155,9 +156,15 @@ namespace SL.ChatLinks
 				Version = 1,
 				Databases = new Dictionary<string, Database>()
 			};
-			if (!currentDataManifest.Databases.TryGetValue(language.Alpha2Code, out var currentDatabase) || currentDatabase.SchemaVersion != ChatLinksContext.SchemaVersion || IsEmpty(currentDatabase))
+			Database currentDatabase;
+			bool flag = !currentDataManifest.Databases.TryGetValue(language.Alpha2Code, out currentDatabase) || currentDatabase.SchemaVersion != ChatLinksContext.SchemaVersion || IsEmpty(currentDatabase);
+			if (!flag)
 			{
-				Database seedDatabase = await DownloadDatabase(language, currentDatabase).ConfigureAwait(continueOnCapturedContext: false);
+				flag = !(await IsReady(currentDatabase).ConfigureAwait(continueOnCapturedContext: false));
+			}
+			if (flag)
+			{
+				Database seedDatabase = await DownloadDatabase(language).ConfigureAwait(continueOnCapturedContext: false);
 				if ((object)seedDatabase != null)
 				{
 					currentDatabase = seedDatabase;
@@ -199,11 +206,37 @@ namespace SL.ChatLinks
 			return (await context.Database.GetPendingMigrationsAsync().ConfigureAwait(continueOnCapturedContext: false)).Any();
 		}
 
-		private async Task<Database?> DownloadDatabase(Language language, Database? currentDatabase)
+		private async Task<bool> IsReady(Database database)
+		{
+			_ = 1;
+			try
+			{
+				ChatLinksContext context = _contextFactory.CreateDbContext(database.Name);
+				ConfiguredAsyncDisposable configuredAsyncDisposable = context.ConfigureAwait(continueOnCapturedContext: false);
+				try
+				{
+					return !(await HasPendingMigrations(context).ConfigureAwait(continueOnCapturedContext: false));
+				}
+				finally
+				{
+					IAsyncDisposable asyncDisposable = configuredAsyncDisposable as IAsyncDisposable;
+					if (asyncDisposable != null)
+					{
+						await asyncDisposable.DisposeAsync();
+					}
+				}
+			}
+			catch (SqliteException)
+			{
+				return false;
+			}
+		}
+
+		private async Task<Database?> DownloadDatabase(Language language)
 		{
 			Language language2 = language;
 			SeedDatabase seedDatabase = (await _staticDataClient.GetSeedIndex(CancellationToken.None).ConfigureAwait(continueOnCapturedContext: false)).Databases.OrderByDescending((SeedDatabase seed) => seed.SchemaVersion).FirstOrDefault((SeedDatabase seed) => seed.SchemaVersion <= ChatLinksContext.SchemaVersion && seed.Language == language2.Alpha2Code);
-			if ((object)seedDatabase == null || seedDatabase.SchemaVersion == currentDatabase?.SchemaVersion)
+			if ((object)seedDatabase == null)
 			{
 				return null;
 			}
