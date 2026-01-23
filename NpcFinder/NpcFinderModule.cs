@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
+using Blish_HUD.Gw2Mumble;
 using Blish_HUD.Input;
 using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
@@ -28,7 +29,9 @@ namespace NpcFinder
 
 		private ChangelogWindow _changelogWindow;
 
-		private const string CHANGELOG_TEXT = "v1.1.0\r\n- Huge performance improvements\r\n- Much better precision (works for most of the NPCs now)\r\n- Added Suggestions panel\r\n- Added a marker that displays on the corner if it's off-screen\r\n- Stopped it from opening by itself.\r\n- Added changelog window\r\n- Improved NPC title suggestions (prefix + search + scoring)\r\n- Anchors fallback restored when no coordinates are parsed\r\n- Better caching system\r\n- UI improvements\r\n\r\n! Some NPCs may take a bit longer to resolve the position the first time \r\n(due to caching) -> be patient (around max 2-3 minutes)\r\n\r\n** For the next version (v1.2.0) I'm planning to add a feature to search by MAP \r\nand to display all the NPCs on that map ** \r\n\r\n** Also I will try to fix the small offset of the marker when moving the map \r\nin the next version **\r\n";
+		private static readonly string[] CHANGELOG_PAGE_TITLES = new string[3] { "Latest (v1.2.0)", "v1.1.0", "v1.0.0" };
+
+		private static readonly string[] CHANGELOG_PAGE_TEXTS = new string[3] { "\r\nv1.2.0\r\n- Added search by MAP feature (it is possible not all NPCs of that map will show)\r\n- Optimized NPC search (now takes around 5-10 seconds max to find most NPCs)\r\n- Fixed marker jitter\r\n- Safety improvements\r\n- UI improvements (+changelog)\r\n- Increase cache size limits (stored up to 25 days)\r\n", "\r\nv1.1.0\r\n- Huge performance improvements\r\n- Much better precision (works for most of the NPCs now)\r\n- Added Suggestions panel\r\n- Added a marker that displays on the corner if it's off-screen\r\n- Stopped it from opening by itself.\r\n- Added changelog window\r\n- Improved NPC title suggestions (prefix + search + scoring)\r\n- Anchors fallback restored when no coordinates are parsed\r\n- Better caching system\r\n- UI improvements\r\n\r\n! Some NPCs may take a bit longer to resolve the position the first time \r\n(due to caching) -> be patient (around max 2-3 minutes)\r\n            \r\n** For the next version (v1.2.0) I'm planning to add a feature to search by MAP \r\nand to display all the NPCs on that map ** \r\n            \r\n** Also I will try to fix the small offset of the marker when moving the map \r\nin the next version **\r\n", "\r\nv1.0.0\r\n- Initial release\r\n- Basic NPC search + marker\r\n" };
 
 		private static readonly Logger Logger = Logger.GetLogger<NpcFinderModule>();
 
@@ -139,11 +142,11 @@ namespace NpcFinder
 
 		private void EnsureChangelogWindow()
 		{
-			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
 			if (_changelogWindow == null)
 			{
 				AsyncTexture2D bg = AsyncTexture2D.FromAssetId(155997);
-				ChangelogWindow changelogWindow = new ChangelogWindow(bg, "v1.1.0\r\n- Huge performance improvements\r\n- Much better precision (works for most of the NPCs now)\r\n- Added Suggestions panel\r\n- Added a marker that displays on the corner if it's off-screen\r\n- Stopped it from opening by itself.\r\n- Added changelog window\r\n- Improved NPC title suggestions (prefix + search + scoring)\r\n- Anchors fallback restored when no coordinates are parsed\r\n- Better caching system\r\n- UI improvements\r\n\r\n! Some NPCs may take a bit longer to resolve the position the first time \r\n(due to caching) -> be patient (around max 2-3 minutes)\r\n\r\n** For the next version (v1.2.0) I'm planning to add a feature to search by MAP \r\nand to display all the NPCs on that map ** \r\n\r\n** Also I will try to fix the small offset of the marker when moving the map \r\nin the next version **\r\n");
+				ChangelogWindow changelogWindow = new ChangelogWindow(bg, CHANGELOG_PAGE_TEXTS, CHANGELOG_PAGE_TITLES);
 				((Control)changelogWindow).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 				((Control)changelogWindow).set_Location(new Point(340, 240));
 				((WindowBase2)changelogWindow).set_Id("NpcFinderModule_ChangelogWindow");
@@ -237,13 +240,19 @@ namespace NpcFinder
 		protected override void Update(GameTime gameTime)
 		{
 			((Module)this).Update(gameTime);
-			_pollMs += gameTime.get_ElapsedGameTime().TotalMilliseconds;
-			if (_pollMs < 1000.0)
+			Gw2MumbleService gw2Mumble = GameService.Gw2Mumble;
+			bool? obj;
+			if (gw2Mumble == null)
 			{
-				return;
+				obj = null;
 			}
-			_pollMs = 0.0;
-			if (GameService.Gw2Mumble.get_UI().get_IsMapOpen())
+			else
+			{
+				UI uI = gw2Mumble.get_UI();
+				obj = ((uI != null) ? new bool?(uI.get_IsMapOpen()) : null);
+			}
+			bool? flag = obj;
+			if (flag.GetValueOrDefault())
 			{
 				BigMapOverlayControl bigMapOverlay = _bigMapOverlay;
 				if (bigMapOverlay != null)
@@ -251,6 +260,12 @@ namespace NpcFinder
 					((Control)bigMapOverlay).Invalidate();
 				}
 			}
+			_pollMs += gameTime.get_ElapsedGameTime().TotalMilliseconds;
+			if (_pollMs < 1000.0)
+			{
+				return;
+			}
+			_pollMs = 0.0;
 			MumbleReader.DumpUiOncePerSecond();
 			if (!MumbleReader.TryGetMapId(out var mapId) || mapId == _lastMapId)
 			{

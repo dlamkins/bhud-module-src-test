@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
@@ -18,6 +17,12 @@ namespace NpcFinder.Controls
 	public class NpcFinderWindow : StandardWindow
 	{
 		private static readonly bool DEBUG_LOGS;
+
+		private const int MAX_MAP_RESULTS = 120;
+
+		private Checkbox _mapModeCheckbox;
+
+		private bool _mapMode;
 
 		private CancellationToken _activeSearchToken;
 
@@ -61,6 +66,8 @@ namespace NpcFinder.Controls
 
 		private Label _status;
 
+		private Label _changeLog;
+
 		private StandardButton _clearBtn;
 
 		private readonly Action _clearTarget;
@@ -93,42 +100,6 @@ namespace NpcFinder.Controls
 			((WindowBase2)this).set_CanResize(false);
 			((WindowBase2)this).set_SavesPosition(true);
 			BuildUi();
-		}
-
-		private static void MakeNonFocusable(object control)
-		{
-			if (control == null)
-			{
-				return;
-			}
-			try
-			{
-				Type t = control.GetType();
-				BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
-				string[] array = new string[6] { "CanFocus", "CanReceiveFocus", "IsFocusable", "Focusable", "CanBeFocused", "CanTakeFocus" };
-				foreach (string propName in array)
-				{
-					PropertyInfo p = t.GetProperty(propName, flags);
-					if (p != null && p.CanWrite && p.PropertyType == typeof(bool))
-					{
-						p.SetValue(control, false, null);
-						break;
-					}
-				}
-				array = new string[3] { "CanFocus", "IsFocusable", "Focusable" };
-				foreach (string fieldName in array)
-				{
-					FieldInfo f = t.GetField(fieldName, flags);
-					if (f != null && f.FieldType == typeof(bool))
-					{
-						f.SetValue(control, false);
-						break;
-					}
-				}
-			}
-			catch
-			{
-			}
 		}
 
 		private static string Norm(string s)
@@ -243,8 +214,13 @@ namespace NpcFinder.Controls
 			return _suggestCts.Token;
 		}
 
-		private async Task<List<(string label, string value)>> BuildMergedSuggestionsAsync(string text, CancellationToken ct)
+		private async Task<List<(string label, string value)>> BuildMergedSuggestionsAsync(string text, bool mapMode, CancellationToken ct)
 		{
+			if (mapMode)
+			{
+				return (from m in ((await _mapIndex.SuggestMapNamesAsync(text, 12, ct).ConfigureAwait(continueOnCapturedContext: false)) ?? new List<string>()).Distinct(StringComparer.OrdinalIgnoreCase).Take(12)
+					select (m, m)).ToList();
+			}
 			Task<List<string>> mapTask = _mapIndex.SuggestMapNamesAsync(text, 6, ct);
 			Task<List<string>> sugTask = _wiki.SuggestTitlesAsync(text, 10, ct);
 			Task<List<string>> searchTask = Task.FromResult(new List<string>());
@@ -310,7 +286,7 @@ namespace NpcFinder.Controls
 					HideSuggestions();
 					return;
 				}
-				List<(string, string)> merged = await BuildMergedSuggestionsAsync(q, ct);
+				List<(string, string)> merged = await BuildMergedSuggestionsAsync(q, _mapMode, ct);
 				ct.ThrowIfCancellationRequested();
 				if (myId == _suggestReqId)
 				{
@@ -352,172 +328,203 @@ namespace NpcFinder.Controls
 			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0085: Expected O, but got Unknown
-			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0091: Expected O, but got Unknown
+			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0107: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0113: Expected O, but got Unknown
-			//IL_014b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0150: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0177: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0182: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018b: Expected O, but got Unknown
+			//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e9: Expected O, but got Unknown
+			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0102: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0112: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0129: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0137: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0141: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0148: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0156: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0161: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0177: Expected O, but got Unknown
+			//IL_01ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b1: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01bd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c2: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0203: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0213: Expected O, but got Unknown
-			//IL_022b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0230: Unknown result type (might be due to invalid IL or missing references)
-			//IL_023c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0244: Unknown result type (might be due to invalid IL or missing references)
-			//IL_025c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0266: Unknown result type (might be due to invalid IL or missing references)
-			//IL_026d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_027d: Expected O, but got Unknown
-			//IL_0280: Unknown result type (might be due to invalid IL or missing references)
-			//IL_028d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0292: Unknown result type (might be due to invalid IL or missing references)
-			//IL_029e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02e5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02f1: Expected O, but got Unknown
-			//IL_02f2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02f7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0303: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0306: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0310: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0317: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0321: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0328: Unknown result type (might be due to invalid IL or missing references)
-			//IL_032f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_033a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0349: Expected O, but got Unknown
-			//IL_034a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_034f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_035b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_036c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0376: Unknown result type (might be due to invalid IL or missing references)
-			//IL_037e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0388: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0398: Expected O, but got Unknown
-			//IL_03b0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03b5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03e0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03e8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03f2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0402: Expected O, but got Unknown
+			//IL_01d8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ec: Expected O, but got Unknown
+			//IL_0214: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0219: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0225: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0241: Unknown result type (might be due to invalid IL or missing references)
+			//IL_024b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0250: Unknown result type (might be due to invalid IL or missing references)
+			//IL_025a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_026a: Expected O, but got Unknown
+			//IL_0282: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0287: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0293: Unknown result type (might be due to invalid IL or missing references)
+			//IL_029b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02c4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d4: Expected O, but got Unknown
+			//IL_02d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02e9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_030e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0318: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0319: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0332: Unknown result type (might be due to invalid IL or missing references)
+			//IL_033c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0348: Expected O, but got Unknown
+			//IL_0349: Unknown result type (might be due to invalid IL or missing references)
+			//IL_034e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_035a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_035d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0367: Unknown result type (might be due to invalid IL or missing references)
+			//IL_036e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0378: Unknown result type (might be due to invalid IL or missing references)
+			//IL_037f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0386: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0391: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03a0: Expected O, but got Unknown
+			//IL_03a1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03cd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03d5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03df: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03ef: Expected O, but got Unknown
+			//IL_0407: Unknown result type (might be due to invalid IL or missing references)
+			//IL_040c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0418: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0419: Unknown result type (might be due to invalid IL or missing references)
+			//IL_042d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0437: Unknown result type (might be due to invalid IL or missing references)
+			//IL_043f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0449: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0459: Expected O, but got Unknown
+			//IL_0471: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0476: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0482: Unknown result type (might be due to invalid IL or missing references)
+			//IL_048a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0494: Unknown result type (might be due to invalid IL or missing references)
+			//IL_049b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04ab: Expected O, but got Unknown
 			Rectangle cr = ((Container)this).get_ContentRegion();
 			Panel val = new Panel();
 			((Control)val).set_Parent((Container)(object)this);
 			((Control)val).set_Location(new Point(40, 40));
-			((Control)val).set_Size(new Point(520, 400));
+			((Control)val).set_Size(new Point(520, 450));
 			((Control)val).set_ClipsBounds(false);
 			_contentRoot = val;
-			TextBox val2 = new TextBox();
+			Checkbox val2 = new Checkbox();
 			((Control)val2).set_Parent((Container)(object)_contentRoot);
-			((Control)val2).set_Location(new Point(0, 0));
-			((Control)val2).set_Width(cr.Width - 30 - 110);
-			((TextInputBase)val2).set_PlaceholderText("NPC name...");
-			_searchBox = val2;
-			FlowPanel val3 = new FlowPanel();
+			((Control)val2).set_Location(new Point(350, 50));
+			((Control)val2).set_Size(new Point(260, 20));
+			val2.set_Text("Map mode ?");
+			val2.set_Checked(false);
+			_mapModeCheckbox = val2;
+			_mapModeCheckbox.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
+			{
+				_mapMode = _mapModeCheckbox.get_Checked();
+				((Container)_resultsPanel).ClearChildren();
+				HideSuggestions();
+				((TextInputBase)_searchBox).set_Text("");
+				((TextInputBase)_searchBox).set_PlaceholderText(_mapMode ? "Map name..." : "NPC/WP/POI name...");
+				_status.set_Text(_mapMode ? "Map mode: type a map name, then Search to list NPCs." : "Awaiting NPC selection from the list below...");
+			});
+			TextBox val3 = new TextBox();
 			((Control)val3).set_Parent((Container)(object)_contentRoot);
-			((Control)val3).set_Location(new Point(((Control)_searchBox).get_Location().X, ((Control)_searchBox).get_Location().Y + 34));
-			((Control)val3).set_Size(new Point(((Control)_searchBox).get_Width(), 120));
-			((Control)val3).set_ClipsBounds(true);
-			((Panel)val3).set_CanScroll(true);
-			val3.set_FlowDirection((ControlFlowDirection)3);
-			val3.set_ControlPadding(new Vector2(0f, 2f));
-			((Control)val3).set_Visible(false);
-			_suggestPanel = val3;
+			((Control)val3).set_Location(new Point(0, 0));
+			((Control)val3).set_Width(cr.Width - 30 - 110);
+			((TextInputBase)val3).set_PlaceholderText("NPC/WP/POI name...");
+			_searchBox = val3;
+			FlowPanel val4 = new FlowPanel();
+			((Control)val4).set_Parent((Container)(object)_contentRoot);
+			((Control)val4).set_Location(new Point(((Control)_searchBox).get_Location().X, ((Control)_searchBox).get_Location().Y + 34));
+			((Control)val4).set_Size(new Point(((Control)_searchBox).get_Width(), 120));
+			((Control)val4).set_ClipsBounds(true);
+			((Panel)val4).set_CanScroll(true);
+			val4.set_FlowDirection((ControlFlowDirection)3);
+			val4.set_ControlPadding(new Vector2(0f, 2f));
+			((Control)val4).set_Visible(false);
+			_suggestPanel = val4;
 			_suggestBtns = (StandardButton[])(object)new StandardButton[12];
 			_suggestValues = new string[12];
 			for (int i = 0; i < 12; i++)
 			{
 				int idx = i;
-				StandardButton val4 = new StandardButton();
-				((Control)val4).set_Parent((Container)(object)_suggestPanel);
-				((Control)val4).set_Size(new Point(((Control)_suggestPanel).get_Width() - 18, 28));
-				val4.set_Text("");
-				((Control)val4).set_Visible(false);
-				StandardButton b = val4;
-				MakeNonFocusable(b);
+				StandardButton val5 = new StandardButton();
+				((Control)val5).set_Parent((Container)(object)_suggestPanel);
+				((Control)val5).set_Size(new Point(((Control)_suggestPanel).get_Width() - 18, 28));
+				val5.set_Text("");
+				((Control)val5).set_Visible(false);
+				StandardButton b = val5;
 				((Control)b).add_Click((EventHandler<MouseEventArgs>)async delegate
 				{
-					string val11 = _suggestValues[idx];
-					if (!string.IsNullOrWhiteSpace(val11))
+					string val13 = _suggestValues[idx];
+					if (!string.IsNullOrWhiteSpace(val13))
 					{
-						((TextInputBase)_searchBox).set_Text(val11);
+						((TextInputBase)_searchBox).set_Text(val13);
 						HideSuggestions();
 						await DoSearchAsync();
 					}
 				});
 				_suggestBtns[i] = b;
 			}
-			StandardButton val5 = new StandardButton();
-			((Control)val5).set_Parent((Container)(object)_contentRoot);
-			((Control)val5).set_Location(new Point(((Control)_searchBox).get_Right() + 10, ((Control)_searchBox).get_Top() - 2));
-			((Control)val5).set_Size(new Point(110, 34));
-			val5.set_Text("Search");
-			_searchBtn = val5;
+			StandardButton val6 = new StandardButton();
+			((Control)val6).set_Parent((Container)(object)_contentRoot);
+			((Control)val6).set_Location(new Point(((Control)_searchBox).get_Right() + 10, ((Control)_searchBox).get_Top() - 2));
+			((Control)val6).set_Size(new Point(110, 34));
+			val6.set_Text("Search");
+			_searchBtn = val6;
 			((Control)_searchBtn).add_Click((EventHandler<MouseEventArgs>)async delegate
 			{
 				await DoSearchAsync();
 			});
-			Label val6 = new Label();
-			((Control)val6).set_Parent((Container)(object)_contentRoot);
-			((Control)val6).set_Location(new Point(0, ((Control)_suggestPanel).get_Location().Y + ((Control)_suggestPanel).get_Height() + 8));
-			val6.set_AutoSizeWidth(true);
-			val6.set_Text("Awaiting NPC selection from the list below...");
-			_status = val6;
+			Label val7 = new Label();
+			((Control)val7).set_Parent((Container)(object)_contentRoot);
+			((Control)val7).set_Location(new Point(0, ((Control)_suggestPanel).get_Location().Y + ((Control)_suggestPanel).get_Height() + 8));
+			val7.set_AutoSizeWidth(true);
+			val7.set_Text("Awaiting NPC selection from the list below...");
+			_status = val7;
 			int bottomButtonsH = 34;
 			int bottomY = cr.Height - 10 - bottomButtonsH;
-			Panel val7 = new Panel();
-			((Control)val7).set_Parent((Container)(object)_contentRoot);
-			((Control)val7).set_Location(new Point(((Control)_searchBox).get_Left(), ((Control)_status).get_Bottom() + 8));
-			((Control)val7).set_Size(new Point(cr.Width - 20, bottomY - (((Control)_status).get_Bottom() - 32)));
-			((Control)val7).set_ClipsBounds(true);
-			_resultsViewport = val7;
-			FlowPanel val8 = new FlowPanel();
-			((Control)val8).set_Parent((Container)(object)_resultsViewport);
-			((Control)val8).set_Location(new Point(0, 0));
-			((Control)val8).set_Size(((Control)_resultsViewport).get_Size());
-			((Panel)val8).set_CanScroll(true);
-			val8.set_FlowDirection((ControlFlowDirection)3);
-			val8.set_ControlPadding(new Vector2(0f, 4f));
-			_resultsPanel = val8;
-			StandardButton val9 = new StandardButton();
-			((Control)val9).set_Parent((Container)(object)_contentRoot);
-			((Control)val9).set_Location(new Point(((Control)_searchBox).get_Left(), 355));
-			((Control)val9).set_Size(new Point(220, 34));
-			val9.set_Text("Remove marker / Stop search");
-			_clearBtn = val9;
+			Panel val8 = new Panel();
+			((Control)val8).set_Parent((Container)(object)_contentRoot);
+			((Control)val8).set_Location(new Point(((Control)_searchBox).get_Left(), ((Control)_status).get_Bottom() + 8));
+			((Control)val8).set_Size(new Point(cr.Width - 20, bottomY - (((Control)_status).get_Bottom() - 32)));
+			((Control)val8).set_ClipsBounds(true);
+			_resultsViewport = val8;
+			FlowPanel val9 = new FlowPanel();
+			((Control)val9).set_Parent((Container)(object)_resultsViewport);
+			((Control)val9).set_Location(new Point(0, 0));
+			((Control)val9).set_Size(((Control)_resultsViewport).get_Size());
+			((Panel)val9).set_CanScroll(true);
+			val9.set_FlowDirection((ControlFlowDirection)3);
+			val9.set_ControlPadding(new Vector2(0f, 4f));
+			_resultsPanel = val9;
+			StandardButton val10 = new StandardButton();
+			((Control)val10).set_Parent((Container)(object)_contentRoot);
+			((Control)val10).set_Location(new Point(((Control)_searchBox).get_Left(), 355));
+			((Control)val10).set_Size(new Point(220, 34));
+			val10.set_Text("Remove marker / Stop search");
+			_clearBtn = val10;
 			((Control)_clearBtn).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				StopSearch();
@@ -525,12 +532,12 @@ namespace NpcFinder.Controls
 				((Container)_resultsPanel).ClearChildren();
 				_status.set_Text("Marker removed (and search stopped if it was running).");
 			});
-			StandardButton val10 = new StandardButton();
-			((Control)val10).set_Parent((Container)(object)_contentRoot);
-			((Control)val10).set_Location(new Point(cr.Width - 10 - 160, 355));
-			((Control)val10).set_Size(new Point(160, 34));
-			val10.set_Text("Delete cache");
-			_clearCacheBtn = val10;
+			StandardButton val11 = new StandardButton();
+			((Control)val11).set_Parent((Container)(object)_contentRoot);
+			((Control)val11).set_Location(new Point(cr.Width - 10 - 160, 355));
+			((Control)val11).set_Size(new Point(160, 34));
+			val11.set_Text("Delete cache");
+			_clearCacheBtn = val11;
 			((Control)_clearCacheBtn).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				try
@@ -544,9 +551,12 @@ namespace NpcFinder.Controls
 					_status.set_Text("Cache delete failed: " + ex.Message);
 				}
 			});
-			MakeNonFocusable(_contentRoot);
-			MakeNonFocusable(_resultsViewport);
-			MakeNonFocusable(_resultsPanel);
+			Label val12 = new Label();
+			((Control)val12).set_Parent((Container)(object)_contentRoot);
+			((Control)val12).set_Location(new Point(50, 410));
+			val12.set_AutoSizeWidth(true);
+			val12.set_Text("For more info check the changelog (right click the addon)");
+			_changeLog = val12;
 			((TextInputBase)_searchBox).add_TextChanged((EventHandler<EventArgs>)delegate
 			{
 				UpdateSuggestionsAsync();
@@ -588,7 +598,7 @@ namespace NpcFinder.Controls
 				int cur = ((_currentContinentIdProvider != null) ? _currentContinentIdProvider() : 0);
 				if (cur != 0 && target.TargetContinentId != 0 && cur != target.TargetContinentId)
 				{
-					_status.set_Text("You are on " + ContinentNames.Name(cur) + "; target is on " + ContinentNames.Name(target.TargetContinentId) + ".");
+					_status.set_Text("You are on " + ContinentNames.Name(cur) + ". Target is on " + ContinentNames.Name(target.TargetContinentId) + ". Teleport continents.");
 				}
 				else
 				{
@@ -604,56 +614,18 @@ namespace NpcFinder.Controls
 			{
 				return memo;
 			}
-			List<int> allMapIds = await _mapIndex.GetAllKnownMapIdsAsync(ct).ConfigureAwait(continueOnCapturedContext: false);
-			if (allMapIds == null || allMapIds.Count == 0)
+			int curCont = ((_currentContinentIdProvider != null) ? _currentContinentIdProvider() : 0);
+			int? mapId = await _mapIndex.FindMapIdByContinentPointAsync(cx, cy, curCont, ct).ConfigureAwait(continueOnCapturedContext: false);
+			if (!mapId.HasValue)
 			{
 				return null;
 			}
-			int curCont = ((_currentContinentIdProvider != null) ? _currentContinentIdProvider() : 0);
-			if (curCont != 0)
+			Gw2MapInfo mi = await _gw2.GetMapInfoAsync(mapId.Value, ct).ConfigureAwait(continueOnCapturedContext: false);
+			if (mi != null)
 			{
-				for (int j = 0; j < allMapIds.Count; j++)
-				{
-					ct.ThrowIfCancellationRequested();
-					if (j % 20 == 0)
-					{
-						await Task.Yield();
-					}
-					Gw2MapInfo mi3 = await _gw2.GetMapInfoAsync(allMapIds[j], ct).ConfigureAwait(continueOnCapturedContext: false);
-					if (mi3 != null && mi3.ContinentId == curCont && Contains(mi3))
-					{
-						_continentPointMemo[key] = mi3;
-						return mi3;
-					}
-				}
+				_continentPointMemo[key] = mi;
 			}
-			for (int j = 0; j < allMapIds.Count; j++)
-			{
-				ct.ThrowIfCancellationRequested();
-				if (j % 20 == 0)
-				{
-					await Task.Yield();
-				}
-				Gw2MapInfo mi2 = await _gw2.GetMapInfoAsync(allMapIds[j], ct).ConfigureAwait(continueOnCapturedContext: false);
-				if (mi2 != null && Contains(mi2))
-				{
-					_continentPointMemo[key] = mi2;
-					return mi2;
-				}
-			}
-			return null;
-			bool Contains(Gw2MapInfo mi)
-			{
-				double minX = Math.Min(mi.ContinentRect.X1, mi.ContinentRect.X2);
-				double maxX = Math.Max(mi.ContinentRect.X1, mi.ContinentRect.X2);
-				double minY = Math.Min(mi.ContinentRect.Y1, mi.ContinentRect.Y2);
-				double maxY = Math.Max(mi.ContinentRect.Y1, mi.ContinentRect.Y2);
-				if ((double)cx >= minX && (double)cx <= maxX && (double)cy >= minY)
-				{
-					return (double)cy <= maxY;
-				}
-				return false;
-			}
+			return mi;
 		}
 
 		private async Task AddResolvedHitAsync(NpcCandidateHit h, CancellationToken ct)
@@ -727,7 +699,7 @@ namespace NpcFinder.Controls
 					_setTarget?.Invoke(npcTarget);
 					if (curCont != 0 && npcTarget.TargetContinentId != 0 && curCont != npcTarget.TargetContinentId)
 					{
-						_status.set_Text("You are on " + ContinentNames.Name(curCont) + ". Target is on " + ContinentNames.Name(npcTarget.TargetContinentId) + ". Teleport there, then open map.");
+						_status.set_Text("You are on " + ContinentNames.Name(curCont) + ". Target is on " + ContinentNames.Name(npcTarget.TargetContinentId) + ". Teleport continents.");
 					}
 					else
 					{
@@ -753,6 +725,50 @@ namespace NpcFinder.Controls
 			}
 		}
 
+		private async Task DoMapSearchAsync(string mapName)
+		{
+			await _searchGate.WaitAsync();
+			try
+			{
+				CancellationToken ct = BeginNewSearchToken();
+				((Control)_searchBtn).set_Enabled(false);
+				((Control)_searchBox).set_Enabled(false);
+				((Container)_resultsPanel).ClearChildren();
+				_status.set_Text("Searching NPCs on that map...");
+				int? mapId = await _mapIndex.ResolveMapIdByNameAsync(mapName, ct).ConfigureAwait(continueOnCapturedContext: false);
+				if (!mapId.HasValue || mapId.Value <= 0)
+				{
+					_status.set_Text("Map not recognized. Pick one from suggestions.");
+					return;
+				}
+				List<string> titles = await _wiki.SearchNpcTitlesByMapAsync(mapName, 120, ct).ConfigureAwait(continueOnCapturedContext: false);
+				if (titles == null || titles.Count == 0)
+				{
+					_status.set_Text("No NPC pages found for that map (wiki search came back empty).");
+					return;
+				}
+				_status.set_Text($"Found {titles.Count} NPCs. Click one to resolve location.");
+				foreach (string t in titles)
+				{
+					AddTitleChoice(t);
+				}
+			}
+			catch (OperationCanceledException)
+			{
+				_status.set_Text("Cancelled.");
+			}
+			catch (Exception ex)
+			{
+				_status.set_Text("Error: " + ex.Message);
+			}
+			finally
+			{
+				((Control)_searchBtn).set_Enabled(true);
+				((Control)_searchBox).set_Enabled(true);
+				_searchGate.Release();
+			}
+		}
+
 		private async Task DoSearchAsync()
 		{
 			HideSuggestions();
@@ -760,6 +776,11 @@ namespace NpcFinder.Controls
 			string q = (((TextInputBase)_searchBox).get_Text() ?? "").Trim();
 			if (q.Length == 0)
 			{
+				return;
+			}
+			if (_mapMode)
+			{
+				await DoMapSearchAsync(q);
 				return;
 			}
 			await _searchGate.WaitAsync();
@@ -853,27 +874,16 @@ namespace NpcFinder.Controls
 
 		private static void ForceFlowPanelLayout(FlowPanel fp)
 		{
-			if (fp == null)
+			if (fp != null)
 			{
-				return;
-			}
-			try
-			{
-				((Control)fp).Invalidate();
-				BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
-				string[] array = new string[4] { "RecalculateLayout", "ReflowChildren", "UpdateLayout", "InvalidateLayout" };
-				foreach (string name in array)
+				try
 				{
-					MethodInfo i = ((object)fp).GetType().GetMethod(name, flags);
-					if (i != null && i.GetParameters().Length == 0)
-					{
-						i.Invoke(fp, null);
-						break;
-					}
+					((Control)fp).Invalidate();
+					((Control)fp).RecalculateLayout();
 				}
-			}
-			catch
-			{
+				catch
+				{
+				}
 			}
 		}
 

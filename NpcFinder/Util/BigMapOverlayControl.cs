@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Gw2Mumble;
@@ -42,28 +43,70 @@ namespace NpcFinder.Util
 			return (CaptureType)0;
 		}
 
-		private Vector2? ContinentToScreen(double cx, double cy, Rectangle bounds)
+		private static float GetUiScaleMultiplier()
 		{
-			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-			if (!MumbleReader.TryGetWorldMapUi(out var centerX, out var centerY, out var scale))
+			try
+			{
+				object gfx = GameService.Graphics;
+				if (gfx == null)
+				{
+					return 1f;
+				}
+				Type t = gfx.GetType();
+				PropertyInfo p = t.GetProperty("UIScaleMultiplier") ?? t.GetProperty("UiScaleMultiplier") ?? t.GetProperty("ScaleMultiplier") ?? t.GetProperty("UIScale") ?? t.GetProperty("UiScale");
+				if (p == null)
+				{
+					return 1f;
+				}
+				object v = p.GetValue(gfx);
+				if (v == null)
+				{
+					return 1f;
+				}
+				if (v is float)
+				{
+					return (float)v;
+				}
+				if (v is double)
+				{
+					double d = (double)v;
+					return (float)d;
+				}
+				return Convert.ToSingle(v);
+			}
+			catch
+			{
+				return 1f;
+			}
+		}
+
+		private Vector2? ContinentToScreen(double cx, double cy, Rectangle bounds, float centerX, float centerY, float scale)
+		{
+			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
+			if (float.IsNaN(scale) || float.IsInfinity(scale) || Math.Abs(scale) < 1E-06f)
 			{
 				return null;
 			}
-			if (Math.Abs(scale) < 1E-06f)
+			float uiMul = GetUiScaleMultiplier();
+			if (float.IsNaN(uiMul) || float.IsInfinity(uiMul) || uiMul <= 1E-06f)
 			{
-				return null;
+				uiMul = 1f;
 			}
 			Vector2 val = new Vector2((float)bounds.X + (float)bounds.Width / 2f, (float)bounds.Y + (float)bounds.Height / 2f);
 			float dx = (float)cx - centerX;
 			float dy = (float)cy - centerY;
-			float px = val.X + dx / scale;
-			float py = val.Y + dy / scale;
+			float px = val.X + dx / scale / uiMul;
+			float py = val.Y + dy / scale / uiMul;
+			if (float.IsNaN(px) || float.IsInfinity(px) || float.IsNaN(py) || float.IsInfinity(py))
+			{
+				return null;
+			}
 			return new Vector2(px, py);
 		}
 
@@ -119,14 +162,13 @@ namespace NpcFinder.Util
 			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
 			Vector2 edge = end - start;
 			float angle = (float)Math.Atan2(edge.Y, edge.X);
 			float length = ((Vector2)(ref edge)).Length();
-			sb.Draw(_pixel, new Rectangle((int)start.X, (int)start.Y, (int)length, (int)thickness), (Rectangle?)null, color, angle, new Vector2(0f, 0.5f), (SpriteEffects)0, 0f);
+			sb.Draw(_pixel, start, (Rectangle?)null, color, angle, new Vector2(0f, 0.5f), new Vector2(length, thickness), (SpriteEffects)0, 0f);
 		}
 
 		private static Vector2 ClampToBounds(Vector2 p, Rectangle b, float margin)
@@ -185,40 +227,40 @@ namespace NpcFinder.Util
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0175: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0181: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b7: Expected O, but got Unknown
-			//IL_01c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ca: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01eb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0202: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0219: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0238: Unknown result type (might be due to invalid IL or missing references)
-			//IL_023a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0240: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0245: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d5: Expected O, but got Unknown
+			//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0206: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_023c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_023e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0244: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0249: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0250: Unknown result type (might be due to invalid IL or missing references)
-			//IL_025e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0265: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0278: Unknown result type (might be due to invalid IL or missing references)
-			//IL_027a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_024d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0254: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0262: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0269: Unknown result type (might be due to invalid IL or missing references)
 			//IL_027c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0281: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02d3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02e0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ec: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02f8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0304: Unknown result type (might be due to invalid IL or missing references)
+			//IL_027e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0280: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0285: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02c9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02f0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02fc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0308: Unknown result type (might be due to invalid IL or missing references)
 			Gw2MumbleService gw2Mumble = GameService.Gw2Mumble;
 			bool? obj;
 			if (gw2Mumble == null)
@@ -265,20 +307,20 @@ namespace NpcFinder.Util
 			{
 				return;
 			}
-			Vector2? screenPos = ContinentToScreen(target.TargetContinentX, target.TargetContinentY, bounds);
-			if (!screenPos.HasValue)
-			{
-				return;
-			}
-			Vector2 pos = screenPos.Value;
-			if (_dbgEvery++ % 60 == 0 && DEBUG_LOGS)
-			{
-				Log.Warn($"[OverlayDbg] center=({centerX},{centerY}) scale={scale} " + $"target=({target.TargetContinentX},{target.TargetContinentY}) " + $"dxdy=({(float)target.TargetContinentX - centerX},{(float)target.TargetContinentY - centerY}) " + $"screen=({pos.X},{pos.Y})");
-			}
 			if (_pixel == null)
 			{
 				_pixel = new Texture2D(((GraphicsResource)spriteBatch).get_GraphicsDevice(), 1, 1);
 				_pixel.SetData<Color>((Color[])(object)new Color[1] { Color.get_White() });
+			}
+			Vector2? posOpt = ContinentToScreen(target.TargetContinentX, target.TargetContinentY, bounds, centerX, centerY, scale);
+			if (!posOpt.HasValue)
+			{
+				return;
+			}
+			Vector2 pos = posOpt.Value;
+			if (_dbgEvery++ % 60 == 0 && DEBUG_LOGS)
+			{
+				Log.Warn($"[OverlayDbg] center=({centerX},{centerY}) scale={scale} " + $"target=({target.TargetContinentX},{target.TargetContinentY}) " + $"dxdy=({(float)target.TargetContinentX - centerX},{(float)target.TargetContinentY - centerY}) " + $"screen=({pos.X},{pos.Y})");
 			}
 			if (pos.X < (float)((Rectangle)(ref bounds)).get_Left() + 18f || pos.X > (float)((Rectangle)(ref bounds)).get_Right() - 18f || pos.Y < (float)((Rectangle)(ref bounds)).get_Top() + 18f || pos.Y > (float)((Rectangle)(ref bounds)).get_Bottom() - 18f)
 			{

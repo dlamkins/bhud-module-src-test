@@ -79,7 +79,7 @@ namespace NpcFinder.Services
 
 		private readonly Dictionary<string, int> _waypointToMapIdCache = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
-		private static readonly TimeSpan CacheTtl = TimeSpan.FromDays(14.0);
+		private static readonly TimeSpan CacheTtl = TimeSpan.FromDays(25.0);
 
 		public NpcMerchantResolverService(WikiNpcService wiki, Gw2MapIndexService mapIndex, Gw2ApiService gw2, Gw2MapDetailsService details, string cacheDir)
 		{

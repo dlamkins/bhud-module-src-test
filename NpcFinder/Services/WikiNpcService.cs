@@ -8,6 +8,7 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Blish_HUD;
 using NpcFinder.Models;
 
 namespace NpcFinder.Services
@@ -29,6 +30,34 @@ namespace NpcFinder.Services
 			public string title { get; set; }
 		}
 
+		private static readonly string[] TitleBlacklistContains = new string[27]
+		{
+			"Game updates", "Update", "Patch", "Daily", "Achievement", "Achievements", "Collection", "Collections", "Zone", "Portal",
+			"Waypoint", "Vista", "Point of Interest", "POI", "Dungeon", "Fractal", "Strike", "Raid", "Story", "Episode",
+			"Chapter", "NPCs in", "List of", "Category:", "Template:", "File:", "Help:"
+		};
+
+		private static readonly string[] AnimalExactNames = new string[15]
+		{
+			"Rabbit", "Cow", "Dog", "Cat", "Deer", "Moa", "Pig", "Chicken", "Sheep", "Spider",
+			"Bear", "Raptor", "Skimmer", "Jackal", "Springer"
+		};
+
+		private static readonly string[] ValidNpcMarkers = new string[22]
+		{
+			"{{NPC", "{{Merchant", "{{Vendor", "{{Banker", "{{Crafting", "{{Mystic Forge", "{{Infobox npc", "{{Infobox NPC", "{{Infobox merchant", "{{Infobox Merchant",
+			"{{Infobox character", "{{Infobox Character", "{{Character", "{{character", "{{Vendor", "{{vendor", "{{Merchant", "{{merchant", "| race =", "| gender =",
+			"| profession =", "| services ="
+		};
+
+		private static readonly string[] NotNpcMarkers = new string[11]
+		{
+			"{{POI", "{{Point of interest", "{{Area", "{{Zone", "{{Settlement", "{{Landmark", "{{Event", "{{Achievement", "{{Collection", "{{Patch",
+			"{{Game updates"
+		};
+
+		private static readonly Logger Log = Logger.GetLogger<NpcFinderModule>();
+
 		private readonly RateLimiter _rate;
 
 		private readonly CacheStore _cache;
@@ -43,6 +72,385 @@ namespace NpcFinder.Services
 			_cache = cache;
 			_http = new HttpClient();
 			_http.get_DefaultRequestHeaders().get_UserAgent().ParseAdd("NpcFinder-BlishHUD");
+		}
+
+		private static bool IsBlacklistedTitle(string title)
+		{
+			string[] titleBlacklistContains = TitleBlacklistContains;
+			foreach (string bad in titleBlacklistContains)
+			{
+				if (title.IndexOf(bad, StringComparison.OrdinalIgnoreCase) >= 0)
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+
+		private static bool IsAnimalNpc(string title)
+		{
+			string[] animalExactNames = AnimalExactNames;
+			foreach (string a in animalExactNames)
+			{
+				if (string.Equals(title, a, StringComparison.OrdinalIgnoreCase))
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+
+		private async Task<bool> LooksLikeNpcPageAsync(string title, string mapName, CancellationToken ct)
+		{
+			WikiLookupResult wiki = await ResolveByTitleAsync(title, ct).ConfigureAwait(continueOnCapturedContext: false);
+			if (wiki == null || wiki.Wikitext == null)
+			{
+				return false;
+			}
+			string head = wiki.Wikitext.Substring(0, Math.Min(4096, wiki.Wikitext.Length));
+			string[] notNpcMarkers = NotNpcMarkers;
+			foreach (string bad in notNpcMarkers)
+			{
+				if (head.IndexOf(bad, StringComparison.OrdinalIgnoreCase) >= 0)
+				{
+					return false;
+				}
+			}
+			if (wiki.Hits != null)
+			{
+				foreach (NpcCandidateHit h in wiki.Hits)
+				{
+					if (!string.IsNullOrWhiteSpace(h.MapName) && string.Equals(h.MapName.Trim(), mapName.Trim(), StringComparison.OrdinalIgnoreCase))
+					{
+						return true;
+					}
+				}
+			}
+			notNpcMarkers = ValidNpcMarkers;
+			foreach (string good in notNpcMarkers)
+			{
+				if (head.IndexOf(good, StringComparison.OrdinalIgnoreCase) >= 0)
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+
+		private async Task<List<string>> GetCategoryMembersAsync(string categoryTitle, int limit, CancellationToken ct)
+		{
+			limit = Math.Max(1, Math.Min(limit, 500));
+			List<string> result = new List<string>();
+			string cmcontinue = null;
+			JsonElement q = default(JsonElement);
+			JsonElement arr = default(JsonElement);
+			JsonElement tEl = default(JsonElement);
+			JsonElement cont = default(JsonElement);
+			JsonElement cmc = default(JsonElement);
+			while (result.Count < limit)
+			{
+				ct.ThrowIfCancellationRequested();
+				string url = "https://wiki.guildwars2.com/api.php?action=query&list=categorymembers&cmnamespace=0&cmlimit=" + Math.Min(500, limit - result.Count) + "&format=json&cmtitle=" + Uri.EscapeDataString("Category:" + categoryTitle) + ((cmcontinue != null) ? ("&cmcontinue=" + Uri.EscapeDataString(cmcontinue)) : "");
+				JsonDocument doc = JsonDocument.Parse(await DownloadStringAsync(url, ct).ConfigureAwait(continueOnCapturedContext: false), default(JsonDocumentOptions));
+				try
+				{
+					JsonElement rootElement = doc.get_RootElement();
+					if (((JsonElement)(ref rootElement)).TryGetProperty("query", ref q) && ((JsonElement)(ref q)).TryGetProperty("categorymembers", ref arr) && (int)((JsonElement)(ref arr)).get_ValueKind() == 2)
+					{
+						ArrayEnumerator val = ((JsonElement)(ref arr)).EnumerateArray();
+						ArrayEnumerator enumerator = ((ArrayEnumerator)(ref val)).GetEnumerator();
+						try
+						{
+							while (((ArrayEnumerator)(ref enumerator)).MoveNext())
+							{
+								JsonElement el = ((ArrayEnumerator)(ref enumerator)).get_Current();
+								if (((JsonElement)(ref el)).TryGetProperty("title", ref tEl))
+								{
+									string t = ((JsonElement)(ref tEl)).GetString();
+									if (!string.IsNullOrWhiteSpace(t))
+									{
+										result.Add(t);
+									}
+								}
+							}
+						}
+						finally
+						{
+							((IDisposable)(ArrayEnumerator)(ref enumerator)).Dispose();
+						}
+					}
+					rootElement = doc.get_RootElement();
+					if (((JsonElement)(ref rootElement)).TryGetProperty("continue", ref cont))
+					{
+						if (((JsonElement)(ref cont)).TryGetProperty("cmcontinue", ref cmc))
+						{
+							if ((int)((JsonElement)(ref cmc)).get_ValueKind() == 3)
+							{
+								cmcontinue = ((JsonElement)(ref cmc)).GetString();
+								continue;
+							}
+							return result;
+						}
+						return result;
+					}
+					return result;
+				}
+				finally
+				{
+					((IDisposable)doc)?.Dispose();
+				}
+			}
+			return result;
+		}
+
+		private static List<string> ExtractWikiLinks(string wikitext)
+		{
+			if (string.IsNullOrWhiteSpace(wikitext))
+			{
+				return new List<string>();
+			}
+			List<string> titles = new List<string>();
+			foreach (Match item in Regex.Matches(wikitext, "\\[\\[([^\\]\\|#]+)(?:#[^\\]\\|]+)?(?:\\|[^\\]]+)?\\]\\]"))
+			{
+				string t = item.Groups[1].Value.Trim();
+				if (!string.IsNullOrWhiteSpace(t) && !t.Contains(":"))
+				{
+					titles.Add(t);
+				}
+			}
+			return titles.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+		}
+
+		private async Task<string> FindNpcListPageTitleAsync(string mapName, CancellationToken ct)
+		{
+			string[] candidates = new string[3]
+			{
+				mapName + " NPCs",
+				"NPCs in " + mapName,
+				mapName + " (NPCs)"
+			};
+			string[] array = candidates;
+			foreach (string c in array)
+			{
+				ct.ThrowIfCancellationRequested();
+				if (!string.IsNullOrWhiteSpace(await GetWikitextAsync(c, ct).ConfigureAwait(continueOnCapturedContext: false)))
+				{
+					return c;
+				}
+			}
+			List<string> hits = await SearchTitlesAsync(mapName + " NPCs", 10, ct).ConfigureAwait(continueOnCapturedContext: false);
+			if (hits != null)
+			{
+				string best = hits.FirstOrDefault((string t) => t.Equals(mapName + " NPCs", StringComparison.OrdinalIgnoreCase) || t.Equals("NPCs in " + mapName, StringComparison.OrdinalIgnoreCase) || t.IndexOf("NPC", StringComparison.OrdinalIgnoreCase) >= 0);
+				if (!string.IsNullOrWhiteSpace(best))
+				{
+					return best;
+				}
+			}
+			return null;
+		}
+
+		public async Task<List<string>> SearchNpcTitlesByMapAsync(string mapName, int limit, CancellationToken ct)
+		{
+			if (string.IsNullOrWhiteSpace(mapName))
+			{
+				return new List<string>();
+			}
+			limit = Math.Max(1, Math.Min(limit, 200));
+			string key = "wiki-map-npcs-v5-" + mapName.Trim().ToLowerInvariant();
+			if (_cache.TryLoad<List<string>>(key, out var cached) && cached != null && cached.Count > 0)
+			{
+				return cached;
+			}
+			List<string> all = new List<string>();
+			try
+			{
+				string listPage = await FindNpcListPageTitleAsync(mapName, ct).ConfigureAwait(continueOnCapturedContext: false);
+				if (!string.IsNullOrWhiteSpace(listPage))
+				{
+					WikiLookupResult listWiki = await ResolveByTitleAsync(listPage, ct).ConfigureAwait(continueOnCapturedContext: false);
+					if (listWiki != null && listWiki.Wikitext != null)
+					{
+						all.AddRange(ExtractWikiLinks(listWiki.Wikitext));
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Warn($"[MapMode] listPage extraction failed: {ex}");
+			}
+			foreach (string cat in await FindNpcCategoryTitlesForMapAsync(mapName, 10, ct).ConfigureAwait(continueOnCapturedContext: false))
+			{
+				ct.ThrowIfCancellationRequested();
+				List<string> mem = await GetCategoryMembersAsync(cat, 500, ct).ConfigureAwait(continueOnCapturedContext: false);
+				if (mem != null && mem.Count > 0)
+				{
+					all.AddRange(mem);
+				}
+			}
+			if (all.Distinct(StringComparer.OrdinalIgnoreCase).Count() < Math.Min(25, limit))
+			{
+				string[] queries = new string[7]
+				{
+					"incategory:\"NPCs\" " + mapName,
+					"incategory:\"Merchants\" " + mapName,
+					"incategory:\"Vendors\" " + mapName,
+					"incategory:\"Bankers\" " + mapName,
+					"incategory:\"Traders\" " + mapName,
+					"insource:\"location = [[" + mapName + "]]\"",
+					"insource:\"location = " + mapName + "\""
+				};
+				string[] array = queries;
+				foreach (string q in array)
+				{
+					ct.ThrowIfCancellationRequested();
+					List<string> part = await SearchRawTitlesAsync(q, 50, ct).ConfigureAwait(continueOnCapturedContext: false);
+					if (part != null && part.Count > 0)
+					{
+						all.AddRange(part);
+					}
+				}
+			}
+			int candidateCap = Math.Min(400, Math.Max(120, limit * 12));
+			List<string> candidates = (from t in all
+				where !string.IsNullOrWhiteSpace(t)
+				where !IsBlacklistedTitle(t)
+				where !IsAnimalNpc(t)
+				select t).Distinct(StringComparer.OrdinalIgnoreCase).Take(candidateCap).ToList();
+			List<string> final = new List<string>(limit);
+			foreach (string t2 in candidates)
+			{
+				ct.ThrowIfCancellationRequested();
+				if (await LooksLikeNpcPageAsync(t2, mapName, ct).ConfigureAwait(continueOnCapturedContext: false))
+				{
+					final.Add(t2);
+				}
+				if (final.Count >= limit)
+				{
+					break;
+				}
+			}
+			if (final.Count > 0)
+			{
+				_cache.Save(key, final);
+			}
+			return final;
+		}
+
+		private async Task<List<string>> FindNpcCategoryTitlesForMapAsync(string mapName, int max, CancellationToken ct)
+		{
+			string[] searches = new string[4]
+			{
+				"intitle:\"" + mapName + "\" intitle:npc",
+				"intitle:\"" + mapName + "\" intitle:merchant",
+				"intitle:\"" + mapName + "\" intitle:vendor",
+				"intitle:\"" + mapName + "\" intitle:character"
+			};
+			List<string> results = new List<string>();
+			string[] array = searches;
+			JsonElement q = default(JsonElement);
+			JsonElement arr = default(JsonElement);
+			JsonElement tEl = default(JsonElement);
+			foreach (string s in array)
+			{
+				ct.ThrowIfCancellationRequested();
+				string url = "https://wiki.guildwars2.com/api.php?action=query&list=search&srnamespace=14&srlimit=20&format=json&srsearch=" + Uri.EscapeDataString(s);
+				JsonDocument doc = JsonDocument.Parse(await DownloadStringAsync(url, ct).ConfigureAwait(continueOnCapturedContext: false), default(JsonDocumentOptions));
+				try
+				{
+					JsonElement rootElement = doc.get_RootElement();
+					if (((JsonElement)(ref rootElement)).TryGetProperty("query", ref q) && ((JsonElement)(ref q)).TryGetProperty("search", ref arr) && (int)((JsonElement)(ref arr)).get_ValueKind() == 2)
+					{
+						ArrayEnumerator val = ((JsonElement)(ref arr)).EnumerateArray();
+						ArrayEnumerator enumerator = ((ArrayEnumerator)(ref val)).GetEnumerator();
+						try
+						{
+							while (((ArrayEnumerator)(ref enumerator)).MoveNext())
+							{
+								JsonElement el = ((ArrayEnumerator)(ref enumerator)).get_Current();
+								if (!((JsonElement)(ref el)).TryGetProperty("title", ref tEl))
+								{
+									continue;
+								}
+								string t = ((JsonElement)(ref tEl)).GetString();
+								if (!string.IsNullOrWhiteSpace(t))
+								{
+									if (t.StartsWith("Category:", StringComparison.OrdinalIgnoreCase))
+									{
+										t = t.Substring("Category:".Length);
+									}
+									if (t.IndexOf(mapName, StringComparison.OrdinalIgnoreCase) >= 0)
+									{
+										results.Add(t);
+									}
+								}
+							}
+						}
+						finally
+						{
+							((IDisposable)(ArrayEnumerator)(ref enumerator)).Dispose();
+						}
+					}
+				}
+				finally
+				{
+					((IDisposable)doc)?.Dispose();
+				}
+				if (results.Distinct(StringComparer.OrdinalIgnoreCase).Count() >= max)
+				{
+					break;
+				}
+			}
+			return results.Distinct(StringComparer.OrdinalIgnoreCase).Take(max).ToList();
+		}
+
+		private async Task<List<string>> SearchRawTitlesAsync(string srsearch, int limit, CancellationToken ct)
+		{
+			if (string.IsNullOrWhiteSpace(srsearch))
+			{
+				return new List<string>();
+			}
+			limit = Math.Max(1, Math.Min(limit, 50));
+			string url = "https://wiki.guildwars2.com/api.php?action=query&list=search&srnamespace=0&srlimit=" + limit + "&format=json&srsearch=" + Uri.EscapeDataString(srsearch);
+			string obj = await DownloadStringAsync(url, ct);
+			List<string> result = new List<string>();
+			JsonDocument doc = JsonDocument.Parse(obj, default(JsonDocumentOptions));
+			try
+			{
+				JsonElement rootElement = doc.get_RootElement();
+				JsonElement q = default(JsonElement);
+				JsonElement arr = default(JsonElement);
+				if (((JsonElement)(ref rootElement)).TryGetProperty("query", ref q) && ((JsonElement)(ref q)).TryGetProperty("search", ref arr) && (int)((JsonElement)(ref arr)).get_ValueKind() == 2)
+				{
+					ArrayEnumerator val = ((JsonElement)(ref arr)).EnumerateArray();
+					ArrayEnumerator enumerator = ((ArrayEnumerator)(ref val)).GetEnumerator();
+					try
+					{
+						JsonElement tEl = default(JsonElement);
+						while (((ArrayEnumerator)(ref enumerator)).MoveNext())
+						{
+							JsonElement el = ((ArrayEnumerator)(ref enumerator)).get_Current();
+							if (((JsonElement)(ref el)).TryGetProperty("title", ref tEl))
+							{
+								string t = ((JsonElement)(ref tEl)).GetString();
+								if (!string.IsNullOrWhiteSpace(t))
+								{
+									result.Add(t);
+								}
+							}
+						}
+					}
+					finally
+					{
+						((IDisposable)(ArrayEnumerator)(ref enumerator)).Dispose();
+					}
+				}
+			}
+			finally
+			{
+				((IDisposable)doc)?.Dispose();
+			}
+			return result;
 		}
 
 		public async Task<WikiLookupResult> ResolveByNpcNameAsync(string npcName, CancellationToken ct)
@@ -171,11 +579,20 @@ namespace NpcFinder.Services
 		private async Task<string> GetWikitextAsync(string title, CancellationToken ct)
 		{
 			string url = "https://wiki.guildwars2.com/api.php?action=parse&redirects=1&prop=wikitext&format=json&formatversion=2&page=" + Uri.EscapeDataString(title);
-			JsonDocument doc = JsonDocument.Parse(await DownloadStringAsync(url, ct), default(JsonDocumentOptions));
+			JsonDocument doc = JsonDocument.Parse(await DownloadStringAsync(url, ct).ConfigureAwait(continueOnCapturedContext: false), default(JsonDocumentOptions));
 			try
 			{
-				JsonElement rootElement = doc.get_RootElement();
-				JsonElement parse = ((JsonElement)(ref rootElement)).GetProperty("parse");
+				JsonElement root = doc.get_RootElement();
+				JsonElement err = default(JsonElement);
+				if (((JsonElement)(ref root)).TryGetProperty("error", ref err))
+				{
+					return null;
+				}
+				JsonElement parse = default(JsonElement);
+				if (!((JsonElement)(ref root)).TryGetProperty("parse", ref parse))
+				{
+					return null;
+				}
 				JsonElement wt = default(JsonElement);
 				if (((JsonElement)(ref parse)).TryGetProperty("wikitext", ref wt))
 				{
@@ -184,7 +601,7 @@ namespace NpcFinder.Services
 						return ((JsonElement)(ref wt)).GetString();
 					}
 					JsonElement star = default(JsonElement);
-					if ((int)((JsonElement)(ref wt)).get_ValueKind() == 1 && ((JsonElement)(ref wt)).TryGetProperty("*", ref star))
+					if ((int)((JsonElement)(ref wt)).get_ValueKind() == 1 && ((JsonElement)(ref wt)).TryGetProperty("*", ref star) && (int)((JsonElement)(ref star)).get_ValueKind() == 3)
 					{
 						return ((JsonElement)(ref star)).GetString();
 					}
