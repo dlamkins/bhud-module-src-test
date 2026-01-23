@@ -19,6 +19,8 @@ namespace Maestro.UI.MaestroCreator
 
 			public const int Padding = 5;
 
+			public const int PaddingBottom = 30;
+
 			public const int ButtonY = 6;
 		}
 
@@ -33,6 +35,8 @@ namespace Maestro.UI.MaestroCreator
 		private readonly StandardButton _clearButton;
 
 		private readonly FlowPanel _chipsContainer;
+
+		private Panel _bottomSpacer;
 
 		public IReadOnlyList<string> Notes => _notes.AsReadOnly();
 
@@ -147,6 +151,7 @@ namespace Maestro.UI.MaestroCreator
 			NoteChip chip = noteChip;
 			chip.RemoveClicked += OnChipRemoveClicked;
 			_chips.Add(chip);
+			EnsureBottomSpacer();
 			UpdateHeader();
 			UpdateButtonStates();
 			this.SequenceChanged?.Invoke(this, EventArgs.Empty);
@@ -193,6 +198,12 @@ namespace Maestro.UI.MaestroCreator
 				((Control)chip).Dispose();
 			}
 			_chips.Clear();
+			Panel bottomSpacer = _bottomSpacer;
+			if (bottomSpacer != null)
+			{
+				((Control)bottomSpacer).Dispose();
+			}
+			_bottomSpacer = null;
 			UpdateHeader();
 			UpdateButtonStates();
 			this.SequenceChanged?.Invoke(this, EventArgs.Empty);
@@ -227,6 +238,27 @@ namespace Maestro.UI.MaestroCreator
 			((Control)_clearButton).set_Enabled(hasNotes);
 		}
 
+		private void EnsureBottomSpacer()
+		{
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004b: Expected O, but got Unknown
+			Panel bottomSpacer = _bottomSpacer;
+			if (bottomSpacer != null)
+			{
+				((Control)bottomSpacer).Dispose();
+			}
+			Panel val = new Panel();
+			((Control)val).set_Parent((Container)(object)_chipsContainer);
+			((Control)val).set_Size(new Point(((Control)_chipsContainer).get_Width(), 30));
+			((Control)val).set_BackgroundColor(Color.get_Transparent());
+			_bottomSpacer = val;
+		}
+
 		protected override void DisposeControl()
 		{
 			Label headerLabel = _headerLabel;
@@ -243,6 +275,11 @@ namespace Maestro.UI.MaestroCreator
 			if (clearButton != null)
 			{
 				((Control)clearButton).Dispose();
+			}
+			Panel bottomSpacer = _bottomSpacer;
+			if (bottomSpacer != null)
+			{
+				((Control)bottomSpacer).Dispose();
 			}
 			foreach (NoteChip chip in _chips)
 			{

@@ -225,6 +225,14 @@ namespace Maestro
 			_keyboardService?.PlayOctaveChange(up);
 		}
 
+		public void PauseIfPlaying()
+		{
+			if (_songPlayer.IsPlaying && !_songPlayer.IsPaused)
+			{
+				_songPlayer.Pause();
+			}
+		}
+
 		public void ResetToMiddleOctave()
 		{
 			_keyboardService?.ResetToMiddleOctave();

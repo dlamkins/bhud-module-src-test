@@ -472,6 +472,7 @@ namespace Maestro.UI.MaestroCreator
 
 		private void OnOctaveChanged(object sender, bool up)
 		{
+			Module.Instance.PauseIfPlaying();
 			Module.Instance.PlayOctaveChange(up);
 		}
 
@@ -495,6 +496,7 @@ namespace Maestro.UI.MaestroCreator
 		{
 			if (!e.IsRest)
 			{
+				Module.Instance.PauseIfPlaying();
 				Module.Instance.PlayNote(e.Note, e.IsSharp, e.IsHighC);
 			}
 		}

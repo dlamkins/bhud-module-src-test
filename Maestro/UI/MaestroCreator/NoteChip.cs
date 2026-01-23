@@ -12,17 +12,11 @@ namespace Maestro.UI.MaestroCreator
 		{
 			public const int Height = 24;
 
-			public const int MinWidth = 50;
-
-			public const int MaxWidth = 155;
+			public const int FixedWidth = 118;
 
 			public const int CloseButtonSize = 16;
 
 			public const int Padding = 4;
-
-			public const int CharWidthEstimate = 8;
-
-			public const int CharWidthTruncate = 7;
 
 			public const int CloseButtonMargin = 2;
 		}
@@ -40,48 +34,48 @@ namespace Maestro.UI.MaestroCreator
 		public NoteChip(string noteString, int index)
 			: this()
 		{
-			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0102: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0109: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0110: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0121: Expected O, but got Unknown
-			//IL_0122: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0127: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0139: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0141: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0150: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0175: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0188: Expected O, but got Unknown
+			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fa: Expected O, but got Unknown
+			//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0100: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0107: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0112: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0116: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0120: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0125: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0140: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0151: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015d: Expected O, but got Unknown
 			NoteChip noteChip = this;
 			NoteString = noteString;
 			Index = index;
-			int textWidth = noteString.Length * 8 + 8 + 16;
-			int width = Math.Max(50, Math.Min(textWidth, 155));
-			((Control)this).set_Size(new Point(width, 24));
+			((Control)this).set_Size(new Point(118, 24));
 			((Control)this).set_BackgroundColor(GetNoteColor(noteString));
-			string displayText = noteString;
-			int maxTextWidth = width - 16 - 8;
+			int maxTextWidth = 92;
 			int maxChars = maxTextWidth / 7;
-			if (noteString.Length > maxChars && maxChars > 3)
+			string displayText = noteString;
+			bool needsTooltip = false;
+			if (noteString.Length > maxChars)
 			{
 				displayText = noteString.Substring(0, maxChars - 2) + "..";
+				needsTooltip = true;
 			}
 			Label val = new Label();
 			((Control)val).set_Parent((Container)(object)this);
@@ -92,12 +86,12 @@ namespace Maestro.UI.MaestroCreator
 			val.set_TextColor(MaestroTheme.CreamWhite);
 			val.set_HorizontalAlignment((HorizontalAlignment)0);
 			val.set_VerticalAlignment((VerticalAlignment)1);
-			((Control)val).set_BasicTooltipText(noteString);
+			((Control)val).set_BasicTooltipText(needsTooltip ? noteString : null);
 			_noteLabel = val;
 			Label val2 = new Label();
 			((Control)val2).set_Parent((Container)(object)this);
 			val2.set_Text("×");
-			((Control)val2).set_Location(new Point(width - 16 - 2, 2));
+			((Control)val2).set_Location(new Point(100, 2));
 			((Control)val2).set_Size(new Point(16, 20));
 			val2.set_Font(GameService.Content.get_DefaultFont14());
 			val2.set_TextColor(MaestroTheme.MutedCream);
