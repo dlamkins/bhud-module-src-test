@@ -218,7 +218,28 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 												if ((object)unlocker7 == null)
 												{
 													ConjuredDoorwayUnlocker unlocker8 = consumable as ConjuredDoorwayUnlocker;
-													if ((object)unlocker8 != null)
+													if ((object)unlocker8 == null)
+													{
+														MountSkinUnlocker unlocker9 = consumable as MountSkinUnlocker;
+														if ((object)unlocker9 != null)
+														{
+															if (!string.IsNullOrEmpty(unlocker9.Description))
+															{
+																PrintPlainText(" ");
+															}
+															PrintUnlocked(string.Format("{0}\r\n", ViewModel.Localizer["You have already unlocked this mount"]), ViewModel.LockedOtherText + "\r\n");
+															PrintPlainText((string)ViewModel.Localizer["Consumable"]);
+														}
+														else if (string.IsNullOrEmpty(consumable.Description))
+														{
+															PrintPlainText((string)ViewModel.Localizer["Consumable"]);
+														}
+														else
+														{
+															PrintPlainText("\r\n" + ViewModel.Localizer["Consumable"]);
+														}
+													}
+													else
 													{
 														if (!string.IsNullOrEmpty(unlocker8.Description))
 														{
@@ -226,14 +247,6 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 														}
 														PrintUnlocked(string.Format("{0}\r\n", ViewModel.Localizer["You have already unlocked this conjured doorway skin"]), ViewModel.LockedOtherText + "\r\n");
 														PrintPlainText((string)ViewModel.Localizer["Consumable"]);
-													}
-													else if (string.IsNullOrEmpty(consumable.Description))
-													{
-														PrintPlainText((string)ViewModel.Localizer["Consumable"]);
-													}
-													else
-													{
-														PrintPlainText("\r\n" + ViewModel.Localizer["Consumable"]);
 													}
 												}
 												else

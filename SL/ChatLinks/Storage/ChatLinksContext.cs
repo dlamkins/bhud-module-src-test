@@ -10,6 +10,7 @@ using GuildWars2.Hero.Equipment.Gliders;
 using GuildWars2.Hero.Equipment.JadeBots;
 using GuildWars2.Hero.Equipment.MailCarriers;
 using GuildWars2.Hero.Equipment.Miniatures;
+using GuildWars2.Hero.Equipment.Mounts;
 using GuildWars2.Hero.Equipment.Novelties;
 using GuildWars2.Hero.Equipment.Outfits;
 using GuildWars2.Hero.Equipment.Wardrobe;
@@ -25,6 +26,7 @@ using SL.ChatLinks.Storage.Models.Hero.Equipment.Gliders;
 using SL.ChatLinks.Storage.Models.Hero.Equipment.JadeBots;
 using SL.ChatLinks.Storage.Models.Hero.Equipment.MailCarriers;
 using SL.ChatLinks.Storage.Models.Hero.Equipment.Miniatures;
+using SL.ChatLinks.Storage.Models.Hero.Equipment.Mounts;
 using SL.ChatLinks.Storage.Models.Hero.Equipment.Novelties;
 using SL.ChatLinks.Storage.Models.Hero.Equipment.Outfits;
 using SL.ChatLinks.Storage.Models.Hero.Equipment.Wardrobe;
@@ -36,7 +38,7 @@ namespace SL.ChatLinks.Storage
 {
 	public class ChatLinksContext : DbContext
 	{
-		public static int SchemaVersion => 7;
+		public static int SchemaVersion => 8;
 
 		public DbSet<Item> Items => Set<Item>();
 
@@ -61,6 +63,10 @@ namespace SL.ChatLinks.Storage
 		public DbSet<Miniature> Miniatures => Set<Miniature>();
 
 		public DbSet<Outfit> Outfits => Set<Outfit>();
+
+		public DbSet<MountSkin> MountSkins => Set<MountSkin>();
+
+		public DbSet<MountSkinUnlock> MountSkinUnlocks => Set<MountSkinUnlock>();
 
 		public DbSet<Achievement> Achievements => Set<Achievement>();
 
@@ -126,6 +132,8 @@ namespace SL.ChatLinks.Storage
 			modelBuilder.ApplyConfiguration(new JadeBotSkinEntityTypeConfiguration());
 			modelBuilder.ApplyConfiguration(new MailCarrierEntityTypeConfiguration());
 			modelBuilder.ApplyConfiguration(new MiniatureEntityTypeConfiguration());
+			modelBuilder.ApplyConfiguration(new MountSkinEntityTypeConfiguration());
+			modelBuilder.ApplyConfiguration(new MountSkinUnlockEntityTypeConfiguration());
 			modelBuilder.ApplyConfiguration(new MistChampionSkinEntityTypeConfiguration());
 			modelBuilder.ApplyConfiguration(new NoveltyEntityTypeConfiguration());
 			modelBuilder.ApplyConfiguration(new OutfitEntityTypeConfiguration());
