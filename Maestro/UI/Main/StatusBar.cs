@@ -137,6 +137,8 @@ namespace Maestro.UI.Main
 
 		public static class Layout
 		{
+			public const int QueueButtonWidth = 55;
+
 			public static int Height => 26;
 		}
 
@@ -148,6 +150,8 @@ namespace Maestro.UI.Main
 
 		private readonly StandardButton _importButton;
 
+		private readonly StandardButton _queueButton;
+
 		private InstrumentSelectorPanel _instrumentPanel;
 
 		private bool _hadPanel;
@@ -155,6 +159,8 @@ namespace Maestro.UI.Main
 		private int _visibleCount;
 
 		private int _totalCount;
+
+		private int _queueCount;
 
 		public int VisibleCount
 		{
@@ -182,11 +188,26 @@ namespace Maestro.UI.Main
 			}
 		}
 
+		public int QueueCount
+		{
+			get
+			{
+				return _queueCount;
+			}
+			set
+			{
+				_queueCount = value;
+				UpdateQueueButtonText();
+			}
+		}
+
 		public event EventHandler ImportClicked;
 
 		public event EventHandler CommunityClicked;
 
 		public event EventHandler<InstrumentType> CreateClicked;
+
+		public event EventHandler QueueToggleClicked;
 
 		public StatusBar(int width)
 			: this()
@@ -204,35 +225,45 @@ namespace Maestro.UI.Main
 			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0081: Expected O, but got Unknown
-			//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0099: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ce: Expected O, but got Unknown
-			//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0092: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d0: Expected O, but got Unknown
+			//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0100: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010f: Expected O, but got Unknown
-			//IL_0127: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0133: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0144: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0153: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0162: Expected O, but got Unknown
+			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010e: Expected O, but got Unknown
+			//IL_012b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0130: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0137: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0142: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0145: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0154: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016e: Expected O, but got Unknown
+			//IL_018b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0190: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0197: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ce: Expected O, but got Unknown
 			((Control)this).set_Size(new Point(width, Layout.Height));
 			((Control)this).set_BackgroundColor(Color.get_Transparent());
-			int buttonsWidth = 265;
+			int buttonsWidth = 295;
 			Label val = new Label();
 			((Control)val).set_Parent((Container)(object)this);
 			((Control)val).set_Location(new Point(0, 0));
@@ -242,30 +273,46 @@ namespace Maestro.UI.Main
 			val.set_TextColor(MaestroTheme.LightGray);
 			val.set_HorizontalAlignment((HorizontalAlignment)0);
 			_statusLabel = val;
+			int x = width - buttonsWidth;
 			StandardButton val2 = new StandardButton();
 			((Control)val2).set_Parent((Container)(object)this);
 			val2.set_Text("Community");
-			((Control)val2).set_Location(new Point(width - buttonsWidth, 0));
-			((Control)val2).set_Size(new Point(95, 26));
+			((Control)val2).set_Location(new Point(x, 0));
+			((Control)val2).set_Size(new Point(85, 26));
 			((Control)val2).set_Enabled(false);
 			((Control)val2).set_BasicTooltipText("Coming soon!");
 			_communityButton = val2;
+			x += 90;
 			StandardButton val3 = new StandardButton();
 			((Control)val3).set_Parent((Container)(object)this);
 			val3.set_Text("Create");
-			((Control)val3).set_Location(new Point(width - 160 - 5, 0));
-			((Control)val3).set_Size(new Point(80, 26));
+			((Control)val3).set_Location(new Point(x, 0));
+			((Control)val3).set_Size(new Point(70, 26));
 			_createButton = val3;
 			((Control)_createButton).add_Click((EventHandler<MouseEventArgs>)OnCreateButtonClick);
+			x += 75;
 			StandardButton val4 = new StandardButton();
 			((Control)val4).set_Parent((Container)(object)this);
 			val4.set_Text("Import");
-			((Control)val4).set_Location(new Point(width - 80, 0));
-			((Control)val4).set_Size(new Point(80, 26));
+			((Control)val4).set_Location(new Point(x, 0));
+			((Control)val4).set_Size(new Point(70, 26));
+			((Control)val4).set_BasicTooltipText("Toggle Import");
 			_importButton = val4;
 			((Control)_importButton).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				this.ImportClicked?.Invoke(this, EventArgs.Empty);
+			});
+			x += 75;
+			StandardButton val5 = new StandardButton();
+			((Control)val5).set_Parent((Container)(object)this);
+			val5.set_Text("Queue");
+			((Control)val5).set_Location(new Point(x, 0));
+			((Control)val5).set_Size(new Point(55, 26));
+			((Control)val5).set_BasicTooltipText("Toggle Queue");
+			_queueButton = val5;
+			((Control)_queueButton).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				this.QueueToggleClicked?.Invoke(this, EventArgs.Empty);
 			});
 		}
 
@@ -298,6 +345,11 @@ namespace Maestro.UI.Main
 			_statusLabel.set_Text((_visibleCount == _totalCount) ? $"  {_totalCount} songs" : $"  {_visibleCount} of {_totalCount} songs");
 		}
 
+		private void UpdateQueueButtonText()
+		{
+			_queueButton.set_Text((_queueCount > 0) ? $"Q ({_queueCount})" : "Queue");
+		}
+
 		protected override void DisposeControl()
 		{
 			InstrumentSelectorPanel instrumentPanel = _instrumentPanel;
@@ -324,6 +376,11 @@ namespace Maestro.UI.Main
 			if (importButton != null)
 			{
 				((Control)importButton).Dispose();
+			}
+			StandardButton queueButton = _queueButton;
+			if (queueButton != null)
+			{
+				((Control)queueButton).Dispose();
 			}
 			((Panel)this).DisposeControl();
 		}

@@ -64,7 +64,7 @@ namespace Maestro.UI.Community
 		}
 
 		public CommunityWindow(CommunityService communityService)
-			: this(GetBackground(), new Rectangle(0, 0, 450, 405), new Rectangle(15, 30, 420, 380))
+			: this(GetBackground(), new Rectangle(0, 0, 450, 405), new Rectangle(15, 20, 420, 380))
 		{
 			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0025: Unknown result type (might be due to invalid IL or missing references)

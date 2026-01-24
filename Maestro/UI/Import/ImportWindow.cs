@@ -8,7 +8,7 @@ using Maestro.Services.Data;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Maestro.UI
+namespace Maestro.UI.Import
 {
 	public class ImportWindow : StandardWindow
 	{
@@ -16,7 +16,7 @@ namespace Maestro.UI
 		{
 			public const int WindowWidth = 420;
 
-			public const int WindowHeight = 380;
+			public const int WindowHeight = 370;
 
 			public const int ContentWidth = 390;
 
@@ -53,11 +53,11 @@ namespace Maestro.UI
 
 		private static Texture2D GetBackground()
 		{
-			return _backgroundTexture ?? (_backgroundTexture = MaestroTheme.CreateWindowBackground(420, 380));
+			return _backgroundTexture ?? (_backgroundTexture = MaestroTheme.CreateWindowBackground(420, 370));
 		}
 
 		public ImportWindow()
-			: this(GetBackground(), new Rectangle(0, 0, 420, 380), new Rectangle(15, 30, 390, 380))
+			: this(GetBackground(), new Rectangle(0, 0, 420, 370), new Rectangle(15, 20, 390, 380))
 		{
 			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0025: Unknown result type (might be due to invalid IL or missing references)

@@ -17,7 +17,7 @@ namespace Maestro.UI.Main
 
 			private const int PADDING_X = 8;
 
-			private static readonly string[] SourceItems = new string[3] { "All", "Bundled", "Imported" };
+			private static readonly string[] SourceItems = new string[4] { "All", "Bundled", "Created", "Imported" };
 
 			private static readonly string[] InstrumentItems = new string[5] { "All", "Piano", "Harp", "Lute", "Bass" };
 

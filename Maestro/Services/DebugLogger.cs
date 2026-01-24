@@ -23,6 +23,8 @@ namespace Maestro.Services
 
 		private bool _enabled;
 
+		private bool _hasLoggedNotes;
+
 		private string _songName;
 
 		[Conditional("DEBUG")]
@@ -31,6 +33,7 @@ namespace Maestro.Services
 			_log.Clear();
 			_songName = songName;
 			_enabled = true;
+			_hasLoggedNotes = false;
 			_lastEventMs = 0L;
 			_stopwatch.Restart();
 		}
@@ -40,18 +43,18 @@ namespace Maestro.Services
 		{
 			_stopwatch.Stop();
 			_enabled = false;
-			if (_log.Length == 0)
+			if (!_hasLoggedNotes || _log.Length == 0)
 			{
 				return;
 			}
+			_hasLoggedNotes = false;
 			try
 			{
 				if (!Directory.Exists("C:\\git\\perso\\Maestro\\SongsDebug"))
 				{
 					Directory.CreateDirectory("C:\\git\\perso\\Maestro\\SongsDebug");
 				}
-				string safeFileName = SanitizeFileName(_songName);
-				string logPath = Path.Combine("C:\\git\\perso\\Maestro\\SongsDebug", safeFileName + ".txt");
+				string logPath = GetUniqueLogPath(SanitizeFileName(_songName));
 				string header = "=== Debug Log for: " + _songName + " ===\n" + $"=== Time: {DateTime.Now:yyyy-MM-dd HH:mm:ss} ===\n\n";
 				File.WriteAllText(logPath, header + _log);
 				Logger.Info("Debug log written to: " + logPath);
@@ -60,6 +63,24 @@ namespace Maestro.Services
 			{
 				Logger.Warn(ex, "Failed to write debug log");
 			}
+		}
+
+		private static string GetUniqueLogPath(string baseName)
+		{
+			string basePath = Path.Combine("C:\\git\\perso\\Maestro\\SongsDebug", baseName + ".txt");
+			if (!File.Exists(basePath))
+			{
+				return basePath;
+			}
+			int counter = 1;
+			string newPath;
+			do
+			{
+				newPath = Path.Combine("C:\\git\\perso\\Maestro\\SongsDebug", $"{baseName} - {counter}.txt");
+				counter++;
+			}
+			while (File.Exists(newPath));
+			return newPath;
 		}
 
 		private static string SanitizeFileName(string name)
@@ -86,10 +107,11 @@ namespace Maestro.Services
 		[Conditional("DEBUG")]
 		public void LogNote(Keys key, Keys targetKey)
 		{
-			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
 			if (_enabled)
 			{
+				_hasLoggedNotes = true;
 				long currentMs = _stopwatch.ElapsedMilliseconds;
 				long deltaMs = currentMs - _lastEventMs;
 				_lastEventMs = currentMs;
@@ -100,11 +122,12 @@ namespace Maestro.Services
 		[Conditional("DEBUG")]
 		public void LogSharp(Keys key, KeyBinding binding)
 		{
-			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
 			if (_enabled)
 			{
+				_hasLoggedNotes = true;
 				long currentMs = _stopwatch.ElapsedMilliseconds;
 				long deltaMs = currentMs - _lastEventMs;
 				_lastEventMs = currentMs;

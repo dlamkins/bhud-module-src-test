@@ -47,6 +47,12 @@ namespace Maestro.UI
 
 		public static readonly Color PanelSelected = new Color(51, 51, 51, 220);
 
+		public static readonly Color DrawerHeader = new Color(38, 42, 48);
+
+		public static readonly Color DrawerAccent = new Color(85, 95, 110);
+
+		public static readonly Color DrawerBackground = new Color(25, 28, 32);
+
 		public static readonly Color PianoWhiteKey = new Color(250, 250, 245);
 
 		public static readonly Color PianoWhiteKeyHover = new Color(230, 230, 220);
@@ -81,6 +87,8 @@ namespace Maestro.UI
 
 		public const int PaddingContentTop = 2;
 
+		public const int WindowContentTopPadding = 20;
+
 		private static readonly Color WindowBackground = new Color(30, 30, 30, 255);
 
 		private const int BACKGROUND_X_OFFSET = 1;
@@ -111,6 +119,34 @@ namespace Maestro.UI
 				for (int i = 0; i < data.Length; i++)
 				{
 					data[i] = WindowBackground;
+				}
+				texture.SetData<Color>(data);
+				return texture;
+			}
+			finally
+			{
+				((GraphicsDeviceContext)(ref context)).Dispose();
+			}
+		}
+
+		public static Texture2D CreateDrawerBackground(int windowWidth, int windowHeight)
+		{
+			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0023: Expected O, but got Unknown
+			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+			int width = windowWidth - 1;
+			int height = windowHeight - 13;
+			GraphicsDeviceContext context = GameService.Graphics.LendGraphicsDeviceContext();
+			try
+			{
+				Texture2D texture = new Texture2D(((GraphicsDeviceContext)(ref context)).get_GraphicsDevice(), width, height);
+				Color[] data = (Color[])(object)new Color[width * height];
+				for (int i = 0; i < data.Length; i++)
+				{
+					data[i] = DrawerBackground;
 				}
 				texture.SetData<Color>(data);
 				return texture;

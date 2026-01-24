@@ -18,7 +18,7 @@ namespace Maestro.UI.MaestroCreator
 		{
 			public const int WindowWidth = 420;
 
-			public const int WindowHeight = 565;
+			public const int WindowHeight = 560;
 
 			public const int ContentWidth = 390;
 
@@ -105,7 +105,7 @@ namespace Maestro.UI.MaestroCreator
 
 		private static Texture2D GetBackground()
 		{
-			return _backgroundTexture ?? (_backgroundTexture = MaestroTheme.CreateWindowBackground(420, 565));
+			return _backgroundTexture ?? (_backgroundTexture = MaestroTheme.CreateWindowBackground(420, 560));
 		}
 
 		public void SetInstrument(InstrumentType instrument)
@@ -156,7 +156,7 @@ namespace Maestro.UI.MaestroCreator
 		}
 
 		public MaestroCreatorWindow()
-			: this(GetBackground(), new Rectangle(0, 0, 420, 565), new Rectangle(15, 30, 390, 530))
+			: this(GetBackground(), new Rectangle(0, 0, 420, 560), new Rectangle(15, 20, 390, 530))
 		{
 			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
@@ -615,7 +615,7 @@ namespace Maestro.UI.MaestroCreator
 					Artist = artist,
 					Transcriber = transcriber,
 					Instrument = _instrument,
-					IsUserImported = true
+					IsCreated = true
 				};
 				foreach (string note in _noteSequencePanel.Notes)
 				{

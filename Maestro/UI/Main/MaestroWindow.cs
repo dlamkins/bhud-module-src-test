@@ -5,7 +5,9 @@ using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Maestro.Models;
+using Maestro.Services;
 using Maestro.Services.Playback;
+using Maestro.UI.Playlist;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -17,16 +19,20 @@ namespace Maestro.UI.Main
 		{
 			public const int WindowWidth = 420;
 
-			public const int WindowHeight = 495;
+			public const int WindowHeight = 500;
 
 			public const int ContentWidth = 390;
 
-			public const int ContentHeight = 445;
+			public const int ContentHeight = 455;
 		}
+
+		private static Texture2D _backgroundTexture;
 
 		private readonly SongPlayer _songPlayer;
 
 		private readonly List<Song> _allSongs;
+
+		private readonly PlaylistService _playlistService;
 
 		private NowPlayingPanel _nowPlayingPanel;
 
@@ -36,7 +42,15 @@ namespace Maestro.UI.Main
 
 		private StatusBar _statusBar;
 
-		private static Texture2D _backgroundTexture;
+		private PlaylistDrawerWindow _playlistDrawer;
+
+		private bool _isDrawerOpen;
+
+		private bool _isPlayingFromQueue;
+
+		private InstrumentType? _lastPlayedInstrument;
+
+		private Song _pendingSong;
 
 		public event EventHandler ImportRequested;
 
@@ -46,28 +60,186 @@ namespace Maestro.UI.Main
 
 		public event EventHandler<Song> SongDeleteRequested;
 
-		private static Texture2D GetBackground()
-		{
-			return _backgroundTexture ?? (_backgroundTexture = MaestroTheme.CreateWindowBackground(420, 495));
-		}
-
 		public MaestroWindow(SongPlayer songPlayer, List<Song> songs)
-			: this(GetBackground(), new Rectangle(0, 0, 420, 495), new Rectangle(15, 30, 390, 445))
+			: this(GetBackground(), new Rectangle(0, 0, 420, 500), new Rectangle(15, 20, 390, 455))
 		{
 			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
 			_songPlayer = songPlayer;
 			_allSongs = songs;
+			_playlistService = new PlaylistService();
 			((WindowBase2)this).set_Title("Maestro");
 			((WindowBase2)this).set_Subtitle("Music player");
 			((WindowBase2)this).set_Emblem(Module.Instance.ContentsManager.GetTexture("maestro-emblem.png"));
 			((WindowBase2)this).set_SavesPosition(true);
-			((WindowBase2)this).set_Id("MaestroWindow_v3");
+			((WindowBase2)this).set_Id("MaestroWindow_v4");
 			((WindowBase2)this).set_CanResize(false);
 			((Control)this).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			BuildUi();
 			SubscribeToEvents();
 			((Control)this).add_LeftMouseButtonPressed((EventHandler<MouseEventArgs>)OnWindowClicked);
+		}
+
+		public void AddImportedSong(Song song)
+		{
+			_allSongs.Add(song);
+			_statusBar.TotalCount = _allSongs.Count;
+			RefreshSongList();
+		}
+
+		public void RefreshAfterCommunityDownload()
+		{
+			_statusBar.TotalCount = _allSongs.Count;
+			RefreshSongList();
+		}
+
+		public void SetCreateButtonEnabled(bool enabled)
+		{
+			_statusBar.SetCreateButtonEnabled(enabled);
+		}
+
+		public void RemoveSong(Song song)
+		{
+			if (_songPlayer.CurrentSong == song)
+			{
+				_songPlayer.Stop();
+			}
+			_allSongs.Remove(song);
+			_statusBar.TotalCount = _allSongs.Count;
+			RefreshSongList();
+		}
+
+		protected override void OnMoved(MovedEventArgs e)
+		{
+			((Control)this).OnMoved(e);
+			if (_isDrawerOpen)
+			{
+				UpdateDrawerPosition();
+			}
+		}
+
+		protected override void OnHidden(EventArgs e)
+		{
+			((Control)this).OnHidden(e);
+			PlaylistDrawerWindow playlistDrawer = _playlistDrawer;
+			if (playlistDrawer != null)
+			{
+				((Control)playlistDrawer).Hide();
+			}
+		}
+
+		protected override void OnShown(EventArgs e)
+		{
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+			((Control)this).OnShown(e);
+			if (_isDrawerOpen)
+			{
+				Rectangle absoluteBounds = ((Control)this).get_AbsoluteBounds();
+				int targetX = ((Rectangle)(ref absoluteBounds)).get_Right() + 5;
+				absoluteBounds = ((Control)this).get_AbsoluteBounds();
+				int targetY = ((Rectangle)(ref absoluteBounds)).get_Top() + 35;
+				_playlistDrawer.ShowWithAnimation(targetX, targetY);
+			}
+		}
+
+		protected override void DisposeControl()
+		{
+			UnsubscribeFromEvents();
+			_songPlayer.Stop();
+			DisposeControls();
+			((WindowBase2)this).DisposeControl();
+		}
+
+		private static Texture2D GetBackground()
+		{
+			return _backgroundTexture ?? (_backgroundTexture = MaestroTheme.CreateWindowBackground(420, 500));
+		}
+
+		private void BuildUi()
+		{
+			int currentY = 2;
+			currentY = BuildNowPlayingPanel(currentY);
+			currentY = BuildFilterBar(currentY);
+			currentY = BuildSongListPanel(currentY);
+			BuildStatusBar(currentY);
+			BuildPlaylistDrawer();
+			RefreshSongList();
+		}
+
+		private int BuildNowPlayingPanel(int currentY)
+		{
+			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+			NowPlayingPanel nowPlayingPanel = new NowPlayingPanel(_songPlayer, 390);
+			((Control)nowPlayingPanel).set_Parent((Container)(object)this);
+			((Control)nowPlayingPanel).set_Location(new Point(0, currentY));
+			_nowPlayingPanel = nowPlayingPanel;
+			_nowPlayingPanel.StopRequested += OnStopRequested;
+			_nowPlayingPanel.PlayPendingRequested += OnPlayPendingRequested;
+			return currentY + 105 + 7;
+		}
+
+		private int BuildFilterBar(int currentY)
+		{
+			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+			SongFilterBar songFilterBar = new SongFilterBar(390);
+			((Control)songFilterBar).set_Parent((Container)(object)this);
+			((Control)songFilterBar).set_Location(new Point(0, currentY));
+			_filterBar = songFilterBar;
+			_filterBar.SearchChanged += OnFilterChanged;
+			_filterBar.FilterChanged += OnFilterChanged;
+			return currentY + 36 + 7 - 3;
+		}
+
+		private int BuildSongListPanel(int currentY)
+		{
+			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+			SongListPanel songListPanel = new SongListPanel(_songPlayer, 390);
+			((Control)songListPanel).set_Parent((Container)(object)this);
+			((Control)songListPanel).set_Location(new Point(0, currentY));
+			_songListPanel = songListPanel;
+			_songListPanel.SongPlayRequested += OnSongPlayRequested;
+			_songListPanel.SongDeleteRequested += OnSongDeleteRequested;
+			_songListPanel.AddToQueueRequested += OnAddToQueueRequested;
+			_songListPanel.CountChanged += OnCountChanged;
+			return currentY + 280 + 7;
+		}
+
+		private void BuildStatusBar(int currentY)
+		{
+			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+			StatusBar statusBar = new StatusBar(390);
+			((Control)statusBar).set_Parent((Container)(object)this);
+			((Control)statusBar).set_Location(new Point(0, currentY));
+			_statusBar = statusBar;
+			_statusBar.TotalCount = _allSongs.Count;
+			_statusBar.ImportClicked += OnImportClicked;
+			_statusBar.CommunityClicked += OnCommunityClicked;
+			_statusBar.CreateClicked += OnCreateClicked;
+			_statusBar.QueueToggleClicked += OnQueueToggleClicked;
+		}
+
+		private void BuildPlaylistDrawer()
+		{
+			PlaylistDrawerWindow playlistDrawerWindow = new PlaylistDrawerWindow(_playlistService);
+			((Control)playlistDrawerWindow).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+			((Control)playlistDrawerWindow).set_Visible(false);
+			_playlistDrawer = playlistDrawerWindow;
+			((Control)_playlistDrawer).add_Hidden((EventHandler<EventArgs>)OnDrawerHidden);
+			_playlistDrawer.PlayQueueRequested += OnPlayQueueRequested;
+		}
+
+		private void SubscribeToEvents()
+		{
+			_songPlayer.OnStarted += OnPlaybackStateChanged;
+			_songPlayer.OnPaused += OnPlaybackStateChanged;
+			_songPlayer.OnResumed += OnPlaybackStateChanged;
+			_songPlayer.OnStopped += OnPlaybackStateChanged;
+			_songPlayer.OnCompleted += OnPlaybackStateChanged;
+			_songPlayer.OnCompleted += OnSongCompleted;
+			_playlistService.QueueChanged += OnQueueChanged;
 		}
 
 		private void OnWindowClicked(object sender, MouseEventArgs e)
@@ -78,53 +250,6 @@ namespace Maestro.UI.Main
 			{
 				textInput.set_Focused(false);
 			}
-		}
-
-		private void BuildUi()
-		{
-			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0114: Unknown result type (might be due to invalid IL or missing references)
-			int currentY = 2;
-			NowPlayingPanel nowPlayingPanel = new NowPlayingPanel(_songPlayer, 390);
-			((Control)nowPlayingPanel).set_Parent((Container)(object)this);
-			((Control)nowPlayingPanel).set_Location(new Point(0, currentY));
-			_nowPlayingPanel = nowPlayingPanel;
-			currentY += 102;
-			SongFilterBar songFilterBar = new SongFilterBar(390);
-			((Control)songFilterBar).set_Parent((Container)(object)this);
-			((Control)songFilterBar).set_Location(new Point(0, currentY));
-			_filterBar = songFilterBar;
-			_filterBar.SearchChanged += OnFilterChanged;
-			_filterBar.FilterChanged += OnFilterChanged;
-			currentY += 40;
-			SongListPanel songListPanel = new SongListPanel(_songPlayer, 390);
-			((Control)songListPanel).set_Parent((Container)(object)this);
-			((Control)songListPanel).set_Location(new Point(0, currentY));
-			_songListPanel = songListPanel;
-			_songListPanel.SongPlayRequested += OnSongPlayRequested;
-			_songListPanel.SongDeleteRequested += OnSongDeleteRequested;
-			_songListPanel.CountChanged += OnCountChanged;
-			currentY += 287;
-			StatusBar statusBar = new StatusBar(390);
-			((Control)statusBar).set_Parent((Container)(object)this);
-			((Control)statusBar).set_Location(new Point(0, currentY));
-			_statusBar = statusBar;
-			_statusBar.TotalCount = _allSongs.Count;
-			_statusBar.ImportClicked += OnImportClicked;
-			_statusBar.CommunityClicked += OnCommunityClicked;
-			_statusBar.CreateClicked += OnCreateClicked;
-			RefreshSongList();
-		}
-
-		private void SubscribeToEvents()
-		{
-			_songPlayer.OnStarted += OnPlaybackStateChanged;
-			_songPlayer.OnPaused += OnPlaybackStateChanged;
-			_songPlayer.OnResumed += OnPlaybackStateChanged;
-			_songPlayer.OnStopped += OnPlaybackStateChanged;
-			_songPlayer.OnCompleted += OnPlaybackStateChanged;
 		}
 
 		private void OnPlaybackStateChanged(object sender, EventArgs e)
@@ -139,7 +264,18 @@ namespace Maestro.UI.Main
 
 		private void OnSongPlayRequested(object sender, Song song)
 		{
-			_songPlayer.Play(song);
+			if (_pendingSong != null)
+			{
+				_pendingSong = null;
+				_nowPlayingPanel.ClearPendingSong();
+				_playlistDrawer.HideInstrumentConfirmation();
+			}
+			PlaySongDirectly(song);
+		}
+
+		private void OnSongDeleteRequested(object sender, Song song)
+		{
+			this.SongDeleteRequested?.Invoke(this, song);
 		}
 
 		private void OnCountChanged(object sender, int count)
@@ -162,38 +298,180 @@ namespace Maestro.UI.Main
 			this.CreateRequested?.Invoke(this, instrument);
 		}
 
-		public void AddImportedSong(Song song)
+		private void OnQueueToggleClicked(object sender, EventArgs e)
 		{
-			_allSongs.Add(song);
-			_statusBar.TotalCount = _allSongs.Count;
-			RefreshSongList();
+			ToggleDrawer();
 		}
 
-		public void RefreshAfterCommunityDownload()
+		private void OnAddToQueueRequested(object sender, Song song)
 		{
-			_statusBar.TotalCount = _allSongs.Count;
-			RefreshSongList();
+			_playlistService.Add(song);
 		}
 
-		public void SetCreateButtonEnabled(bool enabled)
+		private void OnQueueChanged(object sender, EventArgs e)
 		{
-			_statusBar.SetCreateButtonEnabled(enabled);
+			_statusBar.QueueCount = _playlistService.Count;
 		}
 
-		private void OnSongDeleteRequested(object sender, Song song)
+		private void OnDrawerHidden(object sender, EventArgs e)
 		{
-			this.SongDeleteRequested?.Invoke(this, song);
+			_isDrawerOpen = false;
+			if (_pendingSong != null)
+			{
+				_pendingSong = null;
+				_nowPlayingPanel.ClearPendingSong();
+				if (_isPlayingFromQueue)
+				{
+					SetQueuePlaybackMode(isPlaying: false);
+				}
+			}
 		}
 
-		public void RemoveSong(Song song)
+		private void OnPlayPendingRequested(object sender, Song song)
 		{
-			if (_songPlayer.CurrentSong == song)
+			_playlistDrawer.HideInstrumentConfirmation();
+			if (!_isPlayingFromQueue)
+			{
+				SetQueuePlaybackMode(isPlaying: false);
+			}
+			if (!_playlistService.HasItems)
+			{
+				_isDrawerOpen = false;
+				((Control)_playlistDrawer).Hide();
+			}
+			_lastPlayedInstrument = song.Instrument;
+			_nowPlayingPanel.SetCurrentInstrument(song.Instrument);
+			_pendingSong = null;
+			_songPlayer.Play(song);
+		}
+
+		private void ShowInstrumentConfirmation(Song song)
+		{
+			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+			_pendingSong = song;
+			_nowPlayingPanel.SetPendingSong(song);
+			if (!_isDrawerOpen)
+			{
+				_isDrawerOpen = true;
+				Rectangle absoluteBounds = ((Control)this).get_AbsoluteBounds();
+				int targetX = ((Rectangle)(ref absoluteBounds)).get_Right() + 5;
+				absoluteBounds = ((Control)this).get_AbsoluteBounds();
+				int targetY = ((Rectangle)(ref absoluteBounds)).get_Top() + 35;
+				_playlistDrawer.ShowWithAnimation(targetX, targetY);
+			}
+			_playlistDrawer.ShowInstrumentConfirmation(song.Instrument);
+		}
+
+		private void PlaySongDirectly(Song song)
+		{
+			SetQueuePlaybackMode(isPlaying: false);
+			_lastPlayedInstrument = song.Instrument;
+			_nowPlayingPanel.SetCurrentInstrument(song.Instrument);
+			_songPlayer.Play(song);
+		}
+
+		private void OnSongCompleted(object sender, EventArgs e)
+		{
+			if (_isPlayingFromQueue && _playlistService.HasItems)
+			{
+				PlayNextFromQueue();
+			}
+			else
+			{
+				SetQueuePlaybackMode(isPlaying: false);
+			}
+		}
+
+		private void OnPlayQueueRequested(object sender, EventArgs e)
+		{
+			if (_playlistService.HasItems)
 			{
 				_songPlayer.Stop();
+				SetQueuePlaybackMode(isPlaying: true);
+				PlayNextFromQueue();
 			}
-			_allSongs.Remove(song);
-			_statusBar.TotalCount = _allSongs.Count;
-			RefreshSongList();
+		}
+
+		private void OnStopRequested(object sender, EventArgs e)
+		{
+			SetQueuePlaybackMode(isPlaying: false);
+			_songPlayer.Stop();
+		}
+
+		private void SetQueuePlaybackMode(bool isPlaying)
+		{
+			_isPlayingFromQueue = isPlaying;
+			_playlistDrawer.SetQueuePlaybackMode(isPlaying);
+			_nowPlayingPanel.SetQueuePlaybackMode(isPlaying);
+		}
+
+		private void PlayNextFromQueue()
+		{
+			Song nextSong = _playlistService.Dequeue();
+			if (nextSong != null)
+			{
+				Song pendingSong = _pendingSong;
+				InstrumentType? currentInstrument = ((pendingSong != null) ? new InstrumentType?(pendingSong.Instrument) : _lastPlayedInstrument);
+				if (currentInstrument.HasValue && nextSong.Instrument != currentInstrument.Value)
+				{
+					ShowInstrumentConfirmation(nextSong);
+					return;
+				}
+				if (_pendingSong != null)
+				{
+					_pendingSong = null;
+					_nowPlayingPanel.ClearPendingSong();
+					_playlistDrawer.HideInstrumentConfirmation();
+				}
+				_lastPlayedInstrument = nextSong.Instrument;
+				_nowPlayingPanel.SetCurrentInstrument(nextSong.Instrument);
+				_songPlayer.Play(nextSong);
+			}
+			else
+			{
+				SetQueuePlaybackMode(isPlaying: false);
+			}
+		}
+
+		private void ToggleDrawer()
+		{
+			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+			_isDrawerOpen = !_isDrawerOpen;
+			if (_isDrawerOpen)
+			{
+				Rectangle absoluteBounds = ((Control)this).get_AbsoluteBounds();
+				int targetX = ((Rectangle)(ref absoluteBounds)).get_Right() + 5;
+				absoluteBounds = ((Control)this).get_AbsoluteBounds();
+				int targetY = ((Rectangle)(ref absoluteBounds)).get_Top() + 35;
+				_playlistDrawer.ShowWithAnimation(targetX, targetY);
+			}
+			else
+			{
+				((Control)_playlistDrawer).Hide();
+			}
+		}
+
+		private void UpdateDrawerPosition()
+		{
+			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+			if (_playlistDrawer != null)
+			{
+				PlaylistDrawerWindow playlistDrawer = _playlistDrawer;
+				Rectangle absoluteBounds = ((Control)this).get_AbsoluteBounds();
+				int num = ((Rectangle)(ref absoluteBounds)).get_Right() + 5;
+				absoluteBounds = ((Control)this).get_AbsoluteBounds();
+				((Control)playlistDrawer).set_Location(new Point(num, ((Rectangle)(ref absoluteBounds)).get_Top() + 35));
+			}
 		}
 
 		private void RefreshSongList()
@@ -205,50 +483,75 @@ namespace Maestro.UI.Main
 		private IEnumerable<Song> GetFilteredSongs()
 		{
 			IEnumerable<Song> songs = _allSongs.AsEnumerable();
-			switch (_filterBar.SelectedSource)
-			{
-			case "Bundled":
-				songs = songs.Where((Song s) => !s.IsUserImported && !s.IsCommunityDownloaded);
-				break;
-			case "Community":
-				songs = songs.Where((Song s) => s.IsCommunityDownloaded);
-				break;
-			case "Imported":
-				songs = songs.Where((Song s) => s.IsUserImported);
-				break;
-			}
-			string filter = _filterBar.SelectedInstrument;
-			if (filter != "All")
-			{
-				if (Enum.TryParse<InstrumentType>(filter, out var instrument))
-				{
-					songs = songs.Where((Song s) => s.Instrument == instrument);
-				}
-			}
-			string searchTerm = _filterBar.SearchText;
-			if (!string.IsNullOrEmpty(searchTerm))
-			{
-				songs = songs.Where((Song s) => s.Name.ToLower().Contains(searchTerm) || s.Artist.ToLower().Contains(searchTerm));
-			}
+			songs = FilterBySource(songs);
+			songs = FilterByInstrument(songs);
+			songs = FilterBySearchTerm(songs);
 			return songs.OrderBy((Song s) => s.Name);
 		}
 
-		protected override void DisposeControl()
+		private IEnumerable<Song> FilterBySource(IEnumerable<Song> songs)
+		{
+			return _filterBar.SelectedSource switch
+			{
+				"Bundled" => songs.Where((Song s) => !s.IsUserImported && !s.IsCreated && !s.IsCommunityDownloaded), 
+				"Community" => songs.Where((Song s) => s.IsCommunityDownloaded), 
+				"Created" => songs.Where((Song s) => s.IsCreated), 
+				"Imported" => songs.Where((Song s) => s.IsUserImported), 
+				_ => songs, 
+			};
+		}
+
+		private IEnumerable<Song> FilterByInstrument(IEnumerable<Song> songs)
+		{
+			string filter = _filterBar.SelectedInstrument;
+			if (filter == "All")
+			{
+				return songs;
+			}
+			if (Enum.TryParse<InstrumentType>(filter, out var instrument))
+			{
+				return songs.Where((Song s) => s.Instrument == instrument);
+			}
+			return songs;
+		}
+
+		private IEnumerable<Song> FilterBySearchTerm(IEnumerable<Song> songs)
+		{
+			string searchTerm = _filterBar.SearchText;
+			if (string.IsNullOrEmpty(searchTerm))
+			{
+				return songs;
+			}
+			return songs.Where((Song s) => s.Name.ToLower().Contains(searchTerm) || s.Artist.ToLower().Contains(searchTerm));
+		}
+
+		private void UnsubscribeFromEvents()
 		{
 			_songPlayer.OnStarted -= OnPlaybackStateChanged;
 			_songPlayer.OnPaused -= OnPlaybackStateChanged;
 			_songPlayer.OnResumed -= OnPlaybackStateChanged;
 			_songPlayer.OnStopped -= OnPlaybackStateChanged;
 			_songPlayer.OnCompleted -= OnPlaybackStateChanged;
+			_songPlayer.OnCompleted -= OnSongCompleted;
+			_playlistService.QueueChanged -= OnQueueChanged;
 			_filterBar.SearchChanged -= OnFilterChanged;
 			_filterBar.FilterChanged -= OnFilterChanged;
 			_songListPanel.SongPlayRequested -= OnSongPlayRequested;
 			_songListPanel.SongDeleteRequested -= OnSongDeleteRequested;
+			_songListPanel.AddToQueueRequested -= OnAddToQueueRequested;
 			_songListPanel.CountChanged -= OnCountChanged;
 			_statusBar.ImportClicked -= OnImportClicked;
 			_statusBar.CommunityClicked -= OnCommunityClicked;
 			_statusBar.CreateClicked -= OnCreateClicked;
-			_songPlayer.Stop();
+			_statusBar.QueueToggleClicked -= OnQueueToggleClicked;
+			((Control)_playlistDrawer).remove_Hidden((EventHandler<EventArgs>)OnDrawerHidden);
+			_playlistDrawer.PlayQueueRequested -= OnPlayQueueRequested;
+			_nowPlayingPanel.StopRequested -= OnStopRequested;
+			_nowPlayingPanel.PlayPendingRequested -= OnPlayPendingRequested;
+		}
+
+		private void DisposeControls()
+		{
 			NowPlayingPanel nowPlayingPanel = _nowPlayingPanel;
 			if (nowPlayingPanel != null)
 			{
@@ -269,7 +572,11 @@ namespace Maestro.UI.Main
 			{
 				((Control)statusBar).Dispose();
 			}
-			((WindowBase2)this).DisposeControl();
+			PlaylistDrawerWindow playlistDrawer = _playlistDrawer;
+			if (playlistDrawer != null)
+			{
+				((Control)playlistDrawer).Dispose();
+			}
 		}
 	}
 }

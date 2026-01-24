@@ -22,6 +22,8 @@ namespace Maestro.Models
 
 		public bool IsUserImported { get; set; }
 
+		public bool IsCreated { get; set; }
+
 		public bool SkipOctaveReset { get; set; }
 
 		public string CommunityId { get; set; }

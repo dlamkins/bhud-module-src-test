@@ -10,7 +10,7 @@ namespace Maestro.UI.Main
 {
 	public class SongCard : Panel
 	{
-		public static class Layout
+		private static class Layout
 		{
 			public const int Height = 70;
 
@@ -35,8 +35,6 @@ namespace Maestro.UI.Main
 			public static int LabelRightMargin => 55;
 		}
 
-		private readonly Song _song;
-
 		private readonly Panel _indicator;
 
 		private readonly Label _instrumentLabel;
@@ -53,7 +51,7 @@ namespace Maestro.UI.Main
 
 		private bool _isPlaying;
 
-		public Song Song => _song;
+		public Song Song { get; }
 
 		public bool IsSelected
 		{
@@ -86,6 +84,8 @@ namespace Maestro.UI.Main
 		public event EventHandler<MouseEventArgs> CardClicked;
 
 		public event EventHandler DeleteRequested;
+
+		public event EventHandler AddToQueueRequested;
 
 		public SongCard(Song song, int width)
 			: this()
@@ -141,9 +141,9 @@ namespace Maestro.UI.Main
 			//IL_0206: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0210: Unknown result type (might be due to invalid IL or missing references)
 			//IL_021d: Expected O, but got Unknown
-			//IL_0244: Unknown result type (might be due to invalid IL or missing references)
-			//IL_024a: Expected O, but got Unknown
-			_song = song;
+			//IL_0234: Unknown result type (might be due to invalid IL or missing references)
+			//IL_023a: Expected O, but got Unknown
+			Song = song;
 			((Control)this).set_Size(new Point(width, 70));
 			((Control)this).set_BackgroundColor(MaestroTheme.PanelBackground);
 			_highlightEffect = new ScrollingHighlightEffect((Control)(object)this);
@@ -197,20 +197,24 @@ namespace Maestro.UI.Main
 			{
 				this.PlayClicked?.Invoke(this, e);
 			});
-			if (song.IsUserImported || song.IsCommunityDownloaded)
+			ContextMenuStrip contextMenu = new ContextMenuStrip();
+			((Control)contextMenu.AddMenuItem("Add to Queue")).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				ContextMenuStrip contextMenu = new ContextMenuStrip();
+				this.AddToQueueRequested?.Invoke(this, EventArgs.Empty);
+			});
+			if (song.IsUserImported || song.IsCreated || song.IsCommunityDownloaded)
+			{
 				((Control)contextMenu.AddMenuItem("Delete Song")).add_Click((EventHandler<MouseEventArgs>)delegate
 				{
 					this.DeleteRequested?.Invoke(this, EventArgs.Empty);
 				});
-				((Control)this).set_Menu(contextMenu);
-				((Control)this).set_BasicTooltipText("Right-click for options");
-				((Control)_indicator).set_BasicTooltipText("Right-click for options");
-				((Control)_instrumentLabel).set_BasicTooltipText("Right-click for options");
-				((Control)_titleLabel).set_BasicTooltipText("Right-click for options");
-				((Control)_artistLabel).set_BasicTooltipText("Right-click for options");
 			}
+			((Control)this).set_Menu(contextMenu);
+			((Control)this).set_BasicTooltipText("Right-click for options");
+			((Control)_indicator).set_BasicTooltipText("Right-click for options");
+			((Control)_instrumentLabel).set_BasicTooltipText("Right-click for options");
+			((Control)_titleLabel).set_BasicTooltipText("Right-click for options");
+			((Control)_artistLabel).set_BasicTooltipText("Right-click for options");
 			((Control)this).add_Click((EventHandler<MouseEventArgs>)delegate(object s, MouseEventArgs e)
 			{
 				this.CardClicked?.Invoke(this, e);
