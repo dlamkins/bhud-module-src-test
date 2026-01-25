@@ -55,7 +55,7 @@ namespace Maestro.Services.Data
 						{
 							commands.Add(SongCommand.KeyDownCmd(octaveKey));
 							commands.Add(SongCommand.KeyUpCmd(octaveKey));
-							commands.Add(SongCommand.WaitCmd(100));
+							commands.Add(SongCommand.WaitCmd(10));
 						}
 						currentOctave = note2.TargetOctave;
 					}
