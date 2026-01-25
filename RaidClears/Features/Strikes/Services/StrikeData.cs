@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text;
 using Blish_HUD.Settings;
 using Newtonsoft.Json;
 using RaidClears.Features.Strikes.Models;
@@ -16,7 +17,7 @@ namespace RaidClears.Features.Strikes.Services
 		public static string FILENAME = "strike_data.json";
 
 		[JsonIgnore]
-		public static string FILE_URL = "https://bhm.blishhud.com/Soeed.RaidClears/static/strike_data.json";
+		public static string FILE_URL = Module.STATIC_HOST_URL + Module.STATIC_HOST_API_VERSION + FILENAME;
 
 		[JsonProperty("version")]
 		public string Version { get; set; } = "";
@@ -167,7 +168,7 @@ namespace RaidClears.Features.Strikes.Services
 		{
 			FileInfo configFileInfo = GetConfigFileInfo();
 			string serializedContents = JsonConvert.SerializeObject(this, Formatting.None);
-			using StreamWriter writer = new StreamWriter(configFileInfo.FullName);
+			using StreamWriter writer = new StreamWriter(configFileInfo.FullName, append: false, Encoding.UTF8);
 			writer.Write(serializedContents);
 			writer.Close();
 		}
@@ -177,7 +178,7 @@ namespace RaidClears.Features.Strikes.Services
 			FileInfo configFileInfo = GetConfigFileInfo();
 			if (configFileInfo != null && configFileInfo.Exists)
 			{
-				using (StreamReader reader = new StreamReader(configFileInfo.FullName))
+				using (StreamReader reader = new StreamReader(configFileInfo.FullName, Encoding.UTF8))
 				{
 					string fileText = reader.ReadToEnd();
 					reader.Close();
@@ -202,6 +203,7 @@ namespace RaidClears.Features.Strikes.Services
 			try
 			{
 				using WebClient webClient = new WebClient();
+				webClient.Encoding = Encoding.UTF8;
 				StrikeData data = JsonConvert.DeserializeObject<StrikeData>(webClient.DownloadString(FILE_URL));
 				if (data == null)
 				{

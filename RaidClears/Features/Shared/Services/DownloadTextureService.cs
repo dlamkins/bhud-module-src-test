@@ -63,7 +63,7 @@ namespace RaidClears.Features.Shared.Services
 			{
 				using WebClient webClient = new WebClient();
 				string savePath = Service.DirectoriesManager.GetFullDirectoryPath(Module.DIRECTORY_PATH) + "\\" + fileName;
-				webClient.DownloadFile(url + "/" + fileName, savePath);
+				webClient.DownloadFile(url + fileName, savePath);
 				return true;
 			}
 			catch (Exception)

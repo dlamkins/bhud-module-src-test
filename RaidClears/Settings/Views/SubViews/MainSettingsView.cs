@@ -22,30 +22,33 @@ namespace RaidClears.Settings.Views.SubViews
 			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004b: Expected O, but got Unknown
-			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a7: Expected O, but got Unknown
-			//IL_016c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0178: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0180: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0185: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0190: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0195: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e6: Expected O, but got Unknown
+			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0056: Expected O, but got Unknown
+			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bd: Expected O, but got Unknown
+			//IL_0182: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0196: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01fc: Expected O, but got Unknown
 			((View<IPresenter>)this).Build(buildPanel);
 			FlowPanel panel = new FlowPanel();
 			FlowPanel panel2 = panel.BeginFlow(buildPanel, new Point(-95, 0), new Point(0, 5));
 			StandardButton val = new StandardButton();
 			val.set_Text(Strings.PatchNotes);
 			((Control)val).set_BasicTooltipText(Strings.PatchNotes_Tooltip);
+			((Control)val).set_Width(300);
 			Control patchNotesButton;
 			FlowPanel panel3 = panel2.AddFlowControl((Control)val, out patchNotesButton).AddSpace().AddSetting((SettingEntry)(object)Service.Settings.SettingsPanelKeyBind)
 				.AddSpace()
@@ -53,7 +56,8 @@ namespace RaidClears.Settings.Views.SubViews
 				.AddSpace();
 			StandardButton val2 = new StandardButton();
 			val2.set_Text(Strings.Settings_RefreshNow);
-			((Container)(object)panel3.AddFlowControl((Control)val2, out var refreshButton).AddSpace().AddSetting((SettingEntry)(object)Service.Settings.OrganicGridBoxBackgrounds)).AddControl((Control)(object)new GridBox((Container)(object)panel, "Demo", "Example encounter box", Service.Settings.RaidSettings.Style.GridOpacity, Service.Settings.RaidSettings.Style.FontSize), out var grid);
+			((Control)val2).set_Width(300);
+			((Container)(object)panel3.AddFlowControl((Control)val2, out var refreshButton).AddSpace().AddSetting((SettingEntry)(object)Service.Settings.OrganicGridBoxBackgrounds)).AddControl((Control)(object)new GridBox((Container)(object)panel, Strings.Settings_Main_Demo, Strings.Settings_Main_ExampleEncounterBox, Service.Settings.RaidSettings.Style.GridOpacity, Service.Settings.RaidSettings.Style.FontSize), out var grid);
 			panel.AddSpace().AddSetting((SettingEntry)(object)Service.Settings.ScreenClamp).AddSpace()
 				.AddSetting((SettingEntry)(object)Service.Settings.GlobalCornerIconEnabled);
 			(grid as GridBox).BackgroundColor = Service.Settings.RaidSettings.Style.Color.Cleared.get_Value().ToString().HexToXnaColor();

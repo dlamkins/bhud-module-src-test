@@ -48,6 +48,7 @@ namespace RaidClears.Features.Fractals.Models
 				CmTooltip fractalTooptip = new CmTooltip();
 				fractalTooptip.Fractal = new CMInterface(map, scale, DayOfYearIndexService.DayOfYearIndex());
 				((Control)encounterBox).set_Tooltip((Tooltip)(object)fractalTooptip);
+				encounterBox.VisiblityChanged(Service.FractalSettings.GetChallengeMoteVisibleByApiId(encounter.id));
 				encounterBox.TextColorSetting(Settings.Style.Color.Text);
 				encounter.SetGridBoxReference(encounterBox);
 				encounter.WatchColorSettings(Settings.Style.Color.Cleared, Settings.Style.Color.NotCleared);

@@ -36,8 +36,8 @@ namespace RaidClears.Settings.Views.Tabs
 			})));
 			_registeredMenuItems.Add(new MenuViewItem(new MenuItem(Strings.SettingsPanel_Raids_Heading_Layout), (MenuItem _) => (IView)(object)new GenericStyleView(Service.Settings.StrikeSettings.Style, null, showCopyRaids: true)));
 			_registeredMenuItems.Add(new MenuViewItem(new MenuItem(Strings.SettingsPanel_Strikes_Heading_Selection), (MenuItem _) => (IView)(object)new DynamicStrikeSelectionView()));
-			_registeredMenuItems.Add(new MenuViewItem(new MenuItem("Customize Labels"), (MenuItem _) => (IView)(object)new StrikeLabelCustomizationView()));
-			_registeredMenuItems.Add(new MenuViewItem(new MenuItem("Manage Clears"), (MenuItem _) => (IView)(object)new StrikeClearCorrectionView()));
+			_registeredMenuItems.Add(new MenuViewItem(new MenuItem(Strings.SettingsPanel_Strikes_Heading_CustomizeLabels), (MenuItem _) => (IView)(object)new StrikeLabelCustomizationView()));
+			_registeredMenuItems.Add(new MenuViewItem(new MenuItem(Strings.SettingsPanel_Strikes_Heading_ManageClears), (MenuItem _) => (IView)(object)new StrikeClearCorrectionView()));
 		}
 
 		public IEnumerable<MenuItem> GetSettingMenus()

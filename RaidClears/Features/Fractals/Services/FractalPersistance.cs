@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using Newtonsoft.Json;
 using RaidClears.Features.Raids.Services;
 
@@ -82,7 +83,7 @@ namespace RaidClears.Features.Fractals.Services
 		{
 			FileInfo configFileInfo = GetConfigFileInfo();
 			string serializedContents = JsonConvert.SerializeObject(this, Formatting.Indented);
-			using StreamWriter writer = new StreamWriter(configFileInfo.FullName);
+			using StreamWriter writer = new StreamWriter(configFileInfo.FullName, append: false, Encoding.UTF8);
 			writer.Write(serializedContents);
 			writer.Close();
 		}
@@ -97,7 +98,7 @@ namespace RaidClears.Features.Fractals.Services
 			FileInfo configFileInfo = GetConfigFileInfo();
 			if (configFileInfo != null && configFileInfo.Exists)
 			{
-				using (StreamReader reader = new StreamReader(configFileInfo.FullName))
+				using (StreamReader reader = new StreamReader(configFileInfo.FullName, Encoding.UTF8))
 				{
 					string fileText = reader.ReadToEnd();
 					reader.Close();

@@ -38,6 +38,10 @@ namespace RaidClears.Features.Shared.Services
 
 		public Texture2D CornerIconHoverTexture { get; }
 
+		public Texture2D CornerIconNotificationTexture { get; }
+
+		public Texture2D CornerIconNotificationHoverTexture { get; }
+
 		public List<AsyncTexture2D> GridBoxBackgroundTexture { get; private set; } = new List<AsyncTexture2D>();
 
 
@@ -46,6 +50,8 @@ namespace RaidClears.Features.Shared.Services
 			_downloadTextures = new DownloadTextureService();
 			CornerIconTexture = contentsManager.GetTexture("raids\\textures\\raidIconDark.png");
 			CornerIconHoverTexture = contentsManager.GetTexture("raids\\textures\\raidIconBright.png");
+			CornerIconNotificationTexture = contentsManager.GetTexture("raids\\textures\\cornerIcon_notification.png");
+			CornerIconNotificationHoverTexture = contentsManager.GetTexture("raids\\textures\\cornerIcon_notification_hover.png");
 			SettingWindowBackground = AsyncTexture2D.op_Implicit(GetDynamicTexture("texture_background.png"));
 			SettingWindowEmblem = contentsManager.GetTexture("module_profile_hero_icon.png");
 			SettingTabRaid = DatAsset(1302679);
@@ -93,6 +99,8 @@ namespace RaidClears.Features.Shared.Services
 			GridBoxBackgroundTexture.Clear();
 			((GraphicsResource)CornerIconTexture).Dispose();
 			((GraphicsResource)CornerIconHoverTexture).Dispose();
+			((GraphicsResource)CornerIconNotificationTexture).Dispose();
+			((GraphicsResource)CornerIconNotificationHoverTexture).Dispose();
 			((GraphicsResource)SettingWindowBackground).Dispose();
 			((GraphicsResource)SettingWindowEmblem).Dispose();
 			((GraphicsResource)SettingTabGeneral).Dispose();

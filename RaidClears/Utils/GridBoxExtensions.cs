@@ -25,7 +25,14 @@ namespace RaidClears.Utils
 					((Control)box2).Show();
 					((Label)box2).set_Text(GetLabelText(args.get_NewValue(), shortText2, longText2));
 				}
-				((Control)((Control)box2).get_Parent()).Invalidate();
+				try
+				{
+					((Control)((Control)box2).get_Parent()).Invalidate();
+				}
+				catch (Exception ex)
+				{
+					Logger.GetLogger<Module>().Warn(ex.Message);
+				}
 			};
 			labelDisplay.add_SettingChanged(settingChangedDelegate);
 			settingChangedDelegate(null, new ValueChangedEventArgs<LabelDisplay>(labelDisplay.get_Value(), labelDisplay.get_Value()));

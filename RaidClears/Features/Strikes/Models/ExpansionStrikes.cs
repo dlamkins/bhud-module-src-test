@@ -24,6 +24,36 @@ namespace RaidClears.Features.Strikes.Models
 		[JsonProperty("missions")]
 		public List<StrikeMission> Missions = new List<StrikeMission>();
 
+		[JsonProperty("name")]
+		private string _name = "undefined";
+
+		[JsonProperty("abbriviation")]
+		private string _abbriviation = "undefined";
+
+		public new string Name
+		{
+			get
+			{
+				return GetLocalizedName(_name);
+			}
+			set
+			{
+				_name = value;
+			}
+		}
+
+		public new string Abbriviation
+		{
+			get
+			{
+				return GetLocalizedAbbreviation(_abbriviation);
+			}
+			set
+			{
+				_abbriviation = value;
+			}
+		}
+
 		public List<BoxModel> GetEncounters()
 		{
 			List<BoxModel> missionslist = new List<BoxModel>();

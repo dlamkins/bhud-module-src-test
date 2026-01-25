@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using RaidClears.Features.Fractals.Models;
 using RaidClears.Features.Fractals.Services;
+using RaidClears.Localization;
 using RaidClears.Utils.Kenedia;
 
 namespace RaidClears.Features.Fractals
@@ -130,8 +131,8 @@ namespace RaidClears.Features.Fractals
 				_instabIcons.Add(detailedTexture);
 				index++;
 			});
-			_title.set_Text(map.Label + " (" + Service.FractalPersistance.GetEncounterLabel(map.ApiLabel) + ")");
-			_id.set_Text($"Scale: {scale}");
+			_title.set_Text(string.Format(Strings.CMTooltip_Title, map.Label, Service.FractalPersistance.GetEncounterLabel(map.ApiLabel)));
+			_id.set_Text(string.Format(Strings.CMTooltip_Scale, scale));
 		}
 
 		public override void Draw(SpriteBatch spriteBatch, Rectangle drawBounds, Rectangle scissor)
@@ -151,8 +152,8 @@ namespace RaidClears.Features.Fractals
 			SpriteBatch spriteBatch2 = spriteBatch;
 			((Tooltip)this).PaintBeforeChildren(spriteBatch2, bounds);
 			_image.Draw((Control)(object)this, spriteBatch2);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch2, (Control)(object)this, "Instabilities", GameService.Content.get_DefaultFont14(), _instabsTitle, Color.get_Chartreuse(), false, (HorizontalAlignment)0, (VerticalAlignment)1);
-			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch2, (Control)(object)this, "Tomorrow", GameService.Content.get_DefaultFont14(), _tomorrowInstabsTitle, Color.get_Chartreuse(), false, (HorizontalAlignment)0, (VerticalAlignment)1);
+			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch2, (Control)(object)this, Strings.CMTooltip_Instabilities, GameService.Content.get_DefaultFont14(), _instabsTitle, Color.get_Chartreuse(), false, (HorizontalAlignment)0, (VerticalAlignment)1);
+			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch2, (Control)(object)this, Strings.CMTooltip_Tomorrow, GameService.Content.get_DefaultFont14(), _tomorrowInstabsTitle, Color.get_Chartreuse(), false, (HorizontalAlignment)0, (VerticalAlignment)1);
 			int i = 0;
 			_instabIcons.ForEach(delegate(DetailedTexture icon)
 			{

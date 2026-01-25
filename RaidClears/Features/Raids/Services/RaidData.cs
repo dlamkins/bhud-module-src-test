@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Text;
 using Newtonsoft.Json;
 using RaidClears.Features.Raids.Models;
 
@@ -14,7 +15,7 @@ namespace RaidClears.Features.Raids.Services
 		public static string FILENAME = "raid_data.json";
 
 		[JsonIgnore]
-		public static string FILE_URL = "https://bhm.blishhud.com/Soeed.RaidClears/static/raid_data.json";
+		public static string FILE_URL = Module.STATIC_HOST_URL + Module.STATIC_HOST_API_VERSION + FILENAME;
 
 		[JsonProperty("version")]
 		public string Version { get; set; } = "";
@@ -23,6 +24,17 @@ namespace RaidClears.Features.Raids.Services
 		[JsonProperty("secondsInWeek")]
 		public int SecondsInWeek { get; set; } = -1;
 
+
+		[JsonProperty("powerDamageAssetId")]
+		public int PowerDamageAssetId { get; set; } = 993687;
+
+
+		[JsonProperty("condiDamageAssetId")]
+		public int CondiDamageAssetId { get; set; } = 156600;
+
+
+		[JsonProperty("defianceAssetId")]
+		public int DefianceAssetId { get; set; }
 
 		[JsonProperty("aerodrome")]
 		public Aerodrome AeroDrome { get; set; } = new Aerodrome();
@@ -150,7 +162,7 @@ namespace RaidClears.Features.Raids.Services
 		{
 			FileInfo configFileInfo = GetConfigFileInfo();
 			string serializedContents = JsonConvert.SerializeObject(this, Formatting.None);
-			using StreamWriter writer = new StreamWriter(configFileInfo.FullName);
+			using StreamWriter writer = new StreamWriter(configFileInfo.FullName, append: false, Encoding.UTF8);
 			writer.Write(serializedContents);
 			writer.Close();
 		}
@@ -160,7 +172,7 @@ namespace RaidClears.Features.Raids.Services
 			FileInfo configFileInfo = GetConfigFileInfo();
 			if (configFileInfo != null && configFileInfo.Exists)
 			{
-				using (StreamReader reader = new StreamReader(configFileInfo.FullName))
+				using (StreamReader reader = new StreamReader(configFileInfo.FullName, Encoding.UTF8))
 				{
 					string fileText = reader.ReadToEnd();
 					reader.Close();
@@ -185,6 +197,7 @@ namespace RaidClears.Features.Raids.Services
 			try
 			{
 				using WebClient webClient = new WebClient();
+				webClient.Encoding = Encoding.UTF8;
 				RaidData data = JsonConvert.DeserializeObject<RaidData>(webClient.DownloadString(FILE_URL));
 				if (data == null)
 				{

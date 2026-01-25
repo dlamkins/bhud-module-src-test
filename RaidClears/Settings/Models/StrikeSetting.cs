@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Text;
+using RaidClears.Localization;
 
 namespace RaidClears.Settings.Models
 {
@@ -19,7 +20,7 @@ namespace RaidClears.Settings.Models
 		public StrikeSetting(string Key, T DefaultValue, Func<string>? Name = null)
 		{
 			Func<string> Name2 = Name;
-			base._002Ector(Key, DefaultValue, Name2, (Func<string>?)(() => "Enable " + Name2?.Invoke() + " on the strike overlay"));
+			base._002Ector(Key, DefaultValue, Name2, (Func<string>?)(() => string.Format(Strings.Settings_EnableStrike, Name2?.Invoke() ?? "")));
 		}
 
 		[CompilerGenerated]

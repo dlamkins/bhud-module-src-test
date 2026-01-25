@@ -10,6 +10,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended.BitmapFonts;
+using RaidClears.Localization;
 using RaidClears.Utils;
 
 namespace RaidClears.Shared.Controls
@@ -73,10 +74,10 @@ namespace RaidClears.Shared.Controls
 			//IL_0049: Expected O, but got Unknown
 			(StandardButton, DialogResult)[] array = new(StandardButton, DialogResult)[2];
 			StandardButton val = new StandardButton();
-			val.set_Text("OK");
+			val.set_Text(Strings.ConfirmDialog_OK);
 			array[0] = (val, DialogResult.OK);
 			StandardButton val2 = new StandardButton();
-			val2.set_Text("Cancel");
+			val2.set_Text(Strings.ConfirmDialog_Cancel);
 			array[1] = (val2, DialogResult.Cancel);
 			_buttons = array;
 			((Container)this)._002Ector();

@@ -5,6 +5,7 @@ using Blish_HUD.Settings;
 using Microsoft.Xna.Framework;
 using RaidClears.Features.Strikes.Models;
 using RaidClears.Features.Strikes.Services;
+using RaidClears.Localization;
 using RaidClears.Utils;
 
 namespace RaidClears.Settings.Views.SubViews
@@ -46,7 +47,7 @@ namespace RaidClears.Settings.Views.SubViews
 			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007d: Expected O, but got Unknown
+			//IL_0078: Expected O, but got Unknown
 			FlowPanel val = new FlowPanel();
 			val.set_FlowDirection((ControlFlowDirection)3);
 			val.set_OuterControlPadding(new Vector2(20f, 5f));
@@ -56,7 +57,7 @@ namespace RaidClears.Settings.Views.SubViews
 			((Container)val).set_HeightSizingMode((SizingMode)1);
 			((Control)val).set_Width(((Control)panel).get_Width() - 40);
 			((Panel)val).set_BackgroundTexture(Service.Textures!.GetDynamicTexture(expac.asset));
-			panel.AddChildPanel((Panel)(object)FlowPanelExtensions.AddString(val, "Display " + expac.Name + " strike missions").AddSetting((SettingEntry)(object)_data.GetPriorityVisible()).AddSpace());
+			panel.AddChildPanel((Panel)(object)FlowPanelExtensions.AddString(val, string.Format(Strings.DynamicStrikeSelection_DisplayExpansion, expac.Name)).AddSetting((SettingEntry)(object)_data.GetPriorityVisible()).AddSpace());
 		}
 
 		private void BuildExpansionPanel(FlowPanel panel, ExpansionStrikes expac)
@@ -71,9 +72,9 @@ namespace RaidClears.Settings.Views.SubViews
 			//IL_0099: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00af: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00df: Expected O, but got Unknown
-			//IL_0107: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0111: Expected O, but got Unknown
+			//IL_00da: Expected O, but got Unknown
+			//IL_0102: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010c: Expected O, but got Unknown
 			List<SettingEntry<bool>> expansionMissions = new List<SettingEntry<bool>>();
 			foreach (StrikeMission mission in expac.Missions)
 			{
@@ -89,7 +90,7 @@ namespace RaidClears.Settings.Views.SubViews
 			((Container)val).set_HeightSizingMode((SizingMode)1);
 			((Control)val).set_Width(((Control)panel).get_Width() - 40);
 			((Panel)val).set_BackgroundTexture(Service.Textures!.GetDynamicTexture(expac.asset));
-			panel2.AddFlowControl((Control)(object)FlowPanelExtensions.AddString(val, "Display individual " + expac.Name + " strike missions").AddSetting((IEnumerable<SettingEntry>?)expansionMissions).AddSpace(), out var childPanel);
+			panel2.AddFlowControl((Control)(object)FlowPanelExtensions.AddString(val, string.Format(Strings.DynamicStrikeSelection_DisplayIndividual, expac.Name)).AddSetting((IEnumerable<SettingEntry>?)expansionMissions).AddSpace(), out var childPanel);
 			for (int i = expansionMissions.Count; i <= 5; i++)
 			{
 				FlowPanelExtensions.AddSpace((FlowPanel)childPanel);

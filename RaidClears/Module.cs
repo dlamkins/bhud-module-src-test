@@ -4,7 +4,6 @@ using System.ComponentModel.Composition;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Controls;
-using Blish_HUD.GameIntegration;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Input;
 using Blish_HUD.Modules;
@@ -26,7 +25,6 @@ using RaidClears.Settings.Controls;
 using RaidClears.Settings.Services;
 using RaidClears.Settings.Views;
 using RaidClears.Shared.Services;
-using SemVer;
 
 namespace RaidClears
 {
@@ -35,7 +33,9 @@ namespace RaidClears
 	{
 		public static string DIRECTORY_PATH = "clearsTracker";
 
-		public static string STATIC_HOST_URL = "https://bhm.blishhud.com/Soeed.RaidClears/static";
+		public static string STATIC_HOST_URL = "https://bhm.blishhud.com/Soeed.RaidClears/static/";
+
+		public static string STATIC_HOST_API_VERSION = "v2/";
 
 		internal static readonly Logger ModuleLogger = Logger.GetLogger<Module>();
 
@@ -61,15 +61,12 @@ namespace RaidClears
 
 		protected override void Initialize()
 		{
-			TEMP_FIX_SetTacOAsActive();
 		}
 
-		protected override Task LoadAsync()
+		protected override async Task LoadAsync()
 		{
-			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d3: Expected O, but got Unknown
 			Service.Textures = new TextureService(Service.ContentsManager);
-			ModuleMetaDataService.CheckVersions();
+			ModuleMetaDataService metadata = ModuleMetaDataService.CheckVersions();
 			Service.RaidData = RaidData.Load();
 			Service.StrikeData = StrikeData.Load();
 			Service.RaidSettings = RaidSettingsPersistance.Load();
@@ -78,6 +75,7 @@ namespace RaidClears
 			Service.InstabilitiesData = InstabilitiesData.Load();
 			Service.StrikePersistance = StrikePersistance.Load();
 			Service.FractalPersistance = FractalPersistance.Load();
+			Service.FractalSettings = FractalSettingsPersistance.Load();
 			Service.ApiPollingService = new ApiPollService(Service.Settings.ApiPollingPeriod);
 			Service.ResetWatcher = new ResetsWatcherService();
 			Service.MapWatcher = new MapWatcherService();
@@ -87,26 +85,36 @@ namespace RaidClears
 			Service.StrikesWindow = new StrikesPanel();
 			Service.FractalWindow = new FractalsPanel();
 			Service.DungeonWindow = new DungeonPanel();
-			ContextMenuStripItem refreshApiContextMenu = new ContextMenuStripItem(Strings.Settings_RefreshNow);
-			((Control)refreshApiContextMenu).add_Click((EventHandler<MouseEventArgs>)delegate
+			try
 			{
-				Service.ApiPollingService?.Invoke();
-			});
-			Service.CornerIcon = new CornerIconService(Service.Settings.GlobalCornerIconEnabled, Strings.Module_Title, Service.Textures!.CornerIconTexture, Service.Textures!.CornerIconHoverTexture, new List<ContextMenuStripItem>
+				ContextMenuStripItem refreshApiContextMenu = new ContextMenuStripItem(Strings.Settings_RefreshNow);
+				((Control)refreshApiContextMenu).add_Click((EventHandler<MouseEventArgs>)delegate
+				{
+					Service.ApiPollingService?.Invoke();
+				});
+				Service.CornerIcon = new CornerIconService(Service.Settings.GlobalCornerIconEnabled, Strings.Module_Title, Service.Textures!.CornerIconTexture, Service.Textures!.CornerIconHoverTexture, Service.Textures!.CornerIconNotificationTexture, Service.Textures!.CornerIconNotificationHoverTexture, new List<ContextMenuStripItem>
+				{
+					(ContextMenuStripItem)(object)new CornerIconToggleMenuItem((Control)(object)Service.SettingsWindow, Strings.ModuleSettings_OpenSettings),
+					(ContextMenuStripItem)(object)new ContextMenuStripItemSeparator(),
+					(ContextMenuStripItem)(object)new CornerIconToggleMenuItem(Service.Settings.RaidSettings.Generic.Visible, Strings.SettingsPanel_Tab_Raids),
+					(ContextMenuStripItem)(object)new CornerIconToggleMenuItem(Service.Settings.StrikeSettings.Generic.Visible, Strings.SettingsPanel_Tab_Strikes),
+					(ContextMenuStripItem)(object)new CornerIconToggleMenuItem(Service.Settings.FractalSettings.Generic.Visible, "Fractals"),
+					(ContextMenuStripItem)(object)new CornerIconToggleMenuItem(Service.Settings.DungeonSettings.Generic.Visible, Strings.SettingsPanel_Tab_Dunegons),
+					(ContextMenuStripItem)(object)new ContextMenuStripItemSeparator(),
+					refreshApiContextMenu
+				});
+				if (Service.CornerIcon != null)
+				{
+					Service.CornerIcon.IconLeftClicked += new EventHandler<bool>(CornerIcon_IconLeftClicked);
+					CheckMotd(metadata);
+				}
+				Service.Gw2ApiManager.add_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)Gw2ApiManager_SubtokenUpdated);
+				DispatchClears();
+			}
+			catch (Exception e2)
 			{
-				(ContextMenuStripItem)(object)new CornerIconToggleMenuItem((Control)(object)Service.SettingsWindow, Strings.ModuleSettings_OpenSettings),
-				(ContextMenuStripItem)(object)new ContextMenuStripItemSeparator(),
-				(ContextMenuStripItem)(object)new CornerIconToggleMenuItem(Service.Settings.RaidSettings.Generic.Visible, Strings.SettingsPanel_Tab_Raids),
-				(ContextMenuStripItem)(object)new CornerIconToggleMenuItem(Service.Settings.StrikeSettings.Generic.Visible, Strings.SettingsPanel_Tab_Strikes),
-				(ContextMenuStripItem)(object)new CornerIconToggleMenuItem(Service.Settings.FractalSettings.Generic.Visible, "Fractals"),
-				(ContextMenuStripItem)(object)new CornerIconToggleMenuItem(Service.Settings.DungeonSettings.Generic.Visible, Strings.SettingsPanel_Tab_Dunegons),
-				(ContextMenuStripItem)(object)new ContextMenuStripItemSeparator(),
-				refreshApiContextMenu
-			});
-			Service.CornerIcon.IconLeftClicked += new EventHandler<bool>(CornerIcon_IconLeftClicked);
-			Service.Gw2ApiManager.add_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)Gw2ApiManager_SubtokenUpdated);
-			DispatchClears();
-			return Task.CompletedTask;
+				ModuleLogger.Error(e2, "Error loading module");
+			}
 		}
 
 		private void DispatchClears()
@@ -120,24 +128,13 @@ namespace RaidClears
 			});
 		}
 
-		private void TEMP_FIX_SetTacOAsActive()
-		{
-			if (DateTime.UtcNow.Date >= new DateTime(2023, 8, 22, 0, 0, 0, DateTimeKind.Utc) && Program.get_OverlayVersion() < new SemVer.Version(1, 1, 0))
-			{
-				try
-				{
-					typeof(TacOIntegration).GetProperty("TacOIsRunning").GetSetMethod(nonPublic: true)?.Invoke(GameService.GameIntegration.get_TacO(), new object[1] { true });
-				}
-				catch
-				{
-				}
-			}
-		}
-
 		protected override void Unload()
 		{
 			Service.Gw2ApiManager.remove_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)Gw2ApiManager_SubtokenUpdated);
-			Service.CornerIcon.IconLeftClicked -= new EventHandler<bool>(CornerIcon_IconLeftClicked);
+			if (Service.CornerIcon != null)
+			{
+				Service.CornerIcon.IconLeftClicked -= new EventHandler<bool>(CornerIcon_IconLeftClicked);
+			}
 			ContentsManager contentsManager = Service.ContentsManager;
 			if (contentsManager != null)
 			{
@@ -198,6 +195,26 @@ namespace RaidClears
 		{
 			DispatchClears();
 			Service.ApiPollingService?.Invoke();
+		}
+
+		private void CheckMotd(ModuleMetaDataService metadata)
+		{
+			try
+			{
+				if (!string.IsNullOrEmpty(metadata.Motd) && !string.IsNullOrEmpty(metadata.MotdId))
+				{
+					string lastShownId = Service.Settings.LastShownMotdId.get_Value();
+					if (Service.CornerIcon != null)
+					{
+						Service.CornerIcon.SetCurrentMotdId(metadata.MotdId);
+						Service.CornerIcon.SetNotificationState(lastShownId != metadata.MotdId, metadata.Motd);
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				ModuleLogger.Warn(ex, "Error checking MOTD");
+			}
 		}
 	}
 }

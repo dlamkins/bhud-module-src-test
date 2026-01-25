@@ -3,7 +3,6 @@ using System.Linq;
 using Blish_HUD.Controls;
 using RaidClears.Features.Shared.Controls;
 using RaidClears.Features.Shared.Models;
-using RaidClears.Localization;
 using RaidClears.Settings.Models;
 using RaidClears.Utils;
 
@@ -36,7 +35,7 @@ namespace RaidClears.Features.Strikes.Models
 					encounter.WatchColorSettings(settings.Style.Color.Cleared, settings.Style.Color.NotCleared);
 				}
 			}
-			strikes.Add(new PriorityStrikes(Strings.StrikeGroup_Priority, Strings.StrikeGroup_Priority_abbr, 11, Strings.StrikeGroup_Priority_abbr, new List<BoxModel>(), (Container)(object)panel));
+			strikes.Add(new PriorityStrikes(Service.StrikeData.Priority.Name, Service.StrikeData.Priority.Abbriviation, 11, Service.StrikeData.Priority.Abbriviation, new List<BoxModel>(), (Container)(object)panel));
 			return strikes;
 		}
 

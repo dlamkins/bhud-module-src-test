@@ -134,21 +134,21 @@ namespace RaidClears.Utils.Kenedia
 			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0135: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0141: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0150: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0170: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0185: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0197: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0122: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0158: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0172: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0178: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0184: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0193: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01cf: Unknown result type (might be due to invalid IL or missing references)
 			if (!_isDisposed && (FallBackTexture != null || Texture != null))
 			{
 				Vector2 valueOrDefault = origin.GetValueOrDefault();
@@ -182,7 +182,7 @@ namespace RaidClears.Utils.Kenedia
 				}
 				if (Texture != null)
 				{
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, ctrl, AsyncTexture2D.op_Implicit(((forceHover == true || Hovered) && HoveredTexture != null) ? HoveredTexture : (Texture ?? FallBackTexture)), Bounds, (Rectangle?)TextureRegion, color.Value, rotation.Value, origin.Value, (SpriteEffects)0);
+					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, ctrl, AsyncTexture2D.op_Implicit(((forceHover.GetValueOrDefault() || Hovered) && HoveredTexture != null) ? HoveredTexture : (Texture ?? FallBackTexture)), Bounds, (Rectangle?)TextureRegion, color.Value, rotation.Value, origin.Value, (SpriteEffects)0);
 				}
 				else
 				{
@@ -215,24 +215,24 @@ namespace RaidClears.Utils.Kenedia
 			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0150: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0156: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0140: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0162: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0171: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0178: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0192: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0197: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ac: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0181: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0196: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b7: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ef: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f9: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0200: Unknown result type (might be due to invalid IL or missing references)
-			//IL_020f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0216: Unknown result type (might be due to invalid IL or missing references)
 			if (!_isDisposed && (FallBackTexture != null || Texture != null))
 			{
 				SpriteEffects valueOrDefault = effect.GetValueOrDefault();
@@ -272,7 +272,7 @@ namespace RaidClears.Utils.Kenedia
 				}
 				if (Texture != null)
 				{
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, ctrl, AsyncTexture2D.op_Implicit(((forceHover == true || Hovered) && HoveredTexture != null) ? HoveredTexture : (Texture ?? FallBackTexture)), Bounds, (Rectangle?)TextureRegion, color.Value, rotation.Value, origin.Value, effect.Value);
+					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, ctrl, AsyncTexture2D.op_Implicit(((forceHover.GetValueOrDefault() || Hovered) && HoveredTexture != null) ? HoveredTexture : (Texture ?? FallBackTexture)), Bounds, (Rectangle?)TextureRegion, color.Value, rotation.Value, origin.Value, effect.Value);
 				}
 				else
 				{

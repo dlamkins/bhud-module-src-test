@@ -58,6 +58,9 @@ namespace RaidClears
 		public static FractalPersistance FractalPersistance { get; set; } = null;
 
 
+		public static FractalSettingsPersistance FractalSettings { get; set; } = null;
+
+
 		public static InstabilitiesData InstabilitiesData { get; set; } = null;
 
 

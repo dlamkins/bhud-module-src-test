@@ -17,21 +17,36 @@ namespace RaidClears.Features.Shared.Services
 
 		private readonly Texture2D _cornerIconHoverTexture;
 
+		private readonly Texture2D _cornerIconNotificationTexture;
+
+		private readonly Texture2D _cornerIconNotificationHoverTexture;
+
 		private readonly SettingEntry<bool> _cornerIconIsVisibleSetting;
 
 		private readonly string _tooltip;
 
-		private CornerIcon _cornerIcon;
+		private CornerIcon? _cornerIcon;
+
+		private CornerIconTooltipView? _tooltipView;
+
+		private bool _hasNotification;
+
+		private string? _motdMessage;
+
+		private string? _currentMotdId;
 
 		public event EventHandler<bool>? IconLeftClicked;
 
-		public CornerIconService(SettingEntry<bool> cornerIconIsVisibleSetting, string tooltip, Texture2D defaultTexture, Texture2D hoverTexture, IEnumerable<ContextMenuStripItem> contextMenuItems)
+		public CornerIconService(SettingEntry<bool> cornerIconIsVisibleSetting, string tooltip, Texture2D defaultTexture, Texture2D hoverTexture, Texture2D notificationTexture, Texture2D notificationHoverTexture, IEnumerable<ContextMenuStripItem> contextMenuItems)
 		{
 			_tooltip = tooltip;
 			_cornerIconIsVisibleSetting = cornerIconIsVisibleSetting;
 			_cornerIconTexture = defaultTexture;
 			_cornerIconHoverTexture = hoverTexture;
+			_cornerIconNotificationTexture = notificationTexture;
+			_cornerIconNotificationHoverTexture = notificationHoverTexture;
 			_contextMenuItems = contextMenuItems;
+			_hasNotification = false;
 			cornerIconIsVisibleSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnCornerIconIsVisibleSettingChanged);
 			Service.Settings.CornerIconPriority.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)CornerIconPriority_SettingChanged);
 			if (cornerIconIsVisibleSetting.get_Value())
@@ -42,9 +57,52 @@ namespace RaidClears.Features.Shared.Services
 
 		public void UpdateAccountName(string name)
 		{
+			if (_tooltipView != null)
+			{
+				_tooltipView!.UpdateAccountName(name);
+			}
+		}
+
+		public void SetNotificationState(bool hasNotification, string? motdMessage = null)
+		{
+			_hasNotification = hasNotification;
+			_motdMessage = motdMessage;
 			if (_cornerIcon != null)
 			{
-				((Control)_cornerIcon).set_BasicTooltipText(_tooltip + "\n\nProfile: " + name);
+				UpdateIconTextures();
+				UpdateTooltip();
+			}
+			if (_tooltipView != null)
+			{
+				_tooltipView!.MotdMessage = motdMessage;
+			}
+		}
+
+		private void UpdateIconTextures()
+		{
+			if (_cornerIcon != null)
+			{
+				if (_hasNotification)
+				{
+					_cornerIcon!.set_Icon(AsyncTexture2D.op_Implicit(_cornerIconNotificationTexture));
+					_cornerIcon!.set_HoverIcon(AsyncTexture2D.op_Implicit(_cornerIconNotificationHoverTexture));
+				}
+				else
+				{
+					_cornerIcon!.set_Icon(AsyncTexture2D.op_Implicit(_cornerIconTexture));
+					_cornerIcon!.set_HoverIcon(AsyncTexture2D.op_Implicit(_cornerIconHoverTexture));
+				}
+			}
+		}
+
+		private void UpdateTooltip()
+		{
+			if (_cornerIcon != null && _tooltipView != null)
+			{
+				((Control)_cornerIcon).set_BasicTooltipText((string)null);
+				((Control)_cornerIcon).set_Tooltip((Tooltip)(object)_tooltipView);
+				_tooltipView!.MotdMessage = _motdMessage;
+				_tooltipView!.UpdateAccountName(Service.CurrentAccountName);
 			}
 		}
 
@@ -53,28 +111,39 @@ namespace RaidClears.Features.Shared.Services
 			_cornerIconIsVisibleSetting.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnCornerIconIsVisibleSettingChanged);
 			Service.Settings.CornerIconPriority.remove_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)CornerIconPriority_SettingChanged);
 			RemoveCornerIcon();
+			CornerIconTooltipView? tooltipView = _tooltipView;
+			if (tooltipView != null)
+			{
+				((Control)tooltipView).Dispose();
+			}
 		}
 
 		private void CreateCornerIcon()
 		{
-			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0089: Expected O, but got Unknown
-			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bc: Expected O, but got Unknown
+			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008d: Expected O, but got Unknown
+			//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e3: Expected O, but got Unknown
 			RemoveCornerIcon();
+			if (_tooltipView == null)
+			{
+				_tooltipView = new CornerIconTooltipView();
+				_tooltipView!.UpdateAccountName(Service.CurrentAccountName);
+				if (!string.IsNullOrEmpty(_motdMessage))
+				{
+					_tooltipView!.MotdMessage = _motdMessage;
+				}
+			}
 			CornerIcon val = new CornerIcon();
-			val.set_Icon(AsyncTexture2D.op_Implicit(_cornerIconTexture));
-			val.set_HoverIcon(AsyncTexture2D.op_Implicit(_cornerIconHoverTexture));
-			((Control)val).set_BasicTooltipText(_tooltip + "\n\nAccount: " + Service.CurrentAccountName);
 			((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			val.set_Priority((int)(2.1474836E+09f * ((1000f - (float)Service.Settings.CornerIconPriority.get_Value()) / 1000f)) - 1);
 			_cornerIcon = val;
+			UpdateIconTextures();
+			UpdateTooltip();
 			((Control)_cornerIcon).add_Click((EventHandler<MouseEventArgs>)OnCornerIconClicked);
+			((Control)_cornerIcon).add_MouseEntered((EventHandler<MouseEventArgs>)OnCornerIconMouseEntered);
 			((Control)_cornerIcon).set_Menu(new ContextMenuStrip((Func<IEnumerable<ContextMenuStripItem>>)(() => _contextMenuItems)));
 		}
 
@@ -83,15 +152,16 @@ namespace RaidClears.Features.Shared.Services
 			if (_cornerIcon != null)
 			{
 				((Control)_cornerIcon).remove_Click((EventHandler<MouseEventArgs>)OnCornerIconClicked);
+				((Control)_cornerIcon).remove_MouseEntered((EventHandler<MouseEventArgs>)OnCornerIconMouseEntered);
 				((Control)_cornerIcon).Dispose();
 			}
 		}
 
 		private void CornerIconPriority_SettingChanged(object sender, ValueChangedEventArgs<int> e)
 		{
-			if (Service.Settings.GlobalCornerIconEnabled.get_Value())
+			if (Service.Settings.GlobalCornerIconEnabled.get_Value() && _cornerIcon != null)
 			{
-				_cornerIcon.set_Priority((int)(2.1474836E+09f * ((1000f - (float)e.get_NewValue()) / 1000f)) - 1);
+				_cornerIcon!.set_Priority((int)(2.1474836E+09f * ((1000f - (float)e.get_NewValue()) / 1000f)) - 1);
 			}
 		}
 
@@ -110,6 +180,24 @@ namespace RaidClears.Features.Shared.Services
 		private void OnCornerIconClicked(object sender, MouseEventArgs e)
 		{
 			this.IconLeftClicked?.Invoke(this, e: true);
+		}
+
+		private void OnCornerIconMouseEntered(object sender, MouseEventArgs e)
+		{
+			if (_hasNotification)
+			{
+				_hasNotification = false;
+				UpdateIconTextures();
+				if (!string.IsNullOrEmpty(_currentMotdId) && Service.Settings != null)
+				{
+					Service.Settings.LastShownMotdId.set_Value(_currentMotdId);
+				}
+			}
+		}
+
+		public void SetCurrentMotdId(string? motdId)
+		{
+			_currentMotdId = motdId;
 		}
 	}
 }

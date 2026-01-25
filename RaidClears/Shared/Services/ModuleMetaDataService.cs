@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Text;
 using Newtonsoft.Json;
 using RaidClears.Features.Fractals.Services;
 using RaidClears.Features.Raids.Services;
@@ -17,7 +18,7 @@ namespace RaidClears.Shared.Services
 		public static string FILENAME = "clears_tracker.json";
 
 		[JsonIgnore]
-		public static string FILE_URL = "https://bhm.blishhud.com/Soeed.RaidClears/static/clears_tracker.json";
+		public static string FILE_URL = Module.STATIC_HOST_URL + Module.STATIC_HOST_API_VERSION + FILENAME;
 
 		[JsonProperty("fractal_instabilities")]
 		public string InstabilitiesVersion { get; set; }
@@ -39,6 +40,12 @@ namespace RaidClears.Shared.Services
 		public List<string> GridBoxMasks { get; set; } = new List<string>();
 
 
+		[JsonProperty("motd")]
+		public string? Motd { get; set; }
+
+		[JsonProperty("motd_id")]
+		public string? MotdId { get; set; }
+
 		private static FileInfo GetConfigFileInfo()
 		{
 			return new FileInfo(Service.DirectoriesManager.GetFullDirectoryPath(Module.DIRECTORY_PATH) + "\\" + FILENAME);
@@ -48,12 +55,12 @@ namespace RaidClears.Shared.Services
 		{
 			FileInfo configFileInfo = GetConfigFileInfo();
 			string serializedContents = JsonConvert.SerializeObject(this, Formatting.None);
-			using StreamWriter writer = new StreamWriter(configFileInfo.FullName);
+			using StreamWriter writer = new StreamWriter(configFileInfo.FullName, append: false, Encoding.UTF8);
 			writer.Write(serializedContents);
 			writer.Close();
 		}
 
-		public static void CheckVersions()
+		public static ModuleMetaDataService CheckVersions()
 		{
 			ModuleMetaDataService webFile = DownloadFile();
 			ModuleMetaDataService localFile = Load();
@@ -95,6 +102,7 @@ namespace RaidClears.Shared.Services
 			}
 			webFile.Save();
 			webFile.ValidateAssetCache(webFile.Assets, webFile.GridBoxMasks);
+			return webFile;
 		}
 
 		public void ValidateAssetCache(List<string> assets, List<string> gridboxMasks)
@@ -116,7 +124,7 @@ namespace RaidClears.Shared.Services
 			FileInfo configFileInfo = GetConfigFileInfo();
 			if (configFileInfo != null && configFileInfo.Exists)
 			{
-				using (StreamReader reader = new StreamReader(configFileInfo.FullName))
+				using (StreamReader reader = new StreamReader(configFileInfo.FullName, Encoding.UTF8))
 				{
 					string fileText = reader.ReadToEnd();
 					reader.Close();
@@ -141,6 +149,7 @@ namespace RaidClears.Shared.Services
 			try
 			{
 				using WebClient webClient = new WebClient();
+				webClient.Encoding = Encoding.UTF8;
 				ModuleMetaDataService metaFile = JsonConvert.DeserializeObject<ModuleMetaDataService>(webClient.DownloadString(FILE_URL));
 				if (metaFile == null)
 				{

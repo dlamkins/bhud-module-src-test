@@ -42,11 +42,47 @@ namespace RaidClears.Localization
 			}
 		}
 
+		internal static string CMTooltip_Instabilities => ResourceManager.GetString("CMTooltip_Instabilities", resourceCulture);
+
+		internal static string CMTooltip_Scale => ResourceManager.GetString("CMTooltip_Scale", resourceCulture);
+
+		internal static string CMTooltip_Title => ResourceManager.GetString("CMTooltip_Title", resourceCulture);
+
+		internal static string CMTooltip_Tomorrow => ResourceManager.GetString("CMTooltip_Tomorrow", resourceCulture);
+
+		internal static string ConfirmDialog_Cancel => ResourceManager.GetString("ConfirmDialog_Cancel", resourceCulture);
+
+		internal static string ConfirmDialog_OK => ResourceManager.GetString("ConfirmDialog_OK", resourceCulture);
+
 		internal static string CornerIconPriority_Help => ResourceManager.GetString("CornerIconPriority_Help", resourceCulture);
 
 		internal static string CornerIconPriority_Label => ResourceManager.GetString("CornerIconPriority_Label", resourceCulture);
 
 		internal static string CornerIconPriority_Tooltlp => ResourceManager.GetString("CornerIconPriority_Tooltlp", resourceCulture);
+
+		internal static string DynamicStrikeSelection_DisplayExpansion => ResourceManager.GetString("DynamicStrikeSelection_DisplayExpansion", resourceCulture);
+
+		internal static string DynamicStrikeSelection_DisplayIndividual => ResourceManager.GetString("DynamicStrikeSelection_DisplayIndividual", resourceCulture);
+
+		internal static string EncounterClearStatus_MarkComplete => ResourceManager.GetString("EncounterClearStatus_MarkComplete", resourceCulture);
+
+		internal static string EncounterClearStatus_NoClearDate => ResourceManager.GetString("EncounterClearStatus_NoClearDate", resourceCulture);
+
+		internal static string EncounterClearStatus_RemoveClear => ResourceManager.GetString("EncounterClearStatus_RemoveClear", resourceCulture);
+
+		internal static string EncounterLabelCustomerizer_ResetTo => ResourceManager.GetString("EncounterLabelCustomerizer_ResetTo", resourceCulture);
+
+		internal static string Fractal_ChallengeMoteLabel => ResourceManager.GetString("Fractal_ChallengeMoteLabel", resourceCulture);
+
+		internal static string Fractal_RecLabel => ResourceManager.GetString("Fractal_RecLabel", resourceCulture);
+
+		internal static string Fractal_TierNLabel => ResourceManager.GetString("Fractal_TierNLabel", resourceCulture);
+
+		internal static string Fractal_TomorrowLabel => ResourceManager.GetString("Fractal_TomorrowLabel", resourceCulture);
+
+		internal static string FractalClearCorrection_LastClears => ResourceManager.GetString("FractalClearCorrection_LastClears", resourceCulture);
+
+		internal static string FractalLabelCustomization_Heading => ResourceManager.GetString("FractalLabelCustomization_Heading", resourceCulture);
 
 		internal static string Fractals_DailyRecommended => ResourceManager.GetString("Fractals_DailyRecommended", resourceCulture);
 
@@ -56,9 +92,13 @@ namespace RaidClears.Localization
 
 		internal static string Fractals_Selection_Prompt => ResourceManager.GetString("Fractals_Selection_Prompt", resourceCulture);
 
+		internal static string FractalSelection_ThanksInvisi => ResourceManager.GetString("FractalSelection_ThanksInvisi", resourceCulture);
+
 		internal static string Module_Title => ResourceManager.GetString("Module_Title", resourceCulture);
 
 		internal static string ModuleSettings_OpenSettings => ResourceManager.GetString("ModuleSettings_OpenSettings", resourceCulture);
+
+		internal static string ModuleSettings_SetupWizard => ResourceManager.GetString("ModuleSettings_SetupWizard", resourceCulture);
 
 		internal static string PatchNotes => ResourceManager.GetString("PatchNotes", resourceCulture);
 
@@ -215,6 +255,8 @@ namespace RaidClears.Localization
 		internal static string Raid_Wing_8_4_Short => ResourceManager.GetString("Raid_Wing_8_4_Short", resourceCulture);
 
 		internal static string Raid_Wing_8_Short => ResourceManager.GetString("Raid_Wing_8_Short", resourceCulture);
+
+		internal static string RaidLabelCustomization_Heading => ResourceManager.GetString("RaidLabelCustomization_Heading", resourceCulture);
 
 		internal static string Setting_APIPoll_Label => ResourceManager.GetString("Setting_APIPoll_Label", resourceCulture);
 
@@ -514,13 +556,41 @@ namespace RaidClears.Localization
 
 		internal static string Settings_Dungeon_Heading => ResourceManager.GetString("Settings_Dungeon_Heading", resourceCulture);
 
+		internal static string Settings_EnableDungeon => ResourceManager.GetString("Settings_EnableDungeon", resourceCulture);
+
+		internal static string Settings_EnableStrike => ResourceManager.GetString("Settings_EnableStrike", resourceCulture);
+
+		internal static string Settings_Fractal_ChallengeMoteVisible_Description => ResourceManager.GetString("Settings_Fractal_ChallengeMoteVisible_Description", resourceCulture);
+
 		internal static string Settings_Fractals_Completion => ResourceManager.GetString("Settings_Fractals_Completion", resourceCulture);
 
 		internal static string Settings_Fractals_CompletionTooltip => ResourceManager.GetString("Settings_Fractals_CompletionTooltip", resourceCulture);
 
+		internal static string Settings_Fractals_ShowChallengeMotes => ResourceManager.GetString("Settings_Fractals_ShowChallengeMotes", resourceCulture);
+
+		internal static string Settings_Fractals_ShowChallengeMotes_Tooltip => ResourceManager.GetString("Settings_Fractals_ShowChallengeMotes_Tooltip", resourceCulture);
+
+		internal static string Settings_Fractals_TomorrowTier => ResourceManager.GetString("Settings_Fractals_TomorrowTier", resourceCulture);
+
+		internal static string Settings_Fractals_TomorrowTier_Tooltip => ResourceManager.GetString("Settings_Fractals_TomorrowTier_Tooltip", resourceCulture);
+
 		internal static string Settings_Keybind_Label => ResourceManager.GetString("Settings_Keybind_Label", resourceCulture);
 
 		internal static string Settings_Keybind_tooltip => ResourceManager.GetString("Settings_Keybind_tooltip", resourceCulture);
+
+		internal static string Settings_Main_Demo => ResourceManager.GetString("Settings_Main_Demo", resourceCulture);
+
+		internal static string Settings_Main_ExampleEncounterBox => ResourceManager.GetString("Settings_Main_ExampleEncounterBox", resourceCulture);
+
+		internal static string Settings_OrganicGridBoxBackgrounds_Label => ResourceManager.GetString("Settings_OrganicGridBoxBackgrounds_Label", resourceCulture);
+
+		internal static string Settings_OrganicGridBoxBackgrounds_Tooltip => ResourceManager.GetString("Settings_OrganicGridBoxBackgrounds_Tooltip", resourceCulture);
+
+		internal static string Settings_Raid_EnableExpansion => ResourceManager.GetString("Settings_Raid_EnableExpansion", resourceCulture);
+
+		internal static string Settings_Raid_EncounterVisible_Description => ResourceManager.GetString("Settings_Raid_EncounterVisible_Description", resourceCulture);
+
+		internal static string Settings_Raid_ExpansionVisible_Description => ResourceManager.GetString("Settings_Raid_ExpansionVisible_Description", resourceCulture);
 
 		internal static string Settings_Raid_Hot_Heading => ResourceManager.GetString("Settings_Raid_Hot_Heading", resourceCulture);
 
@@ -528,7 +598,13 @@ namespace RaidClears.Localization
 
 		internal static string Settings_Raid_PoF_Heading => ResourceManager.GetString("Settings_Raid_PoF_Heading", resourceCulture);
 
+		internal static string Settings_Raid_WingVisible_Description => ResourceManager.GetString("Settings_Raid_WingVisible_Description", resourceCulture);
+
 		internal static string Settings_RefreshNow => ResourceManager.GetString("Settings_RefreshNow", resourceCulture);
+
+		internal static string Settings_ScreenClamp_Label => ResourceManager.GetString("Settings_ScreenClamp_Label", resourceCulture);
+
+		internal static string Settings_ScreenClamp_Tooltip => ResourceManager.GetString("Settings_ScreenClamp_Tooltip", resourceCulture);
 
 		internal static string Settings_Strike_AnchorToRaidLabel => ResourceManager.GetString("Settings_Strike_AnchorToRaidLabel", resourceCulture);
 
@@ -550,6 +626,10 @@ namespace RaidClears.Localization
 
 		internal static string SettingsPanel_Fractals_Heading_Selection => ResourceManager.GetString("SettingsPanel_Fractals_Heading_Selection", resourceCulture);
 
+		internal static string SettingsPanel_Raid_Visual_ColorPickerButton => ResourceManager.GetString("SettingsPanel_Raid_Visual_ColorPickerButton", resourceCulture);
+
+		internal static string SettingsPanel_Raid_Visual_ColorPickerButtonTooltip => ResourceManager.GetString("SettingsPanel_Raid_Visual_ColorPickerButtonTooltip", resourceCulture);
+
 		internal static string SettingsPanel_Raid_Visual_Colors => ResourceManager.GetString("SettingsPanel_Raid_Visual_Colors", resourceCulture);
 
 		internal static string SettingsPanel_Raid_Visual_ColorsTip => ResourceManager.GetString("SettingsPanel_Raid_Visual_ColorsTip", resourceCulture);
@@ -559,6 +639,10 @@ namespace RaidClears.Localization
 		internal static string SettingsPanel_Raids_Heading_Layout => ResourceManager.GetString("SettingsPanel_Raids_Heading_Layout", resourceCulture);
 
 		internal static string SettingsPanel_Raids_Heading_WingSelection => ResourceManager.GetString("SettingsPanel_Raids_Heading_WingSelection", resourceCulture);
+
+		internal static string SettingsPanel_Strikes_Heading_CustomizeLabels => ResourceManager.GetString("SettingsPanel_Strikes_Heading_CustomizeLabels", resourceCulture);
+
+		internal static string SettingsPanel_Strikes_Heading_ManageClears => ResourceManager.GetString("SettingsPanel_Strikes_Heading_ManageClears", resourceCulture);
 
 		internal static string SettingsPanel_Strikes_Heading_Selection => ResourceManager.GetString("SettingsPanel_Strikes_Heading_Selection", resourceCulture);
 
@@ -608,6 +692,8 @@ namespace RaidClears.Localization
 
 		internal static string Strike_Tooltip_tomorrow => ResourceManager.GetString("Strike_Tooltip_tomorrow", resourceCulture);
 
+		internal static string StrikeClearCorrection_LastClears => ResourceManager.GetString("StrikeClearCorrection_LastClears", resourceCulture);
+
 		internal static string StrikeGroup_EoD => ResourceManager.GetString("StrikeGroup_EoD", resourceCulture);
 
 		internal static string StrikeGroup_Eod_abbr => ResourceManager.GetString("StrikeGroup_Eod_abbr", resourceCulture);
@@ -619,6 +705,18 @@ namespace RaidClears.Localization
 		internal static string StrikeGroup_Priority => ResourceManager.GetString("StrikeGroup_Priority", resourceCulture);
 
 		internal static string StrikeGroup_Priority_abbr => ResourceManager.GetString("StrikeGroup_Priority_abbr", resourceCulture);
+
+		internal static string StrikeLabelCustomization_Heading => ResourceManager.GetString("StrikeLabelCustomization_Heading", resourceCulture);
+
+		internal static string StrikeSettings_EnableExpansion => ResourceManager.GetString("StrikeSettings_EnableExpansion", resourceCulture);
+
+		internal static string StrikeSettings_EnablePriority => ResourceManager.GetString("StrikeSettings_EnablePriority", resourceCulture);
+
+		internal static string Tooltip_ConditionDamage => ResourceManager.GetString("Tooltip_ConditionDamage", resourceCulture);
+
+		internal static string Tooltip_DefianceBreak => ResourceManager.GetString("Tooltip_DefianceBreak", resourceCulture);
+
+		internal static string Tooltip_PowerDamage => ResourceManager.GetString("Tooltip_PowerDamage", resourceCulture);
 
 		internal static string VisibleHide => ResourceManager.GetString("VisibleHide", resourceCulture);
 

@@ -28,12 +28,14 @@ namespace RaidClears.Features.Fractals.Services
 
 		public static IEnumerable<(BoxModel box, FractalMap fractalMap, int scale)> BuildToolTipData(IEnumerable<FractalMap> fractals)
 		{
-			DayOfYearIndexService.DayOfYearIndex();
 			List<(BoxModel, FractalMap, int)> CMs = new List<(BoxModel, FractalMap, int)>();
 			foreach (FractalMap map in fractals)
 			{
-				List<int> scales = map.Scales;
-				CMs.Add((new BoxModel(map.ApiLabel, "", Service.FractalPersistance.GetEncounterLabel(map.ApiLabel)), map, scales.Last()));
+				if (map.Scales.Count >= 1)
+				{
+					List<int> scales = map.Scales;
+					CMs.Add((new BoxModel(map.ApiLabel, "", Service.FractalPersistance.GetEncounterLabel(map.ApiLabel)), map, scales.Last()));
+				}
 			}
 			return CMs;
 		}

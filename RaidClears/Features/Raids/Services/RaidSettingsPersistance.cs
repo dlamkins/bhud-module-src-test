@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using Blish_HUD;
 using Blish_HUD.Settings;
 using Newtonsoft.Json;
 using RaidClears.Features.Raids.Models;
+using RaidClears.Localization;
 
 namespace RaidClears.Features.Raids.Services
 {
@@ -81,8 +83,8 @@ namespace RaidClears.Features.Raids.Services
 			}
 			SettingEntry<bool> obj = new SettingEntry<bool>();
 			obj.set_Value(Expansions[expac2.Id]);
-			((SettingEntry)obj).set_GetDescriptionFunc((Func<string>)(() => ""));
-			((SettingEntry)obj).set_GetDisplayNameFunc((Func<string>)(() => "Enable " + expac2.Name));
+			((SettingEntry)obj).set_GetDescriptionFunc((Func<string>)(() => string.Format(Strings.Settings_Raid_ExpansionVisible_Description, expac2.Name)));
+			((SettingEntry)obj).set_GetDisplayNameFunc((Func<string>)(() => string.Format(Strings.Settings_Raid_EnableExpansion, expac2.Name)));
 			SettingEntry<bool> setting = obj;
 			setting.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)delegate(object _, ValueChangedEventArgs<bool> e)
 			{
@@ -111,7 +113,7 @@ namespace RaidClears.Features.Raids.Services
 			}
 			SettingEntry<bool> obj = new SettingEntry<bool>();
 			obj.set_Value(Wings[raidWing2.Id]);
-			((SettingEntry)obj).set_GetDescriptionFunc((Func<string>)(() => "Show " + raidWing2.Name + " on the raid overlay"));
+			((SettingEntry)obj).set_GetDescriptionFunc((Func<string>)(() => string.Format(Strings.Settings_Raid_WingVisible_Description, raidWing2.Name)));
 			((SettingEntry)obj).set_GetDisplayNameFunc((Func<string>)(() => raidWing2.Name ?? ""));
 			SettingEntry<bool> setting = obj;
 			setting.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)delegate(object _, ValueChangedEventArgs<bool> e)
@@ -137,7 +139,7 @@ namespace RaidClears.Features.Raids.Services
 			}
 			SettingEntry<bool> obj = new SettingEntry<bool>();
 			obj.set_Value(Encounters[encounter2.ApiId]);
-			((SettingEntry)obj).set_GetDescriptionFunc((Func<string>)(() => "Show " + encounter2.Name + " on the raid overlay"));
+			((SettingEntry)obj).set_GetDescriptionFunc((Func<string>)(() => string.Format(Strings.Settings_Raid_EncounterVisible_Description, encounter2.Name)));
 			((SettingEntry)obj).set_GetDisplayNameFunc((Func<string>)(() => encounter2.Abbriviation ?? ""));
 			SettingEntry<bool> setting = obj;
 			setting.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)delegate(object _, ValueChangedEventArgs<bool> e)
@@ -171,7 +173,7 @@ namespace RaidClears.Features.Raids.Services
 		{
 			FileInfo configFileInfo = GetConfigFileInfo();
 			string serializedContents = JsonConvert.SerializeObject(this, Formatting.Indented);
-			using StreamWriter writer = new StreamWriter(configFileInfo.FullName);
+			using StreamWriter writer = new StreamWriter(configFileInfo.FullName, append: false, Encoding.UTF8);
 			writer.Write(serializedContents);
 			writer.Close();
 			this.RaidSettingsChanged?.Invoke(this, e: true);
@@ -187,7 +189,7 @@ namespace RaidClears.Features.Raids.Services
 			FileInfo configFileInfo = GetConfigFileInfo();
 			if (configFileInfo != null && configFileInfo.Exists)
 			{
-				using (StreamReader reader = new StreamReader(configFileInfo.FullName))
+				using (StreamReader reader = new StreamReader(configFileInfo.FullName, Encoding.UTF8))
 				{
 					string fileText = reader.ReadToEnd();
 					reader.Close();

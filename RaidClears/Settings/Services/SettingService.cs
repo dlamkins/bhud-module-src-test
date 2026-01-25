@@ -26,6 +26,8 @@ namespace RaidClears.Settings.Services
 
 		public SettingEntry<int> CornerIconPriority { get; }
 
+		public SettingEntry<string> LastShownMotdId { get; }
+
 		public RaidSettings RaidSettings { get; }
 
 		public DungeonSettings DungeonSettings { get; }
@@ -36,16 +38,17 @@ namespace RaidClears.Settings.Services
 
 		public SettingService(SettingCollection settings)
 		{
-			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0108: Expected O, but got Unknown
+			//IL_0114: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015c: Expected O, but got Unknown
 			ApiPollingPeriod = settings.DefineSetting<ApiPollPeriod>("RCPoll", ApiPollPeriod.MINUTES_5, (Func<string>)(() => Strings.Setting_APIPoll_Label), (Func<string>)(() => Strings.Setting_APIPoll_Tooltip));
 			CornerIconPriority = settings.DefineSetting<int>("RCCornerPriority", 53, (Func<string>)(() => Strings.CornerIconPriority_Label), (Func<string>)(() => Strings.CornerIconPriority_Tooltlp));
 			SettingComplianceExtensions.SetRange(CornerIconPriority, 0, 1000);
+			LastShownMotdId = settings.DefineSetting<string>("RCLastShownMotdId", "", (Func<string>)(() => ""), (Func<string>)(() => ""));
 			SettingsPanelKeyBind = settings.DefineSetting<KeyBinding>("RCsettingsKeybind", new KeyBinding((Keys)0), (Func<string>)(() => Strings.Settings_Keybind_Label), (Func<string>)(() => Strings.Settings_Keybind_tooltip));
 			SettingsPanelKeyBind.get_Value().set_Enabled(true);
 			GlobalCornerIconEnabled = settings.DefineSetting<bool>("RCGlobalCornerIcon", true, (Func<string>)(() => Strings.Setting_CornerIconEnable), (Func<string>)(() => Strings.Setting_CornerIconEnableTooltip));
-			ScreenClamp = settings.DefineSetting<bool>("RCScreenClamp", true, (Func<string>)(() => "Keep overlay windows on screen"), (Func<string>)(() => "When turned on, this will make sure that all overlay windows stay within the visible area of your screen, so they don't go off the edges"));
-			OrganicGridBoxBackgrounds = settings.DefineSetting<bool>("RCStylize", true, (Func<string>)(() => "'GW2 Style' background boxes"), (Func<string>)(() => "On: Backgrounds will appear with fuzzy edges more akin to GW2's style,\nOff: Background will be rectangles"));
+			ScreenClamp = settings.DefineSetting<bool>("RCScreenClamp", true, (Func<string>)(() => Strings.Settings_ScreenClamp_Label), (Func<string>)(() => Strings.Settings_ScreenClamp_Tooltip));
+			OrganicGridBoxBackgrounds = settings.DefineSetting<bool>("RCStylize", true, (Func<string>)(() => Strings.Settings_OrganicGridBoxBackgrounds_Label), (Func<string>)(() => Strings.Settings_OrganicGridBoxBackgrounds_Tooltip));
 			RaidSettings = new RaidSettings(settings);
 			DungeonSettings = new DungeonSettings(settings);
 			StrikeSettings = new StrikeSettings(settings);

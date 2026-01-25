@@ -21,9 +21,6 @@
       <HintPath>..\..\working\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="MonoGame.Extended" />
-    <Reference Include="SemVer">
-      <HintPath>..\..\working\SemVer.dll</HintPath>
-    </Reference>
     <Reference Include="System.Core" />
   </ItemGroup>
 </Project>

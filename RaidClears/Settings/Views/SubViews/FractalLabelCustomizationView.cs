@@ -4,6 +4,7 @@ using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Microsoft.Xna.Framework;
 using RaidClears.Features.Shared.Models;
+using RaidClears.Localization;
 using RaidClears.Settings.Controls;
 using RaidClears.Utils;
 
@@ -38,7 +39,7 @@ namespace RaidClears.Settings.Views.SubViews
 					((Container)(object)panel).AddControl((Control)(object)new EncounterLabelCustomerizer(encounter: enumerator2.Current.Value.ToEncounterInterface(), parent: panel, labelable: Service.FractalPersistance, labelColor: Color.get_White()));
 				}
 			}
-			panel.AddString("Customize Fractal Labels");
+			panel.AddString(Strings.FractalLabelCustomization_Heading);
 		}
 	}
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Text;
 using Newtonsoft.Json;
 
 namespace RaidClears.Features.Fractals.Services
@@ -10,10 +11,10 @@ namespace RaidClears.Features.Fractals.Services
 	public class InstabilitiesData
 	{
 		[JsonIgnore]
-		public static string FILENAME = "instabilities.json";
+		public static string FILENAME = "fractal_instabilities.json";
 
 		[JsonIgnore]
-		public static string FILE_URL = "https://bhm.blishhud.com/Soeed.RaidClears/static/fractal_instabilities.json";
+		public static string FILE_URL = Module.STATIC_HOST_URL + Module.STATIC_HOST_API_VERSION + FILENAME;
 
 		[JsonProperty("instabilities")]
 		public Dictionary<string, int[][]> Instabilities { get; set; } = new Dictionary<string, int[][]>();
@@ -50,7 +51,7 @@ namespace RaidClears.Features.Fractals.Services
 		{
 			FileInfo configFileInfo = GetConfigFileInfo();
 			string serializedContents = JsonConvert.SerializeObject(this, Formatting.None);
-			using StreamWriter writer = new StreamWriter(configFileInfo.FullName);
+			using StreamWriter writer = new StreamWriter(configFileInfo.FullName, append: false, Encoding.UTF8);
 			writer.Write(serializedContents);
 			writer.Close();
 		}
@@ -60,7 +61,7 @@ namespace RaidClears.Features.Fractals.Services
 			FileInfo configFileInfo = GetConfigFileInfo();
 			if (configFileInfo != null && configFileInfo.Exists)
 			{
-				using (StreamReader reader = new StreamReader(configFileInfo.FullName))
+				using (StreamReader reader = new StreamReader(configFileInfo.FullName, Encoding.UTF8))
 				{
 					string fileText = reader.ReadToEnd();
 					reader.Close();
@@ -85,6 +86,7 @@ namespace RaidClears.Features.Fractals.Services
 			try
 			{
 				using WebClient webClient = new WebClient();
+				webClient.Encoding = Encoding.UTF8;
 				InstabilitiesData instabs = JsonConvert.DeserializeObject<InstabilitiesData>(webClient.DownloadString(FILE_URL));
 				if (instabs == null)
 				{

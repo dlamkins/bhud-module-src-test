@@ -1,23 +1,24 @@
 using System.Collections.Generic;
 using RaidClears.Features.Shared.Models;
+using RaidClears.Localization;
 
 namespace RaidClears.Features.Fractals.Models
 {
 	public class Fractal : GroupModel
 	{
-		public static string ChallengeMoteLabel = "Challenge Mote";
+		public static string ChallengeMoteLabel = Strings.Fractal_ChallengeMoteLabel;
 
 		public static string ChallengeMoteId = "CM";
 
-		public static string TomorrowLabel = "Tomorrow T#";
+		public static string TomorrowLabel = Strings.Fractal_TomorrowLabel;
 
 		public static string TomorrowId = "Tom";
 
-		public static string TierNLabel = "Tier #";
+		public static string TierNLabel = Strings.Fractal_TierNLabel;
 
 		public static string TierNId = "T#";
 
-		public static string RecLabel = "Daily Recommended";
+		public static string RecLabel = Strings.Fractal_RecLabel;
 
 		public static string RecId = "Rec";
 

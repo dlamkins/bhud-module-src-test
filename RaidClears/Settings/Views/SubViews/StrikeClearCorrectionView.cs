@@ -5,6 +5,7 @@ using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Microsoft.Xna.Framework;
 using RaidClears.Features.Strikes.Models;
+using RaidClears.Localization;
 using RaidClears.Utils;
 
 namespace RaidClears.Settings.Views.SubViews
@@ -44,7 +45,7 @@ namespace RaidClears.Settings.Views.SubViews
 					}
 				}
 			}
-			panel.AddString("Last Strike Mission Clears (Profile: " + Service.CurrentAccountName + ")");
+			panel.AddString(string.Format(Strings.StrikeClearCorrection_LastClears, Service.CurrentAccountName));
 		}
 	}
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text;
 using Newtonsoft.Json;
 using RaidClears.Features.Fractals.Models;
 using RaidClears.Features.Shared.Models;
@@ -16,7 +17,7 @@ namespace RaidClears.Features.Fractals.Services
 		public static string FILENAME = "fractal_maps.json";
 
 		[JsonIgnore]
-		public static string FILE_URL = "https://bhm.blishhud.com/Soeed.RaidClears/static/fractal_maps.json";
+		public static string FILE_URL = Module.STATIC_HOST_URL + Module.STATIC_HOST_API_VERSION + FILENAME;
 
 		[JsonProperty("instabilityAssets")]
 		public Dictionary<string, int> InstabilityAssets = new Dictionary<string, int>();
@@ -172,7 +173,7 @@ namespace RaidClears.Features.Fractals.Services
 		{
 			FileInfo configFileInfo = GetConfigFileInfo();
 			string serializedContents = JsonConvert.SerializeObject(this, Formatting.None);
-			using StreamWriter writer = new StreamWriter(configFileInfo.FullName);
+			using StreamWriter writer = new StreamWriter(configFileInfo.FullName, append: false, Encoding.UTF8);
 			writer.Write(serializedContents);
 			writer.Close();
 		}
@@ -207,6 +208,7 @@ namespace RaidClears.Features.Fractals.Services
 			try
 			{
 				using WebClient webClient = new WebClient();
+				webClient.Encoding = Encoding.UTF8;
 				FractalMapData data = JsonConvert.DeserializeObject<FractalMapData>(webClient.DownloadString(FILE_URL));
 				if (data == null)
 				{

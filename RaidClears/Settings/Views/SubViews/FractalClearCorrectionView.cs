@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
+using RaidClears.Localization;
 using RaidClears.Utils;
 
 namespace RaidClears.Settings.Views.SubViews
@@ -29,7 +30,7 @@ namespace RaidClears.Settings.Views.SubViews
 			{
 				panel.AddEncounterClearStatus(Service.FractalMapData.GetFractalByApiName(entry.Key), entry.Value);
 			}
-			panel.AddString("Last Fractal Clears (Profile: " + Service.CurrentAccountName + ")");
+			panel.AddString(string.Format(Strings.FractalClearCorrection_LastClears, Service.CurrentAccountName));
 		}
 	}
 }

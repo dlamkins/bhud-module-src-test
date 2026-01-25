@@ -5,6 +5,8 @@ using Microsoft.Xna.Framework;
 using RaidClears.Features.Raids.Models;
 using RaidClears.Features.Raids.Services;
 using RaidClears.Features.Shared.Models;
+using RaidClears.Features.Strikes.Models;
+using RaidClears.Localization;
 
 namespace RaidClears.Settings.Controls
 {
@@ -58,32 +60,108 @@ namespace RaidClears.Settings.Controls
 			Build(encounter.Name, encounter.Abbriviation, encounter.ApiId, labelColor);
 		}
 
+		public EncounterLabelCustomerizer(FlowPanel parent, Labelable labelable, StrikeMission encounter, Color? labelColor = null)
+			: this()
+		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000b: Expected O, but got Unknown
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0016: Expected O, but got Unknown
+			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0021: Expected O, but got Unknown
+			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002c: Expected O, but got Unknown
+			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+			_labelable = labelable;
+			((Control)this).set_Parent((Container)(object)parent);
+			((Control)this).set_Width(((Control)parent).get_Width() - 10);
+			((Control)this).set_Padding(new Thickness(0f, 10f));
+			Build(encounter.Name, encounter.Abbriviation, encounter.Id, labelColor);
+		}
+
+		public EncounterLabelCustomerizer(FlowPanel parent, Labelable labelable, RaidWing encounter, Color? labelColor = null)
+			: this()
+		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000b: Expected O, but got Unknown
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0016: Expected O, but got Unknown
+			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0021: Expected O, but got Unknown
+			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002c: Expected O, but got Unknown
+			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+			_labelable = labelable;
+			((Control)this).set_Parent((Container)(object)parent);
+			((Control)this).set_Width(((Control)parent).get_Width() - 10);
+			((Control)this).set_Padding(new Thickness(0f, 10f));
+			Build(encounter.Name, encounter.Abbriviation, encounter.Id, labelColor);
+		}
+
+		public EncounterLabelCustomerizer(FlowPanel parent, Labelable labelable, ExpansionStrikes encounter, Color? labelColor = null)
+			: this()
+		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000b: Expected O, but got Unknown
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0016: Expected O, but got Unknown
+			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0021: Expected O, but got Unknown
+			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002c: Expected O, but got Unknown
+			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+			_labelable = labelable;
+			((Control)this).set_Parent((Container)(object)parent);
+			((Control)this).set_Width(((Control)parent).get_Width() - 10);
+			((Control)this).set_Padding(new Thickness(0f, 10f));
+			Build(encounter.Name, encounter.Abbriviation, encounter.Id, labelColor);
+		}
+
+		public EncounterLabelCustomerizer(FlowPanel parent, Labelable labelable, ExpansionRaid encounter, Color? labelColor = null)
+			: this()
+		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000b: Expected O, but got Unknown
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0016: Expected O, but got Unknown
+			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0021: Expected O, but got Unknown
+			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002c: Expected O, but got Unknown
+			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+			_labelable = labelable;
+			((Control)this).set_Parent((Container)(object)parent);
+			((Control)this).set_Width(((Control)parent).get_Width() - 10);
+			((Control)this).set_Padding(new Thickness(0f, 10f));
+			Build(encounter.Name, encounter.Abbriviation, encounter.Id, labelColor);
+		}
+
 		protected void Build(string Name, string abbriv, string id, Color? color = null)
 		{
 			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
 			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0090: Expected O, but got Unknown
-			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009a: Expected O, but got Unknown
+			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bf: Expected O, but got Unknown
-			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0105: Expected O, but got Unknown
+			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ca: Expected O, but got Unknown
+			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0100: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010d: Expected O, but got Unknown
 			string id2 = id;
 			string abbriv2 = abbriv;
 			if (!color.HasValue)
@@ -92,7 +170,9 @@ namespace RaidClears.Settings.Controls
 			}
 			string userLabel = _labelable.GetEncounterLabel(id2);
 			int col1 = (((Control)this).get_Width() - 30) / 3;
-			int colN = (2 * col1 - 5) / 3;
+			int remainingWidth = 2 * col1 - 5;
+			int inputWidth = remainingWidth / 3;
+			int resetBtnWidth = 2 * remainingWidth / 3;
 			Label val = new Label();
 			val.set_Text(Name);
 			((Control)val).set_Parent((Container)(object)this);
@@ -104,13 +184,13 @@ namespace RaidClears.Settings.Controls
 			((TextInputBase)val2).set_Text(userLabel);
 			((Control)val2).set_Parent((Container)(object)this);
 			((Control)val2).set_Location(new Point(col1 + 5, 0));
-			((Control)val2).set_Width(colN);
+			((Control)val2).set_Width(inputWidth);
 			input = val2;
 			StandardButton val3 = new StandardButton();
-			val3.set_Text("Reset to '" + abbriv2 + "'");
+			val3.set_Text(string.Format(Strings.EncounterLabelCustomerizer_ResetTo, abbriv2));
 			((Control)val3).set_Parent((Container)(object)this);
-			((Control)val3).set_Location(new Point(col1 + colN + 10, 0));
-			((Control)val3).set_Width(colN);
+			((Control)val3).set_Location(new Point(col1 + inputWidth + 10, 0));
+			((Control)val3).set_Width(resetBtnWidth);
 			resetBtn = val3;
 			if (abbriv2 == userLabel)
 			{
@@ -128,7 +208,7 @@ namespace RaidClears.Settings.Controls
 			((Control)resetBtn).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				((TextInputBase)input).set_Text(abbriv2);
-				Service.RaidSettings.SetEncounterLabel(id2, abbriv2);
+				_labelable.SetEncounterLabel(id2, abbriv2);
 				((Control)resetBtn).Hide();
 			});
 		}

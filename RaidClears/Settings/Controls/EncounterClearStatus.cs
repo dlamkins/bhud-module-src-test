@@ -4,6 +4,7 @@ using Blish_HUD.Input;
 using Microsoft.Xna.Framework;
 using RaidClears.Features.Fractals.Services;
 using RaidClears.Features.Strikes.Models;
+using RaidClears.Localization;
 
 namespace RaidClears.Settings.Controls
 {
@@ -70,7 +71,7 @@ namespace RaidClears.Settings.Controls
 			{
 				Service.MapWatcher.MarkStrikeNotCompleted(mission);
 			}
-			clearDate.set_Text("----------");
+			clearDate.set_Text(Strings.EncounterClearStatus_NoClearDate);
 		}
 
 		protected void Build(string Name, DateTime datetime)
@@ -111,19 +112,19 @@ namespace RaidClears.Settings.Controls
 			((Control)val).set_Width(col1);
 			title = val;
 			Label val2 = new Label();
-			val2.set_Text((datetime.Year == 1) ? "----------" : datetime.ToShortDateString());
+			val2.set_Text((datetime.Year == 1) ? Strings.EncounterClearStatus_NoClearDate : datetime.ToShortDateString());
 			((Control)val2).set_Parent((Container)(object)this);
 			((Control)val2).set_Location(new Point(col1 + 5, 0));
 			((Control)val2).set_Width(colN);
 			clearDate = val2;
 			StandardButton val3 = new StandardButton();
-			val3.set_Text("Mark Complete");
+			val3.set_Text(Strings.EncounterClearStatus_MarkComplete);
 			((Control)val3).set_Parent((Container)(object)this);
 			((Control)val3).set_Location(new Point(col1 + colN + 5, 0));
 			((Control)val3).set_Width(colN);
 			StandardButton complete = val3;
 			StandardButton val4 = new StandardButton();
-			val4.set_Text("Remove Clear");
+			val4.set_Text(Strings.EncounterClearStatus_RemoveClear);
 			((Control)val4).set_Parent((Container)(object)this);
 			((Control)val4).set_Location(new Point(col1 + colN + colN + 5, 0));
 			((Control)val4).set_Width(colN);

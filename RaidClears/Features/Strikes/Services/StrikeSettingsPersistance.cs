@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using Blish_HUD;
 using Blish_HUD.Settings;
 using Newtonsoft.Json;
 using RaidClears.Features.Raids.Services;
 using RaidClears.Features.Strikes.Models;
+using RaidClears.Localization;
 
 namespace RaidClears.Features.Strikes.Services
 {
@@ -80,7 +82,7 @@ namespace RaidClears.Features.Strikes.Services
 			SettingEntry<bool> obj = new SettingEntry<bool>();
 			obj.set_Value(Priority);
 			((SettingEntry)obj).set_GetDescriptionFunc((Func<string>)(() => ""));
-			((SettingEntry)obj).set_GetDisplayNameFunc((Func<string>)(() => "Enable " + priority2.Name));
+			((SettingEntry)obj).set_GetDisplayNameFunc((Func<string>)(() => string.Format(Strings.StrikeSettings_EnablePriority, priority2.Name)));
 			SettingEntry<bool> setting = obj;
 			setting.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)delegate(object _, ValueChangedEventArgs<bool> e)
 			{
@@ -106,7 +108,7 @@ namespace RaidClears.Features.Strikes.Services
 			SettingEntry<bool> obj = new SettingEntry<bool>();
 			obj.set_Value(Expansions[expac2.Id]);
 			((SettingEntry)obj).set_GetDescriptionFunc((Func<string>)(() => ""));
-			((SettingEntry)obj).set_GetDisplayNameFunc((Func<string>)(() => "Enable " + expac2.Name));
+			((SettingEntry)obj).set_GetDisplayNameFunc((Func<string>)(() => string.Format(Strings.StrikeSettings_EnableExpansion, expac2.Name)));
 			SettingEntry<bool> setting = obj;
 			setting.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)delegate(object _, ValueChangedEventArgs<bool> e)
 			{
@@ -147,7 +149,7 @@ namespace RaidClears.Features.Strikes.Services
 		{
 			FileInfo configFileInfo = GetConfigFileInfo();
 			string serializedContents = JsonConvert.SerializeObject(this, Formatting.Indented);
-			using StreamWriter writer = new StreamWriter(configFileInfo.FullName);
+			using StreamWriter writer = new StreamWriter(configFileInfo.FullName, append: false, Encoding.UTF8);
 			writer.Write(serializedContents);
 			writer.Close();
 			this.StrikeSettingsChanged?.Invoke(this, e: true);
@@ -163,7 +165,7 @@ namespace RaidClears.Features.Strikes.Services
 			FileInfo configFileInfo = GetConfigFileInfo();
 			if (configFileInfo != null && configFileInfo.Exists)
 			{
-				using (StreamReader reader = new StreamReader(configFileInfo.FullName))
+				using (StreamReader reader = new StreamReader(configFileInfo.FullName, Encoding.UTF8))
 				{
 					string fileText = reader.ReadToEnd();
 					reader.Close();
