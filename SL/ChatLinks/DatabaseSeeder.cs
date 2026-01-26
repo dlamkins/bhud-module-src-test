@@ -21,6 +21,7 @@ using GuildWars2.Hero.Equipment.Miniatures;
 using GuildWars2.Hero.Equipment.Mounts;
 using GuildWars2.Hero.Equipment.Novelties;
 using GuildWars2.Hero.Equipment.Outfits;
+using GuildWars2.Hero.Equipment.Skiffs;
 using GuildWars2.Hero.Equipment.Wardrobe;
 using GuildWars2.Items;
 using GuildWars2.Pvp.MistChampions;
@@ -33,6 +34,7 @@ using SL.ChatLinks.StaticFiles;
 using SL.ChatLinks.Storage;
 using SL.ChatLinks.Storage.Metadata;
 using SL.ChatLinks.Storage.Models.Hero.Equipment.Mounts;
+using SL.ChatLinks.Storage.Models.Hero.Equipment.Skiffs;
 using SL.Common;
 
 namespace SL.ChatLinks
@@ -393,17 +395,19 @@ namespace SL.ChatLinks
 			Dictionary<string, int> dictionary11 = dictionary;
 			dictionary11["mount_skins"] = await SeedMountSkins(context, language, cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
 			Dictionary<string, int> dictionary12 = dictionary;
-			dictionary12["mist_champions"] = await SeedMistChampions(context, language, cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
+			dictionary12["skiff_skins"] = await SeedSkiffSkins(context, language, cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
 			Dictionary<string, int> dictionary13 = dictionary;
-			dictionary13["novelties"] = await SeedNovelties(context, language, cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
+			dictionary13["mist_champions"] = await SeedMistChampions(context, language, cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
 			Dictionary<string, int> dictionary14 = dictionary;
-			dictionary14["outfits"] = await SeedOutfits(context, language, cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
+			dictionary14["novelties"] = await SeedNovelties(context, language, cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
 			Dictionary<string, int> dictionary15 = dictionary;
-			dictionary15["achievements"] = await SeedAchievements(context, language, cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
+			dictionary15["outfits"] = await SeedOutfits(context, language, cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
 			Dictionary<string, int> dictionary16 = dictionary;
-			dictionary16["achievement_categories"] = await SeedAchievementCategories(context, language, cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
+			dictionary16["achievements"] = await SeedAchievements(context, language, cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
 			Dictionary<string, int> dictionary17 = dictionary;
-			dictionary17["achievement_groups"] = await SeedAchievementGroups(context, language, cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
+			dictionary17["achievement_categories"] = await SeedAchievementCategories(context, language, cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
+			Dictionary<string, int> dictionary18 = dictionary;
+			dictionary18["achievement_groups"] = await SeedAchievementGroups(context, language, cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
 			await _eventAggregator.PublishAsync(new DatabaseSeeded(language, dictionary), cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
 		}
 
@@ -697,6 +701,41 @@ namespace SL.ChatLinks
 				DetachAllEntities(context);
 			}
 			_logger.LogInformation("Finished seeding {Count} outfits.", index.Count);
+			return index.Count;
+		}
+
+		private async Task<int> SeedSkiffSkins(ChatLinksContext context, Language language, CancellationToken cancellationToken)
+		{
+			_logger.LogInformation("Start seeding skiff skins.");
+			IImmutableValueSet<int> index = await _gw2Client.Hero.Equipment.Skiffs.GetSkiffSkinsIndex(cancellationToken).ValueOnly().ConfigureAwait(continueOnCapturedContext: false);
+			_logger.LogDebug("Found {Count} skiff skins in the API.", index.Count);
+			index = index.Except(await context.SkiffSkins.Select((SkiffSkin skiffSkin) => skiffSkin.Id).ToListAsync(cancellationToken).ConfigureAwait(continueOnCapturedContext: false));
+			if (index.Count != 0)
+			{
+				_logger.LogDebug("Start seeding {Count} skiff skins.", index.Count);
+				foreach (int[] chunk in index.Chunk(200))
+				{
+					await context.AddRangeAsync(await _gw2Client.Hero.Equipment.Skiffs.GetSkiffSkinsByIds(chunk, language, MissingMemberBehavior.Undefined, cancellationToken).ValueOnly().ConfigureAwait(continueOnCapturedContext: false), cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
+					await context.SaveChangesAsync(cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
+					DetachAllEntities(context);
+				}
+			}
+			List<SkiffSkinUnlock> unlockItems = await (from unlocker in context.Items.OfType<MountSkinUnlocker>()
+				join skiffSkin in context.SkiffSkins on unlocker.IconUrl equals skiffSkin.IconUrl
+				select new SkiffSkinUnlock
+				{
+					SkiffSkinId = skiffSkin.Id,
+					ItemId = unlocker.Id
+				}).ToListAsync(cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
+			List<SkiffSkinUnlock> existingUnlocks = await context.SkiffSkinUnlocks.ToListAsync(cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
+			List<SkiffSkinUnlock> newUnlocks = unlockItems.Where((SkiffSkinUnlock unlock) => !existingUnlocks.Contains(unlock)).ToList();
+			if (newUnlocks.Count != 0)
+			{
+				await context.SkiffSkinUnlocks.AddRangeAsync(newUnlocks, cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
+				await context.SaveChangesAsync(cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
+				DetachAllEntities(context);
+			}
+			_logger.LogInformation("Finished seeding {Count} skiff skins.", index.Count);
 			return index.Count;
 		}
 

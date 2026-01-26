@@ -227,7 +227,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 															{
 																PrintPlainText(" ");
 															}
-															PrintUnlocked(string.Format("{0}\r\n", ViewModel.Localizer["You have already unlocked this mount"]), ViewModel.LockedOtherText + "\r\n");
+															PrintUnlocked();
 															PrintPlainText((string)ViewModel.Localizer["Consumable"]);
 														}
 														else if (string.IsNullOrEmpty(consumable.Description))
@@ -245,7 +245,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 														{
 															PrintPlainText(" ");
 														}
-														PrintUnlocked(string.Format("{0}\r\n", ViewModel.Localizer["You have already unlocked this conjured doorway skin"]), ViewModel.LockedOtherText + "\r\n");
+														PrintUnlocked();
 														PrintPlainText((string)ViewModel.Localizer["Consumable"]);
 													}
 												}
@@ -255,7 +255,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 													{
 														PrintPlainText(" ");
 													}
-													PrintUnlocked(ViewModel.UnlockedText + "\r\n", ViewModel.LockedOtherText + "\r\n", ViewModel.UnlockedTextColor);
+													PrintUnlocked(ViewModel.UnlockedTextColor);
 													PrintPlainText((string)ViewModel.Localizer["Consumable"]);
 												}
 											}
@@ -265,7 +265,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 												{
 													PrintPlainText(" ");
 												}
-												PrintUnlocked(string.Format("{0}\r\n", ViewModel.Localizer["You have already unlocked this outfit"]), ViewModel.LockedOtherText + "\r\n");
+												PrintUnlocked();
 												PrintPlainText((string)ViewModel.Localizer["Consumable"]);
 											}
 										}
@@ -275,7 +275,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 											{
 												PrintPlainText(" ");
 											}
-											PrintUnlocked(string.Format("{0}\r\n", ViewModel.Localizer["You have already unlocked this outfit"]), ViewModel.LockedOtherText + "\r\n");
+											PrintUnlocked();
 											PrintPlainText((string)ViewModel.Localizer["Consumable"]);
 										}
 									}
@@ -285,7 +285,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 										{
 											PrintPlainText(" ");
 										}
-										PrintUnlocked(string.Format("{0}\r\n", ViewModel.Localizer["You have already unlocked this Jade Bot"]), ViewModel.LockedOtherText + "\r\n");
+										PrintUnlocked();
 										PrintPlainText((string)ViewModel.Localizer["Consumable"]);
 									}
 								}
@@ -295,7 +295,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 									{
 										PrintPlainText(" ");
 									}
-									PrintUnlocked(string.Format("{0}\r\n", ViewModel.Localizer["You have already unlocked this glider"]), ViewModel.LockedOtherText + "\r\n");
+									PrintUnlocked();
 									PrintPlainText((string)ViewModel.Localizer["Consumable"]);
 								}
 							}
@@ -305,7 +305,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 								{
 									PrintPlainText(" ");
 								}
-								PrintUnlocked(string.Format("{0}\r\n", ViewModel.Localizer["You have already unlocked this dye"]), ViewModel.LockedOtherText + "\r\n");
+								PrintUnlocked();
 								PrintPlainText((string)ViewModel.Localizer["Consumable"]);
 							}
 						}
@@ -315,7 +315,7 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 							{
 								PrintPlainText(" ");
 							}
-							PrintUnlocked(string.Format("{0}\r\n", ViewModel.Localizer["You already have that content unlocked"]), ViewModel.LockedOtherText + "\r\n");
+							PrintUnlocked();
 							PrintPlainText((string)ViewModel.Localizer["Consumable"]);
 						}
 					}
@@ -750,12 +750,14 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0042: Expected O, but got Unknown
-			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00df: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0119: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0182: Unknown result type (might be due to invalid IL or missing references)
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Parent((Container)(object)_layout);
 			val.set_FlowDirection((ControlFlowDirection)2);
@@ -763,10 +765,22 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 			((Control)val).set_Width(((Control)_layout).get_Width());
 			((Control)val).set_Height(50);
 			FlowPanel header = val;
-			Image val2 = new Image();
-			((Control)val2).set_Parent((Container)(object)header);
-			val2.set_Texture(ViewModel.GetIcon(ViewModel.Item));
-			((Control)val2).set_Size(new Point(50));
+			if ((object)ViewModel.DyeColor != null)
+			{
+				Color rgb = default(Color);
+				((Color)(ref rgb))._002Ector((int)ViewModel.DyeColor!.Metal.Rgb.R, (int)ViewModel.DyeColor!.Metal.Rgb.G, (int)ViewModel.DyeColor!.Metal.Rgb.B);
+				StackedImage stackedImage = new StackedImage();
+				((Control)stackedImage).set_Parent((Container)(object)header);
+				((Control)stackedImage).set_Size(new Point(50));
+				stackedImage.Textures.Add((AsyncTexture2D.FromAssetId(156885), rgb));
+			}
+			else
+			{
+				Image val2 = new Image();
+				((Control)val2).set_Parent((Container)(object)header);
+				val2.set_Texture(ViewModel.GetIcon(ViewModel.Item));
+				((Control)val2).set_Size(new Point(50));
+			}
 			((Control)new FormattedLabelBuilder().SetWidth(((Control)_layout).get_Width() - 55).SetHeight(50).Wrap()
 				.SetVerticalAlignment((VerticalAlignment)1)
 				.AddMarkup(ViewModel.ItemName.Replace(" ", "  "), delegate(FormattedLabelPartBuilder part)
@@ -922,6 +936,11 @@ namespace SL.ChatLinks.UI.Tabs.Items.Tooltips
 		private void PrintTransmutation()
 		{
 			PrintLockedUnlocked(string.Format("\r\n{0}", ViewModel.Localizer["Skin Locked"]), string.Format("\r\n{0}", ViewModel.Localizer["Skin Unlocked"]), "\r\n" + ViewModel.LockedOtherText);
+		}
+
+		private void PrintUnlocked(Color? unlockedTextColor = null)
+		{
+			PrintUnlocked(ViewModel.UnlockedText + "\r\n", ViewModel.LockedOtherText + "\r\n", unlockedTextColor);
 		}
 
 		private void PrintUnlocked(string unlockedText, string? other = null, Color? unlockedTextColor = null)

@@ -87,6 +87,7 @@ namespace SL.ChatLinks
 			services.AddSingleton<UnlockedMailCarriers>();
 			services.AddSingleton<UnlockedMiniatures>();
 			services.AddSingleton<UnlockedMountSkins>();
+			services.AddSingleton<UnlockedSkiffSkins>();
 			services.AddSingleton<UnlockedMistChampionSkins>();
 			services.AddSingleton<UnlockedNovelties>();
 			services.AddSingleton<UnlockedOutfits>();

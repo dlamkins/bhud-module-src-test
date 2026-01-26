@@ -13,6 +13,7 @@ using GuildWars2.Hero.Equipment.Miniatures;
 using GuildWars2.Hero.Equipment.Mounts;
 using GuildWars2.Hero.Equipment.Novelties;
 using GuildWars2.Hero.Equipment.Outfits;
+using GuildWars2.Hero.Equipment.Skiffs;
 using GuildWars2.Hero.Equipment.Wardrobe;
 using GuildWars2.Items;
 using GuildWars2.Pvp.MistChampions;
@@ -29,6 +30,7 @@ using SL.ChatLinks.Storage.Models.Hero.Equipment.Miniatures;
 using SL.ChatLinks.Storage.Models.Hero.Equipment.Mounts;
 using SL.ChatLinks.Storage.Models.Hero.Equipment.Novelties;
 using SL.ChatLinks.Storage.Models.Hero.Equipment.Outfits;
+using SL.ChatLinks.Storage.Models.Hero.Equipment.Skiffs;
 using SL.ChatLinks.Storage.Models.Hero.Equipment.Wardrobe;
 using SL.ChatLinks.Storage.Models.Items;
 using SL.ChatLinks.Storage.Models.Pvp.MistChampions;
@@ -38,7 +40,7 @@ namespace SL.ChatLinks.Storage
 {
 	public class ChatLinksContext : DbContext
 	{
-		public static int SchemaVersion => 8;
+		public static int SchemaVersion => 9;
 
 		public DbSet<Item> Items => Set<Item>();
 
@@ -67,6 +69,10 @@ namespace SL.ChatLinks.Storage
 		public DbSet<MountSkin> MountSkins => Set<MountSkin>();
 
 		public DbSet<MountSkinUnlock> MountSkinUnlocks => Set<MountSkinUnlock>();
+
+		public DbSet<SkiffSkin> SkiffSkins => Set<SkiffSkin>();
+
+		public DbSet<SkiffSkinUnlock> SkiffSkinUnlocks => Set<SkiffSkinUnlock>();
 
 		public DbSet<Achievement> Achievements => Set<Achievement>();
 
@@ -134,6 +140,8 @@ namespace SL.ChatLinks.Storage
 			modelBuilder.ApplyConfiguration(new MiniatureEntityTypeConfiguration());
 			modelBuilder.ApplyConfiguration(new MountSkinEntityTypeConfiguration());
 			modelBuilder.ApplyConfiguration(new MountSkinUnlockEntityTypeConfiguration());
+			modelBuilder.ApplyConfiguration(new SkiffSkinEntityTypeConfiguration());
+			modelBuilder.ApplyConfiguration(new SkiffSkinUnlockEntityTypeConfiguration());
 			modelBuilder.ApplyConfiguration(new MistChampionSkinEntityTypeConfiguration());
 			modelBuilder.ApplyConfiguration(new NoveltyEntityTypeConfiguration());
 			modelBuilder.ApplyConfiguration(new OutfitEntityTypeConfiguration());
