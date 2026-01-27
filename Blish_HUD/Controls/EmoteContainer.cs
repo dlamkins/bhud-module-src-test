@@ -1,6 +1,6 @@
 namespace Blish_HUD.Controls
 {
-	internal class EmoteContainer : Container
+	public class EmoteContainer : Container
 	{
 		private Image img;
 

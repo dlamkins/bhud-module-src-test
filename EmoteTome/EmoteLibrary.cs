@@ -23,11 +23,11 @@ namespace EmoteTome
 
 		private static readonly string RANKJSON = "Emotes/Rank/Json/";
 
-		public static readonly string CORECODE = "core";
+		public const string CORECODE = "core";
 
-		public static readonly string UNLOCKCODE = "unlock";
+		public const string UNLOCKCODE = "unlock";
 
-		public static readonly string RANKCODE = "rank";
+		public const string RANKCODE = "rank";
 
 		public EmoteLibrary(ContentsManager manager)
 		{

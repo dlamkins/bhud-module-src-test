@@ -3,7 +3,7 @@ using Blish_HUD.Controls;
 
 namespace EmoteTome
 {
-	internal class Emote
+	public class Emote
 	{
 		private string imagePath;
 
@@ -14,6 +14,8 @@ namespace EmoteTome
 		private bool canTarget;
 
 		private EmoteContainer emoCon = new EmoteContainer();
+
+		private EmoteContainer favCon;
 
 		private string category;
 
@@ -60,6 +62,17 @@ namespace EmoteTome
 		public EmoteContainer getContainer()
 		{
 			return emoCon;
+		}
+
+		public void setFavContainer(EmoteContainer container)
+		{
+			favCon = new EmoteContainer();
+			favCon = container;
+		}
+
+		public EmoteContainer getFavContainer()
+		{
+			return favCon;
 		}
 
 		public string getCategory()

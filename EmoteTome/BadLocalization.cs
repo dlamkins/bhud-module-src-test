@@ -14,11 +14,11 @@ namespace EmoteTome
 
 		public static readonly List<string> WINDOWTITLE = new List<string> { "Emote Tome", "Emote Tome", "Emote Tome", "Emote Tome" };
 
-		public static readonly List<string> UNLOCKABLEPANELTITLE = new List<string> { "Unlockable Emotes", "Emotes pour déverrouiller", "Freischaltbare Emotes", "Emotes desbloqueables" };
+		public static readonly List<string> UNLOCKABLEPANELTITLE = new List<string> { "Unlockable Emotes", "Emotes pour deverrouiller", "Freischaltbare Emotes", "Emotes desbloqueables" };
 
 		public static readonly List<string> RANKPANELTITLE = new List<string> { "Rank Emotes", "Rang Emotes", "Rang Emotes", "Rango Emotes" };
 
-		public static readonly List<string> COREPANELTITLE = new List<string> { "Core Emotes", "Émote de base", "Kern Emotes", "Emotes de base" };
+		public static readonly List<string> COREPANELTITLE = new List<string> { "Core Emotes", "Emote de base", "Kern Emotes", "Emotes de base" };
 
 		public static readonly List<string> NOEMOTEONKEYPRESSED = new List<string> { "Can't peform emotes while a key is pressed", "Impossible d'effectuer des emotes pendant qu'une touche est pressée", "Nicht möglich, während eine Taste gedrückt ist", "No se pueden realizar emotes mientras se pulsa una tecla" };
 
@@ -50,6 +50,12 @@ namespace EmoteTome
 
 		public static readonly List<string> EMOTETEXT = new List<string> { "Shows/Hides this emote", "Affiche/Masque cet emote", "Zeigt/versteckt dieses Emote", "Muestra/Oculta este emote" };
 
+		public static readonly List<string> HIDECOREEMOTE = new List<string> { "Hide Core Category", "Masque categorie de base", "Verstecke Kern Kategorie", "Oculta categoria de base" };
+
+		public static readonly List<string> HIDEUNLOCKEMOTE = new List<string> { "Hide Unlockable Category", "Masque categorie deverrouiller", "Verstecke Freischaltbar Kategorie", "Oculta categoria desbloqueables" };
+
+		public static readonly List<string> HIDERANKEMOTE = new List<string> { "Hide Rank Category", "Masque categorie rang", "Verstecke Rang Kategorie", "Oculta categoria rango" };
+
 		public static readonly List<string> CHECKKEY = new List<string> { "Check keystrokes for emotes", "vérifier les touches enfoncées pour les émotes", "Prüfe Tastendruck bei Emotes", "Verifique las pulsaciones de teclas para ver emoticones" };
 
 		public static readonly List<string> CHECKKEYTEXT = new List<string> { "Does not allow emotes when a key is pressed.\nIt's not recommended to disable this setting.", "N'autorise pas les émoticônes lorsqu'une touche est enfoncée.\nIl n'est pas recommandé de désactiver ce paramètre.", "Erlaubt keine Emotes, während eine Taste gedrückt wird.\nEs wird nicht empfohlen, diese Einstellung zu deaktivieren.", "No permite gestos cuando se presiona una tecla.\nNo se recomienda deshabilitar esta configuración." };
@@ -57,6 +63,8 @@ namespace EmoteTome
 		public static readonly List<string> CHECKMOVE = new List<string> { "Check movement for emotes", "Vérifiez le mouvement pour les émoticônes", "Prüfe Bewegung bei Emotes", "Comprueba el movimiento de los emoticones" };
 
 		public static readonly List<string> CHECKMOVETEXT = new List<string> { "Does not allow emotes when player is moving.\nIt's not recommended to disable this setting.", "N'autorise pas les émoticônes lorsque le joueur se déplace.\nIl n'est pas recommandé de désactiver ce paramètre.", "Erlaubt keine Emotes, während sich der Spieler bewegt.\nEs wird nicht empfohlen, diese Einstellung zu deaktivieren.", "No permite gestos cuando el jugador está en movimiento.\nNo se recomienda deshabilitar esta configuración." };
+
+		public static readonly List<string> FAVORITESBAR = new List<string> { "Favorites Bar", "Bar des favoris", "Favoriten Leiste", "Barra de favoritos" };
 
 		public static readonly List<string> BECKON = new List<string> { "Beckon", "Approcher", "Herbeiwinken", "Señas" };
 
