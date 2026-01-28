@@ -399,23 +399,36 @@ namespace LTMessages
 		{
 			return new List<MessageEntry>
 			{
-				new MessageEntry("Moving", "Tag is moving"),
 				new MessageEntry("Stack", "Stack on Tag"),
-				new MessageEntry("HP-Combat", "Please let Tag start the combat hp!"),
-				new MessageEntry("HP-Commune", "Commune with HP and then stack on tag!"),
+				new MessageEntry("Wait", "Wait for the squad!"),
+				new MessageEntry("Buffs", "Buffs dropped near tag"),
+				new MessageEntry("Stealth", "Stack for stealth share"),
+				new MessageEntry("Blast", "Blast the field for might/stealth"),
+				new MessageEntry("Moving", "Tag is moving"),
+				new MessageEntry("Stop", "Stop! Hold position"),
 				new MessageEntry("Port", "Port is on the marker"),
-				new MessageEntry("F-Vist", "F the Vista and then Stack on Tag"),
-				new MessageEntry("POI", "Point of Interest on Tag!"),
-				new MessageEntry("Bunny", "Bunny up for CC"),
-				new MessageEntry("Take-WP", "Take the Waypoint."),
-				new MessageEntry("Woosh-WP", "Woosh the Waypoint"),
-				new MessageEntry("Red", "If it is red make it dead!"),
-				new MessageEntry("Red-Circles", "Don't stand in the red circles"),
-				new MessageEntry("Mech", "Watch for the bounty mechanics"),
-				new MessageEntry("Help", "If you get lost ask for help!"),
+				new MessageEntry("Portal", "Portal is up at marker"),
+				new MessageEntry("Unlock-WP", "Unlock the Waypoint!"),
+				new MessageEntry("Take-WP", "Take the Waypoint in chat"),
+				new MessageEntry("Link-WP", "Link the Waypoint in chat"),
+				new MessageEntry("Focus", "Focus the target"),
+				new MessageEntry("Kill-Adds", "Kill the adds"),
+				new MessageEntry("Spread", "Spread out!"),
+				new MessageEntry("Dodge", "Dodge the AoE attacks!"),
+				new MessageEntry("Rez", "Rez downed players!"),
+				new MessageEntry("Mount-CC", "Springer or Warclaw up for CC"),
+				new MessageEntry("Need-CC", "We need CC!"),
+				new MessageEntry("Safe", "Area is clear - all safe"),
+				new MessageEntry("HP-Combat", "Please let Tag start the combat HP!"),
+				new MessageEntry("HP-Commune", "Commune with HP and then stack on tag!"),
+				new MessageEntry("F-Vista", "F the Vista and then stack on tag!"),
+				new MessageEntry("POI-Tag", "Point of Interest on Tag!"),
+				new MessageEntry("POI-Marker", "Point of Interest on Marker"),
 				new MessageEntry("Guard", "We need 1-2 people to guard this spot"),
-				new MessageEntry("Specials", "Special Squad can come get their loot"),
-				new MessageEntry("No-Drop", "Please don't drop EMPs or other items. Let Commander setup stations.")
+				new MessageEntry("Loot", "F for loot! Some chests need manual looting"),
+				new MessageEntry("Help", "If you get lost ask for help!"),
+				new MessageEntry("No-Drop", "Please don't drop items. Let Commander set up stations."),
+				new MessageEntry("Break", "We are taking a short break. BRB")
 			};
 		}
 
@@ -490,7 +503,7 @@ namespace LTMessages
 		{
 			try
 			{
-				string[] defaultMessages = new string[33]
+				string[] defaultMessages = new string[55]
 				{
 					"# ========================================",
 					"# LT Messages Configuration File",
@@ -508,23 +521,45 @@ namespace LTMessages
 					"# Lines starting with # are comments and ignored",
 					"# ========================================",
 					"",
-					"Moving,Tag is moving",
+					"# Pre-Movement & Positioning",
 					"Stack,Stack on Tag",
-					"HP-Combat,Please let Tag start the combat hp!",
-					"HP-Commune,Commune with HP and then stack on tag!",
+					"Wait,Wait for the squad!",
+					"Buffs,Buffs dropped near tag",
+					"Stealth,Stack for stealth share",
+					"Blast,Blast the field for might/stealth",
+					"",
+					"# Movement Commands",
+					"Moving,Tag is moving",
+					"Stop,Stop! Hold position",
 					"Port,Port is on the marker",
-					"F-Vist, F the Vista and then Stack on Tag",
-					"POI,Point of Interest on Tag!",
-					"Bunny,Bunny up for CC",
-					"Take-WP,Take the Waypoint.",
-					"Woosh-WP,Woosh the Waypoint",
-					"Red,If it is red make it dead!",
-					"Red-Circles,Don't stand in the red circles",
-					"Mech,Watch for the bounty mechanics",
-					"Help,If you get lost ask for help!",
+					"Portal,Portal is up at marker",
+					"Unlock-WP,Unlock the Waypoint!",
+					"Take-WP,Take the Waypoint in chat",
+					"Link-WP,Link the Waypoint in chat",
+					"",
+					"# Combat - Priority Actions",
+					"Focus,Focus the target",
+					"Kill-Adds,Kill the adds",
+					"Spread,Spread out!",
+					"Dodge,Dodge the AoE attacks!",
+					"Rez,Rez downed players!",
+					"Mount-CC,Springer or Warclaw up for CC",
+					"Need-CC,We need CC!",
+					"Safe,Area is clear - all safe",
+					"",
+					"# Objectives",
+					"HP-Combat,Please let Tag start the combat HP!",
+					"HP-Commune,Commune with HP and then stack on tag!",
+					"F-Vista,F the Vista and then stack on tag!",
+					"POI-Tag,Point of Interest on Tag!",
+					"POI-Marker,Point of Interest on Marker",
+					"",
+					"# Squad Management",
 					"Guard,We need 1-2 people to guard this spot",
-					"Specials,Special Squad can come get their loot",
-					"No-Drop,Please don't drop EMPs or other items. Let Commander setup stations."
+					"Loot,F for loot! Some chests need manual looting",
+					"Help,If you get lost ask for help!",
+					"No-Drop,Please don't drop items. Let Commander set up stations.",
+					"Break,We are taking a short break. BRB"
 				};
 				File.WriteAllLines(filePath, defaultMessages);
 				Logger.Info("Created default message file at " + filePath);
@@ -933,33 +968,39 @@ namespace LTMessages
 			//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0114: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0119: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0120: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0127: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0135: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0144: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0113: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0118: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0123: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0132: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0159: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0165: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0170: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0185: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0194: Expected O, but got Unknown
-			//IL_0194: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0199: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0169: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0171: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0178: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0182: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01a4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01af: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01b7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ee: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0201: Unknown result type (might be due to invalid IL or missing references)
-			//IL_020b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01eb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0200: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0207: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0216: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0221: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0237: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0242: Unknown result type (might be due to invalid IL or missing references)
+			//IL_024c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0257: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0266: Expected O, but got Unknown
 			Panel val = new Panel();
 			((Control)val).set_Size(new Point(500, 400));
 			((Control)val).set_ZIndex(10000);
@@ -978,43 +1019,52 @@ namespace LTMessages
 			val2.set_ShowShadow(true);
 			((Control)val2).set_Parent((Container)(object)_editorWindow);
 			StandardButton val3 = new StandardButton();
-			val3.set_Text("Close");
-			((Control)val3).set_Width(80);
-			((Control)val3).set_Location(new Point(410, 8));
+			val3.set_Text("Add");
+			((Control)val3).set_Width(60);
+			((Control)val3).set_Location(new Point(210, 8));
 			((Control)val3).set_Parent((Container)(object)_editorWindow);
 			((Control)val3).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				((Control)_editorWindow).Hide();
-			});
-			FlowPanel val4 = new FlowPanel();
-			val4.set_FlowDirection((ControlFlowDirection)3);
-			((Container)val4).set_WidthSizingMode((SizingMode)2);
-			((Container)val4).set_HeightSizingMode((SizingMode)2);
-			((Panel)val4).set_CanScroll(true);
-			((Control)val4).set_Location(new Point(10, 40));
-			((Control)val4).set_Size(new Point(480, 310));
-			((Control)val4).set_Parent((Container)(object)_editorWindow);
-			val4.set_OuterControlPadding(new Vector2(5f, 5f));
-			val4.set_ControlPadding(new Vector2(0f, 3f));
-			_editorFlowPanel = val4;
-			StandardButton val5 = new StandardButton();
-			val5.set_Text("Add New Message");
-			((Control)val5).set_Width(150);
-			((Control)val5).set_Location(new Point(10, 360));
-			((Control)val5).set_Parent((Container)(object)_editorWindow);
-			((Control)val5).add_Click((EventHandler<MouseEventArgs>)delegate
-			{
 				ShowEditDialog(-1, null);
 			});
-			StandardButton val6 = new StandardButton();
-			val6.set_Text("Save to File");
-			((Control)val6).set_Width(120);
-			((Control)val6).set_Location(new Point(170, 360));
-			((Control)val6).set_Parent((Container)(object)_editorWindow);
-			((Control)val6).add_Click((EventHandler<MouseEventArgs>)delegate
+			StandardButton val4 = new StandardButton();
+			val4.set_Text("Save");
+			((Control)val4).set_Width(60);
+			((Control)val4).set_Location(new Point(280, 8));
+			((Control)val4).set_Parent((Container)(object)_editorWindow);
+			((Control)val4).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				SaveMessagesToFile();
 			});
+			StandardButton val5 = new StandardButton();
+			val5.set_Text("Restore");
+			((Control)val5).set_Width(70);
+			((Control)val5).set_Location(new Point(350, 8));
+			((Control)val5).set_Parent((Container)(object)_editorWindow);
+			((Control)val5).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				RestoreDefaultMessages();
+			});
+			StandardButton val6 = new StandardButton();
+			val6.set_Text("Close");
+			((Control)val6).set_Width(60);
+			((Control)val6).set_Location(new Point(420, 8));
+			((Control)val6).set_Parent((Container)(object)_editorWindow);
+			((Control)val6).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				((Control)_editorWindow).Hide();
+			});
+			FlowPanel val7 = new FlowPanel();
+			val7.set_FlowDirection((ControlFlowDirection)3);
+			((Container)val7).set_WidthSizingMode((SizingMode)2);
+			((Container)val7).set_HeightSizingMode((SizingMode)2);
+			((Panel)val7).set_CanScroll(true);
+			((Control)val7).set_Location(new Point(10, 40));
+			((Control)val7).set_Size(new Point(480, 345));
+			((Control)val7).set_Parent((Container)(object)_editorWindow);
+			val7.set_OuterControlPadding(new Vector2(5f, 5f));
+			val7.set_ControlPadding(new Vector2(0f, 3f));
+			_editorFlowPanel = val7;
 		}
 
 		private void RefreshEditorUI()
@@ -1332,6 +1382,111 @@ namespace LTMessages
 			{
 				Logger.Error(ex, "Failed to save messages to file");
 				ScreenNotification.ShowNotification("LT Messages: Failed to save messages to file", (NotificationType)2, (Texture2D)null, 4);
+			}
+		}
+
+		private void RestoreDefaultMessages()
+		{
+			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0092: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009e: Expected O, but got Unknown
+			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0111: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0127: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0134: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0149: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0164: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0169: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0174: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0187: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0191: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019e: Expected O, but got Unknown
+			//IL_019e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01cb: Unknown result type (might be due to invalid IL or missing references)
+			try
+			{
+				Panel val = new Panel();
+				((Control)val).set_Size(new Point(400, 200));
+				((Control)val).set_Location(new Point((((Control)GameService.Graphics.get_SpriteScreen()).get_Width() - 400) / 2, (((Control)GameService.Graphics.get_SpriteScreen()).get_Height() - 200) / 2));
+				((Control)val).set_ZIndex(15000);
+				((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+				((Control)val).set_BackgroundColor(new Color(25, 20, 15, 250));
+				val.set_ShowBorder(true);
+				Panel confirmDialog = val;
+				Label val2 = new Label();
+				val2.set_Text("Restore Default Messages?");
+				val2.set_Font(GameService.Content.get_DefaultFont18());
+				val2.set_AutoSizeHeight(true);
+				val2.set_AutoSizeWidth(true);
+				((Control)val2).set_Location(new Point(20, 20));
+				val2.set_TextColor(new Color(220, 200, 150, 255));
+				val2.set_ShowShadow(true);
+				((Control)val2).set_Parent((Container)(object)confirmDialog);
+				Label val3 = new Label();
+				val3.set_Text("This will replace all your current messages\nwith the 30 default messages.\n\nThis action cannot be undone.");
+				((Control)val3).set_Width(360);
+				((Control)val3).set_Height(80);
+				((Control)val3).set_Location(new Point(20, 60));
+				val3.set_TextColor(Color.get_White());
+				val3.set_Font(GameService.Content.get_DefaultFont14());
+				((Control)val3).set_Parent((Container)(object)confirmDialog);
+				StandardButton val4 = new StandardButton();
+				val4.set_Text("Yes, Restore Defaults");
+				((Control)val4).set_Width(160);
+				((Control)val4).set_Location(new Point(20, 150));
+				((Control)val4).set_Parent((Container)(object)confirmDialog);
+				StandardButton yesButton = val4;
+				StandardButton val5 = new StandardButton();
+				val5.set_Text("Cancel");
+				((Control)val5).set_Width(100);
+				((Control)val5).set_Location(new Point(190, 150));
+				((Control)val5).set_Parent((Container)(object)confirmDialog);
+				((Control)yesButton).add_Click((EventHandler<MouseEventArgs>)delegate
+				{
+					_messages = GetDefaultMessages();
+					RefreshEditorUI();
+					RefreshMessageUI();
+					SaveMessagesToFile();
+					((Control)confirmDialog).Dispose();
+					ScreenNotification.ShowNotification("LT Messages: Restored 30 default messages", (NotificationType)0, (Texture2D)null, 4);
+					Logger.Info("Restored default messages");
+				});
+				((Control)val5).add_Click((EventHandler<MouseEventArgs>)delegate
+				{
+					((Control)confirmDialog).Dispose();
+				});
+			}
+			catch (Exception ex)
+			{
+				Logger.Error(ex, "Failed to restore default messages");
+				ScreenNotification.ShowNotification("LT Messages: Failed to restore defaults", (NotificationType)2, (Texture2D)null, 4);
 			}
 		}
 
