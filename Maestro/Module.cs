@@ -27,6 +27,8 @@ namespace Maestro
 	[Export(typeof(Module))]
 	public class Module : Module
 	{
+		private const int CORNER_ICON_PRIORITY = 1316531834;
+
 		private static readonly Logger Logger = Logger.GetLogger<Module>();
 
 		private ModuleSettings _moduleSettings;
@@ -104,17 +106,20 @@ namespace Maestro
 			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003c: Expected O, but got Unknown
-			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008c: Expected O, but got Unknown
+			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0047: Expected O, but got Unknown
+			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0087: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0092: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a2: Expected O, but got Unknown
 			try
 			{
 				Texture2D iconTexture = ContentsManager.GetTexture("icon.png");
 				CornerIcon val = new CornerIcon();
 				val.set_Icon(AsyncTexture2D.op_Implicit(iconTexture ?? Textures.get_Error()));
 				((Control)val).set_BasicTooltipText("Maestro - Music Player");
+				val.set_Priority(1316531834);
 				_cornerIcon = val;
 				((Control)_cornerIcon).add_Click((EventHandler<MouseEventArgs>)OnCornerIconClick);
 			}
@@ -124,6 +129,7 @@ namespace Maestro
 				CornerIcon val2 = new CornerIcon();
 				val2.set_Icon(AsyncTexture2D.op_Implicit(Textures.get_Error()));
 				((Control)val2).set_BasicTooltipText("Maestro - Music Player");
+				val2.set_Priority(1316531834);
 				_cornerIcon = val2;
 				((Control)_cornerIcon).add_Click((EventHandler<MouseEventArgs>)OnCornerIconClick);
 			}
