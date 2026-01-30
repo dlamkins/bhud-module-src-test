@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using Blish_HUD;
@@ -89,6 +90,8 @@ namespace Maestro.UI.MaestroCreator
 
 		private InstrumentType _instrument;
 
+		private Song _editingSong;
+
 		private readonly Panel _confirmationOverlay;
 
 		private readonly Label _confirmationLabel;
@@ -100,6 +103,8 @@ namespace Maestro.UI.MaestroCreator
 		private static Texture2D _backgroundTexture;
 
 		public event EventHandler<Song> SongCreated;
+
+		public event EventHandler<Song> SongEdited;
 
 		public event EventHandler WindowClosed;
 
@@ -115,14 +120,38 @@ namespace Maestro.UI.MaestroCreator
 			_pianoKeyboard.Configure(instrument);
 		}
 
+		public void LoadSong(Song song)
+		{
+			_editingSong = song;
+			_instrument = song.Instrument;
+			SetInstrument(song.Instrument);
+			((TextInputBase)_titleInput).set_Text(song.Name ?? string.Empty);
+			((TextInputBase)_artistInput).set_Text(song.Artist ?? string.Empty);
+			((TextInputBase)_transcriberInput).set_Text(song.Transcriber ?? string.Empty);
+			_noteSequencePanel.Clear();
+			foreach (string note in song.Notes)
+			{
+				_noteSequencePanel.AddNote(note);
+			}
+		}
+
 		public override void Show()
 		{
 			((WindowBase2)this).Show();
 			_pianoKeyboard.Configure(_instrument);
-			_isWaitingForConfirmation = true;
-			_confirmationLabel.set_Text($"Equip your {_instrument} and click Ready");
-			((Control)_confirmationOverlay).set_Visible(true);
-			_pianoKeyboard.SetOctaveButtonsEnabled(enabled: false);
+			if (_editingSong != null)
+			{
+				_isWaitingForConfirmation = false;
+				((Control)_confirmationOverlay).set_Visible(false);
+				_pianoKeyboard.SetOctaveButtonsEnabled(enabled: true);
+			}
+			else
+			{
+				_isWaitingForConfirmation = true;
+				_confirmationLabel.set_Text($"Equip your {_instrument} and click Ready");
+				((Control)_confirmationOverlay).set_Visible(true);
+				_pianoKeyboard.SetOctaveButtonsEnabled(enabled: false);
+			}
 		}
 
 		private void OnReadyClicked(object sender, MouseEventArgs e)
@@ -565,16 +594,29 @@ namespace Maestro.UI.MaestroCreator
 			{
 				AddPendingChord();
 			}
-			if (ValidateInput())
+			if (!ValidateInput())
 			{
-				Song song = BuildSong(((TextInputBase)_titleInput).get_Text().Trim(), string.IsNullOrWhiteSpace(((TextInputBase)_artistInput).get_Text()) ? "Unknown" : ((TextInputBase)_artistInput).get_Text().Trim(), string.IsNullOrWhiteSpace(((TextInputBase)_transcriberInput).get_Text()) ? "" : ((TextInputBase)_transcriberInput).get_Text().Trim());
-				if (song != null)
+				return;
+			}
+			Song song = BuildSong(((TextInputBase)_titleInput).get_Text().Trim(), string.IsNullOrWhiteSpace(((TextInputBase)_artistInput).get_Text()) ? "Unknown" : ((TextInputBase)_artistInput).get_Text().Trim(), string.IsNullOrWhiteSpace(((TextInputBase)_transcriberInput).get_Text()) ? "" : ((TextInputBase)_transcriberInput).get_Text().Trim());
+			if (song != null)
+			{
+				if (_editingSong != null)
+				{
+					song.IsCreated = _editingSong.IsCreated;
+					song.IsUserImported = _editingSong.IsUserImported;
+					song.CommunityId = _editingSong.CommunityId;
+					song.IsUploaded = _editingSong.IsUploaded && !HasSongChanged(_editingSong, song);
+					this.SongEdited?.Invoke(this, song);
+					ScreenNotification.ShowNotification("Song updated: " + song.Name, (NotificationType)0, (Texture2D)null, 4);
+				}
+				else
 				{
 					this.SongCreated?.Invoke(this, song);
 					ScreenNotification.ShowNotification("Song saved: " + song.Name, (NotificationType)0, (Texture2D)null, 4);
-					((Control)this).Hide();
-					ClearInputs();
 				}
+				((Control)this).Hide();
+				ClearInputs();
 			}
 		}
 
@@ -588,6 +630,31 @@ namespace Maestro.UI.MaestroCreator
 		{
 			((WindowBase2)this).Hide();
 			this.WindowClosed?.Invoke(this, EventArgs.Empty);
+		}
+
+		private bool HasSongChanged(Song original, Song edited)
+		{
+			if (original.Name != edited.Name)
+			{
+				return true;
+			}
+			if (original.Artist != edited.Artist)
+			{
+				return true;
+			}
+			if (original.Transcriber != edited.Transcriber)
+			{
+				return true;
+			}
+			if (original.Instrument != edited.Instrument)
+			{
+				return true;
+			}
+			if (!original.Notes.SequenceEqual(edited.Notes))
+			{
+				return true;
+			}
+			return false;
 		}
 
 		private bool ValidateInput()
@@ -634,6 +701,7 @@ namespace Maestro.UI.MaestroCreator
 
 		private void ClearInputs()
 		{
+			_editingSong = null;
 			((TextInputBase)_titleInput).set_Text(string.Empty);
 			((TextInputBase)_artistInput).set_Text(string.Empty);
 			((TextInputBase)_transcriberInput).set_Text(string.Empty);

@@ -6,6 +6,7 @@ using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Maestro.Models;
 using Maestro.Services.Community;
+using Maestro.UI.Controls;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -15,23 +16,19 @@ namespace Maestro.UI.Community
 	{
 		private static class Layout
 		{
-			public const int WindowWidth = 450;
+			public const int WindowWidth = 420;
 
-			public const int WindowHeight = 405;
+			public const int WindowHeight = 350;
 
-			public const int ContentWidth = 420;
-
-			public const int ContentHeight = 380;
-
-			public const int TopPadding = 10;
+			public const int ContentWidth = 390;
 
 			public const int FilterBarHeight = 32;
 
-			public const int SongListHeight = 283;
+			public const int SongListHeight = 250;
 
 			public const int StatusBarHeight = 30;
 
-			public const int CardWidth = 400;
+			public const int CardWidth = 378;
 		}
 
 		private static Texture2D _backgroundTexture;
@@ -42,9 +39,7 @@ namespace Maestro.UI.Community
 
 		private TextBox _searchBox;
 
-		private Dropdown _instrumentFilter;
-
-		private Dropdown _sortFilter;
+		private GenericFilterButton _filterButton;
 
 		private FlowPanel _songListPanel;
 
@@ -52,19 +47,23 @@ namespace Maestro.UI.Community
 
 		private StandardButton _refreshButton;
 
+		private StandardButton _uploadButton;
+
 		private LoadingSpinner _loadingSpinner;
 
 		public event EventHandler<Song> SongDownloaded;
 
 		public event EventHandler<string> SongDeleteRequested;
 
+		public event EventHandler UploadRequested;
+
 		private static Texture2D GetBackground()
 		{
-			return _backgroundTexture ?? (_backgroundTexture = MaestroTheme.CreateWindowBackground(450, 405));
+			return _backgroundTexture ?? (_backgroundTexture = MaestroTheme.CreateWindowBackground(420, 350));
 		}
 
 		public CommunityWindow(CommunityService communityService)
-			: this(GetBackground(), new Rectangle(0, 0, 450, 405), new Rectangle(15, 20, 420, 380))
+			: this(GetBackground(), new Rectangle(0, 0, 420, 350), new Rectangle(15, 20, 390, 350))
 		{
 			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
@@ -93,143 +92,151 @@ namespace Maestro.UI.Community
 
 		private void BuildUi()
 		{
-			//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003a: Expected O, but got Unknown
-			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0077: Expected O, but got Unknown
-			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b9: Expected O, but got Unknown
-			//IL_014a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0156: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0039: Expected O, but got Unknown
+			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008a: Expected O, but got Unknown
+			//IL_0138: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0167: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0174: Expected O, but got Unknown
-			//IL_01db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ee: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01fd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0207: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0213: Expected O, but got Unknown
-			//IL_0214: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0219: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0220: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0232: Unknown result type (might be due to invalid IL or missing references)
-			//IL_023c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0249: Expected O, but got Unknown
-			//IL_0266: Unknown result type (might be due to invalid IL or missing references)
-			//IL_026b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0272: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0173: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0187: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0191: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019d: Expected O, but got Unknown
+			//IL_01ba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0204: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0217: Expected O, but got Unknown
+			//IL_0228: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0234: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0243: Unknown result type (might be due to invalid IL or missing references)
+			//IL_024d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0252: Unknown result type (might be due to invalid IL or missing references)
+			//IL_025c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0268: Expected O, but got Unknown
+			//IL_0269: Unknown result type (might be due to invalid IL or missing references)
+			//IL_026e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0275: Unknown result type (might be due to invalid IL or missing references)
-			//IL_027f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0280: Unknown result type (might be due to invalid IL or missing references)
 			//IL_028a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0294: Unknown result type (might be due to invalid IL or missing references)
-			//IL_029b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c3: Expected O, but got Unknown
-			//IL_02cc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02d1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02d8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02e5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02f0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02f8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_029c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a9: Expected O, but got Unknown
+			//IL_02c1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02cd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02f7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0307: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0308: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0309: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0313: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0323: Expected O, but got Unknown
-			int currentY = 12;
+			//IL_0312: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0322: Expected O, but got Unknown
+			int currentY = 2;
 			Panel val = new Panel();
 			((Control)val).set_Parent((Container)(object)this);
 			((Control)val).set_Location(new Point(0, currentY));
-			((Control)val).set_Size(new Point(420, 32));
+			((Control)val).set_Size(new Point(390, 32));
 			((Control)val).set_BackgroundColor(Color.get_Transparent());
 			Panel filterPanel = val;
+			int uploadWidth = 70;
+			int num = 390 - uploadWidth - 7;
+			int searchWidth = (num - 7) / 2;
+			int filterWidth = num - searchWidth - 7;
 			TextBox val2 = new TextBox();
 			((Control)val2).set_Parent((Container)(object)filterPanel);
 			((Control)val2).set_Location(new Point(0, 0));
-			((Control)val2).set_Width(150);
+			((Control)val2).set_Width(searchWidth);
 			((Control)val2).set_Height(26);
-			((TextInputBase)val2).set_PlaceholderText("Search songs...");
+			((TextInputBase)val2).set_PlaceholderText("Search...");
 			_searchBox = val2;
 			((TextInputBase)_searchBox).add_TextChanged((EventHandler<EventArgs>)OnFilterChanged);
-			Dropdown val3 = new Dropdown();
+			GenericFilterButton genericFilterButton = new GenericFilterButton(new FilterSection
+			{
+				Items = new string[5] { "All", "Piano", "Harp", "Lute", "Bass" },
+				DefaultValue = "All"
+			}, new FilterSection
+			{
+				Items = new string[3] { "Newest", "Name A-Z", "Name Z-A" },
+				DefaultValue = "Newest"
+			});
+			((Control)genericFilterButton).set_Parent((Container)(object)filterPanel);
+			((Control)genericFilterButton).set_Location(new Point(searchWidth + 7, 0));
+			((Control)genericFilterButton).set_Width(filterWidth);
+			_filterButton = genericFilterButton;
+			_filterButton.FilterChanged += OnFilterChanged;
+			StandardButton val3 = new StandardButton();
 			((Control)val3).set_Parent((Container)(object)filterPanel);
-			((Control)val3).set_Location(new Point(155, 0));
-			((Control)val3).set_Width(75);
-			_instrumentFilter = val3;
-			_instrumentFilter.get_Items().Add("All");
-			_instrumentFilter.get_Items().Add("Piano");
-			_instrumentFilter.get_Items().Add("Harp");
-			_instrumentFilter.get_Items().Add("Lute");
-			_instrumentFilter.get_Items().Add("Bass");
-			_instrumentFilter.set_SelectedItem("All");
-			_instrumentFilter.add_ValueChanged((EventHandler<ValueChangedEventArgs>)OnFilterChanged);
-			Dropdown val4 = new Dropdown();
-			((Control)val4).set_Parent((Container)(object)filterPanel);
-			((Control)val4).set_Location(new Point(235, 0));
-			((Control)val4).set_Width(80);
-			_sortFilter = val4;
-			_sortFilter.get_Items().Add("Popular");
-			_sortFilter.get_Items().Add("Newest");
-			_sortFilter.get_Items().Add("Name A-Z");
-			_sortFilter.set_SelectedItem("Popular");
-			_sortFilter.add_ValueChanged((EventHandler<ValueChangedEventArgs>)OnFilterChanged);
+			val3.set_Text("Upload");
+			((Control)val3).set_Location(new Point(390 - uploadWidth, 0));
+			((Control)val3).set_Width(uploadWidth);
+			_uploadButton = val3;
+			((Control)_uploadButton).add_Click((EventHandler<MouseEventArgs>)OnUploadClicked);
+			currentY += 39;
+			FlowPanel val4 = new FlowPanel();
+			((Control)val4).set_Parent((Container)(object)this);
+			((Control)val4).set_Location(new Point(0, currentY));
+			((Control)val4).set_Size(new Point(390, 250));
+			val4.set_FlowDirection((ControlFlowDirection)3);
+			val4.set_ControlPadding(new Vector2(0f, 5f));
+			((Panel)val4).set_CanScroll(true);
+			((Panel)val4).set_ShowBorder(true);
+			_songListPanel = val4;
+			currentY += 257;
+			int refreshWidth = 70;
+			int spinnerSize = 26;
 			LoadingSpinner val5 = new LoadingSpinner();
-			((Control)val5).set_Parent((Container)(object)filterPanel);
-			((Control)val5).set_Location(new Point(320, 0));
-			((Control)val5).set_Size(new Point(26, 26));
+			((Control)val5).set_Parent((Container)(object)this);
+			((Control)val5).set_Location(new Point(390 - refreshWidth - 7 - spinnerSize, currentY));
+			((Control)val5).set_Size(new Point(spinnerSize, spinnerSize));
 			((Control)val5).set_Visible(false);
 			_loadingSpinner = val5;
 			StandardButton val6 = new StandardButton();
-			((Control)val6).set_Parent((Container)(object)filterPanel);
+			((Control)val6).set_Parent((Container)(object)this);
 			val6.set_Text("Refresh");
-			((Control)val6).set_Location(new Point(350, 0));
-			((Control)val6).set_Width(70);
+			((Control)val6).set_Location(new Point(390 - refreshWidth, currentY));
+			((Control)val6).set_Width(refreshWidth);
+			((Control)val6).set_Height(26);
 			_refreshButton = val6;
 			((Control)_refreshButton).add_Click((EventHandler<MouseEventArgs>)OnRefreshClicked);
-			currentY += 39;
-			FlowPanel val7 = new FlowPanel();
+			Label val7 = new Label();
 			((Control)val7).set_Parent((Container)(object)this);
 			((Control)val7).set_Location(new Point(0, currentY));
-			((Control)val7).set_Size(new Point(420, 283));
-			val7.set_FlowDirection((ControlFlowDirection)3);
-			val7.set_ControlPadding(new Vector2(0f, 5f));
-			((Panel)val7).set_CanScroll(true);
-			((Panel)val7).set_ShowBorder(true);
-			_songListPanel = val7;
-			currentY += 290;
-			Label val8 = new Label();
-			((Control)val8).set_Parent((Container)(object)this);
-			((Control)val8).set_Location(new Point(0, currentY));
-			((Control)val8).set_Width(420);
-			((Control)val8).set_Height(30);
-			val8.set_Font(GameService.Content.get_DefaultFont12());
-			val8.set_TextColor(MaestroTheme.LightGray);
-			val8.set_Text("Loading...");
-			_statusLabel = val8;
+			((Control)val7).set_Width(390 - refreshWidth - 7 - spinnerSize - 7);
+			((Control)val7).set_Height(30);
+			val7.set_Font(GameService.Content.get_DefaultFont12());
+			val7.set_TextColor(MaestroTheme.LightGray);
+			val7.set_Text("Loading...");
+			_statusLabel = val7;
+		}
+
+		private void OnUploadClicked(object sender, MouseEventArgs e)
+		{
+			this.UploadRequested?.Invoke(this, EventArgs.Empty);
 		}
 
 		private void SubscribeToEvents()
@@ -306,27 +313,25 @@ namespace Maestro.UI.Community
 			((Container)_songListPanel).ClearChildren();
 			TextBox searchBox = _searchBox;
 			string searchTerm = ((searchBox == null) ? null : ((TextInputBase)searchBox).get_Text()?.ToLower()) ?? "";
-			Dropdown instrumentFilter2 = _instrumentFilter;
-			string instrumentFilter = ((instrumentFilter2 != null) ? instrumentFilter2.get_SelectedItem() : null) ?? "All";
-			Dropdown sortFilter = _sortFilter;
-			string sortOption = ((sortFilter != null) ? sortFilter.get_SelectedItem() : null) ?? "Popular";
+			string instrumentFilter = _filterButton?.SelectedValue1 ?? "All";
+			string sortOption = _filterButton?.SelectedValue2 ?? "Newest";
 			IEnumerable<CommunitySong> songs = _communityService.SearchSongs(searchTerm, instrumentFilter);
 			switch (sortOption)
 			{
-			case "Popular":
-				songs = songs.OrderByDescending((CommunitySong s) => s.Downloads);
-				break;
 			case "Newest":
 				songs = songs.OrderByDescending((CommunitySong s) => s.CreatedAt);
 				break;
 			case "Name A-Z":
 				songs = songs.OrderBy((CommunitySong s) => s.Name);
 				break;
+			case "Name Z-A":
+				songs = songs.OrderByDescending((CommunitySong s) => s.Name);
+				break;
 			}
 			foreach (CommunitySong song in songs.ToList())
 			{
 				bool isDownloaded = _communityService.IsSongDownloaded(song.Id);
-				CommunitySongCard communitySongCard = new CommunitySongCard(song, 400, isDownloaded);
+				CommunitySongCard communitySongCard = new CommunitySongCard(song, 378, isDownloaded);
 				((Control)communitySongCard).set_Parent((Container)(object)_songListPanel);
 				CommunitySongCard card = communitySongCard;
 				card.DownloadRequested += OnDownloadRequested;
@@ -379,20 +384,16 @@ namespace Maestro.UI.Community
 				((Control)value).Dispose();
 			}
 			_songCards.Clear();
+			((Control)_uploadButton).remove_Click((EventHandler<MouseEventArgs>)OnUploadClicked);
 			TextBox searchBox = _searchBox;
 			if (searchBox != null)
 			{
 				((Control)searchBox).Dispose();
 			}
-			Dropdown instrumentFilter = _instrumentFilter;
-			if (instrumentFilter != null)
+			GenericFilterButton filterButton = _filterButton;
+			if (filterButton != null)
 			{
-				((Control)instrumentFilter).Dispose();
-			}
-			Dropdown sortFilter = _sortFilter;
-			if (sortFilter != null)
-			{
-				((Control)sortFilter).Dispose();
+				((Control)filterButton).Dispose();
 			}
 			FlowPanel songListPanel = _songListPanel;
 			if (songListPanel != null)
@@ -408,6 +409,11 @@ namespace Maestro.UI.Community
 			if (refreshButton != null)
 			{
 				((Control)refreshButton).Dispose();
+			}
+			StandardButton uploadButton = _uploadButton;
+			if (uploadButton != null)
+			{
+				((Control)uploadButton).Dispose();
 			}
 			LoadingSpinner loadingSpinner = _loadingSpinner;
 			if (loadingSpinner != null)

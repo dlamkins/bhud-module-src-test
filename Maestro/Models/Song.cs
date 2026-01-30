@@ -28,42 +28,33 @@ namespace Maestro.Models
 
 		public string CommunityId { get; set; }
 
-		public int Downloads { get; set; }
+		public bool IsUploaded { get; set; }
 
-		public bool IsCommunityDownloaded => !string.IsNullOrEmpty(CommunityId);
-
-		public string DisplayDownloads
+		public bool IsCommunityDownloaded
 		{
 			get
 			{
-				if (Downloads <= 0)
+				if (!string.IsNullOrEmpty(CommunityId) && !IsUserImported)
 				{
-					return null;
+					return !IsCreated;
 				}
-				if (Downloads >= 1000000)
-				{
-					return $"{(double)Downloads / 1000000.0:F1}M";
-				}
-				if (Downloads >= 1000)
-				{
-					return $"{(double)Downloads / 1000.0:F1}k";
-				}
-				return Downloads.ToString();
+				return false;
 			}
 		}
 
 		public string DisplayName => Name + " - " + Artist;
 
+		public long DurationMs => Commands.Where((SongCommand c) => c.Type == CommandType.Wait).Sum((SongCommand c) => c.Duration);
+
 		public string DisplayDuration
 		{
 			get
 			{
-				int totalMs = Commands.Where((SongCommand c) => c.Type == CommandType.Wait).Sum((SongCommand c) => c.Duration);
-				if (totalMs <= 0)
+				if (DurationMs <= 0)
 				{
 					return null;
 				}
-				TimeSpan span = TimeSpan.FromMilliseconds(totalMs);
+				TimeSpan span = TimeSpan.FromMilliseconds(DurationMs);
 				if (!(span.TotalHours >= 1.0))
 				{
 					return span.ToString("m\\:ss");

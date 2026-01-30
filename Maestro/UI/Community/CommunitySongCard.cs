@@ -25,15 +25,15 @@ namespace Maestro.UI.Community
 
 			public const int DetailsY = 40;
 
-			public const int ButtonWidth = 50;
+			public const int ButtonWidth = 90;
 
 			public const int ButtonHeight = 26;
 
-			public const int ButtonY = 22;
+			public const int ButtonY = 18;
 
 			public const int ButtonRightMargin = 15;
 
-			public static int LabelRightMargin => 75;
+			public static int LabelRightMargin => 115;
 		}
 
 		private readonly CommunitySong _song;
@@ -117,38 +117,38 @@ namespace Maestro.UI.Community
 			//IL_0122: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0123: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0132: Expected O, but got Unknown
-			//IL_018d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0192: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0199: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01af: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01dc: Expected O, but got Unknown
-			//IL_01dd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01fe: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0208: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0215: Expected O, but got Unknown
-			//IL_022d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0232: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0239: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0169: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0175: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0181: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0198: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b8: Expected O, but got Unknown
+			//IL_01b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f1: Expected O, but got Unknown
+			//IL_0209: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0215: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0220: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0234: Unknown result type (might be due to invalid IL or missing references)
+			//IL_023c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0244: Unknown result type (might be due to invalid IL or missing references)
-			//IL_024e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0258: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0260: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0268: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0278: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0279: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0283: Unknown result type (might be due to invalid IL or missing references)
-			//IL_028a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0296: Expected O, but got Unknown
-			//IL_0297: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a1: Expected O, but got Unknown
+			//IL_0254: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0255: Unknown result type (might be due to invalid IL or missing references)
+			//IL_025f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0266: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0272: Expected O, but got Unknown
+			//IL_0273: Unknown result type (might be due to invalid IL or missing references)
+			//IL_027d: Expected O, but got Unknown
 			_song = song;
 			_downloadState = (isDownloaded ? DownloadState.Completed : DownloadState.Idle);
 			((Control)this).set_Size(new Point(width, 70));
@@ -178,10 +178,6 @@ namespace Maestro.UI.Community
 			val3.set_TextColor(MaestroTheme.CreamWhite);
 			_titleLabel = val3;
 			string detailsText = song.Artist + " - " + song.Transcriber;
-			if (!string.IsNullOrEmpty(song.DisplayDownloads))
-			{
-				detailsText = detailsText + " | " + song.DisplayDownloads + " downloads";
-			}
 			if (!string.IsNullOrEmpty(song.DisplayDuration))
 			{
 				detailsText = detailsText + " | " + song.DisplayDuration;
@@ -196,16 +192,16 @@ namespace Maestro.UI.Community
 			_detailsLabel = val4;
 			StandardButton val5 = new StandardButton();
 			((Control)val5).set_Parent((Container)(object)this);
-			val5.set_Text("DL");
-			((Control)val5).set_Location(new Point(width - 50 - 15, 22));
-			((Control)val5).set_Width(50);
+			val5.set_Text("Download");
+			((Control)val5).set_Location(new Point(width - 90 - 15, 18));
+			((Control)val5).set_Width(90);
 			_actionButton = val5;
 			((Control)_actionButton).add_Click((EventHandler<MouseEventArgs>)OnActionButtonClicked);
 			Label val6 = new Label();
 			((Control)val6).set_Parent((Container)(object)this);
 			val6.set_Text("");
-			((Control)val6).set_Location(new Point(width - 50 - 15, 27));
-			((Control)val6).set_Width(50);
+			((Control)val6).set_Location(new Point(width - 90 - 15, 23));
+			((Control)val6).set_Width(90);
 			((Control)val6).set_Height(26);
 			val6.set_Font(GameService.Content.get_DefaultFont12());
 			val6.set_TextColor(MaestroTheme.CreamWhite);
@@ -247,7 +243,7 @@ namespace Maestro.UI.Community
 			switch (_downloadState)
 			{
 			case DownloadState.Idle:
-				_actionButton.set_Text("v");
+				_actionButton.set_Text("Download");
 				((Control)_actionButton).set_Visible(true);
 				((Control)_actionButton).set_Enabled(true);
 				((Control)_progressLabel).set_Visible(false);
@@ -258,7 +254,7 @@ namespace Maestro.UI.Community
 				((Control)_progressLabel).set_Visible(true);
 				break;
 			case DownloadState.Completed:
-				_actionButton.set_Text("v");
+				_actionButton.set_Text("Downloaded");
 				((Control)_actionButton).set_Visible(true);
 				((Control)_actionButton).set_Enabled(false);
 				((Control)_progressLabel).set_Visible(false);
@@ -270,7 +266,7 @@ namespace Maestro.UI.Community
 				((Control)_progressLabel).set_Visible(false);
 				break;
 			case DownloadState.Cancelled:
-				_actionButton.set_Text("v");
+				_actionButton.set_Text("Download");
 				((Control)_actionButton).set_Visible(true);
 				((Control)_actionButton).set_Enabled(true);
 				((Control)_progressLabel).set_Visible(false);

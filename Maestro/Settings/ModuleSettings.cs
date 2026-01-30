@@ -38,10 +38,13 @@ namespace Maestro.Settings
 
 		public SettingEntry<KeyBinding> SharpA { get; private set; }
 
+		public string ClientId { get; private set; }
+
 		public ModuleSettings(SettingCollection settings)
 		{
 			DefineInstrumentKeys(settings);
 			DefinePianoSharps(settings);
+			DefineClientId(settings);
 		}
 
 		private void DefineInstrumentKeys(SettingCollection settings)
@@ -97,6 +100,17 @@ namespace Maestro.Settings
 			SharpF = pianoSharps.DefineSetting<KeyBinding>("KeySharpF", new KeyBinding((ModifierKeys)2, (Keys)51), (Func<string>)(() => "Sharp F#"), (Func<string>)(() => "Match to Profession Skill 3"));
 			SharpG = pianoSharps.DefineSetting<KeyBinding>("KeySharpG", new KeyBinding((ModifierKeys)2, (Keys)52), (Func<string>)(() => "Sharp G#"), (Func<string>)(() => "Match to Profession Skill 4"));
 			SharpA = pianoSharps.DefineSetting<KeyBinding>("KeySharpA", new KeyBinding((ModifierKeys)2, (Keys)53), (Func<string>)(() => "Sharp A#"), (Func<string>)(() => "Match to Profession Skill 5"));
+		}
+
+		private void DefineClientId(SettingCollection settings)
+		{
+			SettingEntry<string> clientIdSetting = settings.DefineSetting<string>("ClientId", "", (Func<string>)(() => ""), (Func<string>)(() => ""));
+			SettingComplianceExtensions.SetDisabled((SettingEntry)(object)clientIdSetting, true);
+			if (string.IsNullOrEmpty(clientIdSetting.get_Value()))
+			{
+				clientIdSetting.set_Value(Guid.NewGuid().ToString());
+			}
+			ClientId = clientIdSetting.get_Value();
 		}
 
 		public Dictionary<Keys, SettingEntry<KeyBinding>> GetKeyMappings()

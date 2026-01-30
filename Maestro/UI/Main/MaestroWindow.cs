@@ -19,11 +19,9 @@ namespace Maestro.UI.Main
 		{
 			public const int WindowWidth = 420;
 
-			public const int WindowHeight = 500;
+			public const int WindowHeight = 495;
 
 			public const int ContentWidth = 390;
-
-			public const int ContentHeight = 455;
 		}
 
 		private static Texture2D _backgroundTexture;
@@ -60,8 +58,10 @@ namespace Maestro.UI.Main
 
 		public event EventHandler<Song> SongDeleteRequested;
 
+		public event EventHandler<Song> EditRequested;
+
 		public MaestroWindow(SongPlayer songPlayer, List<Song> songs)
-			: this(GetBackground(), new Rectangle(0, 0, 420, 500), new Rectangle(15, 20, 390, 455))
+			: this(GetBackground(), new Rectangle(0, 0, 420, 495), new Rectangle(15, 20, 390, 495))
 		{
 			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
@@ -155,7 +155,7 @@ namespace Maestro.UI.Main
 
 		private static Texture2D GetBackground()
 		{
-			return _backgroundTexture ?? (_backgroundTexture = MaestroTheme.CreateWindowBackground(420, 500));
+			return _backgroundTexture ?? (_backgroundTexture = MaestroTheme.CreateWindowBackground(420, 495));
 		}
 
 		private void BuildUi()
@@ -178,6 +178,7 @@ namespace Maestro.UI.Main
 			_nowPlayingPanel = nowPlayingPanel;
 			_nowPlayingPanel.StopRequested += OnStopRequested;
 			_nowPlayingPanel.PlayPendingRequested += OnPlayPendingRequested;
+			_nowPlayingPanel.QueueToggleClicked += OnQueueToggleClicked;
 			return currentY + 105 + 7;
 		}
 
@@ -202,6 +203,7 @@ namespace Maestro.UI.Main
 			_songListPanel = songListPanel;
 			_songListPanel.SongPlayRequested += OnSongPlayRequested;
 			_songListPanel.SongDeleteRequested += OnSongDeleteRequested;
+			_songListPanel.EditRequested += OnEditRequested;
 			_songListPanel.AddToQueueRequested += OnAddToQueueRequested;
 			_songListPanel.CountChanged += OnCountChanged;
 			return currentY + 280 + 7;
@@ -218,7 +220,6 @@ namespace Maestro.UI.Main
 			_statusBar.ImportClicked += OnImportClicked;
 			_statusBar.CommunityClicked += OnCommunityClicked;
 			_statusBar.CreateClicked += OnCreateClicked;
-			_statusBar.QueueToggleClicked += OnQueueToggleClicked;
 		}
 
 		private void BuildPlaylistDrawer()
@@ -278,6 +279,11 @@ namespace Maestro.UI.Main
 			this.SongDeleteRequested?.Invoke(this, song);
 		}
 
+		private void OnEditRequested(object sender, Song song)
+		{
+			this.EditRequested?.Invoke(this, song);
+		}
+
 		private void OnCountChanged(object sender, int count)
 		{
 			_statusBar.VisibleCount = count;
@@ -310,7 +316,6 @@ namespace Maestro.UI.Main
 
 		private void OnQueueChanged(object sender, EventArgs e)
 		{
-			_statusBar.QueueCount = _playlistService.Count;
 		}
 
 		private void OnDrawerHidden(object sender, EventArgs e)
@@ -486,7 +491,20 @@ namespace Maestro.UI.Main
 			songs = FilterBySource(songs);
 			songs = FilterByInstrument(songs);
 			songs = FilterBySearchTerm(songs);
-			return songs.OrderBy((Song s) => s.Name);
+			return ApplySort(songs);
+		}
+
+		private IEnumerable<Song> ApplySort(IEnumerable<Song> songs)
+		{
+			string sort = _filterBar.SelectedSort;
+			if (!(sort == "Name Z-A"))
+			{
+				if (!(sort == "Name A-Z"))
+				{
+				}
+				return songs.OrderBy((Song s) => s.Name);
+			}
+			return songs.OrderByDescending((Song s) => s.Name);
 		}
 
 		private IEnumerable<Song> FilterBySource(IEnumerable<Song> songs)
@@ -538,16 +556,17 @@ namespace Maestro.UI.Main
 			_filterBar.FilterChanged -= OnFilterChanged;
 			_songListPanel.SongPlayRequested -= OnSongPlayRequested;
 			_songListPanel.SongDeleteRequested -= OnSongDeleteRequested;
+			_songListPanel.EditRequested -= OnEditRequested;
 			_songListPanel.AddToQueueRequested -= OnAddToQueueRequested;
 			_songListPanel.CountChanged -= OnCountChanged;
 			_statusBar.ImportClicked -= OnImportClicked;
 			_statusBar.CommunityClicked -= OnCommunityClicked;
 			_statusBar.CreateClicked -= OnCreateClicked;
-			_statusBar.QueueToggleClicked -= OnQueueToggleClicked;
 			((Control)_playlistDrawer).remove_Hidden((EventHandler<EventArgs>)OnDrawerHidden);
 			_playlistDrawer.PlayQueueRequested -= OnPlayQueueRequested;
 			_nowPlayingPanel.StopRequested -= OnStopRequested;
 			_nowPlayingPanel.PlayPendingRequested -= OnPlayPendingRequested;
+			_nowPlayingPanel.QueueToggleClicked -= OnQueueToggleClicked;
 		}
 
 		private void DisposeControls()

@@ -41,17 +41,25 @@ namespace Maestro
 
 		private CommunityService _communityService;
 
+		private CommunityUploadService _uploadService;
+
+		private UploadRateLimiter _uploadRateLimiter;
+
 		private MaestroWindow _maestroWindow;
 
 		private ImportWindow _importWindow;
 
 		private CommunityWindow _communityWindow;
 
+		private UploadWindow _uploadWindow;
+
 		private MaestroCreatorWindow _maestroCreatorWindow;
 
 		private CornerIcon _cornerIcon;
 
 		private List<Song> _songs;
+
+		private Song _editingOriginalSong;
 
 		internal static Module Instance { get; private set; }
 
@@ -99,6 +107,9 @@ namespace Maestro
 			Logger.Info($"Loaded {userSongs.Count} user songs from storage");
 			_songs.AddRange(userSongs);
 			_communityService = new CommunityService(_songStorage, _songs);
+			_uploadRateLimiter = new UploadRateLimiter(_songStorage.Database);
+			_uploadRateLimiter.CleanupOldRecords();
+			_uploadService = new CommunityUploadService(new CommunityApiClient(_moduleSettings.ClientId), _communityService, _uploadRateLimiter, _songStorage);
 		}
 
 		protected override void OnModuleLoaded(EventArgs e)
@@ -145,6 +156,7 @@ namespace Maestro
 				_maestroWindow.CommunityRequested += OnCommunityRequested;
 				_maestroWindow.CreateRequested += OnCreateRequested;
 				_maestroWindow.SongDeleteRequested += OnSongDeleteRequested;
+				_maestroWindow.EditRequested += OnEditRequested;
 			}
 			((WindowBase2)_maestroWindow).ToggleWindow();
 		}
@@ -173,6 +185,7 @@ namespace Maestro
 				_communityWindow = new CommunityWindow(_communityService);
 				_communityWindow.SongDownloaded += OnCommunitySongDownloaded;
 				_communityWindow.SongDeleteRequested += OnCommunitySongDeleteRequested;
+				_communityWindow.UploadRequested += OnUploadRequested;
 			}
 			if (((Control)_communityWindow).get_Visible())
 			{
@@ -189,6 +202,7 @@ namespace Maestro
 			{
 				_maestroCreatorWindow = new MaestroCreatorWindow();
 				_maestroCreatorWindow.SongCreated += OnPianoSongCreated;
+				_maestroCreatorWindow.SongEdited += OnSongEdited;
 				_maestroCreatorWindow.WindowClosed += OnCreatorWindowClosed;
 			}
 			_maestroCreatorWindow.SetInstrument(instrument);
@@ -206,12 +220,62 @@ namespace Maestro
 			_maestroWindow?.SetCreateButtonEnabled(enabled: true);
 		}
 
+		private void OnEditRequested(object sender, Song song)
+		{
+			if (_maestroCreatorWindow == null)
+			{
+				_maestroCreatorWindow = new MaestroCreatorWindow();
+				_maestroCreatorWindow.SongCreated += OnPianoSongCreated;
+				_maestroCreatorWindow.SongEdited += OnSongEdited;
+				_maestroCreatorWindow.WindowClosed += OnCreatorWindowClosed;
+			}
+			_editingOriginalSong = song;
+			_maestroCreatorWindow.LoadSong(song);
+			_maestroWindow?.SetCreateButtonEnabled(enabled: false);
+			((Control)_maestroCreatorWindow).Show();
+		}
+
+		private void OnSongEdited(object sender, Song editedSong)
+		{
+			try
+			{
+				if (_editingOriginalSong != null)
+				{
+					_songStorage.DeleteSong(_editingOriginalSong);
+					int index = _songs.IndexOf(_editingOriginalSong);
+					if (index >= 0)
+					{
+						_songs[index] = editedSong;
+					}
+					else
+					{
+						_songs.Add(editedSong);
+					}
+					_editingOriginalSong = null;
+				}
+				else
+				{
+					_songs.Add(editedSong);
+				}
+				_songStorage.SaveSong(editedSong);
+				_maestroWindow?.RefreshAfterCommunityDownload();
+				_uploadWindow?.RefreshSongList();
+				Logger.Info("Edited and saved song: " + editedSong.Name + " by " + editedSong.Artist);
+			}
+			catch (Exception ex)
+			{
+				Logger.Error(ex, "Failed to save edited song: " + editedSong.Name);
+				ScreenNotification.ShowNotification("Failed to save song", (NotificationType)2, (Texture2D)null, 4);
+			}
+		}
+
 		private void OnPianoSongCreated(object sender, Song song)
 		{
 			try
 			{
 				_songStorage.SaveSong(song);
 				_maestroWindow?.AddImportedSong(song);
+				_uploadWindow?.RefreshSongList();
 				Logger.Info("Created and saved song: " + song.Name + " by " + song.Artist);
 			}
 			catch (Exception ex)
@@ -247,6 +311,31 @@ namespace Maestro
 		public void PreviewSong(Song song)
 		{
 			_songPlayer?.Play(song);
+		}
+
+		private void OnUploadRequested(object sender, EventArgs e)
+		{
+			if (_uploadWindow == null)
+			{
+				_uploadWindow = new UploadWindow(_uploadService, _songs);
+				_uploadWindow.UploadCompleted += OnUploadCompleted;
+			}
+			if (((Control)_uploadWindow).get_Visible())
+			{
+				((Control)_uploadWindow).Hide();
+			}
+			else
+			{
+				((Control)_uploadWindow).Show();
+			}
+		}
+
+		private void OnUploadCompleted(object sender, UploadResponse response)
+		{
+			if (response.Success)
+			{
+				Logger.Info("Song upload complete. Song ID: " + response.SongId);
+			}
 		}
 
 		private void OnCommunitySongDownloaded(object sender, Song song)
@@ -308,6 +397,11 @@ namespace Maestro
 			if (maestroCreatorWindow != null)
 			{
 				((Control)maestroCreatorWindow).Dispose();
+			}
+			UploadWindow uploadWindow = _uploadWindow;
+			if (uploadWindow != null)
+			{
+				((Control)uploadWindow).Dispose();
 			}
 			CommunityWindow communityWindow = _communityWindow;
 			if (communityWindow != null)

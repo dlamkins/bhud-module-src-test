@@ -45,6 +45,12 @@ namespace Maestro.UI.Main
 			public const int SpeedSliderWidth = 180;
 
 			public const int SpeedValueX = 248;
+
+			public const int QueueButtonWidth = 30;
+
+			public const int QueueButtonRightPadding = 8;
+
+			public const int QueueButtonY = 8;
 		}
 
 		private readonly SongPlayer _songPlayer;
@@ -65,6 +71,8 @@ namespace Maestro.UI.Main
 
 		private readonly Label _speedValueLabel;
 
+		private readonly StandardButton _queueButton;
+
 		private bool _isPlayingFromQueue;
 
 		private Song _pendingSong;
@@ -74,6 +82,8 @@ namespace Maestro.UI.Main
 		public event EventHandler StopRequested;
 
 		public event EventHandler<Song> PlayPendingRequested;
+
+		public event EventHandler QueueToggleClicked;
 
 		public NowPlayingPanel(SongPlayer songPlayer, int width)
 			: this()
@@ -93,6 +103,7 @@ namespace Maestro.UI.Main
 			_speedLabel = CreateSpeedLabel();
 			_speedSlider = CreateSpeedSlider();
 			_speedValueLabel = CreateSpeedValueLabel();
+			_queueButton = CreateQueueButton(width);
 			SubscribeToEvents();
 		}
 
@@ -322,6 +333,31 @@ namespace Maestro.UI.Main
 			val.set_AutoSizeWidth(true);
 			val.set_Font(GameService.Content.get_DefaultFont12());
 			val.set_TextColor(MaestroTheme.CreamWhite);
+			return val;
+		}
+
+		private StandardButton CreateQueueButton(int panelWidth)
+		{
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0056: Expected O, but got Unknown
+			StandardButton val = new StandardButton();
+			((Control)val).set_Parent((Container)(object)this);
+			val.set_Text(">>");
+			((Control)val).set_Location(new Point(panelWidth - 30 - 8, 8));
+			((Control)val).set_Size(new Point(30, 26));
+			((Control)val).set_BasicTooltipText("Toggle Queue");
+			((Control)val).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				this.QueueToggleClicked?.Invoke(this, EventArgs.Empty);
+			});
 			return val;
 		}
 
@@ -576,6 +612,11 @@ namespace Maestro.UI.Main
 			if (speedValueLabel != null)
 			{
 				((Control)speedValueLabel).Dispose();
+			}
+			StandardButton queueButton = _queueButton;
+			if (queueButton != null)
+			{
+				((Control)queueButton).Dispose();
 			}
 		}
 	}

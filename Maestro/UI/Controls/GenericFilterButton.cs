@@ -5,9 +5,9 @@ using Blish_HUD.Input;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Maestro.UI.Main
+namespace Maestro.UI.Controls
 {
-	public class FilterButton : Control
+	public class GenericFilterButton : Control
 	{
 		private class FilterPanel : Control
 		{
@@ -17,23 +17,26 @@ namespace Maestro.UI.Main
 
 			private const int PADDING_X = 8;
 
-			private static readonly string[] SourceItems = new string[4] { "All", "Bundled", "Created", "Imported" };
-
-			private static readonly string[] InstrumentItems = new string[5] { "All", "Piano", "Harp", "Lute", "Bass" };
-
-			private readonly FilterButton _owner;
+			private readonly GenericFilterButton _owner;
 
 			private int _highlightedIndex = -1;
 
-			public FilterPanel(FilterButton owner)
+			public FilterPanel(GenericFilterButton owner)
 				: this()
 			{
-				//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-				//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+				//IL_007b: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0082: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0087: Unknown result type (might be due to invalid IL or missing references)
 				_owner = owner;
-				int height = (SourceItems.Length + InstrumentItems.Length) * 24 + 8;
+				int totalItems = _owner._section1.Items.Length + _owner._section2.Items.Length;
+				int separatorCount = 1;
+				if (_owner._section3 != null)
+				{
+					totalItems += _owner._section3.Items.Length;
+					separatorCount = 2;
+				}
+				int height = totalItems * 24 + separatorCount * 8;
 				base._size = new Point(((Control)_owner).get_Width(), height);
 				base._location = GetPanelLocation();
 				base._zIndex = 2147483615;
@@ -70,33 +73,54 @@ namespace Maestro.UI.Main
 
 			private int GetItemIndexAt(int y)
 			{
-				int sourceHeight = SourceItems.Length * 24;
-				if (y < sourceHeight)
+				int section1Height = _owner._section1.Items.Length * 24;
+				if (y < section1Height)
 				{
 					return y / 24;
 				}
-				if (y < sourceHeight + 8)
+				if (y < section1Height + 8)
 				{
 					return -1;
 				}
-				int instrumentY = y - sourceHeight - 8;
-				return SourceItems.Length + instrumentY / 24;
+				int section2Start = section1Height + 8;
+				int section2Height = _owner._section2.Items.Length * 24;
+				if (y < section2Start + section2Height)
+				{
+					int section2Y = y - section2Start;
+					return _owner._section1.Items.Length + section2Y / 24;
+				}
+				if (_owner._section3 == null)
+				{
+					return -1;
+				}
+				int section3Start = section2Start + section2Height + 8;
+				if (y < section2Start + section2Height + 8)
+				{
+					return -1;
+				}
+				int section3Y = y - section3Start;
+				return _owner._section1.Items.Length + _owner._section2.Items.Length + section3Y / 24;
 			}
 
 			protected override void OnClick(MouseEventArgs e)
 			{
 				//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 				int index = GetItemIndexAt(((Control)this).get_RelativeMousePosition().Y);
-				if (index >= 0 && index < SourceItems.Length)
+				if (index >= 0 && index < _owner._section1.Items.Length)
 				{
-					_owner.SelectedSource = SourceItems[index];
+					_owner.SelectedValue1 = _owner._section1.Items[index];
 				}
-				else if (index >= SourceItems.Length)
+				else if (index >= _owner._section1.Items.Length && index < _owner._section1.Items.Length + _owner._section2.Items.Length)
 				{
-					int instrumentIndex = index - SourceItems.Length;
-					if (instrumentIndex < InstrumentItems.Length)
+					int section2Index = index - _owner._section1.Items.Length;
+					_owner.SelectedValue2 = _owner._section2.Items[section2Index];
+				}
+				else if (_owner._section3 != null && index >= _owner._section1.Items.Length + _owner._section2.Items.Length)
+				{
+					int section3Index = index - _owner._section1.Items.Length - _owner._section2.Items.Length;
+					if (section3Index < _owner._section3.Items.Length)
 					{
-						_owner.SelectedInstrument = InstrumentItems[instrumentIndex];
+						_owner.SelectedValue3 = _owner._section3.Items[section3Index];
 					}
 				}
 				((Control)this).OnClick(e);
@@ -108,27 +132,42 @@ namespace Maestro.UI.Main
 				//IL_000d: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-				//IL_008c: Unknown result type (might be due to invalid IL or missing references)
+				//IL_009d: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0158: Unknown result type (might be due to invalid IL or missing references)
+				//IL_015d: Unknown result type (might be due to invalid IL or missing references)
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(Point.get_Zero(), base._size), Color.get_Black());
 				int y = 0;
-				for (int j = 0; j < SourceItems.Length; j++)
+				for (int k = 0; k < _owner._section1.Items.Length; k++)
 				{
-					string item = SourceItems[j];
-					bool isSelected = item == _owner.SelectedSource;
-					bool isHighlighted = _highlightedIndex == j;
+					string item = _owner._section1.Items[k];
+					bool isSelected = item == _owner.SelectedValue1;
+					bool isHighlighted = _highlightedIndex == k;
 					DrawItem(spriteBatch, item, y, isSelected, isHighlighted);
 					y += 24;
 				}
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(8, y + 4 - 1, base._size.X - 16, 2), MaestroTheme.MediumGray);
 				y += 8;
-				for (int i = 0; i < InstrumentItems.Length; i++)
+				for (int j = 0; j < _owner._section2.Items.Length; j++)
 				{
-					string item2 = InstrumentItems[i];
-					bool isSelected2 = item2 == _owner.SelectedInstrument;
-					bool isHighlighted2 = _highlightedIndex == SourceItems.Length + i;
+					string item2 = _owner._section2.Items[j];
+					bool isSelected2 = item2 == _owner.SelectedValue2;
+					bool isHighlighted2 = _highlightedIndex == _owner._section1.Items.Length + j;
 					DrawItem(spriteBatch, item2, y, isSelected2, isHighlighted2);
 					y += 24;
+				}
+				if (_owner._section3 != null)
+				{
+					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(8, y + 4 - 1, base._size.X - 16, 2), MaestroTheme.MediumGray);
+					y += 8;
+					for (int i = 0; i < _owner._section3.Items.Length; i++)
+					{
+						string item3 = _owner._section3.Items[i];
+						bool isSelected3 = item3 == _owner.SelectedValue3;
+						bool isHighlighted3 = _highlightedIndex == _owner._section1.Items.Length + _owner._section2.Items.Length + i;
+						DrawItem(spriteBatch, item3, y, isSelected3, isHighlighted3);
+						y += 24;
+					}
 				}
 			}
 
@@ -188,37 +227,61 @@ namespace Maestro.UI.Main
 
 		private bool _hadPanel;
 
-		private string _selectedSource = "All";
+		private readonly FilterSection _section1;
 
-		private string _selectedInstrument = "All";
+		private readonly FilterSection _section2;
 
-		public string SelectedSource
+		private readonly FilterSection _section3;
+
+		private string _selectedValue1;
+
+		private string _selectedValue2;
+
+		private string _selectedValue3;
+
+		public string SelectedValue1
 		{
 			get
 			{
-				return _selectedSource;
+				return _selectedValue1;
 			}
 			set
 			{
-				if (_selectedSource != value)
+				if (_selectedValue1 != value)
 				{
-					_selectedSource = value;
+					_selectedValue1 = value;
 					this.FilterChanged?.Invoke(this, EventArgs.Empty);
 				}
 			}
 		}
 
-		public string SelectedInstrument
+		public string SelectedValue2
 		{
 			get
 			{
-				return _selectedInstrument;
+				return _selectedValue2;
 			}
 			set
 			{
-				if (_selectedInstrument != value)
+				if (_selectedValue2 != value)
 				{
-					_selectedInstrument = value;
+					_selectedValue2 = value;
+					this.FilterChanged?.Invoke(this, EventArgs.Empty);
+				}
+			}
+		}
+
+		public string SelectedValue3
+		{
+			get
+			{
+				return _selectedValue3;
+			}
+			set
+			{
+				if (_selectedValue3 != value)
+				{
+					_selectedValue3 = value;
 					this.FilterChanged?.Invoke(this, EventArgs.Empty);
 				}
 			}
@@ -226,14 +289,30 @@ namespace Maestro.UI.Main
 
 		public bool PanelOpen => _panel != null;
 
-		private string DisplayText => _selectedSource + " / " + _selectedInstrument;
+		private string DisplayText
+		{
+			get
+			{
+				if (_section3 == null)
+				{
+					return _selectedValue1 + " / " + _selectedValue2;
+				}
+				return _selectedValue1 + " / " + _selectedValue2 + " / " + _selectedValue3;
+			}
+		}
 
 		public event EventHandler FilterChanged;
 
-		public FilterButton()
+		public GenericFilterButton(FilterSection section1, FilterSection section2, FilterSection section3 = null)
 			: this()
 		{
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+			_section1 = section1;
+			_section2 = section2;
+			_section3 = section3;
+			_selectedValue1 = section1.DefaultValue;
+			_selectedValue2 = section2.DefaultValue;
+			_selectedValue3 = section3?.DefaultValue;
 			((Control)this).set_Size(new Point(180, 27));
 		}
 

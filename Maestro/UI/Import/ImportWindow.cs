@@ -103,7 +103,7 @@ namespace Maestro.UI.Import
 			//IL_02b9: Expected O, but got Unknown
 			((WindowBase2)this).set_Title("Import Song");
 			((WindowBase2)this).set_Subtitle("AHK v1 Format");
-			((WindowBase2)this).set_Emblem(Module.Instance.ContentsManager.GetTexture("import.png"));
+			((WindowBase2)this).set_Emblem(Module.Instance.ContentsManager.GetTexture("import-emblem.png"));
 			((WindowBase2)this).set_SavesPosition(true);
 			((WindowBase2)this).set_Id("ImportWindow_v1");
 			((WindowBase2)this).set_CanResize(false);

@@ -85,6 +85,8 @@ namespace Maestro.UI.Main
 
 		public event EventHandler DeleteRequested;
 
+		public event EventHandler EditRequested;
+
 		public event EventHandler AddToQueueRequested;
 
 		public SongCard(Song song, int width)
@@ -124,25 +126,25 @@ namespace Maestro.UI.Main
 			//IL_0115: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0116: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0125: Expected O, but got Unknown
-			//IL_0195: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e4: Expected O, but got Unknown
-			//IL_01e5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01fc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0206: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0171: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0176: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0184: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0189: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0193: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c0: Expected O, but got Unknown
+			//IL_01c1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01cd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f9: Expected O, but got Unknown
 			//IL_0210: Unknown result type (might be due to invalid IL or missing references)
-			//IL_021d: Expected O, but got Unknown
-			//IL_0234: Unknown result type (might be due to invalid IL or missing references)
-			//IL_023a: Expected O, but got Unknown
+			//IL_0216: Expected O, but got Unknown
 			Song = song;
 			((Control)this).set_Size(new Point(width, 70));
 			((Control)this).set_BackgroundColor(MaestroTheme.PanelBackground);
@@ -171,10 +173,6 @@ namespace Maestro.UI.Main
 			val3.set_TextColor(MaestroTheme.CreamWhite);
 			_titleLabel = val3;
 			string artistText = (string.IsNullOrWhiteSpace(song.Transcriber) ? song.Artist : (song.Artist + " - " + song.Transcriber));
-			if (!string.IsNullOrEmpty(song.DisplayDownloads))
-			{
-				artistText = artistText + " | " + song.DisplayDownloads + " downloads";
-			}
 			if (!string.IsNullOrEmpty(song.DisplayDuration))
 			{
 				artistText = artistText + " | " + song.DisplayDuration;
@@ -202,6 +200,13 @@ namespace Maestro.UI.Main
 			{
 				this.AddToQueueRequested?.Invoke(this, EventArgs.Empty);
 			});
+			if (song.IsUserImported || song.IsCreated)
+			{
+				((Control)contextMenu.AddMenuItem("Edit Song")).add_Click((EventHandler<MouseEventArgs>)delegate
+				{
+					this.EditRequested?.Invoke(this, EventArgs.Empty);
+				});
+			}
 			if (song.IsUserImported || song.IsCreated || song.IsCommunityDownloaded)
 			{
 				((Control)contextMenu.AddMenuItem("Delete Song")).add_Click((EventHandler<MouseEventArgs>)delegate

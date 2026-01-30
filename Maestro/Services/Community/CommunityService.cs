@@ -133,7 +133,6 @@ namespace Maestro.Services.Community
 					RaiseDownloadProgress(communitySong.Id, 0, DownloadState.Failed);
 					return null;
 				}
-				song.Downloads = communitySong.Downloads;
 				_songStorage.SaveSong(song);
 				progress?.Report(100);
 				RaiseDownloadProgress(communitySong.Id, 100, DownloadState.Completed);
