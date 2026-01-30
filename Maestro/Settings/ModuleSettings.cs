@@ -104,8 +104,7 @@ namespace Maestro.Settings
 
 		private void DefineClientId(SettingCollection settings)
 		{
-			SettingEntry<string> clientIdSetting = settings.DefineSetting<string>("ClientId", "", (Func<string>)(() => ""), (Func<string>)(() => ""));
-			SettingComplianceExtensions.SetDisabled((SettingEntry)(object)clientIdSetting, true);
+			SettingEntry<string> clientIdSetting = settings.AddSubCollection("Internal", false).DefineSetting<string>("ClientId", "", (Func<string>)null, (Func<string>)null);
 			if (string.IsNullOrEmpty(clientIdSetting.get_Value()))
 			{
 				clientIdSetting.set_Value(Guid.NewGuid().ToString());
