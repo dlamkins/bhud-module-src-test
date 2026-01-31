@@ -39,5 +39,6 @@
       <HintPath>..\..\working\LiteDB.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json" />
+    <Reference Include="AsyncClipboardService" />
   </ItemGroup>
 </Project>

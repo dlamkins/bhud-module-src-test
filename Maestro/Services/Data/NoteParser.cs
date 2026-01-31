@@ -24,13 +24,33 @@ namespace Maestro.Services.Data
 
 		private static readonly Regex NotePattern = new Regex("([A-GR])(\\^|#)?([+-])?:(\\d+)", RegexOptions.Compiled);
 
+		public static long CalculateDurationMs(List<string> noteLines)
+		{
+			long total = 0L;
+			foreach (string line in noteLines)
+			{
+				MatchCollection matchCollection = NotePattern.Matches(line);
+				int maxDuration = 0;
+				foreach (Match item in matchCollection)
+				{
+					int duration = int.Parse(item.Groups[4].Value);
+					if (duration > maxDuration)
+					{
+						maxDuration = duration;
+					}
+				}
+				total += maxDuration;
+			}
+			return total;
+		}
+
 		public static List<SongCommand> Parse(List<string> noteLines)
 		{
-			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0121: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a8: Unknown result type (might be due to invalid IL or missing references)
 			List<SongCommand> commands = new List<SongCommand>();
 			int currentOctave = 0;
 			foreach (string noteLine in noteLines)
@@ -49,13 +69,15 @@ namespace Maestro.Services.Data
 				{
 					if (note2.TargetOctave != currentOctave)
 					{
-						int steps = note2.TargetOctave - currentOctave;
-						Keys octaveKey = (Keys)((steps > 0) ? 105 : 96);
-						for (int i = 0; i < Math.Abs(steps); i++)
+						int num = note2.TargetOctave - currentOctave;
+						int absSteps = Math.Abs(num);
+						Keys octaveKey = (Keys)((num > 0) ? 105 : 96);
+						int delay = ((absSteps > 1) ? 100 : 10);
+						for (int i = 0; i < absSteps; i++)
 						{
 							commands.Add(SongCommand.KeyDownCmd(octaveKey));
 							commands.Add(SongCommand.KeyUpCmd(octaveKey));
-							commands.Add(SongCommand.WaitCmd(10));
+							commands.Add(SongCommand.WaitCmd(delay));
 						}
 						currentOctave = note2.TargetOctave;
 					}

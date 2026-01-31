@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
@@ -16,19 +17,15 @@ namespace Maestro.UI.Import
 		{
 			public const int WindowWidth = 420;
 
-			public const int WindowHeight = 370;
+			public const int WindowHeight = 250;
 
 			public const int ContentWidth = 390;
-
-			public const int ContentHeight = 380;
 
 			public const int InputX = 90;
 
 			public const int InputWidth = 290;
 
 			public const int RowHeight = 28;
-
-			public const int ScriptAreaHeight = 140;
 		}
 
 		private readonly TextBox _titleInput;
@@ -39,13 +36,15 @@ namespace Maestro.UI.Import
 
 		private readonly Dropdown _instrumentDropdown;
 
-		private readonly Panel _scriptContainer;
+		private readonly StandardButton _pasteButton;
 
-		private readonly MultilineTextBox _scriptInput;
+		private readonly Label _parseStatusLabel;
 
 		private readonly StandardButton _importButton;
 
 		private readonly StandardButton _cancelButton;
+
+		private List<string> _parsedNotes;
 
 		private static Texture2D _backgroundTexture;
 
@@ -53,11 +52,11 @@ namespace Maestro.UI.Import
 
 		private static Texture2D GetBackground()
 		{
-			return _backgroundTexture ?? (_backgroundTexture = MaestroTheme.CreateWindowBackground(420, 370));
+			return _backgroundTexture ?? (_backgroundTexture = MaestroTheme.CreateWindowBackground(420, 250));
 		}
 
 		public ImportWindow()
-			: this(GetBackground(), new Rectangle(0, 0, 420, 370), new Rectangle(15, 20, 390, 380))
+			: this(GetBackground(), new Rectangle(0, 0, 420, 250), new Rectangle(15, 20, 390, 250))
 		{
 			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
@@ -67,40 +66,40 @@ namespace Maestro.UI.Import
 			//IL_011e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0128: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0138: Expected O, but got Unknown
+			//IL_018f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0194: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0199: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d5: Expected O, but got Unknown
-			//IL_01d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01bc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01cb: Expected O, but got Unknown
+			//IL_01e8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ed: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01f4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01ff: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0209: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0214: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0220: Expected O, but got Unknown
-			//IL_0229: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0203: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0218: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0220: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022f: Expected O, but got Unknown
 			//IL_0235: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0240: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0247: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0251: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0256: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0265: Expected O, but got Unknown
-			//IL_027d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0282: Unknown result type (might be due to invalid IL or missing references)
+			//IL_023a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0241: Unknown result type (might be due to invalid IL or missing references)
+			//IL_024c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0253: Unknown result type (might be due to invalid IL or missing references)
+			//IL_025d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0262: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0271: Expected O, but got Unknown
 			//IL_0289: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0294: Unknown result type (might be due to invalid IL or missing references)
-			//IL_029b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02aa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b9: Expected O, but got Unknown
+			//IL_028e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0295: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02c5: Expected O, but got Unknown
 			((WindowBase2)this).set_Title("Import Song");
 			((WindowBase2)this).set_Subtitle("AHK v1 Format");
 			((WindowBase2)this).set_Emblem(Module.Instance.ContentsManager.GetTexture("import-emblem.png"));
@@ -130,24 +129,25 @@ namespace Maestro.UI.Import
 				_instrumentDropdown.get_Items().Add(instrument);
 			}
 			_instrumentDropdown.set_SelectedItem("Harp");
-			currentY += 35;
+			currentY += 42;
 			CreateLabel("AHK Script:", 0, currentY);
-			currentY += 28;
-			Panel val2 = new Panel();
+			StandardButton val2 = new StandardButton();
 			((Control)val2).set_Parent((Container)(object)this);
-			((Control)val2).set_Location(new Point(0, currentY));
-			((Control)val2).set_Size(new Point(390, 140));
-			val2.set_CanScroll(true);
-			val2.set_ShowBorder(true);
-			_scriptContainer = val2;
-			MultilineTextBox val3 = new MultilineTextBox();
-			((Control)val3).set_Parent((Container)(object)_scriptContainer);
-			((Control)val3).set_Location(new Point(0, 0));
-			((Control)val3).set_Size(new Point(370, 600));
-			((TextInputBase)val3).set_PlaceholderText("Paste AHK v1 script here...");
-			val3.set_HideBackground(true);
-			_scriptInput = val3;
-			currentY += 147;
+			val2.set_Text("Paste from Clipboard");
+			((Control)val2).set_Location(new Point(90, currentY));
+			((Control)val2).set_Size(new Point(290, 26));
+			_pasteButton = val2;
+			((Control)_pasteButton).add_Click((EventHandler<MouseEventArgs>)OnPasteClicked);
+			currentY += 35;
+			Label val3 = new Label();
+			((Control)val3).set_Parent((Container)(object)this);
+			val3.set_Text("");
+			((Control)val3).set_Location(new Point(90, currentY));
+			((Control)val3).set_Width(290);
+			val3.set_AutoSizeHeight(true);
+			val3.set_TextColor(MaestroTheme.MutedCream);
+			_parseStatusLabel = val3;
+			currentY += 17;
 			StandardButton val4 = new StandardButton();
 			((Control)val4).set_Parent((Container)(object)this);
 			val4.set_Text("Import");
@@ -201,11 +201,57 @@ namespace Maestro.UI.Import
 			return val;
 		}
 
+		private void OnPasteClicked(object sender, MouseEventArgs e)
+		{
+			ClipboardUtil.get_WindowsClipboardService().GetTextAsync().ContinueWith(delegate(Task<string> task)
+			{
+				//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+				if (task.IsFaulted || string.IsNullOrEmpty(task.Result))
+				{
+					_parsedNotes = null;
+					_parseStatusLabel.set_Text("Clipboard is empty");
+					_parseStatusLabel.set_TextColor(MaestroTheme.Error);
+				}
+				else
+				{
+					ParseScript(task.Result);
+				}
+			});
+		}
+
+		private void ParseScript(string script)
+		{
+			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
+			try
+			{
+				_parsedNotes = AhkParser.ParseToCompact(script);
+				if (_parsedNotes.Count == 0)
+				{
+					_parseStatusLabel.set_Text("No notes found in script");
+					_parseStatusLabel.set_TextColor(MaestroTheme.Error);
+				}
+				else
+				{
+					TimeSpan duration = TimeSpan.FromMilliseconds(NoteParser.CalculateDurationMs(_parsedNotes));
+					_parseStatusLabel.set_Text($"{_parsedNotes.Count} notes · {duration:m\\:ss}");
+					_parseStatusLabel.set_TextColor(MaestroTheme.Playing);
+				}
+			}
+			catch
+			{
+				_parsedNotes = null;
+				_parseStatusLabel.set_Text("Could not parse clipboard content");
+				_parseStatusLabel.set_TextColor(MaestroTheme.Error);
+			}
+		}
+
 		private void OnImportClicked(object sender, MouseEventArgs e)
 		{
 			if (ValidateInput())
 			{
-				Song song = ParseSong();
+				Song song = BuildSong();
 				if (song != null)
 				{
 					this.SongImported?.Invoke(this, song);
@@ -228,44 +274,30 @@ namespace Maestro.UI.Import
 				ScreenNotification.ShowNotification("Please enter a song title", (NotificationType)2, (Texture2D)null, 4);
 				return false;
 			}
-			if (string.IsNullOrWhiteSpace(((TextInputBase)_scriptInput).get_Text()))
+			if (_parsedNotes == null || _parsedNotes.Count == 0)
 			{
-				ScreenNotification.ShowNotification("Please paste the AHK script", (NotificationType)2, (Texture2D)null, 4);
+				ScreenNotification.ShowNotification("Please paste a valid AHK script", (NotificationType)2, (Texture2D)null, 4);
 				return false;
 			}
 			return true;
 		}
 
-		private Song ParseSong()
+		private Song BuildSong()
 		{
-			try
+			Enum.TryParse<InstrumentType>(_instrumentDropdown.get_SelectedItem(), out var instrument);
+			Song song = new Song
 			{
-				List<string> notes = AhkParser.ParseToCompact(((TextInputBase)_scriptInput).get_Text());
-				if (notes.Count == 0)
-				{
-					ScreenNotification.ShowNotification("No notes found in AHK script", (NotificationType)2, (Texture2D)null, 4);
-					return null;
-				}
-				Enum.TryParse<InstrumentType>(_instrumentDropdown.get_SelectedItem(), out var instrument);
-				Song song = new Song
-				{
-					Name = ((TextInputBase)_titleInput).get_Text().Trim(),
-					Artist = (string.IsNullOrWhiteSpace(((TextInputBase)_artistInput).get_Text()) ? "Unknown" : ((TextInputBase)_artistInput).get_Text().Trim()),
-					Transcriber = (string.IsNullOrWhiteSpace(((TextInputBase)_transcriberInput).get_Text()) ? null : ((TextInputBase)_transcriberInput).get_Text().Trim()),
-					Instrument = instrument,
-					IsUserImported = true
-				};
-				song.Notes.AddRange(notes);
-				List<SongCommand> commands = NoteParser.Parse(notes);
-				song.Commands.AddRange(commands);
-				ScreenNotification.ShowNotification($"Imported {notes.Count} notes, {song.Commands.Count} commands", (NotificationType)0, (Texture2D)null, 4);
-				return song;
-			}
-			catch (Exception ex)
-			{
-				ScreenNotification.ShowNotification("Parse error: " + ex.Message, (NotificationType)2, (Texture2D)null, 4);
-				return null;
-			}
+				Name = ((TextInputBase)_titleInput).get_Text().Trim(),
+				Artist = (string.IsNullOrWhiteSpace(((TextInputBase)_artistInput).get_Text()) ? "Unknown" : ((TextInputBase)_artistInput).get_Text().Trim()),
+				Transcriber = (string.IsNullOrWhiteSpace(((TextInputBase)_transcriberInput).get_Text()) ? null : ((TextInputBase)_transcriberInput).get_Text().Trim()),
+				Instrument = instrument,
+				IsUserImported = true
+			};
+			song.Notes.AddRange(_parsedNotes);
+			List<SongCommand> commands = NoteParser.Parse(_parsedNotes);
+			song.Commands.AddRange(commands);
+			ScreenNotification.ShowNotification($"Imported \"{song.Name}\" ({_parsedNotes.Count} notes)", (NotificationType)0, (Texture2D)null, 4);
+			return song;
 		}
 
 		private void ClearInputs()
@@ -273,14 +305,16 @@ namespace Maestro.UI.Import
 			((TextInputBase)_titleInput).set_Text(string.Empty);
 			((TextInputBase)_artistInput).set_Text(string.Empty);
 			((TextInputBase)_transcriberInput).set_Text(string.Empty);
-			((TextInputBase)_scriptInput).set_Text(string.Empty);
 			_instrumentDropdown.set_SelectedItem("Harp");
+			_parsedNotes = null;
+			_parseStatusLabel.set_Text("");
 		}
 
 		protected override void DisposeControl()
 		{
 			((Control)_importButton).remove_Click((EventHandler<MouseEventArgs>)OnImportClicked);
 			((Control)_cancelButton).remove_Click((EventHandler<MouseEventArgs>)OnCancelClicked);
+			((Control)_pasteButton).remove_Click((EventHandler<MouseEventArgs>)OnPasteClicked);
 			TextBox titleInput = _titleInput;
 			if (titleInput != null)
 			{
@@ -301,15 +335,10 @@ namespace Maestro.UI.Import
 			{
 				((Control)instrumentDropdown).Dispose();
 			}
-			MultilineTextBox scriptInput = _scriptInput;
-			if (scriptInput != null)
+			StandardButton pasteButton = _pasteButton;
+			if (pasteButton != null)
 			{
-				((Control)scriptInput).Dispose();
-			}
-			Panel scriptContainer = _scriptContainer;
-			if (scriptContainer != null)
-			{
-				((Control)scriptContainer).Dispose();
+				((Control)pasteButton).Dispose();
 			}
 			StandardButton importButton = _importButton;
 			if (importButton != null)
