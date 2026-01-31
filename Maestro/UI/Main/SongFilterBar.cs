@@ -76,9 +76,10 @@ namespace Maestro.UI.Main
 				}
 				IsTextInputFocused = e.get_Value();
 			});
+			string[] sourceItems = new string[5] { "All", "Bundled", "Created", "Imported", "Community" };
 			GenericFilterButton genericFilterButton = new GenericFilterButton(new FilterSection
 			{
-				Items = new string[5] { "All", "Bundled", "Created", "Imported", "Community" },
+				Items = sourceItems,
 				DefaultValue = "All"
 			}, new FilterSection
 			{

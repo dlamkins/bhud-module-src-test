@@ -175,6 +175,49 @@ namespace Maestro.Services.Community
 			Logger.Info("Deleted song: " + song.Name + " (" + (song.CommunityId ?? "imported") + ")");
 		}
 
+		public async Task<List<Song>> LoadSubmittalsAsync(CancellationToken cancellationToken = default(CancellationToken))
+		{
+			List<Song> submittals = new List<Song>();
+			try
+			{
+				CommunityManifest pendingManifest = await _apiClient.FetchPendingManifestAsync(cancellationToken);
+				if (pendingManifest?.Songs == null || pendingManifest.Songs.Count == 0)
+				{
+					return submittals;
+				}
+				CommunityManifest communityManifest = _manifest;
+				if (communityManifest == null)
+				{
+					communityManifest = await _apiClient.FetchManifestAsync(cancellationToken);
+				}
+				HashSet<string> mainSongIds = new HashSet<string>(communityManifest?.Songs?.Select((CommunitySong s) => s.Id) ?? Enumerable.Empty<string>());
+				List<CommunitySong> newSongs = pendingManifest.Songs.Where((CommunitySong s) => !mainSongIds.Contains(s.Id)).ToList();
+				Logger.Info($"Found {newSongs.Count} submittal(s) in pending branch");
+				foreach (CommunitySong communitySong in newSongs)
+				{
+					try
+					{
+						Song song = await _apiClient.FetchPendingSongAsync(communitySong.Id, cancellationToken);
+						if (song != null)
+						{
+							song.IsSubmittal = true;
+							submittals.Add(song);
+							Logger.Info("Loaded submittal: " + song.Name);
+						}
+					}
+					catch (Exception ex2)
+					{
+						Logger.Warn(ex2, "Failed to load submittal " + communitySong.Id + ", skipping");
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Logger.Error(ex, "Failed to load submittals from pending branch");
+			}
+			return submittals;
+		}
+
 		private void RaiseDownloadProgress(string communityId, int progress, DownloadState state)
 		{
 			this.DownloadProgressChanged?.Invoke(this, new DownloadProgressEventArgs(communityId, progress, state));

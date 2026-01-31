@@ -216,11 +216,11 @@ namespace Maestro.Services.Playback
 				{
 					KeyDown((Keys)96);
 					KeyUp((Keys)96);
-					Thread.Sleep(10);
+					Thread.Sleep(100);
 				}
 				KeyDown((Keys)105);
 				KeyUp((Keys)105);
-				Thread.Sleep(10);
+				Thread.Sleep(100);
 			}
 		}
 

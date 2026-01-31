@@ -30,6 +30,8 @@ namespace Maestro.Models
 
 		public bool IsUploaded { get; set; }
 
+		public bool IsSubmittal { get; set; }
+
 		public bool IsCommunityDownloaded
 		{
 			get

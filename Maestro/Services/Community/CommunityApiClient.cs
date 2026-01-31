@@ -17,6 +17,8 @@ namespace Maestro.Services.Community
 
 		private const string BASE_URL = "https://raw.githubusercontent.com/uwponcel/Maestro/main/Community";
 
+		private const string PENDING_BASE_URL = "https://raw.githubusercontent.com/uwponcel/Maestro/community/pending/Community";
+
 		private const string UPLOAD_API_URL = "https://maestro-api.uwponcel.workers.dev/api";
 
 		private readonly HttpClient _httpClient;
@@ -85,6 +87,60 @@ namespace Maestro.Services.Community
 			catch (Exception ex)
 			{
 				Logger.Error(ex, "Failed to fetch community song " + songId);
+				throw;
+			}
+		}
+
+		public async Task<CommunityManifest> FetchPendingManifestAsync(CancellationToken cancellationToken = default(CancellationToken))
+		{
+			_ = 1;
+			try
+			{
+				string url = "https://raw.githubusercontent.com/uwponcel/Maestro/community/pending/Community/manifest.json";
+				Logger.Info("Fetching pending manifest from " + url);
+				HttpResponseMessage obj = await _httpClient.GetAsync(url, cancellationToken);
+				obj.EnsureSuccessStatusCode();
+				CommunityManifest manifest = JsonConvert.DeserializeObject<CommunityManifest>(await obj.get_Content().ReadAsStringAsync());
+				Logger.Info($"Fetched pending manifest with {(manifest?.Songs?.Count).GetValueOrDefault()} songs");
+				return manifest;
+			}
+			catch (OperationCanceledException)
+			{
+				Logger.Debug("Pending manifest fetch cancelled");
+				throw;
+			}
+			catch (Exception ex)
+			{
+				Logger.Error(ex, "Failed to fetch pending manifest");
+				throw;
+			}
+		}
+
+		public async Task<Song> FetchPendingSongAsync(string songId, CancellationToken cancellationToken = default(CancellationToken))
+		{
+			_ = 1;
+			try
+			{
+				string url = "https://raw.githubusercontent.com/uwponcel/Maestro/community/pending/Community/songs/" + songId + ".json";
+				Logger.Info("Fetching pending song " + songId);
+				HttpResponseMessage obj = await _httpClient.GetAsync(url, cancellationToken);
+				obj.EnsureSuccessStatusCode();
+				Song song = SongSerializer.DeserializeJsonContent(await obj.get_Content().ReadAsStringAsync());
+				if (song != null)
+				{
+					song.CommunityId = songId;
+				}
+				Logger.Info("Fetched pending song: " + song?.Name);
+				return song;
+			}
+			catch (OperationCanceledException)
+			{
+				Logger.Debug("Pending song fetch cancelled for " + songId);
+				throw;
+			}
+			catch (Exception ex)
+			{
+				Logger.Error(ex, "Failed to fetch pending song " + songId);
 				throw;
 			}
 		}

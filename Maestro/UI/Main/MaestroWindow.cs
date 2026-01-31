@@ -515,6 +515,7 @@ namespace Maestro.UI.Main
 				"Community" => songs.Where((Song s) => s.IsCommunityDownloaded), 
 				"Created" => songs.Where((Song s) => s.IsCreated), 
 				"Imported" => songs.Where((Song s) => s.IsUserImported), 
+				"Submittals" => songs.Where((Song s) => s.IsSubmittal), 
 				_ => songs, 
 			};
 		}
