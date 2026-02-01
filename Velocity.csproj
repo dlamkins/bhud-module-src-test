@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+  <PropertyGroup>
+    <AssemblyName>Velocity</AssemblyName>
+    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+    <UseWindowsForms>True</UseWindowsForms>
+    <TargetFramework>net48</TargetFramework>
+  </PropertyGroup>
+  <PropertyGroup>
+    <LangVersion>Preview</LangVersion>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemGroup />
+  <ItemGroup>
+    <Reference Include="Blish HUD">
+      <HintPath>..\..\working\Blish HUD.exe</HintPath>
+    </Reference>
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="MonoGame.Framework">
+      <HintPath>..\..\working\MonoGame.Framework.dll</HintPath>
+    </Reference>
+    <Reference Include="Gw2Sharp">
+      <HintPath>..\..\working\Gw2Sharp.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoGame.Extended">
+      <HintPath>..\..\working\MonoGame.Extended.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Core" />
+  </ItemGroup>
+</Project>
