@@ -195,9 +195,9 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			return (panel, label.Item1, trackbar);
 		}
 
-		protected (Panel Panel, Label label, Checkbox checkbox) RenderBoolSetting(Panel parent, SettingEntry<bool> settingEntry, Func<bool, bool, Task<bool>> onBeforeChangeAction = null)
+		protected (Panel Panel, Label label, Checkbox checkbox) RenderBoolSetting(Panel parent, SettingEntry<bool> settingEntry, Func<bool, bool, Task<bool>> onBeforeChangeAction = null, Func<bool, bool, Task> onAfterChangeAction = null)
 		{
-			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
 			Panel panel = GetPanel((Container)(object)parent);
 			(Label, Label) label = RenderLabel(panel, ((SettingEntry)settingEntry).get_DisplayName());
 			Checkbox checkbox = RenderCheckbox(panel, CONTROL_LOCATION, settingEntry.get_Value(), delegate(bool newValue)
@@ -205,6 +205,7 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 				try
 				{
 					settingEntry.set_Value(newValue);
+					onAfterChangeAction?.Invoke(!settingEntry.get_Value(), settingEntry.get_Value());
 				}
 				catch (Exception ex)
 				{

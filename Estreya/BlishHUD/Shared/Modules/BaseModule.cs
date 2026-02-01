@@ -25,6 +25,7 @@ using Estreya.BlishHUD.Shared.Exceptions;
 using Estreya.BlishHUD.Shared.Extensions;
 using Estreya.BlishHUD.Shared.Helpers;
 using Estreya.BlishHUD.Shared.Models;
+using Estreya.BlishHUD.Shared.Models.Features;
 using Estreya.BlishHUD.Shared.MumbleInfo.Map;
 using Estreya.BlishHUD.Shared.Net;
 using Estreya.BlishHUD.Shared.Security;
@@ -41,9 +42,11 @@ using Estreya.BlishHUD.Shared.Utils;
 using Flurl.Http;
 using Flurl.Http.Configuration;
 using Gw2Sharp.Models;
+using Jose;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended.BitmapFonts;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using NodaTime;
 using NodaTime.Serialization.JsonNet;
 using SemVer;
@@ -227,9 +230,15 @@ namespace Estreya.BlishHUD.Shared.Modules
 							}
 						}
 					};
+					c.JsonSerializer = new NewtonsoftJsonSerializer(GetJsonSerializer().ToSettings());
 				});
 			}
 			return _flurlClient;
+		}
+
+		protected JsonSerializer GetJsonSerializer()
+		{
+			return JsonSerializer.CreateDefault().ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
 		}
 
 		protected BaseModule(ModuleParameters moduleParameters)
@@ -249,7 +258,6 @@ namespace Estreya.BlishHUD.Shared.Modules
 		{
 			Logger.Info("Running in normal mode.");
 			_cancellationTokenSource = new CancellationTokenSource();
-			JsonConvert.DefaultSettings = () => new JsonSerializerSettings().ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
 			TEMP_FIX_SetTacOAsActive();
 			string directoryName = GetDirectoryName();
 			if (!string.IsNullOrWhiteSpace(directoryName))
@@ -305,6 +313,28 @@ namespace Estreya.BlishHUD.Shared.Modules
 			ModuleSettings.UpdateLocalization(TranslationService);
 			ModuleSettings.RegisterCornerIcon.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)RegisterCornerIcon_SettingChanged);
 			BackendConnectionRestored += BaseModule_BackendConnectionRestored;
+		}
+
+		protected async Task<bool> IsFeatureEnabledAsync(string feature)
+		{
+			try
+			{
+				string userId = null;
+				string accessToken = BlishHUDAPIService?.AccessToken;
+				if (!string.IsNullOrWhiteSpace(accessToken))
+				{
+					userId = JObject.Parse(JWT.Payload(accessToken)).GetValue("email")?.ToObject<string>();
+				}
+				return (await (await GetFlurlClient().Request("https://gitlab.estreya.de/feature-flags/blish-hud/modules/production").WithHeader("Authorization", "aBx2dd/XZJ21gdwHQOQ42e5Xf1VuT36XCYeBj7Ghdts=").PostJsonAsync(new
+				{
+					context = new { userId }
+				}, default(CancellationToken), (HttpCompletionOption)0)).GetJsonAsync<UnleashProxyResponse>()).Toggles.FirstOrDefault((UnleashProxyToggle t) => t.Name == feature)?.Enabled ?? false;
+			}
+			catch (Exception e)
+			{
+				Logger.Warn(e, "Failed to evaluate feature flag status.");
+				return false;
+			}
 		}
 
 		private async Task BaseModule_BackendConnectionRestored(object sender)

@@ -4,6 +4,8 @@ namespace Estreya.BlishHUD.EventTable.Models
 {
 	public enum EventCompletedAction
 	{
+		[Translation("eventCompletedAction-none", "None")]
+		None,
 		[Translation("eventCompletedAction-crossout", "Crossout")]
 		Crossout,
 		[Translation("eventCompletedAction-hide", "Hide")]

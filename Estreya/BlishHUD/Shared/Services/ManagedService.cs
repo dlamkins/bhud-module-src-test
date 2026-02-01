@@ -97,13 +97,18 @@ namespace Estreya.BlishHUD.Shared.Services
 
 		private void Unload()
 		{
-			if (_cancellationTokenSource.IsCancellationRequested)
+			if (!Running)
+			{
+				Logger.Warn("Trying to stop, but not running.");
+				return;
+			}
+			if (_cancellationTokenSource?.IsCancellationRequested ?? false)
 			{
 				Logger.Warn("Already unloaded.");
 				return;
 			}
 			Logger.Debug("Unloading state.");
-			_cancellationTokenSource.Cancel();
+			_cancellationTokenSource?.Cancel();
 			InternalUnload();
 		}
 

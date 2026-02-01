@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Estreya.BlishHUD.Shared.Threading;
@@ -11,7 +11,7 @@ namespace Estreya.BlishHUD.Shared.Utils
 	{
 		private static readonly Logger Logger = Logger.GetLogger(typeof(UpdateUtil));
 
-		private static readonly SynchronizedCollection<IntPtr> _asyncStateMonitor = new SynchronizedCollection<IntPtr>();
+		private static readonly ConcurrentDictionary<IntPtr, Task> _asyncStateMonitor = new ConcurrentDictionary<IntPtr, Task>();
 
 		public static void Update(Action<GameTime> call, GameTime gameTime, double interval, ref double lastCheck)
 		{
@@ -33,59 +33,72 @@ namespace Estreya.BlishHUD.Shared.Utils
 			}
 		}
 
-		public static async Task UpdateAsync(Func<GameTime, Task> call, GameTime gameTime, double interval, AsyncRef<double> lastCheck, bool doLogging = true, TaskCreationOptions taskCreationOptions = TaskCreationOptions.None)
+		public static async Task<Task> UpdateAsync(Func<GameTime, Task> call, GameTime gameTime, double interval, AsyncRef<double> lastCheck, bool doLogging = true, TaskCreationOptions taskCreationOptions = TaskCreationOptions.None)
 		{
 			lastCheck.Value += gameTime.get_ElapsedGameTime().TotalMilliseconds;
-			if (lastCheck.Value < interval || _asyncStateMonitor.Contains(call.Method.MethodHandle.Value))
+			if (lastCheck.Value < interval)
 			{
-				return;
+				return Task.CompletedTask;
 			}
-			_asyncStateMonitor.Add(call.Method.MethodHandle.Value);
+			if (_asyncStateMonitor.TryGetValue(call.Method.MethodHandle.Value, out var savedTask))
+			{
+				return savedTask;
+			}
 			string methodName = call.Target.GetType().FullName + "." + call.Method.Name + "()";
 			if (doLogging)
 			{
 				Logger.Debug("Start running update function '{0}'.", new object[1] { methodName });
 			}
+			Task task = Task.Factory.StartNew(() => call(gameTime), taskCreationOptions).Unwrap();
+			_asyncStateMonitor.AddOrUpdate(call.Method.MethodHandle.Value, task, (IntPtr _, Task _) => task);
 			try
 			{
-				await Task.Factory.StartNew(() => call(gameTime), taskCreationOptions).Unwrap();
+				await task;
 				lastCheck.Value = 0.0;
 			}
 			finally
 			{
-				_asyncStateMonitor.Remove(call.Method.MethodHandle.Value);
+				_asyncStateMonitor.TryRemove(call.Method.MethodHandle.Value, out var _);
 			}
 			if (doLogging)
 			{
 				Logger.Debug("Update function '{0}' finished running.", new object[1] { methodName });
 			}
+			return task;
 		}
 
-		public static async Task UpdateAsync(Func<Task> call, GameTime gameTime, double interval, AsyncRef<double> lastCheck, bool doLogging = true, TaskCreationOptions taskCreationOptions = TaskCreationOptions.None)
+		public static async Task<Task> UpdateAsync(Func<Task> call, GameTime gameTime, double interval, AsyncRef<double> lastCheck, bool doLogging = true, TaskCreationOptions taskCreationOptions = TaskCreationOptions.None)
 		{
 			lastCheck.Value += gameTime.get_ElapsedGameTime().TotalMilliseconds;
-			if (!(lastCheck.Value < interval) && !_asyncStateMonitor.Contains(call.Method.MethodHandle.Value))
+			if (lastCheck.Value < interval)
 			{
-				_asyncStateMonitor.Add(call.Method.MethodHandle.Value);
-				string methodName = call.Target.GetType().FullName + "." + call.Method.Name + "()";
-				if (doLogging)
-				{
-					Logger.Debug("Start running update function '{0}'.", new object[1] { methodName });
-				}
-				try
-				{
-					await Task.Factory.StartNew(call, taskCreationOptions).Unwrap();
-					lastCheck.Value = 0.0;
-				}
-				finally
-				{
-					_asyncStateMonitor.Remove(call.Method.MethodHandle.Value);
-				}
-				if (doLogging)
-				{
-					Logger.Debug("Update function '{0}' finished running.", new object[1] { methodName });
-				}
+				return Task.CompletedTask;
 			}
+			if (_asyncStateMonitor.TryGetValue(call.Method.MethodHandle.Value, out var savedTask))
+			{
+				return savedTask;
+			}
+			string methodName = call.Target.GetType().FullName + "." + call.Method.Name + "()";
+			if (doLogging)
+			{
+				Logger.Debug("Start running update function '{0}'.", new object[1] { methodName });
+			}
+			Task task = Task.Factory.StartNew(call, taskCreationOptions).Unwrap();
+			_asyncStateMonitor.AddOrUpdate(call.Method.MethodHandle.Value, task, (IntPtr _, Task _) => task);
+			try
+			{
+				await task;
+				lastCheck.Value = 0.0;
+			}
+			finally
+			{
+				_asyncStateMonitor.TryRemove(call.Method.MethodHandle.Value, out var _);
+			}
+			if (doLogging)
+			{
+				Logger.Debug("Update function '{0}' finished running.", new object[1] { methodName });
+			}
+			return task;
 		}
 	}
 }

@@ -123,15 +123,15 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 						{
 							Name = base.TranslationService.GetTranslation("reminderSettingsView-btn-changeTimes-title", "Change Times"),
 							Tooltip = base.TranslationService.GetTranslation("reminderSettingsView-btn-changeTimes-tooltip", "Click to change the times at which reminders happen."),
-							Icon = "1466345.png",
-							Action = ManageReminderTimes
+							Icon = (Estreya.BlishHUD.EventTable.Models.Event ev) => "1466345.png",
+							Action = (Estreya.BlishHUD.EventTable.Models.Event ev, GlowButton _) => ManageReminderTimes(ev)
 						},
 						new ManageEventsView.CustomActionDefinition
 						{
 							Name = base.TranslationService.GetTranslation("reminderSettingsView-btn-uploadEventSoundFile-title", "Upload Sound File"),
 							Tooltip = base.TranslationService.GetTranslation("reminderSettingsView-btn-uploadEventSoundFile-tooltip", "Click to upload a specific sound file for this event."),
-							Icon = "156764.png",
-							Action = UploadEventSoundFile
+							Icon = (Estreya.BlishHUD.EventTable.Models.Event ev) => "156764.png",
+							Action = (Estreya.BlishHUD.EventTable.Models.Event ev, GlowButton _) => UploadEventSoundFile(ev)
 						}
 					}
 				} }, () => _moduleSettings.ReminderDisabledForEvents.get_Value(), _moduleSettings, _accountService, base.APIManager, base.IconService, base.TranslationService);

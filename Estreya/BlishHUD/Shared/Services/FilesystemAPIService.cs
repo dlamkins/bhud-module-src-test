@@ -44,6 +44,8 @@ namespace Estreya.BlishHUD.Shared.Services
 
 		protected virtual bool ForceAPI => false;
 
+		protected virtual TimeSpan MaxCacheAge => TimeSpan.FromDays(5.0);
+
 		protected FilesystemAPIService(Gw2ApiManager apiManager, APIServiceConfiguration configuration, string baseModulePath, IFlurlClient flurlClient, string fileRootUrl)
 			: base(apiManager, configuration)
 		{
@@ -267,12 +269,12 @@ namespace Estreya.BlishHUD.Shared.Services
 			string lastUpdatedFilePath = Path.Combine(DirectoryPath, "last_updated.txt");
 			if (File.Exists(lastUpdatedFilePath))
 			{
-				if (!DateTime.TryParseExact(await FileUtil.ReadStringAsync(lastUpdatedFilePath), "yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out var _))
+				if (!DateTime.TryParseExact(await FileUtil.ReadStringAsync(lastUpdatedFilePath), "yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out var lastUpdated))
 				{
 					Logger.Debug("Failed parsing last updated.");
 					return false;
 				}
-				return true;
+				return DateTime.UtcNow - lastUpdated < MaxCacheAge;
 			}
 			return false;
 		}

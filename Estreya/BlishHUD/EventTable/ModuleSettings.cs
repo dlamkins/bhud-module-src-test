@@ -134,6 +134,14 @@ namespace Estreya.BlishHUD.EventTable
 
 		public SettingEntry<bool> HideRemindersInPvP { get; private set; }
 
+		public SettingEntry<KeyBinding> ShowEventTimeTableWindowKeybinding { get; private set; }
+
+		public SettingEntry<List<string>> DisabledEventTimeTableSettingsKeys { get; private set; }
+
+		public SettingEntry<bool> CloseEventTimeTableWithEsc { get; private set; }
+
+		public SettingEntry<bool> ShowEventTimeTableSettingButtonInExternalWindow { get; private set; }
+
 		public ModuleSettings(SettingCollection settings, Version moduleVersion)
 			: base(settings, moduleVersion, new KeyBinding())
 		{
@@ -160,6 +168,8 @@ namespace Estreya.BlishHUD.EventTable
 			//IL_1297: Expected O, but got Unknown
 			//IL_12e6: Unknown result type (might be due to invalid IL or missing references)
 			//IL_132e: Expected O, but got Unknown
+			//IL_1628: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1670: Expected O, but got Unknown
 			((SettingEntry)base.RegisterContext).set_GetDisplayNameFunc((Func<string>)(() => "Allow Cross Module Interaction"));
 			((SettingEntry)base.RegisterContext).set_GetDescriptionFunc((Func<string>)(() => "Allow other BlishHUD modules to add certain elements to this module (events, reminders, ...). Requires a restart."));
 			MapKeybinding = base.GlobalSettings.DefineSetting<KeyBinding>("MapKeybinding", new KeyBinding((Keys)77), (Func<string>)(() => "Open Map Hotkey"), (Func<string>)(() => "Defines the key used to open the fullscreen map."));
@@ -262,6 +272,13 @@ namespace Estreya.BlishHUD.EventTable
 			HideRemindersInPvE_Competetive = base.GlobalSettings.DefineSetting<bool>("HideRemindersInPvE_Competetive", false, (Func<string>)(() => "Hide Reminders in PvE (Competetive)"), (Func<string>)(() => "Whether the reminders should hide when in PvE (Competetive)."));
 			HideRemindersInWvW = base.GlobalSettings.DefineSetting<bool>("HideRemindersInWvW", false, (Func<string>)(() => "Hide Reminders in WvW"), (Func<string>)(() => "Whether the reminders should hide when in world vs. world."));
 			HideRemindersInPvP = base.GlobalSettings.DefineSetting<bool>("HideRemindersInPvP", false, (Func<string>)(() => "Hide Reminders in PvP"), (Func<string>)(() => "Whether the reminders should hide when in player vs. player."));
+			ShowEventTimeTableWindowKeybinding = base.GlobalSettings.DefineSetting<KeyBinding>("ShowEventTimeTableWindowKeybinding", new KeyBinding((ModifierKeys)3, (Keys)69), (Func<string>)(() => "Show Event Time Table Keybinding"), (Func<string>)(() => "Defines the key used to toggle the event times table window."));
+			ShowEventTimeTableWindowKeybinding.get_Value().set_Enabled(true);
+			ShowEventTimeTableWindowKeybinding.get_Value().set_IgnoreWhenInTextField(true);
+			ShowEventTimeTableWindowKeybinding.get_Value().set_BlockSequenceFromGw2(true);
+			DisabledEventTimeTableSettingsKeys = base.GlobalSettings.DefineSetting<List<string>>("DisabledEventTimeTableSettingsKeys", new List<string>(), (Func<string>)null, (Func<string>)null);
+			CloseEventTimeTableWithEsc = base.GlobalSettings.DefineSetting<bool>("CloseEventTimeTableWithEsc", true, (Func<string>)(() => "Close with ESC"), (Func<string>)(() => "Whether the event times table should close with the ESC key."));
+			ShowEventTimeTableSettingButtonInExternalWindow = base.GlobalSettings.DefineSetting<bool>("ShowEventTimeTableSettingButtonInExternalWindow", true, (Func<string>)(() => "Show Setting Button in external Window"), (Func<string>)(() => "Whether the event times table should show the setting button in the external window."));
 			HandleEnabledStates();
 		}
 
@@ -412,6 +429,11 @@ namespace Estreya.BlishHUD.EventTable
 			SettingEntry<bool> hideInPvP = base.DrawerSettings.DefineSetting<bool>(name + "-hideInPvP", false, (Func<string>)(() => "Hide in PvP"), (Func<string>)(() => "Whether the area should hide when in player vs. player."));
 			SettingEntry<bool> showCategoryNames = base.DrawerSettings.DefineSetting<bool>(name + "-showCategoryNames", false, (Func<string>)(() => "Show Category Names"), (Func<string>)(() => "Defines if the category names should be shown before the event bars."));
 			SettingEntry<Color> categoryNameColor = base.DrawerSettings.DefineSetting<Color>(name + "-categoryNameColor", base.DefaultGW2Color, (Func<string>)(() => "Category Name Color"), (Func<string>)(() => "Defines the color of the category names."));
+			SettingEntry<float> categoryNameOpacity = base.DrawerSettings.DefineSetting<float>(name + "-categoryNameOpacity", 1f, (Func<string>)(() => "Category Name Opacity"), (Func<string>)(() => "Defines the opacity of the category names."));
+			SettingComplianceExtensions.SetRange(categoryNameOpacity, 0.1f, 1f);
+			SettingEntry<Color> categoryNameBackgroundColor = base.DrawerSettings.DefineSetting<Color>(name + "-categoryNameBackgroundColor", base.DefaultGW2Color, (Func<string>)(() => "Category Name Background Color"), (Func<string>)(() => "Defines the background color of the category names."));
+			SettingEntry<float> categoryNameBackgroundOpacity = base.DrawerSettings.DefineSetting<float>(name + "-categoryNameBackgroundOpacity", 1f, (Func<string>)(() => "Category Name Background Opacity"), (Func<string>)(() => "Defines the opacity of the category names background."));
+			SettingComplianceExtensions.SetRange(categoryNameBackgroundOpacity, 0.1f, 1f);
 			SettingEntry<bool> enableColorGradients = base.DrawerSettings.DefineSetting<bool>(name + "-enableColorGradients", false, (Func<string>)(() => "Enable Color Gradients"), (Func<string>)(() => "Defines if supported events should have a smoother color gradient from and to the next event."));
 			SettingEntry<string> eventTimespanDaysFormatString = base.DrawerSettings.DefineSetting<string>(name + "-eventTimespanDaysFormatString", "DD\\.hh\\:mm\\:ss", (Func<string>)(() => "Days Format String"), (Func<string>)(() => "Defines the format strings for timespans over 1 day."));
 			SettingEntry<string> eventTimespanHoursFormatString = base.DrawerSettings.DefineSetting<string>(name + "-eventTimespanHoursFormatString", "hh\\:mm\\:ss", (Func<string>)(() => "Hours Format String"), (Func<string>)(() => "Defines the format strings for timespans over 1 hours."));
@@ -423,10 +445,13 @@ namespace Estreya.BlishHUD.EventTable
 			SettingEntry<Color> topTimelineLineColor = base.DrawerSettings.DefineSetting<Color>(name + "-topTimelineLineColor", base.DefaultGW2Color, (Func<string>)(() => "Top Timeline Line Color"), (Func<string>)(() => "Defines the line color of the top timeline."));
 			SettingEntry<Color> topTimelineTimeColor = base.DrawerSettings.DefineSetting<Color>(name + "-topTimelineTimeColor", base.DefaultGW2Color, (Func<string>)(() => "Top Timeline Time Color"), (Func<string>)(() => "Defines the time color of the top timeline."));
 			SettingEntry<float> topTimelineBackgroundOpacity = base.DrawerSettings.DefineSetting<float>(name + "-topTimelineBackgroundOpacity", 1f, (Func<string>)(() => "Top Timeline Background Opacity"), (Func<string>)(() => "Defines the background color opacity of the top timeline."));
+			SettingComplianceExtensions.SetRange(topTimelineBackgroundOpacity, 0.1f, 1f);
 			SettingEntry<float> topTimelineLineOpacity = base.DrawerSettings.DefineSetting<float>(name + "-topTimelineLineOpacity", 1f, (Func<string>)(() => "Top Timeline Line Opacity"), (Func<string>)(() => "Defines the line color opacity of the top timeline."));
 			SettingEntry<float> topTimelineTimeOpacity = base.DrawerSettings.DefineSetting<float>(name + "-topTimelineTimeOpacity", 1f, (Func<string>)(() => "Top Timeline Time Opacity"), (Func<string>)(() => "Defines the time color opacity of the top timeline."));
 			SettingEntry<bool> topTimelineLinesOverWholeHeight = base.DrawerSettings.DefineSetting<bool>(name + "-topTimelineLinesOverWholeHeight", false, (Func<string>)(() => "Top Timeline Lines Over Whole Height"), (Func<string>)(() => "Defines if the top timeline lines should cover the whole event area height."));
 			SettingEntry<bool> topTimelineLinesInBackground = base.DrawerSettings.DefineSetting<bool>(name + "-topTimelineLinesInBackground", true, (Func<string>)(() => "Top Timeline Lines in Background"), (Func<string>)(() => "Defines if the top timeline lines should be in the background or foreground."));
+			SettingEntry<List<string>> disabledComplectionActionForEvents = base.DrawerSettings.DefineSetting<List<string>>(name + "-disabledCompletionActionForEvents", new List<string>(), (Func<string>)null, (Func<string>)null);
+			SettingEntry<bool> compactMode = base.DrawerSettings.DefineSetting<bool>(name + "-compactMode", false, (Func<string>)(() => "Compact Mode"), (Func<string>)(() => "Defines if the area should be displayed in a compact format."));
 			base.DrawerSettings.AddLoggingEvents();
 			return new EventAreaConfiguration
 			{
@@ -486,6 +511,9 @@ namespace Estreya.BlishHUD.EventTable
 				HideInWvW = hideInWvW,
 				ShowCategoryNames = showCategoryNames,
 				CategoryNameColor = categoryNameColor,
+				CategoryNameOpacity = categoryNameOpacity,
+				CategoryNameBackgroundColor = categoryNameBackgroundColor,
+				CategoryNameBackgroundOpacity = categoryNameBackgroundOpacity,
 				EnableColorGradients = enableColorGradients,
 				EventTimespanDaysFormatString = eventTimespanDaysFormatString,
 				EventTimespanHoursFormatString = eventTimespanHoursFormatString,
@@ -500,7 +528,9 @@ namespace Estreya.BlishHUD.EventTable
 				TopTimelineLineOpacity = topTimelineLineOpacity,
 				TopTimelineTimeOpacity = topTimelineTimeOpacity,
 				TopTimelineLinesOverWholeHeight = topTimelineLinesOverWholeHeight,
-				TopTimelineLinesInBackground = topTimelineLinesInBackground
+				TopTimelineLinesInBackground = topTimelineLinesInBackground,
+				DisabledCompletionActionForEvents = disabledComplectionActionForEvents,
+				CompactMode = compactMode
 			};
 		}
 
@@ -562,6 +592,9 @@ namespace Estreya.BlishHUD.EventTable
 			base.DrawerSettings.UndefineSetting(name + "-hideInPvP");
 			base.DrawerSettings.UndefineSetting(name + "-showCategoryNames");
 			base.DrawerSettings.UndefineSetting(name + "-categoryNameColor");
+			base.DrawerSettings.UndefineSetting(name + "-categoryNameOpacity");
+			base.DrawerSettings.UndefineSetting(name + "-categoryNameBackgroundColor");
+			base.DrawerSettings.UndefineSetting(name + "-categoryNameBackgroundOpacity");
 			base.DrawerSettings.UndefineSetting(name + "-enableColorGradients");
 			base.DrawerSettings.UndefineSetting(name + "-eventTimespanDaysFormatString");
 			base.DrawerSettings.UndefineSetting(name + "-eventTimespanHoursFormatString");
@@ -577,6 +610,8 @@ namespace Estreya.BlishHUD.EventTable
 			base.DrawerSettings.UndefineSetting(name + "-topTimelineTimeOpacity");
 			base.DrawerSettings.UndefineSetting(name + "-topTimelineLinesOverWholeHeight");
 			base.DrawerSettings.UndefineSetting(name + "-topTimelineLinesInBackground");
+			base.DrawerSettings.UndefineSetting(name + "-disabledCompletionActionForEvents");
+			base.DrawerSettings.UndefineSetting(name + "-compactMode");
 		}
 
 		public override void UpdateLocalization(TranslationService translationService)
@@ -837,18 +872,35 @@ namespace Estreya.BlishHUD.EventTable
 		{
 			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001a: Expected O, but got Unknown
-			if (!(lastModuleVersion == (Version)null) && !(lastModuleVersion <= new Version("3.15.0", false)))
+			//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bf: Expected O, but got Unknown
+			if (lastModuleVersion == (Version)null || lastModuleVersion <= new Version("3.15.0", false))
+			{
+				foreach (string item in EventAreaNames.get_Value())
+				{
+					string entryKey2 = item + "-eventTimespanDaysFormatString";
+					SettingEntry<string> daysFormatStringSetting = base.DrawerSettings.get_Item(entryKey2) as SettingEntry<string>;
+					if (daysFormatStringSetting != null && daysFormatStringSetting.get_Value() == "dd\\.hh\\:mm\\:ss")
+					{
+						daysFormatStringSetting.set_Value("DD\\.hh\\:mm\\:ss");
+						Logger.Info("Performed migration of " + entryKey2);
+					}
+				}
+			}
+			if (!(lastModuleVersion == (Version)null) && !(lastModuleVersion <= new Version("3.16.5", false)))
 			{
 				return;
 			}
-			foreach (string item in EventAreaNames.get_Value())
+			foreach (string item2 in EventAreaNames.get_Value())
 			{
-				string entryKey = item + "-eventTimespanDaysFormatString";
-				SettingEntry<string> daysFormatStringSetting = base.DrawerSettings.get_Item(entryKey) as SettingEntry<string>;
-				if (daysFormatStringSetting != null && daysFormatStringSetting.get_Value() == "dd\\.hh\\:mm\\:ss")
+				string entryKey = item2 + "-completionAction";
+				SettingEntry<EventCompletedAction> completionAction = base.DrawerSettings.get_Item(entryKey) as SettingEntry<EventCompletedAction>;
+				if (completionAction != null)
 				{
-					daysFormatStringSetting.set_Value("DD\\.hh\\:mm\\:ss");
-					Logger.Info("Performed migration of " + entryKey);
+					EventCompletedAction oldValue = completionAction.get_Value();
+					EventCompletedAction newValue = completionAction.get_Value() + 1;
+					completionAction.set_Value(newValue);
+					Logger.Info($"Performed migration of {entryKey}. {oldValue} -> {newValue}");
 				}
 			}
 		}

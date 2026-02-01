@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Blish_HUD;
+using Estreya.BlishHUD.Shared.Extensions;
 using Estreya.BlishHUD.Shared.Helpers;
 using Estreya.BlishHUD.Shared.Services;
 using Estreya.BlishHUD.Shared.Utils;
@@ -41,6 +42,8 @@ namespace Estreya.BlishHUD.EventTable.Services
 
 		private readonly Func<Instant> _getNowAction;
 
+		private readonly Func<JsonSerializer> _getSerializerAction;
+
 		private string _path;
 
 		private bool dirty;
@@ -66,11 +69,12 @@ namespace Estreya.BlishHUD.EventTable.Services
 
 		public event EventHandler<ValueEventArgs<VisibleStateInfo>> StateRemoved;
 
-		public EventStateService(ServiceConfiguration configuration, string basePath, Func<Instant> getNowAction)
+		public EventStateService(ServiceConfiguration configuration, string basePath, Func<Instant> getNowAction, Func<JsonSerializer> getSerializerAction)
 			: base(configuration)
 		{
 			_basePath = basePath;
 			_getNowAction = getNowAction;
+			_getSerializerAction = getSerializerAction;
 		}
 
 		protected override Task InternalReload()
@@ -230,7 +234,7 @@ namespace Estreya.BlishHUD.EventTable.Services
 				{
 					return;
 				}
-				foreach (VisibleStateInfo instance in JsonConvert.DeserializeObject<List<VisibleStateInfo>>(json)!)
+				foreach (VisibleStateInfo instance in _getSerializerAction().DeserializeObject<List<VisibleStateInfo>>(json))
 				{
 					Add(instance.AreaName, instance.EventKey, instance.Until, instance.State);
 				}
@@ -246,9 +250,11 @@ namespace Estreya.BlishHUD.EventTable.Services
 			if (dirty)
 			{
 				string json = null;
+				JsonSerializer serializer = _getSerializerAction();
+				serializer.Formatting = Formatting.Indented;
 				lock (Instances)
 				{
-					json = JsonConvert.SerializeObject(Instances, Formatting.Indented);
+					json = serializer.SerializeObject(Instances);
 				}
 				if (!string.IsNullOrWhiteSpace(json))
 				{

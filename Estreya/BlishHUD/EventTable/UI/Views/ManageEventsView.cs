@@ -37,9 +37,13 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 			public string Tooltip { get; set; }
 
-			public string Icon { get; set; }
+			public Func<Estreya.BlishHUD.EventTable.Models.Event, string> Icon { get; set; }
 
-			public Func<Estreya.BlishHUD.EventTable.Models.Event, Task> Action { get; set; }
+			public Func<Estreya.BlishHUD.EventTable.Models.Event, bool> InitialChecked { get; set; }
+
+			public Func<Estreya.BlishHUD.EventTable.Models.Event, GlowButton, Task> Action { get; set; }
+
+			public bool ReloadIconAfterAction { get; set; }
 		}
 
 		public const int BEST_WIDTH = 1060;
@@ -177,16 +181,17 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			//IL_0797: Unknown result type (might be due to invalid IL or missing references)
 			//IL_07ad: Unknown result type (might be due to invalid IL or missing references)
 			//IL_07b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0840: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0845: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0857: Unknown result type (might be due to invalid IL or missing references)
-			//IL_085e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_088c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08d3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08e0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08e8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08f4: Expected O, but got Unknown
+			//IL_0846: Unknown result type (might be due to invalid IL or missing references)
+			//IL_084b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_085d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0864: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0876: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08ba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0919: Unknown result type (might be due to invalid IL or missing references)
+			//IL_091e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_092b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0933: Unknown result type (might be due to invalid IL or missing references)
+			//IL_093f: Expected O, but got Unknown
 			Panel val = new Panel();
 			((Control)val).set_Parent((Container)(object)parent);
 			((Control)val).set_Location(new Point(MAIN_PADDING.X, MAIN_PADDING.Y));
@@ -431,8 +436,9 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 								GlowButton val12 = new GlowButton();
 								((Control)val12).set_Parent((Container)(object)button);
 								val12.set_ToggleGlow(false);
-								val12.set_Icon((customAction.Icon != null) ? base.IconService.GetIcon(customAction.Icon) : null);
 								((Control)val12).set_BasicTooltipText(customAction.Tooltip);
+								val12.set_Icon((customAction.Icon != null) ? base.IconService.GetIcon(customAction.Icon(e2)) : null);
+								val12.set_Checked(customAction.InitialChecked?.Invoke(e2) ?? false);
 								((Control)val12).add_Click((EventHandler<MouseEventArgs>)async delegate(object s, MouseEventArgs ea)
 								{
 									GlowButton button2 = (GlowButton)((s is GlowButton) ? s : null);
@@ -440,7 +446,12 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 									((Control)button2).set_Enabled(false);
 									try
 									{
-										await (customAction.Action?.Invoke(e2));
+										await (customAction.Action?.Invoke(e2, button2));
+										button2.set_Checked(!button2.get_Checked());
+										if (customAction.ReloadIconAfterAction)
+										{
+											button2.set_Icon((customAction.Icon != null) ? base.IconService.GetIcon(customAction.Icon(e2)) : null);
+										}
 									}
 									finally
 									{

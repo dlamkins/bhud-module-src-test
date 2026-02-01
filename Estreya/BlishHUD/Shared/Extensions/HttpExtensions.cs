@@ -9,8 +9,12 @@ namespace Estreya.BlishHUD.Shared.Extensions
 	{
 		public static async Task<T> GetJsonAsync<T>(this HttpResponseMessage responseMessage)
 		{
+			return await responseMessage.GetJsonAsync<T>(JsonSerializer.Create(JsonConvert.DefaultSettings?.Invoke() ?? null));
+		}
+
+		public static async Task<T> GetJsonAsync<T>(this HttpResponseMessage responseMessage, JsonSerializer serializer)
+		{
 			using Stream stream = await responseMessage.get_Content().ReadAsStreamAsync().ConfigureAwait(continueOnCapturedContext: false);
-			JsonSerializer serializer = JsonSerializer.Create(JsonConvert.DefaultSettings?.Invoke() ?? null);
 			using StreamReader sr = new StreamReader(stream);
 			using JsonTextReader jsonTextReader = new JsonTextReader(sr);
 			return serializer.Deserialize<T>(jsonTextReader);

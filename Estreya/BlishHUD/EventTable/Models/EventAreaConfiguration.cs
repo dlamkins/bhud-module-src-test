@@ -97,6 +97,12 @@ namespace Estreya.BlishHUD.EventTable.Models
 
 		public SettingEntry<Color> CategoryNameColor { get; set; }
 
+		public SettingEntry<float> CategoryNameOpacity { get; set; }
+
+		public SettingEntry<Color> CategoryNameBackgroundColor { get; set; }
+
+		public SettingEntry<float> CategoryNameBackgroundOpacity { get; set; }
+
 		public SettingEntry<bool> EnableColorGradients { get; set; }
 
 		public SettingEntry<string> EventAbsoluteTimeFormatString { get; set; }
@@ -126,6 +132,10 @@ namespace Estreya.BlishHUD.EventTable.Models
 		public SettingEntry<bool> TopTimelineLinesOverWholeHeight { get; set; }
 
 		public SettingEntry<bool> TopTimelineLinesInBackground { get; set; }
+
+		public SettingEntry<List<string>> DisabledCompletionActionForEvents { get; set; }
+
+		public SettingEntry<bool> CompactMode { get; set; }
 
 		public void CopyTo(EventAreaConfiguration other)
 		{
@@ -173,6 +183,9 @@ namespace Estreya.BlishHUD.EventTable.Models
 			other.HideInPvP.set_Value(HideInPvP.get_Value());
 			other.ShowCategoryNames.set_Value(ShowCategoryNames.get_Value());
 			other.CategoryNameColor.set_Value(CategoryNameColor.get_Value());
+			other.CategoryNameOpacity.set_Value(CategoryNameOpacity.get_Value());
+			other.CategoryNameBackgroundColor.set_Value(CategoryNameBackgroundColor.get_Value());
+			other.CategoryNameBackgroundOpacity.set_Value(CategoryNameBackgroundOpacity.get_Value());
 			other.EnableColorGradients.set_Value(EnableColorGradients.get_Value());
 			other.EventAbsoluteTimeFormatString.set_Value(EventAbsoluteTimeFormatString.get_Value());
 			other.EventTimespanDaysFormatString.set_Value(EventTimespanDaysFormatString.get_Value());
@@ -188,6 +201,8 @@ namespace Estreya.BlishHUD.EventTable.Models
 			other.TopTimelineTimeOpacity.set_Value(TopTimelineTimeOpacity.get_Value());
 			other.TopTimelineLinesOverWholeHeight.set_Value(TopTimelineLinesOverWholeHeight.get_Value());
 			other.TopTimelineLinesInBackground.set_Value(TopTimelineLinesInBackground.get_Value());
+			other.DisabledCompletionActionForEvents.set_Value(DisabledCompletionActionForEvents.get_Value());
+			other.CompactMode.set_Value(CompactMode.get_Value());
 		}
 	}
 }

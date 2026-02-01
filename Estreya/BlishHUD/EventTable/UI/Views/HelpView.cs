@@ -466,8 +466,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		protected override async Task<bool> InternalLoad(IProgress<string> progress)
 		{
-			IApiV2ObjectList<MapChest> mapchests = await ((IAllExpandableClient<MapChest>)(object)base.APIManager.get_Gw2ApiClient().get_V2().get_MapChests()).AllAsync(default(CancellationToken));
-			IApiV2ObjectList<WorldBoss> worldbosses = await ((IAllExpandableClient<WorldBoss>)(object)base.APIManager.get_Gw2ApiClient().get_V2().get_WorldBosses()).AllAsync(default(CancellationToken));
+			IApiV2ObjectList<MapChest> mapchests = await ((IAllExpandableClient<MapChest>)(object)base.APIManager.get_Gw2ApiClient().get_V2().get_MapChests()).AllAsync(default(CancellationToken)).ContinueWith((Task<IApiV2ObjectList<MapChest>> x) => (IApiV2ObjectList<MapChest>)((!x.IsFaulted) ? ((object)x.Result) : ((object)new ApiV2BaseObjectList<MapChest>())));
+			IApiV2ObjectList<WorldBoss> worldbosses = await ((IAllExpandableClient<WorldBoss>)(object)base.APIManager.get_Gw2ApiClient().get_V2().get_WorldBosses()).AllAsync(default(CancellationToken)).ContinueWith((Task<IApiV2ObjectList<WorldBoss>> x) => (IApiV2ObjectList<WorldBoss>)((!x.IsFaulted) ? ((object)x.Result) : ((object)new ApiV2BaseObjectList<WorldBoss>())));
 			_autocompleteAPIKeys.AddRange(((IEnumerable<MapChest>)mapchests).Select((MapChest m) => m.get_Id()));
 			_autocompleteAPIKeys.AddRange(((IEnumerable<WorldBoss>)worldbosses).Select((WorldBoss w) => w.get_Id()));
 			return true;

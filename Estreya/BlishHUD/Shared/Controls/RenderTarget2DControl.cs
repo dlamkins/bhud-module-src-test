@@ -21,8 +21,10 @@ namespace Estreya.BlishHUD.Shared.Controls
 
 		private bool _renderTargetIsEmpty;
 
-		public TimeSpan DrawInterval { get; set; } = TimeSpan.FromMilliseconds(500.0);
+		protected TimeSpan DrawInterval { get; set; } = TimeSpan.FromMilliseconds(500.0);
 
+
+		protected bool SkipDraw { get; set; }
 
 		public Point Size
 		{
@@ -80,10 +82,13 @@ namespace Estreya.BlishHUD.Shared.Controls
 
 		protected sealed override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b1: Expected O, but got Unknown
+			//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0116: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
 			((GraphicsResource)spriteBatch).get_GraphicsDevice().get_PresentationParameters().set_RenderTargetUsage((RenderTargetUsage)1);
 			spriteBatch.End();
 			if (_renderTargetLock.IsFree())
@@ -92,10 +97,13 @@ namespace Estreya.BlishHUD.Shared.Controls
 				{
 					if (_renderTarget != null)
 					{
-						if (_renderTargetIsEmpty || (DrawInterval != Timeout.InfiniteTimeSpan && _lastDraw >= DrawInterval))
+						if (!SkipDraw && (_renderTargetIsEmpty || (DrawInterval != Timeout.InfiniteTimeSpan && _lastDraw >= DrawInterval)))
 						{
 							((GraphicsResource)spriteBatch).get_GraphicsDevice().SetRenderTarget(_renderTarget);
-							spriteBatch.Begin((SpriteSortMode)0, (BlendState)null, SamplerState.PointClamp, (DepthStencilState)null, (RasterizerState)null, (Effect)null, (Matrix?)null);
+							SamplerState pointClamp = SamplerState.PointClamp;
+							RasterizerState val = new RasterizerState();
+							val.set_ScissorTestEnable(true);
+							spriteBatch.Begin((SpriteSortMode)0, (BlendState)null, pointClamp, (DepthStencilState)null, val, (Effect)null, (Matrix?)null);
 							((GraphicsResource)spriteBatch).get_GraphicsDevice().Clear(Color.get_Transparent());
 							try
 							{

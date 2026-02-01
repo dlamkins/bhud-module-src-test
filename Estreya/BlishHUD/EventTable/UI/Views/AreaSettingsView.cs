@@ -37,7 +37,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		private const int PADDING_Y = 20;
 
-		private readonly Func<List<EventCategory>> _allEvents;
+		private readonly Func<EventAreaConfiguration, List<EventCategory>> _allEvents;
 
 		private readonly Func<IEnumerable<EventAreaConfiguration>> _areaConfigurationFunc;
 
@@ -67,7 +67,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		public event AsyncEventHandler<EventAreaConfiguration> SyncEnabledEventsToOtherAreas;
 
-		public AreaSettingsView(Func<IEnumerable<EventAreaConfiguration>> areaConfiguration, Func<List<EventCategory>> allEvents, ModuleSettings moduleSettings, AccountService accountService, Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, SettingEventService settingEventService, EventStateService eventStateService)
+		public AreaSettingsView(Func<IEnumerable<EventAreaConfiguration>> areaConfiguration, Func<EventAreaConfiguration, List<EventCategory>> allEvents, ModuleSettings moduleSettings, AccountService accountService, Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, SettingEventService settingEventService, EventStateService eventStateService)
 			: base(apiManager, iconService, translationService, settingEventService)
 		{
 			_areaConfigurationFunc = areaConfiguration;
@@ -282,35 +282,37 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		private void BuildEditPanel(Panel parent, Rectangle bounds, MenuItem menuItem, EventAreaConfiguration areaConfiguration)
 		{
-			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0082: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0087: Unknown result type (might be due to invalid IL or missing references)
 			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00dc: Expected O, but got Unknown
-			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0108: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0116: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0125: Expected O, but got Unknown
+			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f4: Expected O, but got Unknown
+			//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0105: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0114: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0120: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0127: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0135: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013d: Expected O, but got Unknown
 			if (areaConfiguration == null)
 			{
 				throw new ArgumentNullException("areaConfiguration");
@@ -345,7 +347,11 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderEmptyLine((Panel)(object)settingsPanel);
 			RenderLocationAndSizeSettings(settingsPanel, areaConfiguration);
 			RenderEmptyLine((Panel)(object)settingsPanel);
-			RenderLayoutSettings(settingsPanel, areaConfiguration);
+			RenderLayoutSettings(settingsPanel, areaConfiguration, delegate
+			{
+				//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+				BuildEditPanel(parent, bounds, menuItem, areaConfiguration);
+			});
 			RenderEmptyLine((Panel)(object)settingsPanel);
 			RenderVisibilitySettings(settingsPanel, areaConfiguration);
 			RenderEmptyLine((Panel)(object)settingsPanel);
@@ -461,20 +467,20 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderEmptyLine((Panel)(object)groupPanel, 20);
 		}
 
-		private void RenderLayoutSettings(FlowPanel settingsPanel, EventAreaConfiguration areaConfiguration)
+		private void RenderLayoutSettings(FlowPanel settingsPanel, EventAreaConfiguration areaConfiguration, Action rebuildAction)
 		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006f: Expected O, but got Unknown
+			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0083: Expected O, but got Unknown
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Parent((Container)(object)settingsPanel);
 			((Container)val).set_HeightSizingMode((SizingMode)1);
@@ -496,6 +502,14 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.ShowTopTimeline);
 			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.TopTimelineLinesOverWholeHeight);
 			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.TopTimelineLinesInBackground);
+			RenderEmptyLine((Panel)(object)groupPanel);
+			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.CompactMode, async (bool oldVal, bool newVal) => !newVal || await new ConfirmDialog("Compact Mode", "You are in the process of enabling compact mode.\n\nThis will reset some of the incompatible settings as the category names will change.\n\nA RESTART OF BLISHHUD IS NEEDED FOR THIS TO TAKE EFFECT!", base.IconService)
+			{
+				SelectedButtonIndex = 1
+			}.ShowDialog() == DialogResult.OK, async delegate
+			{
+				rebuildAction();
+			});
 			RenderEmptyLine((Panel)(object)groupPanel, 20);
 		}
 
@@ -578,6 +592,9 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderFloatSetting((Panel)(object)groupPanel, areaConfiguration.EventBackgroundOpacity);
 			RenderEmptyLine((Panel)(object)groupPanel);
 			RenderColorSetting((Panel)(object)groupPanel, areaConfiguration.CategoryNameColor);
+			RenderFloatSetting((Panel)(object)groupPanel, areaConfiguration.CategoryNameOpacity);
+			RenderColorSetting((Panel)(object)groupPanel, areaConfiguration.CategoryNameBackgroundColor);
+			RenderFloatSetting((Panel)(object)groupPanel, areaConfiguration.CategoryNameBackgroundOpacity);
 			RenderEmptyLine((Panel)(object)groupPanel);
 			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.EnableColorGradients);
 			RenderEmptyLine((Panel)(object)groupPanel);
@@ -604,19 +621,19 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0083: Expected O, but got Unknown
-			//IL_0109: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0115: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0110: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0126: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0138: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0142: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0149: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0151: Expected O, but got Unknown
-			//IL_0182: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0188: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0292: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0119: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0128: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0144: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0153: Expected O, but got Unknown
+			//IL_0185: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0295: Unknown result type (might be due to invalid IL or missing references)
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Parent((Container)(object)settingsPanel);
 			((Container)val).set_HeightSizingMode((SizingMode)1);
@@ -735,7 +752,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0083: Expected O, but got Unknown
-			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0153: Unknown result type (might be due to invalid IL or missing references)
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Parent((Container)(object)settingsPanel);
 			((Container)val).set_HeightSizingMode((SizingMode)1);
@@ -747,7 +764,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			((Panel)val).set_Collapsed(true);
 			((Panel)val).set_Title(base.TranslationService.GetTranslation("areaSettingsView-group-synchronization", "Synchronization"));
 			FlowPanel groupPanel = val;
-			RenderButtonAsync((Panel)(object)groupPanel, "Sync enabled Events to Reminders", async delegate
+			Estreya.BlishHUD.Shared.Controls.Button syncEnabledToRemindersButton = RenderButtonAsync((Panel)(object)groupPanel, "Sync enabled Events to Reminders", async delegate
 			{
 				if (await new ConfirmDialog("Synchronizing", "You are in the process of synchronizing the enabled events of this area to the reminders.\n\nThis will override all previously configured enabled/disabled reminder settings.", base.IconService)
 				{
@@ -758,7 +775,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 					ScreenNotification.ShowNotification("Synchronization complete!", (NotificationType)0, (Texture2D)null, 4);
 				}
 			});
-			RenderButtonAsync((Panel)(object)groupPanel, "Sync enabled Events from Reminders", async delegate
+			((Control)syncEnabledToRemindersButton).set_Enabled(!areaConfiguration.CompactMode.get_Value());
+			Estreya.BlishHUD.Shared.Controls.Button syncEnabledFromRemindersButton = RenderButtonAsync((Panel)(object)groupPanel, "Sync enabled Events from Reminders", async delegate
 			{
 				if (await new ConfirmDialog("Synchronizing", "You are in the process of synchronizing the enabled events for reminders to this area.\n\nThis will override all previously configured enabled/disabled event settings of this area.", base.IconService)
 				{
@@ -769,7 +787,8 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 					ScreenNotification.ShowNotification("Synchronization complete!", (NotificationType)0, (Texture2D)null, 4);
 				}
 			});
-			RenderButtonAsync((Panel)(object)groupPanel, "Sync enabled Events to other Areas", async delegate
+			((Control)syncEnabledFromRemindersButton).set_Enabled(!areaConfiguration.CompactMode.get_Value());
+			Estreya.BlishHUD.Shared.Controls.Button syncEnabledEventsToOtherAreasButton = RenderButtonAsync((Panel)(object)groupPanel, "Sync enabled Events to other Areas", async delegate
 			{
 				if (await new ConfirmDialog("Synchronizing", "You are in the process of synchronizing the enabled events of this area to all other areas.\n\nThis will override all previously configured enabled/disabled event settings of other areas.", base.IconService)
 				{
@@ -780,6 +799,14 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 					ScreenNotification.ShowNotification("Synchronization complete!", (NotificationType)0, (Texture2D)null, 4);
 				}
 			});
+			((Control)syncEnabledEventsToOtherAreasButton).set_Enabled(!areaConfiguration.CompactMode.get_Value());
+			if (areaConfiguration.CompactMode.get_Value())
+			{
+				string message = "Not available in compact mode.";
+				((Control)syncEnabledToRemindersButton).set_BasicTooltipText(message);
+				((Control)syncEnabledFromRemindersButton).set_BasicTooltipText(message);
+				((Control)syncEnabledEventsToOtherAreasButton).set_BasicTooltipText(message);
+			}
 			RenderEmptyLine((Panel)(object)groupPanel, (int)groupPanel.get_OuterControlPadding().Y);
 		}
 
@@ -793,7 +820,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			{
 				(_reorderEventsWindow.CurrentView as ReorderEventsView).SaveClicked -= new EventHandler<(EventAreaConfiguration, string[])>(ReorderView_SaveClicked);
 			}
-			ReorderEventsView view = new ReorderEventsView(_allEvents(), configuration.EventOrder.get_Value(), configuration, base.APIManager, base.IconService, base.TranslationService);
+			ReorderEventsView view = new ReorderEventsView(_allEvents(configuration), configuration.EventOrder.get_Value(), configuration, base.APIManager, base.IconService, base.TranslationService);
 			view.SaveClicked += new EventHandler<(EventAreaConfiguration, string[])>(ReorderView_SaveClicked);
 			_reorderEventsWindow.Show((IView)(object)view);
 		}
@@ -814,7 +841,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			{
 				(_manageEventsWindow.CurrentView as ManageEventsView).EventChanged -= ManageView_EventChanged;
 			}
-			ManageEventsView view = new ManageEventsView(_allEvents(), new Dictionary<string, object>
+			ManageEventsView view = new ManageEventsView(_allEvents(configuration), new Dictionary<string, object>
 			{
 				{ "configuration", configuration },
 				{
@@ -822,6 +849,36 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 					(from x in _eventStateService.Instances
 						where x.AreaName == configuration.Name && x.State == EventStateService.EventStates.Hidden
 						select x.EventKey).ToList()
+				},
+				{
+					"customActions",
+					new List<ManageEventsView.CustomActionDefinition>
+					{
+						new ManageEventsView.CustomActionDefinition
+						{
+							Name = "Enable/Disable Completion Action",
+							Tooltip = "Toggles the tracking for the completion action of this event.",
+							InitialChecked = (Event ev) => !configuration.DisabledCompletionActionForEvents.get_Value().Contains(ev.SettingKey),
+							Icon = (Event ev) => configuration.DisabledCompletionActionForEvents.get_Value().Contains(ev.SettingKey) ? "156882.png" : "156881.png",
+							ReloadIconAfterAction = true,
+							Action = delegate(Event ev, GlowButton button)
+							{
+								if (button.get_Checked())
+								{
+									configuration.DisabledCompletionActionForEvents.set_Value(new List<string>(from x in configuration.DisabledCompletionActionForEvents.get_Value()
+										where x != ev.SettingKey
+										select x) { ev.SettingKey });
+								}
+								else
+								{
+									configuration.DisabledCompletionActionForEvents.set_Value(new List<string>(from x in configuration.DisabledCompletionActionForEvents.get_Value()
+										where x != ev.SettingKey
+										select x));
+								}
+								return Task.CompletedTask;
+							}
+						}
+					}
 				}
 			}, () => configuration.DisabledEventKeys.get_Value(), _moduleSettings, _accountService, base.APIManager, base.IconService, base.TranslationService);
 			view.EventChanged += ManageView_EventChanged;
