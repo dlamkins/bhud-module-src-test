@@ -239,7 +239,7 @@ namespace BhModule.Community.Pathing.State
 			{
 				this.CategoryInactiveChanged?.Invoke(this, new PathingCategoryEventArgs(category)
 				{
-					Active = !isInactive
+					Active = (category.DefaultToggle ? (!isInactive) : isInactive)
 				});
 			}
 			_stateDirty = true;

@@ -596,7 +596,10 @@ namespace BhModule.Community.Pathing.UI.Controls.TreeNodes
 
 		private void DetectAndBuildContexts()
 		{
-			PathingCategory.TryGetAchievementId(out _achievementId);
+			if (!PathingCategory.TryGetAchievementId(out _achievementId))
+			{
+				return;
+			}
 			PathingCategory.TryGetAchievementBit(out _achievementBit);
 			if (_packState.UserConfiguration.PackAllowMarkersToAutomaticallyHide.get_Value())
 			{
