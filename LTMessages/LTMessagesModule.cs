@@ -24,16 +24,59 @@ namespace LTMessages
 	[Export(typeof(Module))]
 	public class LTMessagesModule : Module
 	{
-		private enum ChatMethod
+		private enum ChatFocus
 		{
 			ShiftEnter,
-			SlashCommand
+			Enter
+		}
+
+		private enum ChatAction
+		{
+			PasteOnly,
+			Send
 		}
 
 		private enum ChatCommand
 		{
+			Default,
 			Squad,
-			Subgroup
+			Subgroup,
+			Party1,
+			Party2,
+			Party3,
+			Party4,
+			Party5,
+			Guild,
+			Guild1,
+			Guild2,
+			Guild3,
+			Guild4,
+			Guild5,
+			Guild6,
+			Say,
+			Map,
+			Party,
+			Team
+		}
+
+		private enum SendDelay
+		{
+			_5ms = 5,
+			_8ms = 8,
+			_10ms = 10,
+			_12ms = 12,
+			_15ms = 0xF,
+			_20ms = 20,
+			_25ms = 25,
+			_30ms = 30,
+			_35ms = 35,
+			_40ms = 40,
+			_50ms = 50,
+			_60ms = 60,
+			_75ms = 75,
+			_100ms = 100,
+			_125ms = 125,
+			_150ms = 150
 		}
 
 		private struct INPUT
@@ -83,11 +126,13 @@ namespace LTMessages
 
 		private static readonly Logger Logger = Logger.GetLogger<LTMessagesModule>();
 
-		private SettingEntry<string> _messageFilePath;
+		private SettingEntry<ChatFocus> _chatFocus;
 
-		private SettingEntry<bool> _autoSendEnabled;
+		private SettingEntry<ChatAction> _chatAction;
 
-		private SettingEntry<int> _sendDelayMs;
+		private SettingEntry<ChatCommand> _chatCommand;
+
+		private SettingEntry<SendDelay> _sendDelay;
 
 		private SettingEntry<bool> _showCornerIcon;
 
@@ -97,13 +142,11 @@ namespace LTMessages
 
 		private SettingEntry<KeyBinding> _openEditorKeybind;
 
-		private SettingEntry<ChatMethod> _chatMethod;
-
-		private SettingEntry<ChatCommand> _chatCommand;
-
-		private SettingEntry<int> _maxMessageLength;
-
 		private SettingEntry<bool> _ltModeEnabled;
+
+		private int _activeMessageList;
+
+		private Dictionary<int, string> _listNames = new Dictionary<int, string>();
 
 		private CornerIcon _cornerIcon;
 
@@ -116,6 +159,8 @@ namespace LTMessages
 		private Panel _editorWindow;
 
 		private FlowPanel _editorFlowPanel;
+
+		private Dropdown _listSelectorDropdown;
 
 		private Panel _editDialogWindow;
 
@@ -131,11 +176,13 @@ namespace LTMessages
 
 		private FileSystemWatcher _fileWatcher;
 
-		private static readonly string DefaultFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "Guild Wars 2\\addons\\blishhud\\ltmessages\\messages.txt");
+		private int _currentListIndex;
 
-		private const int DefaultSendDelayMs = 200;
+		private const int MessageListCount = 6;
 
-		private const int DefaultMaxMessageLength = 200;
+		private static readonly string DefaultFilePathBase = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "Guild Wars 2\\addons\\blishhud\\ltmessages\\");
+
+		private const int DefaultMaxMessageLength = 199;
 
 		private const uint INPUT_KEYBOARD = 1u;
 
@@ -152,6 +199,12 @@ namespace LTMessages
 		private const ushort VK_V = 86;
 
 		private const ushort VK_SLASH = 191;
+
+		private TextBox _renameTextBox;
+
+		private Panel _renameDialogWindow;
+
+		private Panel _helpDialogWindow;
 
 		internal SettingsManager SettingsManager => base.ModuleParameters.get_SettingsManager();
 
@@ -280,25 +333,26 @@ namespace LTMessages
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
+			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005c: Expected O, but got Unknown
 			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00b0: Expected O, but got Unknown
 			//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0104: Expected O, but got Unknown
-			//IL_0110: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0158: Expected O, but got Unknown
-			_messageFilePath = settings.DefineSetting<string>("MessageFilePath", DefaultFilePath, (Func<string>)(() => "Message File Path"), (Func<string>)(() => "Path to messages.txt - Edit this file with any text editor to customize your messages. File auto-reloads when changed."));
 			_popupKeybind = settings.DefineSetting<KeyBinding>("PopupKeybind", new KeyBinding(), (Func<string>)(() => "Popup Keybind"), (Func<string>)(() => "Press this key to show the message popup at your cursor (optional - no default binding)"));
 			_toggleLTModeKeybind = settings.DefineSetting<KeyBinding>("ToggleLTModeKeybind", new KeyBinding(), (Func<string>)(() => "Toggle LT Mode Keybind"), (Func<string>)(() => "Press this key to toggle LT Mode on/off (optional - no default binding)"));
 			_openEditorKeybind = settings.DefineSetting<KeyBinding>("OpenEditorKeybind", new KeyBinding(), (Func<string>)(() => "Open Editor Keybind"), (Func<string>)(() => "Press this key to open the message editor window (optional - no default binding)"));
 			_showCornerIcon = settings.DefineSetting<bool>("ShowCornerIcon", true, (Func<string>)(() => "Show Corner Icon"), (Func<string>)(() => "Display an icon in the Blish HUD menu for alternative access"));
 			_ltModeEnabled = settings.DefineSetting<bool>("LTModeEnabled", true, (Func<string>)(() => "LT Mode Enabled"), (Func<string>)(() => "Enable this when you are a Lieutenant or Commander. Messages won't send when disabled."));
-			_autoSendEnabled = settings.DefineSetting<bool>("AutoSendEnabled", false, (Func<string>)(() => "Auto-send messages"), (Func<string>)(() => "Automatically send messages to chat (if disabled, copies to clipboard only)"));
-			_sendDelayMs = settings.DefineSetting<int>("SendDelayMs", 200, (Func<string>)(() => "Send delay (ms)"), (Func<string>)(() => "Delay between keystrokes when auto-sending (adjust if messages don't send reliably)"));
-			SettingComplianceExtensions.SetRange(_sendDelayMs, 50, 500);
-			_chatMethod = settings.DefineSetting<ChatMethod>("ChatMethod", ChatMethod.ShiftEnter, (Func<string>)(() => "Chat Method"), (Func<string>)(() => "Shift+Enter = Direct squad chat | Shift+/ = Use chat command"));
-			_chatCommand = settings.DefineSetting<ChatCommand>("ChatCommand", ChatCommand.Squad, (Func<string>)(() => "Chat Command"), (Func<string>)(() => "Which command to use when Chat Method is set to Shift+/ (squad or subgroup)"));
-			_maxMessageLength = settings.DefineSetting<int>("MaxMessageLength", 200, (Func<string>)(() => "Max Message Length"), (Func<string>)(() => "Maximum characters per message (GW2 limit is around 200)"));
-			SettingComplianceExtensions.SetRange(_maxMessageLength, 50, 500);
+			_chatFocus = settings.DefineSetting<ChatFocus>("ChatFocus", ChatFocus.ShiftEnter, (Func<string>)(() => "Chat Focus"), (Func<string>)(() => "Shift+Enter = Open squad chat directly | Enter = Open last used chat"));
+			_chatAction = settings.DefineSetting<ChatAction>("ChatAction", ChatAction.Send, (Func<string>)(() => "Chat Action"), (Func<string>)(() => "Send = Type and send message automatically | Paste Only = Copy to clipboard"));
+			_chatCommand = settings.DefineSetting<ChatCommand>("ChatCommand", ChatCommand.Default, (Func<string>)(() => "Chat Command"), (Func<string>)(() => "Which chat channel to send to. Default = Use whatever channel is already active."));
+			_sendDelay = settings.DefineSetting<SendDelay>("SendDelay", SendDelay._40ms, (Func<string>)(() => "Typing Delay (ms)"), (Func<string>)(() => "Delay between keystrokes when typing messages (adjust if messages don't send reliably)"));
+			if (!Enum.IsDefined(typeof(SendDelay), _sendDelay.get_Value()))
+			{
+				Logger.Info("Migrating invalid send delay value to default (40ms)");
+				_sendDelay.set_Value(SendDelay._40ms);
+			}
 			SettingEntry<bool> openEditorButton = settings.DefineSetting<bool>("OpenEditorButton", false, (Func<string>)(() => "Open Message Editor"), (Func<string>)(() => "Toggle this on to open the in-game message editor"));
 			openEditorButton.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)delegate(object s, ValueChangedEventArgs<bool> e)
 			{
@@ -312,15 +366,28 @@ namespace LTMessages
 					});
 				}
 			});
-			_messageFilePath.add_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)OnFilePathChanged);
+			SettingEntry<bool> openHelpButton = settings.DefineSetting<bool>("OpenHelpButton", false, (Func<string>)(() => "Show Help"), (Func<string>)(() => "Toggle this on to see help and configuration guide"));
+			openHelpButton.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)delegate(object s, ValueChangedEventArgs<bool> e)
+			{
+				if (e.get_NewValue() && !e.get_PreviousValue())
+				{
+					ShowHelpDialog();
+					Task.Run(async delegate
+					{
+						await Task.Delay(100);
+						openHelpButton.set_Value(false);
+					});
+				}
+			});
 		}
 
 		protected override async Task LoadAsync()
 		{
 			Logger.Info("Loading LT Messages module...");
-			_messages = GetDefaultMessages();
-			Logger.Info($"Initialized with {_messages.Count} default messages");
+			LoadInternalData();
+			_currentListIndex = _activeMessageList;
 			LoadMessagesFromFile();
+			Logger.Info($"Loaded {GetListDisplayName(_currentListIndex)} with {_messages.Count} messages");
 			SetupFileWatcher();
 			if (_showCornerIcon.get_Value())
 			{
@@ -349,7 +416,7 @@ namespace LTMessages
 		protected override void Unload()
 		{
 			Logger.Info("Unloading LT Messages module...");
-			_messageFilePath.remove_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)OnFilePathChanged);
+			SaveInternalData();
 			_showCornerIcon.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnShowCornerIconChanged);
 			if (_popupKeybind?.get_Value() != null)
 			{
@@ -390,6 +457,16 @@ namespace LTMessages
 			if (editDialogWindow != null)
 			{
 				((Control)editDialogWindow).Dispose();
+			}
+			Panel renameDialogWindow = _renameDialogWindow;
+			if (renameDialogWindow != null)
+			{
+				((Control)renameDialogWindow).Dispose();
+			}
+			Panel helpDialogWindow = _helpDialogWindow;
+			if (helpDialogWindow != null)
+			{
+				((Control)helpDialogWindow).Dispose();
 			}
 			_messages.Clear();
 			Logger.Info("LT Messages module unloaded.");
@@ -432,9 +509,136 @@ namespace LTMessages
 			};
 		}
 
+		private List<MessageEntry> GetSampleMessage()
+		{
+			return new List<MessageEntry>
+			{
+				new MessageEntry("Stack", "Stack on Tag")
+			};
+		}
+
+		private string GetFilePathForList(int listIndex)
+		{
+			if (listIndex == 0)
+			{
+				return Path.Combine(DefaultFilePathBase, "messages.txt");
+			}
+			return Path.Combine(DefaultFilePathBase, $"messages_{listIndex}.txt");
+		}
+
+		private void LoadInternalData()
+		{
+			_listNames.Clear();
+			string dataFile = Path.Combine(DefaultFilePathBase, "module_data.txt");
+			try
+			{
+				if (File.Exists(dataFile))
+				{
+					string[] array = File.ReadAllLines(dataFile);
+					foreach (string line in array)
+					{
+						if (line.StartsWith("ActiveList="))
+						{
+							if (int.TryParse(line.Substring(11), out var listIndex))
+							{
+								_activeMessageList = listIndex;
+							}
+						}
+						else if (line.StartsWith("ListName:"))
+						{
+							string[] parts = line.Substring(9).Split(new char[1] { ':' }, 2);
+							if (parts.Length == 2 && int.TryParse(parts[0], out var index))
+							{
+								_listNames[index] = parts[1];
+							}
+						}
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Logger.Error(ex, "Failed to load internal data");
+			}
+			for (int i = 0; i < 6; i++)
+			{
+				if (!_listNames.ContainsKey(i))
+				{
+					_listNames[i] = ((i == 0) ? "Default" : $"List {i}");
+				}
+			}
+			if (_activeMessageList < 0 || _activeMessageList >= 6)
+			{
+				_activeMessageList = 0;
+			}
+		}
+
+		private void SaveInternalData()
+		{
+			string dataFile = Path.Combine(DefaultFilePathBase, "module_data.txt");
+			try
+			{
+				string directory = Path.GetDirectoryName(dataFile);
+				if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+				{
+					Directory.CreateDirectory(directory);
+				}
+				List<string> lines = new List<string>();
+				lines.Add($"ActiveList={_activeMessageList}");
+				foreach (KeyValuePair<int, string> kvp in _listNames)
+				{
+					lines.Add($"ListName:{kvp.Key}:{kvp.Value}");
+				}
+				File.WriteAllLines(dataFile, lines);
+			}
+			catch (Exception ex)
+			{
+				Logger.Error(ex, "Failed to save internal data");
+			}
+		}
+
+		private string GetListDisplayName(int listIndex)
+		{
+			if (_listNames.ContainsKey(listIndex))
+			{
+				return _listNames[listIndex];
+			}
+			if (listIndex != 0)
+			{
+				return $"List {listIndex}";
+			}
+			return "Default";
+		}
+
+		private string GetChatCommandString(ChatCommand command)
+		{
+			return command switch
+			{
+				ChatCommand.Default => "", 
+				ChatCommand.Squad => "/squad", 
+				ChatCommand.Subgroup => "/subgroup", 
+				ChatCommand.Party1 => "/1", 
+				ChatCommand.Party2 => "/2", 
+				ChatCommand.Party3 => "/3", 
+				ChatCommand.Party4 => "/4", 
+				ChatCommand.Party5 => "/5", 
+				ChatCommand.Guild => "/guild", 
+				ChatCommand.Guild1 => "/g1", 
+				ChatCommand.Guild2 => "/g2", 
+				ChatCommand.Guild3 => "/g3", 
+				ChatCommand.Guild4 => "/g4", 
+				ChatCommand.Guild5 => "/g5", 
+				ChatCommand.Guild6 => "/g6", 
+				ChatCommand.Say => "/say", 
+				ChatCommand.Map => "/map", 
+				ChatCommand.Party => "/party", 
+				ChatCommand.Team => "/team", 
+				_ => "", 
+			};
+		}
+
 		private void LoadMessagesFromFile()
 		{
-			string filePath = _messageFilePath.get_Value();
+			string filePath = GetFilePathForList(_currentListIndex);
 			try
 			{
 				string directory = Path.GetDirectoryName(filePath);
@@ -445,8 +649,8 @@ namespace LTMessages
 				}
 				if (!File.Exists(filePath))
 				{
-					CreateDefaultMessageFile(filePath);
-					_messages = GetDefaultMessages();
+					CreateDefaultMessageFile(filePath, _currentListIndex);
+					_messages = ((_currentListIndex == 0) ? GetDefaultMessages() : GetSampleMessage());
 					RefreshMessageUI();
 					return;
 				}
@@ -472,11 +676,10 @@ namespace LTMessages
 						Logger.Warn("Skipping line with empty title or message: " + line);
 						continue;
 					}
-					int maxLen = _maxMessageLength?.get_Value() ?? 200;
-					if (message.Length > maxLen)
+					if (message.Length > 199)
 					{
-						message = message.Substring(0, maxLen);
-						Logger.Warn($"Message truncated to {maxLen} characters: {message}");
+						message = message.Substring(0, 199);
+						Logger.Warn($"Message truncated to {199} characters: {message}");
 					}
 					MessageEntry entry = new MessageEntry(title, message);
 					if (title.Length > 16)
@@ -499,14 +702,34 @@ namespace LTMessages
 			}
 		}
 
-		private void CreateDefaultMessageFile(string filePath)
+		private void CreateDefaultMessageFile(string filePath, int listIndex)
 		{
 			try
 			{
-				string[] defaultMessages = new string[55]
+				List<string> defaultMessages = ((listIndex != 0) ? new List<string>
 				{
 					"# ========================================",
-					"# LT Messages Configuration File",
+					$"# LT Messages Configuration File - List {listIndex}",
+					"# ========================================",
+					"# ",
+					"# TO EDIT: Open this file in Notepad, VSCode, or any text editor",
+					"# FILE LOCATION: " + filePath,
+					"# ",
+					"# Use this list for specific event types (WvW, Metas, HP Trains, etc.)",
+					"# Add your custom messages below.",
+					"# ",
+					"# FORMAT: Title,Message",
+					"#   Title: max 16 characters (shown in popup menu)",
+					"#   Message: max 199 characters (GW2 chat limit)",
+					"# ",
+					"# Lines starting with # are comments and ignored",
+					"# ========================================",
+					"",
+					"Stack,Stack on Tag"
+				} : new List<string>
+				{
+					"# ========================================",
+					"# LT Messages Configuration File - List 0 (Default)",
 					"# ========================================",
 					"# ",
 					"# TO EDIT: Open this file in Notepad, VSCode, or any text editor",
@@ -516,7 +739,7 @@ namespace LTMessages
 					"# ",
 					"# FORMAT: Title,Message",
 					"#   Title: max 16 characters (shown in popup menu)",
-					"#   Message: max 200 characters (default GW2 chat limit)",
+					"#   Message: max 199 characters (GW2 chat limit)",
 					"# ",
 					"# Lines starting with # are comments and ignored",
 					"# ========================================",
@@ -560,9 +783,9 @@ namespace LTMessages
 					"Help,If you get lost ask for help!",
 					"No-Drop,Please don't drop items. Let Commander set up stations.",
 					"Break,We are taking a short break. BRB"
-				};
+				});
 				File.WriteAllLines(filePath, defaultMessages);
-				Logger.Info("Created default message file at " + filePath);
+				Logger.Info($"Created default message file at {filePath} (List {listIndex})");
 			}
 			catch (Exception ex)
 			{
@@ -574,7 +797,7 @@ namespace LTMessages
 		{
 			try
 			{
-				string filePath = _messageFilePath.get_Value();
+				string filePath = GetFilePathForList(_activeMessageList);
 				string directory = Path.GetDirectoryName(filePath);
 				string fileName = Path.GetFileName(filePath);
 				if (!string.IsNullOrEmpty(directory) && !string.IsNullOrEmpty(fileName))
@@ -588,7 +811,7 @@ namespace LTMessages
 					};
 					_fileWatcher.Changed += OnFileChanged;
 					_fileWatcher.EnableRaisingEvents = true;
-					Logger.Info("File watcher setup for " + filePath);
+					Logger.Info($"File watcher setup for {filePath} (List {_activeMessageList})");
 				}
 			}
 			catch (Exception ex)
@@ -600,14 +823,11 @@ namespace LTMessages
 		private void OnFileChanged(object sender, FileSystemEventArgs e)
 		{
 			Thread.Sleep(100);
-			Logger.Info("Message file changed, reloading...");
-			LoadMessagesFromFile();
-		}
-
-		private void OnFilePathChanged(object sender, ValueChangedEventArgs<string> e)
-		{
-			LoadMessagesFromFile();
-			SetupFileWatcher();
+			Logger.Info($"Message file changed for List {_activeMessageList}, reloading...");
+			if (_activeMessageList == _currentListIndex)
+			{
+				LoadMessagesFromFile();
+			}
 		}
 
 		private void CreateCornerIcon()
@@ -962,45 +1182,69 @@ namespace LTMessages
 			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0113: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0118: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0123: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0132: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0159: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0169: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0171: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fe: Expected O, but got Unknown
+			//IL_014f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0154: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0167: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0178: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0182: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01af: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0195: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e0: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01eb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0200: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0207: Unknown result type (might be due to invalid IL or missing references)
-			//IL_020c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0216: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0204: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0221: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0237: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0242: Unknown result type (might be due to invalid IL or missing references)
-			//IL_024c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0257: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0266: Expected O, but got Unknown
+			//IL_0226: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0231: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0239: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0240: Unknown result type (might be due to invalid IL or missing references)
+			//IL_024a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0267: Unknown result type (might be due to invalid IL or missing references)
+			//IL_026c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0277: Unknown result type (might be due to invalid IL or missing references)
+			//IL_027f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0287: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0291: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0305: Unknown result type (might be due to invalid IL or missing references)
+			//IL_030d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0315: Unknown result type (might be due to invalid IL or missing references)
+			//IL_031f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_033d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0342: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0349: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0350: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0357: Unknown result type (might be due to invalid IL or missing references)
+			//IL_035e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0363: Unknown result type (might be due to invalid IL or missing references)
+			//IL_036d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0378: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0382: Unknown result type (might be due to invalid IL or missing references)
+			//IL_038e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0399: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03ae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03bd: Expected O, but got Unknown
 			Panel val = new Panel();
 			((Control)val).set_Size(new Point(500, 400));
 			((Control)val).set_ZIndex(10000);
@@ -1018,53 +1262,105 @@ namespace LTMessages
 			val2.set_TextColor(new Color(220, 200, 150, 255));
 			val2.set_ShowShadow(true);
 			((Control)val2).set_Parent((Container)(object)_editorWindow);
-			StandardButton val3 = new StandardButton();
-			val3.set_Text("Add");
-			((Control)val3).set_Width(60);
-			((Control)val3).set_Location(new Point(210, 8));
+			Dropdown val3 = new Dropdown();
+			((Control)val3).set_Location(new Point(10, 40));
+			((Control)val3).set_Width(150);
 			((Control)val3).set_Parent((Container)(object)_editorWindow);
-			((Control)val3).add_Click((EventHandler<MouseEventArgs>)delegate
+			_listSelectorDropdown = val3;
+			for (int i = 0; i < 6; i++)
 			{
-				ShowEditDialog(-1, null);
+				_listSelectorDropdown.get_Items().Add(GetListDisplayName(i));
+			}
+			_listSelectorDropdown.set_SelectedItem(GetListDisplayName(_currentListIndex));
+			_listSelectorDropdown.add_ValueChanged((EventHandler<ValueChangedEventArgs>)delegate
+			{
+				string selectedItem = _listSelectorDropdown.get_SelectedItem();
+				for (int j = 0; j < 6; j++)
+				{
+					if (GetListDisplayName(j) == selectedItem)
+					{
+						_currentListIndex = j;
+						Logger.Info($"Switched to editing {selectedItem} (index {j})");
+						LoadMessagesFromFile();
+						RefreshEditorUI();
+						break;
+					}
+				}
 			});
 			StandardButton val4 = new StandardButton();
-			val4.set_Text("Save");
-			((Control)val4).set_Width(60);
-			((Control)val4).set_Location(new Point(280, 8));
+			val4.set_Text("Defaults");
+			((Control)val4).set_Width(70);
+			((Control)val4).set_Location(new Point(170, 8));
 			((Control)val4).set_Parent((Container)(object)_editorWindow);
 			((Control)val4).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				SaveMessagesToFile();
+				RestoreDefaultMessages();
 			});
 			StandardButton val5 = new StandardButton();
-			val5.set_Text("Restore");
+			val5.set_Text("Add");
 			((Control)val5).set_Width(70);
-			((Control)val5).set_Location(new Point(350, 8));
+			((Control)val5).set_Location(new Point(250, 8));
 			((Control)val5).set_Parent((Container)(object)_editorWindow);
 			((Control)val5).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				RestoreDefaultMessages();
+				ShowEditDialog(-1, null);
 			});
 			StandardButton val6 = new StandardButton();
-			val6.set_Text("Close");
-			((Control)val6).set_Width(60);
-			((Control)val6).set_Location(new Point(420, 8));
+			val6.set_Text("Save");
+			((Control)val6).set_Width(70);
+			((Control)val6).set_Location(new Point(330, 8));
 			((Control)val6).set_Parent((Container)(object)_editorWindow);
 			((Control)val6).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
+				SaveMessagesToFile();
+			});
+			StandardButton val7 = new StandardButton();
+			val7.set_Text("Close");
+			((Control)val7).set_Width(70);
+			((Control)val7).set_Location(new Point(410, 8));
+			((Control)val7).set_Parent((Container)(object)_editorWindow);
+			((Control)val7).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
 				((Control)_editorWindow).Hide();
 			});
-			FlowPanel val7 = new FlowPanel();
-			val7.set_FlowDirection((ControlFlowDirection)3);
-			((Container)val7).set_WidthSizingMode((SizingMode)2);
-			((Container)val7).set_HeightSizingMode((SizingMode)2);
-			((Panel)val7).set_CanScroll(true);
-			((Control)val7).set_Location(new Point(10, 40));
-			((Control)val7).set_Size(new Point(480, 345));
-			((Control)val7).set_Parent((Container)(object)_editorWindow);
-			val7.set_OuterControlPadding(new Vector2(5f, 5f));
-			val7.set_ControlPadding(new Vector2(0f, 3f));
-			_editorFlowPanel = val7;
+			StandardButton val8 = new StandardButton();
+			val8.set_Text("Reset All");
+			((Control)val8).set_Width(70);
+			((Control)val8).set_Location(new Point(170, 40));
+			((Control)val8).set_Parent((Container)(object)_editorWindow);
+			((Control)val8).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				ResetAllListsToDefaults();
+			});
+			StandardButton val9 = new StandardButton();
+			val9.set_Text("Rename");
+			((Control)val9).set_Width(70);
+			((Control)val9).set_Location(new Point(250, 40));
+			((Control)val9).set_Parent((Container)(object)_editorWindow);
+			((Control)val9).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				ShowRenameListDialog();
+			});
+			StandardButton val10 = new StandardButton();
+			val10.set_Text("Help");
+			((Control)val10).set_Width(70);
+			((Control)val10).set_Location(new Point(330, 40));
+			((Control)val10).set_Parent((Container)(object)_editorWindow);
+			((Control)val10).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				ShowHelpDialog();
+			});
+			FlowPanel val11 = new FlowPanel();
+			val11.set_FlowDirection((ControlFlowDirection)3);
+			((Container)val11).set_WidthSizingMode((SizingMode)2);
+			((Container)val11).set_HeightSizingMode((SizingMode)2);
+			((Panel)val11).set_CanScroll(true);
+			((Control)val11).set_Location(new Point(10, 70));
+			((Control)val11).set_Size(new Point(480, 315));
+			((Control)val11).set_Parent((Container)(object)_editorWindow);
+			val11.set_OuterControlPadding(new Vector2(5f, 5f));
+			val11.set_ControlPadding(new Vector2(0f, 3f));
+			_editorFlowPanel = val11;
 		}
 
 		private void RefreshEditorUI()
@@ -1279,7 +1575,7 @@ namespace LTMessages
 			((Control)val4).set_Parent((Container)(object)_editDialogWindow);
 			_editTitleTextBox = val4;
 			Label val5 = new Label();
-			val5.set_Text("Message (max 200 chars):");
+			val5.set_Text("Message (max 199 chars):");
 			((Control)val5).set_Location(new Point(10, 100));
 			((Control)val5).set_Width(200);
 			val5.set_TextColor(Color.get_White());
@@ -1287,11 +1583,11 @@ namespace LTMessages
 			TextBox val6 = new TextBox();
 			((Control)val6).set_Location(new Point(10, 120));
 			((Control)val6).set_Width(380);
-			((TextInputBase)val6).set_MaxLength(200);
+			((TextInputBase)val6).set_MaxLength(199);
 			((Control)val6).set_Parent((Container)(object)_editDialogWindow);
 			_editMessageTextBox = val6;
 			Label val7 = new Label();
-			val7.set_Text("0 / 200");
+			val7.set_Text("0 / 199");
 			((Control)val7).set_Location(new Point(10, 145));
 			((Control)val7).set_Width(100);
 			val7.set_TextColor(Color.get_Gray());
@@ -1300,7 +1596,7 @@ namespace LTMessages
 			Label charCountLabel = val7;
 			((TextInputBase)_editMessageTextBox).add_TextChanged((EventHandler<EventArgs>)delegate
 			{
-				charCountLabel.set_Text($"{((TextInputBase)_editMessageTextBox).get_Text().Length} / 200");
+				charCountLabel.set_Text($"{((TextInputBase)_editMessageTextBox).get_Text().Length} / 199");
 			});
 			StandardButton val8 = new StandardButton();
 			val8.set_Text("Save");
@@ -1355,11 +1651,244 @@ namespace LTMessages
 			}
 		}
 
+		private void ShowRenameListDialog()
+		{
+			//IL_0069: Unknown result type (might be due to invalid IL or missing references)
+			if (_renameDialogWindow == null)
+			{
+				CreateRenameDialog();
+			}
+			((TextInputBase)_renameTextBox).set_Text(GetListDisplayName(_currentListIndex));
+			int x = (((Control)GameService.Graphics.get_SpriteScreen()).get_Width() - ((Control)_renameDialogWindow).get_Width()) / 2;
+			int y = (((Control)GameService.Graphics.get_SpriteScreen()).get_Height() - ((Control)_renameDialogWindow).get_Height()) / 2;
+			((Control)_renameDialogWindow).set_Location(new Point(x, y));
+			((Control)_renameDialogWindow).Show();
+			((TextInputBase)_renameTextBox).set_Focused(true);
+		}
+
+		private void CreateRenameDialog()
+		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0058: Expected O, but got Unknown
+			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0111: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0116: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0125: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0130: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0138: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0149: Expected O, but got Unknown
+			//IL_0149: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0159: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0161: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0169: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0173: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0190: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0195: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ba: Unknown result type (might be due to invalid IL or missing references)
+			Panel val = new Panel();
+			((Control)val).set_Size(new Point(350, 150));
+			((Control)val).set_ZIndex(10002);
+			((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+			((Control)val).set_BackgroundColor(new Color(25, 20, 15, 250));
+			val.set_ShowBorder(true);
+			_renameDialogWindow = val;
+			Label val2 = new Label();
+			val2.set_Text("Rename " + GetListDisplayName(_currentListIndex));
+			val2.set_Font(GameService.Content.get_DefaultFont16());
+			val2.set_AutoSizeHeight(true);
+			val2.set_AutoSizeWidth(true);
+			((Control)val2).set_Location(new Point(10, 10));
+			val2.set_TextColor(new Color(220, 200, 150, 255));
+			((Control)val2).set_Parent((Container)(object)_renameDialogWindow);
+			Label val3 = new Label();
+			val3.set_Text("List Name (max 30 chars):");
+			((Control)val3).set_Location(new Point(10, 45));
+			((Control)val3).set_Width(200);
+			val3.set_TextColor(Color.get_White());
+			((Control)val3).set_Parent((Container)(object)_renameDialogWindow);
+			TextBox val4 = new TextBox();
+			((Control)val4).set_Location(new Point(10, 65));
+			((Control)val4).set_Width(330);
+			((TextInputBase)val4).set_MaxLength(30);
+			((Control)val4).set_Parent((Container)(object)_renameDialogWindow);
+			_renameTextBox = val4;
+			StandardButton val5 = new StandardButton();
+			val5.set_Text("Save");
+			((Control)val5).set_Width(80);
+			((Control)val5).set_Location(new Point(170, 100));
+			((Control)val5).set_Parent((Container)(object)_renameDialogWindow);
+			((Control)val5).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				SaveListRename();
+			});
+			StandardButton val6 = new StandardButton();
+			val6.set_Text("Cancel");
+			((Control)val6).set_Width(80);
+			((Control)val6).set_Location(new Point(260, 100));
+			((Control)val6).set_Parent((Container)(object)_renameDialogWindow);
+			((Control)val6).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				((Control)_renameDialogWindow).Hide();
+			});
+		}
+
+		private void SaveListRename()
+		{
+			string newName = ((TextInputBase)_renameTextBox).get_Text().Trim();
+			if (string.IsNullOrEmpty(newName))
+			{
+				ScreenNotification.ShowNotification("LT Messages: List name cannot be empty", (NotificationType)2, (Texture2D)null, 4);
+				return;
+			}
+			_listNames[_currentListIndex] = newName;
+			SaveInternalData();
+			_listSelectorDropdown.get_Items().Clear();
+			for (int i = 0; i < 6; i++)
+			{
+				_listSelectorDropdown.get_Items().Add(GetListDisplayName(i));
+			}
+			_listSelectorDropdown.set_SelectedItem(GetListDisplayName(_currentListIndex));
+			((Control)_renameDialogWindow).Hide();
+			ScreenNotification.ShowNotification("LT Messages: List renamed to '" + newName + "'", (NotificationType)0, (Texture2D)null, 4);
+			Logger.Info($"Renamed list {_currentListIndex} to '{newName}'");
+		}
+
+		private void ShowHelpDialog()
+		{
+			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+			if (_helpDialogWindow == null)
+			{
+				CreateHelpDialog();
+			}
+			int x = (((Control)GameService.Graphics.get_SpriteScreen()).get_Width() - ((Control)_helpDialogWindow).get_Width()) / 2;
+			int y = (((Control)GameService.Graphics.get_SpriteScreen()).get_Height() - ((Control)_helpDialogWindow).get_Height()) / 2;
+			((Control)_helpDialogWindow).set_Location(new Point(x, y));
+			((Control)_helpDialogWindow).Show();
+		}
+
+		private void CreateHelpDialog()
+		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005f: Expected O, but got Unknown
+			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0092: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0111: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0116: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0120: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0135: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0141: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0148: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0150: Expected O, but got Unknown
+			//IL_0156: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0162: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0165: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0185: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0195: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a3: Unknown result type (might be due to invalid IL or missing references)
+			Panel val = new Panel();
+			((Control)val).set_Size(new Point(600, 500));
+			((Control)val).set_ZIndex(10003);
+			((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+			((Control)val).set_BackgroundColor(new Color(25, 20, 15, 250));
+			val.set_ShowBorder(true);
+			val.set_CanScroll(false);
+			_helpDialogWindow = val;
+			Label val2 = new Label();
+			val2.set_Text("LT Messages - Help");
+			val2.set_Font(GameService.Content.get_DefaultFont18());
+			val2.set_AutoSizeHeight(true);
+			val2.set_AutoSizeWidth(true);
+			((Control)val2).set_Location(new Point(10, 10));
+			val2.set_TextColor(new Color(220, 200, 150, 255));
+			((Control)val2).set_Parent((Container)(object)_helpDialogWindow);
+			StandardButton val3 = new StandardButton();
+			val3.set_Text("Close");
+			((Control)val3).set_Width(80);
+			((Control)val3).set_Location(new Point(510, 8));
+			((Control)val3).set_Parent((Container)(object)_helpDialogWindow);
+			((Control)val3).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				((Control)_helpDialogWindow).Hide();
+			});
+			Panel val4 = new Panel();
+			((Control)val4).set_Location(new Point(10, 45));
+			((Control)val4).set_Size(new Point(580, 445));
+			((Control)val4).set_Parent((Container)(object)_helpDialogWindow);
+			val4.set_CanScroll(true);
+			val4.set_ShowBorder(false);
+			Panel contentPanel = val4;
+			string helpText = "QUICK START\r\n• Left-click [LT] icon to see your messages\r\n• Click a message to send it\r\n• Right-click [LT] icon to open this editor\r\n\r\nMODULE SETTINGS\r\nAll operational settings are found in:\r\nBlish HUD → Manage Modules → LT Messages\r\n\r\nCHAT SETTINGS\r\n\r\nChat Focus - How to open chat:\r\n• Shift+Enter: Opens squad chat directly\r\n• Enter: Opens last used chat (map, say, etc.)\r\n\r\nChat Action - What to do with message:\r\n• Send: Automatically types and sends\r\n• Paste Only: Copies to clipboard (Ctrl+V to paste)\r\n\r\nChat Command - Which channel to send to:\r\n• Default: Uses your current active channel\r\n• /squad: Squad broadcast\r\n• /map: Map chat\r\n• /party: Party chat\r\n• /guild: Guild chat\r\n• /say: Local say\r\n• /1 through /5: Whisper to party members\r\n• /g1 through /g6: Guild channels 1-6\r\n• And more!\r\n\r\nCOMMON CONFIGURATIONS\r\n\r\nFor Squad Broadcast:\r\n• Chat Focus: Shift+Enter\r\n• Chat Action: Send\r\n• Chat Command: Default (or /squad)\r\n\r\nFor Map Chat:\r\n• Chat Focus: Enter\r\n• Chat Action: Send\r\n• Chat Command: /map\r\n\r\nFor Manual Control (Clipboard):\r\n• Chat Action: Paste Only\r\n• (Chat Focus and Command don't matter)\r\n\r\nMESSAGE LISTS\r\n\r\n• Use 6 different lists for different events\r\n• Click dropdown to switch lists\r\n• Click \"Rename\" to give lists custom names\r\n  (e.g., \"WvW\", \"Metas\", \"HP Trains\")\r\n\r\nEDITING MESSAGES\r\n\r\n• Add: Create new message\r\n• Edit: Modify existing message (click in list)\r\n• Delete: Remove message (click Delete on message)\r\n• Save: Saves to file automatically\r\n• Defaults: Restore 30 default commander messages\r\n\r\nTYPING DELAY\r\n\r\n• Adjust if messages don't send reliably\r\n• Lower = faster typing (5-40ms recommended)\r\n• Higher = more reliable on slow systems\r\n• Default: 40ms works for most people\r\n\r\nTROUBLESHOOTING\r\n\r\nMessages not sending?\r\n• Check that LT Mode is enabled\r\n• Set Chat Action to \"Send\"\r\n• Try higher Typing Delay\r\n• Verify Chat Command is correct\r\n\r\nNeed more help?\r\n• GitHub: github.com/senzal/LTMessages\r\n• Blish Discord: discord.gg/FYKN3qh\r\n\r\n---\r\n\r\nTHANK YOU!\r\n\r\nThanks to the amazing Guild Wars 2 community\r\nand the Blish HUD community for using and\r\ncreating incredible plugins that make our\r\ngaming experience even better!\r\n\r\nYour support, feedback, and contributions\r\nhelp make tools like this possible.\r\n\r\nHappy commanding! ♥\r\n\r\n---\r\n\r\nFor full documentation, visit the wiki:\r\nhttps://github.com/senzal/LTMessages/wiki";
+			Label val5 = new Label();
+			val5.set_Text(helpText);
+			((Control)val5).set_Location(new Point(5, 5));
+			((Control)val5).set_Width(555);
+			val5.set_TextColor(Color.get_White());
+			val5.set_Font(GameService.Content.get_DefaultFont14());
+			((Control)val5).set_Parent((Container)(object)contentPanel);
+			val5.set_WrapText(true);
+			val5.set_AutoSizeHeight(true);
+		}
+
 		private void SaveMessagesToFile()
 		{
 			try
 			{
-				string filePath = _messageFilePath.get_Value();
+				string filePath = GetFilePathForList(_currentListIndex);
 				string directory = Path.GetDirectoryName(filePath);
 				if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
 				{
@@ -1367,7 +1896,16 @@ namespace LTMessages
 				}
 				List<string> lines = new List<string>
 				{
-					"# ========================================", "# LT Messages Configuration File", "# ========================================", "# ", "# Format: Title,Message", "# Title: max 16 characters (shown in popup menu)", "# Message: max 200 characters (default GW2 chat limit)", "# ", "# Lines starting with # are comments", "# ========================================",
+					"# ========================================",
+					$"# LT Messages Configuration File - List {_currentListIndex}",
+					"# ========================================",
+					"# ",
+					"# Format: Title,Message",
+					"# Title: max 16 characters (shown in popup menu)",
+					"# Message: max 200 characters (default GW2 chat limit)",
+					"# ",
+					"# Lines starting with # are comments",
+					"# ========================================",
 					""
 				};
 				foreach (MessageEntry message in _messages)
@@ -1375,8 +1913,8 @@ namespace LTMessages
 					lines.Add(message.Title + "," + message.Message);
 				}
 				File.WriteAllLines(filePath, lines);
-				Logger.Info($"Saved {_messages.Count} messages to {filePath}");
-				ScreenNotification.ShowNotification($"LT Messages: Saved {_messages.Count} messages", (NotificationType)0, (Texture2D)null, 4);
+				Logger.Info($"Saved {_messages.Count} messages to {filePath} ({GetListDisplayName(_currentListIndex)})");
+				ScreenNotification.ShowNotification($"LT Messages: Saved {_messages.Count} messages to {GetListDisplayName(_currentListIndex)}", (NotificationType)0, (Texture2D)null, 4);
 			}
 			catch (Exception ex)
 			{
@@ -1400,83 +1938,85 @@ namespace LTMessages
 			//IL_009e: Expected O, but got Unknown
 			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0102: Unknown result type (might be due to invalid IL or missing references)
 			//IL_010c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0111: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0127: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0134: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0149: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0164: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0169: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0174: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0187: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0191: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019e: Expected O, but got Unknown
-			//IL_019e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0175: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0181: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0194: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0199: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0203: Expected O, but got Unknown
+			//IL_0203: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0208: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0213: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0226: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0230: Unknown result type (might be due to invalid IL or missing references)
 			try
 			{
 				Panel val = new Panel();
-				((Control)val).set_Size(new Point(400, 200));
-				((Control)val).set_Location(new Point((((Control)GameService.Graphics.get_SpriteScreen()).get_Width() - 400) / 2, (((Control)GameService.Graphics.get_SpriteScreen()).get_Height() - 200) / 2));
+				((Control)val).set_Size(new Point(450, 220));
+				((Control)val).set_Location(new Point((((Control)GameService.Graphics.get_SpriteScreen()).get_Width() - 450) / 2, (((Control)GameService.Graphics.get_SpriteScreen()).get_Height() - 220) / 2));
 				((Control)val).set_ZIndex(15000);
 				((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 				((Control)val).set_BackgroundColor(new Color(25, 20, 15, 250));
 				val.set_ShowBorder(true);
 				Panel confirmDialog = val;
 				Label val2 = new Label();
-				val2.set_Text("Restore Default Messages?");
+				val2.set_Text("⚠ Load Defaults for " + GetListDisplayName(_currentListIndex) + "?");
 				val2.set_Font(GameService.Content.get_DefaultFont18());
 				val2.set_AutoSizeHeight(true);
 				val2.set_AutoSizeWidth(true);
 				((Control)val2).set_Location(new Point(20, 20));
-				val2.set_TextColor(new Color(220, 200, 150, 255));
+				val2.set_TextColor(new Color(255, 200, 0, 255));
 				val2.set_ShowShadow(true);
 				((Control)val2).set_Parent((Container)(object)confirmDialog);
+				string messageText = ((_currentListIndex == 0) ? $"WARNING: This will replace ALL messages in {GetListDisplayName(_currentListIndex)}\nwith the 30 default messages.\n\nYour current {_messages.Count} message(s) will be lost!\n\nThis action CANNOT be undone." : $"WARNING: This will replace ALL messages in {GetListDisplayName(_currentListIndex)}\nwith one sample message: 'Stack on Tag'.\n\nYour current {_messages.Count} message(s) will be lost!\n\nThis action CANNOT be undone.");
 				Label val3 = new Label();
-				val3.set_Text("This will replace all your current messages\nwith the 30 default messages.\n\nThis action cannot be undone.");
-				((Control)val3).set_Width(360);
-				((Control)val3).set_Height(80);
+				val3.set_Text(messageText);
+				((Control)val3).set_Width(410);
+				((Control)val3).set_Height(100);
 				((Control)val3).set_Location(new Point(20, 60));
 				val3.set_TextColor(Color.get_White());
 				val3.set_Font(GameService.Content.get_DefaultFont14());
 				((Control)val3).set_Parent((Container)(object)confirmDialog);
 				StandardButton val4 = new StandardButton();
-				val4.set_Text("Yes, Restore Defaults");
-				((Control)val4).set_Width(160);
-				((Control)val4).set_Location(new Point(20, 150));
+				val4.set_Text("Yes, Load Defaults");
+				((Control)val4).set_Width(140);
+				((Control)val4).set_Location(new Point(20, 170));
 				((Control)val4).set_Parent((Container)(object)confirmDialog);
 				StandardButton yesButton = val4;
 				StandardButton val5 = new StandardButton();
 				val5.set_Text("Cancel");
 				((Control)val5).set_Width(100);
-				((Control)val5).set_Location(new Point(190, 150));
+				((Control)val5).set_Location(new Point(170, 170));
 				((Control)val5).set_Parent((Container)(object)confirmDialog);
 				((Control)yesButton).add_Click((EventHandler<MouseEventArgs>)delegate
 				{
-					_messages = GetDefaultMessages();
+					_messages = ((_currentListIndex == 0) ? GetDefaultMessages() : GetSampleMessage());
 					RefreshEditorUI();
 					RefreshMessageUI();
 					SaveMessagesToFile();
 					((Control)confirmDialog).Dispose();
-					ScreenNotification.ShowNotification("LT Messages: Restored 30 default messages", (NotificationType)0, (Texture2D)null, 4);
-					Logger.Info("Restored default messages");
+					int count = _messages.Count;
+					ScreenNotification.ShowNotification($"LT Messages: Loaded {count} default message(s) for {GetListDisplayName(_currentListIndex)}", (NotificationType)0, (Texture2D)null, 4);
+					Logger.Info("Loaded default messages for " + GetListDisplayName(_currentListIndex));
 				});
 				((Control)val5).add_Click((EventHandler<MouseEventArgs>)delegate
 				{
@@ -1486,7 +2026,131 @@ namespace LTMessages
 			catch (Exception ex)
 			{
 				Logger.Error(ex, "Failed to restore default messages");
-				ScreenNotification.ShowNotification("LT Messages: Failed to restore defaults", (NotificationType)2, (Texture2D)null, 4);
+				ScreenNotification.ShowNotification("LT Messages: Failed to load defaults", (NotificationType)2, (Texture2D)null, 4);
+			}
+		}
+
+		private void ResetAllListsToDefaults()
+		{
+			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0092: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009e: Expected O, but got Unknown
+			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0106: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0116: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0121: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0131: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0146: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0161: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0166: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0171: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0184: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019b: Expected O, but got Unknown
+			//IL_019b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01cb: Unknown result type (might be due to invalid IL or missing references)
+			try
+			{
+				Panel val = new Panel();
+				((Control)val).set_Size(new Point(500, 280));
+				((Control)val).set_Location(new Point((((Control)GameService.Graphics.get_SpriteScreen()).get_Width() - 500) / 2, (((Control)GameService.Graphics.get_SpriteScreen()).get_Height() - 280) / 2));
+				((Control)val).set_ZIndex(15000);
+				((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+				((Control)val).set_BackgroundColor(new Color(40, 10, 10, 250));
+				val.set_ShowBorder(true);
+				Panel confirmDialog = val;
+				Label val2 = new Label();
+				val2.set_Text("⚠⚠⚠ RESET ALL LISTS? ⚠⚠⚠");
+				val2.set_Font(GameService.Content.get_DefaultFont18());
+				val2.set_AutoSizeHeight(true);
+				val2.set_AutoSizeWidth(true);
+				((Control)val2).set_Location(new Point(20, 20));
+				val2.set_TextColor(new Color(255, 100, 100, 255));
+				val2.set_ShowShadow(true);
+				((Control)val2).set_Parent((Container)(object)confirmDialog);
+				Label val3 = new Label();
+				val3.set_Text("DANGER: This will reset ALL 6 message lists (0-5)\nback to their default states!\n\n• List 0: 30 default messages\n• Lists 1-5: Single sample message\n\nALL your custom messages in ALL lists will be lost!\n\nThis action CANNOT be undone!\n\nAre you absolutely sure?");
+				((Control)val3).set_Width(460);
+				((Control)val3).set_Height(160);
+				((Control)val3).set_Location(new Point(20, 60));
+				val3.set_TextColor(Color.get_White());
+				val3.set_Font(GameService.Content.get_DefaultFont14());
+				((Control)val3).set_Parent((Container)(object)confirmDialog);
+				StandardButton val4 = new StandardButton();
+				val4.set_Text("YES, RESET ALL LISTS");
+				((Control)val4).set_Width(180);
+				((Control)val4).set_Location(new Point(20, 230));
+				((Control)val4).set_Parent((Container)(object)confirmDialog);
+				StandardButton yesButton = val4;
+				StandardButton val5 = new StandardButton();
+				val5.set_Text("Cancel (Recommended)");
+				((Control)val5).set_Width(160);
+				((Control)val5).set_Location(new Point(210, 230));
+				((Control)val5).set_Parent((Container)(object)confirmDialog);
+				((Control)yesButton).add_Click((EventHandler<MouseEventArgs>)delegate
+				{
+					try
+					{
+						for (int i = 0; i < 6; i++)
+						{
+							string filePathForList = GetFilePathForList(i);
+							string directoryName = Path.GetDirectoryName(filePathForList);
+							if (!string.IsNullOrEmpty(directoryName) && !Directory.Exists(directoryName))
+							{
+								Directory.CreateDirectory(directoryName);
+							}
+							CreateDefaultMessageFile(filePathForList, i);
+							Logger.Info($"Reset List {i} to defaults");
+						}
+						LoadMessagesFromFile();
+						RefreshEditorUI();
+						RefreshMessageUI();
+						((Control)confirmDialog).Dispose();
+						ScreenNotification.ShowNotification("LT Messages: All lists reset to defaults!", (NotificationType)0, (Texture2D)null, 4);
+						Logger.Info("Reset all message lists to defaults");
+					}
+					catch (Exception ex2)
+					{
+						Logger.Error(ex2, "Failed to reset all lists");
+						ScreenNotification.ShowNotification("LT Messages: Failed to reset all lists", (NotificationType)2, (Texture2D)null, 4);
+						((Control)confirmDialog).Dispose();
+					}
+				});
+				((Control)val5).add_Click((EventHandler<MouseEventArgs>)delegate
+				{
+					((Control)confirmDialog).Dispose();
+				});
+			}
+			catch (Exception ex)
+			{
+				Logger.Error(ex, "Failed to show reset dialog");
+				ScreenNotification.ShowNotification("LT Messages: Failed to show reset dialog", (NotificationType)2, (Texture2D)null, 4);
 			}
 		}
 
@@ -1499,7 +2163,7 @@ namespace LTMessages
 				Logger.Warn("Message send blocked - LT Mode is disabled");
 				HidePopup();
 			}
-			else if (_autoSendEnabled.get_Value())
+			else if (_chatAction.get_Value() == ChatAction.Send)
 			{
 				SendMessageAutomatic(message);
 			}
@@ -1514,11 +2178,11 @@ namespace LTMessages
 			try
 			{
 				string originalClipboard = null;
+				string commandString = GetChatCommandString(_chatCommand.get_Value());
 				string clipboardText;
-				if (_chatMethod.get_Value() == ChatMethod.SlashCommand)
+				if (!string.IsNullOrEmpty(commandString))
 				{
-					string command = ((_chatCommand.get_Value() == ChatCommand.Squad) ? "squad" : "subgroup");
-					clipboardText = "/" + command + " " + message.Message;
+					clipboardText = commandString + " " + message.Message;
 				}
 				else
 				{
@@ -1573,30 +2237,36 @@ namespace LTMessages
 		{
 			Task.Run(async delegate
 			{
-				_ = 5;
+				_ = 3;
 				try
 				{
 					FocusGameWindow();
 					await Task.Delay(100);
-					if (_chatMethod.get_Value() == ChatMethod.SlashCommand)
+					string commandString = GetChatCommandString(_chatCommand.get_Value());
+					string fullMessage;
+					if (!string.IsNullOrEmpty(commandString))
 					{
-						string command = ((_chatCommand.get_Value() == ChatCommand.Squad) ? "squad" : "subgroup");
-						Logger.Info("Sending message: /" + command + " " + message.Message);
-						Logger.Debug("Sending Shift+/ to open chat with /");
-						SendKeyPress(191, shift: true);
-						await Task.Delay(150);
-						Logger.Debug("Typing: " + command + " " + message.Message);
-						await TypeString(command + " " + message.Message);
+						fullMessage = commandString + " " + message.Message;
+						Logger.Info("Sending message: " + fullMessage);
 					}
 					else
 					{
-						Logger.Info("Sending message to squad chat: " + message.Message);
+						fullMessage = message.Message;
+						Logger.Info("Sending message to active channel: " + message.Message);
+					}
+					if (_chatFocus.get_Value() == ChatFocus.ShiftEnter)
+					{
 						Logger.Debug("Sending Shift+Enter to open squad chat");
 						SendKeyPress(13, shift: true);
-						await Task.Delay(150);
-						Logger.Debug("Typing: " + message.Message);
-						await TypeString(message.Message);
 					}
+					else
+					{
+						Logger.Debug("Sending Enter to open last used chat");
+						SendKeyPress(13);
+					}
+					await Task.Delay(150);
+					Logger.Debug("Typing: " + fullMessage);
+					await TypeString(fullMessage, (int)_sendDelay.get_Value());
 					await Task.Delay(50);
 					Logger.Debug("Sending Enter to send message");
 					SendKeyPress(13);
