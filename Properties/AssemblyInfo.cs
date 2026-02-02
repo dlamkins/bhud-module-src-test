@@ -6,7 +6,7 @@ using System.Runtime.Versioning;
 [assembly: AssemblyCompany("LTMessages")]
 [assembly: AssemblyConfiguration("Release")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
-[assembly: AssemblyInformationalVersion("1.0.0+6eabf35e87769a8ca67151382e61fc9709e84ec2")]
+[assembly: AssemblyInformationalVersion("1.0.0+227d29f80bae5b01397bc7401603510826887c15")]
 [assembly: AssemblyProduct("LTMessages")]
 [assembly: AssemblyTitle("LTMessages")]
 [assembly: AssemblyVersion("1.0.0.0")]

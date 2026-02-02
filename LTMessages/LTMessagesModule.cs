@@ -172,6 +172,8 @@ namespace LTMessages
 
 		private int _editingMessageIndex = -1;
 
+		private bool _suppressListSwitchWarning;
+
 		private List<MessageEntry> _messages = new List<MessageEntry>();
 
 		private FileSystemWatcher _fileWatcher;
@@ -854,6 +856,18 @@ namespace LTMessages
 				{
 					UpdateCornerIconTooltip();
 				});
+				_chatFocus.add_SettingChanged((EventHandler<ValueChangedEventArgs<ChatFocus>>)delegate
+				{
+					UpdateCornerIconTooltip();
+				});
+				_chatAction.add_SettingChanged((EventHandler<ValueChangedEventArgs<ChatAction>>)delegate
+				{
+					UpdateCornerIconTooltip();
+				});
+				_chatCommand.add_SettingChanged((EventHandler<ValueChangedEventArgs<ChatCommand>>)delegate
+				{
+					UpdateCornerIconTooltip();
+				});
 				Logger.Info("Corner icon created");
 			}
 			catch (Exception ex)
@@ -867,8 +881,38 @@ namespace LTMessages
 			if (_cornerIcon != null)
 			{
 				string status = (_ltModeEnabled.get_Value() ? "ENABLED" : "DISABLED");
-				((Control)_cornerIcon).set_BasicTooltipText("LT Messages\nLeft-click: Show messages\nRight-click: Open editor\nLT Mode: " + status);
+				string focus = ((_chatFocus.get_Value() == ChatFocus.ShiftEnter) ? "Shift+Enter" : "Enter");
+				string action = ((_chatAction.get_Value() == ChatAction.Send) ? "Send" : "Paste");
+				string command = GetChatCommandDisplayName(_chatCommand.get_Value());
+				((Control)_cornerIcon).set_BasicTooltipText("LT Messages\nLeft-click: Show messages\nRight-click: Open editor\nLT Mode: " + status + "\nMode: " + focus + " | " + action + " | " + command);
 			}
+		}
+
+		private string GetChatCommandDisplayName(ChatCommand command)
+		{
+			return command switch
+			{
+				ChatCommand.Default => "Default", 
+				ChatCommand.Squad => "Squad", 
+				ChatCommand.Subgroup => "Subgroup", 
+				ChatCommand.Map => "Map", 
+				ChatCommand.Say => "Say", 
+				ChatCommand.Party => "Party", 
+				ChatCommand.Team => "Team", 
+				ChatCommand.Guild => "Guild", 
+				ChatCommand.Guild1 => "Guild1", 
+				ChatCommand.Guild2 => "Guild2", 
+				ChatCommand.Guild3 => "Guild3", 
+				ChatCommand.Guild4 => "Guild4", 
+				ChatCommand.Guild5 => "Guild5", 
+				ChatCommand.Guild6 => "Guild6", 
+				ChatCommand.Party1 => "Party1", 
+				ChatCommand.Party2 => "Party2", 
+				ChatCommand.Party3 => "Party3", 
+				ChatCommand.Party4 => "Party4", 
+				ChatCommand.Party5 => "Party5", 
+				_ => command.ToString(), 
+			};
 		}
 
 		private void CreatePopupWindow()
@@ -941,7 +985,7 @@ namespace LTMessages
 			val3.set_Text("X");
 			((Control)val3).set_Width(25);
 			((Control)val3).set_Height(25);
-			((Control)val3).set_Location(new Point(((Control)_popupWindow).get_Width() - 30, 5));
+			((Control)val3).set_Location(new Point(((Control)_popupWindow).get_Width() - 35, 5));
 			((Control)val3).set_Parent((Container)(object)_popupWindow);
 			((Control)val3).set_ZIndex(10);
 			_popupCloseButton = val3;
@@ -954,11 +998,11 @@ namespace LTMessages
 			((Container)val4).set_WidthSizingMode((SizingMode)2);
 			((Container)val4).set_HeightSizingMode((SizingMode)2);
 			((Panel)val4).set_CanScroll(true);
-			((Control)val4).set_Location(new Point(5, 35));
-			((Control)val4).set_Size(new Point(210, 260));
+			((Control)val4).set_Location(new Point(6, 40));
+			((Control)val4).set_Size(new Point(204, 260));
 			((Control)val4).set_Parent((Container)(object)_popupWindow);
-			val4.set_OuterControlPadding(new Vector2(8f, 8f));
-			val4.set_ControlPadding(new Vector2(0f, 2f));
+			val4.set_OuterControlPadding(new Vector2(5f, 10f));
+			val4.set_ControlPadding(new Vector2(0f, 3f));
 			_messageFlowPanel = val4;
 			((Control)GameService.Graphics.get_SpriteScreen()).add_LeftMouseButtonPressed((EventHandler<MouseEventArgs>)OnScreenClicked);
 			RefreshMessageUI();
@@ -966,23 +1010,26 @@ namespace LTMessages
 
 		private void RefreshMessageUI()
 		{
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e1: Expected O, but got Unknown
+			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e7: Expected O, but got Unknown
+			//IL_0196: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d5: Unknown result type (might be due to invalid IL or missing references)
 			if (_messageFlowPanel == null)
 			{
 				return;
@@ -992,8 +1039,8 @@ namespace LTMessages
 			{
 				Label val = new Label();
 				val.set_Text(message.Title);
-				((Control)val).set_Width(200);
-				((Control)val).set_Height(26);
+				((Control)val).set_Width(194);
+				((Control)val).set_Height(28);
 				val.set_TextColor(new Color(220, 200, 150, 255));
 				val.set_Font(GameService.Content.get_DefaultFont16());
 				val.set_ShowShadow(true);
@@ -1026,6 +1073,18 @@ namespace LTMessages
 					label.set_TextColor(new Color(220, 200, 150, 255));
 				});
 			}
+			int num = Math.Min(_messages.Count, 15);
+			int itemHeight = 28;
+			int itemPadding = 3;
+			int outerPadding = 20;
+			int flowPanelHeight = num * (itemHeight + itemPadding) + outerPadding;
+			int minFlowPanelHeight = 3 * (itemHeight + itemPadding) + outerPadding;
+			flowPanelHeight = Math.Max(flowPanelHeight, minFlowPanelHeight);
+			((Control)_messageFlowPanel).set_Size(new Point(204, flowPanelHeight));
+			int popupHeight = 40 + flowPanelHeight + 10;
+			((Control)_popupWindow).set_Size(new Point(220, popupHeight));
+			((Control)_popupCloseButton).set_Location(new Point(((Control)_popupWindow).get_Width() - 35, 5));
+			((Control)_messageFlowPanel).Invalidate();
 		}
 
 		private void OnShowCornerIconChanged(object sender, ValueChangedEventArgs<bool> e)
@@ -1091,25 +1150,17 @@ namespace LTMessages
 
 		private void ShowPopupAtCursor()
 		{
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0116: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
 			if (_popupWindow == null || _messages.Count == 0)
 			{
 				return;
 			}
 			try
 			{
+				RefreshMessageUI();
 				Point position = GameService.Input.get_Mouse().get_Position();
-				int itemHeight = 25;
-				int windowHeight = Math.Min(_messages.Count * itemHeight + 60, 440);
-				((Control)_popupWindow).set_Size(new Point(200, windowHeight));
-				if (_popupCloseButton != null)
-				{
-					((Control)_popupCloseButton).set_Location(new Point(((Control)_popupWindow).get_Width() - 30, 5));
-				}
 				int x = position.X;
 				int y = position.Y;
 				if (x + ((Control)_popupWindow).get_Width() > ((Control)GameService.Graphics.get_SpriteScreen()).get_Width())
@@ -1224,27 +1275,21 @@ namespace LTMessages
 			//IL_02c6: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02ce: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02d8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02f5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02fa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0305: Unknown result type (might be due to invalid IL or missing references)
-			//IL_030d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0315: Unknown result type (might be due to invalid IL or missing references)
-			//IL_031f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_033d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0342: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0349: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0350: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0357: Unknown result type (might be due to invalid IL or missing references)
-			//IL_035e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0363: Unknown result type (might be due to invalid IL or missing references)
-			//IL_036d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0378: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0382: Unknown result type (might be due to invalid IL or missing references)
-			//IL_038e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0399: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03bd: Expected O, but got Unknown
+			//IL_02f6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02fb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0302: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0309: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0310: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0317: Unknown result type (might be due to invalid IL or missing references)
+			//IL_031c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0326: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0331: Unknown result type (might be due to invalid IL or missing references)
+			//IL_033b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0347: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0352: Unknown result type (might be due to invalid IL or missing references)
+			//IL_035c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0367: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0376: Expected O, but got Unknown
 			Panel val = new Panel();
 			((Control)val).set_Size(new Point(500, 400));
 			((Control)val).set_ZIndex(10000);
@@ -1274,16 +1319,27 @@ namespace LTMessages
 			_listSelectorDropdown.set_SelectedItem(GetListDisplayName(_currentListIndex));
 			_listSelectorDropdown.add_ValueChanged((EventHandler<ValueChangedEventArgs>)delegate
 			{
-				string selectedItem = _listSelectorDropdown.get_SelectedItem();
-				for (int j = 0; j < 6; j++)
+				if (!_suppressListSwitchWarning && _editDialogWindow != null && ((Control)_editDialogWindow).get_Visible())
 				{
-					if (GetListDisplayName(j) == selectedItem)
+					string selectedItem = _listSelectorDropdown.get_SelectedItem();
+					_suppressListSwitchWarning = true;
+					_listSelectorDropdown.set_SelectedItem(GetListDisplayName(_currentListIndex));
+					_suppressListSwitchWarning = false;
+					ShowUnsavedChangesDialog(selectedItem);
+				}
+				else
+				{
+					string selectedItem2 = _listSelectorDropdown.get_SelectedItem();
+					for (int j = 0; j < 6; j++)
 					{
-						_currentListIndex = j;
-						Logger.Info($"Switched to editing {selectedItem} (index {j})");
-						LoadMessagesFromFile();
-						RefreshEditorUI();
-						break;
+						if (GetListDisplayName(j) == selectedItem2)
+						{
+							_currentListIndex = j;
+							Logger.Info($"Switched to editing {selectedItem2} (index {j})");
+							LoadMessagesFromFile();
+							RefreshEditorUI();
+							break;
+						}
 					}
 				}
 			});
@@ -1297,115 +1353,118 @@ namespace LTMessages
 				RestoreDefaultMessages();
 			});
 			StandardButton val5 = new StandardButton();
-			val5.set_Text("Add");
+			val5.set_Text("Reset All");
 			((Control)val5).set_Width(70);
 			((Control)val5).set_Location(new Point(250, 8));
 			((Control)val5).set_Parent((Container)(object)_editorWindow);
 			((Control)val5).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				ShowEditDialog(-1, null);
+				ResetAllListsToDefaults();
 			});
 			StandardButton val6 = new StandardButton();
-			val6.set_Text("Save");
+			val6.set_Text("Add");
 			((Control)val6).set_Width(70);
-			((Control)val6).set_Location(new Point(330, 8));
+			((Control)val6).set_Location(new Point(340, 8));
 			((Control)val6).set_Parent((Container)(object)_editorWindow);
 			((Control)val6).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				SaveMessagesToFile();
+				ShowEditDialog(-1, null);
 			});
 			StandardButton val7 = new StandardButton();
 			val7.set_Text("Close");
 			((Control)val7).set_Width(70);
-			((Control)val7).set_Location(new Point(410, 8));
+			((Control)val7).set_Location(new Point(420, 8));
 			((Control)val7).set_Parent((Container)(object)_editorWindow);
 			((Control)val7).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				((Control)_editorWindow).Hide();
+				CloseEditor();
 			});
 			StandardButton val8 = new StandardButton();
-			val8.set_Text("Reset All");
+			val8.set_Text("Rename");
 			((Control)val8).set_Width(70);
 			((Control)val8).set_Location(new Point(170, 40));
 			((Control)val8).set_Parent((Container)(object)_editorWindow);
 			((Control)val8).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				ResetAllListsToDefaults();
+				ShowRenameListDialog();
 			});
 			StandardButton val9 = new StandardButton();
-			val9.set_Text("Rename");
+			val9.set_Text("Help");
 			((Control)val9).set_Width(70);
-			((Control)val9).set_Location(new Point(250, 40));
+			((Control)val9).set_Location(new Point(420, 40));
 			((Control)val9).set_Parent((Container)(object)_editorWindow);
 			((Control)val9).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				ShowRenameListDialog();
-			});
-			StandardButton val10 = new StandardButton();
-			val10.set_Text("Help");
-			((Control)val10).set_Width(70);
-			((Control)val10).set_Location(new Point(330, 40));
-			((Control)val10).set_Parent((Container)(object)_editorWindow);
-			((Control)val10).add_Click((EventHandler<MouseEventArgs>)delegate
-			{
 				ShowHelpDialog();
 			});
-			FlowPanel val11 = new FlowPanel();
-			val11.set_FlowDirection((ControlFlowDirection)3);
-			((Container)val11).set_WidthSizingMode((SizingMode)2);
-			((Container)val11).set_HeightSizingMode((SizingMode)2);
-			((Panel)val11).set_CanScroll(true);
-			((Control)val11).set_Location(new Point(10, 70));
-			((Control)val11).set_Size(new Point(480, 315));
-			((Control)val11).set_Parent((Container)(object)_editorWindow);
-			val11.set_OuterControlPadding(new Vector2(5f, 5f));
-			val11.set_ControlPadding(new Vector2(0f, 3f));
-			_editorFlowPanel = val11;
+			FlowPanel val10 = new FlowPanel();
+			val10.set_FlowDirection((ControlFlowDirection)3);
+			((Container)val10).set_WidthSizingMode((SizingMode)2);
+			((Container)val10).set_HeightSizingMode((SizingMode)2);
+			((Panel)val10).set_CanScroll(true);
+			((Control)val10).set_Location(new Point(10, 70));
+			((Control)val10).set_Size(new Point(480, 315));
+			((Control)val10).set_Parent((Container)(object)_editorWindow);
+			val10.set_OuterControlPadding(new Vector2(5f, 5f));
+			val10.set_ControlPadding(new Vector2(0f, 3f));
+			_editorFlowPanel = val10;
 		}
 
 		private void RefreshEditorUI()
 		{
-			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0083: Expected O, but got Unknown
-			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00da: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0110: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f3: Expected O, but got Unknown
+			//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0114: Unknown result type (might be due to invalid IL or missing references)
 			//IL_011f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0129: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0134: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0122: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0141: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0162: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0174: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0191: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0167: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0183: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0192: Unknown result type (might be due to invalid IL or missing references)
 			//IL_019c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ac: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0202: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0207: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0212: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0222: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022c: Unknown result type (might be due to invalid IL or missing references)
 			if (_editorFlowPanel == null)
 			{
 				return;
 			}
 			((Container)_editorFlowPanel).ClearChildren();
+			int num = Math.Min(_messages.Count, 6);
+			int itemHeight = 60;
+			int itemPadding = 3;
+			int outerPadding = 10;
+			int flowPanelHeight = num * (itemHeight + itemPadding) + outerPadding;
+			int minFlowPanelHeight = 3 * (itemHeight + itemPadding) + outerPadding;
+			flowPanelHeight = Math.Max(flowPanelHeight, minFlowPanelHeight);
+			((Control)_editorFlowPanel).set_Size(new Point(480, flowPanelHeight));
+			int editorHeight = 70 + flowPanelHeight + 20;
+			((Control)_editorWindow).set_Size(new Point(500, editorHeight));
 			for (int i = 0; i < _messages.Count; i++)
 			{
 				MessageEntry message = _messages[i];
@@ -1450,6 +1509,7 @@ namespace LTMessages
 					DeleteMessage(index);
 				});
 			}
+			((Control)_editorFlowPanel).Invalidate();
 		}
 
 		private void ShowEditDialog(int messageIndex, MessageEntry message)
@@ -1639,6 +1699,7 @@ namespace LTMessages
 			((Control)_editDialogWindow).Hide();
 			RefreshEditorUI();
 			RefreshMessageUI();
+			SaveMessagesToFile();
 		}
 
 		private void DeleteMessage(int index)
@@ -1649,6 +1710,252 @@ namespace LTMessages
 				RefreshEditorUI();
 				RefreshMessageUI();
 			}
+		}
+
+		private void ShowUnsavedChangesDialog(string targetListName)
+		{
+			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006c: Expected O, but got Unknown
+			//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0121: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0126: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0131: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0136: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0140: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0153: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0154: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0170: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0175: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0180: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0193: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0207: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0217: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0222: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0237: Unknown result type (might be due to invalid IL or missing references)
+			Panel val = new Panel();
+			((Control)val).set_Size(new Point(450, 180));
+			((Control)val).set_ZIndex(10002);
+			((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+			((Control)val).set_BackgroundColor(new Color(25, 20, 15, 250));
+			val.set_ShowBorder(true);
+			Panel confirmDialog = val;
+			int x = (((Control)GameService.Graphics.get_SpriteScreen()).get_Width() - ((Control)confirmDialog).get_Width()) / 2;
+			int y = (((Control)GameService.Graphics.get_SpriteScreen()).get_Height() - ((Control)confirmDialog).get_Height()) / 2;
+			((Control)confirmDialog).set_Location(new Point(x, y));
+			Label val2 = new Label();
+			val2.set_Text("Unsaved Changes");
+			val2.set_Font(GameService.Content.get_DefaultFont16());
+			val2.set_AutoSizeHeight(true);
+			val2.set_AutoSizeWidth(true);
+			((Control)val2).set_Location(new Point(10, 10));
+			val2.set_TextColor(new Color(220, 200, 150, 255));
+			((Control)val2).set_Parent((Container)(object)confirmDialog);
+			Label val3 = new Label();
+			val3.set_Text("You have unsaved changes in the message editor.\nWhat would you like to do?");
+			((Control)val3).set_Location(new Point(10, 45));
+			((Control)val3).set_Width(430);
+			((Control)val3).set_Height(50);
+			val3.set_TextColor(Color.get_White());
+			val3.set_WrapText(true);
+			((Control)val3).set_Parent((Container)(object)confirmDialog);
+			StandardButton val4 = new StandardButton();
+			val4.set_Text("Save & Switch");
+			((Control)val4).set_Width(130);
+			((Control)val4).set_Location(new Point(10, 130));
+			((Control)val4).set_Parent((Container)(object)confirmDialog);
+			((Control)val4).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				SaveEditedMessage();
+				((Control)confirmDialog).Dispose();
+				SwitchToList(targetListName);
+			});
+			StandardButton val5 = new StandardButton();
+			val5.set_Text("Discard & Switch");
+			((Control)val5).set_Width(130);
+			((Control)val5).set_Location(new Point(150, 130));
+			((Control)val5).set_Parent((Container)(object)confirmDialog);
+			((Control)val5).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				((Control)_editDialogWindow).Hide();
+				((Control)confirmDialog).Dispose();
+				SwitchToList(targetListName);
+			});
+			StandardButton val6 = new StandardButton();
+			val6.set_Text("Cancel");
+			((Control)val6).set_Width(130);
+			((Control)val6).set_Location(new Point(290, 130));
+			((Control)val6).set_Parent((Container)(object)confirmDialog);
+			((Control)val6).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				((Control)confirmDialog).Dispose();
+			});
+			((Control)confirmDialog).Show();
+		}
+
+		private void SwitchToList(string listName)
+		{
+			_suppressListSwitchWarning = true;
+			_listSelectorDropdown.set_SelectedItem(listName);
+			_suppressListSwitchWarning = false;
+			for (int i = 0; i < 6; i++)
+			{
+				if (GetListDisplayName(i) == listName)
+				{
+					_currentListIndex = i;
+					Logger.Info($"Switched to editing {listName} (index {i})");
+					LoadMessagesFromFile();
+					RefreshEditorUI();
+					break;
+				}
+			}
+		}
+
+		private void CloseEditor()
+		{
+			if (_editDialogWindow != null && ((Control)_editDialogWindow).get_Visible())
+			{
+				ShowCloseEditorConfirmation();
+			}
+			else
+			{
+				((Control)_editorWindow).Hide();
+			}
+		}
+
+		private void ShowCloseEditorConfirmation()
+		{
+			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0065: Expected O, but got Unknown
+			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0105: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0139: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0144: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0157: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0169: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0179: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0184: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0196: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0200: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0205: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0210: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0226: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0230: Unknown result type (might be due to invalid IL or missing references)
+			Panel val = new Panel();
+			((Control)val).set_Size(new Point(450, 180));
+			((Control)val).set_ZIndex(10002);
+			((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+			((Control)val).set_BackgroundColor(new Color(25, 20, 15, 250));
+			val.set_ShowBorder(true);
+			Panel confirmDialog = val;
+			int x = (((Control)GameService.Graphics.get_SpriteScreen()).get_Width() - ((Control)confirmDialog).get_Width()) / 2;
+			int y = (((Control)GameService.Graphics.get_SpriteScreen()).get_Height() - ((Control)confirmDialog).get_Height()) / 2;
+			((Control)confirmDialog).set_Location(new Point(x, y));
+			Label val2 = new Label();
+			val2.set_Text("Unsaved Changes");
+			val2.set_Font(GameService.Content.get_DefaultFont16());
+			val2.set_AutoSizeHeight(true);
+			val2.set_AutoSizeWidth(true);
+			((Control)val2).set_Location(new Point(10, 10));
+			val2.set_TextColor(new Color(220, 200, 150, 255));
+			((Control)val2).set_Parent((Container)(object)confirmDialog);
+			Label val3 = new Label();
+			val3.set_Text("You have unsaved changes in the message editor.\nWhat would you like to do?");
+			((Control)val3).set_Location(new Point(10, 45));
+			((Control)val3).set_Width(430);
+			((Control)val3).set_Height(50);
+			val3.set_TextColor(Color.get_White());
+			val3.set_WrapText(true);
+			((Control)val3).set_Parent((Container)(object)confirmDialog);
+			StandardButton val4 = new StandardButton();
+			val4.set_Text("Save & Close");
+			((Control)val4).set_Width(130);
+			((Control)val4).set_Location(new Point(10, 130));
+			((Control)val4).set_Parent((Container)(object)confirmDialog);
+			((Control)val4).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				SaveEditedMessage();
+				((Control)confirmDialog).Dispose();
+				((Control)_editorWindow).Hide();
+			});
+			StandardButton val5 = new StandardButton();
+			val5.set_Text("Discard & Close");
+			((Control)val5).set_Width(130);
+			((Control)val5).set_Location(new Point(150, 130));
+			((Control)val5).set_Parent((Container)(object)confirmDialog);
+			((Control)val5).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				((Control)_editDialogWindow).Hide();
+				((Control)confirmDialog).Dispose();
+				((Control)_editorWindow).Hide();
+			});
+			StandardButton val6 = new StandardButton();
+			val6.set_Text("Cancel");
+			((Control)val6).set_Width(130);
+			((Control)val6).set_Location(new Point(290, 130));
+			((Control)val6).set_Parent((Container)(object)confirmDialog);
+			((Control)val6).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				((Control)confirmDialog).Dispose();
+			});
+			((Control)confirmDialog).Show();
 		}
 
 		private void ShowRenameListDialog()
