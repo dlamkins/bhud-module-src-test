@@ -4,6 +4,7 @@ using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Maestro.Models;
 using Maestro.Services.Playback;
+using Maestro.UI.Controls;
 using Microsoft.Xna.Framework;
 
 namespace Maestro.UI.Main
@@ -59,7 +60,7 @@ namespace Maestro.UI.Main
 
 		private readonly StandardButton _stopButton;
 
-		private readonly Label _nowPlayingLabel;
+		private readonly MarqueeLabel _nowPlayingLabel;
 
 		private readonly Label _progressLabel;
 
@@ -201,26 +202,19 @@ namespace Maestro.UI.Main
 			return val;
 		}
 
-		private Label CreateNowPlayingLabel()
+		private MarqueeLabel CreateNowPlayingLabel()
 		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004d: Expected O, but got Unknown
-			Label val = new Label();
-			((Control)val).set_Parent((Container)(object)this);
-			val.set_Text("No song playing");
-			((Control)val).set_Location(new Point(100, 21));
-			((Control)val).set_Width(300);
-			val.set_Font(GameService.Content.get_DefaultFont14());
-			val.set_TextColor(MaestroTheme.MutedCream);
-			return val;
+			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+			int availableWidth = ((Control)this).get_Width() - 100 - 30 - 8 - 5;
+			MarqueeLabel marqueeLabel = new MarqueeLabel();
+			((Control)marqueeLabel).set_Parent((Container)(object)this);
+			marqueeLabel.Text = "No song playing";
+			((Control)marqueeLabel).set_Location(new Point(100, 21));
+			((Control)marqueeLabel).set_Width(availableWidth);
+			marqueeLabel.Font = GameService.Content.get_DefaultFont14();
+			marqueeLabel.TextColor = MaestroTheme.MutedCream;
+			return marqueeLabel;
 		}
 
 		private Label CreateProgressLabel()
@@ -410,7 +404,7 @@ namespace Maestro.UI.Main
 		{
 			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
 			Song song = _songPlayer.CurrentSong;
-			_nowPlayingLabel.set_Text(song?.DisplayName ?? "Unknown");
+			_nowPlayingLabel.Text = song?.DisplayName ?? "Unknown";
 			((Control)_nowPlayingLabel).set_Location(new Point(100, 8));
 			_instrumentLabel.set_Text(song?.Instrument.ToString() ?? "");
 			if (_songPlayer.IsPaused)
@@ -430,7 +424,7 @@ namespace Maestro.UI.Main
 			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
 			_pauseButton.set_Text(">");
-			_nowPlayingLabel.set_TextColor(MaestroTheme.CreamWhite);
+			_nowPlayingLabel.TextColor = MaestroTheme.CreamWhite;
 			_progressLabel.set_Text("Paused" + GetQueueSuffix());
 			_progressLabel.set_TextColor(MaestroTheme.Paused);
 		}
@@ -441,7 +435,7 @@ namespace Maestro.UI.Main
 			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
 			_pauseButton.set_Text("||");
-			_nowPlayingLabel.set_TextColor(MaestroTheme.CreamWhite);
+			_nowPlayingLabel.TextColor = MaestroTheme.CreamWhite;
 			if (_songPlayer.IsAdjustingOctave)
 			{
 				_progressLabel.set_Text("Adjusting..." + GetQueueSuffix());
@@ -475,17 +469,17 @@ namespace Maestro.UI.Main
 			Song song = _songPlayer.CurrentSong;
 			if (song != null && _songPlayer.CurrentCommandIndex >= song.Commands.Count)
 			{
-				_nowPlayingLabel.set_Text(song.DisplayName);
+				_nowPlayingLabel.Text = song.DisplayName;
 				((Control)_nowPlayingLabel).set_Location(new Point(100, 8));
-				_nowPlayingLabel.set_TextColor(MaestroTheme.CreamWhite);
+				_nowPlayingLabel.TextColor = MaestroTheme.CreamWhite;
 				_progressLabel.set_Text("Done!");
 				_progressLabel.set_TextColor(MaestroTheme.MutedCream);
 			}
 			else
 			{
-				_nowPlayingLabel.set_Text("No song playing");
+				_nowPlayingLabel.Text = "No song playing";
 				((Control)_nowPlayingLabel).set_Location(new Point(100, 21));
-				_nowPlayingLabel.set_TextColor(MaestroTheme.MutedCream);
+				_nowPlayingLabel.TextColor = MaestroTheme.MutedCream;
 				_progressLabel.set_Text("");
 			}
 			_pauseButton.set_Text("||");
@@ -498,9 +492,9 @@ namespace Maestro.UI.Main
 			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-			_nowPlayingLabel.set_Text(_pendingSong?.DisplayName ?? "Unknown");
+			_nowPlayingLabel.Text = _pendingSong?.DisplayName ?? "Unknown";
 			((Control)_nowPlayingLabel).set_Location(new Point(100, 8));
-			_nowPlayingLabel.set_TextColor(MaestroTheme.CreamWhite);
+			_nowPlayingLabel.TextColor = MaestroTheme.CreamWhite;
 			_instrumentLabel.set_Text(_pendingSong?.Instrument.ToString() ?? "");
 			_progressLabel.set_Text("Ready" + GetQueueSuffix());
 			_progressLabel.set_TextColor(MaestroTheme.Paused);
@@ -583,7 +577,7 @@ namespace Maestro.UI.Main
 			{
 				((Control)stopButton).Dispose();
 			}
-			Label nowPlayingLabel = _nowPlayingLabel;
+			MarqueeLabel nowPlayingLabel = _nowPlayingLabel;
 			if (nowPlayingLabel != null)
 			{
 				((Control)nowPlayingLabel).Dispose();
