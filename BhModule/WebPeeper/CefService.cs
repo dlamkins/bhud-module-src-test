@@ -59,6 +59,7 @@ namespace BhModule.WebPeeper
 			((Game)WebPeeperModule.BlishHudInstance).remove_Exiting((EventHandler<EventArgs>)OnBlishHudExiting);
 			AppDomain.CurrentDomain.AssemblyResolve -= CefSharpCoreRuntimeResolver;
 			_webBrowser?.Dispose();
+			_webBrowser = null;
 			_inputMethod.Dispose();
 		}
 
@@ -214,6 +215,7 @@ namespace BhModule.WebPeeper
 		private void OnBlishHudExiting(object sender, EventArgs e)
 		{
 			_webBrowser?.Dispose();
+			_webBrowser = null;
 		}
 
 		private (Stream, string) OnBlishHudSchemeRequested(IRequest request)

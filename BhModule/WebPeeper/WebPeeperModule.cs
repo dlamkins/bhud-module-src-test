@@ -15,7 +15,7 @@ namespace BhModule.WebPeeper
 	[Export(typeof(Module))]
 	public class WebPeeperModule : Module
 	{
-		private static readonly Logger Logger = Logger.GetLogger<WebPeeperModule>();
+		public static readonly Logger Logger = Logger.GetLogger<WebPeeperModule>();
 
 		public static BlishHud BlishHudInstance;
 

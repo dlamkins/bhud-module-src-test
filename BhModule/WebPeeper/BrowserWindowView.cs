@@ -13,21 +13,28 @@ namespace BhModule.WebPeeper
 
 		protected override void Build(Container window)
 		{
-			_window = window;
-			if (WebPeeperModule.Instance.CefService.CreateWebBrowser().Wait(TimeSpan.FromSeconds(30.0)))
+			try
 			{
-				WebPeeperModule.BlishHudInstance.get_Form().SafeInvoke(delegate
+				_window = window;
+				if (WebPeeperModule.Instance.CefService.CreateWebBrowser().Wait(TimeSpan.FromSeconds(30.0)))
 				{
-					//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-					BrowserWindowView browserWindowView = this;
-					Rectangle contentRegion = _window.get_ContentRegion();
-					WindowContent windowContent = new WindowContent(((Rectangle)(ref contentRegion)).get_Size());
-					((Control)windowContent).set_Parent(window);
-					browserWindowView._windowContent = windowContent;
-					((Control)_window).add_Resized((EventHandler<ResizedEventArgs>)OnWindowResize);
-				});
+					WebPeeperModule.BlishHudInstance.get_Form().SafeInvoke(delegate
+					{
+						//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+						//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+						//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+						BrowserWindowView browserWindowView = this;
+						Rectangle contentRegion = _window.get_ContentRegion();
+						WindowContent windowContent = new WindowContent(((Rectangle)(ref contentRegion)).get_Size());
+						((Control)windowContent).set_Parent(window);
+						browserWindowView._windowContent = windowContent;
+						((Control)_window).add_Resized((EventHandler<ResizedEventArgs>)OnWindowResize);
+					});
+				}
+			}
+			catch (Exception ex)
+			{
+				WebPeeperModule.Logger.Error(ex.Message);
 			}
 		}
 

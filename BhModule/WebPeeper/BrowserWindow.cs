@@ -339,6 +339,7 @@ namespace BhModule.WebPeeper
 		{
 			WebPainter.DisposeWebTexture();
 			((GraphicsResource)_bg).Dispose();
+			_bg = null;
 			((WindowBase2)this).DisposeControl();
 		}
 	}

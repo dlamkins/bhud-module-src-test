@@ -301,10 +301,10 @@ namespace BhModule.WebPeeper
 		{
 			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
 			//IL_008b: Invalid comparison between Unknown and I4
-			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ec: Expected O, but got Unknown
+			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e1: Expected O, but got Unknown
 			e.Handled = true;
 			if (!((Control)WebPeeperModule.Instance.UIService.BrowserWindow).get_Visible())
 			{
@@ -322,11 +322,7 @@ namespace BhModule.WebPeeper
 			Utils.ReadProcessMemory(_cefPaintProcess.Handle, e.BufferHandle, _webTextureBufferBytes, num, out var _);
 			if (_webTexture == null || (int)((Texture)_webTexture).get_Format() != 21 || _webTexture.get_Width() != e.Width || _webTexture.get_Height() != e.Height)
 			{
-				Texture2D webTexture = _webTexture;
-				if (webTexture != null)
-				{
-					((GraphicsResource)webTexture).Dispose();
-				}
+				DisposeWebTexture();
 				GraphicsDeviceContext val = Control.get_Graphics().LendGraphicsDeviceContext();
 				try
 				{
@@ -446,6 +442,7 @@ namespace BhModule.WebPeeper
 			{
 				((GraphicsResource)webTexture).Dispose();
 			}
+			_webTexture = null;
 		}
 
 		private static CefEventFlags GetCurrentKeyboardModifiers()
