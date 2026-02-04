@@ -10,6 +10,7 @@ namespace KpRefresher.Domain
 		HarvestTemple = 1437,
 		OldLionsCourt = 1485,
 		CosmicObservatory = 1515,
-		TempleOfFebe = 1520
+		TempleOfFebe = 1520,
+		GuardiansGlade = 1609
 	}
 }

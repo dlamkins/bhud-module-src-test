@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 
 namespace KpRefresher.Ressources
 {
-	[GeneratedCode("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
+	[GeneratedCode("System.Resources.Tools.StronglyTypedResourceBuilder", "18.0.0.0")]
 	[DebuggerNonUserCode]
 	[CompilerGenerated]
 	public class tokens
@@ -46,7 +46,11 @@ namespace KpRefresher.Ressources
 
 		public static string AetherbladeHideout => ResourceManager.GetString("AetherbladeHideout", resourceCulture);
 
+		public static string AetherbladeHideout_Old => ResourceManager.GetString("AetherbladeHideout_Old", resourceCulture);
+
 		public static string AetherbladeHideoutCM => ResourceManager.GetString("AetherbladeHideoutCM", resourceCulture);
+
+		public static string AetherbladeHideoutCM_Old => ResourceManager.GetString("AetherbladeHideoutCM_Old", resourceCulture);
 
 		public static string Boneskinner => ResourceManager.GetString("Boneskinner", resourceCulture);
 
@@ -56,7 +60,11 @@ namespace KpRefresher.Ressources
 
 		public static string CosmicObservatory => ResourceManager.GetString("CosmicObservatory", resourceCulture);
 
+		public static string CosmicObservatory_Old => ResourceManager.GetString("CosmicObservatory_Old", resourceCulture);
+
 		public static string CosmicObservatoryCM => ResourceManager.GetString("CosmicObservatoryCM", resourceCulture);
+
+		public static string CosmicObservatoryCM_Old => ResourceManager.GetString("CosmicObservatoryCM_Old", resourceCulture);
 
 		public static string Decima => ResourceManager.GetString("Decima", resourceCulture);
 
@@ -72,13 +80,25 @@ namespace KpRefresher.Ressources
 
 		public static string Greer => ResourceManager.GetString("Greer", resourceCulture);
 
+		public static string GuardiansGlade => ResourceManager.GetString("GuardiansGlade", resourceCulture);
+
 		public static string HarvestTemple => ResourceManager.GetString("HarvestTemple", resourceCulture);
+
+		public static string HarvestTemple_Old => ResourceManager.GetString("HarvestTemple_Old", resourceCulture);
 
 		public static string HarvestTempleCM => ResourceManager.GetString("HarvestTempleCM", resourceCulture);
 
+		public static string HarvestTempleCM_Old => ResourceManager.GetString("HarvestTempleCM_Old", resourceCulture);
+
+		public static string IcebroodCoffer => ResourceManager.GetString("IcebroodCoffer", resourceCulture);
+
 		public static string KainengOverlook => ResourceManager.GetString("KainengOverlook", resourceCulture);
 
+		public static string KainengOverlook_Old => ResourceManager.GetString("KainengOverlook_Old", resourceCulture);
+
 		public static string KainengOverlookCM => ResourceManager.GetString("KainengOverlookCM", resourceCulture);
+
+		public static string KainengOverlookCM_Old => ResourceManager.GetString("KainengOverlookCM_Old", resourceCulture);
 
 		public static string KeepConstruct => ResourceManager.GetString("KeepConstruct", resourceCulture);
 
@@ -88,7 +108,11 @@ namespace KpRefresher.Ressources
 
 		public static string OldLionsCourt => ResourceManager.GetString("OldLionsCourt", resourceCulture);
 
+		public static string OldLionsCourt_Old => ResourceManager.GetString("OldLionsCourt_Old", resourceCulture);
+
 		public static string OldLionsCourtCM => ResourceManager.GetString("OldLionsCourtCM", resourceCulture);
+
+		public static string OldLionsCourtCM_Old => ResourceManager.GetString("OldLionsCourtCM_Old", resourceCulture);
 
 		public static string Qadim => ResourceManager.GetString("Qadim", resourceCulture);
 
@@ -108,7 +132,11 @@ namespace KpRefresher.Ressources
 
 		public static string TempleOfFebe => ResourceManager.GetString("TempleOfFebe", resourceCulture);
 
+		public static string TempleOfFebe_Old => ResourceManager.GetString("TempleOfFebe_Old", resourceCulture);
+
 		public static string TempleOfFebeCM => ResourceManager.GetString("TempleOfFebeCM", resourceCulture);
+
+		public static string TempleOfFebeCM_Old => ResourceManager.GetString("TempleOfFebeCM_Old", resourceCulture);
 
 		public static string TwinLargos => ResourceManager.GetString("TwinLargos", resourceCulture);
 
@@ -116,11 +144,17 @@ namespace KpRefresher.Ressources
 
 		public static string Vale => ResourceManager.GetString("Vale", resourceCulture);
 
+		public static string WeeklyQuickplayRaidCache => ResourceManager.GetString("WeeklyQuickplayRaidCache", resourceCulture);
+
 		public static string Xera => ResourceManager.GetString("Xera", resourceCulture);
 
 		public static string XunlaiJadeJunkyard => ResourceManager.GetString("XunlaiJadeJunkyard", resourceCulture);
 
+		public static string XunlaiJadeJunkyard_Old => ResourceManager.GetString("XunlaiJadeJunkyard_Old", resourceCulture);
+
 		public static string XunlaiJadeJunkyardCM => ResourceManager.GetString("XunlaiJadeJunkyardCM", resourceCulture);
+
+		public static string XunlaiJadeJunkyardCM_Old => ResourceManager.GetString("XunlaiJadeJunkyardCM_Old", resourceCulture);
 
 		internal tokens()
 		{

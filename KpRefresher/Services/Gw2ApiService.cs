@@ -9,7 +9,6 @@ using Gw2Sharp.WebApi.V2;
 using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
 using KpRefresher.Domain;
-using KpRefresher.Domain.Attributes;
 using KpRefresher.Extensions;
 using KpRefresher.Ressources;
 
@@ -83,23 +82,7 @@ namespace KpRefresher.Services
 					.get_Bank()).GetAsync(default(CancellationToken));
 				if (bankItems != null)
 				{
-					List<(Token, int)> bankTokens = new List<(Token, int)>();
-					foreach (AccountItem item3 in (IEnumerable<AccountItem>)bankItems)
-					{
-						if (item3 != null && tokensId.Contains(item3.get_Id()))
-						{
-							bankTokens.Add(((Token)item3.get_Id(), item3.get_Count()));
-						}
-					}
-					if (bankTokens.Count > 0)
-					{
-						string bankData = string.Empty;
-						foreach (var token3 in bankTokens.OrderBy(((Token, int) t) => t.Item1.GetAttribute<OrderAttribute>().Order))
-						{
-							bankData = $"{bankData}{token3.Item2}   {token3.Item1.GetDisplayName()}\n";
-						}
-						res = res + "[" + strings.GW2APIService_Bank + "]\n" + bankData + "\n";
-					}
+					res += GetFormatedResult(bankItems, strings.GW2APIService_Bank);
 				}
 				else
 				{
@@ -116,23 +99,7 @@ namespace KpRefresher.Services
 					.get_Inventory()).GetAsync(default(CancellationToken));
 				if (sharedInventoryItems != null)
 				{
-					List<(Token, int)> sharedInventoryTokens = new List<(Token, int)>();
-					foreach (AccountItem item2 in (IEnumerable<AccountItem>)sharedInventoryItems)
-					{
-						if (item2 != null && tokensId.Contains(item2.get_Id()))
-						{
-							sharedInventoryTokens.Add(((Token)item2.get_Id(), item2.get_Count()));
-						}
-					}
-					if (sharedInventoryTokens.Count > 0)
-					{
-						string sharedInventoryData = string.Empty;
-						foreach (var token2 in sharedInventoryTokens.OrderBy(((Token, int) t) => t.Item1.GetAttribute<OrderAttribute>().Order))
-						{
-							sharedInventoryData = $"{sharedInventoryData}{token2.Item2}   {token2.Item1.GetDisplayName()}\n";
-						}
-						res = res + "[" + strings.GW2APIService_SharedSlots + "]\n" + sharedInventoryData + "\n";
-					}
+					res += GetFormatedResult(sharedInventoryItems, strings.GW2APIService_SharedSlots);
 				}
 				else
 				{
@@ -177,7 +144,7 @@ namespace KpRefresher.Services
 							continue;
 						}
 						string characterData = string.Empty;
-						foreach (var token in characterTokens.OrderBy(((Token, int) t) => t.Item1.GetAttribute<OrderAttribute>().Order))
+						foreach (var token in characterTokens.SortByEncounter())
 						{
 							characterData = $"{characterData}{token.Item2}   {token.Item1.GetDisplayName()}\n";
 						}
@@ -195,6 +162,29 @@ namespace KpRefresher.Services
 				_logger.Warn($"Failed to retrieve characters : {ex}");
 			}
 			return res;
+		}
+
+		private string GetFormatedResult(IApiV2ObjectList<AccountItem> items, string category)
+		{
+			List<int> tokensId = _tokens.Select((Token c) => (int)c).ToList();
+			List<(Token, int)> tokens = new List<(Token, int)>();
+			foreach (AccountItem item in (IEnumerable<AccountItem>)items)
+			{
+				if (item != null && tokensId.Contains(item.get_Id()))
+				{
+					tokens.Add(((Token)item.get_Id(), item.get_Count()));
+				}
+			}
+			if (tokens.Count > 0)
+			{
+				string data = string.Empty;
+				foreach (var token in tokens.SortByEncounter())
+				{
+					data = $"{data}{token.Item2}   {token.Item1.GetDisplayName()}\n";
+				}
+				return "[" + category + "]\n" + data + "\n";
+			}
+			return string.Empty;
 		}
 	}
 }

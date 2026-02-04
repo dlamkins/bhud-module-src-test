@@ -357,7 +357,7 @@ namespace KpRefresher.Services
 				Task tt = Task.Run(async delegate
 				{
 					bool? refreshRes = await _kpMeService.RefreshApi(acc);
-					res = res + "- " + acc + " : " + ((refreshRes == true) ? strings.BusinessService_Refreshed : ((refreshRes == false) ? strings.BusinessService_RefreshNotAvailable : strings.BusinessService_Error)) + "\n";
+					res = res + "- " + acc + " : " + (refreshRes.GetValueOrDefault() ? strings.BusinessService_Refreshed : ((refreshRes == false) ? strings.BusinessService_RefreshNotAvailable : strings.BusinessService_Error)) + "\n";
 				});
 				tasks.Add(tt);
 			}
