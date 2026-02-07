@@ -27,22 +27,38 @@
       </xsd:complexType>
     </xsd:element>
   </xsd:schema>
-<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="Escort"><value>Turret Fragment</value></data>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="KeepConstruct_Coffer"><value>Keep Construct's Coffer</value></data>
+  <data name="Desmina_Coffer"><value>Desmina's Coffer</value></data>
+  <data name="Sandcastle"><value>Sandcastle</value></data>
+  <data name="Escort"><value>Turret Fragment</value></data>
+  <data name="Deimos_Coffer"><value>Deimos's Coffer</value></data>
   <data name="XunlaiJadeJunkyard"><value>Ankka's Coffer</value></data>
   <data name="Decima"><value>Decima's Token</value></data>
   <data name="Deimos"><value>Fragment of Saul's Burden</value></data>
   <data name="CosmicObservatoryCM_Old"><value>Dagda's Magnificent Coffer (old)</value></data>
+  <data name="BanditTrio"><value>Prison-Camp Chest</value></data>
   <data name="TempleOfFebe"><value>Cerus's Coffer</value></data>
+  <data name="Ura_Coffer_2"><value>Ura's Coffer</value></data>
+  <data name="Cairn_Coffer"><value>Cairn's Coffer</value></data>
   <data name="Sabetha"><value>Sabetha Flamethrower Fragment Piece</value></data>
   <data name="Samarog"><value>Impaled Prisoner Token</value></data>
   <data name="TempleOfFebeCM"><value>Cerus's Magnificent Coffer</value></data>
+  <data name="Slothasor_Coffer"><value>Slothasor's Coffer</value></data>
+  <data name="Gorseval_Coffer"><value>Gorseval's Coffer</value></data>
   <data name="Statue"><value>Statue Token</value></data>
   <data name="TempleOfFebe_Old"><value>Cerus's Coffer (old)</value></data>
   <data name="XunlaiJadeJunkyard_Old"><value>Ankka's Coffer (old)</value></data>
+  <data name="MursaatOverseer_Coffer"><value>Mursaat Overseer's Coffer</value></data>
   <data name="KainengOverlook"><value>Minister Li's Coffer</value></data>
+  <data name="GreerCM_Coffer"><value>Greer's Magnificent Coffer</value></data>
   <data name="AetherbladeHideoutCM"><value>Mai Trin's Magnificent Coffer</value></data>
   <data name="TwinLargos"><value>Twin Largos Token</value></data>
   <data name="OldLionsCourt_Old"><value>Assault Knights' Coffer (old)</value></data>
+  <data name="Samarog_Coffer"><value>Samarog's Coffer</value></data>
+  <data name="UraCM_Coffer_2"><value>Ura's Magnificent Coffer</value></data>
+  <data name="Xera_Coffer"><value>Xera's Coffer</value></data>
+  <data name="Ura_Coffer"><value>Ura's Coffer</value></data>
+  <data name="UraCM_Coffer"><value>Ura's Magnificent Coffer</value></data>
   <data name="Desmina"><value>Desmina's Token</value></data>
   <data name="KeepConstruct"><value>Keep Construct Rubble</value></data>
   <data name="Gorseval"><value>Gorseval Tentacle Piece</value></data>
@@ -59,20 +75,37 @@
   <data name="River"><value>River of Souls Token</value></data>
   <data name="Sabir"><value>Cardinal Sabir's Token</value></data>
   <data name="HarvestTempleCM"><value>Void's Magnificent Coffer</value></data>
+  <data name="QTP_Coffer"><value>Qadim the Peerless's Coffer</value></data>
+  <data name="Greer_Coffer"><value>Greer's Coffer</value></data>
   <data name="KainengOverlook_Old"><value>Minister Li's Coffer (old)</value></data>
   <data name="HarvestTemple_Old"><value>Void's Coffer (old)</value></data>
+  <data name="DecimaCM_Coffer_2"><value>Decima's Magnificent Coffer</value></data>
+  <data name="TwinLargos_Coffer"><value>Twin Largos' Coffer</value></data>
   <data name="Slothasor"><value>Slothasor Mushroom</value></data>
+  <data name="Greer_Coffer_2"><value>Greer's Coffer</value></data>
+  <data name="Adina_Coffer"><value>Cardinal Adina's Coffer</value></data>
   <data name="ConjuredAmalgamate"><value>Conjured Amalgamate Token</value></data>
+  <data name="DecimaCM_Coffer"><value>Decima's Magnificent Coffer</value></data>
   <data name="OldLionsCourt"><value>Assault Knights' Coffer</value></data>
+  <data name="GreerCM_Coffer_2"><value>Greer's Magnificent Coffer</value></data>
+  <data name="Decima_Coffer"><value>Decima's Coffer</value></data>
   <data name="Matthias"><value>White Mantle Abomination Crystal</value></data>
+  <data name="Qadim_Coffer"><value>Qadim's Coffer</value></data>
   <data name="KainengOverlookCM"><value>Minister Li's Magnificent Coffer</value></data>
   <data name="TempleOfFebeCM_Old"><value>Cerus's Magnificent Coffer (old)</value></data>
   <data name="CosmicObservatory"><value>Dagda's Coffer</value></data>
+  <data name="Sabetha_Coffer"><value>Sabetha's Coffer</value></data>
+  <data name="Vale_Coffer"><value>Vale Guardian Coffer</value></data>
   <data name="HarvestTempleCM_Old"><value>Void's Magnificent Coffer (old)</value></data>
+  <data name="Statue_Coffer"><value>Statue of Grenth Coffer</value></data>
   <data name="HarvestTemple"><value>Void's Coffer</value></data>
   <data name="WeeklyQuickplayRaidCache"><value>Weekly Quickplay Raid Cache</value></data>
+  <data name="Decima_Coffer_2"><value>Decima's Coffer</value></data>
   <data name="OldLionsCourtCM"><value>Assault Knights' Magnificent Coffer</value></data>
+  <data name="ConjuredAmalgamate_Coffer"><value>Conjured Amalgamate's Coffer</value></data>
   <data name="KainengOverlookCM_Old"><value>Minister Li's Magnificent Coffer (old)</value></data>
+  <data name="Matthias_Coffer"><value>Matthias's Coffer</value></data>
+  <data name="River_Coffer"><value>River of Souls Coffer</value></data>
   <data name="AetherbladeHideoutCM_Old"><value>Mai Trin's Magnificent Coffer (old)</value></data>
   <data name="GuardiansGlade"><value>Kela's Coffer</value></data>
   <data name="AetherbladeHideout"><value>Mai Trin's Coffer</value></data>
@@ -80,8 +113,11 @@
   <data name="CosmicObservatoryCM"><value>Dagda's Magnificent Coffer</value></data>
   <data name="MursaatOverseer"><value>Recreation Room Floor Fragment</value></data>
   <data name="XunlaiJadeJunkyardCM_Old"><value>Ankka's Magnificent Coffer (old)</value></data>
+  <data name="Escort_Coffer"><value>McLeod's Coffer</value></data>
   <data name="XunlaiJadeJunkyardCM"><value>Ankka's Magnificent Coffer</value></data>
+  <data name="Sabir_Coffer"><value>Cardinal Sabir's Coffer</value></data>
   <data name="AetherbladeHideout_Old"><value>Mai Trin's Coffer (old)</value></data>
+  <data name="Dhuum_Coffer"><value>Dhuum's Coffer</value></data>
   <data name="Vale"><value>Vale Guardian Fragment</value></data>
   <data name="Xera"><value>Ribbon Scrap</value></data>
   </root>
