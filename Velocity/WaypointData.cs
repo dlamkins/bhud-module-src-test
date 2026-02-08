@@ -1,4 +1,4 @@
-namespace Taimi.Velocity
+namespace Velocity
 {
 	public class WaypointData
 	{

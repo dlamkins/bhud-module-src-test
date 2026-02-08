@@ -10,16 +10,17 @@ using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Blish_HUD.Modules;
 using Blish_HUD.Settings;
+using Gw2Sharp.WebApi.V2;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
-namespace Taimi.Velocity
+namespace Velocity
 {
 	[Export(typeof(Module))]
-	public class VelocityModule : Module
+	public class WaypointModule : Module
 	{
-		private static readonly Logger Logger = Logger.GetLogger<VelocityModule>();
+		private static readonly Logger Logger = Logger.GetLogger<WaypointModule>();
 
 		private CornerIcon _cornerIcon;
 
@@ -33,6 +34,8 @@ namespace Taimi.Velocity
 
 		private FlowPanel _resultsPanel;
 
+		private Blish_HUD.Controls.Label _loadingLabel;
+
 		private bool _isDragging;
 
 		private Point _dragStart = Point.Zero;
@@ -42,6 +45,8 @@ namespace Taimi.Velocity
 		private float _currentOpacity;
 
 		private bool _isOpen;
+
+		private bool _isDataLoaded;
 
 		private SettingEntry<KeyBinding> _toggleHotkey;
 
@@ -58,15 +63,15 @@ namespace Taimi.Velocity
 		private const int MAX_WINDOW_HEIGHT = 500;
 
 		[ImportingConstructor]
-		public VelocityModule([Import("ModuleParameters")] ModuleParameters moduleParameters)
+		public WaypointModule([Import("ModuleParameters")] ModuleParameters moduleParameters)
 			: base(moduleParameters)
 		{
 		}
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
-			_toggleHotkey = settings.DefineSetting("ToggleKey", new KeyBinding(ModifierKeys.Ctrl | ModifierKeys.Shift, Microsoft.Xna.Framework.Input.Keys.F), () => "Search Hotkey", () => "Press this key to open the Waypoint Search bar.");
-			_windowPositionSetting = settings.DefineSetting("WindowPosition", WindowPositionType.Center, () => "Default Open Position", () => "Where should the search bar appear when opened?");
+			_toggleHotkey = settings.DefineSetting("ToggleKey", new KeyBinding(ModifierKeys.Ctrl | ModifierKeys.Shift, Microsoft.Xna.Framework.Input.Keys.F), () => "Search Hotkey", () => "Press to open search.");
+			_windowPositionSetting = settings.DefineSetting("WindowPosition", WindowPositionType.Center, () => "Default Position", () => "Where the bar appears.");
 			_toggleHotkey.Value.Enabled = true;
 			_toggleHotkey.Value.Activated += OnHotkeyPressed;
 		}
@@ -111,30 +116,45 @@ namespace Taimi.Velocity
 
 		protected override async Task LoadAsync()
 		{
+			_ = 1;
 			try
 			{
-				foreach (ContinentFloorRegion value in (await GameService.Gw2WebApi.AnonymousConnection.Client.V2.Continents[1].Floors.GetAsync(1)).Regions.Values)
+				IGw2WebApiV2Client client = GameService.Gw2WebApi.AnonymousConnection.Client.V2;
+				int[] continents = new int[2] { 1, 2 };
+				int[] array = continents;
+				foreach (int contId in array)
 				{
-					foreach (ContinentFloorRegionMap value2 in value.Maps.Values)
+					foreach (int floorId in (await client.Continents.GetAsync(contId)).Floors)
 					{
-						foreach (ContinentFloorRegionMapPoi p in value2.PointsOfInterest.Values)
+						foreach (ContinentFloorRegion value in (await client.Continents[contId].Floors.GetAsync(floorId)).Regions.Values)
 						{
-							if (p.Type == PoiType.Waypoint)
+							foreach (ContinentFloorRegionMap value2 in value.Maps.Values)
 							{
-								_waypointCache.Add(new WaypointData
+								foreach (ContinentFloorRegionMapPoi poi in value2.PointsOfInterest.Values)
 								{
-									Name = p.Name,
-									Id = p.Id,
-									ChatLink = p.ChatLink
-								});
+									if (poi.Type == PoiType.Waypoint && !_waypointCache.Any((WaypointData w) => w.Id == poi.Id))
+									{
+										_waypointCache.Add(new WaypointData
+										{
+											Name = poi.Name,
+											Id = poi.Id,
+											ChatLink = poi.ChatLink
+										});
+									}
+								}
 							}
 						}
 					}
 				}
+				_isDataLoaded = true;
+				if (_loadingLabel != null)
+				{
+					_loadingLabel.Visible = false;
+				}
 			}
 			catch (Exception ex)
 			{
-				Logger.Error(ex, "Failed to load waypoints.");
+				Logger.Error(ex, "Failed expansion waypoint load.");
 			}
 		}
 
@@ -196,6 +216,16 @@ namespace Taimi.Velocity
 				Location = new Point(20, 65)
 			};
 			_searchBox.TextChanged += OnSearchTextChanged;
+			_loadingLabel = new Blish_HUD.Controls.Label
+			{
+				Parent = _mainWindow,
+				Text = "Syncing Expansions...",
+				Location = new Point(20, 95),
+				Width = 300,
+				HorizontalAlignment = Blish_HUD.Controls.HorizontalAlignment.Center,
+				TextColor = Microsoft.Xna.Framework.Color.Orange,
+				Visible = !_isDataLoaded
+			};
 			_resultsPanel = new FlowPanel
 			{
 				Parent = _mainWindow,
@@ -205,7 +235,6 @@ namespace Taimi.Velocity
 				FlowDirection = ControlFlowDirection.SingleTopToBottom,
 				CanScroll = true,
 				ShowBorder = false,
-				BackgroundColor = Microsoft.Xna.Framework.Color.Transparent,
 				Visible = false
 			};
 			_cornerIcon = new CornerIcon
@@ -229,8 +258,7 @@ namespace Taimi.Velocity
 			}
 			if (_mainWindow != null)
 			{
-				float speed = 0.05f;
-				_currentOpacity = MathHelper.Lerp(_currentOpacity, _targetOpacity, speed);
+				_currentOpacity = MathHelper.Lerp(_currentOpacity, _targetOpacity, 0.05f);
 				_mainWindow.Opacity = _currentOpacity;
 				if (_currentOpacity < 0.01f && !_isOpen)
 				{
@@ -265,10 +293,9 @@ namespace Taimi.Velocity
 					};
 				}
 				int newResultsHeight = Math.Min(matches.Count * 35 + 10, 390);
-				int newWindowHeight = 110 + newResultsHeight + 10;
 				_resultsPanel.Height = newResultsHeight;
 				_resultsPanel.Visible = true;
-				_mainWindow.Height = newWindowHeight;
+				_mainWindow.Height = 110 + newResultsHeight + 10;
 			}
 			else
 			{
@@ -289,10 +316,7 @@ namespace Taimi.Velocity
 
 		protected override void Unload()
 		{
-			if (_toggleHotkey != null)
-			{
-				_toggleHotkey.Value.Activated -= OnHotkeyPressed;
-			}
+			_toggleHotkey.Value.Activated -= OnHotkeyPressed;
 			_cornerIcon?.Dispose();
 			_mainWindow?.Dispose();
 			_waypointCache.Clear();
