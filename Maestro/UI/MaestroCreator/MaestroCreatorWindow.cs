@@ -49,14 +49,14 @@ namespace Maestro.UI.MaestroCreator
 
 			public const int ActionButtonWidth = 80;
 
+			public const int PreviewButtonWidth = 95;
+
 			public const int ActionButtonSpacing = 10;
 
 			public const int ChordPreviewMaxLength = 38;
 
 			public const int LabelYOffset = 5;
 		}
-
-		private static readonly Logger Logger = Logger.GetLogger<MaestroCreatorWindow>();
 
 		private readonly TextBox _titleInput;
 
@@ -244,61 +244,61 @@ namespace Maestro.UI.MaestroCreator
 			//IL_02f0: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0300: Expected O, but got Unknown
 			//IL_0336: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0358: Unknown result type (might be due to invalid IL or missing references)
-			//IL_035d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0364: Unknown result type (might be due to invalid IL or missing references)
-			//IL_036f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0372: Unknown result type (might be due to invalid IL or missing references)
 			//IL_037c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0381: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0390: Expected O, but got Unknown
-			//IL_03a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03b4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03c8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03d7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03e6: Expected O, but got Unknown
-			//IL_03fe: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0403: Unknown result type (might be due to invalid IL or missing references)
-			//IL_040a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0415: Unknown result type (might be due to invalid IL or missing references)
-			//IL_041e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0428: Unknown result type (might be due to invalid IL or missing references)
-			//IL_042d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_043c: Expected O, but got Unknown
+			//IL_0388: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0393: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0396: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03b4: Expected O, but got Unknown
+			//IL_03cc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03d8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03f6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03fb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_040a: Expected O, but got Unknown
+			//IL_0422: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0427: Unknown result type (might be due to invalid IL or missing references)
+			//IL_042e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0439: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0445: Unknown result type (might be due to invalid IL or missing references)
+			//IL_044f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0454: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0459: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0460: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0464: Unknown result type (might be due to invalid IL or missing references)
-			//IL_046e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0479: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0483: Unknown result type (might be due to invalid IL or missing references)
-			//IL_048c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0496: Unknown result type (might be due to invalid IL or missing references)
-			//IL_049e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04aa: Expected O, but got Unknown
-			//IL_04ab: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04b0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04d3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04dd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04e5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04ef: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04ff: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0500: Unknown result type (might be due to invalid IL or missing references)
-			//IL_050a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0516: Expected O, but got Unknown
-			//IL_0517: Unknown result type (might be due to invalid IL or missing references)
-			//IL_051c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0528: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0533: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0542: Unknown result type (might be due to invalid IL or missing references)
-			//IL_054c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0551: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0560: Expected O, but got Unknown
+			//IL_0463: Expected O, but got Unknown
+			//IL_047b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0480: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0487: Unknown result type (might be due to invalid IL or missing references)
+			//IL_048b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0495: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04d1: Expected O, but got Unknown
+			//IL_04d2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04ee: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0504: Unknown result type (might be due to invalid IL or missing references)
+			//IL_050c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0516: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0526: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0527: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0531: Unknown result type (might be due to invalid IL or missing references)
+			//IL_053d: Expected O, but got Unknown
+			//IL_053e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0543: Unknown result type (might be due to invalid IL or missing references)
+			//IL_054f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_055a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0569: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0573: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0578: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0587: Expected O, but got Unknown
 			((WindowBase2)this).set_Title("Maestro Creator");
 			((WindowBase2)this).set_Emblem(Module.Instance.ContentsManager.GetTexture("creator-emblem.png"));
 			((WindowBase2)this).set_SavesPosition(true);
@@ -373,26 +373,28 @@ namespace Maestro.UI.MaestroCreator
 			((Control)noteSequencePanel).set_Location(new Point(0, currentY));
 			((Panel)noteSequencePanel).set_ShowBorder(true);
 			_noteSequencePanel = noteSequencePanel;
+			_noteSequencePanel.PreviewSelectionRequested += OnPreviewSelectionClicked;
 			currentY += 209;
-			int buttonsStartX = 65;
+			int totalButtonsWidth = 275;
+			int buttonsStartX = (390 - totalButtonsWidth) / 2;
 			StandardButton val7 = new StandardButton();
 			((Control)val7).set_Parent((Container)(object)this);
-			val7.set_Text("Preview");
+			val7.set_Text("Preview All");
 			((Control)val7).set_Location(new Point(buttonsStartX, currentY));
-			((Control)val7).set_Size(new Point(80, 26));
+			((Control)val7).set_Size(new Point(95, 26));
 			_previewButton = val7;
 			((Control)_previewButton).add_Click((EventHandler<MouseEventArgs>)OnPreviewClicked);
 			StandardButton val8 = new StandardButton();
 			((Control)val8).set_Parent((Container)(object)this);
 			val8.set_Text("Save");
-			((Control)val8).set_Location(new Point(buttonsStartX + 80 + 10, currentY));
+			((Control)val8).set_Location(new Point(buttonsStartX + 95 + 10, currentY));
 			((Control)val8).set_Size(new Point(80, 26));
 			_saveButton = val8;
 			((Control)_saveButton).add_Click((EventHandler<MouseEventArgs>)OnSaveClicked);
 			StandardButton val9 = new StandardButton();
 			((Control)val9).set_Parent((Container)(object)this);
 			val9.set_Text("Cancel");
-			((Control)val9).set_Location(new Point(buttonsStartX + 180, currentY));
+			((Control)val9).set_Location(new Point(buttonsStartX + 95 + 80 + 20, currentY));
 			((Control)val9).set_Size(new Point(80, 26));
 			_cancelButton = val9;
 			((Control)_cancelButton).add_Click((EventHandler<MouseEventArgs>)OnCancelClicked);
@@ -588,6 +590,36 @@ namespace Maestro.UI.MaestroCreator
 			}
 		}
 
+		private void OnPreviewSelectionClicked(object sender, EventArgs e)
+		{
+			IReadOnlyList<string> selectedNotes = _noteSequencePanel.GetSelectedNotes();
+			if (selectedNotes.Count == 0)
+			{
+				return;
+			}
+			try
+			{
+				Song song = new Song
+				{
+					Name = "Preview",
+					Artist = "Preview",
+					Instrument = _instrument,
+					IsCreated = true
+				};
+				foreach (string note in selectedNotes)
+				{
+					song.Notes.Add(note);
+				}
+				List<SongCommand> commands = NoteParser.Parse(song.Notes);
+				song.Commands.AddRange(commands);
+				Module.Instance.PreviewSong(song);
+			}
+			catch (Exception ex)
+			{
+				ScreenNotification.ShowNotification("Error previewing selection: " + ex.Message, (NotificationType)2, (Texture2D)null, 4);
+			}
+		}
+
 		private void OnSaveClicked(object sender, MouseEventArgs e)
 		{
 			if (_pendingChordNotes.Count > 0)
@@ -705,6 +737,7 @@ namespace Maestro.UI.MaestroCreator
 			((TextInputBase)_titleInput).set_Text(string.Empty);
 			((TextInputBase)_artistInput).set_Text(string.Empty);
 			((TextInputBase)_transcriberInput).set_Text(string.Empty);
+			_noteSequencePanel.ClearSelection();
 			_noteSequencePanel.Clear();
 			_pianoKeyboard.CurrentOctave = 0;
 			_pendingChordNotes.Clear();
@@ -716,6 +749,7 @@ namespace Maestro.UI.MaestroCreator
 
 		protected override void DisposeControl()
 		{
+			_noteSequencePanel.PreviewSelectionRequested -= OnPreviewSelectionClicked;
 			_pianoKeyboard.NotePressed -= OnNotePressed;
 			_pianoKeyboard.OctaveChanged -= OnOctaveChanged;
 			((Control)_previewButton).remove_Click((EventHandler<MouseEventArgs>)OnPreviewClicked);
