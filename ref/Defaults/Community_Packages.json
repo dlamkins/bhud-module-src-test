@@ -966,6 +966,8 @@
         "Description": "SVET",
         "Minutes": 8,
         "Seconds": 45,
+        "TTSText": "",
+        "TTSActive":  false,
         "WaypointData": [
           {
             "Type": "",
@@ -996,391 +998,413 @@
           }
         ]
       },
-      {
-        "ID": 2,
-        "Description": "EVET",
-        "Minutes": 8,
-        "Seconds": 45,
-        "WaypointData": [
-          {
-            "Type": "",
-            "Notes": "[\u0026BGwIAAA=] evet",
-            "Broadcast": false
-          }
-        ],
-        "NotesData": [
-          {
-            "Type": "",
-            "Notes": "2-3 taps on vets. Only need 3.5k damage for gold.",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          }
-        ]
-      },
-      {
-        "ID": 3,
-        "Description": "NVET",
-        "Minutes": 8,
-        "Seconds": 45,
-        "WaypointData": [
-          {
-            "Type": "",
-            "Notes": "[\u0026BN0HAAA=] nvet",
-            "Broadcast": false
-          }
-        ],
-        "NotesData": [
-          {
-            "Type": "",
-            "Notes": "2-3 taps on vets. Only need 3.5k damage for gold.",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          }
-        ]
-      },
-      {
-        "ID": 4,
-        "Description": "WVET",
-        "Minutes": 8,
-        "Seconds": 45,
-        "WaypointData": [
-          {
-            "Type": "",
-            "Notes": "[\u0026BAYIAAA=] wvet",
-            "Broadcast": false
-          }
-        ],
-        "NotesData": [
-          {
-            "Type": "",
-            "Notes": "2-3 taps on vets. Only need 3.5k damage for gold.",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          }
-        ]
-      },
-      {
-        "ID": 5,
-        "Description": "SAP",
-        "Minutes": 8,
-        "Seconds": 20,
-        "WaypointData": [
-          {
-            "Type": "",
-            "Notes": "[\u0026BEkIAAA=] sap",
-            "Broadcast": false
-          }
-        ],
-        "NotesData": [
-          {
-            "Type": "",
-            "Notes": "Please hold right before the entrance to first sap.",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "There are 3 sap events. Target 1 Corpse Taker until dead. Then, attack the sap for credit.",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          }
-        ]
-      },
-      {
-        "ID": 6,
-        "Description": "BALTH",
-        "Minutes": 9,
-        "Seconds": 30,
-        "WaypointData": [
-          {
-            "Type": "",
-            "Notes": "[\u0026BAIIAAA=] balth",
-            "Broadcast": false
-          }
-        ],
-        "NotesData": [
-          {
-            "Type": "",
-            "Notes": "Hold at the doorway before entering the Rest!!",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "Wait for all friends and my call to enter.",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          }
-        ]
-      },
-      {
-        "ID": 7,
-        "Description": "WYVERN",
-        "Minutes": 11,
-        "Seconds": 30,
-        "WaypointData": [
-          {
-            "Type": "",
-            "Notes": "[\u0026BEkIAAA=] wyvern",
-            "Broadcast": false
-          }
-        ],
-        "NotesData": [
-          {
-            "Type": "",
-            "Notes": "Prep CC for when wyvern turns around.",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          }
-        ]
-      },
-      {
-        "ID": 8,
-        "Description": "BRAMBLE",
-        "Minutes": 10,
-        "Seconds": 20,
-        "WaypointData": [
-          {
-            "Type": "",
-            "Notes": "[\u0026BN0HAAA=] bramble",
-            "Broadcast": false
-          }
-        ],
-        "NotesData": [
-          {
-            "Type": "",
-            "Notes": "Prep CC",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          }
-        ]
-      },
-      {
-        "ID": 9,
-        "Description": "OOZE",
-        "Minutes": 14,
-        "Seconds": 0,
-        "WaypointData": [
-          {
-            "Type": "",
-            "Notes": "[\u0026BAYIAAA=] ooze",
-            "Broadcast": false
-          }
-        ],
-        "NotesData": [
-          {
-            "Type": "",
-            "Notes": "Take the north walkway if you do not have mount",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "Hold at entrance of cave until whole group is together.",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          }
-        ]
-      },
-      {
-        "ID": 10,
-        "Description": "GUZZLER",
-        "Minutes": 9,
-        "Seconds": 30,
-        "WaypointData": [
-          {
-            "Type": "",
-            "Notes": "[\u0026BN0HAAA=] guzzler",
-            "Broadcast": false
-          }
-        ],
-        "NotesData": [
-          {
-            "Type": "",
-            "Notes": "Throw rocks or CC with Turtle mount to remove layers.",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          }
-        ]
-      },
-      {
-        "ID": 11,
-        "Description": "TM",
-        "Minutes": 9,
-        "Seconds": 30,
-        "WaypointData": [
-          {
-            "Type": "",
-            "Notes": "[\u0026BGwIAAA=] TM",
-            "Broadcast": false
-          }
-        ],
-        "NotesData": [
-          {
-            "Type": "",
-            "Notes": "You need stealth detection mastery to see the TM. AOE area for credit.",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          }
-        ]
-      },
-      {
-        "ID": 12,
-        "Description": "STONEHEADS",
-        "Minutes": 10,
-        "Seconds": 20,
-        "WaypointData": [
-          {
-            "Type": "",
-            "Notes": "[\u0026BAIIAAA=] stoneheads",
-            "Broadcast": false
-          }
-        ],
-        "NotesData": [
-          {
-            "Type": "",
-            "Notes": "Attack Alpha. Then Beta. One is always invulnerable at given time",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "Kill rollers when they spawn halfway through.",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          }
-        ]
-      }
+        {
+            "ID": 2,
+            "Description": "EVET",
+            "Minutes": 8,
+            "Seconds": 45,
+            "TTSText": "",
+            "TTSActive": false,
+            "WaypointData": [
+                {
+                    "Type": "",
+                    "Notes": "[\u0026BGwIAAA=] evet",
+                    "Broadcast": false
+                }
+            ],
+            "NotesData": [
+                {
+                    "Type": "",
+                    "Notes": "2-3 taps on vets. Only need 3.5k damage for gold.",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                }
+            ]
+        },
+        {
+            "ID": 3,
+            "Description": "NVET",
+            "Minutes": 8,
+            "Seconds": 45,
+            "TTSText": "",
+            "TTSActive": false,
+            "WaypointData": [
+                {
+                    "Type": "",
+                    "Notes": "[\u0026BN0HAAA=] nvet",
+                    "Broadcast": false
+                }
+            ],
+            "NotesData": [
+                {
+                    "Type": "",
+                    "Notes": "2-3 taps on vets. Only need 3.5k damage for gold.",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                }
+            ]
+        },
+        {
+            "ID": 4,
+            "Description": "WVET",
+            "Minutes": 8,
+            "Seconds": 45,
+            "TTSText": "",
+            "TTSActive": false,
+            "WaypointData": [
+                {
+                    "Type": "",
+                    "Notes": "[\u0026BAYIAAA=] wvet",
+                    "Broadcast": false
+                }
+            ],
+            "NotesData": [
+                {
+                    "Type": "",
+                    "Notes": "2-3 taps on vets. Only need 3.5k damage for gold.",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                }
+            ]
+        },
+        {
+            "ID": 5,
+            "Description": "SAP",
+            "Minutes": 8,
+            "Seconds": 20,
+            "TTSText": "",
+            "TTSActive": false,
+            "WaypointData": [
+                {
+                    "Type": "",
+                    "Notes": "[\u0026BEkIAAA=] sap",
+                    "Broadcast": false
+                }
+            ],
+            "NotesData": [
+                {
+                    "Type": "",
+                    "Notes": "Please hold right before the entrance to first sap.",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "There are 3 sap events. Target 1 Corpse Taker until dead. Then, attack the sap for credit.",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                }
+            ]
+        },
+        {
+            "ID": 6,
+            "Description": "BALTH",
+            "Minutes": 9,
+            "Seconds": 30,
+            "TTSText": "",
+            "TTSActive": false,
+            "WaypointData": [
+                {
+                    "Type": "",
+                    "Notes": "[\u0026BAIIAAA=] balth",
+                    "Broadcast": false
+                }
+            ],
+            "NotesData": [
+                {
+                    "Type": "",
+                    "Notes": "Hold at the doorway before entering the Rest!!",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "Wait for all friends and my call to enter.",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                }
+            ]
+        },
+        {
+            "ID": 7,
+            "Description": "WYVERN",
+            "Minutes": 11,
+            "Seconds": 30,
+            "TTSText": "",
+            "TTSActive": false,
+            "WaypointData": [
+                {
+                    "Type": "",
+                    "Notes": "[\u0026BEkIAAA=] wyvern",
+                    "Broadcast": false
+                }
+            ],
+            "NotesData": [
+                {
+                    "Type": "",
+                    "Notes": "Prep CC for when wyvern turns around.",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                }
+            ]
+        },
+        {
+            "ID": 8,
+            "Description": "BRAMBLE",
+            "Minutes": 10,
+            "Seconds": 20,
+            "TTSText": "",
+            "TTSActive": false,
+            "WaypointData": [
+                {
+                    "Type": "",
+                    "Notes": "[\u0026BN0HAAA=] bramble",
+                    "Broadcast": false
+                }
+            ],
+            "NotesData": [
+                {
+                    "Type": "",
+                    "Notes": "Prep CC",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                }
+            ]
+        },
+        {
+            "ID": 9,
+            "Description": "OOZE",
+            "Minutes": 14,
+            "Seconds": 0,
+            "TTSText": "",
+            "TTSActive": false,
+            "WaypointData": [
+                {
+                    "Type": "",
+                    "Notes": "[\u0026BAYIAAA=] ooze",
+                    "Broadcast": false
+                }
+            ],
+            "NotesData": [
+                {
+                    "Type": "",
+                    "Notes": "Take the north walkway if you do not have mount",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "Hold at entrance of cave until whole group is together.",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                }
+            ]
+        },
+        {
+            "ID": 10,
+            "Description": "GUZZLER",
+            "Minutes": 9,
+            "Seconds": 30,
+            "TTSText": "",
+            "TTSActive": false,
+            "WaypointData": [
+                {
+                    "Type": "",
+                    "Notes": "[\u0026BN0HAAA=] guzzler",
+                    "Broadcast": false
+                }
+            ],
+            "NotesData": [
+                {
+                    "Type": "",
+                    "Notes": "Throw rocks or CC with Turtle mount to remove layers.",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                }
+            ]
+        },
+        {
+            "ID": 11,
+            "Description": "TM",
+            "Minutes": 9,
+            "Seconds": 30,
+            "TTSText": "",
+            "TTSActive": false,
+            "WaypointData": [
+                {
+                    "Type": "",
+                    "Notes": "[\u0026BGwIAAA=] TM",
+                    "Broadcast": false
+                }
+            ],
+            "NotesData": [
+                {
+                    "Type": "",
+                    "Notes": "You need stealth detection mastery to see the TM. AOE area for credit.",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                }
+            ]
+        },
+        {
+            "ID": 12,
+            "Description": "STONEHEADS",
+            "Minutes": 10,
+            "Seconds": 20,
+            "TTSText": "",
+            "TTSActive": false,
+            "WaypointData": [
+                {
+                    "Type": "",
+                    "Notes": "[\u0026BAIIAAA=] stoneheads",
+                    "Broadcast": false
+                }
+            ],
+            "NotesData": [
+                {
+                    "Type": "",
+                    "Notes": "Attack Alpha. Then Beta. One is always invulnerable at given time",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "Kill rollers when they spawn halfway through.",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                }
+            ]
+        }
     ]
   },
   {
@@ -2081,111 +2105,117 @@
       }
     ],
     "TimerDetailData": [
-      {
-        "ID": 1,
-        "Description": "TM #1",
-        "Minutes": 10,
-        "Seconds": 0,
-        "WaypointData": [
-          {
-            "Type": "",
-            "Notes": "[\u0026BGUIAAA=]TM1",
-            "Broadcast": false
-          }
-        ],
-        "NotesData": [
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          }
-        ]
-      },
-      {
-        "ID": 2,
-        "Description": "TM #2",
-        "Minutes": 10,
-        "Seconds": 0,
-        "WaypointData": [
-          {
-            "Type": "",
-            "Notes": "[\u0026BFMIAAA=]TM2",
-            "Broadcast": false
-          }
-        ],
-        "NotesData": [
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          }
-        ]
-      },
-      {
-        "ID": 3,
-        "Description": "TM #3",
-        "Minutes": 10,
-        "Seconds": 0,
-        "WaypointData": [
-          {
-            "Type": "",
-            "Notes": "[\u0026BFIIAAA=]TM3",
-            "Broadcast": false
-          }
-        ],
-        "NotesData": [
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          }
-        ]
-      }
+        {
+            "ID": 1,
+            "Description": "TM #1",
+            "Minutes": 10,
+            "Seconds": 0,
+            "TTSText": "",
+            "TTSActive": false,
+            "WaypointData": [
+                {
+                    "Type": "",
+                    "Notes": "[\u0026BGUIAAA=]TM1",
+                    "Broadcast": false
+                }
+            ],
+            "NotesData": [
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                }
+            ]
+        },
+        {
+            "ID": 2,
+            "Description": "TM #2",
+            "Minutes": 10,
+            "Seconds": 0,
+            "TTSText": "",
+            "TTSActive": false,
+            "WaypointData": [
+                {
+                    "Type": "",
+                    "Notes": "[\u0026BFMIAAA=]TM2",
+                    "Broadcast": false
+                }
+            ],
+            "NotesData": [
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                }
+            ]
+        },
+        {
+            "ID": 3,
+            "Description": "TM #3",
+            "Minutes": 10,
+            "Seconds": 0,
+            "TTSText": "",
+            "TTSActive": false,
+            "WaypointData": [
+                {
+                    "Type": "",
+                    "Notes": "[\u0026BFIIAAA=]TM3",
+                    "Broadcast": false
+                }
+            ],
+            "NotesData": [
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                }
+            ]
+        }
     ]
   },
   {
@@ -2886,111 +2916,117 @@
       }
     ],
     "TimerDetailData": [
-      {
-        "ID": 1,
-        "Description": "TM #1",
-        "Minutes": 10,
-        "Seconds": 0,
-        "WaypointData": [
-          {
-            "Type": "",
-            "Notes": "[\u0026BGUIAAA=]TM1",
-            "Broadcast": false
-          }
-        ],
-        "NotesData": [
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          }
-        ]
-      },
-      {
-        "ID": 2,
-        "Description": "TM #2",
-        "Minutes": 10,
-        "Seconds": 0,
-        "WaypointData": [
-          {
-            "Type": "",
-            "Notes": "[\u0026BFMIAAA=]TM2",
-            "Broadcast": false
-          }
-        ],
-        "NotesData": [
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          }
-        ]
-      },
-      {
-        "ID": 3,
-        "Description": "TM #3",
-        "Minutes": 10,
-        "Seconds": 0,
-        "WaypointData": [
-          {
-            "Type": "",
-            "Notes": "[\u0026BFIIAAA=]TM3",
-            "Broadcast": false
-          }
-        ],
-        "NotesData": [
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          }
-        ]
-      }
+        {
+            "ID": 1,
+            "Description": "TM #1",
+            "Minutes": 10,
+            "Seconds": 0,
+            "TTSText": "",
+            "TTSActive": false,
+            "WaypointData": [
+                {
+                    "Type": "",
+                    "Notes": "[\u0026BGUIAAA=]TM1",
+                    "Broadcast": false
+                }
+            ],
+            "NotesData": [
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                }
+            ]
+        },
+        {
+            "ID": 2,
+            "Description": "TM #2",
+            "Minutes": 10,
+            "Seconds": 0,
+            "TTSText": "",
+            "TTSActive": false,
+            "WaypointData": [
+                {
+                    "Type": "",
+                    "Notes": "[\u0026BFMIAAA=]TM2",
+                    "Broadcast": false
+                }
+            ],
+            "NotesData": [
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                }
+            ]
+        },
+        {
+            "ID": 3,
+            "Description": "TM #3",
+            "Minutes": 10,
+            "Seconds": 0,
+            "TTSText": "",
+            "TTSActive": false,
+            "WaypointData": [
+                {
+                    "Type": "",
+                    "Notes": "[\u0026BFIIAAA=]TM3",
+                    "Broadcast": false
+                }
+            ],
+            "NotesData": [
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                }
+            ]
+        }
     ]
   },
   {
@@ -3691,111 +3727,117 @@
       }
     ],
     "TimerDetailData": [
-      {
-        "ID": 1,
-        "Description": "TM #1",
-        "Minutes": 10,
-        "Seconds": 0,
-        "WaypointData": [
-          {
-            "Type": "",
-            "Notes": "[\u0026BGUIAAA=]TM1",
-            "Broadcast": false
-          }
-        ],
-        "NotesData": [
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          }
-        ]
-      },
-      {
-        "ID": 2,
-        "Description": "TM #2",
-        "Minutes": 10,
-        "Seconds": 0,
-        "WaypointData": [
-          {
-            "Type": "",
-            "Notes": "[\u0026BFMIAAA=]TM2",
-            "Broadcast": false
-          }
-        ],
-        "NotesData": [
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          }
-        ]
-      },
-      {
-        "ID": 3,
-        "Description": "TM #3",
-        "Minutes": 10,
-        "Seconds": 0,
-        "WaypointData": [
-          {
-            "Type": "",
-            "Notes": "[\u0026BFIIAAA=]TM3",
-            "Broadcast": false
-          }
-        ],
-        "NotesData": [
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          },
-          {
-            "Type": "",
-            "Notes": "",
-            "Broadcast": false
-          }
-        ]
-      }
+        {
+            "ID": 1,
+            "Description": "TM #1",
+            "Minutes": 10,
+            "Seconds": 0,
+            "TTSText": "",
+            "TTSActive": false,
+            "WaypointData": [
+                {
+                    "Type": "",
+                    "Notes": "[\u0026BGUIAAA=]TM1",
+                    "Broadcast": false
+                }
+            ],
+            "NotesData": [
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                }
+            ]
+        },
+        {
+            "ID": 2,
+            "Description": "TM #2",
+            "Minutes": 10,
+            "Seconds": 0,
+            "TTSText": "",
+            "TTSActive": false,
+            "WaypointData": [
+                {
+                    "Type": "",
+                    "Notes": "[\u0026BFMIAAA=]TM2",
+                    "Broadcast": false
+                }
+            ],
+            "NotesData": [
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                }
+            ]
+        },
+        {
+            "ID": 3,
+            "Description": "TM #3",
+            "Minutes": 10,
+            "Seconds": 0,
+            "TTSText": "",
+            "TTSActive": false,
+            "WaypointData": [
+                {
+                    "Type": "",
+                    "Notes": "[\u0026BFIIAAA=]TM3",
+                    "Broadcast": false
+                }
+            ],
+            "NotesData": [
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                },
+                {
+                    "Type": "",
+                    "Notes": "",
+                    "Broadcast": false
+                }
+            ]
+        }
     ]
   }
 ]

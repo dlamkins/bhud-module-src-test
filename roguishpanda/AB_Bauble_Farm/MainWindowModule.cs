@@ -269,16 +269,12 @@ namespace roguishpanda.AB_Bauble_Farm
 			//IL_038f: Expected O, but got Unknown
 			//IL_03e4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_042c: Expected O, but got Unknown
-			//IL_047e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04c6: Expected O, but got Unknown
-			//IL_0518: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0560: Expected O, but got Unknown
-			//IL_0716: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0722: Unknown result type (might be due to invalid IL or missing references)
-			//IL_072e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_073a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0746: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0752: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05e2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05ee: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0606: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0612: Unknown result type (might be due to invalid IL or missing references)
+			//IL_061e: Unknown result type (might be due to invalid IL or missing references)
 			_MainSettingsCollection = settings.AddSubCollection("MainSettings", false);
 			_PackageSettingsCollection = settings.AddSubCollection("PackageSettings", false);
 			_InOrdercheckboxDefault = _MainSettingsCollection.DefineSetting<bool>("InOrdercheckboxDefault", false, (Func<string>)(() => "Order by Timer"), (Func<string>)(() => "Check this box if you want to order your timers by time."));
@@ -303,14 +299,6 @@ namespace roguishpanda.AB_Bauble_Farm
 			_toggleStaticWindowKeybind.get_Value().set_BlockSequenceFromGw2(true);
 			_toggleStaticWindowKeybind.get_Value().set_Enabled(true);
 			_toggleStaticWindowKeybind.get_Value().add_Activated((EventHandler<EventArgs>)ToggleStaticWindowKeybind_Activated);
-			_postNotesKeybind = _MainSettingsCollection.DefineSetting<KeyBinding>("PostNotesKeybinding", new KeyBinding((ModifierKeys)4, (Keys)66), (Func<string>)(() => "Post Notes"), (Func<string>)(() => "Keybind to confirm posting notes in chat."));
-			_postNotesKeybind.get_Value().set_BlockSequenceFromGw2(true);
-			_postNotesKeybind.get_Value().set_Enabled(true);
-			_postNotesKeybind.get_Value().add_BindingChanged((EventHandler<EventArgs>)PostNotes_BindingChanged);
-			_cancelNotesKeybind = _MainSettingsCollection.DefineSetting<KeyBinding>("CancelNotesKeybinding", new KeyBinding((ModifierKeys)4, (Keys)78), (Func<string>)(() => "Cancel Notes"), (Func<string>)(() => "Keybind to cancel posting notes in chat."));
-			_cancelNotesKeybind.get_Value().set_BlockSequenceFromGw2(true);
-			_cancelNotesKeybind.get_Value().set_Enabled(true);
-			_cancelNotesKeybind.get_Value().add_BindingChanged((EventHandler<EventArgs>)CancelNotes_BindingChanged);
 			_TargetChatDefault = _MainSettingsCollection.DefineSetting<TargetChats>("TargetChatDefault", TargetChats.None, (Func<string>)(() => "Target Chat"), (Func<string>)(() => "Pick the default chat shorts targeted chat."));
 			_TimerColorDefault = _MainSettingsCollection.DefineSetting<TimerColors>("TimerColorDefault", TimerColors.Green, (Func<string>)(() => "Timer Color"), (Func<string>)(() => "Pick the color for the timer."));
 			_TimerColorDefault.add_SettingChanged((EventHandler<ValueChangedEventArgs<TimerColors>>)_TimerColorDefault_SettingChanged);
@@ -485,22 +473,6 @@ namespace roguishpanda.AB_Bauble_Farm
 				}
 				TimeSpan Minutes = TimeSpan.FromMinutes(_TimerMinutes[i]);
 				TimeSpan Seconds = TimeSpan.FromSeconds(_TimerSeconds[i]);
-				if (MintuesSettingEntry != null)
-				{
-					TimeSpan TempMinutes = TimeSpan.FromMinutes(MintuesSettingEntry.get_Value());
-					if (TempMinutes != TimeSpan.FromMinutes(0.0))
-					{
-						Minutes = TempMinutes;
-					}
-				}
-				if (SecondsSettingEntry != null)
-				{
-					TimeSpan TempSeconds = TimeSpan.FromSeconds(SecondsSettingEntry.get_Value());
-					if (TempSeconds != TimeSpan.FromSeconds(0.0))
-					{
-						Seconds = TempSeconds;
-					}
-				}
 				_timerDurationDefaults[i] = Minutes + Seconds;
 				_timerLabels[i].set_Text(_timerDurationDefaults[i].ToString("mm\\:ss"));
 			}
@@ -767,10 +739,10 @@ namespace roguishpanda.AB_Bauble_Farm
 			Thread.Sleep(100);
 		}
 
-		private async Task NotesIcon_Click(int index, string eventType)
+		private void NotesIcon_Click(int index, string eventType)
 		{
-			new List<NotesData>();
-			List<NotesData> notesData = ((!(eventType == "Static")) ? _timerEvents[index].NotesData : _staticEvents[index].NotesData);
+			List<NotesData> notesData = new List<NotesData>();
+			notesData = ((!(eventType == "Static")) ? _timerEvents[index].NotesData : _staticEvents[index].NotesData);
 			for (int m = 0; m < _staticNotesIcon.Count(); m++)
 			{
 				((Control)_staticNotesIcon[m]).set_Enabled(false);
@@ -781,24 +753,12 @@ namespace roguishpanda.AB_Bauble_Farm
 				((Control)_timerNotesIcon[l]).set_Enabled(false);
 				((Control)_timerWaypointIcon[l]).set_Enabled(false);
 			}
-			ShowInputPanel("Notes");
-			bool wasKeybindPressed = await WaitForKeybindAsync();
-			await WaitForShiftKeyUpAsync();
-			Panel inputPanel = _inputPanel;
-			if (inputPanel != null)
+			for (int k = 0; k < notesData.Count; k++)
 			{
-				((Control)inputPanel).Hide();
-			}
-			_inputPanel = null;
-			if (wasKeybindPressed)
-			{
-				for (int k = 0; k < notesData.Count; k++)
+				string message = notesData[k].Notes;
+				if (message != null && message.Length > 0)
 				{
-					string message = notesData[k].Notes;
-					if (message != null && message.Length > 0)
-					{
-						ClipboardPaste(notesData[k]);
-					}
+					ClipboardPaste(notesData[k]);
 				}
 			}
 			for (int j = 0; j < _staticNotesIcon.Count(); j++)
@@ -1552,18 +1512,10 @@ namespace roguishpanda.AB_Bauble_Farm
 						((Control)obj5).set_Size(new Point(32, 32));
 						((Control)obj5).set_Opacity(0.7f);
 					});
-					((Control)_timerNotesIcon[n]).add_Click((EventHandler<MouseEventArgs>)async delegate
+					((Control)_timerNotesIcon[n]).add_Click((EventHandler<MouseEventArgs>)delegate
 					{
-						await NotesIcon_Click(index2, "Timer");
+						NotesIcon_Click(index2, "Timer");
 					});
-					if ((int)_postNotesKeybind.get_Value().get_PrimaryKey() == 0 || (int)_cancelNotesKeybind.get_Value().get_PrimaryKey() == 0)
-					{
-						((Control)_timerNotesIcon[n]).Hide();
-					}
-					else
-					{
-						((Control)_timerNotesIcon[n]).Show();
-					}
 					bool waypointNote = false;
 					for (int k3 = 0; k3 < _timerEvents[n].WaypointData.Count; k3++)
 					{
@@ -1814,9 +1766,9 @@ namespace roguishpanda.AB_Bauble_Farm
 						((Control)obj).set_Size(new Point(32, 32));
 						((Control)obj).set_Opacity(0.7f);
 					});
-					((Control)_staticNotesIcon[j3]).add_Click((EventHandler<MouseEventArgs>)async delegate
+					((Control)_staticNotesIcon[j3]).add_Click((EventHandler<MouseEventArgs>)delegate
 					{
-						await NotesIcon_Click(index, "Static");
+						NotesIcon_Click(index, "Static");
 					});
 					Checkbox[] staticCheckboxes = _staticCheckboxes;
 					int num11 = j3;
@@ -1829,14 +1781,6 @@ namespace roguishpanda.AB_Bauble_Farm
 					{
 						_StaticEventsCheckbox_Click(index);
 					});
-					if ((int)_postNotesKeybind.get_Value().get_PrimaryKey() == 0 || (int)_cancelNotesKeybind.get_Value().get_PrimaryKey() == 0)
-					{
-						((Control)_staticNotesIcon[j3]).Hide();
-					}
-					else
-					{
-						((Control)_staticNotesIcon[j3]).Show();
-					}
 					bool waypointNote2 = false;
 					for (int k5 = 0; k5 < _staticEvents[j3].WaypointData.Count; k5++)
 					{

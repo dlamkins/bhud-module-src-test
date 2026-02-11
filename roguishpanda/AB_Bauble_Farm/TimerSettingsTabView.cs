@@ -929,30 +929,32 @@ namespace roguishpanda.AB_Bauble_Farm
 			//IL_07fe: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0806: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0810: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0818: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0822: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0832: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0843: Expected O, but got Unknown
-			//IL_0844: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0849: Unknown result type (might be due to invalid IL or missing references)
-			//IL_084e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0858: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0860: Unknown result type (might be due to invalid IL or missing references)
-			//IL_086a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0881: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0892: Expected O, but got Unknown
-			//IL_08f5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08fa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0905: Unknown result type (might be due to invalid IL or missing references)
-			//IL_090a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0914: Unknown result type (might be due to invalid IL or missing references)
-			//IL_091f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0929: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0930: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0941: Expected O, but got Unknown
-			//IL_0a14: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0a3d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0a78: Unknown result type (might be due to invalid IL or missing references)
+			//IL_081b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0823: Unknown result type (might be due to invalid IL or missing references)
+			//IL_082d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_083d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_084e: Expected O, but got Unknown
+			//IL_084f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0854: Unknown result type (might be due to invalid IL or missing references)
+			//IL_085f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0864: Unknown result type (might be due to invalid IL or missing references)
+			//IL_086e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0876: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0880: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0897: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08a8: Expected O, but got Unknown
+			//IL_090b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0910: Unknown result type (might be due to invalid IL or missing references)
+			//IL_091b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0920: Unknown result type (might be due to invalid IL or missing references)
+			//IL_092a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0935: Unknown result type (might be due to invalid IL or missing references)
+			//IL_093f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0946: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0957: Expected O, but got Unknown
+			//IL_0a2a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0a53: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0a8e: Unknown result type (might be due to invalid IL or missing references)
 			try
 			{
 				object[] timerEventsPanels = _timerEventsPanels;
@@ -1107,11 +1109,13 @@ namespace roguishpanda.AB_Bauble_Farm
 				_TTSLabel = val11;
 				TextBox val12 = new TextBox();
 				((Control)val12).set_Size(new Point(350, 40));
+				((Control)val12).set_BasicTooltipText("Enter Text-To-Speech value for this event.");
 				((Control)val12).set_Location(new Point(110, 500));
 				((TextInputBase)val12).set_Font(GameService.Content.get_DefaultFont16());
 				((Control)val12).set_Parent((Container)(object)_SettingsControlPanel);
 				_TTSTextbox = val12;
 				Checkbox val13 = new Checkbox();
+				((Control)val13).set_BasicTooltipText("Activate Text-To-Speech value for this event.");
 				((Control)val13).set_Size(new Point(32, 32));
 				((Control)val13).set_Location(new Point(80, 504));
 				val13.set_Checked(eventNotes[senderIndex].TTSActive);
