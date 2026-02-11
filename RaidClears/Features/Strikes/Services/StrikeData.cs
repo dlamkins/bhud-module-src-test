@@ -27,6 +27,10 @@ namespace RaidClears.Features.Strikes.Services
 		public ExpansionStrikes Priority { get; set; } = new ExpansionStrikes();
 
 
+		[JsonProperty("priority_tomorrow")]
+		public ExpansionStrikes PriorityTomorrow { get; set; } = new ExpansionStrikes();
+
+
 		[JsonProperty("expansions")]
 		public List<ExpansionStrikes> Expansions { get; set; } = new List<ExpansionStrikes>();
 
@@ -89,9 +93,18 @@ namespace RaidClears.Features.Strikes.Services
 					}
 				}
 			}
+			if (Priority.Id == name)
+			{
+				return Priority.ToStrikeMission();
+			}
+			if (PriorityTomorrow.Id == name)
+			{
+				return PriorityTomorrow.ToStrikeMission();
+			}
 			return new StrikeMission
 			{
-				Id = name
+				Id = name,
+				Name = "GetStrikeMissionById Failed"
 			};
 		}
 
@@ -147,6 +160,11 @@ namespace RaidClears.Features.Strikes.Services
 		public SettingEntry<bool> GetPriorityVisible()
 		{
 			return Service.StrikeSettings.GetPriorityVisible(Priority);
+		}
+
+		public SettingEntry<bool> GetTomorrowBountiesVisible()
+		{
+			return Service.StrikeSettings.GetTomorrowBountiesVisible(PriorityTomorrow);
 		}
 
 		public SettingEntry<bool> GetExpansionVisible(ExpansionStrikes expac)

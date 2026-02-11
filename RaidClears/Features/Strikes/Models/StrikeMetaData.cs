@@ -35,7 +35,15 @@ namespace RaidClears.Features.Strikes.Models
 					encounter.WatchColorSettings(settings.Style.Color.Cleared, settings.Style.Color.NotCleared);
 				}
 			}
-			strikes.Add(new PriorityStrikes(Service.StrikeData.Priority.Name, Service.StrikeData.Priority.Abbriviation, 11, Service.StrikeData.Priority.Abbriviation, new List<BoxModel>(), (Container)(object)panel));
+			if (Service.DailyBountyData.Enabled)
+			{
+				ExpansionStrikes priorityMeta = Service.StrikeData.Priority;
+				string todayShortName = Service.StrikeSettings.GetEncounterLabel(priorityMeta.Id);
+				strikes.Add(new DailyBounty(priorityMeta.Name, priorityMeta.Id, 12, todayShortName, new List<BoxModel>(), (Container)(object)panel));
+				ExpansionStrikes tomorrowMeta = Service.StrikeData.PriorityTomorrow;
+				string tomorrowShortName = Service.StrikeSettings.GetEncounterLabel(tomorrowMeta.Id);
+				strikes.Add(new DailyBountyTomorrow(tomorrowMeta.Name, tomorrowMeta.Id, 13, tomorrowShortName, new List<BoxModel>(), (Container)(object)panel));
+			}
 			return strikes;
 		}
 

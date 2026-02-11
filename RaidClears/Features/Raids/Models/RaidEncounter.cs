@@ -25,6 +25,9 @@ namespace RaidClears.Features.Raids.Models
 		[JsonProperty("needsDefianceBreak")]
 		public bool NeedsDefianceBreak { get; set; }
 
+		[JsonProperty("mentor_achievement_id", NullValueHandling = NullValueHandling.Ignore)]
+		public int? MentorAchievementId { get; set; }
+
 		public new string Name
 		{
 			get

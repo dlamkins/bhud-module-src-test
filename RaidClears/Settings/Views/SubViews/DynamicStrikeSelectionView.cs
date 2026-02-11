@@ -57,7 +57,8 @@ namespace RaidClears.Settings.Views.SubViews
 			((Container)val).set_HeightSizingMode((SizingMode)1);
 			((Control)val).set_Width(((Control)panel).get_Width() - 40);
 			((Panel)val).set_BackgroundTexture(Service.Textures!.GetDynamicTexture(expac.asset));
-			panel.AddChildPanel((Panel)(object)FlowPanelExtensions.AddString(val, string.Format(Strings.DynamicStrikeSelection_DisplayExpansion, expac.Name)).AddSetting((SettingEntry)(object)_data.GetPriorityVisible()).AddSpace());
+			panel.AddChildPanel((Panel)(object)FlowPanelExtensions.AddString(val, string.Format(Strings.DynamicStrikeSelection_DisplayExpansion, expac.Name)).AddSetting((SettingEntry)(object)_data.GetPriorityVisible()).AddSetting((SettingEntry)(object)_data.GetTomorrowBountiesVisible())
+				.AddSpace());
 		}
 
 		private void BuildExpansionPanel(FlowPanel panel, ExpansionStrikes expac)

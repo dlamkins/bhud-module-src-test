@@ -21,11 +21,19 @@ namespace RaidClears.Settings.Views.SubViews
 		{
 			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0012: Expected O, but got Unknown
-			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
 			((View<IPresenter>)this).Build(buildPanel);
 			FlowPanel panel = FlowPanelExtensions.BeginFlow(new FlowPanel(), buildPanel);
 			((Panel)panel).set_CanScroll(true);
 			new Dictionary<string, DateTime>();
+			if (Service.DailyBountyData != null && Service.DailyBountyData.Enabled)
+			{
+				((Container)(object)panel).AddControl((Control)(object)new EncounterLabelCustomerizer(panel, Service.StrikeSettings, Service.StrikeData.Priority, Color.get_Gold()));
+				((Container)(object)panel).AddControl((Control)(object)new EncounterLabelCustomerizer(panel, Service.StrikeSettings, Service.StrikeData.PriorityTomorrow, Color.get_Gold()));
+				panel.AddSpace();
+			}
 			foreach (ExpansionStrikes expansion in Service.StrikeData.Expansions)
 			{
 				((Container)(object)panel).AddControl((Control)(object)new EncounterLabelCustomerizer(panel, Service.StrikeSettings, expansion, Color.get_Gold()));

@@ -28,6 +28,9 @@ namespace RaidClears.Features.Strikes.Services
 		public bool Priority { get; set; } = true;
 
 
+		[JsonProperty("tomorrow_bounties")]
+		public bool TomorrowBounties { get; set; }
+
 		[JsonProperty("expansions")]
 		public Dictionary<string, bool> Expansions { get; set; } = new Dictionary<string, bool>();
 
@@ -90,6 +93,27 @@ namespace RaidClears.Features.Strikes.Services
 				Save();
 			});
 			VirtualSettingsEnties.Add("priority", setting);
+			return setting;
+		}
+
+		public SettingEntry<bool> GetTomorrowBountiesVisible(ExpansionStrikes priority)
+		{
+			ExpansionStrikes priority2 = priority;
+			if (VirtualSettingsEnties.ContainsKey("priority_tomorrow"))
+			{
+				return VirtualSettingsEnties["priority_tomorrow"];
+			}
+			SettingEntry<bool> obj = new SettingEntry<bool>();
+			obj.set_Value(TomorrowBounties);
+			((SettingEntry)obj).set_GetDescriptionFunc((Func<string>)(() => string.Empty));
+			((SettingEntry)obj).set_GetDisplayNameFunc((Func<string>)(() => string.Format(Strings.StrikeSettings_EnablePriority, priority2.Name)));
+			SettingEntry<bool> setting = obj;
+			setting.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)delegate(object _, ValueChangedEventArgs<bool> e)
+			{
+				TomorrowBounties = e.get_NewValue();
+				Save();
+			});
+			VirtualSettingsEnties.Add("priority_tomorrow", setting);
 			return setting;
 		}
 
@@ -196,11 +220,10 @@ namespace RaidClears.Features.Strikes.Services
 
 		private static StrikeSettingsPersistance CreateNewCharacterConfiguration()
 		{
-			StrikeSettingsPersistance newCharacterConfiguration = new StrikeSettingsPersistance();
-			newCharacterConfiguration.DefineEmpty();
-			Service.Settings.StrikeSettings.ConvertToJsonFile(newCharacterConfiguration);
-			newCharacterConfiguration.Save();
-			return newCharacterConfiguration;
+			StrikeSettingsPersistance strikeSettingsPersistance = new StrikeSettingsPersistance();
+			strikeSettingsPersistance.DefineEmpty();
+			strikeSettingsPersistance.Save();
+			return strikeSettingsPersistance;
 		}
 	}
 }

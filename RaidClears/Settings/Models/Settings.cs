@@ -133,17 +133,9 @@ namespace RaidClears.Settings.Models
 
 				public static Setting<bool> highlightCotm = new Setting<bool>("RCCotM", DefaultValue: true, () => Strings.Setting_Raid_Cotm_Label, () => Strings.Setting_Raid_Cotm_Tooltip);
 
-				public static Setting<bool>[] raidWings = new Setting<bool>[8]
-				{
-					new Setting<bool>("RCw1", DefaultValue: true, () => Strings.Setting_Raid_W1_Label, () => Strings.Setting_Raid_W1_Tooltip),
-					new Setting<bool>("RCw2", DefaultValue: true, () => Strings.Setting_Raid_W2_Label, () => Strings.Setting_Raid_W2_Tooltip),
-					new Setting<bool>("RCw3", DefaultValue: true, () => Strings.Setting_Raid_W3_Label, () => Strings.Setting_Raid_W3_Tooltip),
-					new Setting<bool>("RCw4", DefaultValue: true, () => Strings.Setting_Raid_W4_Label, () => Strings.Setting_Raid_W4_Tooltip),
-					new Setting<bool>("RCw5", DefaultValue: true, () => Strings.Setting_Raid_W5_Label, () => Strings.Setting_Raid_W5_Tooltip),
-					new Setting<bool>("RCw6", DefaultValue: true, () => Strings.Setting_Raid_W6_Label, () => Strings.Setting_Raid_W6_Tooltip),
-					new Setting<bool>("RCw7", DefaultValue: true, () => Strings.Setting_Raid_W7_Label, () => Strings.Setting_Raid_W7_Tooltip),
-					new Setting<bool>("RCw8", DefaultValue: true, () => Strings.Setting_Raid_W8_Label, () => Strings.Setting_Raid_W8_Tooltip)
-				};
+				public static Setting<bool> mentorProgress = new Setting<bool>("RCMentorProgress", DefaultValue: true, () => Strings.Setting_Raid_MentorProgress_Label, () => Strings.Setting_Raid_MentorProgress_Tooltip);
+
+				public static Setting<bool> mentorProgressPopup = new Setting<bool>("RCMentorProgressPopup", DefaultValue: true, () => Strings.Setting_Raid_MentorProgressPopup_Label, () => Strings.Setting_Raid_MentorProgressPopup_Tooltip);
 			}
 		}
 
@@ -194,40 +186,6 @@ namespace RaidClears.Settings.Models
 
 			public static class Module
 			{
-				public static Setting<bool>[] ibsMissions = new Setting<bool>[7]
-				{
-					new StrikeSetting<bool>("StrikeVis_shiverpeak_pass", DefaultValue: true, () => Strings.Setting_Strike_SP_Label),
-					new StrikeSetting<bool>("StrikeVis_fraenir_of_jormag", DefaultValue: true, () => Strings.Setting_Strike_FoJ_Label),
-					new StrikeSetting<bool>("StrikeVis_voice_and_claw", DefaultValue: true, () => Strings.Setting_Strike_VandC_Label),
-					new StrikeSetting<bool>("StrikeVis_whisper_of_jormag", DefaultValue: true, () => Strings.Setting_Strike_WoJ_Label),
-					new StrikeSetting<bool>("StrikeVis_boneskinner", DefaultValue: true, () => Strings.Setting_Strike_BS_Label),
-					new StrikeSetting<bool>("StrikeVis_cold_war", DefaultValue: true, () => Strings.Setting_Strike_CW_Label),
-					new StrikeSetting<bool>("StrikeVis_dragonstorm", DefaultValue: true, () => "Dragonstorm")
-				};
-
-				public static Setting<bool>[] eodMissions = new Setting<bool>[5]
-				{
-					new StrikeSetting<bool>("StrikeVis_aetherblade_hideout", DefaultValue: true, () => Strings.Setting_Strike_AH_Label),
-					new StrikeSetting<bool>("StrikeVis_xunlai_jade_junkyard", DefaultValue: true, () => Strings.Setting_Strike_XJJ_Label),
-					new StrikeSetting<bool>("StrikeVis_kaineng_overlook", DefaultValue: true, () => Strings.Setting_Strike_KO_Label),
-					new StrikeSetting<bool>("StrikeVis_harvest_temple", DefaultValue: true, () => Strings.Setting_Strike_HT_Label),
-					new StrikeSetting<bool>("StrikeVis_old_lion_court", DefaultValue: true, () => Strings.Setting_Strike_OLC_Label)
-				};
-
-				public static Setting<bool>[] sotoMissions = new Setting<bool>[2]
-				{
-					new StrikeSetting<bool>("StrikeVis_cosmic_observatory", DefaultValue: true, () => "Cosmic Observatory"),
-					new StrikeSetting<bool>("StrikeVis_temple_of_febe", DefaultValue: true, () => "Temple of Febe")
-				};
-
-				public static Setting<bool> showIbs = new Setting<bool>("StrikeVis_ibs", DefaultValue: true, () => Strings.Setting_Strike_IBS);
-
-				public static Setting<bool> showEod = new Setting<bool>("StrikeVis_eod", DefaultValue: true, () => Strings.Setting_Strike_Eod);
-
-				public static Setting<bool> showSotO = new Setting<bool>("StrikeVis_soto", DefaultValue: true, () => "Enable Secrets of the Obscure");
-
-				public static Setting<bool> showPriority = new Setting<bool>("StrikeVis_priority", DefaultValue: true, () => Strings.Setting_Stike_Priority);
-
 				public static Setting<bool> anchorToRaids = new Setting<bool>("RCAnchorToRaids", DefaultValue: false, () => Strings.Settings_Strike_AnchorToRaidLabel, () => Strings.Settings_Strike_AnchorToRaidTooltip);
 
 				public static Setting<StrikeComplete> strikeCompletion = new Setting<StrikeComplete>("RCStrikeComplete", StrikeComplete.MAP_CHANGE, () => Strings.Settings_Strike_Completion, () => Strings.Settings_Strike_CompletionTooltip);

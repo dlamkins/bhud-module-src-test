@@ -30,7 +30,9 @@ namespace RaidClears.Settings.Views.Tabs
 			_registeredMenuItems.Add(new MenuViewItem(new MenuItem(Strings.SettingsPanel_Raids_Heading_General), (MenuItem _) => (IView)(object)new GenericGeneralView(Service.Settings.RaidSettings.Generic, new List<SettingEntry>
 			{
 				(SettingEntry)(object)Service.Settings.RaidSettings.RaidPanelHighlightEmbolden,
-				(SettingEntry)(object)Service.Settings.RaidSettings.RaidPanelHighlightCotM
+				(SettingEntry)(object)Service.Settings.RaidSettings.RaidPanelHighlightCotM,
+				(SettingEntry)(object)Service.Settings.RaidSettings.RaidPanelMentorProgress,
+				(SettingEntry)(object)Service.Settings.RaidSettings.RaidPanelMentorProgressPopup
 			})));
 			_registeredMenuItems.Add(new MenuViewItem(new MenuItem(Strings.SettingsPanel_Raids_Heading_Layout), (MenuItem _) => (IView)(object)new GenericStyleView(Service.Settings.RaidSettings.Style, new List<SettingEntry<string>>
 			{

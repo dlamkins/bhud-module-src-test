@@ -5,6 +5,7 @@ using System.Net;
 using System.Text;
 using Newtonsoft.Json;
 using RaidClears.Features.Raids.Models;
+using RaidClears.Features.Strikes.Models;
 
 namespace RaidClears.Features.Raids.Services
 {
@@ -35,6 +36,10 @@ namespace RaidClears.Features.Raids.Services
 
 		[JsonProperty("defianceAssetId")]
 		public int DefianceAssetId { get; set; }
+
+		[JsonProperty("mentorAssetId")]
+		public int MentorAssetId { get; set; } = 155062;
+
 
 		[JsonProperty("aerodrome")]
 		public Aerodrome AeroDrome { get; set; } = new Aerodrome();
@@ -147,10 +152,40 @@ namespace RaidClears.Features.Raids.Services
 					}
 				}
 			}
+			StrikeMission strike = Service.StrikeData.GetStrikeMissionById(apiId);
+			if (strike.Name != "undefined")
+			{
+				return new RaidEncounter
+				{
+					Abbriviation = strike.Abbriviation,
+					ApiId = strike.Id,
+					AssetId = strike.AssetId,
+					Name = strike.Name,
+					Id = strike.Id
+				};
+			}
 			return new RaidEncounter
 			{
 				Abbriviation = apiId
 			};
+		}
+
+		public RaidEncounter? GetEncounterByMentorAchievementId(int mentorAchievementId)
+		{
+			foreach (ExpansionRaid expansion in Expansions)
+			{
+				foreach (RaidWing wing in expansion.Wings)
+				{
+					foreach (RaidEncounter enc in wing.Encounters)
+					{
+						if (enc.MentorAchievementId == mentorAchievementId)
+						{
+							return enc;
+						}
+					}
+				}
+			}
+			return null;
 		}
 
 		private static FileInfo GetConfigFileInfo()

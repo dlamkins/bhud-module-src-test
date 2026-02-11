@@ -34,6 +34,10 @@ namespace RaidClears.Features.Raids
 							encounter.SetCleared(weeklyClears.Contains(encounter.id));
 						}
 					}
+					if (Settings.RaidPanelMentorProgress.get_Value())
+					{
+						await Service.MentorAchievementProgress.RefreshFromApiAsync();
+					}
 					((Control)this).Invalidate();
 				});
 			};

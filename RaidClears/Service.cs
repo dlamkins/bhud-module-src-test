@@ -5,6 +5,7 @@ using RaidClears.Features.Fractals;
 using RaidClears.Features.Fractals.Services;
 using RaidClears.Features.Raids;
 using RaidClears.Features.Raids.Services;
+using RaidClears.Features.Shared.Models;
 using RaidClears.Features.Shared.Services;
 using RaidClears.Features.Strikes;
 using RaidClears.Features.Strikes.Services;
@@ -43,6 +44,9 @@ namespace RaidClears
 		public static SettingsPanel SettingsWindow { get; set; } = null;
 
 
+		public static DailyBountyData DailyBountyData { get; set; } = null;
+
+
 		public static StrikeData StrikeData { get; set; } = null;
 
 
@@ -68,6 +72,9 @@ namespace RaidClears
 
 
 		public static RaidData RaidData { get; set; } = null;
+
+
+		public static MentorAchievementProgressService MentorAchievementProgress { get; set; } = null;
 
 
 		public static RaidPanel RaidWindow { get; set; } = null;

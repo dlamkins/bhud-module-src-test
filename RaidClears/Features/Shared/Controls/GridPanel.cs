@@ -5,7 +5,10 @@ using Blish_HUD.Input;
 using Blish_HUD.Settings;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using RaidClears.Features.Raids;
 using RaidClears.Features.Shared.Services;
+using RaidClears.Features.Strikes;
+using RaidClears.Settings.Enums;
 using RaidClears.Settings.Models;
 
 namespace RaidClears.Features.Shared.Controls
@@ -98,6 +101,78 @@ namespace RaidClears.Features.Shared.Controls
 				Point nOffset = GameService.Input.get_Mouse().get_Position() - _dragStart;
 				((Control)this).set_Location(((Control)this).get_Location() + nOffset);
 				_dragStart = GameService.Input.get_Mouse().get_Position();
+				SyncAnchoredPanelDuringDrag();
+			}
+		}
+
+		private void SyncAnchoredPanelDuringDrag()
+		{
+			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0102: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0114: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0119: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0121: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0142: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0153: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0158: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0160: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0166: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0170: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0178: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0182: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0185: Unknown result type (might be due to invalid IL or missing references)
+			if (!Service.Settings.StrikeSettings.AnchorToRaidPanel.get_Value())
+			{
+				return;
+			}
+			RaidPanel raidPanel = Service.RaidWindow;
+			StrikesPanel strikesPanel = Service.StrikesWindow;
+			if (raidPanel != null && strikesPanel != null)
+			{
+				Vector2 controlPadding = ((FlowPanel)raidPanel).get_ControlPadding();
+				Point padding = ((Vector2)(ref controlPadding)).ToPoint();
+				Layout layout = Service.Settings.RaidSettings.Style.Layout.get_Value();
+				if (this == raidPanel)
+				{
+					bool flag = (((uint)(layout - 1) <= 1u) ? true : false);
+					Point strikeLoc2 = (flag ? (((Control)this).get_Location() + new Point(((Control)this).get_Size().X + padding.X, 0)) : (((Control)this).get_Location() + new Point(0, ((Control)this).get_Size().Y + padding.Y)));
+					((Control)strikesPanel).set_Location(strikeLoc2);
+				}
+				else if (this == strikesPanel)
+				{
+					bool flag = (((uint)(layout - 1) <= 1u) ? true : false);
+					Point raidLoc = (flag ? (((Control)this).get_Location() - new Point(((Control)raidPanel).get_Size().X + padding.X, 0)) : (((Control)this).get_Location() - new Point(0, ((Control)raidPanel).get_Size().Y + padding.Y)));
+					((Control)raidPanel).set_Location(raidLoc);
+					flag = (((uint)(layout - 1) <= 1u) ? true : false);
+					Point strikeLoc = (flag ? (((Control)raidPanel).get_Location() + new Point(((Control)raidPanel).get_Size().X + padding.X, 0)) : (((Control)raidPanel).get_Location() + new Point(0, ((Control)raidPanel).get_Size().Y + padding.Y)));
+					((Control)strikesPanel).set_Location(strikeLoc);
+				}
 			}
 		}
 
@@ -115,10 +190,15 @@ namespace RaidClears.Features.Shared.Controls
 			});
 			((Control)this).add_LeftMouseButtonReleased((EventHandler<MouseEventArgs>)delegate
 			{
+				//IL_0056: Unknown result type (might be due to invalid IL or missing references)
 				if (_settings.PositionLock.get_Value())
 				{
 					_isDraggedByMouse = false;
 					ClampToSpriteScreen();
+					if (Service.Settings.StrikeSettings.AnchorToRaidPanel.get_Value() && this == Service.StrikesWindow)
+					{
+						Service.Settings.RaidSettings.Generic.Location.set_Value(((Control)Service.RaidWindow).get_Location());
+					}
 				}
 			});
 		}
@@ -147,7 +227,6 @@ namespace RaidClears.Features.Shared.Controls
 			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0104: Unknown result type (might be due to invalid IL or missing references)
 			if (_screenClamp.get_Value())
 			{
 				Point screenSize = ((Control)GameService.Graphics.get_SpriteScreen()).get_Size();
@@ -167,8 +246,8 @@ namespace RaidClears.Features.Shared.Controls
 				{
 					((Control)this).set_Location(new Point(((Control)this).get_Location().X, screenSize.Y - ((Control)this).get_Size().Y));
 				}
+				SyncAnchoredPanelDuringDrag();
 			}
-			_settings.Location.set_Value(((Control)this).get_Location());
 		}
 
 		private bool ShouldIgnoreMouse()

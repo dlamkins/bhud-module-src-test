@@ -63,6 +63,7 @@
   <data name="StrikeGroup_Icebrood_abbr"><value>IBS</value></data>
   <data name="Setting_Strike_CW_Label"><value>Cold War</value></data>
   <data name="Settings_OrganicGridBoxBackgrounds_Label"><value>'GW2 Style' background boxes</value></data>
+  <data name="Tooltip_MentorProgress"><value>Mentor: {0} / {1}</value></data>
   <data name="Raid_Wing_2_3_Short"><value>M</value></data>
   <data name="Raid_Wing_8_2_Short"><value>D</value></data>
   <data name="Setting_Fractals_Visible_Tooltip"><value /></data>
@@ -76,7 +77,6 @@
   <data name="SharedKeybind"><value>Overlays can use the same keybind</value></data>
   <data name="Raid_Wing_3_2_Short"><value>KC</value></data>
   <data name="Setting_Fractals_LabelOpacity_Tooltip"><value>Hidden &lt;---&gt; Fully Visible</value></data>
-  <data name="Setting_Stike_Priority"><value>Enable priority missions (daily)</value></data>
   <data name="Setting_Raid_Layout_Label"><value>Grid layout</value></data>
   <data name="SettingsPanel_Dun_Heading_PathSelection"><value>Dungeon Selection</value></data>
   <data name="FractalSelection_ThanksInvisi"><value>Special thank you to Invisi for providing challenge mote Instabilities information</value></data>
@@ -105,6 +105,7 @@
   <data name="Strike_Short_AetherbladeHideout"><value>AH</value></data>
   <data name="Settings_RefreshNow"><value>Refresh now</value></data>
   <data name="Raid_Wing_2_2_Short"><value>B3</value></data>
+  <data name="Tooltip_MentorDone"><value>Mentor: Done</value></data>
   <data name="Raid_Wing_6_2_Name"><value>Twin Largos</value></data>
   <data name="Setting_Raid_Visible_Label"><value>Show Raid Wings overlay</value></data>
   <data name="Tooltip_DefianceBreak"><value>Defiance Break</value></data>
@@ -120,7 +121,6 @@
 Off: Background will be rectangles</value></data>
   <data name="Settings_Fractals_TomorrowTier_Tooltip"><value>Show tomorrow's TierN fractals. Useful for statics that pre-clear before reset</value></data>
   <data name="StrikeClearCorrection_LastClears"><value>Last Raid Encounters Clears (Profile: {0})</value></data>
-  <data name="StrikeGroup_Priority"><value>Priority Missions (Daily)</value></data>
   <data name="Setting_Strike_ColText_Label"><value>Label and Grid text color</value></data>
   <data name="Fractals_DailyTierN"><value>Daily Tier (1,2,3,4)</value></data>
   <data name="Setting_Fractals_LabelDisplay_Label"><value>Label style</value></data>
@@ -175,7 +175,6 @@ Off: Background will be rectangles</value></data>
   <data name="Setting_Fractals_Font_Label"><value>Grid size</value></data>
   <data name="CMTooltip_Instabilities"><value>Instabilities</value></data>
   <data name="SettingsPanel_Raid_Visual_ColorsTip"><value>(Tip: Google 'color picker' for help)</value></data>
-  <data name="StrikeGroup_Priority_abbr"><value>PM</value></data>
   <data name="Setting_Fractals_Drag_Tooltip"><value>Click and drag to reposition the overlay window</value></data>
   <data name="Settings_ScreenClamp_Tooltip"><value>When turned on, this will make sure that all overlay windows stay within the visible area of your screen, so they don't go off the edges</value></data>
   <data name="Settings_Strike_CompletionTooltip"><value>Determine how Raid Encounters are marked as cleared</value></data>
@@ -198,6 +197,7 @@ Off: Background will be rectangles</value></data>
   <data name="Setting_Fractals_GridOpactiy_Tooltip"><value>Hidden &lt;---&gt; Fully Visible</value></data>
   <data name="Setting_APIPoll_Tooltip"><value>How often should the GW2 API be checked for updated information?</value></data>
   <data name="Raid_Wing_7_Short"><value>TKoA</value></data>
+  <data name="Setting_Raid_MentorProgressPopup_Tooltip"><value>Show a popup when mentor progress increases (tracking must be enabled).</value></data>
   <data name="Raid_Wing_2_1_Name"><value>Slothasor</value></data>
   <data name="EncounterClearStatus_MarkComplete"><value>Mark Complete</value></data>
   <data name="Setting_Strike_HT_Label"><value>Harvest Temple</value></data>
@@ -297,6 +297,7 @@ Off: Background will be rectangles</value></data>
   <data name="Setting_Strike_Layout_Label"><value>Grid layout</value></data>
   <data name="Setting_Fractals_PanelOpacity_Tooltip"><value>Hidden &lt;---&gt; Fully Visible</value></data>
   <data name="Settings_Raid_JW_Heading"><value>Enable Janthir Wilds raid wing</value></data>
+  <data name="Setting_Raid_MentorProgressPopup_Label"><value>Show mentor progress popup</value></data>
   <data name="Setting_Strike_Eod"><value>Enable End of Dragons</value></data>
   <data name="Setting_Strike_IBS"><value>Enable Icebrood Saga</value></data>
   <data name="Setting_Strike_Drag_Tooltip"><value>Click and drag to reposition the overlay window</value></data>
@@ -312,6 +313,7 @@ Off: Background will be rectangles</value></data>
   <data name="Setting_Strike_FoJ_Label"><value>Fraenir of Jormag</value></data>
   <data name="Strike_Short_VoiceAndClaw"><value>V&amp;C</value></data>
   <data name="Setting_Strike_LabelDisplay_Label"><value>Label style</value></data>
+  <data name="Setting_Raid_MentorProgress_Label"><value>Track Mentor Achievement Progress</value></data>
   <data name="Setting_Dun_Icon_Label"><value>Dungeons hide/show on menubar icon click</value></data>
   <data name="Settings_Main_ExampleEncounterBox"><value>Example encounter box</value></data>
   <data name="StrikeGroup_Icebrood"><value>Icebrood Saga</value></data>
@@ -358,6 +360,7 @@ Off: Background will be rectangles</value></data>
   <data name="Setting_Dun_Keybind_Tooltip"><value /></data>
   <data name="Setting_Fractals_GridOpacity_Label"><value>Grid opacity</value></data>
   <data name="Settings_Raid_ExpansionVisible_Description"><value>Show all Raid Wings for '{0}' on the Raid Wings Overlay</value></data>
+  <data name="Setting_Raid_MentorProgress_Tooltip"><value>Show your raid mentor achievement progress in raid boss tooltips.  (Restart module to take effect)</value></data>
   <data name="Setting_Fractals_ColBG_Label"><value>Overlay background color</value></data>
   <data name="Setting_Raid_W3_Tooltip"><value>Enable Stronghold of the Faithful on the Raid Wings overlay</value></data>
   <data name="Setting_Dun_ColFreqText_Tooltip"><value>Hex color code (#rrggbb) for Paths that count for dungeon frequenter achievement</value></data>

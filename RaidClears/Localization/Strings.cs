@@ -386,6 +386,14 @@ namespace RaidClears.Localization
 
 		internal static string Setting_Raid_Cotm_Tooltip => ResourceManager.GetString("Setting_Raid_Cotm_Tooltip", resourceCulture);
 
+		internal static string Setting_Raid_MentorProgress_Label => ResourceManager.GetString("Setting_Raid_MentorProgress_Label", resourceCulture);
+
+		internal static string Setting_Raid_MentorProgress_Tooltip => ResourceManager.GetString("Setting_Raid_MentorProgress_Tooltip", resourceCulture);
+
+		internal static string Setting_Raid_MentorProgressPopup_Label => ResourceManager.GetString("Setting_Raid_MentorProgressPopup_Label", resourceCulture);
+
+		internal static string Setting_Raid_MentorProgressPopup_Tooltip => ResourceManager.GetString("Setting_Raid_MentorProgressPopup_Tooltip", resourceCulture);
+
 		internal static string Setting_Raid_Drag_Label => ResourceManager.GetString("Setting_Raid_Drag_Label", resourceCulture);
 
 		internal static string Setting_Raid_Drag_Tooltip => ResourceManager.GetString("Setting_Raid_Drag_Tooltip", resourceCulture);
@@ -465,8 +473,6 @@ namespace RaidClears.Localization
 		internal static string Setting_Raid_W8_Label => ResourceManager.GetString("Setting_Raid_W8_Label", resourceCulture);
 
 		internal static string Setting_Raid_W8_Tooltip => ResourceManager.GetString("Setting_Raid_W8_Tooltip", resourceCulture);
-
-		internal static string Setting_Stike_Priority => ResourceManager.GetString("Setting_Stike_Priority", resourceCulture);
 
 		internal static string Setting_Strike_AH_Label => ResourceManager.GetString("Setting_Strike_AH_Label", resourceCulture);
 
@@ -702,10 +708,6 @@ namespace RaidClears.Localization
 
 		internal static string StrikeGroup_Icebrood_abbr => ResourceManager.GetString("StrikeGroup_Icebrood_abbr", resourceCulture);
 
-		internal static string StrikeGroup_Priority => ResourceManager.GetString("StrikeGroup_Priority", resourceCulture);
-
-		internal static string StrikeGroup_Priority_abbr => ResourceManager.GetString("StrikeGroup_Priority_abbr", resourceCulture);
-
 		internal static string StrikeLabelCustomization_Heading => ResourceManager.GetString("StrikeLabelCustomization_Heading", resourceCulture);
 
 		internal static string StrikeSettings_EnableExpansion => ResourceManager.GetString("StrikeSettings_EnableExpansion", resourceCulture);
@@ -715,6 +717,10 @@ namespace RaidClears.Localization
 		internal static string Tooltip_ConditionDamage => ResourceManager.GetString("Tooltip_ConditionDamage", resourceCulture);
 
 		internal static string Tooltip_DefianceBreak => ResourceManager.GetString("Tooltip_DefianceBreak", resourceCulture);
+
+		internal static string Tooltip_MentorDone => ResourceManager.GetString("Tooltip_MentorDone", resourceCulture);
+
+		internal static string Tooltip_MentorProgress => ResourceManager.GetString("Tooltip_MentorProgress", resourceCulture);
 
 		internal static string Tooltip_PowerDamage => ResourceManager.GetString("Tooltip_PowerDamage", resourceCulture);
 

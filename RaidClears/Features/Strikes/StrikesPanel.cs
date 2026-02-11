@@ -40,9 +40,13 @@ namespace RaidClears.Features.Strikes
 
 		private void _mapService_CompletedStrikes(object sender, List<string> strikesCompletedThisReset)
 		{
-			foreach (Strike strike in _strikes)
+			foreach (Strike group in _strikes)
 			{
-				foreach (BoxModel encounter in strike.boxes)
+				if (group is DailyBountyTomorrow)
+				{
+					continue;
+				}
+				foreach (BoxModel encounter in group.boxes)
 				{
 					encounter.SetCleared(strikesCompletedThisReset.Contains(encounter.id));
 				}

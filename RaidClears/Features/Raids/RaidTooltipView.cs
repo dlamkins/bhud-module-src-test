@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
@@ -5,8 +6,10 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using RaidClears.Features.Raids.Models;
 using RaidClears.Features.Raids.Services;
+using RaidClears.Features.Shared.Models;
 using RaidClears.Features.Strikes.Models;
 using RaidClears.Localization;
+using RaidClears.Settings.Services;
 using RaidClears.Utils.Kenedia;
 
 namespace RaidClears.Features.Raids
@@ -30,6 +33,10 @@ namespace RaidClears.Features.Raids
 		private readonly Image _defianceIcon;
 
 		private readonly Label _defianceLabel;
+
+		private readonly Image _mentorIcon;
+
+		private readonly Label _mentorLabel;
 
 		private RaidEncounter _encounter = new RaidEncounter();
 
@@ -163,6 +170,29 @@ namespace RaidClears.Features.Raids
 			//IL_03ce: Unknown result type (might be due to invalid IL or missing references)
 			//IL_03d9: Unknown result type (might be due to invalid IL or missing references)
 			//IL_03e5: Expected O, but got Unknown
+			//IL_03e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03eb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03f2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0402: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0412: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0415: Unknown result type (might be due to invalid IL or missing references)
+			//IL_042b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0431: Unknown result type (might be due to invalid IL or missing references)
+			//IL_043d: Expected O, but got Unknown
+			//IL_043e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0443: Unknown result type (might be due to invalid IL or missing references)
+			//IL_044a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_045f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0466: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0469: Unknown result type (might be due to invalid IL or missing references)
+			//IL_047f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0485: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0495: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0496: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04b6: Expected O, but got Unknown
 			Image val = new Image();
 			((Control)val).set_Parent((Container)(object)this);
 			((Control)val).set_Height(48);
@@ -275,6 +305,33 @@ namespace RaidClears.Features.Raids
 			val9.set_Text(Strings.Tooltip_DefianceBreak);
 			((Control)val9).set_Visible(false);
 			_defianceLabel = val9;
+			Image val10 = new Image();
+			((Control)val10).set_Parent((Container)(object)this);
+			((Control)val10).set_Height(20);
+			((Control)val10).set_Width(20);
+			val10.set_Texture(AsyncTexture2D.op_Implicit(Textures.get_Pixel()));
+			location = new Point
+			{
+				X = 0,
+				Y = 0
+			};
+			((Control)val10).set_Location(location);
+			((Control)val10).set_Visible(false);
+			_mentorIcon = val10;
+			Label val11 = new Label();
+			((Control)val11).set_Parent((Container)(object)this);
+			((Control)val11).set_Height(Control.get_Content().get_DefaultFont12().get_LineHeight());
+			val11.set_AutoSizeWidth(true);
+			location = new Point
+			{
+				X = 0,
+				Y = 0
+			};
+			((Control)val11).set_Location(location);
+			val11.set_Font(Control.get_Content().get_DefaultFont12());
+			val11.set_TextColor(Color.get_White() * 0.85f);
+			((Control)val11).set_Visible(false);
+			_mentorLabel = val11;
 		}
 
 		private void ApplyEncounter(object sender, ValueChangedEventArgs<RaidEncounter> e)
@@ -285,6 +342,11 @@ namespace RaidClears.Features.Raids
 			//IL_0194: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0202: Unknown result type (might be due to invalid IL or missing references)
 			//IL_022c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0359: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0432: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0447: Unknown result type (might be due to invalid IL or missing references)
 			if (e.NewValue == null)
 			{
 				return;
@@ -335,12 +397,51 @@ namespace RaidClears.Features.Raids
 					((Control)_defianceIcon).set_Visible(true);
 					((Control)_defianceLabel).set_Location(new Point(((Control)_defianceIcon).get_Right() + 5, yOffset));
 					((Control)_defianceLabel).set_Visible(true);
+					yOffset += 25;
 				}
 				else
 				{
 					((Control)_defianceIcon).set_Visible(false);
 					((Control)_defianceLabel).set_Visible(false);
 				}
+				SettingService settings = Service.Settings;
+				bool num = settings != null && (settings.RaidSettings?.RaidPanelMentorProgress?.get_Value()).GetValueOrDefault();
+				bool hasOtherCallouts = ((Control)_powerIcon).get_Visible() || ((Control)_condiIcon).get_Visible() || ((Control)_defianceIcon).get_Visible();
+				if (num)
+				{
+					int? mentorAchievementId = e.NewValue!.MentorAchievementId;
+					if (mentorAchievementId.HasValue)
+					{
+						int mentorId = mentorAchievementId.GetValueOrDefault();
+						if (hasOtherCallouts)
+						{
+							yOffset += 12;
+						}
+						IReadOnlyDictionary<int, MentorAchievementProgressEntry> progress = Service.MentorAchievementProgress?.Progress;
+						((Control)_mentorIcon).set_Visible(raidData.MentorAssetId > 0);
+						if (((Control)_mentorIcon).get_Visible())
+						{
+							_mentorIcon.set_Texture(Service.Textures!.DatAsset(raidData.MentorAssetId));
+							((Control)_mentorIcon).set_Location(new Point(xOffset, yOffset));
+						}
+						if (progress != null && progress.TryGetValue(mentorId, out var entry))
+						{
+							_mentorLabel.set_Text(entry.Done ? Strings.Tooltip_MentorDone : string.Format(Strings.Tooltip_MentorProgress, entry.Current, entry.Max));
+							((Control)_mentorLabel).set_Location(((Control)_mentorIcon).get_Visible() ? new Point(((Control)_mentorIcon).get_Right() + 5, yOffset) : new Point(xOffset + 5, yOffset));
+							((Control)_mentorLabel).set_Visible(true);
+						}
+						else
+						{
+							_mentorLabel.set_Text(string.Format(Strings.Tooltip_MentorProgress, 0, "?"));
+							((Control)_mentorLabel).set_Location(((Control)_mentorIcon).get_Visible() ? new Point(((Control)_mentorIcon).get_Right() + 5, yOffset) : new Point(xOffset + 5, yOffset));
+							((Control)_mentorLabel).set_Visible(true);
+						}
+						yOffset += 25;
+						goto IL_04de;
+					}
+				}
+				((Control)_mentorIcon).set_Visible(false);
+				((Control)_mentorLabel).set_Visible(false);
 			}
 			else
 			{
@@ -350,7 +451,11 @@ namespace RaidClears.Features.Raids
 				((Control)_condiLabel).set_Visible(false);
 				((Control)_defianceIcon).set_Visible(false);
 				((Control)_defianceLabel).set_Visible(false);
+				((Control)_mentorIcon).set_Visible(false);
+				((Control)_mentorLabel).set_Visible(false);
 			}
+			goto IL_04de;
+			IL_04de:
 			((Control)this).Invalidate();
 		}
 
@@ -382,8 +487,8 @@ namespace RaidClears.Features.Raids
 
 		public override void RecalculateLayout()
 		{
-			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0099: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
 			int height = 58;
 			int contentHeight = 48;
 			int indicatorCount = 0;
@@ -403,6 +508,16 @@ namespace RaidClears.Features.Raids
 			{
 				height += indicatorCount * 25;
 				contentHeight += indicatorCount * 25;
+			}
+			if (_mentorIcon != null && ((Control)_mentorIcon).get_Visible())
+			{
+				if (indicatorCount > 0)
+				{
+					height += 12;
+					contentHeight += 12;
+				}
+				height += 25;
+				contentHeight += 25;
 			}
 			((Control)this).set_Size(new Point(230, height));
 			((Container)this).set_ContentRegion(new Rectangle(5, 5, 220, contentHeight));

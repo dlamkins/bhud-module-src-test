@@ -11,10 +11,12 @@ using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using RaidClears.Features.Dungeons;
 using RaidClears.Features.Fractals;
 using RaidClears.Features.Fractals.Services;
 using RaidClears.Features.Raids;
+using RaidClears.Features.Raids.Models;
 using RaidClears.Features.Raids.Services;
 using RaidClears.Features.Shared.Models;
 using RaidClears.Features.Shared.Services;
@@ -68,7 +70,10 @@ namespace RaidClears
 			Service.Textures = new TextureService(Service.ContentsManager);
 			ModuleMetaDataService metadata = ModuleMetaDataService.CheckVersions();
 			Service.RaidData = RaidData.Load();
+			Service.MentorAchievementProgress = new MentorAchievementProgressService(Service.RaidData);
+			Service.MentorAchievementProgress.LoadCache();
 			Service.StrikeData = StrikeData.Load();
+			Service.DailyBountyData = DailyBountyDataService.Load();
 			Service.RaidSettings = RaidSettingsPersistance.Load();
 			Service.StrikeSettings = StrikeSettingsPersistance.Load();
 			Service.FractalMapData = FractalMapData.Load();
@@ -109,6 +114,7 @@ namespace RaidClears
 					CheckMotd(metadata);
 				}
 				Service.Gw2ApiManager.add_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)Gw2ApiManager_SubtokenUpdated);
+				Service.MentorAchievementProgress.ProgressUpdated += new EventHandler<MentorProgressUpdatedEventArgs>(MentorAchievementProgress_ProgressUpdated);
 				DispatchClears();
 			}
 			catch (Exception e2)
@@ -125,11 +131,16 @@ namespace RaidClears
 				Service.MapWatcher.DispatchCurrentStrikeClears();
 				Service.FractalMapWatcher.DispatchCurrentClears();
 				Service.CornerIcon?.UpdateAccountName(Service.CurrentAccountName);
+				if (Service.Settings.RaidSettings.RaidPanelMentorProgress.get_Value())
+				{
+					await Service.MentorAchievementProgress.RefreshFromApiAsync();
+				}
 			});
 		}
 
 		protected override void Unload()
 		{
+			Service.MentorAchievementProgress.ProgressUpdated -= new EventHandler<MentorProgressUpdatedEventArgs>(MentorAchievementProgress_ProgressUpdated);
 			Service.Gw2ApiManager.remove_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)Gw2ApiManager_SubtokenUpdated);
 			if (Service.CornerIcon != null)
 			{
@@ -195,6 +206,46 @@ namespace RaidClears
 		{
 			DispatchClears();
 			Service.ApiPollingService?.Invoke();
+		}
+
+		private void MentorAchievementProgress_ProgressUpdated(object? sender, MentorProgressUpdatedEventArgs e)
+		{
+			SettingService settings = Service.Settings;
+			if (settings == null || !(settings.RaidSettings?.RaidPanelMentorProgress?.get_Value()).GetValueOrDefault())
+			{
+				return;
+			}
+			SettingService settings2 = Service.Settings;
+			if (settings2 == null || !(settings2.RaidSettings?.RaidPanelMentorProgressPopup?.get_Value()).GetValueOrDefault() || e.Changes.Count == 0)
+			{
+				return;
+			}
+			RaidData raidData = Service.RaidData;
+			IReadOnlyDictionary<int, MentorAchievementProgressEntry> progress = Service.MentorAchievementProgress?.Progress;
+			if (raidData == null || progress == null)
+			{
+				return;
+			}
+			List<MentorProgressChange> changes = new List<MentorProgressChange>(e.Changes);
+			GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate
+			{
+				//IL_000a: Unknown result type (might be due to invalid IL or missing references)
+				//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
+				int num = ((Control)GameService.Graphics.get_SpriteScreen()).get_Size().X - 300 - 20;
+				int num2 = 80;
+				foreach (MentorProgressChange current in changes)
+				{
+					if (current.Delta > 0)
+					{
+						RaidEncounter encounterByMentorAchievementId = raidData.GetEncounterByMentorAchievementId(current.AchievementId);
+						MentorAchievementProgressEntry value;
+						MentorProgressPopupPanel obj = new MentorProgressPopupPanel(encounterByMentorAchievementId?.Name ?? $"Achievement {current.AchievementId}", max: progress.TryGetValue(current.AchievementId, out value) ? value.Max : current.NewCurrent, iconAssetId: (encounterByMentorAchievementId != null && encounterByMentorAchievementId.AssetId > 0) ? encounterByMentorAchievementId.AssetId : raidData.MentorAssetId, current: current.NewCurrent, delta: current.Delta);
+						((Control)obj).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+						((Control)obj).set_Location(new Point(num, num2));
+						num2 += 80;
+					}
+				}
+			});
 		}
 
 		private void CheckMotd(ModuleMetaDataService metadata)

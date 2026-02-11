@@ -220,11 +220,10 @@ namespace RaidClears.Features.Raids.Services
 
 		private static RaidSettingsPersistance CreateNewCharacterConfiguration()
 		{
-			RaidSettingsPersistance newCharacterConfiguration = new RaidSettingsPersistance();
-			newCharacterConfiguration.DefineEmpty();
-			Service.Settings.RaidSettings.ConvertToJsonFile(newCharacterConfiguration, Service.RaidData);
-			newCharacterConfiguration.Save();
-			return newCharacterConfiguration;
+			RaidSettingsPersistance raidSettingsPersistance = new RaidSettingsPersistance();
+			raidSettingsPersistance.DefineEmpty();
+			raidSettingsPersistance.Save();
+			return raidSettingsPersistance;
 		}
 	}
 }

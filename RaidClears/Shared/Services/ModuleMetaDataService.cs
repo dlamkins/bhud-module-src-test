@@ -20,6 +20,12 @@ namespace RaidClears.Shared.Services
 		[JsonIgnore]
 		public static string FILE_URL = Module.STATIC_HOST_URL + Module.STATIC_HOST_API_VERSION + FILENAME;
 
+		[JsonProperty("cache_bust")]
+		public bool CacheBust { get; set; }
+
+		[JsonProperty("daily_bounties")]
+		public string DailyBountiesVersion { get; set; }
+
 		[JsonProperty("fractal_instabilities")]
 		public string InstabilitiesVersion { get; set; }
 
@@ -64,7 +70,7 @@ namespace RaidClears.Shared.Services
 		{
 			ModuleMetaDataService webFile = DownloadFile();
 			ModuleMetaDataService localFile = Load();
-			if (webFile.InstabilitiesVersion != localFile.InstabilitiesVersion)
+			if (webFile.InstabilitiesVersion != localFile.InstabilitiesVersion || webFile.CacheBust)
 			{
 				InstabilitiesData.DownloadFile();
 				Module.ModuleLogger.Info("JSON File: Instababilites UPDATED to version " + webFile.InstabilitiesVersion);
@@ -73,7 +79,7 @@ namespace RaidClears.Shared.Services
 			{
 				Module.ModuleLogger.Info("JSON File: Instababilites are current on version " + webFile.InstabilitiesVersion);
 			}
-			if (webFile.FractalMapVersion != localFile.FractalMapVersion)
+			if (webFile.FractalMapVersion != localFile.FractalMapVersion || webFile.CacheBust)
 			{
 				FractalMapData.DownloadFile();
 				Module.ModuleLogger.Info("JSON File: Fractal Map Data UPDATED to version " + webFile.FractalMapVersion);
@@ -82,7 +88,7 @@ namespace RaidClears.Shared.Services
 			{
 				Module.ModuleLogger.Info("JSON File: Fractal Map Data is current on version " + webFile.FractalMapVersion);
 			}
-			if (webFile.StrikeDataVersion != localFile.StrikeDataVersion)
+			if (webFile.StrikeDataVersion != localFile.StrikeDataVersion || webFile.CacheBust)
 			{
 				StrikeData.DownloadFile();
 				Module.ModuleLogger.Info("JSON File: Strike Data UPDATED to version " + webFile.StrikeDataVersion);
@@ -91,7 +97,7 @@ namespace RaidClears.Shared.Services
 			{
 				Module.ModuleLogger.Info("JSON File: Strike Data is current on version " + webFile.StrikeDataVersion);
 			}
-			if (webFile.RaidDataVersion != localFile.RaidDataVersion)
+			if (webFile.RaidDataVersion != localFile.RaidDataVersion || webFile.CacheBust)
 			{
 				RaidData.DownloadFile();
 				Module.ModuleLogger.Info("JSON File: Raid Data UPDATED to version " + webFile.RaidDataVersion);
@@ -99,6 +105,15 @@ namespace RaidClears.Shared.Services
 			else
 			{
 				Module.ModuleLogger.Info("JSON File: Raid Data is current on version " + webFile.RaidDataVersion);
+			}
+			if (webFile.DailyBountiesVersion != localFile.DailyBountiesVersion || webFile.CacheBust)
+			{
+				DailyBountyDataService.DownloadFile();
+				Module.ModuleLogger.Info("JSON File: Daily Bounties UPDATED to version " + webFile.DailyBountiesVersion);
+			}
+			else
+			{
+				Module.ModuleLogger.Info("JSON File: Daily Bounties is current on version " + webFile.DailyBountiesVersion);
 			}
 			webFile.Save();
 			webFile.ValidateAssetCache(webFile.Assets, webFile.GridBoxMasks);
