@@ -47,10 +47,10 @@ namespace Maestro.Services.Data
 		public static List<SongCommand> Parse(List<string> noteLines)
 		{
 			//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0130: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ab: Unknown result type (might be due to invalid IL or missing references)
 			List<SongCommand> commands = new List<SongCommand>();
 			int currentOctave = 0;
 			foreach (string noteLine in noteLines)
@@ -72,7 +72,7 @@ namespace Maestro.Services.Data
 						int num = note2.TargetOctave - currentOctave;
 						int absSteps = Math.Abs(num);
 						Keys octaveKey = (Keys)((num > 0) ? 105 : 96);
-						int delay = ((absSteps > 1) ? 100 : 10);
+						int delay = ((absSteps > 1) ? 150 : 50);
 						for (int i = 0; i < absSteps; i++)
 						{
 							commands.Add(SongCommand.KeyDownCmd(octaveKey));
@@ -98,6 +98,59 @@ namespace Maestro.Services.Data
 				}
 			}
 			return commands;
+		}
+
+		public static SeekData ComputeSeekData(List<SongCommand> commands)
+		{
+			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0042: Invalid comparison between Unknown and I4
+			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005b: Invalid comparison between Unknown and I4
+			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007c: Invalid comparison between Unknown and I4
+			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0087: Invalid comparison between Unknown and I4
+			int count = commands.Count;
+			long[] cumulativeTimeMs = new long[count];
+			int[] octaveAtCommand = new int[count];
+			long elapsed = 0L;
+			int octave = 0;
+			bool lastKeyUpWasOctave = false;
+			for (int i = 0; i < count; i++)
+			{
+				SongCommand cmd = commands[i];
+				if (cmd.Type == CommandType.KeyDown)
+				{
+					if ((int)cmd.Key == 105)
+					{
+						octave = Math.Min(octave + 1, 1);
+					}
+					else if ((int)cmd.Key == 96)
+					{
+						octave = Math.Max(octave - 1, -1);
+					}
+				}
+				if (cmd.Type == CommandType.KeyUp)
+				{
+					lastKeyUpWasOctave = (int)cmd.Key == 105 || (int)cmd.Key == 96;
+				}
+				cumulativeTimeMs[i] = elapsed;
+				octaveAtCommand[i] = octave;
+				if (cmd.Type == CommandType.Wait)
+				{
+					if (!lastKeyUpWasOctave)
+					{
+						elapsed += cmd.Duration;
+					}
+					lastKeyUpWasOctave = false;
+				}
+			}
+			return new SeekData
+			{
+				CumulativeTimeMs = cumulativeTimeMs,
+				OctaveAtCommand = octaveAtCommand,
+				TotalDurationMs = elapsed
+			};
 		}
 
 		private static List<ParsedNote> ParseNotesFromLine(string line)

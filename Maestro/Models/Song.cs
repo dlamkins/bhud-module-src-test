@@ -33,6 +33,8 @@ namespace Maestro.Models
 
 		public bool IsSubmittal { get; set; }
 
+		public SeekData SeekData { get; set; }
+
 		public bool IsCommunityDownloaded
 		{
 			get

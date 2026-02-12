@@ -180,7 +180,7 @@ namespace Maestro.UI.MaestroCreator
 			for (int i = 0; i < 5; i++)
 			{
 				keyboardService.PlayOctaveChange(up: false);
-				Thread.Sleep(100);
+				Thread.Sleep(150);
 			}
 		}
 

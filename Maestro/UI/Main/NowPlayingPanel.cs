@@ -13,7 +13,7 @@ namespace Maestro.UI.Main
 	{
 		public static class Layout
 		{
-			public const int Height = 105;
+			public const int Height = 130;
 
 			public const int ButtonY = 18;
 
@@ -47,6 +47,18 @@ namespace Maestro.UI.Main
 
 			public const int SpeedValueX = 248;
 
+			public const int SeekElapsedX = 8;
+
+			public const int SeekLabelY = 87;
+
+			public const int SeekSliderX = 42;
+
+			public const int SeekSliderY = 90;
+
+			public const int SeekSliderWidth = 200;
+
+			public const int SeekTotalX = 248;
+
 			public const int QueueButtonWidth = 30;
 
 			public const int QueueButtonRightPadding = 8;
@@ -72,6 +84,12 @@ namespace Maestro.UI.Main
 
 		private readonly Label _speedValueLabel;
 
+		private readonly Label _elapsedLabel;
+
+		private readonly TrackBar _seekSlider;
+
+		private readonly Label _totalLabel;
+
 		private readonly StandardButton _queueButton;
 
 		private bool _isPlayingFromQueue;
@@ -79,6 +97,8 @@ namespace Maestro.UI.Main
 		private Song _pendingSong;
 
 		private InstrumentType? _currentInstrument;
+
+		private bool _wasPlayingBeforeSeek;
 
 		public event EventHandler StopRequested;
 
@@ -89,11 +109,11 @@ namespace Maestro.UI.Main
 		public NowPlayingPanel(SongPlayer songPlayer, int width)
 			: this()
 		{
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
 			_songPlayer = songPlayer;
-			((Control)this).set_Size(new Point(width, 105));
+			((Control)this).set_Size(new Point(width, 130));
 			((Control)this).set_BackgroundColor(MaestroTheme.WithAlpha(MaestroTheme.SlateGray, 150));
 			((Panel)this).set_ShowBorder(true);
 			_pauseButton = CreatePauseButton();
@@ -104,6 +124,9 @@ namespace Maestro.UI.Main
 			_speedLabel = CreateSpeedLabel();
 			_speedSlider = CreateSpeedSlider();
 			_speedValueLabel = CreateSpeedValueLabel();
+			_elapsedLabel = CreateElapsedLabel();
+			_seekSlider = CreateSeekSlider();
+			_totalLabel = CreateTotalLabel();
 			_queueButton = CreateQueueButton(width);
 			SubscribeToEvents();
 		}
@@ -150,6 +173,10 @@ namespace Maestro.UI.Main
 			if (_songPlayer.IsPlaying && !_songPlayer.IsPaused)
 			{
 				UpdateLiveProgress();
+			}
+			if (_songPlayer.IsPlaying && !_seekSlider.get_Dragging())
+			{
+				UpdateSeekSlider();
 			}
 		}
 
@@ -330,6 +357,79 @@ namespace Maestro.UI.Main
 			return val;
 		}
 
+		private Label CreateElapsedLabel()
+		{
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Expected O, but got Unknown
+			Label val = new Label();
+			((Control)val).set_Parent((Container)(object)this);
+			val.set_Text("0:00");
+			((Control)val).set_Location(new Point(8, 87));
+			val.set_AutoSizeWidth(true);
+			val.set_Font(GameService.Content.get_DefaultFont12());
+			val.set_TextColor(MaestroTheme.MutedCream);
+			return val;
+		}
+
+		private TrackBar CreateSeekSlider()
+		{
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007a: Expected O, but got Unknown
+			TrackBar val = new TrackBar();
+			((Control)val).set_Parent((Container)(object)this);
+			((Control)val).set_Location(new Point(42, 90));
+			((Control)val).set_Width(200);
+			val.set_MinValue(0f);
+			val.set_MaxValue(1000f);
+			val.set_Value(0f);
+			val.set_SmallStep(true);
+			((Control)val).set_Enabled(false);
+			val.add_IsDraggingChanged((EventHandler<ValueEventArgs<bool>>)OnSeekDraggingChanged);
+			val.add_ValueChanged((EventHandler<ValueEventArgs<float>>)OnSeekValueChanged);
+			return val;
+		}
+
+		private Label CreateTotalLabel()
+		{
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004c: Expected O, but got Unknown
+			Label val = new Label();
+			((Control)val).set_Parent((Container)(object)this);
+			val.set_Text("0:00");
+			((Control)val).set_Location(new Point(248, 87));
+			val.set_AutoSizeWidth(true);
+			val.set_Font(GameService.Content.get_DefaultFont12());
+			val.set_TextColor(MaestroTheme.MutedCream);
+			return val;
+		}
+
 		private StandardButton CreateQueueButton(int panelWidth)
 		{
 			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
@@ -400,6 +500,39 @@ namespace Maestro.UI.Main
 			_speedValueLabel.set_Text($"{speed:F1}x");
 		}
 
+		private void OnSeekDraggingChanged(object sender, ValueEventArgs<bool> e)
+		{
+			if (e.get_Value())
+			{
+				_wasPlayingBeforeSeek = _songPlayer.IsPlaying && !_songPlayer.IsPaused;
+				if (_wasPlayingBeforeSeek)
+				{
+					_songPlayer.Pause();
+				}
+			}
+			else
+			{
+				_songPlayer.SeekTo(_seekSlider.get_Value() / 1000f);
+				if (_wasPlayingBeforeSeek)
+				{
+					_songPlayer.Resume();
+				}
+			}
+		}
+
+		private void OnSeekValueChanged(object sender, ValueEventArgs<float> e)
+		{
+			if (_seekSlider.get_Dragging())
+			{
+				Song song = _songPlayer.CurrentSong;
+				if (song?.SeekData != null)
+				{
+					long targetMs = (long)(e.get_Value() / 1000f * (float)song.SeekData.TotalDurationMs);
+					_elapsedLabel.set_Text(FormatTime(targetMs));
+				}
+			}
+		}
+
 		private void UpdatePlayingState()
 		{
 			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
@@ -417,6 +550,11 @@ namespace Maestro.UI.Main
 			}
 			((Control)_pauseButton).set_Enabled(true);
 			((Control)_stopButton).set_Enabled(true);
+			((Control)_seekSlider).set_Enabled(true);
+			if (song?.SeekData != null)
+			{
+				_totalLabel.set_Text(FormatTime(song.SeekData.TotalDurationMs));
+			}
 		}
 
 		private void UpdatePausedState()
@@ -485,6 +623,10 @@ namespace Maestro.UI.Main
 			_pauseButton.set_Text("||");
 			((Control)_pauseButton).set_Enabled(false);
 			((Control)_stopButton).set_Enabled(false);
+			((Control)_seekSlider).set_Enabled(false);
+			_seekSlider.set_Value(0f);
+			_elapsedLabel.set_Text("0:00");
+			_totalLabel.set_Text("0:00");
 		}
 
 		private void ShowPendingState()
@@ -501,6 +643,7 @@ namespace Maestro.UI.Main
 			_pauseButton.set_Text(">");
 			((Control)_pauseButton).set_Enabled(true);
 			((Control)_stopButton).set_Enabled(false);
+			((Control)_seekSlider).set_Enabled(false);
 		}
 
 		private void UpdateLiveProgress()
@@ -528,6 +671,27 @@ namespace Maestro.UI.Main
 			}
 		}
 
+		private void UpdateSeekSlider()
+		{
+			Song song = _songPlayer.CurrentSong;
+			if (song?.SeekData != null)
+			{
+				SeekData seekData = song.SeekData;
+				int index = _songPlayer.CurrentCommandIndex;
+				if (index >= seekData.CumulativeTimeMs.Length)
+				{
+					index = seekData.CumulativeTimeMs.Length - 1;
+				}
+				if (index >= 0)
+				{
+					long elapsedMs = seekData.CumulativeTimeMs[index];
+					float progress = ((seekData.TotalDurationMs > 0) ? ((float)elapsedMs / (float)seekData.TotalDurationMs * 1000f) : 0f);
+					_seekSlider.set_Value(progress);
+					_elapsedLabel.set_Text(FormatTime(elapsedMs));
+				}
+			}
+		}
+
 		private string GetQueueSuffix()
 		{
 			if (!_isPlayingFromQueue)
@@ -544,6 +708,16 @@ namespace Maestro.UI.Main
 				return 0f;
 			}
 			return (float)_songPlayer.CurrentCommandIndex / (float)song.Commands.Count * 100f;
+		}
+
+		private static string FormatTime(long ms)
+		{
+			TimeSpan span = TimeSpan.FromMilliseconds(Math.Max(0L, ms));
+			if (!(span.TotalHours >= 1.0))
+			{
+				return span.ToString("m\\:ss");
+			}
+			return span.ToString("h\\:mm\\:ss");
 		}
 
 		private static void ClearTextInputFocus()
@@ -606,6 +780,21 @@ namespace Maestro.UI.Main
 			if (speedValueLabel != null)
 			{
 				((Control)speedValueLabel).Dispose();
+			}
+			Label elapsedLabel = _elapsedLabel;
+			if (elapsedLabel != null)
+			{
+				((Control)elapsedLabel).Dispose();
+			}
+			TrackBar seekSlider = _seekSlider;
+			if (seekSlider != null)
+			{
+				((Control)seekSlider).Dispose();
+			}
+			Label totalLabel = _totalLabel;
+			if (totalLabel != null)
+			{
+				((Control)totalLabel).Dispose();
 			}
 			StandardButton queueButton = _queueButton;
 			if (queueButton != null)
