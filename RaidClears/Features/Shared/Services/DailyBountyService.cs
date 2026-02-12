@@ -13,27 +13,26 @@ namespace RaidClears.Features.Shared.Services
 		{
 			DailyBountyData bountyData = Service.DailyBountyData;
 			RaidData raidData = Service.RaidData;
-			StrikeData strikeData = Service.StrikeData;
 			if (bountyData == null || !bountyData.Enabled)
 			{
 				return Enumerable.Empty<Encounter>();
 			}
-			return GetDayOfYearBounties(PriorityRotationService.DayOfYearIndex(), bountyData, raidData, strikeData);
+			return GetDayOfYearBounties(PriorityRotationService.DayOfYearIndex(), bountyData, raidData);
 		}
 
 		public static IEnumerable<Encounter> GetTomorrowBounties()
 		{
 			DailyBountyData bountyData = Service.DailyBountyData;
 			RaidData raidData = Service.RaidData;
-			StrikeData strikeData = Service.StrikeData;
+			_ = Service.StrikeData;
 			if (bountyData == null || !bountyData.Enabled)
 			{
 				return Enumerable.Empty<Encounter>();
 			}
-			return GetDayOfYearBounties(PriorityRotationService.DayOfYearIndex() + 1, bountyData, raidData, strikeData);
+			return GetDayOfYearBounties(PriorityRotationService.DayOfYearIndex() + 1, bountyData, raidData, "tomorrow_");
 		}
 
-		private static IEnumerable<Encounter> GetDayOfYearBounties(int dayIndex, DailyBountyData bountyData, RaidData raidData, StrikeData strikeData)
+		private static IEnumerable<Encounter> GetDayOfYearBounties(int dayIndex, DailyBountyData bountyData, RaidData raidData, string prefix = "priority_")
 		{
 			if (bountyData.BossSlots != null && bountyData.BossSlots.Count > 0)
 			{
@@ -58,17 +57,17 @@ namespace RaidClears.Features.Shared.Services
 						}
 					}
 				}
-				return ResolveBountyEncounters(references, raidData, strikeData);
+				return ResolveBountyEncounters(references, raidData, prefix);
 			}
 			int legacyIndex = (dayIndex + bountyData.Offset) % bountyData.Modulo;
 			if (legacyIndex < bountyData.Rotation.Count)
 			{
-				return ResolveBountyEncounters(bountyData.Rotation[legacyIndex], raidData, strikeData);
+				return ResolveBountyEncounters(bountyData.Rotation[legacyIndex], raidData, prefix);
 			}
 			return Enumerable.Empty<Encounter>();
 		}
 
-		private static IEnumerable<Encounter> ResolveBountyEncounters(List<BountyEncounterReference> references, RaidData raidData, StrikeData strikeData)
+		private static IEnumerable<Encounter> ResolveBountyEncounters(List<BountyEncounterReference> references, RaidData raidData, string prefix = "priority_")
 		{
 			List<Encounter> encounters = new List<Encounter>();
 			foreach (BountyEncounterReference reference in references)
@@ -76,6 +75,8 @@ namespace RaidClears.Features.Shared.Services
 				RaidEncounter raidEncounter = raidData.GetRaidEncounterByApiId(reference.EncounterId);
 				if (raidEncounter != null)
 				{
+					raidEncounter.Id = prefix + raidEncounter.Id;
+					raidEncounter.ApiId = prefix + raidEncounter.ApiId;
 					Encounter encounter = new Encounter(raidEncounter);
 					encounters.Add(encounter);
 				}
