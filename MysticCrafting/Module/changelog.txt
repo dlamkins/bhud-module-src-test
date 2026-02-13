@@ -1,4 +1,7 @@
-﻿#1.5.7 Bug fixes
+﻿#1.5.8 Data update to add all the new items
+- Sorry for the long wait everyone! <3 Atzie
+
+#1.5.7 Bug fixes
 - Fixed an issue with Rift Essence currencies displaying as items
 - Fixed an issue with pricing not updating when changing sources
 - Fixed an issue with Curious Mursaat Remnants
