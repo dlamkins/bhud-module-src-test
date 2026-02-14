@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using DecorBlishhudModule.Homestead;
@@ -16,117 +17,121 @@ namespace DecorBlishhudModule
 
 		public static async Task<Dictionary<string, List<Decoration>>> FetchDecorationsAsync()
 		{
-			DecorModule.DecorModuleInstance.Client.get_DefaultRequestHeaders().get_UserAgent().ParseAdd("Mozilla/5.0");
 			Dictionary<string, List<Decoration>> decorationsByCategory = new Dictionary<string, List<Decoration>>();
-			KeyValuePair<string, List<Decoration>>[] array = await Task.WhenAll(HomesteadCategories.GetCategories().Select(async delegate(string category)
+			List<string> categories = HomesteadCategories.GetCategories();
+			foreach (string category in categories)
 			{
 				string formattedCategoryName = category.Replace(" ", "_");
-				return new KeyValuePair<string, List<Decoration>>(category, await FetchDecorationsForCategoryAsync("https://wiki.guildwars2.com/api.php?action=parse&page=Decoration/Homestead/" + formattedCategoryName + "&format=json&prop=text"));
-			}).ToList());
-			for (int i = 0; i < array.Length; i++)
-			{
-				KeyValuePair<string, List<Decoration>> result = array[i];
-				decorationsByCategory[result.Key] = result.Value;
+				decorationsByCategory[category] = await FetchDecorationsForCategoryAsync("https://wiki.guildwars2.com/api.php?action=parse&page=Decoration/Homestead/" + formattedCategoryName + "&prop=text&format=json&origin=*");
+				await Task.Delay(300);
 			}
 			return decorationsByCategory;
 		}
 
-		private static async Task<List<Decoration>> FetchDecorationsForCategoryAsync(string baseUrl)
+		private static async Task<List<Decoration>> FetchDecorationsForCategoryAsync(string url)
 		{
 			List<Decoration> decorations = new List<Decoration>();
-			string combinedHtmlContent = string.Empty;
-			JToken obj = JObject.Parse(await DecorModule.DecorModuleInstance.Client.GetStringAsync(baseUrl)).get_Item("parse");
-			object obj2;
-			if (obj == null)
+			HttpRequestMessage request = new HttpRequestMessage(HttpMethod.get_Get(), url);
+			try
 			{
-				obj2 = null;
-			}
-			else
-			{
-				JToken obj3 = obj.get_Item((object)"text");
-				obj2 = ((obj3 == null) ? null : ((object)obj3.get_Item((object)"*"))?.ToString());
-			}
-			string htmlContent = (string)obj2;
-			if (!string.IsNullOrEmpty(htmlContent))
-			{
-				combinedHtmlContent += htmlContent;
-			}
-			HtmlDocument doc = new HtmlDocument();
-			doc.LoadHtml(combinedHtmlContent);
-			HtmlNode listNode = doc.DocumentNode.SelectSingleNode("ancestor::h2/following-sibling::div[@class='smw-ul-columns'] | //div[contains(@class, 'smw-ul-columns')]");
-			if (listNode != null)
-			{
-				foreach (HtmlNode item in (IEnumerable<HtmlNode>)listNode.SelectNodes(".//li[@class='smw-row']"))
+				request.get_Headers().get_Accept().ParseAdd("application/json");
+				HttpResponseMessage response = await DecorModule.DecorModuleInstance.Client.SendAsync(request);
+				try
 				{
-					Decoration decoration = new Decoration();
-					string nameNode = item.InnerText;
-					if (nameNode != null)
+					response.EnsureSuccessStatusCode();
+					JToken obj = JObject.Parse(await response.get_Content().ReadAsStringAsync()).get_Item("parse");
+					object obj2;
+					if (obj == null)
 					{
-						decoration.Name = nameNode.Trim().Replace("\u00a0", " ").Replace("&nbsp;", "")
-							.Trim();
-					}
-					HtmlNode iconNode = item.SelectSingleNode(".//img");
-					if (iconNode != null)
-					{
-						decoration.IconUrl = "https://wiki.guildwars2.com" + iconNode.GetAttributeValue("src", "").Trim();
+						obj2 = null;
 					}
 					else
 					{
-						decoration.IconUrl = "https://wiki.guildwars2.com/images/7/74/Skill.png";
-						string[] nameParts = nameNode?.Split(new string[1] { ".png" }, StringSplitOptions.None);
-						if (nameParts != null && nameParts.Length > 1)
+						JToken obj3 = obj.get_Item((object)"text");
+						obj2 = ((obj3 == null) ? null : ((object)obj3.get_Item((object)"*"))?.ToString());
+					}
+					string htmlContent = (string)obj2;
+					if (string.IsNullOrWhiteSpace(htmlContent))
+					{
+						return decorations;
+					}
+					HtmlDocument doc = new HtmlDocument();
+					doc.LoadHtml(htmlContent);
+					HtmlNode listNode = doc.DocumentNode.SelectSingleNode("//div[contains(@class,'smw-ul-columns')]");
+					if (listNode != null)
+					{
+						HtmlNodeCollection listItems = listNode.SelectNodes(".//li[contains(@class,'smw-row')]");
+						if (listItems != null)
 						{
-							decoration.Name = nameParts[1].Trim();
-						}
-					}
-					decorations.Add(decoration);
-				}
-			}
-			HtmlNode galleryNode = doc.DocumentNode.SelectSingleNode("//div[contains(@class, 'srf-gallery')]");
-			if (galleryNode != null)
-			{
-				foreach (HtmlNode item2 in (IEnumerable<HtmlNode>)galleryNode.SelectNodes(".//li[@class='gallerybox']"))
-				{
-					string galleryName = item2.SelectSingleNode(".//div[@class='gallerytext']//a")?.InnerText.Trim();
-					HtmlNode imgNode = item2.SelectSingleNode(".//img");
-					string imageUrl = ((imgNode != null) ? ("https://wiki.guildwars2.com" + imgNode.GetAttributeValue("src", "").Trim()) : null);
-					if (imageUrl != null)
-					{
-						imageUrl = imageUrl.Replace("/images/thumb/", "/images/");
-						imageUrl = Regex.Replace(imageUrl, "/\\d+px-[^/]+$", "");
-					}
-					Decoration matchedDecoration2 = decorations.FirstOrDefault((Decoration d) => d.Name.Trim().Equals(galleryName?.Trim(), StringComparison.OrdinalIgnoreCase));
-					if (matchedDecoration2 != null && imageUrl != null)
-					{
-						matchedDecoration2.ImageUrl = imageUrl;
-					}
-				}
-			}
-			HtmlNodeCollection recipesNode = doc.DocumentNode.SelectNodes("//table[@class='recipe sortable table']//tr[position()>1]");
-			if (recipesNode != null)
-			{
-				foreach (HtmlNode item3 in (IEnumerable<HtmlNode>)recipesNode)
-				{
-					HtmlNodeCollection cells = item3.SelectNodes("td");
-					if (cells != null && cells.Count >= 5)
-					{
-						string recipeName = cells[0].InnerText.Trim().Split(new string[1] { "  " }, StringSplitOptions.None)[0];
-						Decoration matchedDecoration = decorations.FirstOrDefault((Decoration d) => d.Name.Trim().Equals(recipeName, StringComparison.OrdinalIgnoreCase));
-						if (matchedDecoration != null)
-						{
-							matchedDecoration.Book = ((cells[0].InnerText.Trim().Split(new string[1] { "  " }, StringSplitOptions.None).Length <= 1) ? null : cells[0].InnerText.Trim().Split(new string[1] { "  " }, StringSplitOptions.None).ElementAtOrDefault(1)?.Replace("(Learned from: ", "").Replace(")", "").Trim());
-							matchedDecoration.CraftingRating = cells[3]?.InnerText.Trim();
-							HtmlNode ingredientsNode = cells[4].SelectSingleNode(".//dl");
-							if (ingredientsNode != null)
+							foreach (HtmlNode item in (IEnumerable<HtmlNode>)listItems)
 							{
-								ParseIngredients(ingredientsNode, matchedDecoration);
+								Decoration decoration = new Decoration();
+								decoration.Name = item.InnerText.Replace("\u00a0", " ").Replace("&nbsp;", "").Trim();
+								HtmlNode iconNode = item.SelectSingleNode(".//img");
+								decoration.IconUrl = ((iconNode != null) ? ("https://wiki.guildwars2.com" + iconNode.GetAttributeValue("src", "").Trim()) : "https://wiki.guildwars2.com/images/7/74/Skill.png");
+								decorations.Add(decoration);
 							}
 						}
 					}
+					HtmlNode galleryNode = doc.DocumentNode.SelectSingleNode("//div[contains(@class,'srf-gallery')]");
+					if (galleryNode != null)
+					{
+						HtmlNodeCollection galleryItems = galleryNode.SelectNodes(".//li[contains(@class,'gallerybox')]");
+						if (galleryItems != null)
+						{
+							foreach (HtmlNode item2 in (IEnumerable<HtmlNode>)galleryItems)
+							{
+								HtmlNode nameNode = item2.SelectSingleNode(".//div[@class='gallerytext']//a");
+								HtmlNode imgNode = item2.SelectSingleNode(".//img");
+								if (nameNode != null && imgNode != null)
+								{
+									string galleryName = nameNode.InnerText.Trim();
+									string imageUrl = "https://wiki.guildwars2.com" + imgNode.GetAttributeValue("src", "").Replace("/images/thumb/", "/images/");
+									imageUrl = Regex.Replace(imageUrl, "/\\d+px-[^/]+$", "");
+									Decoration matchedDecoration2 = decorations.FirstOrDefault((Decoration d) => d.Name.Equals(galleryName, StringComparison.OrdinalIgnoreCase));
+									if (matchedDecoration2 != null)
+									{
+										matchedDecoration2.ImageUrl = imageUrl;
+									}
+								}
+							}
+						}
+					}
+					HtmlNodeCollection recipesNode = doc.DocumentNode.SelectNodes("//table[contains(@class,'recipe')]//tr[position()>1]");
+					if (recipesNode != null)
+					{
+						foreach (HtmlNode item3 in (IEnumerable<HtmlNode>)recipesNode)
+						{
+							HtmlNodeCollection cells = item3.SelectNodes("td");
+							if (cells == null || cells.Count < 5)
+							{
+								continue;
+							}
+							string recipeName = cells[0].InnerText.Split(new string[1] { "  " }, StringSplitOptions.None)[0].Trim();
+							Decoration matchedDecoration = decorations.FirstOrDefault((Decoration d) => d.Name.Equals(recipeName, StringComparison.OrdinalIgnoreCase));
+							if (matchedDecoration != null)
+							{
+								matchedDecoration.Book = ((cells[0].InnerText.Split(new string[1] { "  " }, StringSplitOptions.None).Length > 1) ? cells[0].InnerText.Split(new string[1] { "  " }, StringSplitOptions.None)[1].Replace("(Learned from: ", "").Replace(")", "").Trim() : null);
+								matchedDecoration.CraftingRating = cells[3]?.InnerText.Trim();
+								HtmlNode ingredientsNode = cells[4].SelectSingleNode(".//dl");
+								if (ingredientsNode != null)
+								{
+									ParseIngredients(ingredientsNode, matchedDecoration);
+								}
+							}
+						}
+					}
+					return decorations;
 				}
-				return decorations;
+				finally
+				{
+					((IDisposable)response)?.Dispose();
+				}
 			}
-			return decorations;
+			finally
+			{
+				((IDisposable)request)?.Dispose();
+			}
 		}
 
 		private static void ParseIngredients(HtmlNode ingredientsNode, Decoration decoration)

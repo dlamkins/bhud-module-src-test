@@ -40,7 +40,7 @@ namespace DecorBlishhudModule.CustomControls.CustomTab
 			{
 				customTab.OrderPriority = _customTabs.Count;
 			}
-			_customTabs = new List<CustomTab>(from t in _customTabs.Concat(new _003C_003Ez__ReadOnlyArray<CustomTab>(new CustomTab[1] { customTab }))
+			_customTabs = new List<CustomTab>(from t in _customTabs.Concat(new _003C_003Ez__ReadOnlySingleElementList<CustomTab>(customTab))
 				orderby t.OrderPriority descending
 				select t);
 			if (_customTabs.Count == 1)

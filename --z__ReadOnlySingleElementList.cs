@@ -3,12 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
-internal sealed class _003C_003Ez__ReadOnlyArray<T> : IEnumerable, ICollection, IList, IEnumerable<T>, IReadOnlyCollection<T>, IReadOnlyList<T>, ICollection<T>, IList<T>
+[CompilerGenerated]
+internal sealed class _003C_003Ez__ReadOnlySingleElementList<T> : IEnumerable, ICollection, IList, IEnumerable<T>, IReadOnlyCollection<T>, IReadOnlyList<T>, ICollection<T>, IList<T>
 {
 	[CompilerGenerated]
-	private readonly T[] _items;
+	private readonly T _item;
 
-	int ICollection.Count => _items.Length;
+	int ICollection.Count => 1;
 
 	bool ICollection.IsSynchronized => false;
 
@@ -18,7 +19,11 @@ internal sealed class _003C_003Ez__ReadOnlyArray<T> : IEnumerable, ICollection, 
 	{
 		get
 		{
-			return _items[index];
+			if (index != 0)
+			{
+				throw new IndexOutOfRangeException();
+			}
+			return _item;
 		}
 		set
 		{
@@ -30,11 +35,21 @@ internal sealed class _003C_003Ez__ReadOnlyArray<T> : IEnumerable, ICollection, 
 
 	bool IList.IsReadOnly => true;
 
-	int IReadOnlyCollection<T>.Count => _items.Length;
+	int IReadOnlyCollection<T>.Count => 1;
 
-	T IReadOnlyList<T>.this[int index] => _items[index];
+	T IReadOnlyList<T>.this[int index]
+	{
+		get
+		{
+			if (index != 0)
+			{
+				throw new IndexOutOfRangeException();
+			}
+			return _item;
+		}
+	}
 
-	int ICollection<T>.Count => _items.Length;
+	int ICollection<T>.Count => 1;
 
 	bool ICollection<T>.IsReadOnly => true;
 
@@ -42,7 +57,11 @@ internal sealed class _003C_003Ez__ReadOnlyArray<T> : IEnumerable, ICollection, 
 	{
 		get
 		{
-			return _items[index];
+			if (index != 0)
+			{
+				throw new IndexOutOfRangeException();
+			}
+			return _item;
 		}
 		set
 		{
@@ -50,19 +69,19 @@ internal sealed class _003C_003Ez__ReadOnlyArray<T> : IEnumerable, ICollection, 
 		}
 	}
 
-	public _003C_003Ez__ReadOnlyArray(T[] items)
+	public _003C_003Ez__ReadOnlySingleElementList(T item)
 	{
-		_items = items;
+		_item = item;
 	}
 
 	IEnumerator IEnumerable.GetEnumerator()
 	{
-		return ((IEnumerable)_items).GetEnumerator();
+		return new Enumerator(_item);
 	}
 
 	void ICollection.CopyTo(Array array, int index)
 	{
-		((ICollection)_items).CopyTo(array, index);
+		array.SetValue(_item, index);
 	}
 
 	int IList.Add(object value)
@@ -77,12 +96,16 @@ internal sealed class _003C_003Ez__ReadOnlyArray<T> : IEnumerable, ICollection, 
 
 	bool IList.Contains(object value)
 	{
-		return ((IList)_items).Contains(value);
+		return EqualityComparer<T>.Default.Equals(_item, (T)value);
 	}
 
 	int IList.IndexOf(object value)
 	{
-		return ((IList)_items).IndexOf(value);
+		if (!EqualityComparer<T>.Default.Equals(_item, (T)value))
+		{
+			return -1;
+		}
+		return 0;
 	}
 
 	void IList.Insert(int index, object value)
@@ -102,7 +125,7 @@ internal sealed class _003C_003Ez__ReadOnlyArray<T> : IEnumerable, ICollection, 
 
 	IEnumerator<T> IEnumerable<T>.GetEnumerator()
 	{
-		return ((IEnumerable<T>)_items).GetEnumerator();
+		return new Enumerator(_item);
 	}
 
 	void ICollection<T>.Add(T item)
@@ -117,12 +140,12 @@ internal sealed class _003C_003Ez__ReadOnlyArray<T> : IEnumerable, ICollection, 
 
 	bool ICollection<T>.Contains(T item)
 	{
-		return ((ICollection<T>)_items).Contains(item);
+		return EqualityComparer<T>.Default.Equals(_item, item);
 	}
 
 	void ICollection<T>.CopyTo(T[] array, int arrayIndex)
 	{
-		((ICollection<T>)_items).CopyTo(array, arrayIndex);
+		array[arrayIndex] = _item;
 	}
 
 	bool ICollection<T>.Remove(T item)
@@ -132,7 +155,11 @@ internal sealed class _003C_003Ez__ReadOnlyArray<T> : IEnumerable, ICollection, 
 
 	int IList<T>.IndexOf(T item)
 	{
-		return ((IList<T>)_items).IndexOf(item);
+		if (!EqualityComparer<T>.Default.Equals(_item, item))
+		{
+			return -1;
+		}
+		return 0;
 	}
 
 	void IList<T>.Insert(int index, T item)

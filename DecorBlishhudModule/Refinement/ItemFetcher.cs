@@ -18,9 +18,9 @@ namespace DecorBlishhudModule.Refinement
 		{
 			string url = type switch
 			{
-				"farm" => "https://wiki.guildwars2.com/api.php?action=parse&page=Homestead_Refinement%E2%80%94Farm&format=json&prop=text&section=6", 
-				"lumber" => "https://wiki.guildwars2.com/api.php?action=parse&page=Homestead_Refinement%E2%80%94Lumber_Mill&format=json&prop=text&section=6", 
-				"metal" => "https://wiki.guildwars2.com/api.php?action=parse&page=Homestead_Refinement%E2%80%94Metal_Forge&format=json&prop=text&section=6", 
+				"farm" => "https://wiki.guildwars2.com/api.php?action=parse&page=Homestead_Refinement%E2%80%94Farm&prop=text&section=6&format=json&origin=*", 
+				"lumber" => "https://wiki.guildwars2.com/api.php?action=parse&page=Homestead_Refinement%E2%80%94Lumber_Mill&prop=text&section=6&format=json&origin=*", 
+				"metal" => "https://wiki.guildwars2.com/api.php?action=parse&page=Homestead_Refinement%E2%80%94Metal_Forge&prop=text&section=6&format=json&origin=*", 
 				_ => null, 
 			};
 			if (string.IsNullOrWhiteSpace(url))
@@ -36,7 +36,7 @@ namespace DecorBlishhudModule.Refinement
 			string response;
 			try
 			{
-				response = (await RetryPolicyAsync(() => DecorModule.DecorModuleInstance.Client.GetStringAsync(url))) ?? string.Empty;
+				response = (await RetryPolicyAsync(() => SendWikiRequestAsync(url))) ?? string.Empty;
 			}
 			catch (HttpRequestException val)
 			{
@@ -92,13 +92,36 @@ namespace DecorBlishhudModule.Refinement
 						});
 					}
 				}
-				return await UpdateItemPrices(items).ContinueWith((Task<List<Item>> t) => (from i in t.Result
-					group i by i.Name).ToDictionary((IGrouping<string, Item> g) => g.Key, (IGrouping<string, Item> g) => g.ToList()));
+				return (from i in await UpdateItemPrices(items)
+					group i by i.Name).ToDictionary((IGrouping<string, Item> g) => g.Key, (IGrouping<string, Item> g) => g.ToList());
 			}
 			catch (Exception ex)
 			{
 				Logger.Error("Error parsing items for type '" + type + "': " + ex.Message);
 				return new Dictionary<string, List<Item>>();
+			}
+		}
+
+		private static async Task<string> SendWikiRequestAsync(string url)
+		{
+			HttpRequestMessage request = new HttpRequestMessage(HttpMethod.get_Get(), url);
+			try
+			{
+				request.get_Headers().get_Accept().ParseAdd("application/json");
+				HttpResponseMessage response = await DecorModule.DecorModuleInstance.Client.SendAsync(request);
+				try
+				{
+					response.EnsureSuccessStatusCode();
+					return await response.get_Content().ReadAsStringAsync();
+				}
+				finally
+				{
+					((IDisposable)response)?.Dispose();
+				}
+			}
+			finally
+			{
+				((IDisposable)request)?.Dispose();
 			}
 		}
 
@@ -109,15 +132,9 @@ namespace DecorBlishhudModule.Refinement
 				Logger.Warn("No items provided for price update.");
 				return new List<Item>();
 			}
-			if (DecorModule.DecorModuleInstance == null || DecorModule.DecorModuleInstance.Client == null)
-			{
-				Logger.Error("DecorModuleInstance or its HTTP client is not initialized.");
-				return items;
-			}
-			List<int> source = items.Select((Item i) => i.Id).Distinct().ToList();
+			List<int> itemIds = items.Select((Item i) => i.Id).Distinct().ToList();
 			int batchSize = 200;
-			IEnumerable<IEnumerable<int>> batches = source.Batch(batchSize) ?? new List<IEnumerable<int>>();
-			foreach (IEnumerable<int> batch in batches)
+			foreach (IEnumerable<int> batch in itemIds.Batch(batchSize))
 			{
 				string ids = string.Join(",", batch);
 				string priceApiUrl = "https://api.guildwars2.com/v2/commerce/prices?ids=" + ids;
@@ -126,7 +143,6 @@ namespace DecorBlishhudModule.Refinement
 					string priceResponse = await RetryPolicyAsync(() => DecorModule.DecorModuleInstance.Client.GetStringAsync(priceApiUrl));
 					if (string.IsNullOrWhiteSpace(priceResponse))
 					{
-						Logger.Error("Received an empty response from the price API for batch " + ids + ".");
 						continue;
 					}
 					List<ItemPrice> priceData = JsonSerializer.Deserialize<List<ItemPrice>>(priceResponse, new JsonSerializerOptions
@@ -147,18 +163,9 @@ namespace DecorBlishhudModule.Refinement
 						}
 					}
 				}
-				catch (HttpRequestException val)
-				{
-					HttpRequestException ex3 = val;
-					Logger.Error("HTTP request error while fetching prices for batch " + ids + ": " + ((Exception)(object)ex3).Message);
-				}
-				catch (JsonException ex2)
-				{
-					Logger.Error("JSON parsing error while processing price data for batch " + ids + ": " + ex2.Message);
-				}
 				catch (Exception ex)
 				{
-					Logger.Error("Unexpected error in UpdateItemPrices for batch " + ids + ": " + ex.Message);
+					Logger.Error("Error updating prices for batch " + ids + ": " + ex.Message);
 				}
 			}
 			return items;
@@ -168,7 +175,7 @@ namespace DecorBlishhudModule.Refinement
 		{
 			object obj2 = default(object);
 			int result = default(int);
-			HttpRequestException ex2 = default(HttpRequestException);
+			HttpRequestException ex = default(HttpRequestException);
 			for (int i = 0; i < retries; i++)
 			{
 				try
@@ -185,19 +192,14 @@ namespace DecorBlishhudModule.Refinement
 					}
 					else
 					{
-						ex2 = (HttpRequestException)obj2;
+						ex = (HttpRequestException)obj2;
 						result = ((i < retries - 1) ? 1 : 0);
 					}
 					return (byte)result != 0;
 				}).Invoke())
 				{
-					Logger.Warn("Retrying due to error: " + ((Exception)(object)ex2).Message);
+					Logger.Warn("Retrying due to error: " + ((Exception)(object)ex).Message);
 					await Task.Delay(1000);
-				}
-				catch (Exception ex)
-				{
-					Logger.Error("Unexpected error: " + ex.Message);
-					break;
 				}
 			}
 			throw new HttpRequestException("Failed after multiple retries.");
@@ -214,18 +216,17 @@ namespace DecorBlishhudModule.Refinement
 			bool hasDot = value.Contains(".");
 			if (hasComma && hasDot)
 			{
-				int lastComma = value.LastIndexOf(",");
-				value = ((value.LastIndexOf(".") <= lastComma) ? value.Replace(".", "").Replace(",", ".") : value.Replace(",", ""));
+				value = ((value.LastIndexOf(".") > value.LastIndexOf(",")) ? value.Replace(",", "") : value.Replace(".", "").Replace(",", "."));
 			}
 			else if (hasComma)
 			{
 				value = value.Replace(",", ".");
 			}
-			if (double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out var parsedValue))
+			if (!double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out var parsed))
 			{
-				return parsedValue;
+				return defaultValue;
 			}
-			return defaultValue;
+			return parsed;
 		}
 	}
 }

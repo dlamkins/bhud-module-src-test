@@ -1,29 +1,16 @@
-using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 public static class LinqExtensions
 {
+	[IteratorStateMachine(typeof(_003CBatch_003Ed__0<>))]
 	public static IEnumerable<IEnumerable<T>> Batch<T>(this IEnumerable<T> source, int size)
 	{
-		if (source == null)
+		return new _003CBatch_003Ed__0<T>(-2)
 		{
-			throw new ArgumentNullException("source");
-		}
-		if (size <= 0)
-		{
-			throw new ArgumentOutOfRangeException("size", "Size must be greater than 0.");
-		}
-		using IEnumerator<T> enumerator = source.GetEnumerator();
-		while (true)
-		{
-			IEnumerable<T> batch = GetBatch(enumerator, size);
-			if (batch != null)
-			{
-				yield return batch;
-				continue;
-			}
-			break;
-		}
+			_003C_003E3__source = source,
+			_003C_003E3__size = size
+		};
 	}
 
 	private static IEnumerable<T>? GetBatch<T>(IEnumerator<T> enumerator, int size)
