@@ -299,7 +299,6 @@ namespace CinemaModule.UI.Controls
 		public void Reset()
 		{
 			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
 			Tween fadeAnimation = _fadeAnimation;
 			if (fadeAnimation != null)
 			{
@@ -309,7 +308,6 @@ namespace CinemaModule.UI.Controls
 			((Control)this).set_Opacity(0f);
 			((Control)this).set_Visible(false);
 			((Control)this).set_Location(Point.get_Zero());
-			((Control)this).set_Size(Point.get_Zero());
 			_isHoveringPlayPause = false;
 			_isHoveringVolume = false;
 			_isHoveringSettings = false;
