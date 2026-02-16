@@ -1,0 +1,116 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="river_of_soulsTooltip"><value>River of Souls</value></data>
+  <data name="greerTooltip"><value>Greer, the Blightbringer</value></data>
+  <data name="kaineng_overlookLabel"><value>KO</value></data>
+  <data name="voice_in_the_voidTooltip"><value>Voice In The Void</value></data>
+  <data name="boneskinnerLabel"><value>BS</value></data>
+  <data name="qadimTooltip"><value>Qadim</value></data>
+  <data name="statues_of_grenthLabel"><value>Statues</value></data>
+  <data name="sabethaTooltip"><value>Sabetha</value></data>
+  <data name="cosmic_observatoryTooltip"><value>Cosmic Observatory</value></data>
+  <data name="cosmic_observatoryLabel"><value>CO</value></data>
+  <data name="river_of_soulsLabel"><value>River</value></data>
+  <data name="old_lion_courtLabel"><value>OLC</value></data>
+  <data name="sabirTooltip"><value>Cardinal Sabir</value></data>
+  <data name="spirit_woodsLabel"><value>Woods</value></data>
+  <data name="bandit_trioLabel"><value>Trio</value></data>
+  <data name="conjured_amalgamateTooltip"><value>Conjured Amalgamate</value></data>
+  <data name="matthiasTooltip"><value>Matthias</value></data>
+  <data name="keep_constructLabel"><value>KC</value></data>
+  <data name="boneskinnerTooltip"><value>Boneskinner</value></data>
+  <data name="voice_and_clawLabel"><value>Voices</value></data>
+  <data name="soulless_horrorTooltip"><value>Soulless Horror</value></data>
+  <data name="cairnTooltip"><value>Cairn</value></data>
+  <data name="gorsevalLabel"><value>Gorseval</value></data>
+  <data name="xunlai_jade_junkyardTooltip"><value>Xunlai Jade Junkyard</value></data>
+  <data name="adinaLabel"><value>Adina</value></data>
+  <data name="decimaTooltip"><value>Decima, the Stormsinger</value></data>
+  <data name="slothasorTooltip"><value>Slothasor</value></data>
+  <data name="qadim_the_peerlessLabel"><value>QTP</value></data>
+  <data name="old_lion_courtTooltip"><value>Old Lion's Court</value></data>
+  <data name="shiverpeaks_passLabel"><value>Shiverpeaks</value></data>
+  <data name="deimosTooltip"><value>Deimos</value></data>
+  <data name="whisper_of_jormagTooltip"><value>Whisper of Jormag</value></data>
+  <data name="soulless_horrorLabel"><value>SH</value></data>
+  <data name="gateLabel"><value>Gate</value></data>
+  <data name="uraTooltip"><value>Ura, the Steamshrieker</value></data>
+  <data name="qadim_the_peerlessTooltip"><value>Qadim the Peerless</value></data>
+  <data name="samarogLabel"><value>Samarog</value></data>
+  <data name="voice_in_the_voidLabel"><value>Dhuum</value></data>
+  <data name="whisper_of_jormagLabel"><value>Whisper</value></data>
+  <data name="fraenir_of_jormagLabel"><value>Fraenir</value></data>
+  <data name="decimaLabel"><value>Decima</value></data>
+  <data name="cairnLabel"><value>Cairn</value></data>
+  <data name="escortTooltip"><value>Escort</value></data>
+  <data name="harvest_templeTooltip"><value>Harvest Temple</value></data>
+  <data name="gorsevalTooltip"><value>Gorseval</value></data>
+  <data name="twin_largosTooltip"><value>Twin Largos</value></data>
+  <data name="aetherblade_hideoutTooltip"><value>Aetherblade Hideout</value></data>
+  <data name="aetherblade_hideoutLabel"><value>Aetherblade</value></data>
+  <data name="vale_guardianLabel"><value>VG</value></data>
+  <data name="gateTooltip"><value>Gate</value></data>
+  <data name="campLabel"><value>Camp</value></data>
+  <data name="mursaat_overseerTooltip"><value>Mursaat Overseer</value></data>
+  <data name="twisted_castleTooltip"><value>Twisted Castle</value></data>
+  <data name="fraenir_of_jormagTooltip"><value>Fraenir of Jormag</value></data>
+  <data name="vale_guardianTooltip"><value>Vale Guardian</value></data>
+  <data name="conjured_amalgamateLabel"><value>CA</value></data>
+  <data name="voice_and_clawTooltip"><value>Voice of the Fallen and Claw of the Fallen</value></data>
+  <data name="xeraTooltip"><value>Xera</value></data>
+  <data name="bandit_trioTooltip"><value>Bandit Trio</value></data>
+  <data name="matthiasLabel"><value>Matthias</value></data>
+  <data name="xeraLabel"><value>Xera</value></data>
+  <data name="xunlai_jade_junkyardLabel"><value>XJJ</value></data>
+  <data name="slothasorLabel"><value>Slothasor</value></data>
+  <data name="adinaTooltip"><value>Cardinal Adina</value></data>
+  <data name="temple_of_febeTooltip"><value>Temple of Febe</value></data>
+  <data name="samarogTooltip"><value>Samarog</value></data>
+  <data name="mursaat_overseerLabel"><value>MO</value></data>
+  <data name="shiverpeaks_passTooltip"><value>Shiverpeaks Pass</value></data>
+  <data name="kelaTooltip"><value>Kela</value></data>
+  <data name="twin_largosLabel"><value>TL</value></data>
+  <data name="harvest_templeLabel"><value>HT</value></data>
+  <data name="kaineng_overlookTooltip"><value>Kaineng Overlook</value></data>
+  <data name="deimosLabel"><value>Deimos</value></data>
+  <data name="campTooltip"><value>Ruined Camp</value></data>
+  <data name="qadimLabel"><value>Qadim</value></data>
+  <data name="sabethaLabel"><value>Sabetha</value></data>
+  <data name="twisted_castleLabel"><value>Castle</value></data>
+  <data name="sabirLabel"><value>Sabir</value></data>
+  <data name="temple_of_febeLabel"><value>Cerus</value></data>
+  <data name="greerLabel"><value>Greer</value></data>
+  <data name="escortLabel"><value>Escort</value></data>
+  <data name="spirit_woodsTooltip"><value>Spirit Woods</value></data>
+  <data name="uraLabel"><value>Ura</value></data>
+  <data name="keep_constructTooltip"><value>Keep Construct</value></data>
+  <data name="statues_of_grenthTooltip"><value>Statues Of Grenth</value></data>
+  <data name="kelaLabel"><value>Kela</value></data>
+  </root>
