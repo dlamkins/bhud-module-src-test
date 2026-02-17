@@ -1,12 +1,11 @@
 using System;
-using BhModule.WebPeeper.Window;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Microsoft.Xna.Framework;
 
 namespace BhModule.WebPeeper
 {
-	public class WindowContent : Panel
+	internal class WindowContent : Panel
 	{
 		private readonly NavigationBar _navigationBar;
 
@@ -75,19 +74,9 @@ namespace BhModule.WebPeeper
 
 		private void CreateMainContent()
 		{
-			if (Warning.Accepted)
-			{
-				_mainContent = (Control)(object)new WebPainter();
-			}
-			else
-			{
-				_mainContent = (Control)(object)new Warning(delegate
-				{
-					CreateMainContent();
-					ResetMainContentRect();
-				});
-			}
-			_mainContent.set_Parent((Container)(object)this);
+			WebPainter webPainter = new WebPainter();
+			((Control)webPainter).set_Parent((Container)(object)this);
+			_mainContent = (Control)(object)webPainter;
 			_mainContent.add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				if (((Control)_bookmarkPanel).get_Visible())

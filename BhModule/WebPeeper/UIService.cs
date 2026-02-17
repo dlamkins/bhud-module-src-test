@@ -9,7 +9,7 @@ using Blish_HUD.Input;
 
 namespace BhModule.WebPeeper
 {
-	public class UIService
+	internal class UiService
 	{
 		private CornerIcon _browserCornerIcon;
 

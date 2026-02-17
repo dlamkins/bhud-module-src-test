@@ -4,7 +4,7 @@ using Blish_HUD.Controls;
 
 namespace BhModule.WebPeeper
 {
-	public class BookmarkMenu : Menu
+	internal class BookmarkMenu : Menu
 	{
 		private static readonly FieldInfo _childPropertyChangedField = typeof(Control).GetField("PropertyChanged", BindingFlags.Instance | BindingFlags.NonPublic);
 

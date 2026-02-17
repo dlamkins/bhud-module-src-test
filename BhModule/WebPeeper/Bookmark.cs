@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 
 namespace BhModule.WebPeeper
 {
-	public class Bookmark
+	internal class Bookmark
 	{
 		[JsonProperty(/*Could not decode attribute arguments.*/)]
 		public string Name;

@@ -17,21 +17,15 @@
   <ItemGroup>
     <Reference Include="Blish HUD" />
     <Reference Include="MonoGame.Framework" />
-    <Reference Include="CefSharp.OffScreen">
-      <HintPath>..\..\working\CefSharp.OffScreen.dll</HintPath>
-    </Reference>
-    <Reference Include="CefSharp">
-      <HintPath>..\..\working\CefSharp.dll</HintPath>
-    </Reference>
+    <Reference Include="System.Core" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Text.Json" />
+    <Reference Include="CefHelper" />
     <Reference Include="Newtonsoft.Json" />
     <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="CefSharp.Core">
-      <HintPath>..\..\working\CefSharp.Core.dll</HintPath>
-    </Reference>
     <Reference Include="MonoGame.Extended" />
-    <Reference Include="System.Core" />
-    <Reference Include="CefHelper">
-      <HintPath>..\..\working\CefHelper.dll</HintPath>
-    </Reference>
+    <Reference Include="System.Buffers" />
+    <Reference Include="AsyncClipboardService" />
   </ItemGroup>
 </Project>

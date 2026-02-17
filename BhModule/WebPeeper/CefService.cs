@@ -1,69 +1,155 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Net.Http;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics;
 using CefHelper;
-using CefSharp;
-using CefSharp.DevTools;
-using CefSharp.OffScreen;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace BhModule.WebPeeper
 {
-	public class CefService
+	internal class CefService
 	{
-		private ChromiumWebBrowser _webBrowser;
-
-		private readonly InputMethod _inputMethod;
-
-		public string LastAddressInputText = "";
-
-		public static string CefSharpDllPath = DirectoryUtil.RegisterDirectory(DirectoryUtil.get_CachePath(), "cefsharp/");
-
-		public static string CefSettingFolder = DirectoryUtil.RegisterDirectory(WebPeeperModule.InstanceModuleManager.get_Manifest().get_Name().Replace(" ", "")
-			.ToLower());
-
-		private const string _mobileUserAgent = "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.114 Mobile Safari/537.36";
-
-		private const string _defaultUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.114 Safari/537.36";
-
-		private string OnContextCreatedScript;
-
-		private string _cefLocalesPath;
-
-		public ChromiumWebBrowser WebBrowser => _webBrowser;
-
-		public InputMethod InputMethod => _inputMethod;
-
-		public CefService()
+		private static readonly Dictionary<CefAvailableVersion, CefPkgVersion> _versions = new Dictionary<CefAvailableVersion, CefPkgVersion>
 		{
-			SetupCefDllPath();
-			SetupCefSharpDllFolder();
-			_inputMethod = new InputMethod();
-			((Game)WebPeeperModule.BlishHudInstance).add_Exiting((EventHandler<EventArgs>)OnBlishHudExiting);
-		}
+			{
+				CefAvailableVersion.v103,
+				new CefPkgVersion("103.0.90", "103.0.9")
+			},
+			{
+				CefAvailableVersion.v144,
+				new CefPkgVersion("144.0.120", "144.0.12")
+			}
+		};
+
+		private static string _cefFolder = Path.Combine(CefSharpVersionsFolder, $"{CurrentVersion}");
+
+		private static string _cefSharpFolder = Path.Combine(CefSharpVersionsFolder, $"{CurrentVersion}");
+
+		private static string _cefSharpBhmPath = Path.Combine("cef", $"{CurrentVersion}");
+
+		private static readonly Dictionary<string, AssemblyLoadType> _pendingResolveDlls = new Dictionary<string, AssemblyLoadType>();
+
+		private bool _eventHandlersBound;
+
+		private static readonly CefPkgVersion _suggestionVersion = _versions[CefAvailableVersion.v144];
+
+		public static readonly CefPkgVersion DefaultVersion = _versions[CefAvailableVersion.v103];
+
+		private static WebPeeperModule Module => WebPeeperModule.Instance;
+
+		private static ModuleSettings Settings => Module.Settings;
+
+		public static CefPkgVersion CurrentVersion { get; private set; } = _versions[Settings.CefVersion.get_Value()];
+
+
+		private static string CefSharpVersionsFolder => DirectoryUtil.RegisterDirectory(Module.DataFolder, "CefVersions");
+
+		private static string CefCacheFolder => DirectoryUtil.RegisterDirectory(Module.DataFolder, "CefCache");
+
+		public static bool LibLoadStarted { get; private set; } = false;
+
+
+		public static IReadOnlyDictionary<CefAvailableVersion, CefPkgVersion> Versions => _versions;
+
+		private static bool IsDefaultVersion => CurrentVersion == DefaultVersion;
+
+		public static bool Outdated => CurrentVersion < _suggestionVersion;
+
+		public static event EventHandler LibLoadStart;
 
 		public void Load()
 		{
-			LoadOnContextCreatedScript();
+			CleanOldData();
+			ExtractFiles();
+			Module.DownloadService.Download(CurrentVersion);
 		}
 
 		public void Unload()
 		{
+			CefService.LibLoadStart = null;
 			((Game)WebPeeperModule.BlishHudInstance).remove_Exiting((EventHandler<EventArgs>)OnBlishHudExiting);
-			AppDomain.CurrentDomain.AssemblyResolve -= CefSharpCoreRuntimeResolver;
-			_webBrowser?.Dispose();
-			_webBrowser = null;
-			_inputMethod.Dispose();
+			AppDomain.CurrentDomain.AssemblyResolve -= CefSharpLibResolver;
+			if (LibLoadStarted)
+			{
+				OnBlishHudExiting(this, EventArgs.Empty);
+			}
 		}
 
-		private void SetupCefDllPath()
+		public void ApplySettingVersion()
+		{
+			CefPkgVersion currentVersion = _versions[Settings.CefVersion.get_Value()];
+			if (!LibLoadStarted)
+			{
+				CurrentVersion = currentVersion;
+			}
+		}
+
+		public string GetCefSharpFolder(CefPkgVersion version)
+		{
+			return Path.Combine(CefSharpVersionsFolder, version.ToString());
+		}
+
+		private void CleanOldData()
+		{
+			WebPeeperModule.Logger.Debug("CefService.CleanOldData: cleaning WebPeeper old version data.");
+			try
+			{
+				string path = Path.Combine(DirectoryUtil.get_CachePath(), "cefsharp");
+				if (Directory.Exists(path))
+				{
+					Directory.Delete(path, recursive: true);
+				}
+			}
+			catch (Exception ex)
+			{
+				WebPeeperModule.Logger.Error(ex.Message);
+			}
+			try
+			{
+				string path2 = Path.Combine(Module.DataFolder, "CefUserData");
+				if (Directory.Exists(path2))
+				{
+					Directory.Delete(path2, recursive: true);
+				}
+			}
+			catch (Exception ex2)
+			{
+				WebPeeperModule.Logger.Error(ex2.Message);
+			}
+			try
+			{
+				CefPkgVersion version = _versions[Settings.CefErrorVersion.get_Value()];
+				Settings.CefErrorVersion.set_Value(CefAvailableVersion.v103);
+				Module.DownloadService.Delete(version);
+			}
+			catch (Exception ex3)
+			{
+				WebPeeperModule.Logger.Error(ex3.Message);
+			}
+		}
+
+		private void ClearCefCache()
+		{
+			try
+			{
+				Directory.Delete(CefCacheFolder, recursive: true);
+			}
+			catch
+			{
+			}
+		}
+
+		private void SetupCefDll()
 		{
 			if (GameService.GameIntegration.get_Gw2Instance().get_Gw2IsRunning())
 			{
@@ -76,52 +162,51 @@ namespace BhModule.WebPeeper
 			void setLibCefDllFolder(object s, EventArgs e)
 			{
 				GameService.GameIntegration.get_Gw2Instance().remove_Gw2Started((EventHandler<EventArgs>)setLibCefDllFolder);
-				Environment.SetEnvironmentVariable("PATH", (_cefLocalesPath = Path.Combine(Path.GetDirectoryName(GameService.GameIntegration.get_Gw2Instance().get_Gw2Process().MainModule.FileName), "bin64\\cef")) + ";" + Environment.GetEnvironmentVariable("PATH"));
+				if (IsDefaultVersion)
+				{
+					_cefFolder = Path.Combine(Path.GetDirectoryName(GameService.GameIntegration.get_Gw2Instance().get_Gw2Process().MainModule.FileName), "bin64\\cef");
+				}
+				else
+				{
+					_cefFolder = ChangePathTail(_cefFolder, $"{CurrentVersion}");
+				}
+				Environment.SetEnvironmentVariable("PATH", _cefFolder + ";" + Environment.GetEnvironmentVariable("PATH"));
+				WebPeeperModule.Logger.Debug($"CefService.SetupCefDll: cef {CurrentVersion} path {_cefFolder}");
 			}
 		}
 
-		private void CefSettingInit()
+		private void BindEventHandlers()
 		{
-			if (!Cef.IsInitialized)
+			if (!_eventHandlersBound)
 			{
-				ModuleSettings settings = WebPeeperModule.Instance.Settings;
-				CefSharpSettings.FocusedNodeChangedEnabled = true;
-				CefSettings cefSettings = new CefSettings();
-				cefSettings.EnableAudio();
-				cefSettings.UserAgent = (settings.IsMobileLayout.get_Value() ? "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.114 Mobile Safari/537.36" : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.114 Safari/537.36");
-				if (!string.IsNullOrEmpty(_cefLocalesPath))
-				{
-					cefSettings.LocalesDirPath = _cefLocalesPath;
-				}
-				cefSettings.BrowserSubprocessPath = Path.Combine(CefSharpDllPath, "CefSharp.BrowserSubprocess.exe");
-				cefSettings.CachePath = Path.Combine(CefSettingFolder, "CefCache");
-				cefSettings.UserDataPath = Path.Combine(CefSettingFolder, "CefUserData");
-				cefSettings.CefCommandLineArgs.Add("gpu-preferences");
-				if (WebPeeperModule.Instance.Settings.IsCleanMode.get_Value())
-				{
-					Directory.Delete(cefSettings.CachePath, recursive: true);
-					Directory.Delete(cefSettings.UserDataPath, recursive: true);
-				}
-				cefSettings.PersistSessionCookies = true;
-				Default.SetCefSchemeHandler(cefSettings, OnBlishHudSchemeRequested);
-				Cef.Initialize(cefSettings);
+				WebPeeperModule.Logger.Debug("CefService.BindEventHandlers: binding cefHelper event.");
+				_eventHandlersBound = true;
+				SetContextCreatedScript();
+				((Game)WebPeeperModule.BlishHudInstance).add_Exiting((EventHandler<EventArgs>)OnBlishHudExiting);
+				Browser.add_BlishHudSchemeRequested((Func<string, Stream>)OnBlishHudSchemeRequested);
+				Browser.add_FocusedChanged((Action<bool>)OnFocusedChanged);
+				Browser.add_TitleChanged((Action<string>)OnTitleChanged);
 			}
 		}
 
-		private void LoadOnContextCreatedScript()
+		private void SetContextCreatedScript()
 		{
-			using MemoryStream stream = WebPeeperModule.Instance.ContentsManager.GetFileStream("onContextCreated.js") as MemoryStream;
+			using MemoryStream stream = Module.ContentsManager.GetFileStream("onContextCreated.js") as MemoryStream;
 			using TextReader textReader = new StreamReader(stream, Encoding.UTF8);
-			OnContextCreatedScript = textReader.ReadToEnd();
+			Browser.ContextCreatedScript = textReader.ReadToEnd();
 		}
 
-		private void ExtractFiles(string[] paths)
+		private void ExtractFiles()
 		{
-			foreach (string text in paths)
+			WebPeeperModule.Logger.Debug("CefService.ExtractFiles: extracting CefSharp default version.");
+			string[] array = new string[4] { "CefSharp.dll", "CefSharp.BrowserSubprocess.Core.dll", "CefSharp.BrowserSubprocess.exe", "CefSharp.Core.Runtime.dll" }.Select((string f) => Path.Combine(ChangePathTail(_cefSharpBhmPath, $"{DefaultVersion}"), f)).ToArray();
+			string text = ChangePathTail(_cefSharpFolder, $"{DefaultVersion}");
+			Directory.CreateDirectory(text);
+			string[] array2 = array;
+			foreach (string text2 in array2)
 			{
-				string path = Path.Combine(CefSharpDllPath, text);
-				Directory.CreateDirectory(Path.GetDirectoryName(path));
-				byte[] fileBytes = WebPeeperModule.InstanceModuleManager.get_DataReader().GetFileBytes(text);
+				string path = Path.Combine(text, Path.GetFileName(text2));
+				byte[] fileBytes = WebPeeperModule.InstanceModuleManager.get_DataReader().GetFileBytes(text2);
 				try
 				{
 					using FileStream fileStream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.Write, 4096);
@@ -133,47 +218,63 @@ namespace BhModule.WebPeeper
 			}
 		}
 
-		private void SetupCefSharpDllFolder()
+		private void SetupCefSharpDll()
 		{
-			AppDomain.CurrentDomain.AssemblyResolve += CefSharpCoreRuntimeResolver;
-			Assembly.Load(WebPeeperModule.InstanceModuleManager.get_DataReader().GetFileBytes("CefSharp.dll"), Array.Empty<byte>());
-			ExtractFiles(new string[4] { "CefSharp.BrowserSubprocess.Core.dll", "CefSharp.BrowserSubprocess.exe", "CefSharp.dll", "_\\CefSharp.Core.Runtime.dll" });
+			_pendingResolveDlls.Add("CefHelper", AssemblyLoadType.Bytes);
+			if (IsDefaultVersion)
+			{
+				_pendingResolveDlls.Add("CefSharp", AssemblyLoadType.Path);
+				_pendingResolveDlls.Add("CefSharp.OffScreen", AssemblyLoadType.Bytes);
+				_pendingResolveDlls.Add("CefSharp.Core", AssemblyLoadType.Bytes);
+				_pendingResolveDlls.Add("CefSharp.Core.Runtime", AssemblyLoadType.Path);
+			}
+			else
+			{
+				_pendingResolveDlls.Add("CefSharp", AssemblyLoadType.Path);
+				_pendingResolveDlls.Add("CefSharp.OffScreen", AssemblyLoadType.Path);
+				_pendingResolveDlls.Add("CefSharp.Core", AssemblyLoadType.Path);
+				_pendingResolveDlls.Add("CefSharp.Core.Runtime", AssemblyLoadType.Path);
+			}
+			_cefSharpFolder = ChangePathTail(_cefSharpFolder, $"{CurrentVersion}");
+			_cefSharpBhmPath = ChangePathTail(_cefSharpBhmPath, $"{CurrentVersion}");
+			AppDomain.CurrentDomain.AssemblyResolve += CefSharpLibResolver;
+			WebPeeperModule.Logger.Debug($"CefService.SetupCefSharpDll: cefsharp {CurrentVersion} path {_cefSharpFolder}");
+			WebPeeperModule.Logger.Debug($"CefService.SetupCefSharpDll: cefsharp {CurrentVersion} path .bhm\\{_cefSharpBhmPath}");
 		}
 
-		private Assembly CefSharpCoreRuntimeResolver(object sender, ResolveEventArgs args)
+		private Assembly CefSharpLibResolver(object sender, ResolveEventArgs args)
 		{
-			string text = "CefSharp.Core.Runtime";
-			if (args.Name.Contains(text))
+			string name = new AssemblyName(args.Name).Name;
+			if (!_pendingResolveDlls.TryGetValue(name, out var value))
 			{
-				return Assembly.LoadFrom(Path.Combine(CefSharpDllPath, "_\\" + text + ".dll"));
+				WebPeeperModule.Logger.Debug("CefService.CefSharpLibResolver: not in pending, skip load");
+				return null;
 			}
-			return null;
-		}
-
-		public void FocusBlurredElement()
-		{
-			if (_webBrowser != null && _webBrowser.CanExecuteJavascriptInMainFrame)
+			_pendingResolveDlls.Remove(name);
+			name += ".dll";
+			switch (value)
 			{
-				_webBrowser.ExecuteScriptAsync("webPeeper_focusBlurredElement()");
-			}
-		}
-
-		public Task SetBrowserSize(int w, int h)
-		{
-			if (WebBrowser == null)
+			case AssemblyLoadType.Bytes:
 			{
-				return Task.FromResult(result: false);
+				string text2 = Path.Combine(_cefSharpBhmPath, name);
+				byte[] fileBytes = WebPeeperModule.InstanceModuleManager.get_DataReader().GetFileBytes(text2);
+				WebPeeperModule.Logger.Debug("CefService.CefSharpLibResolver: load .bhm\\" + text2);
+				return Assembly.Load(fileBytes);
 			}
-			return WebBrowser.ResizeAsync(w, h);
+			case AssemblyLoadType.Path:
+			{
+				string text = Path.Combine(_cefSharpFolder, name);
+				WebPeeperModule.Logger.Debug("CefService.CefSharpLibResolver: load " + text);
+				return Assembly.LoadFrom(text);
+			}
+			default:
+				return null;
+			}
 		}
 
 		public Task<Texture2D> GetScreenshot()
 		{
-			if (WebBrowser == null)
-			{
-				return Task.FromResult<Texture2D>(null);
-			}
-			return WebBrowser.CaptureScreenshotAsync().ContinueWith(delegate(Task<byte[]> t)
+			return Browser.GetScreenshot().ContinueWith(delegate(Task<byte[]> t)
 			{
 				//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0013: Unknown result type (might be due to invalid IL or missing references)
@@ -192,156 +293,151 @@ namespace BhModule.WebPeeper
 			});
 		}
 
-		public async void CloseWebBrowser()
+		public async void Search(string text)
 		{
-			await WebPeeperModule.Instance.UIService.BrowserWindow.PrepareQuitBrowser();
-			if (_webBrowser != null)
+			HttpClient client = new HttpClient();
+			try
 			{
-				_webBrowser.Dispose();
-				_webBrowser = null;
+				if (!Uri.TryCreate(text, UriKind.Absolute, out var _))
+				{
+					UriBuilder uriBuilder = new UriBuilder(text);
+					using CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(3.0));
+					HttpResponseMessage val = await client.GetAsync(uriBuilder.Uri, (HttpCompletionOption)1, cts.Token);
+					try
+					{
+					}
+					finally
+					{
+						((IDisposable)val)?.Dispose();
+					}
+				}
+				Browser.LoadUrlAsync(text);
 			}
+			catch
+			{
+				Browser.LoadUrlAsync(new Regex("{\\s*text\\s*}").Replace(Settings.SearchUrl.get_Value(), Uri.EscapeDataString(text)));
+			}
+			finally
+			{
+				((IDisposable)client)?.Dispose();
+			}
+		}
+
+		public void ApplyFrameRate()
+		{
+			Browser.SetFrameRate(Settings.GetFrameRate());
 		}
 
 		public void ApplyUserAgent()
 		{
-			if (_webBrowser != null)
-			{
-				using DevToolsClient devToolsClient = _webBrowser.GetDevToolsClient();
-				string userAgent = (WebPeeperModule.Instance.Settings.IsMobileLayout.get_Value() ? "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.114 Mobile Safari/537.36" : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.114 Safari/537.36");
-				devToolsClient.Emulation.SetUserAgentOverrideAsync(userAgent);
-			}
+			Browser.SetMobileUserAgent(Settings.IsMobileLayout.get_Value());
 		}
 
 		private void OnBlishHudExiting(object sender, EventArgs e)
 		{
-			_webBrowser?.Dispose();
-			_webBrowser = null;
+			Browser.Dispose();
 		}
 
-		private (Stream, string) OnBlishHudSchemeRequested(IRequest request)
+		private Stream OnBlishHudSchemeRequested(string filePath)
 		{
-			string text = new Uri(request.Url).AbsolutePath.Remove(0, 1);
-			return (WebPeeperModule.Instance.ContentsManager.GetFileStream(text), Cef.GetMimeType(Path.GetExtension(text)));
+			return Module.ContentsManager.GetFileStream(filePath);
 		}
 
-		private void OnContextCreated(IFrame frame)
+		private void OnFocusedChanged(bool focused)
 		{
-			frame.ExecuteJavaScriptAsync(OnContextCreatedScript);
-		}
-
-		private void OnFocusedNodeChanged(IDomNode node)
-		{
+			WebPeeperModule.Logger.Debug($"CefService.OnFocusedChanged: focused={focused}");
 			WebPeeperModule.BlishHudInstance.get_Form().SafeInvoke(delegate
 			{
-				if (node == null)
+				if (focused)
 				{
-					_inputMethod.Disable();
-				}
-				else if ((node["contenteditable"] != null && node["contenteditable"] != "false") || node.TagName == "INPUT" || node.TagName == "TEXTAREA")
-				{
-					_inputMethod.Enable();
+					Module.ImeService.Enable();
 				}
 				else
 				{
-					_inputMethod.Disable();
+					Module.ImeService.Disable();
 				}
 			});
 		}
 
-		private void OnMainFrameChanged()
+		private void OnTitleChanged(string title)
 		{
-			WebPeeperModule.BlishHudInstance.get_Form().SafeInvoke(delegate
+			UiService uiService = Module.UiService;
+			if (uiService != null && uiService.BrowserWindow != null)
 			{
-				_inputMethod.Disable();
-			});
-		}
-
-		private void OnTitleChanged(object sender, TitleChangedEventArgs e)
-		{
-			UIService uIService = WebPeeperModule.Instance.UIService;
-			if (uIService != null && uIService.BrowserWindow != null)
-			{
-				((WindowBase2)uIService.BrowserWindow).set_Subtitle(e.Title);
+				((WindowBase2)uiService.BrowserWindow).set_Subtitle(title);
 			}
 		}
 
-		private void OnFrameLoadStart(object sender, FrameLoadStartEventArgs e)
+		private string ChangePathTail(string path, string directoryName)
 		{
-			WebPainter.Instance?.SetErrorState(state: false);
+			return Path.Combine(Path.GetDirectoryName(path) ?? "", directoryName);
 		}
 
-		public void OnUrlLoadError(object sender, LoadErrorEventArgs e)
+		private void SetupLib()
 		{
-			NavigationBar.Instance?.SetAddressInputText(e.FailedUrl);
-			string lastAddressInputText = LastAddressInputText;
-			LastAddressInputText = "";
-			if (!string.IsNullOrWhiteSpace(lastAddressInputText))
+			if (!LibLoadStarted)
 			{
-				if (Uri.TryCreate(lastAddressInputText, UriKind.Absolute, out var _))
+				WebPeeperModule.Logger.Debug("CefService.SetupLib");
+				LibLoadStarted = true;
+				CefVersionSettingView.UpdateView?.Invoke();
+				CefService.LibLoadStart?.Invoke(this, EventArgs.Empty);
+				if (Settings.IsCleanMode.get_Value())
 				{
-					WebPainter.Instance?.SetErrorState(state: true);
+					ClearCefCache();
 				}
-				else
-				{
-					_webBrowser.LoadUrlAsync(new Regex("{\\s*text\\s*}").Replace(WebPeeperModule.Instance.Settings.SearchUrl.get_Value(), Uri.EscapeDataString(lastAddressInputText)));
-				}
+				SetupCefDll();
+				SetupCefSharpDll();
 			}
 		}
 
-		private void OnFullscreenModeChange(bool isFullscreen)
+		private Task CreateWebBrowser()
 		{
-			if (isFullscreen)
-			{
-				NavigationBar instance = NavigationBar.Instance;
-				if (instance != null)
-				{
-					((Control)instance).Hide();
-				}
-			}
-			else
-			{
-				NavigationBar instance2 = NavigationBar.Instance;
-				if (instance2 != null)
-				{
-					((Control)instance2).Show();
-				}
-			}
-		}
-
-		public Task<bool> CreateWebBrowser()
-		{
-			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005d: Invalid comparison between Unknown and I4
-			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0062: Invalid comparison between Unknown and I4
-			CefSettingInit();
 			TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
-			if (_webBrowser == null || _webBrowser.IsDisposed)
+			try
 			{
-				BrowserSettings browserSettings = new BrowserSettings(autoDispose: true);
-				if (WebPeeperModule.Instance.Settings.IsFollowBhFps.get_Value())
+				Browser.CefSettingInit(IsDefaultVersion ? _cefFolder : Path.Combine(_cefFolder, "locales"), CefCacheFolder, _cefSharpFolder);
+				Browser.Create(Settings.HomeUrl.get_Value(), Settings.GetFrameRate(), Settings.IsMobileLayout.get_Value()).ContinueWith(delegate(Task<bool> t)
 				{
-					BrowserSettings browserSettings2 = browserSettings;
-					FramerateMethod frameLimiter = GameService.Graphics.get_FrameLimiter();
-					int num2 = (browserSettings2.WindowlessFrameRate = (((int)frameLimiter == 1) ? 30 : (((int)frameLimiter != 2) ? 60 : 60)));
-				}
-				_webBrowser = new ChromiumWebBrowser(WebPeeperModule.Instance.Settings.HomeUrl.get_Value(), browserSettings);
-				_webBrowser.TitleChanged += OnTitleChanged;
-				_webBrowser.FrameLoadStart += OnFrameLoadStart;
-				_webBrowser.LoadError += OnUrlLoadError;
-				_webBrowser.BrowserInitialized += delegate
-				{
-					tcs.TrySetResult(result: true);
-				};
-				Default.SetBrowserHandlers(_webBrowser, OnContextCreated, OnFocusedNodeChanged, OnMainFrameChanged, OnFullscreenModeChange);
+					if (t.Status == TaskStatus.RanToCompletion)
+					{
+						tcs.TrySetResult(result: true);
+					}
+					else
+					{
+						WebPeeperModule.Logger.Error(t.Exception?.Message);
+						tcs.TrySetException(t.Exception);
+					}
+				});
+				Task.Delay(TimeSpan.FromSeconds(5.0)).ContinueWith((Task t) => tcs.TrySetCanceled());
 			}
-			if (_webBrowser.IsBrowserInitialized)
+			catch (Exception ex)
 			{
-				tcs.TrySetResult(result: true);
+				WebPeeperModule.Logger.Error(ex.Message);
+				Settings.RedownloadCef();
+				tcs.TrySetException(ex);
 			}
 			return tcs.Task;
+		}
+
+		public async void CloseWebBrowser()
+		{
+			BrowserWindow browserWindow = Module.UiService?.BrowserWindow;
+			if (browserWindow != null)
+			{
+				await browserWindow.PrepareQuitBrowser();
+			}
+			Browser.Close();
+		}
+
+		public Task StartBrowsing()
+		{
+			WebPeeperModule.Logger.Debug("CefService.StartBrowsing");
+			return Task.Run(async delegate
+			{
+				SetupLib();
+				BindEventHandlers();
+				await CreateWebBrowser();
+			});
 		}
 	}
 }

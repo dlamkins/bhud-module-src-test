@@ -2,15 +2,16 @@ using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using Microsoft.Xna.Framework;
 
 namespace BhModule.WebPeeper
 {
-	public static class Utils
+	internal static class Utils
 	{
-		public static NotifyClass Notify = new NotifyClass();
+		public static readonly NotifyClass Notify = new NotifyClass();
 
 		[DllImport("imm32.dll")]
-		internal static extern IntPtr ImmAssociateContextEx(IntPtr hWnd, int hIMC, int iace);
+		internal static extern bool ImmAssociateContextEx(IntPtr hWnd, int hIMC, int iace);
 
 		[DllImport("imm32.dll")]
 		internal static extern IntPtr ImmGetContext(IntPtr hWnd);
@@ -37,6 +38,12 @@ namespace BhModule.WebPeeper
 		internal static extern int GetKeyboardLayout(uint threadId);
 
 		[DllImport("user32.dll")]
+		internal static extern int SetFocus(IntPtr hWnd);
+
+		[DllImport("user32.dll")]
+		internal static extern IntPtr GetFocus();
+
+		[DllImport("user32.dll")]
 		public static extern IntPtr SetWindowLongPtr(IntPtr hWnd, int nIndex, UIntPtr dwNewLong);
 
 		[DllImport("user32.dll", EntryPoint = "SetForegroundWindow")]
@@ -45,7 +52,9 @@ namespace BhModule.WebPeeper
 		public static bool SetForegroundWindow(IntPtr hWnd)
 		{
 			keybd_event(0, 0, 0, 0);
-			return NativeSetForegroundWindow(hWnd);
+			bool result = NativeSetForegroundWindow(hWnd);
+			SetFocus(hWnd);
+			return result;
 		}
 
 		[DllImport("user32.dll")]
@@ -55,9 +64,6 @@ namespace BhModule.WebPeeper
 		public static extern void keybd_event(byte bVk, byte bScan, int dwFlags, int dwExtraInfo);
 
 		[DllImport("user32.dll")]
-		public static extern short GetKeyState(VK nVirtKey);
-
-		[DllImport("user32.dll")]
 		public static extern bool ClientToScreen(IntPtr hWnd, ref Point lpPoint);
 
 		[DllImport("kernel32.dll")]
@@ -65,6 +71,11 @@ namespace BhModule.WebPeeper
 
 		[DllImport("kernel32.dll")]
 		public static extern bool ReadProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, [Out] byte[] lpBuffer, int nSize, out IntPtr lpNumberOfBytesRead);
+
+		public static bool IsForeground(this GameWindow window)
+		{
+			return GetForegroundWindow() == window.get_Handle();
+		}
 
 		public static void SafeInvoke(this Form form, Action cb)
 		{

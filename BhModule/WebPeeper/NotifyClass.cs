@@ -6,15 +6,15 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace BhModule.WebPeeper
 {
-	public class NotifyClass : Control
+	internal class NotifyClass : Control
 	{
-		private float duration = 3000f;
+		private float _duration = 3000f;
 
-		private string message;
+		private string _message;
 
-		private bool waitingForPaint = true;
+		private bool _waitingForPaint = true;
 
-		private DateTime msgStartTime = DateTime.Now;
+		private DateTime _msgStartTime = DateTime.Now;
 
 		public override void DoUpdate(GameTime gameTime)
 		{
@@ -33,14 +33,14 @@ namespace BhModule.WebPeeper
 			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
 			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-			if (message != null)
+			if (_message != null)
 			{
-				if (waitingForPaint)
+				if (_waitingForPaint)
 				{
-					msgStartTime = DateTime.Now;
+					_msgStartTime = DateTime.Now;
 				}
-				float num = (float)(DateTime.Now - msgStartTime).TotalMilliseconds;
-				float num2 = duration - num;
+				float num = (float)(DateTime.Now - _msgStartTime).TotalMilliseconds;
+				float num2 = _duration - num;
 				float num3 = ((num2 > 1000f) ? 1f : (num2 / 1000f));
 				if (num3 < 0f)
 				{
@@ -48,23 +48,23 @@ namespace BhModule.WebPeeper
 					return;
 				}
 				Color val = Color.get_Yellow() * num3;
-				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, message, GameService.Content.get_DefaultFont32(), new Rectangle(0, 0, ((Control)this).get_Width(), ((Control)this).get_Height()), val, false, false, 1, (HorizontalAlignment)1, (VerticalAlignment)0);
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, _message, GameService.Content.get_DefaultFont32(), new Rectangle(0, 0, ((Control)this).get_Width(), ((Control)this).get_Height()), val, false, false, 1, (HorizontalAlignment)1, (VerticalAlignment)0);
 			}
-			waitingForPaint = false;
+			_waitingForPaint = false;
 		}
 
 		public void Clear()
 		{
 			((Control)this).set_Parent((Container)null);
-			message = null;
+			_message = null;
 		}
 
 		public void Show(string text, float duration = 3000f)
 		{
 			((Control)this).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			msgStartTime = DateTime.Now;
-			message = text;
-			this.duration = duration;
+			_msgStartTime = DateTime.Now;
+			_message = text;
+			_duration = duration;
 		}
 
 		protected override CaptureType CapturesInput()

@@ -4,13 +4,13 @@ using System.Linq;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
-using CefSharp.OffScreen;
+using CefHelper;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace BhModule.WebPeeper
 {
-	public class BookmarkItem : MenuItem
+	internal class BookmarkItem : MenuItem
 	{
 		private readonly Bookmark _bookmark;
 
@@ -79,20 +79,17 @@ namespace BhModule.WebPeeper
 
 		public override void UpdateContainer(GameTime t)
 		{
-			IconButton sortBtn = _sortBtn;
-			if (((sortBtn != null) ? ((Control)sortBtn).get_Parent() : null) == null)
+			if (_sortBtn != null && ((Control)_sortBtn).get_Parent() == null)
 			{
-				((Control)_sortBtn).set_Parent(((Control)((Control)this).get_Parent()).get_Parent());
+				((Control)_sortBtn).set_Parent((Container)(object)BookmarkPanel.Instance);
 			}
-			IconButton removeBtn = _removeBtn;
-			if (((removeBtn != null) ? ((Control)removeBtn).get_Parent() : null) == null)
+			if (_removeBtn != null && ((Control)_removeBtn).get_Parent() == null)
 			{
-				((Control)_removeBtn).set_Parent(((Control)((Control)this).get_Parent()).get_Parent());
+				((Control)_removeBtn).set_Parent((Container)(object)BookmarkPanel.Instance);
 			}
-			TextBox nameInput = _nameInput;
-			if (((nameInput != null) ? ((Control)nameInput).get_Parent() : null) == null)
+			if (_nameInput != null && ((Control)_nameInput).get_Parent() == null)
 			{
-				((Control)_nameInput).set_Parent(((Control)((Control)this).get_Parent()).get_Parent());
+				((Control)_nameInput).set_Parent((Container)(object)BookmarkPanel.Instance);
 			}
 			SetEditControlBounds();
 		}
@@ -111,11 +108,14 @@ namespace BhModule.WebPeeper
 
 		protected override void OnClick(MouseEventArgs e)
 		{
-			ChromiumWebBrowser webBrowser = WebPeeperModule.Instance.CefService.WebBrowser;
-			if (!_editing && webBrowser != null)
+			if (!_editing)
 			{
-				webBrowser.Load(_bookmark.URL);
-				((Control)((Control)((Control)this).get_Parent()).get_Parent()).Hide();
+				Browser.LoadUrlAsync(_bookmark.URL);
+				BookmarkPanel instance = BookmarkPanel.Instance;
+				if (instance != null)
+				{
+					((Control)instance).Hide();
+				}
 			}
 			((MenuItem)this).OnClick(e);
 		}

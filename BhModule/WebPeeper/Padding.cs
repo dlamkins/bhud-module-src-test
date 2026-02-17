@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace BhModule.WebPeeper
 {
-	public class Padding : Control
+	internal class Padding : Control
 	{
 		public string message = "";
 

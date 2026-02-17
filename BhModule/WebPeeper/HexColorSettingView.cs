@@ -7,7 +7,7 @@ using MonoGame.Extended;
 
 namespace BhModule.WebPeeper
 {
-	public class HexColorSettingView : StringSettingView
+	internal class HexColorSettingView : StringSettingView
 	{
 		private ColorPreview _colorPreview;
 

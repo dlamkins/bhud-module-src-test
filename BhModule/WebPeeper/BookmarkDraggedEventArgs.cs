@@ -2,7 +2,7 @@ using System;
 
 namespace BhModule.WebPeeper
 {
-	public class BookmarkDraggedEventArgs : EventArgs
+	internal class BookmarkDraggedEventArgs : EventArgs
 	{
 		public readonly Bookmark Bookmark;
 

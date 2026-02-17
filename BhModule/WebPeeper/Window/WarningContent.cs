@@ -8,9 +8,9 @@ using MonoGame.Extended.BitmapFonts;
 
 namespace BhModule.WebPeeper.Window
 {
-	public class WarningContent : Control
+	internal class WarningContent : Control
 	{
-		private readonly string _originText = BhModule.WebPeeper.Strings.UIService.Warning;
+		private readonly string _originText = UIService.Warning;
 
 		private string _text = "";
 

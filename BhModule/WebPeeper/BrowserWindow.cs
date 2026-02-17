@@ -6,14 +6,14 @@ using Blish_HUD.Common.UI.Views;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics;
 using Blish_HUD.Input;
-using CefSharp;
+using CefHelper;
 using Glide;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace BhModule.WebPeeper
 {
-	public class BrowserWindow : StandardWindow
+	internal class BrowserWindow : StandardWindow
 	{
 		private static readonly Point _windowSize = new Point(500, 700);
 
@@ -210,7 +210,7 @@ namespace BhModule.WebPeeper
 			}
 		}
 
-		protected override void OnShown(EventArgs e)
+		private void HandleShown()
 		{
 			if (_firstShow)
 			{
@@ -226,34 +226,41 @@ namespace BhModule.WebPeeper
 					((Control)this).set_Width(num2);
 				}
 			}
-			if (CefService.WebBrowser != null)
+			if (Settings.IsAutoPauseWeb.get_Value())
 			{
-				if (Settings.IsAutoPauseWeb.get_Value())
-				{
-					CefService.WebBrowser?.GetBrowserHost().WasHidden(hidden: false);
-				}
-				((Control)this).OnShown(e);
+				Browser.WasHidden(false);
 			}
+		}
+
+		private void HandleHidden()
+		{
+			Browser.BlurInput();
+			if (Settings.IsAutoQuitProcess.get_Value())
+			{
+				CefService.CloseWebBrowser();
+			}
+			else if (Settings.IsAutoPauseWeb.get_Value())
+			{
+				Browser.WasHidden(true);
+			}
+			BookmarkPanel.Instance?.SetChildrenEditState(edit: false);
+		}
+
+		protected override void OnShown(EventArgs e)
+		{
+			if (CefService.LibLoadStarted)
+			{
+				HandleShown();
+			}
+			((Control)this).OnShown(e);
 		}
 
 		protected override void OnHidden(EventArgs e)
 		{
-			if (CefService.WebBrowser != null)
+			if (CefService.LibLoadStarted)
 			{
-				if (CefService.WebBrowser.CanExecuteJavascriptInMainFrame)
-				{
-					CefService.WebBrowser.ExecuteScriptAsync("webPeeper_blur()");
-				}
-				if (Settings.IsAutoQuitProcess.get_Value())
-				{
-					CefService.CloseWebBrowser();
-				}
-				else if (Settings.IsAutoPauseWeb.get_Value())
-				{
-					CefService.WebBrowser?.GetBrowserHost().WasHidden(hidden: true);
-				}
+				HandleHidden();
 			}
-			BookmarkPanel.Instance?.SetChildrenEditState(edit: false);
 			((Control)this).OnHidden(e);
 		}
 

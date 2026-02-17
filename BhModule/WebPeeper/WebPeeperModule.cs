@@ -15,15 +15,7 @@ namespace BhModule.WebPeeper
 	[Export(typeof(Module))]
 	public class WebPeeperModule : Module
 	{
-		public static readonly Logger Logger = Logger.GetLogger<WebPeeperModule>();
-
-		public static BlishHud BlishHudInstance;
-
-		public static MenuItem InstanceSettingsMenuItem;
-
-		public static ModuleManager InstanceModuleManager;
-
-		public static WebPeeperModule Instance;
+		internal static readonly Logger Logger = Logger.GetLogger<WebPeeperModule>();
 
 		internal SettingsManager SettingsManager => base.ModuleParameters.get_SettingsManager();
 
@@ -33,11 +25,25 @@ namespace BhModule.WebPeeper
 
 		internal Gw2ApiManager Gw2ApiManager => base.ModuleParameters.get_Gw2ApiManager();
 
-		public CefService CefService { get; private set; }
+		internal string DataFolder => DirectoriesManager.GetFullDirectoryPath(((Module)this).get_Name().ToLower());
 
-		public UIService UIService { get; private set; }
+		internal CefService CefService { get; private set; }
 
-		public ModuleSettings Settings { get; private set; }
+		internal ImeService ImeService { get; private set; }
+
+		internal UiService UiService { get; private set; }
+
+		internal DownloadService DownloadService { get; private set; }
+
+		internal ModuleSettings Settings { get; private set; }
+
+		internal static BlishHud BlishHudInstance { get; private set; }
+
+		internal static MenuItem InstanceSettingsMenuItem { get; private set; }
+
+		internal static ModuleManager InstanceModuleManager { get; private set; }
+
+		internal static WebPeeperModule Instance { get; private set; }
 
 		[ImportingConstructor]
 		public WebPeeperModule([Import("ModuleParameters")] ModuleParameters moduleParameters)
@@ -65,15 +71,18 @@ namespace BhModule.WebPeeper
 			Control obj = ((IEnumerable<Control>)((Container)GameService.Overlay.get_SettingsTab().GetSettingMenus().Last()).get_Children()).FirstOrDefault((Control i) => ((MenuItem)i).get_Text() == InstanceModuleManager.get_Manifest().get_Name());
 			InstanceSettingsMenuItem = (MenuItem)(object)((obj is MenuItem) ? obj : null);
 			CefService = new CefService();
-			UIService = new UIService();
+			ImeService = new ImeService();
+			UiService = new UiService();
+			DownloadService = new DownloadService();
 		}
 
 		protected override async Task LoadAsync()
 		{
 			await Task.Run(delegate
 			{
+				Settings.Load();
 				CefService.Load();
-				UIService.Load();
+				UiService.Load();
 			});
 		}
 
@@ -81,7 +90,8 @@ namespace BhModule.WebPeeper
 		{
 			Settings?.Unload();
 			CefService?.Unload();
-			UIService?.Unload();
+			ImeService?.Unload();
+			UiService?.Unload();
 		}
 	}
 }

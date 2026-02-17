@@ -8,7 +8,7 @@ using MonoGame.Extended.TextureAtlases;
 
 namespace BhModule.WebPeeper
 {
-	public class ColorPreview : Control
+	internal class ColorPreview : Control
 	{
 		private static readonly TextureRegion2D _colorTextureRegion = Control.TextureAtlasControl.GetRegion("colorpicker/cp-clr-v1");
 

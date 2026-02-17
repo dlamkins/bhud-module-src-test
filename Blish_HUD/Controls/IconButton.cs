@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Blish_HUD.Controls
 {
-	public class IconButton : Control
+	internal class IconButton : Control
 	{
 		private readonly Texture2D _iconTexture;
 

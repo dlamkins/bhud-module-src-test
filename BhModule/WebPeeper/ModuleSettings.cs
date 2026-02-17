@@ -1,21 +1,30 @@
 using System;
+using System.ComponentModel;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Controls;
+using Blish_HUD.Graphics;
 using Blish_HUD.Input;
+using Blish_HUD.Modules;
 using Blish_HUD.Settings;
+using CefHelper;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
 
 namespace BhModule.WebPeeper
 {
-	public class ModuleSettings
+	internal class ModuleSettings
 	{
 		private const string _defaultSearchUrl = "https://www.google.com/search?q={text} site:wiki.guildwars2.com";
 
 		private const string _defaultHomeUrl = "https://wiki.guildwars2.com/";
 
 		private const string _defaultBgColor = "#00000000";
+
+		public SettingEntry<CefAvailableVersion> CefVersion { get; private set; }
+
+		public SettingEntry<CefAvailableVersion> CefErrorVersion { get; private set; }
 
 		public SettingEntry<KeyBinding> SettingsKey { get; private set; }
 
@@ -53,21 +62,22 @@ namespace BhModule.WebPeeper
 
 		public ModuleSettings(SettingCollection settings)
 		{
-			InitUISetting(settings);
-		}
-
-		private void InitUISetting(SettingCollection settings)
-		{
-			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0052: Expected O, but got Unknown
-			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d5: Expected O, but got Unknown
-			//IL_0111: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0159: Expected O, but got Unknown
-			//IL_0195: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01dd: Expected O, but got Unknown
-			//IL_0219: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0261: Expected O, but got Unknown
+			//IL_00da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0122: Expected O, but got Unknown
+			//IL_015d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a5: Expected O, but got Unknown
+			//IL_01e1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0229: Expected O, but got Unknown
+			//IL_0265: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ad: Expected O, but got Unknown
+			//IL_02e9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0331: Expected O, but got Unknown
+			CefVersion = settings.DefineSetting<CefAvailableVersion>("CefVersion", CefAvailableVersion.v103, (Func<string>)(() => "CEF Version"), (Func<string>)(() => $"Browser core version, each version (excluding {CefService.DefaultVersion}) requires an additional 200 MB download."));
+			CefVersion.add_SettingChanged((EventHandler<ValueChangedEventArgs<CefAvailableVersion>>)delegate
+			{
+				WebPeeperModule.Instance.CefService.ApplySettingVersion();
+			});
+			CefErrorVersion = settings.DefineSetting<CefAvailableVersion>("CefErrorVersion", CefAvailableVersion.v103, (Func<string>)(() => ""), (Func<string>)(() => ""));
 			SettingsKey = settings.DefineSetting<KeyBinding>("SettingsKey", new KeyBinding((ModifierKeys)1, (Keys)123), (Func<string>)(() => "Settings Toggle"), (Func<string>)(() => ""));
 			SettingsKey.get_Value().add_Activated((EventHandler<EventArgs>)ToggleSettings);
 			SettingsKey.get_Value().set_Enabled(true);
@@ -75,18 +85,32 @@ namespace BhModule.WebPeeper
 			WebWindowKey.get_Value().add_Activated((EventHandler<EventArgs>)ToggleWebWindow);
 			WebWindowKey.get_Value().set_Enabled(true);
 			ZoomInKey = settings.DefineSetting<KeyBinding>("ZoomInKey", new KeyBinding((ModifierKeys)1, (Keys)107), (Func<string>)(() => "Zoom In"), (Func<string>)(() => "Only works when the cursor is within the web area."));
-			ZoomInKey.get_Value().add_Activated((EventHandler<EventArgs>)ZoomInWeb);
+			ZoomInKey.get_Value().add_Activated((EventHandler<EventArgs>)OnZoomInActivated);
 			ZoomInKey.get_Value().set_Enabled(true);
 			ZoomOutKey = settings.DefineSetting<KeyBinding>("ZoomOutKey", new KeyBinding((ModifierKeys)1, (Keys)109), (Func<string>)(() => "Zoom Out"), (Func<string>)(() => "Only works when the cursor is within the web area."));
-			ZoomOutKey.get_Value().add_Activated((EventHandler<EventArgs>)ZoomOutWeb);
+			ZoomOutKey.get_Value().add_Activated((EventHandler<EventArgs>)OnZoomOutActivated);
 			ZoomOutKey.get_Value().set_Enabled(true);
 			CaptureKeyboardKey = settings.DefineSetting<KeyBinding>("CaptureKeyboardKey", new KeyBinding((ModifierKeys)1, (Keys)32), (Func<string>)(() => "Focus the Blish-HUD Window"), (Func<string>)(() => "For web input field, only works when the cursor is within the web area. In theory it would auto-focus when caret is flashing."));
-			CaptureKeyboardKey.get_Value().add_Activated((EventHandler<EventArgs>)FocusBHWindow);
+			CaptureKeyboardKey.get_Value().add_Activated((EventHandler<EventArgs>)OnCaptureKeyboardActivated);
 			CaptureKeyboardKey.get_Value().set_Enabled(true);
 			SearchUrl = settings.DefineSetting<string>("SearchUrl", "https://www.google.com/search?q={text} site:wiki.guildwars2.com", (Func<string>)(() => "Search Engine"), (Func<string>)(() => "{text} is represent text variable."));
+			UriBuilder uriBuilder2;
 			SearchUrl.add_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)delegate(object sender, ValueChangedEventArgs<string> e)
 			{
-				if (string.IsNullOrWhiteSpace(e.get_NewValue()))
+				try
+				{
+					uriBuilder2 = new UriBuilder(e.get_NewValue());
+					if (!($"{uriBuilder2.Uri}" == e.get_NewValue()))
+					{
+						Task.Delay(10).ContinueWith(delegate
+						{
+							string absoluteUri2;
+							SearchUrl.set_Value(absoluteUri2 = uriBuilder2.Uri.AbsoluteUri);
+							return absoluteUri2;
+						});
+					}
+				}
+				catch
 				{
 					Task.Delay(10).ContinueWith(delegate
 					{
@@ -97,9 +121,23 @@ namespace BhModule.WebPeeper
 				}
 			});
 			HomeUrl = settings.DefineSetting<string>("HomeUrl", "https://wiki.guildwars2.com/", (Func<string>)(() => "Home Page"), (Func<string>)(() => ""));
+			UriBuilder uriBuilder;
 			HomeUrl.add_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)delegate(object s, ValueChangedEventArgs<string> e)
 			{
-				if (string.IsNullOrWhiteSpace(e.get_NewValue()))
+				try
+				{
+					uriBuilder = new UriBuilder(e.get_NewValue());
+					if (!($"{uriBuilder.Uri}" == e.get_NewValue()))
+					{
+						Task.Delay(10).ContinueWith(delegate
+						{
+							string absoluteUri;
+							HomeUrl.set_Value(absoluteUri = uriBuilder.Uri.AbsoluteUri);
+							return absoluteUri;
+						});
+					}
+				}
+				catch
 				{
 					Task.Delay(10).ContinueWith(delegate
 					{
@@ -145,86 +183,162 @@ namespace BhModule.WebPeeper
 			SettingComplianceExtensions.SetRange(WebWindowOpacity, 0.1f, 1f);
 			WebWindowOpacity.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)delegate(object sender, ValueChangedEventArgs<float> e)
 			{
-				UIService uIService = WebPeeperModule.Instance.UIService;
-				if (uIService != null && ((Control)uIService.BrowserWindow).get_Opacity() > 0f)
+				UiService uiService = WebPeeperModule.Instance.UiService;
+				if (uiService != null && ((Control)uiService.BrowserWindow).get_Opacity() > 0f)
 				{
-					((Control)uIService.BrowserWindow).set_Opacity(e.get_NewValue());
+					((Control)uiService.BrowserWindow).set_Opacity(e.get_NewValue());
 				}
-				WebPeeperSettingsView.UpdateWebWindowOpacityTitle();
+				WebPeeperSettingsView.UpdateWebWindowOpacityTitle?.Invoke();
 			});
 			IsAutoPauseWeb = settings.DefineSetting<bool>("IsAutoPauseWeb", false, (Func<string>)(() => "Pause the Web Process while Close the Web Window"), (Func<string>)(() => ""));
 			IsAutoQuitProcess = settings.DefineSetting<bool>("IsAutoQuitProcess", false, (Func<string>)(() => "Quit the Web Process while Close the Web Window"), (Func<string>)(() => ""));
 			IsAutoQuitProcess.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)delegate(object sender, ValueChangedEventArgs<bool> e)
 			{
 				SettingComplianceExtensions.SetDisabled((SettingEntry)(object)IsAutoPauseWeb, e.get_NewValue());
-				WebPeeperSettingsView.UpdateIsAutoPauseWebState();
+				WebPeeperSettingsView.UpdateIsAutoPauseWebState?.Invoke();
 			});
 			SettingComplianceExtensions.SetDisabled((SettingEntry)(object)IsAutoPauseWeb, IsAutoQuitProcess.get_Value());
 			IsMobileLayout = settings.DefineSetting<bool>("IsMobileLayout", true, (Func<string>)(() => "Use Mobile Website"), (Func<string>)(() => "Whether use mobile User-Agent."));
 			IsMobileLayout.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)delegate
 			{
-				WebPeeperModule.Instance.CefService.ApplyUserAgent();
+				if (CefService.LibLoadStarted)
+				{
+					WebPeeperModule.Instance.CefService.ApplyUserAgent();
+				}
 			});
 			IsUseTouch = settings.DefineSetting<bool>("IsUseTouch", false, (Func<string>)(() => "Simulate Touch"), (Func<string>)(() => "Left mouse button send touch event instead. It is useful for mobile websites."));
-			IsCleanMode = settings.DefineSetting<bool>("IsCleanMode", false, (Func<string>)(() => "Auto Clean User-Data"), (Func<string>)(() => "Clear cache and user-data while WebPeeper module initialize."));
-			IsFollowBhFps = settings.DefineSetting<bool>("IsFollowBhFps", false, (Func<string>)(() => "Same as Blish-HUD FPS Setting"), (Func<string>)(() => "Default is locked at 30 FPS, up to 60 FPS if unchecked."));
+			IsCleanMode = settings.DefineSetting<bool>("IsCleanMode", false, (Func<string>)(() => "Auto Clean User Data"), (Func<string>)(() => "Deletes all data of the previous session each time " + ((Module)WebPeeperModule.Instance).get_Name() + " opens."));
+			IsFollowBhFps = settings.DefineSetting<bool>("IsFollowBhFps", false, (Func<string>)(() => "Same as Blish-HUD FPS Setting"), (Func<string>)(() => "Default is locked at 30 FPS, up to 60 FPS if checked."));
+			IsFollowBhFps.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)delegate
+			{
+				if (CefService.LibLoadStarted)
+				{
+					WebPeeperModule.Instance.CefService.ApplyFrameRate();
+				}
+			});
 			IsBlockKeybinds = settings.DefineSetting<bool>("IsBlockKeybinds", true, (Func<string>)(() => "Block All Blish-HUD Keybinds while the Web is Accepting Input"), (Func<string>)(() => "Uncheck if keybinds fail after typing."));
 			IsShowWarning = settings.DefineSetting<bool>("IsShowWarning", true, (Func<string>)(() => "Show Outdated Warning"), (Func<string>)(() => ""));
+		}
+
+		public void Load()
+		{
+			((Control)WebPeeperModule.InstanceSettingsMenuItem).add_PropertyChanged((PropertyChangedEventHandler)OnSettingsHidden);
+			((Control)GameService.Overlay.get_BlishHudWindow()).add_Hidden((EventHandler<EventArgs>)OnSettingsHidden);
 		}
 
 		public void Unload()
 		{
 			SettingsKey.get_Value().remove_Activated((EventHandler<EventArgs>)ToggleSettings);
 			WebWindowKey.get_Value().remove_Activated((EventHandler<EventArgs>)ToggleWebWindow);
-			CaptureKeyboardKey.get_Value().remove_Activated((EventHandler<EventArgs>)FocusBHWindow);
-			ZoomInKey.get_Value().remove_Activated((EventHandler<EventArgs>)ZoomInWeb);
-			ZoomOutKey.get_Value().remove_Activated((EventHandler<EventArgs>)ZoomOutWeb);
+			CaptureKeyboardKey.get_Value().remove_Activated((EventHandler<EventArgs>)OnCaptureKeyboardActivated);
+			ZoomInKey.get_Value().remove_Activated((EventHandler<EventArgs>)OnZoomInActivated);
+			ZoomOutKey.get_Value().remove_Activated((EventHandler<EventArgs>)OnZoomOutActivated);
+			((Control)WebPeeperModule.InstanceSettingsMenuItem).remove_PropertyChanged((PropertyChangedEventHandler)OnSettingsHidden);
+			((Control)GameService.Overlay.get_BlishHudWindow()).remove_Hidden((EventHandler<EventArgs>)OnSettingsHidden);
+			WebPeeperSettingsView.UpdateWebWindowOpacityTitle = null;
+			WebPeeperSettingsView.UpdateIsAutoPauseWebState = null;
+			CefVersionSettingView.UpdateView = null;
+		}
+
+		private void OnSettingsHidden(object sender, EventArgs e)
+		{
+			PropertyChangedEventArgs propertyChangedEventArgs = e as PropertyChangedEventArgs;
+			if (propertyChangedEventArgs == null || (!(propertyChangedEventArgs.PropertyName != "Selected") && !WebPeeperModule.InstanceSettingsMenuItem.get_Selected()))
+			{
+				WebPeeperModule.Instance.DownloadService.Download(CefService.Versions[CefVersion.get_Value()]);
+			}
+		}
+
+		public int GetFrameRate()
+		{
+			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001d: Invalid comparison between Unknown and I4
+			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0021: Invalid comparison between Unknown and I4
+			int result = 30;
+			if (IsFollowBhFps.get_Value())
+			{
+				FramerateMethod frameLimiter = GameService.Graphics.get_FrameLimiter();
+				int num = (((int)frameLimiter == 1) ? 30 : (((int)frameLimiter != 2) ? 60 : 60));
+				result = num;
+			}
+			return result;
+		}
+
+		public void RedownloadCef()
+		{
+			CefErrorVersion.set_Value(CefVersion.get_Value());
 		}
 
 		private void ToggleSettings(object sender, EventArgs e)
 		{
-			WebPeeperModule.Instance.UIService?.ToggleSettings();
+			WebPeeperModule.Instance.UiService?.ToggleSettings();
 		}
 
 		private void ToggleWebWindow(object sender, EventArgs e)
 		{
-			WebPeeperModule.Instance.UIService?.ToggleBrowser();
+			WebPeeperModule.Instance.UiService?.ToggleBrowser();
 		}
 
-		private void FocusBHWindow(object sender, EventArgs e)
+		private void OnCaptureKeyboardActivated(object sender, EventArgs e)
 		{
-			UIService uIService = WebPeeperModule.Instance.UIService;
+			UiService uiService = WebPeeperModule.Instance.UiService;
 			int num;
-			if (uIService == null)
+			if (uiService == null)
 			{
-				num = 0;
+				num = 1;
 			}
 			else
 			{
-				BrowserWindow browserWindow = uIService.BrowserWindow;
-				num = ((((browserWindow != null) ? new bool?(((Control)browserWindow).get_Visible()) : null) == false) ? 1 : 0);
+				BrowserWindow browserWindow = uiService.BrowserWindow;
+				num = ((!((browserWindow != null) ? new bool?(((Control)browserWindow).get_Visible()) : null).GetValueOrDefault()) ? 1 : 0);
 			}
-			if (num == 0)
+			if (num == 0 && CefService.LibLoadStarted)
 			{
-				Utils.SetForegroundWindow(WebPeeperModule.BlishHudInstance.get_FormHandle());
-				WebPeeperModule.Instance.CefService?.FocusBlurredElement();
+				FocusBHWindow();
 			}
 		}
 
-		private void ZoomInWeb(object sender, EventArgs e)
+		private void FocusBHWindow()
 		{
-			if (WebPainter.Instance != null && ((Control)WebPainter.Instance).get_MouseOver())
+			WebPeeperModule.Logger.Debug("ModuleSettings.FocusBHWindow: bring Blish.HUD to the foreground");
+			if (((Game)WebPeeperModule.BlishHudInstance).get_Window().IsForeground())
 			{
-				WebPainter.Instance.Zoom(1f);
+				WebPeeperModule.Logger.Debug("ModuleSettings.FocusBHWindow: Blish.HUD already foreground");
+				return;
+			}
+			Utils.SetForegroundWindow(WebPeeperModule.BlishHudInstance.get_FormHandle());
+			Browser.FocusBlurredElement();
+		}
+
+		private void OnZoomInActivated(object sender, EventArgs e)
+		{
+			WebPainter instance = WebPainter.Instance;
+			if (instance != null && ((Control)instance).get_MouseOver())
+			{
+				ZoomInWeb();
 			}
 		}
 
-		private void ZoomOutWeb(object sender, EventArgs e)
+		private void ZoomInWeb()
 		{
-			if (WebPainter.Instance != null && ((Control)WebPainter.Instance).get_MouseOver())
+			Browser.Zoom(1f);
+		}
+
+		private void OnZoomOutActivated(object sender, EventArgs e)
+		{
+			WebPainter instance = WebPainter.Instance;
+			if (instance != null && ((Control)instance).get_MouseOver())
 			{
-				WebPainter.Instance.Zoom(-1f);
+				ZoomOutWeb();
 			}
+		}
+
+		private void ZoomOutWeb()
+		{
+			Browser.Zoom(-1f);
 		}
 	}
 }

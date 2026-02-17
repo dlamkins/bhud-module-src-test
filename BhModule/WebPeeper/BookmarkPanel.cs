@@ -2,12 +2,10 @@ using System;
 using System.Collections.Specialized;
 using System.IO;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
-using CefSharp;
-using CefSharp.OffScreen;
+using CefHelper;
 using Glide;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -15,10 +13,8 @@ using Newtonsoft.Json;
 
 namespace BhModule.WebPeeper
 {
-	public class BookmarkPanel : Panel
+	internal class BookmarkPanel : Panel
 	{
-		public static BookmarkPanel Instance;
-
 		private static readonly Point _bgOverSize = new Point(75, 50);
 
 		private static readonly Texture2D _bgTexture = Control.get_Content().GetTexture("controls/window/502049");
@@ -55,7 +51,7 @@ namespace BhModule.WebPeeper
 
 		private bool _editing;
 
-		private ChromiumWebBrowser WebBrowser => WebPeeperModule.Instance.CefService.WebBrowser;
+		public static BookmarkPanel Instance { get; private set; }
 
 		public BookmarkPanel()
 			: this()
@@ -84,17 +80,13 @@ namespace BhModule.WebPeeper
 			_addBtn = iconButton2;
 			((Control)_addBtn).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				if (WebBrowser != null && WebBrowser.CanExecuteJavascriptInMainFrame)
+				string result = Browser.GetMainFrameTitle().Result;
+				string input = (string.IsNullOrWhiteSpace(result) ? ((WindowBase2)WebPeeperModule.Instance.UiService.BrowserWindow).get_Subtitle() : result);
+				AddBookmark(new Bookmark
 				{
-					Task<JavascriptResponse> task = WebBrowser.EvaluateScriptAsync("document.title");
-					task.Wait(TimeSpan.FromSeconds(1.0));
-					string input = (task.IsCanceled ? ((WindowBase2)WebPeeperModule.Instance.UIService.BrowserWindow).get_Subtitle() : ((string)task.Result.Result));
-					AddBookmark(new Bookmark
-					{
-						Name = _notSupportStringMatcher.Replace(input, "-"),
-						URL = WebBrowser.Address
-					});
-				}
+					Name = _notSupportStringMatcher.Replace(input, "-"),
+					URL = Browser.get_Address()
+				});
 			});
 			BookmarkMenu bookmarkMenu = new BookmarkMenu();
 			((Control)bookmarkMenu).set_Size(((Control)this).get_Size());
@@ -124,7 +116,7 @@ namespace BhModule.WebPeeper
 					((Control)_menuContainer).set_Opacity(1f);
 				}
 			});
-			_jsonPath = Path.Combine(CefService.CefSettingFolder, "bookmarks.json");
+			_jsonPath = Path.Combine(WebPeeperModule.Instance.DataFolder, "bookmarks.json");
 			if (!File.Exists(_jsonPath))
 			{
 				return;
@@ -263,7 +255,7 @@ namespace BhModule.WebPeeper
 			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
 			((Control)_editBtn).set_Location(new Point(((Control)this).get_Location().X + 10, ((Control)this).get_Location().Y + 10));
-			((Control)_addBtn).set_Location(new Point(((Control)this).get_Location().X + ((Control)this).get_Width() - 50, ((Control)_editBtn).get_Location().Y));
+			((Control)_addBtn).set_Location(new Point(((Control)this).get_Location().X + ((Control)this).get_Width() - 25, ((Control)_editBtn).get_Location().Y));
 		}
 
 		private void HideBtns()
