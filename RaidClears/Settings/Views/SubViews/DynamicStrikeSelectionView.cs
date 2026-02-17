@@ -3,6 +3,7 @@ using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Settings;
 using Microsoft.Xna.Framework;
+using RaidClears.Features.Shared.Models;
 using RaidClears.Features.Strikes.Models;
 using RaidClears.Features.Strikes.Services;
 using RaidClears.Localization;
@@ -77,7 +78,7 @@ namespace RaidClears.Settings.Views.SubViews
 			//IL_0102: Unknown result type (might be due to invalid IL or missing references)
 			//IL_010c: Expected O, but got Unknown
 			List<SettingEntry<bool>> expansionMissions = new List<SettingEntry<bool>>();
-			foreach (StrikeMission mission in expac.Missions)
+			foreach (BossEncounter mission in expac.Missions)
 			{
 				expansionMissions.Add(_data.GetMissionVisible(mission));
 			}

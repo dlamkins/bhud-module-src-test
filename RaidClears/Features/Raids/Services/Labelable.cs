@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
-using RaidClears.Features.Raids.Models;
+using RaidClears.Features.Shared;
 using RaidClears.Features.Shared.Models;
 
 namespace RaidClears.Features.Raids.Services
@@ -27,13 +27,19 @@ namespace RaidClears.Features.Raids.Services
 			{
 				return value;
 			}
+			string storageKey = StorageKeyPrefixes.NormalizeStorageKey(encounterApiId);
+			if (storageKey != encounterApiId && EncounterLabels.TryGetValue(storageKey, out value))
+			{
+				return value;
+			}
+			string lookupId = storageKey;
 			if (_isRaid)
 			{
-				return Service.RaidData.GetRaidEncounterByApiId(encounterApiId).Abbriviation;
+				return Service.RaidData.GetRaidEncounterByApiId(lookupId).Abbriviation;
 			}
 			if (_isStrike)
 			{
-				return Service.StrikeData.GetStrikeMissionById(encounterApiId).Abbriviation;
+				return Service.StrikeData.GetBossEncounterById(lookupId).Abbriviation;
 			}
 			if (_isFractal)
 			{
@@ -42,9 +48,14 @@ namespace RaidClears.Features.Raids.Services
 			return "undefined";
 		}
 
-		public string GetEncounterLabel(RaidEncounter enc)
+		public string GetEncounterLabel(BossEncounter enc)
 		{
-			if (EncounterLabels.TryGetValue(enc.ApiId, out var value))
+			if (EncounterLabels.TryGetValue(enc.EncounterId, out var value))
+			{
+				return value;
+			}
+			string storageKey = StorageKeyPrefixes.NormalizeStorageKey(enc.EncounterId);
+			if (storageKey != enc.EncounterId && EncounterLabels.TryGetValue(storageKey, out value))
 			{
 				return value;
 			}

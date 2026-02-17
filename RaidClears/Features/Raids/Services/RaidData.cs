@@ -5,13 +5,15 @@ using System.Net;
 using System.Text;
 using Newtonsoft.Json;
 using RaidClears.Features.Raids.Models;
-using RaidClears.Features.Strikes.Models;
+using RaidClears.Features.Shared.Models;
 
 namespace RaidClears.Features.Raids.Services
 {
 	[Serializable]
 	public class RaidData
 	{
+		private static readonly HashSet<string> DefaultEventEncounterApiIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "spirit_woods", "bandit_trio", "escort", "twisted_castle", "river_of_souls", "statues_of_grenth", "gate", "camp" };
+
 		[JsonIgnore]
 		public static string FILENAME = "raid_data.json";
 
@@ -24,6 +26,10 @@ namespace RaidClears.Features.Raids.Services
 
 		[JsonProperty("secondsInWeek")]
 		public int SecondsInWeek { get; set; } = -1;
+
+
+		[JsonProperty("eventEncounterApiIds")]
+		public List<string> EventEncounterApiIds { get; set; } = new List<string>();
 
 
 		[JsonProperty("powerDamageAssetId")]
@@ -103,6 +109,15 @@ namespace RaidClears.Features.Raids.Services
 			return new RaidWing();
 		}
 
+		public bool IsEventEncounter(string apiId)
+		{
+			if (string.IsNullOrEmpty(apiId))
+			{
+				return false;
+			}
+			return ((EventEncounterApiIds != null && EventEncounterApiIds.Count > 0) ? new HashSet<string>(EventEncounterApiIds, StringComparer.OrdinalIgnoreCase) : DefaultEventEncounterApiIds).Contains(apiId);
+		}
+
 		public RaidWing GetRaidWingByZeroIndex(int idx)
 		{
 			foreach (ExpansionRaid expansion in Expansions)
@@ -133,13 +148,13 @@ namespace RaidClears.Features.Raids.Services
 			return new RaidWing();
 		}
 
-		public RaidEncounter GetRaidEncounterByApiId(string apiId)
+		public BossEncounter GetRaidEncounterByApiId(string apiId)
 		{
 			foreach (ExpansionRaid expansion in Expansions)
 			{
 				foreach (RaidWing wing in expansion.Wings)
 				{
-					foreach (RaidEncounter enc in wing.Encounters)
+					foreach (BossEncounter enc in wing.Encounters)
 					{
 						if (enc.ApiId == apiId)
 						{
@@ -148,35 +163,37 @@ namespace RaidClears.Features.Raids.Services
 					}
 					if (wing.Id == apiId)
 					{
-						return wing.ToRaidEncounter();
+						return wing.ToBossEncounter();
 					}
 				}
 			}
-			StrikeMission strike = Service.StrikeData.GetStrikeMissionById(apiId);
+			BossEncounter strike = Service.StrikeData.GetBossEncounterById(apiId);
 			if (strike.Name != "undefined")
 			{
-				return new RaidEncounter
+				return new BossEncounter
 				{
 					Abbriviation = strike.Abbriviation,
 					ApiId = strike.Id,
+					Id = strike.Id,
 					AssetId = strike.AssetId,
 					Name = strike.Name,
-					Id = strike.Id
+					MapIds = ((strike.MapIds != null && strike.MapIds.Count > 0) ? new List<int>(strike.MapIds) : new List<int>()),
+					DailyBountyAchievementId = strike.DailyBountyAchievementId
 				};
 			}
-			return new RaidEncounter
+			return new BossEncounter
 			{
 				Abbriviation = apiId
 			};
 		}
 
-		public RaidEncounter? GetEncounterByMentorAchievementId(int mentorAchievementId)
+		public BossEncounter? GetEncounterByMentorAchievementId(int mentorAchievementId)
 		{
 			foreach (ExpansionRaid expansion in Expansions)
 			{
 				foreach (RaidWing wing in expansion.Wings)
 				{
-					foreach (RaidEncounter enc in wing.Encounters)
+					foreach (BossEncounter enc in wing.Encounters)
 					{
 						if (enc.MentorAchievementId == mentorAchievementId)
 						{

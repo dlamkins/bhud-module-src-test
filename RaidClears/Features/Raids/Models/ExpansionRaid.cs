@@ -6,7 +6,7 @@ using RaidClears.Features.Shared.Models;
 namespace RaidClears.Features.Raids.Models
 {
 	[Serializable]
-	public class ExpansionRaid : EncounterInterface
+	public class ExpansionRaid : EncounterInterface, IExpansion<RaidWing>
 	{
 		[JsonProperty("asset")]
 		public string asset = "missing.png";
@@ -14,34 +14,12 @@ namespace RaidClears.Features.Raids.Models
 		[JsonProperty("wings")]
 		public List<RaidWing> Wings = new List<RaidWing>();
 
-		[JsonProperty("name")]
-		private string _name = "undefined";
+		[JsonIgnore]
+		public string Asset => asset;
 
-		[JsonProperty("abbriviation")]
-		private string _abbriviation = "undefined";
+		[JsonIgnore]
+		public IReadOnlyList<RaidWing> Children => Wings;
 
-		public new string Name
-		{
-			get
-			{
-				return GetLocalizedName(_name);
-			}
-			set
-			{
-				_name = value;
-			}
-		}
-
-		public new string Abbriviation
-		{
-			get
-			{
-				return GetLocalizedAbbreviation(_abbriviation);
-			}
-			set
-			{
-				_abbriviation = value;
-			}
-		}
+		string IExpansion<RaidWing>.Id => Id;
 	}
 }

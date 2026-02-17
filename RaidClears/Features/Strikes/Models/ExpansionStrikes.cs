@@ -7,7 +7,7 @@ using RaidClears.Features.Shared.Models;
 namespace RaidClears.Features.Strikes.Models
 {
 	[Serializable]
-	public class ExpansionStrikes : EncounterInterface
+	public class ExpansionStrikes : EncounterInterface, IExpansion<BossEncounter>
 	{
 		[JsonProperty("asset")]
 		public string asset = "missing.png";
@@ -22,51 +22,29 @@ namespace RaidClears.Features.Strikes.Models
 		public int DailyPriorityOffset;
 
 		[JsonProperty("missions")]
-		public List<StrikeMission> Missions = new List<StrikeMission>();
+		public List<BossEncounter> Missions = new List<BossEncounter>();
 
-		[JsonProperty("name")]
-		private string _name = "undefined";
+		[JsonIgnore]
+		public string Asset => asset;
 
-		[JsonProperty("abbriviation")]
-		private string _abbriviation = "undefined";
+		[JsonIgnore]
+		public IReadOnlyList<BossEncounter> Children => Missions;
 
-		public new string Name
-		{
-			get
-			{
-				return GetLocalizedName(_name);
-			}
-			set
-			{
-				_name = value;
-			}
-		}
-
-		public new string Abbriviation
-		{
-			get
-			{
-				return GetLocalizedAbbreviation(_abbriviation);
-			}
-			set
-			{
-				_abbriviation = value;
-			}
-		}
+		string IExpansion<BossEncounter>.Id => Id;
 
 		public List<BoxModel> GetEncounters()
 		{
 			List<BoxModel> missionslist = new List<BoxModel>();
-			foreach (StrikeMission mission in Missions)
+			foreach (BossEncounter mission in Missions)
 			{
-				missionslist.Add(new Encounter(mission));
+				missionslist.Add(new Encounter(mission, isStrike: true));
 			}
 			return missionslist;
 		}
 
-		public StrikeMission ToStrikeMission()
+		public BossEncounter ToBossEncounter()
 		{
-			return new StrikeMission
+			return new BossEncounter
 			{
 				Name = Name,
 				Id = Id,

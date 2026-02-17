@@ -6,7 +6,7 @@ using System.Runtime.Versioning;
 [assembly: AssemblyCompany("BlishHud-Raid-Clears")]
 [assembly: AssemblyConfiguration("Release")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
-[assembly: AssemblyInformationalVersion("1.0.0+b51f2f13d0b290e2f5bbfae1eeffc407f292a102")]
+[assembly: AssemblyInformationalVersion("1.0.0+8974cd223d27803501161934f906896607fca5fe")]
 [assembly: AssemblyProduct("BlishHud-Raid-Clears")]
 [assembly: AssemblyTitle("BlishHud-Raid-Clears")]
 [assembly: AssemblyVersion("1.0.0.0")]

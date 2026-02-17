@@ -7,7 +7,7 @@ using Blish_HUD.Settings;
 using Blish_HUD.Settings.UI.Views;
 using Microsoft.Xna.Framework;
 using RaidClears.Features.Fractals.Services;
-using RaidClears.Features.Strikes.Models;
+using RaidClears.Features.Shared.Models;
 using RaidClears.Settings.Controls;
 using RaidClears.Settings.Enums;
 using RaidClears.Settings.Views;
@@ -210,7 +210,7 @@ namespace RaidClears.Utils
 			return panel;
 		}
 
-		public static FlowPanel AddEncounterClearStatus(this FlowPanel panel, StrikeMission encounter, DateTime clearDate)
+		public static FlowPanel AddEncounterClearStatus(this FlowPanel panel, BossEncounter encounter, DateTime clearDate)
 		{
 			new EncounterClearStatus(panel, encounter, clearDate);
 			return panel;

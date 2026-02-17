@@ -4,6 +4,7 @@ using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Microsoft.Xna.Framework;
 using RaidClears.Features.Raids.Models;
+using RaidClears.Features.Shared.Models;
 using RaidClears.Localization;
 using RaidClears.Settings.Controls;
 using RaidClears.Utils;
@@ -33,7 +34,7 @@ namespace RaidClears.Settings.Views.SubViews
 				foreach (RaidWing wing in expansion.Wings)
 				{
 					((Container)(object)panel).AddControl((Control)(object)new EncounterLabelCustomerizer(panel, Service.RaidSettings, wing, Color.get_Gray()));
-					foreach (RaidEncounter encounter in wing.Encounters)
+					foreach (BossEncounter encounter in wing.Encounters)
 					{
 						EncounterLabelCustomerizer customerizer = new EncounterLabelCustomerizer(panel, Service.RaidSettings, encounter);
 						((Container)(object)panel).AddControl((Control)(object)customerizer);

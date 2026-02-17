@@ -190,15 +190,19 @@ namespace RaidClears.Features.Shared.Controls
 			});
 			((Control)this).add_LeftMouseButtonReleased((EventHandler<MouseEventArgs>)delegate
 			{
-				//IL_0056: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+				//IL_009a: Unknown result type (might be due to invalid IL or missing references)
 				if (_settings.PositionLock.get_Value())
 				{
 					_isDraggedByMouse = false;
 					ClampToSpriteScreen();
-					if (Service.Settings.StrikeSettings.AnchorToRaidPanel.get_Value() && this == Service.StrikesWindow)
+					if (this == Service.RaidWindow || (Service.Settings.StrikeSettings.AnchorToRaidPanel.get_Value() && this == Service.StrikesWindow))
 					{
 						Service.Settings.RaidSettings.Generic.Location.set_Value(((Control)Service.RaidWindow).get_Location());
 					}
+					Service.Settings.StrikeSettings.Generic.Location.set_Value(((Control)Service.StrikesWindow).get_Location());
+					_settings.Location.set_Value(((Control)this).get_Location());
 				}
 			});
 		}

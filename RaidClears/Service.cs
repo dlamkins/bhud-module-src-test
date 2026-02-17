@@ -47,6 +47,9 @@ namespace RaidClears
 		public static DailyBountyData DailyBountyData { get; set; } = null;
 
 
+		public static DailyBountyProgressService DailyBountyProgress { get; set; } = null;
+
+
 		public static StrikeData StrikeData { get; set; } = null;
 
 
@@ -99,6 +102,9 @@ namespace RaidClears
 
 
 		public static ResetsWatcherService ResetWatcher { get; set; } = null;
+
+
+		public static WeeklyBountyEncountersService WeeklyBountyEncounters { get; set; } = null;
 
 	}
 }

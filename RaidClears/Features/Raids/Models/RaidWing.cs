@@ -27,44 +27,15 @@ namespace RaidClears.Features.Raids.Models
 		public int EmboldendedWeeks = -1;
 
 		[JsonProperty("encounters")]
-		public List<RaidEncounter> Encounters = new List<RaidEncounter>();
+		public List<BossEncounter> Encounters = new List<BossEncounter>();
 
-		[JsonProperty("name")]
-		private string _name = "undefined";
-
-		[JsonProperty("abbriviation")]
-		private string _abbriviation = "undefined";
-
-		public new string Name
+		public BossEncounter ToBossEncounter()
 		{
-			get
-			{
-				return GetLocalizedName(_name);
-			}
-			set
-			{
-				_name = value;
-			}
-		}
-
-		public new string Abbriviation
-		{
-			get
-			{
-				return GetLocalizedAbbreviation(_abbriviation);
-			}
-			set
-			{
-				_abbriviation = value;
-			}
-		}
-
-		public RaidEncounter ToRaidEncounter()
-		{
-			return new RaidEncounter
+			return new BossEncounter
 			{
 				Name = Name,
 				ApiId = Id,
+				Id = Id,
 				Abbriviation = Abbriviation
 			};
 		}

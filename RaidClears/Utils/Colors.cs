@@ -13,5 +13,7 @@ namespace RaidClears.Utils
 		public const string Black = "#000000";
 
 		public const string Blue = "#202090";
+
+		public const string Orange = "#CC8800";
 	}
 }

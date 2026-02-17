@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Blish_HUD;
 using Blish_HUD.Controls;
-using RaidClears.Features.Strikes.Models;
+using RaidClears.Features.Shared.Models;
 using RaidClears.Localization;
 using RaidClears.Settings.Enums;
 using RaidClears.Shared.Controls;
@@ -13,7 +13,7 @@ namespace RaidClears.Features.Strikes.Services
 	{
 		protected bool _isOnStrikeMap;
 
-		protected StrikeMission? _strikeMission;
+		protected BossEncounter? _strikeMission;
 
 		protected string _strikeApiName = string.Empty;
 
@@ -59,13 +59,13 @@ namespace RaidClears.Features.Strikes.Services
 			this.CompletedStrikes?.Invoke(this, clearedStrikesThisReset);
 		}
 
-		public void MarkStrikeCompleted(StrikeMission mission)
+		public void MarkStrikeCompleted(BossEncounter mission)
 		{
 			Service.StrikePersistance.SaveClear(Service.CurrentAccountName, mission);
 			DispatchCurrentStrikeClears();
 		}
 
-		public void MarkStrikeNotCompleted(StrikeMission mission)
+		public void MarkStrikeNotCompleted(BossEncounter mission)
 		{
 			Service.StrikePersistance.RemoveClear(Service.CurrentAccountName, mission);
 			DispatchCurrentStrikeClears();
@@ -81,12 +81,12 @@ namespace RaidClears.Features.Strikes.Services
 
 		private async void CurrentMap_MapChanged(object sender, ValueEventArgs<int> e)
 		{
-			StrikeMission _strikeMap = Service.StrikeData.GetStrikeMisisonByMapId(e.get_Value());
+			BossEncounter _strikeMap = Service.StrikeData.GetBossEncounterByMapId(e.get_Value());
 			if (_strikeMap != null)
 			{
 				Reset();
 				_isOnStrikeMap = true;
-				_strikeApiName = _strikeMap.Id;
+				_strikeApiName = _strikeMap.EncounterId;
 				_strikeName = _strikeMap.Name;
 				_strikeMission = _strikeMap;
 			}

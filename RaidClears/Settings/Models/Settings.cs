@@ -17,7 +17,7 @@ namespace RaidClears.Settings.Models
 			{
 				public static Setting<bool> enable = new Setting<bool>("RCDungeonEnable", DefaultValue: true, () => Strings.Setting_Dun_Enabled, () => Strings.Setting_Dun_Enabled_Tooltip);
 
-				public static Setting<Point> location = new Setting<Point>("RCDungeonLoc", new Point(250, 500));
+				public static Setting<Point> location = new Setting<Point>("RCDungeonLoc", new Point(250, 605));
 
 				public static Setting<bool> positionLock = new Setting<bool>("RCDunDrag", DefaultValue: true, () => Strings.Setting_Dun_Drag_Label, () => Strings.Setting_Dun_Drag_Tooltip);
 
@@ -84,7 +84,7 @@ namespace RaidClears.Settings.Models
 			{
 				public static Setting<bool> enabled = new Setting<bool>("RCRaidEnabled", DefaultValue: true, () => "Enable Raids Feature");
 
-				public static Setting<Point> location = new Setting<Point>("RCLocation", new Point(250, 210));
+				public static Setting<Point> location = new Setting<Point>("RCLocation", new Point(250, 185));
 
 				public static Setting<bool> positionLock = new Setting<bool>("RCDrag", DefaultValue: true, () => Strings.Setting_Raid_Drag_Label, () => Strings.Setting_Raid_Drag_Tooltip);
 
@@ -111,6 +111,8 @@ namespace RaidClears.Settings.Models
 
 					public static Setting<string> embolden = new Setting<string>("colEmbolden", "#202090", () => Strings.Setting_Raid_ColEmbolden_Label, () => Strings.Setting_Raid_ColEmbolden_Tooltip);
 
+					public static Setting<string> nonWeeklyBounty = new Setting<string>("colNonWeeklyBounty", "#CC8800", () => Strings.Setting_Raid_ColNonWeeklyBounty_Label, () => Strings.Setting_Raid_ColNonWeeklyBounty_Tooltip);
+
 					public static Setting<string> background = new Setting<string>("colRaidBG", "#000000", () => Strings.Setting_Raid_ColBG_Label, () => Strings.Setting_Raid_ColBG_Tooltip);
 				}
 
@@ -133,9 +135,13 @@ namespace RaidClears.Settings.Models
 
 				public static Setting<bool> highlightCotm = new Setting<bool>("RCCotM", DefaultValue: true, () => Strings.Setting_Raid_Cotm_Label, () => Strings.Setting_Raid_Cotm_Tooltip);
 
+				public static Setting<bool> highlightNonWeeklyBounty = new Setting<bool>("RCNonWeeklyBounty", DefaultValue: true, () => Strings.Setting_Raid_NonWeeklyBounty_Label, () => Strings.Setting_Raid_NonWeeklyBounty_Tooltip);
+
+				public static Setting<bool> omitEventEncounters = new Setting<bool>("RCOmitEventEncounters", DefaultValue: true, () => Strings.Setting_Raid_OmitEventEncounters_Label, () => Strings.Setting_Raid_OmitEventEncounters_Tooltip);
+
 				public static Setting<bool> mentorProgress = new Setting<bool>("RCMentorProgress", DefaultValue: true, () => Strings.Setting_Raid_MentorProgress_Label, () => Strings.Setting_Raid_MentorProgress_Tooltip);
 
-				public static Setting<bool> mentorProgressPopup = new Setting<bool>("RCMentorProgressPopup", DefaultValue: true, () => Strings.Setting_Raid_MentorProgressPopup_Label, () => Strings.Setting_Raid_MentorProgressPopup_Tooltip);
+				public static Setting<bool> mentorProgressPopup = new Setting<bool>("RCMentorProgressPopup", DefaultValue: false, () => Strings.Setting_Raid_MentorProgressPopup_Label, () => Strings.Setting_Raid_MentorProgressPopup_Tooltip);
 			}
 		}
 
@@ -171,7 +177,7 @@ namespace RaidClears.Settings.Models
 			{
 				public static Setting<bool> enabled = new Setting<bool>("RCStkEnabled", DefaultValue: true, () => "Enable strikes Feature");
 
-				public static Setting<Point> location = new Setting<Point>("RCStkLocation", new Point(250, 370));
+				public static Setting<Point> location = new Setting<Point>("RCStkLocation", new Point(250, 380));
 
 				public static Setting<bool> positionLock = new Setting<bool>("RCStkDrag", DefaultValue: true, () => Strings.Setting_Strike_Drag_Label, () => Strings.Setting_Strike_Drag_Tooltip);
 
@@ -224,7 +230,7 @@ namespace RaidClears.Settings.Models
 			{
 				public static Setting<bool> enabled = new Setting<bool>("RCFracEnabled", DefaultValue: true, () => "Enable Fractals Feature");
 
-				public static Setting<Point> location = new Setting<Point>("RCFracLocation", new Point(250, 445));
+				public static Setting<Point> location = new Setting<Point>("RCFracLocation", new Point(250, 525));
 
 				public static Setting<bool> positionLock = new Setting<bool>("RCFracDrag", DefaultValue: true, () => Strings.Setting_Fractals_Drag_Label, () => Strings.Setting_Fractals_Drag_Tooltip);
 

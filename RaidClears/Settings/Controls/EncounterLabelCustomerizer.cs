@@ -41,7 +41,7 @@ namespace RaidClears.Settings.Controls
 			Build(encounter.Name, encounter.Abbriviation, encounter.Id, labelColor);
 		}
 
-		public EncounterLabelCustomerizer(FlowPanel parent, Labelable labelable, RaidEncounter encounter, Color? labelColor = null)
+		public EncounterLabelCustomerizer(FlowPanel parent, Labelable labelable, BossEncounter encounter, Color? labelColor = null)
 			: this()
 		{
 			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
@@ -57,26 +57,7 @@ namespace RaidClears.Settings.Controls
 			((Control)this).set_Parent((Container)(object)parent);
 			((Control)this).set_Width(((Control)parent).get_Width() - 10);
 			((Control)this).set_Padding(new Thickness(0f, 10f));
-			Build(encounter.Name, encounter.Abbriviation, encounter.ApiId, labelColor);
-		}
-
-		public EncounterLabelCustomerizer(FlowPanel parent, Labelable labelable, StrikeMission encounter, Color? labelColor = null)
-			: this()
-		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000b: Expected O, but got Unknown
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0016: Expected O, but got Unknown
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0021: Expected O, but got Unknown
-			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002c: Expected O, but got Unknown
-			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-			_labelable = labelable;
-			((Control)this).set_Parent((Container)(object)parent);
-			((Control)this).set_Width(((Control)parent).get_Width() - 10);
-			((Control)this).set_Padding(new Thickness(0f, 10f));
-			Build(encounter.Name, encounter.Abbriviation, encounter.Id, labelColor);
+			Build(encounter.Name, encounter.Abbriviation, encounter.EncounterId, labelColor);
 		}
 
 		public EncounterLabelCustomerizer(FlowPanel parent, Labelable labelable, RaidWing encounter, Color? labelColor = null)

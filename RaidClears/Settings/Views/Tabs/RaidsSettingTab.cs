@@ -31,13 +31,16 @@ namespace RaidClears.Settings.Views.Tabs
 			{
 				(SettingEntry)(object)Service.Settings.RaidSettings.RaidPanelHighlightEmbolden,
 				(SettingEntry)(object)Service.Settings.RaidSettings.RaidPanelHighlightCotM,
+				(SettingEntry)(object)Service.Settings.RaidSettings.RaidPanelHighlightNonWeeklyBounty,
+				(SettingEntry)(object)Service.Settings.RaidSettings.RaidPanelOmitEventEncounters,
 				(SettingEntry)(object)Service.Settings.RaidSettings.RaidPanelMentorProgress,
 				(SettingEntry)(object)Service.Settings.RaidSettings.RaidPanelMentorProgressPopup
 			})));
 			_registeredMenuItems.Add(new MenuViewItem(new MenuItem(Strings.SettingsPanel_Raids_Heading_Layout), (MenuItem _) => (IView)(object)new GenericStyleView(Service.Settings.RaidSettings.Style, new List<SettingEntry<string>>
 			{
 				Service.Settings.RaidSettings.RaidPanelColorEmbolden,
-				Service.Settings.RaidSettings.RaidPanelColorCotm
+				Service.Settings.RaidSettings.RaidPanelColorCotm,
+				Service.Settings.RaidSettings.RaidPanelColorNonWeeklyBounty
 			})));
 			_registeredMenuItems.Add(new MenuViewItem(new MenuItem(Strings.SettingsPanel_Raids_Heading_WingSelection), (MenuItem _) => (IView)(object)new DynamicRaidSelectionView()));
 			_registeredMenuItems.Add(new MenuViewItem(new MenuItem("Customize Labels"), (MenuItem _) => (IView)(object)new RaidLabelCustomizationView()));

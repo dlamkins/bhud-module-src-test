@@ -16,7 +16,6 @@ using RaidClears.Features.Dungeons;
 using RaidClears.Features.Fractals;
 using RaidClears.Features.Fractals.Services;
 using RaidClears.Features.Raids;
-using RaidClears.Features.Raids.Models;
 using RaidClears.Features.Raids.Services;
 using RaidClears.Features.Shared.Models;
 using RaidClears.Features.Shared.Services;
@@ -74,6 +73,7 @@ namespace RaidClears
 			Service.MentorAchievementProgress.LoadCache();
 			Service.StrikeData = StrikeData.Load();
 			Service.DailyBountyData = DailyBountyDataService.Load();
+			Service.DailyBountyProgress = new DailyBountyProgressService();
 			Service.RaidSettings = RaidSettingsPersistance.Load();
 			Service.StrikeSettings = StrikeSettingsPersistance.Load();
 			Service.FractalMapData = FractalMapData.Load();
@@ -83,6 +83,11 @@ namespace RaidClears
 			Service.FractalSettings = FractalSettingsPersistance.Load();
 			Service.ApiPollingService = new ApiPollService(Service.Settings.ApiPollingPeriod);
 			Service.ResetWatcher = new ResetsWatcherService();
+			Service.WeeklyBountyEncounters = new WeeklyBountyEncountersService();
+			Service.ResetWatcher.DailyReset += delegate
+			{
+				Service.WeeklyBountyEncounters.Rebuild();
+			};
 			Service.MapWatcher = new MapWatcherService();
 			Service.FractalMapWatcher = new FractalMapWatcherService();
 			Service.SettingsWindow = new SettingsPanel();
@@ -237,7 +242,7 @@ namespace RaidClears
 				{
 					if (current.Delta > 0)
 					{
-						RaidEncounter encounterByMentorAchievementId = raidData.GetEncounterByMentorAchievementId(current.AchievementId);
+						BossEncounter encounterByMentorAchievementId = raidData.GetEncounterByMentorAchievementId(current.AchievementId);
 						MentorAchievementProgressEntry value;
 						MentorProgressPopupPanel obj = new MentorProgressPopupPanel(encounterByMentorAchievementId?.Name ?? $"Achievement {current.AchievementId}", max: progress.TryGetValue(current.AchievementId, out value) ? value.Max : current.NewCurrent, iconAssetId: (encounterByMentorAchievementId != null && encounterByMentorAchievementId.AssetId > 0) ? encounterByMentorAchievementId.AssetId : raidData.MentorAssetId, current: current.NewCurrent, delta: current.Delta);
 						((Control)obj).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());

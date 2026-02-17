@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Newtonsoft.Json;
+using RaidClears.Features.Shared.Models;
 using RaidClears.Features.Strikes.Models;
 
 namespace RaidClears.Features.Strikes.Services
@@ -26,42 +27,44 @@ namespace RaidClears.Features.Strikes.Services
 			Dictionary<string, DateTime> list = new Dictionary<string, DateTime>();
 			foreach (ExpansionStrikes expansion in Service.StrikeData.Expansions)
 			{
-				foreach (StrikeMission miss in expansion.Missions)
+				foreach (BossEncounter miss in expansion.Missions)
 				{
-					list.Add(miss.Id, default(DateTime));
+					list.Add(miss.EncounterId, default(DateTime));
 				}
 			}
 			return list;
 		}
 
-		public void SaveClear(string account, StrikeMission mission)
+		public void SaveClear(string account, BossEncounter mission)
 		{
+			string id = mission.EncounterId;
 			if (!AccountClears.TryGetValue(account, out var clears))
 			{
 				clears = GetEmpty();
 				AccountClears.Add(account, clears);
 			}
-			if (!clears.ContainsKey(mission.Id))
+			if (!clears.ContainsKey(id))
 			{
-				clears.Add(mission.Id, default(DateTime));
+				clears.Add(id, default(DateTime));
 			}
-			clears[mission.Id] = DateTime.UtcNow;
+			clears[id] = DateTime.UtcNow;
 			AccountClears[account] = clears;
 			Save();
 		}
 
-		public void RemoveClear(string account, StrikeMission mission)
+		public void RemoveClear(string account, BossEncounter mission)
 		{
+			string id = mission.EncounterId;
 			if (!AccountClears.TryGetValue(account, out var clears))
 			{
 				clears = GetEmpty();
 				AccountClears.Add(account, clears);
 			}
-			if (!clears.ContainsKey(mission.Id))
+			if (!clears.ContainsKey(id))
 			{
-				clears.Add(mission.Id, default(DateTime));
+				clears.Add(id, default(DateTime));
 			}
-			clears[mission.Id] = default(DateTime);
+			clears[id] = default(DateTime);
 			AccountClears[account] = clears;
 			Save();
 		}

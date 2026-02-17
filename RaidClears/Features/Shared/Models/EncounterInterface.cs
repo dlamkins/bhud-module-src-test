@@ -12,11 +12,11 @@ namespace RaidClears.Features.Shared.Models
 		[JsonProperty("id")]
 		public string Id = "undefined";
 
-		[JsonIgnore]
-		public string Name = "undefined";
+		[JsonProperty("name")]
+		protected string _name = "undefined";
 
-		[JsonIgnore]
-		public string Abbriviation = "undefined";
+		[JsonProperty("abbriviation")]
+		protected string _abbriviation = "undefined";
 
 		[JsonProperty("assetId")]
 		public int AssetId;
@@ -26,6 +26,30 @@ namespace RaidClears.Features.Shared.Models
 
 		[JsonProperty("localizedAbbreviations")]
 		protected LocalizedStrings? LocalizedAbbreviations { get; set; }
+
+		public virtual string Name
+		{
+			get
+			{
+				return GetLocalizedName(_name);
+			}
+			set
+			{
+				_name = value;
+			}
+		}
+
+		public virtual string Abbriviation
+		{
+			get
+			{
+				return GetLocalizedAbbreviation(_abbriviation);
+			}
+			set
+			{
+				_abbriviation = value;
+			}
+		}
 
 		protected string GetLocalizedName(string defaultName)
 		{

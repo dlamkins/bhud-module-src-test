@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using Blish_HUD;
 using Blish_HUD.Settings;
 using Newtonsoft.Json;
 using RaidClears.Features.Raids.Services;
+using RaidClears.Features.Shared;
+using RaidClears.Features.Shared.Models;
 using RaidClears.Features.Strikes.Models;
 using RaidClears.Localization;
 
@@ -17,11 +20,17 @@ namespace RaidClears.Features.Strikes.Services
 		[JsonIgnore]
 		public static string FILENAME = "strike_settings.json";
 
+		private const string CURRENT_VERSION = "3.5.0";
+
+		private static readonly HashSet<string> SupportedVersions = new HashSet<string>(StringComparer.Ordinal) { "3.0.0", "3.5.0" };
+
+		private static readonly HashSet<string> VersionsRequiringPriorityMigration = new HashSet<string>(StringComparer.Ordinal) { "3.0.0" };
+
 		[JsonIgnore]
 		protected Dictionary<string, SettingEntry<bool>> VirtualSettingsEnties = new Dictionary<string, SettingEntry<bool>>();
 
 		[JsonProperty("version")]
-		public string Version { get; set; } = "3.0.0";
+		public string Version { get; set; } = "3.5.0";
 
 
 		[JsonProperty("priority")]
@@ -51,7 +60,7 @@ namespace RaidClears.Features.Strikes.Services
 			foreach (ExpansionStrikes expac in Service.StrikeData.Expansions)
 			{
 				Expansions.Add(expac.Id, value: true);
-				foreach (StrikeMission miss in expac.Missions)
+				foreach (BossEncounter miss in expac.Missions)
 				{
 					Missions.Add(miss.Id, value: true);
 				}
@@ -60,18 +69,15 @@ namespace RaidClears.Features.Strikes.Services
 
 		public override void SetEncounterLabel(string encounterApiId, string label)
 		{
-			if (base.EncounterLabels.ContainsKey(encounterApiId))
+			string storageKey = StorageKeyPrefixes.NormalizeStorageKey(encounterApiId);
+			if (base.EncounterLabels.ContainsKey(storageKey))
 			{
-				base.EncounterLabels.Remove(encounterApiId);
+				base.EncounterLabels.Remove(storageKey);
 			}
-			if (base.EncounterLabels.ContainsKey("priority_" + encounterApiId))
-			{
-				base.EncounterLabels.Remove("priority_" + encounterApiId);
-			}
-			base.EncounterLabels.Add(encounterApiId, label);
-			base.EncounterLabels.Add("priority_" + encounterApiId, label);
+			base.EncounterLabels.Add(storageKey, label);
 			Service.StrikesWindow.UpdateEncounterLabel(encounterApiId, label);
-			Service.StrikesWindow.UpdateEncounterLabel("priority_" + encounterApiId, label);
+			Service.StrikesWindow.UpdateEncounterLabel("priority_" + storageKey, label);
+			Service.StrikesWindow.UpdateEncounterLabel("tomorrow_" + storageKey, label);
 			Save();
 		}
 
@@ -143,29 +149,30 @@ namespace RaidClears.Features.Strikes.Services
 			return setting;
 		}
 
-		public SettingEntry<bool> GetMissionVisible(StrikeMission mission)
+		public SettingEntry<bool> GetMissionVisible(BossEncounter mission)
 		{
-			StrikeMission mission2 = mission;
-			if (VirtualSettingsEnties.ContainsKey(mission2.Id))
+			BossEncounter mission2 = mission;
+			string id = StorageKeyPrefixes.NormalizeStorageKey(mission2.EncounterId);
+			if (VirtualSettingsEnties.ContainsKey(id))
 			{
-				return VirtualSettingsEnties[mission2.Id];
+				return VirtualSettingsEnties[id];
 			}
-			if (!Missions.ContainsKey(mission2.Id))
+			if (!Missions.ContainsKey(id))
 			{
-				Missions.Add(mission2.Id, value: true);
+				Missions.Add(id, value: true);
 				Save();
 			}
 			SettingEntry<bool> obj = new SettingEntry<bool>();
-			obj.set_Value(Missions[mission2.Id]);
+			obj.set_Value(Missions[id]);
 			((SettingEntry)obj).set_GetDescriptionFunc((Func<string>)(() => ""));
-			((SettingEntry)obj).set_GetDisplayNameFunc((Func<string>)(() => mission2.Name ?? ""));
+			((SettingEntry)obj).set_GetDisplayNameFunc((Func<string>)(() => mission2.Name));
 			SettingEntry<bool> setting = obj;
 			setting.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)delegate(object _, ValueChangedEventArgs<bool> e)
 			{
-				Missions[mission2.Id] = e.get_NewValue();
+				Missions[id] = e.get_NewValue();
 				Save();
 			});
-			VirtualSettingsEnties.Add(mission2.Id, setting);
+			VirtualSettingsEnties.Add(id, setting);
 			return setting;
 		}
 
@@ -211,11 +218,53 @@ namespace RaidClears.Features.Strikes.Services
 
 		private static StrikeSettingsPersistance HandleVersionUpgrade(StrikeSettingsPersistance data)
 		{
-			if (data.Version == "3.0.0")
+			if (!SupportedVersions.Contains(data.Version))
+			{
+				return new StrikeSettingsPersistance();
+			}
+			if (data.Version == "3.5.0")
 			{
 				return data;
 			}
-			return new StrikeSettingsPersistance();
+			if (VersionsRequiringPriorityMigration.Contains(data.Version))
+			{
+				MigratePriorityKeysFromStorage(data);
+			}
+			data.Version = "3.5.0";
+			data.Save();
+			return data;
+		}
+
+		private static bool MigratePriorityKeysFromStorage(StrikeSettingsPersistance data)
+		{
+			bool changed = false;
+			foreach (string key2 in data.EncounterLabels.Keys.ToList())
+			{
+				if (!(key2 == "priority") && !(key2 == "priority_tomorrow") && (key2.StartsWith("priority_", StringComparison.Ordinal) || key2.StartsWith("tomorrow_", StringComparison.Ordinal)))
+				{
+					string baseKey2 = (key2.StartsWith("priority_", StringComparison.Ordinal) ? key2.Substring("priority_".Length) : key2.Substring("tomorrow_".Length));
+					if (!data.EncounterLabels.ContainsKey(baseKey2))
+					{
+						data.EncounterLabels[baseKey2] = data.EncounterLabels[key2];
+					}
+					data.EncounterLabels.Remove(key2);
+					changed = true;
+				}
+			}
+			foreach (string key in data.Missions.Keys.ToList())
+			{
+				if (!(key == "priority") && !(key == "priority_tomorrow") && (key.StartsWith("priority_", StringComparison.Ordinal) || key.StartsWith("tomorrow_", StringComparison.Ordinal)))
+				{
+					string baseKey = (key.StartsWith("priority_", StringComparison.Ordinal) ? key.Substring("priority_".Length) : key.Substring("tomorrow_".Length));
+					if (!data.Missions.ContainsKey(baseKey))
+					{
+						data.Missions[baseKey] = data.Missions[key];
+					}
+					data.Missions.Remove(key);
+					changed = true;
+				}
+			}
+			return changed;
 		}
 
 		private static StrikeSettingsPersistance CreateNewCharacterConfiguration()

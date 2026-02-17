@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Microsoft.Xna.Framework;
+using RaidClears.Features.Shared.Models;
 using RaidClears.Features.Strikes.Models;
 using RaidClears.Localization;
 using RaidClears.Settings.Controls;
@@ -37,7 +38,7 @@ namespace RaidClears.Settings.Views.SubViews
 			foreach (ExpansionStrikes expansion in Service.StrikeData.Expansions)
 			{
 				((Container)(object)panel).AddControl((Control)(object)new EncounterLabelCustomerizer(panel, Service.StrikeSettings, expansion, Color.get_Gold()));
-				foreach (StrikeMission mission in expansion.Missions)
+				foreach (BossEncounter mission in expansion.Missions)
 				{
 					EncounterLabelCustomerizer customerizer = new EncounterLabelCustomerizer(panel, Service.StrikeSettings, mission);
 					((Container)(object)panel).AddControl((Control)(object)customerizer);

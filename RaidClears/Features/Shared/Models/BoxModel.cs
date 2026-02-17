@@ -23,6 +23,8 @@ namespace RaidClears.Features.Shared.Models
 
 		private Color _colorCleared = new Color(20, 120, 20);
 
+		public bool IsCleared => _isCleared;
+
 		public GridBox Box { get; private set; }
 
 		public BoxModel(string id, string name, string shortName)

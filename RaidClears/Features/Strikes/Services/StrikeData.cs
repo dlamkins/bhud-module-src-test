@@ -6,6 +6,7 @@ using System.Net;
 using System.Text;
 using Blish_HUD.Settings;
 using Newtonsoft.Json;
+using RaidClears.Features.Shared.Models;
 using RaidClears.Features.Strikes.Models;
 
 namespace RaidClears.Features.Strikes.Services
@@ -62,11 +63,11 @@ namespace RaidClears.Features.Strikes.Services
 			};
 		}
 
-		public StrikeMission? GetStrikeMisisonByMapId(int id)
+		public BossEncounter? GetBossEncounterByMapId(int id)
 		{
 			foreach (ExpansionStrikes expansion in Expansions)
 			{
-				foreach (StrikeMission mission in expansion.Missions)
+				foreach (BossEncounter mission in expansion.Missions)
 				{
 					if (mission.MapIds.Contains(id))
 					{
@@ -77,15 +78,15 @@ namespace RaidClears.Features.Strikes.Services
 			return null;
 		}
 
-		public StrikeMission GetStrikeMissionById(string name)
+		public BossEncounter GetBossEncounterById(string name)
 		{
 			foreach (ExpansionStrikes expansion in Expansions)
 			{
 				if (expansion.Id == name)
 				{
-					return expansion.ToStrikeMission();
+					return expansion.ToBossEncounter();
 				}
-				foreach (StrikeMission mission in expansion.Missions)
+				foreach (BossEncounter mission in expansion.Missions)
 				{
 					if (mission.Id == name)
 					{
@@ -95,25 +96,24 @@ namespace RaidClears.Features.Strikes.Services
 			}
 			if (Priority.Id == name)
 			{
-				return Priority.ToStrikeMission();
+				return Priority.ToBossEncounter();
 			}
 			if (PriorityTomorrow.Id == name)
 			{
-				return PriorityTomorrow.ToStrikeMission();
+				return PriorityTomorrow.ToBossEncounter();
 			}
-			return new StrikeMission
+			return new BossEncounter
 			{
 				Id = name,
-				Name = "GetStrikeMissionById Failed"
+				Name = "GetBossEncounterById Failed"
 			};
 		}
 
-		public StrikeMission GetStrikeMissionByName(string name)
+		public BossEncounter GetBossEncounterByName(string name)
 		{
 			foreach (ExpansionStrikes expansion in Expansions)
 			{
-				_ = expansion.Id == name;
-				foreach (StrikeMission mission in expansion.Missions)
+				foreach (BossEncounter mission in expansion.Missions)
 				{
 					if (mission.Name == name)
 					{
@@ -121,7 +121,7 @@ namespace RaidClears.Features.Strikes.Services
 					}
 				}
 			}
-			return new StrikeMission
+			return new BossEncounter
 			{
 				Name = name
 			};
@@ -131,7 +131,7 @@ namespace RaidClears.Features.Strikes.Services
 		{
 			foreach (ExpansionStrikes expansion in Expansions)
 			{
-				foreach (StrikeMission mission in expansion.Missions)
+				foreach (BossEncounter mission in expansion.Missions)
 				{
 					if (mission.Id == name)
 					{
@@ -172,7 +172,7 @@ namespace RaidClears.Features.Strikes.Services
 			return Service.StrikeSettings.GetExpansionVisible(expac);
 		}
 
-		public SettingEntry<bool> GetMissionVisible(StrikeMission mission)
+		public SettingEntry<bool> GetMissionVisible(BossEncounter mission)
 		{
 			return Service.StrikeSettings.GetMissionVisible(mission);
 		}

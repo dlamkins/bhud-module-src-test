@@ -43,6 +43,7 @@
   <data name="Setting_Fractals_ColNotClear_Label"><value>Not-cleared encounter color</value></data>
   <data name="Setting_Strike_GridOpactiy_Tooltip"><value>Hidden &lt;---&gt; Fully Visible</value></data>
   <data name="SettingsPanel_Raid_Visual_Colors"><value>Customize the colors by entering a Hex color code</value></data>
+  <data name="Setting_Raid_ColNonWeeklyBounty_Label"><value>Non-weekly bounty encounter color</value></data>
   <data name="Raid_Wing_7_3_Name"><value>Cardinal Sabir</value></data>
   <data name="ConfirmDialog_Cancel"><value>Cancel</value></data>
   <data name="CMTooltip_Scale"><value>Scale: {0}</value></data>
@@ -145,6 +146,7 @@ Off: Background will be rectangles</value></data>
   <data name="Strike_Tooltip_tomorrow"><value>Tomorrow:</value></data>
   <data name="Raid_Wing_1_4_Short"><value>S</value></data>
   <data name="Setting_Strike_XJJ_Label"><value>Xunlai Jade Junkyard</value></data>
+  <data name="Setting_Raid_OmitEventEncounters_Label"><value>Do not highlight event encounters as non-weekly</value></data>
   <data name="Setting_Raid_ColNotClear_Label"><value>Non-cleared encounter color</value></data>
   <data name="Strike_Short_OldLionsCourt"><value>OLC</value></data>
   <data name="Setting_Strike_ColBG_Label"><value>Overlay background color</value></data>
@@ -224,6 +226,8 @@ Off: Background will be rectangles</value></data>
   <data name="Strike_Confirm_Message"><value>Did you complete the encounter successfully?</value></data>
   <data name="Setting_Fractals_Font_Tooptip"><value>Change the size of the grid</value></data>
   <data name="Setting_Strike_Tooltips_Tooltip"><value>Hovering the mouse over an encounter will display the full name</value></data>
+  <data name="Setting_Raid_OmitEventEncounters_Tooltip"><value>When highlight non-weekly bounties is active, do not highlight event encounters. (e.g. Spirit Woods, Twisted Castle, etc)</value></data>
+  <data name="Setting_Raid_NonWeeklyBounty_Tooltip"><value>Highlight encounters that will not have a daily bounty for the remainder of the week.</value></data>
   <data name="Raid_Wing_5_4_Short"><value>D</value></data>
   <data name="Setting_Strike_ColClear_Tooltip"><value>Hex color code (#rrggbb) for Encounters that have been cleared this reset</value></data>
   <data name="EncounterLabelCustomerizer_ResetTo"><value>Reset to '{0}'</value></data>
@@ -276,6 +280,7 @@ Off: Background will be rectangles</value></data>
   <data name="Settings_Strike_IBS_Heading"><value>Enable individual Icebrood Saga Raid Encounters</value></data>
   <data name="Setting_Raid_ColText_Tooltip"><value>Hex color code (#rrggbb) for label and grid text</value></data>
   <data name="Setting_Strike_WoJ_Label"><value>Whisper of Jormag</value></data>
+  <data name="Setting_Raid_NonWeeklyBounty_Label"><value>Highlight non-weekly bounty encounters</value></data>
   <data name="Setting_Raid_W5_Label"><value>W5 / Hall of Chains</value></data>
   <data name="Raid_Wing_6_2_Short"><value>TL</value></data>
   <data name="Setting_Strike_LabelDisplay_Tooltip"><value /></data>
@@ -303,6 +308,7 @@ Off: Background will be rectangles</value></data>
   <data name="Setting_Strike_Drag_Tooltip"><value>Click and drag to reposition the overlay window</value></data>
   <data name="Raid_Wing_7_4_Short"><value>Q2</value></data>
   <data name="Setting_Dun_Visible_Label"><value>Show dungeons overlay</value></data>
+  <data name="Setting_Raid_ColNonWeeklyBounty_Tooltip"><value>Hex color code (#rrggbb) for uncleared encounters that will not appear as daily bounties for the rest of this week</value></data>
   <data name="Raid_Wing_8_2_Name"><value>Decima</value></data>
   <data name="Setting_Raid_Icon_Label"><value>Raid Wings hide/show on menubar icon click</value></data>
   <data name="Raid_Wing_8_1_Name"><value>Camp</value></data>

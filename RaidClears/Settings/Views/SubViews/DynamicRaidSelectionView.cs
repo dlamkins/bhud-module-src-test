@@ -5,6 +5,7 @@ using Blish_HUD.Settings;
 using Microsoft.Xna.Framework;
 using RaidClears.Features.Raids.Models;
 using RaidClears.Features.Raids.Services;
+using RaidClears.Features.Shared.Models;
 using RaidClears.Utils;
 
 namespace RaidClears.Settings.Views.SubViews
@@ -84,7 +85,7 @@ namespace RaidClears.Settings.Views.SubViews
 			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_008b: Expected O, but got Unknown
 			List<SettingEntry<bool>> encounters = new List<SettingEntry<bool>>();
-			foreach (RaidEncounter enc in raidWing.Encounters)
+			foreach (BossEncounter enc in raidWing.Encounters)
 			{
 				encounters.Add(_setting.GetEncounterVisible(enc));
 			}

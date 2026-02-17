@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using Blish_HUD;
 using Blish_HUD.Settings;
 using Newtonsoft.Json;
 using RaidClears.Features.Raids.Models;
+using RaidClears.Features.Shared;
+using RaidClears.Features.Shared.Models;
 using RaidClears.Localization;
 
 namespace RaidClears.Features.Raids.Services
@@ -16,11 +19,17 @@ namespace RaidClears.Features.Raids.Services
 		[JsonIgnore]
 		public static string FILENAME = "raid_settings.json";
 
+		private const string CURRENT_VERSION = "3.5.0";
+
+		private static readonly HashSet<string> SupportedVersions = new HashSet<string>(StringComparer.Ordinal) { "1.0.0", "3.5.0" };
+
+		private static readonly HashSet<string> VersionsRequiringPriorityMigration = new HashSet<string>(StringComparer.Ordinal) { "1.0.0" };
+
 		[JsonIgnore]
 		protected Dictionary<string, SettingEntry<bool>> VirtualSettingsEnties = new Dictionary<string, SettingEntry<bool>>();
 
 		[JsonProperty("version")]
-		public string Version { get; set; } = "1.0.0";
+		public string Version { get; set; } = "3.5.0";
 
 
 		[JsonProperty("expansions")]
@@ -50,7 +59,7 @@ namespace RaidClears.Features.Raids.Services
 				foreach (RaidWing wing in expac.Wings)
 				{
 					Wings.Add(wing.Id, value: true);
-					foreach (RaidEncounter encounter in wing.Encounters)
+					foreach (BossEncounter encounter in wing.Encounters)
 					{
 						Encounters.Add(encounter.ApiId, value: true);
 					}
@@ -60,12 +69,15 @@ namespace RaidClears.Features.Raids.Services
 
 		public override void SetEncounterLabel(string encounterApiId, string label)
 		{
-			if (base.EncounterLabels.ContainsKey(encounterApiId))
+			string storageKey = StorageKeyPrefixes.NormalizeStorageKey(encounterApiId);
+			if (base.EncounterLabels.ContainsKey(storageKey))
 			{
-				base.EncounterLabels.Remove(encounterApiId);
+				base.EncounterLabels.Remove(storageKey);
 			}
-			base.EncounterLabels.Add(encounterApiId, label);
+			base.EncounterLabels.Add(storageKey, label);
 			Service.RaidWindow.UpdateEncounterLabel(encounterApiId, label);
+			Service.StrikesWindow.UpdateEncounterLabel("priority_" + storageKey, label);
+			Service.StrikesWindow.UpdateEncounterLabel("tomorrow_" + storageKey, label);
 			Save();
 		}
 
@@ -125,29 +137,30 @@ namespace RaidClears.Features.Raids.Services
 			return setting;
 		}
 
-		public SettingEntry<bool> GetEncounterVisible(RaidEncounter encounter)
+		public SettingEntry<bool> GetEncounterVisible(BossEncounter encounter)
 		{
-			RaidEncounter encounter2 = encounter;
-			if (VirtualSettingsEnties.ContainsKey(encounter2.ApiId))
+			BossEncounter encounter2 = encounter;
+			string id = StorageKeyPrefixes.NormalizeStorageKey(encounter2.EncounterId);
+			if (VirtualSettingsEnties.ContainsKey(id))
 			{
-				return VirtualSettingsEnties[encounter2.ApiId];
+				return VirtualSettingsEnties[id];
 			}
-			if (!Encounters.ContainsKey(encounter2.ApiId))
+			if (!Encounters.ContainsKey(id))
 			{
-				Encounters.Add(encounter2.ApiId, value: true);
+				Encounters.Add(id, value: true);
 				Save();
 			}
 			SettingEntry<bool> obj = new SettingEntry<bool>();
-			obj.set_Value(Encounters[encounter2.ApiId]);
+			obj.set_Value(Encounters[id]);
 			((SettingEntry)obj).set_GetDescriptionFunc((Func<string>)(() => string.Format(Strings.Settings_Raid_EncounterVisible_Description, encounter2.Name)));
-			((SettingEntry)obj).set_GetDisplayNameFunc((Func<string>)(() => encounter2.Abbriviation ?? ""));
+			((SettingEntry)obj).set_GetDisplayNameFunc((Func<string>)(() => encounter2.Abbriviation));
 			SettingEntry<bool> setting = obj;
 			setting.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)delegate(object _, ValueChangedEventArgs<bool> e)
 			{
-				Encounters[encounter2.ApiId] = e.get_NewValue();
+				Encounters[id] = e.get_NewValue();
 				Save();
 			});
-			VirtualSettingsEnties.Add(encounter2.ApiId, setting);
+			VirtualSettingsEnties.Add(id, setting);
 			return setting;
 		}
 
@@ -157,7 +170,7 @@ namespace RaidClears.Features.Raids.Services
 			{
 				foreach (RaidWing wing in expansion.Wings)
 				{
-					foreach (RaidEncounter encounter in wing.Encounters)
+					foreach (BossEncounter encounter in wing.Encounters)
 					{
 						if (encounter.ApiId == apiId)
 						{
@@ -211,11 +224,53 @@ namespace RaidClears.Features.Raids.Services
 
 		private static RaidSettingsPersistance HandleVersionUpgrade(RaidSettingsPersistance data)
 		{
-			if (data.Version == "1.0.0")
+			if (!SupportedVersions.Contains(data.Version))
+			{
+				return new RaidSettingsPersistance();
+			}
+			if (data.Version == "3.5.0")
 			{
 				return data;
 			}
-			return new RaidSettingsPersistance();
+			if (VersionsRequiringPriorityMigration.Contains(data.Version))
+			{
+				MigratePriorityKeysFromStorage(data);
+			}
+			data.Version = "3.5.0";
+			data.Save();
+			return data;
+		}
+
+		private static bool MigratePriorityKeysFromStorage(RaidSettingsPersistance data)
+		{
+			bool changed = false;
+			foreach (string key2 in data.EncounterLabels.Keys.ToList())
+			{
+				if (!(key2 == "priority") && !(key2 == "priority_tomorrow") && (key2.StartsWith("priority_", StringComparison.Ordinal) || key2.StartsWith("tomorrow_", StringComparison.Ordinal)))
+				{
+					string baseKey2 = (key2.StartsWith("priority_", StringComparison.Ordinal) ? key2.Substring("priority_".Length) : key2.Substring("tomorrow_".Length));
+					if (!data.EncounterLabels.ContainsKey(baseKey2))
+					{
+						data.EncounterLabels[baseKey2] = data.EncounterLabels[key2];
+					}
+					data.EncounterLabels.Remove(key2);
+					changed = true;
+				}
+			}
+			foreach (string key in data.Encounters.Keys.ToList())
+			{
+				if (!(key == "priority") && !(key == "priority_tomorrow") && (key.StartsWith("priority_", StringComparison.Ordinal) || key.StartsWith("tomorrow_", StringComparison.Ordinal)))
+				{
+					string baseKey = (key.StartsWith("priority_", StringComparison.Ordinal) ? key.Substring("priority_".Length) : key.Substring("tomorrow_".Length));
+					if (!data.Encounters.ContainsKey(baseKey))
+					{
+						data.Encounters[baseKey] = data.Encounters[key];
+					}
+					data.Encounters.Remove(key);
+					changed = true;
+				}
+			}
+			return changed;
 		}
 
 		private static RaidSettingsPersistance CreateNewCharacterConfiguration()

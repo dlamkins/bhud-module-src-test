@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using RaidClears.Features.Raids.Models;
 using RaidClears.Features.Raids.Services;
 using RaidClears.Features.Shared.Models;
@@ -17,7 +18,7 @@ namespace RaidClears.Features.Shared.Services
 			{
 				return Enumerable.Empty<Encounter>();
 			}
-			return GetDayOfYearBounties(PriorityRotationService.DayOfYearIndex(), bountyData, raidData);
+			return GetDayOfYearBounties(PriorityRotationService.DayOfYearIndex(), bountyData, raidData, "priority_");
 		}
 
 		public static IEnumerable<Encounter> GetTomorrowBounties()
@@ -32,7 +33,16 @@ namespace RaidClears.Features.Shared.Services
 			return GetDayOfYearBounties(PriorityRotationService.DayOfYearIndex() + 1, bountyData, raidData, "tomorrow_");
 		}
 
-		private static IEnumerable<Encounter> GetDayOfYearBounties(int dayIndex, DailyBountyData bountyData, RaidData raidData, string prefix = "priority_")
+		[IteratorStateMachine(typeof(_003CGetBountyEncounterApiIdsForDay_003Ed__2))]
+		public static IEnumerable<string> GetBountyEncounterApiIdsForDay(int dayIndex)
+		{
+			return new _003CGetBountyEncounterApiIdsForDay_003Ed__2(-2)
+			{
+				_003C_003E3__dayIndex = dayIndex
+			};
+		}
+
+		private static IEnumerable<Encounter> GetDayOfYearBounties(int dayIndex, DailyBountyData bountyData, RaidData raidData, string prefix)
 		{
 			if (bountyData.BossSlots != null && bountyData.BossSlots.Count > 0)
 			{
@@ -67,18 +77,30 @@ namespace RaidClears.Features.Shared.Services
 			return Enumerable.Empty<Encounter>();
 		}
 
-		private static IEnumerable<Encounter> ResolveBountyEncounters(List<BountyEncounterReference> references, RaidData raidData, string prefix = "priority_")
+		private static IEnumerable<Encounter> ResolveBountyEncounters(List<BountyEncounterReference> references, RaidData raidData, string prefix)
 		{
 			List<Encounter> encounters = new List<Encounter>();
 			foreach (BountyEncounterReference reference in references)
 			{
-				RaidEncounter raidEncounter = raidData.GetRaidEncounterByApiId(reference.EncounterId);
+				BossEncounter raidEncounter = raidData.GetRaidEncounterByApiId(reference.EncounterId);
 				if (raidEncounter != null)
 				{
-					raidEncounter.Id = prefix + raidEncounter.Id;
-					raidEncounter.ApiId = prefix + raidEncounter.ApiId;
-					Encounter encounter = new Encounter(raidEncounter);
-					encounters.Add(encounter);
+					string baseApiId = ((raidEncounter.ApiId != null && raidEncounter.ApiId != "undefined") ? raidEncounter.ApiId : raidEncounter.Id);
+					BossEncounter copy = new BossEncounter
+					{
+						Id = prefix + raidEncounter.Id,
+						ApiId = prefix + baseApiId,
+						Name = raidEncounter.Name,
+						Abbriviation = raidEncounter.Abbriviation,
+						AssetId = raidEncounter.AssetId,
+						MapIds = (raidEncounter.MapIds ?? new List<int>()),
+						DailyBountyAchievementId = raidEncounter.DailyBountyAchievementId,
+						MentorAchievementId = raidEncounter.MentorAchievementId,
+						PowerFavored = raidEncounter.PowerFavored,
+						CondiFavored = raidEncounter.CondiFavored,
+						NeedsDefianceBreak = raidEncounter.NeedsDefianceBreak
+					};
+					encounters.Add(new Encounter(copy, raidEncounter.IsStrike));
 				}
 				else
 				{

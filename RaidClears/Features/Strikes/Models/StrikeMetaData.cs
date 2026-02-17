@@ -29,7 +29,7 @@ namespace RaidClears.Features.Strikes.Models
 				{
 					BoxModel encounter = strike.boxes.ToArray()[index];
 					GridBox encounterBox = new GridBox((Container)(object)group, encounter.shortName, encounter.name, settings.Style.GridOpacity, settings.Style.FontSize);
-					encounterBox.VisiblityChanged(Service.StrikeData.GetMissionVisible(Service.StrikeData.GetStrikeMissionByName(encounter.name)));
+					encounterBox.VisiblityChanged(Service.StrikeData.GetMissionVisible(Service.StrikeData.GetBossEncounterByName(encounter.name)));
 					encounterBox.TextColorSetting(settings.Style.Color.Text);
 					encounter.SetGridBoxReference(encounterBox);
 					encounter.WatchColorSettings(settings.Style.Color.Cleared, settings.Style.Color.NotCleared);

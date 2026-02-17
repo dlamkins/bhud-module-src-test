@@ -13,6 +13,10 @@ namespace RaidClears.Features.Shared.Models
 		[JsonProperty("enabled")]
 		public bool Enabled { get; set; }
 
+		[JsonProperty("dailyBountyCategoryUrl")]
+		public string DailyBountyCategoryUrl { get; set; } = "https://api.guildwars2.com/v2/achievements/categories/475";
+
+
 		[JsonProperty("version")]
 		public string Version { get; set; } = "";
 

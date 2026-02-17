@@ -3,7 +3,7 @@ using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Microsoft.Xna.Framework;
 using RaidClears.Features.Fractals.Services;
-using RaidClears.Features.Strikes.Models;
+using RaidClears.Features.Shared.Models;
 using RaidClears.Localization;
 
 namespace RaidClears.Settings.Controls
@@ -14,7 +14,7 @@ namespace RaidClears.Settings.Controls
 
 		private FractalMap fractal;
 
-		private StrikeMission mission;
+		private BossEncounter mission;
 
 		private Label title = new Label();
 
@@ -34,7 +34,7 @@ namespace RaidClears.Settings.Controls
 			Build(encounter.Label, lastClear);
 		}
 
-		public EncounterClearStatus(FlowPanel parent, StrikeMission encounter, DateTime lastClear)
+		public EncounterClearStatus(FlowPanel parent, BossEncounter encounter, DateTime lastClear)
 			: this()
 		{
 			//IL_0001: Unknown result type (might be due to invalid IL or missing references)

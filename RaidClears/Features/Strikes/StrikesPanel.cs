@@ -77,7 +77,7 @@ namespace RaidClears.Features.Strikes
 				if (expansion.id == encounterApiId)
 				{
 					((Label)expansion.GroupLabel).set_Text(newLabel);
-					break;
+					((Control)expansion.GroupLabel).Invalidate();
 				}
 				foreach (BoxModel encounter in expansion.boxes)
 				{
@@ -87,6 +87,7 @@ namespace RaidClears.Features.Strikes
 					}
 				}
 			}
+			((Control)this).Invalidate();
 		}
 	}
 }

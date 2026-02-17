@@ -4,6 +4,7 @@ using System.Linq;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Microsoft.Xna.Framework;
+using RaidClears.Features.Shared.Models;
 using RaidClears.Features.Strikes.Models;
 using RaidClears.Localization;
 using RaidClears.Utils;
@@ -33,7 +34,7 @@ namespace RaidClears.Settings.Views.SubViews
 			foreach (ExpansionStrikes expansion in Service.StrikeData.Expansions.OrderBy((ExpansionStrikes x) => x.Name))
 			{
 				panel.AddString(expansion.Name, Color.get_Gold());
-				foreach (StrikeMission mission in expansion.Missions.OrderBy((StrikeMission x) => x.Name))
+				foreach (BossEncounter mission in expansion.Missions.OrderBy((BossEncounter x) => x.Name))
 				{
 					if (clears.ContainsKey(mission.Id))
 					{

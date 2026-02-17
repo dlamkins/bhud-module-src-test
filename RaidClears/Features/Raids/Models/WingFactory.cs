@@ -67,9 +67,9 @@ namespace RaidClears.Features.Raids.Models
 				foreach (RaidWing wing in expansion.Wings)
 				{
 					List<BoxModel> encounters = new List<BoxModel>();
-					foreach (RaidEncounter encounter in wing.Encounters)
+					foreach (BossEncounter encounter in wing.Encounters)
 					{
-						encounters.Add(new Encounter(encounter));
+						encounters.Add(new Encounter(encounter, isStrike: false));
 					}
 					Wing wingModel = new Wing(wing.Name, wing.Id, wing.Number - 1, wing.Abbriviation, encounters.ToArray());
 					raids.Add(wingModel);

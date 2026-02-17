@@ -79,7 +79,7 @@ namespace RaidClears.Features.Raids.Services
 			{
 				foreach (RaidWing wing in expansion.Wings)
 				{
-					foreach (RaidEncounter encounter in wing.Encounters)
+					foreach (BossEncounter encounter in wing.Encounters)
 					{
 						if (encounter.MentorAchievementId.HasValue)
 						{

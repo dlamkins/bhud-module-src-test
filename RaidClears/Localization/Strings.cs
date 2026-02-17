@@ -374,6 +374,10 @@ namespace RaidClears.Localization
 
 		internal static string Setting_Raid_ColEmbolden_Tooltip => ResourceManager.GetString("Setting_Raid_ColEmbolden_Tooltip", resourceCulture);
 
+		internal static string Setting_Raid_ColNonWeeklyBounty_Label => ResourceManager.GetString("Setting_Raid_ColNonWeeklyBounty_Label", resourceCulture);
+
+		internal static string Setting_Raid_ColNonWeeklyBounty_Tooltip => ResourceManager.GetString("Setting_Raid_ColNonWeeklyBounty_Tooltip", resourceCulture);
+
 		internal static string Setting_Raid_ColNotClear_Label => ResourceManager.GetString("Setting_Raid_ColNotClear_Label", resourceCulture);
 
 		internal static string Setting_Raid_ColNotClear_Tooltip => ResourceManager.GetString("Setting_Raid_ColNotClear_Tooltip", resourceCulture);
@@ -401,6 +405,14 @@ namespace RaidClears.Localization
 		internal static string Setting_Raid_Embolden_Label => ResourceManager.GetString("Setting_Raid_Embolden_Label", resourceCulture);
 
 		internal static string Setting_Raid_Embolden_Tooltip => ResourceManager.GetString("Setting_Raid_Embolden_Tooltip", resourceCulture);
+
+		internal static string Setting_Raid_NonWeeklyBounty_Label => ResourceManager.GetString("Setting_Raid_NonWeeklyBounty_Label", resourceCulture);
+
+		internal static string Setting_Raid_NonWeeklyBounty_Tooltip => ResourceManager.GetString("Setting_Raid_NonWeeklyBounty_Tooltip", resourceCulture);
+
+		internal static string Setting_Raid_OmitEventEncounters_Label => ResourceManager.GetString("Setting_Raid_OmitEventEncounters_Label", resourceCulture);
+
+		internal static string Setting_Raid_OmitEventEncounters_Tooltip => ResourceManager.GetString("Setting_Raid_OmitEventEncounters_Tooltip", resourceCulture);
 
 		internal static string Setting_Raid_Font_Label => ResourceManager.GetString("Setting_Raid_Font_Label", resourceCulture);
 
