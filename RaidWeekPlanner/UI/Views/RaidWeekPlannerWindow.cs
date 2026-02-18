@@ -38,7 +38,7 @@ namespace RaidWeekPlanner.UI.Views
 
 		private bool _showClears = true;
 
-		private List<(Panel, Label)> _tablePanels = new List<(Panel, Label)>();
+		private List<(Panel, Label, string)> _tablePanels = new List<(Panel, Label, string)>();
 
 		private ResourceManager _areasResx;
 
@@ -201,9 +201,7 @@ namespace RaidWeekPlanner.UI.Views
 						{
 							(FlowPanel, Label) label = UiUtils.CreateLabel(() => _encountersResx.GetString(currentEncounter.Key + "Label"), () => _encountersResx.GetString(currentEncounter.Key + "Tooltip"), _tableContainer, 12, (HorizontalAlignment)1);
 							((Control)label.Item1).set_BackgroundColor(GetBackgroundColor(currentEncounter.Key));
-							List<(Panel, Label)> tablePanels = _tablePanels;
-							(FlowPanel, Label) tuple = label;
-							tablePanels.Add(((Panel)(object)tuple.Item1, (Label)(object)tuple.Item2));
+							_tablePanels.Add(((Panel)(object)label.Item1, (Label)(object)label.Item2, currentEncounter.Key));
 						}
 						catch (Exception)
 						{
@@ -211,9 +209,8 @@ namespace RaidWeekPlanner.UI.Views
 					}
 					else
 					{
-						List<(Panel, Label)> tablePanels2 = _tablePanels;
-						(FlowPanel, Label) tuple = UiUtils.CreateLabel(() => "", () => "", _tableContainer, 12, (HorizontalAlignment)1);
-						tablePanels2.Add(((Panel)(object)tuple.Item1, (Label)(object)tuple.Item2));
+						(FlowPanel, Label) emptyLabel = UiUtils.CreateLabel(() => "", () => "", _tableContainer, 12, (HorizontalAlignment)1);
+						_tablePanels.Add(((Panel)(object)emptyLabel.Item1, (Label)(object)emptyLabel.Item2, string.Empty));
 					}
 				}
 				count++;
@@ -243,16 +240,25 @@ namespace RaidWeekPlanner.UI.Views
 
 		private void ToggleClears()
 		{
+			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
 			_showClears = !_showClears;
-			DrawData();
+			foreach (var tablePanel in _tablePanels)
+			{
+				((Control)tablePanel.Item1).set_BackgroundColor(GetBackgroundColor(tablePanel.Item3));
+			}
 		}
 
 		private Color GetBackgroundColor(string encounterKey)
 		{
-			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
+			if (string.IsNullOrEmpty(encounterKey))
+			{
+				return Colors.Empty;
+			}
 			if (_showClears && _accountClears != null && _accountClears.Contains(encounterKey))
 			{
 				return Colors.Done;
