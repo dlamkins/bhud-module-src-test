@@ -27,7 +27,7 @@ namespace MysticCrafting.Module.Extensions
 			{
 				return 8;
 			}
-			if (item.Id == 93105)
+			if (item.DetailsType.Equals("Ring", StringComparison.InvariantCultureIgnoreCase))
 			{
 				return 2;
 			}
