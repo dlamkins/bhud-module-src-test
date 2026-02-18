@@ -212,6 +212,16 @@ namespace EmoteTome
 
 		private SettingEntry<bool> _showThumbsDown;
 
+		private SettingEntry<bool> _showPoseHeart;
+
+		private SettingEntry<bool> _showPosePeace;
+
+		private SettingEntry<bool> _showPoseSassy;
+
+		private SettingEntry<bool> _showPoseShy;
+
+		private SettingEntry<bool> _showHappyDance;
+
 		private List<Tuple<SettingEntry<bool>, Emote>> unlockEmoteSettingMap = new List<Tuple<SettingEntry<bool>, Emote>>();
 
 		private SettingEntry<string> _rankEmoteSeparator;
@@ -350,7 +360,12 @@ namespace EmoteTome
 			_showCrabDance = settings.DefineSetting<bool>("Show CrabDance", true, (Func<string>)(() => BadLocalization.CRABDANCE[language]), (Func<string>)(() => BadLocalization.EMOTETEXT[language]));
 			_showShocked = settings.DefineSetting<bool>("Show Shocked", true, (Func<string>)(() => BadLocalization.SHOCKED[language]), (Func<string>)(() => BadLocalization.EMOTETEXT[language]));
 			_showThumbsUp = settings.DefineSetting<bool>("Show ThumbsUp", true, (Func<string>)(() => BadLocalization.THUMBSUP[language]), (Func<string>)(() => BadLocalization.EMOTETEXT[language]));
-			_showThumbsDown = settings.DefineSetting<bool>("Show ThumbsDown", true, (Func<string>)(() => BadLocalization.THUMBSDOWN[language]), (Func<string>)(() => BadLocalization.EMOTETEXT[language]));
+			_showThumbsDown = settings.DefineSetting<bool>("Show ThumbsDown", true, (Func<string>)(() => BadLocalization.POSEHEART[language]), (Func<string>)(() => BadLocalization.EMOTETEXT[language]));
+			_showPoseHeart = settings.DefineSetting<bool>("Show PoseHeart", true, (Func<string>)(() => BadLocalization.POSEHEART[language]), (Func<string>)(() => BadLocalization.EMOTETEXT[language]));
+			_showPosePeace = settings.DefineSetting<bool>("Show PosePeace", true, (Func<string>)(() => BadLocalization.POSEPEACE[language]), (Func<string>)(() => BadLocalization.EMOTETEXT[language]));
+			_showPoseSassy = settings.DefineSetting<bool>("Show PoseSassy", true, (Func<string>)(() => BadLocalization.POSESASSY[language]), (Func<string>)(() => BadLocalization.EMOTETEXT[language]));
+			_showPoseShy = settings.DefineSetting<bool>("Show PoseShy", true, (Func<string>)(() => BadLocalization.POSESHY[language]), (Func<string>)(() => BadLocalization.EMOTETEXT[language]));
+			_showHappyDance = settings.DefineSetting<bool>("Show HappyDance", true, (Func<string>)(() => BadLocalization.HAPPYDANCE[language]), (Func<string>)(() => BadLocalization.EMOTETEXT[language]));
 			_rankEmoteSeparator = settings.DefineSetting<string>("Rank Separator", "", (Func<string>)(() => BadLocalization.RANKPANELTITLE[language]), (Func<string>)(() => ""));
 			_showYourRank = settings.DefineSetting<bool>("Show Your Rank", true, (Func<string>)(() => BadLocalization.YOURRANK[language]), (Func<string>)(() => BadLocalization.EMOTETEXT[language]));
 			_showRankRabbit = settings.DefineSetting<bool>("Show Rank Rabbit", true, (Func<string>)(() => BadLocalization.RABBIT[language]), (Func<string>)(() => BadLocalization.EMOTETEXT[language]));
@@ -607,6 +622,11 @@ namespace EmoteTome
 			unlockSettingList.Add(_showShocked);
 			unlockSettingList.Add(_showThumbsUp);
 			unlockSettingList.Add(_showThumbsDown);
+			unlockSettingList.Add(_showPoseHeart);
+			unlockSettingList.Add(_showPosePeace);
+			unlockSettingList.Add(_showPoseSassy);
+			unlockSettingList.Add(_showPoseShy);
+			unlockSettingList.Add(_showHappyDance);
 			try
 			{
 				int count = Math.Min(unlockEmoteList.Count, unlockSettingList.Count);
@@ -1415,7 +1435,7 @@ namespace EmoteTome
 					unlockedEmotes = unlockedEmotes.ConvertAll((string d) => d.ToLower());
 					foreach (Emote emote6 in unlockEmoteList)
 					{
-						if (emote6.getChatCode().Equals("hiss") || emote6.getChatCode().Equals("magicjuggle") || emote6.getChatCode().Equals("readbook") || emote6.getChatCode().Equals("serve") || emote6.getChatCode().Equals("sipcoffee") || emote6.getChatCode().Equals("unleash") || emote6.getChatCode().Equals("petalthrow") || emote6.getChatCode().Equals("breakdance") || emote6.getChatCode().Equals("boogie") || emote6.getChatCode().Equals("posecover") || emote6.getChatCode().Equals("posehigh") || emote6.getChatCode().Equals("poselow") || emote6.getChatCode().Equals("posetwist") || emote6.getChatCode().Equals("blowkiss") || emote6.getChatCode().Equals("magictrick") || emote6.getChatCode().Equals("channel") || emote6.getChatCode().Equals("barbecue") || emote6.getChatCode().Equals("drink") || emote6.getChatCode().Equals("crabdance") || emote6.getChatCode().Equals("shocked") || emote6.getChatCode().Equals("thumbsup") || emote6.getChatCode().Equals("thumbsdown"))
+						if (emote6.getChatCode().Equals("hiss") || emote6.getChatCode().Equals("magicjuggle") || emote6.getChatCode().Equals("readbook") || emote6.getChatCode().Equals("serve") || emote6.getChatCode().Equals("sipcoffee") || emote6.getChatCode().Equals("unleash") || emote6.getChatCode().Equals("petalthrow") || emote6.getChatCode().Equals("breakdance") || emote6.getChatCode().Equals("boogie") || emote6.getChatCode().Equals("posecover") || emote6.getChatCode().Equals("posehigh") || emote6.getChatCode().Equals("poselow") || emote6.getChatCode().Equals("posetwist") || emote6.getChatCode().Equals("blowkiss") || emote6.getChatCode().Equals("magictrick") || emote6.getChatCode().Equals("channel") || emote6.getChatCode().Equals("barbecue") || emote6.getChatCode().Equals("drink") || emote6.getChatCode().Equals("crabdance") || emote6.getChatCode().Equals("shocked") || emote6.getChatCode().Equals("thumbsup") || emote6.getChatCode().Equals("thumbsdown") || emote6.getChatCode().Equals("poseheart") || emote6.getChatCode().Equals("posepeace") || emote6.getChatCode().Equals("posesassy") || emote6.getChatCode().Equals("poseshy") || emote6.getChatCode().Equals("happydance"))
 						{
 							((Control)emote6.getContainer()).set_Enabled(true);
 							emote6.getContainer().getImage().set_Tint(activatedColor);
