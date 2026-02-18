@@ -32,13 +32,15 @@ namespace RaidWeekPlanner.UI.Views
 
 		private List<string> _accountClears;
 
-		private List<string> _bounties;
+		private Dictionary<int, List<string>> _bounties;
 
 		private List<string> _neverOnTheMenu;
 
 		private bool _showClears = true;
 
 		private List<(Panel, Label, string)> _tablePanels = new List<(Panel, Label, string)>();
+
+		private ResourceManager _stringsResx;
 
 		private ResourceManager _areasResx;
 
@@ -59,6 +61,7 @@ namespace RaidWeekPlanner.UI.Views
 			_areas = businessService.GetAreas();
 			_bounties = businessService.GetEventsForCurrentWeek();
 			_neverOnTheMenu = businessService.GetNeverOnTheMenu();
+			_stringsResx = strings.ResourceManager;
 			_areasResx = areas.ResourceManager;
 			_encountersResx = encounters.ResourceManager;
 		}
@@ -199,7 +202,7 @@ namespace RaidWeekPlanner.UI.Views
 						Encounter currentEncounter = area.Encounters[count - 1];
 						try
 						{
-							(FlowPanel, Label) label = UiUtils.CreateLabel(() => _encountersResx.GetString(currentEncounter.Key + "Label"), () => _encountersResx.GetString(currentEncounter.Key + "Tooltip"), _tableContainer, 12, (HorizontalAlignment)1);
+							(FlowPanel, Label) label = UiUtils.CreateLabel(() => _encountersResx.GetString(currentEncounter.Key + "Label"), () => GetTooltip(currentEncounter.Key), _tableContainer, 12, (HorizontalAlignment)1);
 							((Control)label.Item1).set_BackgroundColor(GetBackgroundColor(currentEncounter.Key));
 							_tablePanels.Add(((Panel)(object)label.Item1, (Label)(object)label.Item2, currentEncounter.Key));
 						}
@@ -215,6 +218,19 @@ namespace RaidWeekPlanner.UI.Views
 				}
 				count++;
 			}
+		}
+
+		private string GetTooltip(string currentEncounter)
+		{
+			string cplTootlip = string.Empty;
+			if (_bounties != null && _bounties.SelectMany((KeyValuePair<int, List<string>> b) => b.Value).Contains(currentEncounter))
+			{
+				IEnumerable<string> allDays = from b in _bounties
+					where b.Value.Contains(currentEncounter)
+					select _stringsResx.GetString($"day{b.Key}");
+				cplTootlip = " - " + string.Join(", ", allDays);
+			}
+			return _encountersResx.GetString(currentEncounter + "Tooltip") + cplTootlip;
 		}
 
 		private void DrawLegend(FlowPanel container)
@@ -252,9 +268,9 @@ namespace RaidWeekPlanner.UI.Views
 		{
 			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
 			if (string.IsNullOrEmpty(encounterKey))
 			{
 				return Colors.Empty;
@@ -263,7 +279,7 @@ namespace RaidWeekPlanner.UI.Views
 			{
 				return Colors.Done;
 			}
-			if (_bounties != null && _bounties.Contains(encounterKey))
+			if (_bounties != null && _bounties.SelectMany((KeyValuePair<int, List<string>> b) => b.Value).Contains(encounterKey))
 			{
 				return Colors.Planned;
 			}

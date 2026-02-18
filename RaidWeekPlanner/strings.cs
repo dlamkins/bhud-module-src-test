@@ -46,6 +46,20 @@ namespace RaidWeekPlanner
 
 		internal static string CornerIcon_Tooltip_Warning => ResourceManager.GetString("CornerIcon_Tooltip_Warning", resourceCulture);
 
+		internal static string day0 => ResourceManager.GetString("day0", resourceCulture);
+
+		internal static string day1 => ResourceManager.GetString("day1", resourceCulture);
+
+		internal static string day2 => ResourceManager.GetString("day2", resourceCulture);
+
+		internal static string day3 => ResourceManager.GetString("day3", resourceCulture);
+
+		internal static string day4 => ResourceManager.GetString("day4", resourceCulture);
+
+		internal static string day5 => ResourceManager.GetString("day5", resourceCulture);
+
+		internal static string day6 => ResourceManager.GetString("day6", resourceCulture);
+
 		internal static string Legend_Done => ResourceManager.GetString("Legend_Done", resourceCulture);
 
 		internal static string Legend_None => ResourceManager.GetString("Legend_None", resourceCulture);

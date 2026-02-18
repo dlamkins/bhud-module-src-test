@@ -98,16 +98,16 @@ namespace RaidWeekPlanner.Services
 				select e.Key).ToList();
 		}
 
-		public List<string> GetEventsForCurrentWeek()
+		public Dictionary<int, List<string>> GetEventsForCurrentWeek()
 		{
 			DateTime monday = GetMonday(DateTime.UtcNow);
-			List<string> weekEvents = new List<string>();
+			Dictionary<int, List<string>> weekEvents = new Dictionary<int, List<string>>();
 			for (int dayOffset = 0; dayOffset < 7; dayOffset++)
 			{
 				DateTime currentDay = monday.AddDays(dayOffset);
-				weekEvents.AddRange(GetEventsForDate(currentDay));
+				weekEvents.Add(dayOffset, GetEventsForDate(currentDay));
 			}
-			return weekEvents.Distinct().ToList();
+			return weekEvents;
 		}
 
 		private async Task<bool> RefreshAccountName()

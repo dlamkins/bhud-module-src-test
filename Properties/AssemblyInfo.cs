@@ -6,7 +6,7 @@ using System.Runtime.Versioning;
 [assembly: AssemblyCompany("RaidWeekPlanner")]
 [assembly: AssemblyConfiguration("Release")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
-[assembly: AssemblyInformationalVersion("1.0.0+89499530bd55bd02aa571c99921c1f40a3240422")]
+[assembly: AssemblyInformationalVersion("1.0.0+d813e74046b19ad334bfd7f067a5784ca2433f6f")]
 [assembly: AssemblyProduct("RaidWeekPlanner")]
 [assembly: AssemblyTitle("RaidWeekPlanner")]
 [assembly: AssemblyVersion("1.0.0.0")]

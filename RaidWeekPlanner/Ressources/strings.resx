@@ -39,4 +39,11 @@
   <data name="Legend_Todo"><value>To do</value></data>
   <data name="Legend_None"><value>N/A</value></data>
   <data name="Legend_Done"><value>Done</value></data>
+  <data name="day1"><value>Tueday</value></data>
+  <data name="day0"><value>Monday</value></data>
+  <data name="day3"><value>Thursday</value></data>
+  <data name="day2"><value>Wednesday</value></data>
+  <data name="day5"><value>Saturday</value></data>
+  <data name="day4"><value>Friday</value></data>
+  <data name="day6"><value>Sunday</value></data>
   </root>
