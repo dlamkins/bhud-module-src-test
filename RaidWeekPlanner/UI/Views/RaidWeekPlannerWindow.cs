@@ -24,7 +24,7 @@ namespace RaidWeekPlanner.UI.Views
 
 		private FlowPanel _tableContainer;
 
-		private readonly List<Label> _labels = new List<Label>();
+		private List<Label> _labels = new List<Label>();
 
 		private readonly List<StandardButton> _buttons = new List<StandardButton>();
 
@@ -37,6 +37,8 @@ namespace RaidWeekPlanner.UI.Views
 		private List<string> _neverOnTheMenu;
 
 		private bool _showClears = true;
+
+		private bool _showWeek;
 
 		private List<(Panel, Label, string)> _tablePanels = new List<(Panel, Label, string)>();
 
@@ -73,14 +75,14 @@ namespace RaidWeekPlanner.UI.Views
 			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0105: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ed: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0203: Unknown result type (might be due to invalid IL or missing references)
-			//IL_020f: Expected O, but got Unknown
-			//IL_0234: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0244: Unknown result type (might be due to invalid IL or missing references)
+			//IL_025f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0264: Unknown result type (might be due to invalid IL or missing references)
+			//IL_026b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0270: Unknown result type (might be due to invalid IL or missing references)
+			//IL_027a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0286: Expected O, but got Unknown
+			//IL_02ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02bb: Unknown result type (might be due to invalid IL or missing references)
 			FlowPanel flowPanel = new FlowPanel();
 			((Control)flowPanel).set_Parent((Container)(object)this);
 			((Container)flowPanel).set_WidthSizingMode((SizingMode)2);
@@ -136,6 +138,19 @@ namespace RaidWeekPlanner.UI.Views
 			{
 				ToggleClears();
 			});
+			List<StandardButton> buttons3 = _buttons;
+			StandardButton obj3 = new StandardButton
+			{
+				SetLocalizedText = () => strings.MainWindow_Button_Toggle_Week_Label,
+				SetLocalizedTooltip = () => strings.MainWindow_Button_Toggle_Week_Tooltip
+			};
+			((Control)obj3).set_Parent((Container)(object)actionContainer);
+			StandardButton drawWeeklyClearsButton = (StandardButton)(object)obj3;
+			buttons3.Add((StandardButton)(object)obj3);
+			((Control)drawWeeklyClearsButton).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				ToggleWeeklyClears();
+			});
 			LoadingSpinner val = new LoadingSpinner();
 			((Control)val).set_Parent((Container)(object)actionContainer);
 			((Control)val).set_Size(new Point(29, 29));
@@ -155,7 +170,10 @@ namespace RaidWeekPlanner.UI.Views
 		public void InjectData(List<string> accountClears)
 		{
 			_accountClears = accountClears;
-			DrawData();
+			if (!_showWeek)
+			{
+				DrawData();
+			}
 		}
 
 		private void AddHeaders(FlowPanel container)
@@ -172,10 +190,59 @@ namespace RaidWeekPlanner.UI.Views
 			}
 		}
 
+		private void AddWeekHeaders(FlowPanel container)
+		{
+			foreach (int day in new List<int>(7) { 0, 1, 2, 3, 4, 5, 6 })
+			{
+				_labels.Add((Label)(object)UiUtils.CreateLabel(() => _stringsResx.GetString($"day{day}"), () => "", container, 7, (HorizontalAlignment)1).label);
+			}
+		}
+
 		private void DrawData()
 		{
 			ClearLines();
 			DrawLines();
+		}
+
+		private void ToggleWeeklyClears()
+		{
+			ClearHeaders();
+			ClearLines();
+			if (_showWeek)
+			{
+				AddHeaders(_tableContainer);
+				DrawLines();
+			}
+			else
+			{
+				AddWeekHeaders(_tableContainer);
+				DrawWeeklyClears();
+			}
+			_showWeek = !_showWeek;
+		}
+
+		private void DrawWeeklyClears()
+		{
+			//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
+			foreach (int row in new List<int>(4) { 0, 1, 2, 3 })
+			{
+				foreach (KeyValuePair<int, List<string>> bounty in _bounties)
+				{
+					string encounter = bounty.Value[row];
+					(FlowPanel, Label) label = UiUtils.CreateLabel(() => _encountersResx.GetString(encounter + "Label"), () => GetTooltip(encounter), _tableContainer, 7, (HorizontalAlignment)1);
+					((Control)label.Item1).set_BackgroundColor(Colors.Todo);
+					_tablePanels.Add(((Panel)(object)label.Item1, (Label)(object)label.Item2, encounter));
+				}
+			}
+		}
+
+		private void ClearHeaders()
+		{
+			for (int i = _labels.Count - 1; i >= 0; i--)
+			{
+				((Control)_labels.ElementAt(i)).Dispose();
+			}
+			_labels = new List<Label>();
 		}
 
 		private void ClearLines()
@@ -184,6 +251,7 @@ namespace RaidWeekPlanner.UI.Views
 			{
 				((Control)_tablePanels.ElementAt(i).Item1).Dispose();
 			}
+			_tablePanels = new List<(Panel, Label, string)>();
 		}
 
 		private void DrawLines()

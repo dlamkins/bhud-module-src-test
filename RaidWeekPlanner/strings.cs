@@ -78,6 +78,10 @@ namespace RaidWeekPlanner
 
 		internal static string MainWindow_Button_Toggle_Tooltip => ResourceManager.GetString("MainWindow_Button_Toggle_Tooltip", resourceCulture);
 
+		internal static string MainWindow_Button_Toggle_Week_Label => ResourceManager.GetString("MainWindow_Button_Toggle_Week_Label", resourceCulture);
+
+		internal static string MainWindow_Button_Toggle_Week_Tooltip => ResourceManager.GetString("MainWindow_Button_Toggle_Week_Tooltip", resourceCulture);
+
 		internal static string NoData => ResourceManager.GetString("NoData", resourceCulture);
 
 		internal strings()
