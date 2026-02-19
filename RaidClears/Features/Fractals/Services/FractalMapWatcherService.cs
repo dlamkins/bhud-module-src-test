@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using RaidClears.Localization;
@@ -65,53 +66,56 @@ namespace RaidClears.Features.Fractals.Services
 			_fractalName = string.Empty;
 		}
 
+		private async Task CompleteAndResetFractalAsync()
+		{
+			if (!_isOnFractalMap || _fractal == null)
+			{
+				return;
+			}
+			switch (Service.Settings.FractalSettings.CompletionMethod.get_Value())
+			{
+			case StrikeComplete.MAP_CHANGE:
+				this.FractalComplete?.Invoke(this, _fractalApiName);
+				MarkCompleted(_fractal);
+				break;
+			case StrikeComplete.POPUP:
+			{
+				ConfirmDialog dialog = new ConfirmDialog(_fractalName, Strings.Strike_Confirm_Message, new ButtonDefinition[2]
+				{
+					new ButtonDefinition(Strings.Strike_Confirm_Btn_Yes, DialogResult.OK),
+					new ButtonDefinition(Strings.Strike_Confirm_Btn_No, DialogResult.Cancel)
+				});
+				DialogResult num = await dialog.ShowDialog();
+				((Control)dialog).Dispose();
+				if (num == DialogResult.OK)
+				{
+					this.FractalComplete?.Invoke(this, _fractalApiName);
+					MarkCompleted(_fractal);
+				}
+				break;
+			}
+			}
+			Reset();
+		}
+
 		private async void CurrentMap_MapChanged(object sender, ValueEventArgs<int> e)
 		{
-			FractalMap _fractalMap = Service.FractalMapData.GetFractalMapById(e.get_Value());
-			if (_fractalMap != null)
+			FractalMap newFractal = Service.FractalMapData.GetFractalMapById(e.get_Value());
+			if (newFractal != null)
 			{
+				if (_isOnFractalMap && _fractal != null && newFractal.ApiLabel != _fractal!.ApiLabel)
+				{
+					await CompleteAndResetFractalAsync();
+				}
 				Reset();
 				_isOnFractalMap = true;
-				_fractalApiName = _fractalMap.ApiLabel;
-				_fractalName = _fractalMap.Label;
-				_fractal = _fractalMap;
+				_fractalApiName = newFractal.ApiLabel;
+				_fractalName = newFractal.Label;
+				_fractal = newFractal;
 			}
-			else
+			else if (_isOnFractalMap)
 			{
-				if (!_isOnFractalMap)
-				{
-					return;
-				}
-				switch (Service.Settings.FractalSettings.CompletionMethod.get_Value())
-				{
-				case StrikeComplete.MAP_CHANGE:
-					this.FractalComplete?.Invoke(this, _fractalApiName);
-					if (_fractal != null)
-					{
-						MarkCompleted(_fractal);
-					}
-					break;
-				case StrikeComplete.POPUP:
-				{
-					ConfirmDialog dialog = new ConfirmDialog(_fractalName, Strings.Strike_Confirm_Message, new ButtonDefinition[2]
-					{
-						new ButtonDefinition(Strings.Strike_Confirm_Btn_Yes, DialogResult.OK),
-						new ButtonDefinition(Strings.Strike_Confirm_Btn_No, DialogResult.Cancel)
-					});
-					DialogResult num = await dialog.ShowDialog();
-					((Control)dialog).Dispose();
-					if (num == DialogResult.OK)
-					{
-						this.FractalComplete?.Invoke(this, _fractalApiName);
-						if (_fractal != null)
-						{
-							MarkCompleted(_fractal);
-						}
-					}
-					break;
-				}
-				}
-				Reset();
+				await CompleteAndResetFractalAsync();
 			}
 		}
 

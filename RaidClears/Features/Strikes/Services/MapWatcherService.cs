@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using RaidClears.Features.Shared.Models;
@@ -79,53 +80,56 @@ namespace RaidClears.Features.Strikes.Services
 			_strikeName = string.Empty;
 		}
 
+		private async Task CompleteAndResetStrikeAsync()
+		{
+			if (!_isOnStrikeMap || _strikeMission == null)
+			{
+				return;
+			}
+			switch (Service.Settings.StrikeSettings.StrikeCompletion.get_Value())
+			{
+			case StrikeComplete.MAP_CHANGE:
+				this.StrikeCompleted?.Invoke(this, _strikeApiName);
+				MarkStrikeCompleted(_strikeMission);
+				break;
+			case StrikeComplete.POPUP:
+			{
+				ConfirmDialog dialog = new ConfirmDialog(_strikeName, Strings.Strike_Confirm_Message, new ButtonDefinition[2]
+				{
+					new ButtonDefinition(Strings.Strike_Confirm_Btn_Yes, DialogResult.OK),
+					new ButtonDefinition(Strings.Strike_Confirm_Btn_No, DialogResult.Cancel)
+				});
+				DialogResult num = await dialog.ShowDialog();
+				((Control)dialog).Dispose();
+				if (num == DialogResult.OK)
+				{
+					this.StrikeCompleted?.Invoke(this, _strikeApiName);
+					MarkStrikeCompleted(_strikeMission);
+				}
+				break;
+			}
+			}
+			Reset();
+		}
+
 		private async void CurrentMap_MapChanged(object sender, ValueEventArgs<int> e)
 		{
-			BossEncounter _strikeMap = Service.StrikeData.GetBossEncounterByMapId(e.get_Value());
-			if (_strikeMap != null)
+			BossEncounter newStrike = Service.StrikeData.GetBossEncounterByMapId(e.get_Value());
+			if (newStrike != null)
 			{
+				if (_isOnStrikeMap && _strikeMission != null && newStrike.EncounterId != _strikeMission!.EncounterId)
+				{
+					await CompleteAndResetStrikeAsync();
+				}
 				Reset();
 				_isOnStrikeMap = true;
-				_strikeApiName = _strikeMap.EncounterId;
-				_strikeName = _strikeMap.Name;
-				_strikeMission = _strikeMap;
+				_strikeApiName = newStrike.EncounterId;
+				_strikeName = newStrike.Name;
+				_strikeMission = newStrike;
 			}
-			else
+			else if (_isOnStrikeMap)
 			{
-				if (!_isOnStrikeMap)
-				{
-					return;
-				}
-				switch (Service.Settings.StrikeSettings.StrikeCompletion.get_Value())
-				{
-				case StrikeComplete.MAP_CHANGE:
-					this.StrikeCompleted?.Invoke(this, _strikeApiName);
-					if (_strikeMission != null)
-					{
-						MarkStrikeCompleted(_strikeMission);
-					}
-					break;
-				case StrikeComplete.POPUP:
-				{
-					ConfirmDialog dialog = new ConfirmDialog(_strikeName, Strings.Strike_Confirm_Message, new ButtonDefinition[2]
-					{
-						new ButtonDefinition(Strings.Strike_Confirm_Btn_Yes, DialogResult.OK),
-						new ButtonDefinition(Strings.Strike_Confirm_Btn_No, DialogResult.Cancel)
-					});
-					DialogResult num = await dialog.ShowDialog();
-					((Control)dialog).Dispose();
-					if (num == DialogResult.OK)
-					{
-						this.StrikeCompleted?.Invoke(this, _strikeApiName);
-						if (_strikeMission != null)
-						{
-							MarkStrikeCompleted(_strikeMission);
-						}
-					}
-					break;
-				}
-				}
-				Reset();
+				await CompleteAndResetStrikeAsync();
 			}
 		}
 
