@@ -287,6 +287,7 @@ namespace CinemaHUD.UI.Windows.MainSettings
 			_contentCts?.Dispose();
 			_contentCts = new CancellationTokenSource();
 			_streamCards.Clear();
+			((Container)_contentPanel).ClearChildren();
 			if (_selectedCategoryId == "Followed Channels")
 			{
 				LoadFollowedContentAsync(_contentCts.Token);
