@@ -1,15 +1,16 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Blish_HUD;
-using Blish_HUD.Controls;
+using Blish_HUD.Content;
+using CinemaModule.Controllers;
 using CinemaModule.Models;
-using CinemaModule.Player;
 using CinemaModule.Services;
 using CinemaModule.Settings;
-using CinemaModule.UI.Displays;
+using CinemaModule.UI.VideoDisplays;
+using CinemaModule.VideoPlayer;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace CinemaModule
 {
@@ -25,101 +26,74 @@ namespace CinemaModule
 
 		private readonly TwitchService _twitchService;
 
-		private VideoPlayer _videoPlayer;
+		private readonly PlaybackController _playbackController;
 
-		private WindowVideoDisplay _windowDisplay;
+		private readonly DisplayManager _displayManager;
 
-		private WorldVideoDisplay _worldDisplay;
+		private readonly TwitchIntegrationHandler _twitchHandler;
+
+		private TwitchStreamInfo _currentTwitchStreamInfo;
 
 		private bool _isDisposed;
 
-		private bool _isPausedDueToRange;
+		private bool IsTwitchStream => _userSettings.CurrentStreamSourceType == StreamSourceType.TwitchChannel;
 
 		public event EventHandler ShowSettingsRequested;
+
+		public event EventHandler<string> ShowChatRequested;
+
+		public event EventHandler<string> ToggleChatRequested;
+
+		public event EventHandler<string> ChatChannelChangeRequested;
 
 		public CinemaController(CinemaSettings coreSettings, CinemaUserSettings userSettings, TwitchService twitchService)
 		{
 			_moduleSettings = coreSettings;
 			_userSettings = userSettings;
 			_twitchService = twitchService;
+			_playbackController = new PlaybackController(coreSettings, userSettings, twitchService);
+			_displayManager = new DisplayManager(coreSettings, userSettings);
+			_twitchHandler = new TwitchIntegrationHandler(userSettings, twitchService);
+			SubscribeToHandlerEvents();
 			SubscribeToSettingsEvents();
-			_twitchService.QualitiesChanged += OnTwitchQualitiesChanged;
 		}
 
-		public void RegisterPlayer(VideoPlayer player)
+		public void RegisterPlayer(global::CinemaModule.VideoPlayer.VideoPlayer player)
 		{
-			_videoPlayer = player;
-			_videoPlayer.QualitiesChanged += OnVideoQualitiesChanged;
-			if (_moduleSettings.IsEnabled && !string.IsNullOrEmpty(_userSettings.StreamUrl))
-			{
-				_videoPlayer.Play(_userSettings.StreamUrl);
-				if (_userSettings.CurrentStreamSourceType == StreamSourceType.TwitchChannel)
-				{
-					string channelName = _userSettings.GetCurrentTwitchChannel();
-					_twitchService.FetchAndCacheQualitiesAsync(channelName);
-				}
-			}
+			_playbackController.RegisterPlayer(player);
+			_displayManager.RegisterPlayer(player);
+			_twitchHandler.RegisterPlayer(player);
+		}
+
+		public void StartInitialPlaybackIfEnabled()
+		{
+			_playbackController.StartInitialPlaybackIfEnabled();
 		}
 
 		public void RegisterDisplays(WindowVideoDisplay windowDisplay, WorldVideoDisplay worldDisplay)
 		{
-			_windowDisplay = windowDisplay;
-			_worldDisplay = worldDisplay;
-			SubscribeToDisplayEvents(_windowDisplay);
-			SubscribeToDisplayEvents(_worldDisplay);
-			if (_windowDisplay != null)
-			{
-				_windowDisplay.PositionChanged += OnWindowPositionChanged;
-				_windowDisplay.SizeChanged += OnWindowSizeChanged;
-			}
-			if (_worldDisplay != null)
-			{
-				_worldDisplay.InRangeChanged += OnWorldDisplayInRangeChanged;
-			}
-			UpdateTwitchStreamState();
-			UpdateDisplayVisibility();
-		}
-
-		private void SubscribeToDisplayEvents(IVideoDisplay display)
-		{
-			if (display != null)
-			{
-				display.PlayPauseClicked += OnPlayPauseClicked;
-				display.VolumeChanged += OnVolumeChangedFromUI;
-				display.SettingsClicked += OnDisplaySettingsClicked;
-				display.QualityChanged += OnQualityChanged;
-				display.TwitchChatClicked += OnTwitchChatClicked;
-				display.CloseClicked += OnCloseClicked;
-			}
+			_displayManager.RegisterDisplays(windowDisplay, worldDisplay);
+			_displayManager.UpdateTwitchStreamState(IsTwitchStream);
+			_displayManager.UpdateDisplayVisibility();
+			_twitchHandler.InitializeStreamInfo();
 		}
 
 		public void Update()
 		{
-			if (_moduleSettings.IsEnabled && _videoPlayer != null)
+			if (_moduleSettings.IsEnabled)
 			{
-				_videoPlayer.Update();
-				SyncDisplayState(_windowDisplay);
-				SyncDisplayState(_worldDisplay);
-				GetActiveDisplay()?.UpdateTexture(_videoPlayer.VideoTexture);
+				_playbackController.Update();
+				_displayManager.SyncDisplayState();
+				_displayManager.UpdateActiveDisplayTexture();
+				UpdateSeekState();
 			}
 		}
 
-		private void SyncDisplayState(IVideoDisplay display)
+		private void UpdateSeekState()
 		{
-			if (display != null && _videoPlayer != null)
-			{
-				display.IsPaused = _videoPlayer.IsPaused;
-				display.Volume = _videoPlayer.Volume;
-			}
-		}
-
-		private IVideoDisplay GetActiveDisplay()
-		{
-			if (_userSettings.DisplayMode != 0)
-			{
-				return _worldDisplay;
-			}
-			return _windowDisplay;
+			bool isSeekable = !IsTwitchStream && _playbackController.IsSeekable;
+			_displayManager.UpdateSeekableState(isSeekable, _playbackController.Duration);
+			_displayManager.UpdateCurrentPosition(_playbackController.Position);
 		}
 
 		public void SelectSavedLocation(string id)
@@ -147,24 +121,78 @@ namespace CinemaModule
 			{
 				_userSettings.WorldPosition = position;
 				_userSettings.WorldScreenWidth = ((screenWidth > 0f) ? screenWidth : 10f);
-				Logger.Info($"Selected preset location '{presetId}': X={position.X:F2}, Y={position.Y:F2}, Z={position.Z:F2}, Yaw={position.Yaw:F1}, Pitch={position.Pitch:F1}, MapId={position.MapId}, ScreenWidth={_userSettings.WorldScreenWidth:F1}");
 			}
 		}
 
 		public void SelectSavedStream(string id)
 		{
-			_userSettings.SelectedSavedStreamId = id;
 			SavedStream stream = _userSettings.SavedStreams.Streams.Find((SavedStream s) => s.Id == id);
 			if (stream != null)
 			{
-				_userSettings.CurrentStreamSourceType = stream.SourceType;
-				_userSettings.CurrentTwitchChannel = ((stream.SourceType == StreamSourceType.TwitchChannel) ? stream.Value : "");
+				_userSettings.SelectSavedStream(stream);
 			}
 			else
 			{
-				_userSettings.CurrentStreamSourceType = StreamSourceType.Url;
-				_userSettings.CurrentTwitchChannel = "";
+				Logger.Warn("Saved stream '" + id + "' not found");
 			}
+		}
+
+		public void RequestShowChat(string channelName)
+		{
+			if (string.IsNullOrEmpty(channelName))
+			{
+				Logger.Warn("Cannot open Twitch chat - channel name is empty");
+			}
+			else
+			{
+				this.ShowChatRequested?.Invoke(this, channelName);
+			}
+		}
+
+		private void SubscribeToHandlerEvents()
+		{
+			_displayManager.WindowPositionChanged += delegate(object s, Point pos)
+			{
+				//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+				_userSettings.WindowPosition = pos;
+			};
+			_displayManager.WindowSizeChanged += delegate(object s, Point size)
+			{
+				//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+				_userSettings.WindowSize = size;
+			};
+			_displayManager.WindowLockToggled += delegate(object s, bool locked)
+			{
+				_userSettings.WindowLocked = locked;
+			};
+			_displayManager.WorldDisplayInRangeChanged += OnWorldDisplayInRangeChanged;
+			_displayManager.PlayPauseClicked += delegate
+			{
+				_playbackController.TogglePause();
+			};
+			_displayManager.VolumeChangedFromUI += OnVolumeChangedFromUI;
+			_displayManager.SettingsClicked += delegate
+			{
+				this.ShowSettingsRequested?.Invoke(this, EventArgs.Empty);
+			};
+			_displayManager.QualityChanged += delegate(object s, int index)
+			{
+				_twitchHandler.HandleQualityChange(index);
+			};
+			_displayManager.TwitchChatClicked += OnTwitchChatClicked;
+			_displayManager.CloseClicked += delegate
+			{
+				_moduleSettings.EnabledSetting.set_Value(false);
+			};
+			_displayManager.SeekRequested += OnSeekRequested;
+			_twitchHandler.ChatChannelChangeRequested += delegate(object s, string channel)
+			{
+				this.ChatChannelChangeRequested?.Invoke(this, channel);
+			};
+			_twitchHandler.QualitiesUpdated += OnQualitiesUpdated;
+			_twitchHandler.StreamInfoUpdated += OnStreamInfoUpdated;
+			_playbackController.StreamUrlRefreshed += OnStreamUrlRefreshed;
+			_playbackController.PlaybackStateChanged += OnPlaybackStateChanged;
 		}
 
 		private void SubscribeToSettingsEvents()
@@ -176,6 +204,7 @@ namespace CinemaModule
 			_userSettings.WorldScreenWidthChanged += OnWorldScreenWidthChanged;
 			_userSettings.VolumeChanged += OnVolumeChanged;
 			_userSettings.CurrentStreamSourceTypeChanged += OnCurrentStreamSourceTypeChanged;
+			_userSettings.CurrentStreamPresetChanged += OnCurrentStreamPresetChanged;
 		}
 
 		private void UnsubscribeFromSettingsEvents()
@@ -187,239 +216,65 @@ namespace CinemaModule
 			_userSettings.WorldScreenWidthChanged -= OnWorldScreenWidthChanged;
 			_userSettings.VolumeChanged -= OnVolumeChanged;
 			_userSettings.CurrentStreamSourceTypeChanged -= OnCurrentStreamSourceTypeChanged;
+			_userSettings.CurrentStreamPresetChanged -= OnCurrentStreamPresetChanged;
 		}
 
-		private void UnsubscribeFromDisplayEvents()
+		private void OnEnabledChanged(object sender, ValueChangedEventArgs<bool> e)
 		{
-			UnsubscribeFromCommonDisplayEvents(_windowDisplay);
-			UnsubscribeFromCommonDisplayEvents(_worldDisplay);
-			if (_windowDisplay != null)
-			{
-				_windowDisplay.PositionChanged -= OnWindowPositionChanged;
-				_windowDisplay.SizeChanged -= OnWindowSizeChanged;
-			}
-			if (_worldDisplay != null)
-			{
-				_worldDisplay.InRangeChanged -= OnWorldDisplayInRangeChanged;
-			}
-		}
-
-		private void UnsubscribeFromCommonDisplayEvents(IVideoDisplay display)
-		{
-			if (display != null)
-			{
-				display.PlayPauseClicked -= OnPlayPauseClicked;
-				display.VolumeChanged -= OnVolumeChangedFromUI;
-				display.SettingsClicked -= OnDisplaySettingsClicked;
-				display.QualityChanged -= OnQualityChanged;
-				display.TwitchChatClicked -= OnTwitchChatClicked;
-				display.CloseClicked -= OnCloseClicked;
-			}
-		}
-
-		private async void OnEnabledChanged(object sender, ValueChangedEventArgs<bool> e)
-		{
-			if (_videoPlayer == null)
-			{
-				return;
-			}
+			_playbackController.HandleEnabledChanged(e.get_NewValue());
 			if (e.get_NewValue())
 			{
-				if (_userSettings.CurrentStreamSourceType == StreamSourceType.TwitchChannel)
-				{
-					await RefreshTwitchStreamAndPlayAsync();
-				}
-				else if (!string.IsNullOrEmpty(_userSettings.StreamUrl))
-				{
-					_videoPlayer.Play(_userSettings.StreamUrl);
-				}
-				UpdateDisplayVisibility();
+				_displayManager.UpdateDisplayVisibility();
 			}
 			else
 			{
-				_videoPlayer.Stop();
-				HideAllDisplays();
+				_displayManager.HideAllDisplays();
 			}
 		}
 
 		private void OnStreamUrlChanged(object sender, string url)
 		{
-			if (_videoPlayer == null)
-			{
-				return;
-			}
-			_twitchService.ClearCachedQualities();
-			if (_moduleSettings.IsEnabled && !string.IsNullOrEmpty(url) && !(_videoPlayer.CurrentUrl == url))
-			{
-				_videoPlayer.Stop();
-				_videoPlayer.Play(url);
-				if (_userSettings.CurrentStreamSourceType == StreamSourceType.TwitchChannel)
-				{
-					string channelName = _userSettings.GetCurrentTwitchChannel();
-					_twitchService.FetchAndCacheQualitiesAsync(channelName);
-				}
-			}
+			_displayManager.UpdateOfflineState(isOffline: false);
+			_displayManager.UpdateOfflineTexture(null);
+			_currentTwitchStreamInfo = null;
+			_playbackController.HandleStreamUrlChanged(url);
+			_twitchHandler.HandleStreamUrlChanged(IsTwitchStream);
 		}
 
 		private void OnDisplayModeChanged(object sender, CinemaDisplayMode mode)
 		{
 			UpdateRangeBasedPlayback();
-			UpdateDisplayVisibility();
-			if (_moduleSettings.IsEnabled && !string.IsNullOrEmpty(_userSettings.StreamUrl) && _videoPlayer != null && !_videoPlayer.IsPlaying)
-			{
-				Logger.Info("Restarting playback after display mode change");
-				_videoPlayer.Play(_userSettings.StreamUrl);
-			}
+			_displayManager.UpdateDisplayVisibility();
+			_playbackController.RestartPlaybackIfNeeded();
 		}
 
 		private void OnWorldPositionChanged(object sender, WorldPosition3D position)
 		{
-			if (_worldDisplay != null)
-			{
-				_worldDisplay.WorldPosition = position;
-			}
+			_displayManager.UpdateWorldPosition(position);
 			UpdateRangeBasedPlayback();
 		}
 
 		private void OnWorldScreenWidthChanged(object sender, float width)
 		{
-			if (_worldDisplay != null)
-			{
-				_worldDisplay.WorldWidth = width;
-			}
+			_displayManager.UpdateWorldScreenWidth(width);
 		}
 
 		private void OnVolumeChanged(object sender, int volume)
 		{
-			if (_videoPlayer != null)
-			{
-				_videoPlayer.Volume = volume;
-			}
-		}
-
-		private void UpdateTwitchStreamState()
-		{
-			bool isTwitchStream = _userSettings.CurrentStreamSourceType == StreamSourceType.TwitchChannel;
-			if (_windowDisplay != null)
-			{
-				_windowDisplay.IsTwitchStream = isTwitchStream;
-			}
-			if (_worldDisplay != null)
-			{
-				_worldDisplay.IsTwitchStream = isTwitchStream;
-			}
+			_playbackController.SetVolume(volume);
 		}
 
 		private void OnCurrentStreamSourceTypeChanged(object sender, StreamSourceType sourceType)
 		{
-			UpdateTwitchStreamState();
-			if (sourceType == StreamSourceType.TwitchChannel && (_videoPlayer?.IsPlaying ?? false))
-			{
-				string channelName = _userSettings.GetCurrentTwitchChannel();
-				_twitchService.FetchAndCacheQualitiesAsync(channelName);
-			}
-			else if (sourceType != StreamSourceType.TwitchChannel)
-			{
-				_twitchService.ClearCachedQualities();
-			}
+			_displayManager.UpdateTwitchStreamState(IsTwitchStream);
+			_twitchHandler.HandleStreamSourceTypeChanged(sourceType);
 		}
 
-		private void OnVideoQualitiesChanged(object sender, EventArgs e)
+		private void OnCurrentStreamPresetChanged(object sender, StreamPresetData preset)
 		{
-			if (_videoPlayer != null && (_userSettings.CurrentStreamSourceType != StreamSourceType.TwitchChannel || _twitchService.CachedQualities.Count <= 0))
+			if (_playbackController.IsOffline)
 			{
-				List<string> qualityNames = _videoPlayer.AvailableQualities.Select((VideoQuality q) => q.Name).ToList();
-				if (_windowDisplay != null)
-				{
-					_windowDisplay.UpdateAvailableQualities(qualityNames, _videoPlayer.SelectedQualityIndex);
-				}
-				if (_worldDisplay != null)
-				{
-					_worldDisplay.UpdateAvailableQualities(qualityNames, _videoPlayer.SelectedQualityIndex);
-				}
-			}
-		}
-
-		private void OnTwitchQualitiesChanged(object sender, TwitchQualitiesEventArgs e)
-		{
-			if (_windowDisplay != null)
-			{
-				_windowDisplay.UpdateAvailableQualities(e.QualityNames.ToList(), e.SelectedIndex);
-			}
-			if (_worldDisplay != null)
-			{
-				_worldDisplay.UpdateAvailableQualities(e.QualityNames.ToList(), e.SelectedIndex);
-			}
-		}
-
-		private void OnWindowPositionChanged(object sender, Point position)
-		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			_userSettings.WindowPosition = position;
-		}
-
-		private void OnWindowSizeChanged(object sender, Point size)
-		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			_userSettings.WindowSize = size;
-		}
-
-		private void OnPlayPauseClicked(object sender, EventArgs e)
-		{
-			_videoPlayer?.TogglePause();
-		}
-
-		private void OnVolumeChangedFromUI(object sender, int volume)
-		{
-			if (_videoPlayer != null)
-			{
-				_videoPlayer.Volume = volume;
-			}
-			_userSettings.Volume = volume;
-		}
-
-		private void OnDisplaySettingsClicked(object sender, EventArgs e)
-		{
-			this.ShowSettingsRequested?.Invoke(this, EventArgs.Empty);
-		}
-
-		private void OnCloseClicked(object sender, EventArgs e)
-		{
-			_moduleSettings.EnabledSetting.set_Value(false);
-		}
-
-		private void OnTwitchChatClicked(object sender, EventArgs e)
-		{
-			string channelName = _userSettings.GetCurrentTwitchChannel();
-			if (string.IsNullOrEmpty(channelName))
-			{
-				Logger.Warn("Cannot open Twitch chat - no valid Twitch channel detected");
-			}
-			else
-			{
-				_twitchService.OpenTwitchChat(channelName);
-			}
-		}
-
-		private void OnQualityChanged(object sender, int qualityIndex)
-		{
-			if (_videoPlayer == null)
-			{
-				return;
-			}
-			if (_userSettings.CurrentStreamSourceType == StreamSourceType.TwitchChannel && _twitchService.CachedQualities.Count > 0)
-			{
-				string streamUrl = _twitchService.SelectQuality(qualityIndex);
-				if (!string.IsNullOrEmpty(streamUrl))
-				{
-					_videoPlayer.Stop();
-					_videoPlayer.Play(streamUrl);
-				}
-			}
-			else
-			{
-				_videoPlayer.SetQuality(qualityIndex);
-				Logger.Info($"Video quality changed to index {qualityIndex}");
+				LoadOfflineTextureAsync();
 			}
 		}
 
@@ -428,79 +283,121 @@ namespace CinemaModule
 			UpdateRangeBasedPlayback();
 		}
 
-		private void UpdateRangeBasedPlayback()
+		private void OnVolumeChangedFromUI(object sender, int volume)
 		{
-			if (_videoPlayer != null)
-			{
-				bool shouldBePaused = _userSettings.DisplayMode == CinemaDisplayMode.InGame && _worldDisplay != null && !_worldDisplay.IsInRange;
-				Logger.Debug($"UpdateRangeBasedPlayback - Display mode: {_userSettings.DisplayMode}, IsInRange: {_worldDisplay?.IsInRange ?? false}, Should pause: {shouldBePaused}, Currently paused due to range: {_isPausedDueToRange}");
-				if (shouldBePaused && !_isPausedDueToRange && !_videoPlayer.IsPaused)
-				{
-					_videoPlayer.Pause();
-					_isPausedDueToRange = true;
-					Logger.Info("World display out of range - paused playback");
-				}
-				else if (!shouldBePaused && _isPausedDueToRange)
-				{
-					_videoPlayer.Resume();
-					_isPausedDueToRange = false;
-					Logger.Info("World display in range or mode changed - resumed playback");
-				}
-			}
+			_playbackController.SetVolume(volume);
+			_userSettings.Volume = volume;
 		}
 
-		private void UpdateDisplayVisibility()
+		private void OnTwitchChatClicked(object sender, EventArgs e)
 		{
-			bool isOnScreen = _userSettings.DisplayMode == CinemaDisplayMode.OnScreen;
-			bool isEnabled = _moduleSettings.IsEnabled;
-			if (_windowDisplay != null)
-			{
-				((Control)_windowDisplay).set_Visible(isEnabled && isOnScreen);
-			}
-			if (_worldDisplay != null)
-			{
-				((Control)_worldDisplay).set_Visible(isEnabled && !isOnScreen);
-			}
-		}
-
-		private void HideAllDisplays()
-		{
-			if (_windowDisplay != null)
-			{
-				((Control)_windowDisplay).set_Visible(false);
-			}
-			if (_worldDisplay != null)
-			{
-				((Control)_worldDisplay).set_Visible(false);
-			}
-		}
-
-		private async Task RefreshTwitchStreamAndPlayAsync()
-		{
-			string channelName = _userSettings.GetCurrentTwitchChannel();
+			string channelName = _twitchHandler.GetCurrentTwitchChannel();
 			if (string.IsNullOrEmpty(channelName))
 			{
-				Logger.Warn("Cannot refresh Twitch stream - no channel name");
-				return;
+				Logger.Warn("Cannot open Twitch chat - no valid Twitch channel detected");
 			}
-			Logger.Info("Refreshing Twitch stream URL for channel: " + channelName);
-			try
+			else
 			{
-				string freshUrl = await _twitchService.GetPlayableStreamUrlAsync(channelName);
-				if (string.IsNullOrEmpty(freshUrl))
-				{
-					Logger.Warn("Failed to get fresh stream URL for channel: " + channelName);
-					return;
-				}
-				_userSettings.StreamUrl = freshUrl;
-				_videoPlayer.Play(freshUrl);
-				_twitchService.FetchAndCacheQualitiesAsync(channelName);
-				Logger.Info("Successfully refreshed Twitch stream for channel: " + channelName);
+				this.ToggleChatRequested?.Invoke(this, channelName);
 			}
-			catch (Exception ex)
+		}
+
+		private void OnQualitiesUpdated(object sender, TwitchQualitiesEventArgs e)
+		{
+			_displayManager.UpdateAvailableQualities(e.QualityNames.ToList(), e.SelectedIndex);
+		}
+
+		private void OnStreamInfoUpdated(object sender, TwitchStreamInfo streamInfo)
+		{
+			_currentTwitchStreamInfo = streamInfo;
+			if (streamInfo != null)
 			{
-				Logger.Error(ex, "Failed to refresh Twitch stream for channel: " + channelName);
+				_displayManager.UpdateStreamInfo(streamInfo.ChannelName, streamInfo.ViewerCount, streamInfo.GameName);
 			}
+			else
+			{
+				_displayManager.UpdateStreamInfo(null, null, null);
+			}
+		}
+
+		private void OnPlaybackStateChanged(object sender, PlaybackState state)
+		{
+			bool isOffline = state == PlaybackState.Stopped || state == PlaybackState.Error || state == PlaybackState.Ended;
+			_displayManager.UpdateOfflineState(isOffline);
+			if (isOffline)
+			{
+				LoadOfflineTextureAsync();
+			}
+			else if (state == PlaybackState.Playing)
+			{
+				_displayManager.UpdateOfflineTexture(null);
+			}
+		}
+
+		private async Task LoadOfflineTextureAsync()
+		{
+			Texture2D val = ((!IsTwitchStream) ? (await LoadUrlStaticImageTextureAsync()) : (await LoadTwitchAvatarTextureAsync()));
+			Texture2D offlineTexture = val;
+			if (offlineTexture != null)
+			{
+				_displayManager.UpdateOfflineTexture(offlineTexture);
+			}
+		}
+
+		private async Task<Texture2D> LoadTwitchAvatarTextureAsync()
+		{
+			string channelName = _userSettings.CurrentTwitchChannel;
+			if (string.IsNullOrEmpty(channelName))
+			{
+				return null;
+			}
+			TwitchStreamInfo twitchStreamInfo = _currentTwitchStreamInfo;
+			if (twitchStreamInfo == null)
+			{
+				twitchStreamInfo = await _twitchService.GetStreamInfoAsync(channelName);
+			}
+			TwitchStreamInfo streamInfo = twitchStreamInfo;
+			if (streamInfo == null || string.IsNullOrEmpty(streamInfo.AvatarUrl))
+			{
+				return null;
+			}
+			AsyncTexture2D obj = await _twitchService.GetAvatarTextureAsync("offline_" + channelName, streamInfo.AvatarUrl);
+			return (obj != null) ? obj.get_Texture() : null;
+		}
+
+		private async Task<Texture2D> LoadUrlStaticImageTextureAsync()
+		{
+			StreamPresetData preset = _userSettings.CurrentStreamPreset;
+			if (preset == null)
+			{
+				return null;
+			}
+			if (string.IsNullOrEmpty(preset.StaticImage))
+			{
+				return null;
+			}
+			AsyncTexture2D asyncTexture = await CinemaModule.Instance.TextureService.GetImageFromUrlAsync("offline_static_" + preset.Id, preset.StaticImage);
+			if (asyncTexture != null)
+			{
+				preset.StaticImageTexture = asyncTexture;
+			}
+			return (asyncTexture != null) ? asyncTexture.get_Texture() : null;
+		}
+
+		private void OnSeekRequested(object sender, float position)
+		{
+			_playbackController.Seek(position);
+		}
+
+		private void OnStreamUrlRefreshed(object sender, TwitchStreamRefreshedEventArgs e)
+		{
+			_userSettings.StreamUrl = e.StreamUrl;
+			this.ChatChannelChangeRequested?.Invoke(this, e.ChannelName);
+		}
+
+		private void UpdateRangeBasedPlayback()
+		{
+			_playbackController.UpdateRangeBasedPlayback(_displayManager.IsWorldDisplayInRange, _userSettings.DisplayMode);
 		}
 
 		public void Dispose()
@@ -508,13 +405,9 @@ namespace CinemaModule
 			if (!_isDisposed)
 			{
 				UnsubscribeFromSettingsEvents();
-				UnsubscribeFromDisplayEvents();
-				if (_videoPlayer != null)
-				{
-					_videoPlayer.QualitiesChanged -= OnVideoQualitiesChanged;
-				}
-				_twitchService.QualitiesChanged -= OnTwitchQualitiesChanged;
-				_isPausedDueToRange = false;
+				_playbackController?.Dispose();
+				_displayManager?.Dispose();
+				_twitchHandler?.Dispose();
 				_isDisposed = true;
 			}
 		}

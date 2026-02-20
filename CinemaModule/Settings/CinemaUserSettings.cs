@@ -23,15 +23,27 @@ namespace CinemaModule.Settings
 
 		private const float ScreenWidthTolerance = 0.001f;
 
-		private const int MinWindowEdgeSpacing = 50;
-
-		private const int DefaultWindowX = 100;
-
-		private const int DefaultWindowY = 50;
-
 		private readonly string _settingsFilePath;
 
 		private CinemaUserSettingsData _data;
+
+		private StreamPresetData _currentStreamPreset;
+
+		public StreamPresetData CurrentStreamPreset
+		{
+			get
+			{
+				return _currentStreamPreset;
+			}
+			set
+			{
+				if (_currentStreamPreset != value)
+				{
+					_currentStreamPreset = value;
+					this.CurrentStreamPresetChanged?.Invoke(this, value);
+				}
+			}
+		}
 
 		public string StreamUrl
 		{
@@ -52,7 +64,7 @@ namespace CinemaModule.Settings
 		{
 			get
 			{
-				return _data.CurrentTwitchChannel ?? "";
+				return _data.CurrentTwitchChannel;
 			}
 			set
 			{
@@ -114,12 +126,14 @@ namespace CinemaModule.Settings
 		{
 			get
 			{
-				return _data.SelectedPresetLocationId ?? "";
+				return _data.SelectedPresetLocationId;
 			}
 			set
 			{
-				_data.SelectedPresetLocationId = value;
-				Save();
+				SetProperty(_data.SelectedPresetLocationId, value, delegate(string v)
+				{
+					_data.SelectedPresetLocationId = v;
+				});
 			}
 		}
 
@@ -131,8 +145,10 @@ namespace CinemaModule.Settings
 			}
 			set
 			{
-				_data.SelectedSavedLocationId = value;
-				Save();
+				SetProperty(_data.SelectedSavedLocationId, value, delegate(string v)
+				{
+					_data.SelectedSavedLocationId = v;
+				});
 			}
 		}
 
@@ -144,9 +160,10 @@ namespace CinemaModule.Settings
 			}
 			set
 			{
-				_data.WorldPosition = value;
-				Save();
-				RaiseEvent(this.WorldPositionChanged, value);
+				SetPropertyWithEvent(_data.WorldPosition, value, delegate(WorldPosition3D v)
+				{
+					_data.WorldPosition = v;
+				}, this.WorldPositionChanged);
 			}
 		}
 
@@ -177,9 +194,13 @@ namespace CinemaModule.Settings
 			}
 			set
 			{
-				//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-				_data.WindowPosition = value;
-				Save();
+				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+				SetProperty(_data.WindowPosition, value, delegate(Point v)
+				{
+					//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+					_data.WindowPosition = v;
+				});
 			}
 		}
 
@@ -192,9 +213,28 @@ namespace CinemaModule.Settings
 			}
 			set
 			{
-				//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-				_data.WindowSize = value;
-				Save();
+				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+				SetProperty(_data.WindowSize, value, delegate(Point v)
+				{
+					//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+					_data.WindowSize = v;
+				});
+			}
+		}
+
+		public bool WindowLocked
+		{
+			get
+			{
+				return _data.WindowLocked;
+			}
+			set
+			{
+				SetProperty(_data.WindowLocked, value, delegate(bool v)
+				{
+					_data.WindowLocked = v;
+				});
 			}
 		}
 
@@ -210,8 +250,149 @@ namespace CinemaModule.Settings
 			}
 			set
 			{
-				_data.SelectedSavedStreamId = value;
-				Save();
+				SetProperty(_data.SelectedSavedStreamId, value, delegate(string v)
+				{
+					_data.SelectedSavedStreamId = v;
+				});
+			}
+		}
+
+		public string SelectedUrlChannelId
+		{
+			get
+			{
+				return _data.SelectedUrlChannelId;
+			}
+			set
+			{
+				SetProperty(_data.SelectedUrlChannelId, value, delegate(string v)
+				{
+					_data.SelectedUrlChannelId = v;
+				});
+			}
+		}
+
+		public string TwitchAccessToken
+		{
+			get
+			{
+				return _data.TwitchAccessToken;
+			}
+			set
+			{
+				SetProperty(_data.TwitchAccessToken, value, delegate(string v)
+				{
+					_data.TwitchAccessToken = v;
+				});
+			}
+		}
+
+		public string TwitchRefreshToken
+		{
+			get
+			{
+				return _data.TwitchRefreshToken;
+			}
+			set
+			{
+				SetProperty(_data.TwitchRefreshToken, value, delegate(string v)
+				{
+					_data.TwitchRefreshToken = v;
+				});
+			}
+		}
+
+		public string LastSelectedSourceCategory
+		{
+			get
+			{
+				return _data.LastSelectedSourceCategory;
+			}
+			set
+			{
+				SetProperty(_data.LastSelectedSourceCategory, value, delegate(string v)
+				{
+					_data.LastSelectedSourceCategory = v;
+				});
+			}
+		}
+
+		public int SelectedSettingsTab
+		{
+			get
+			{
+				return _data.SelectedSettingsTab;
+			}
+			set
+			{
+				SetProperty(_data.SelectedSettingsTab, value, delegate(int v)
+				{
+					_data.SelectedSettingsTab = v;
+				});
+			}
+		}
+
+		public bool TwitchChatWindowLocked
+		{
+			get
+			{
+				return _data.TwitchChatWindowLocked;
+			}
+			set
+			{
+				SetProperty(_data.TwitchChatWindowLocked, value, delegate(bool v)
+				{
+					_data.TwitchChatWindowLocked = v;
+				});
+			}
+		}
+
+		public bool TwitchChatWindowOpen
+		{
+			get
+			{
+				return _data.TwitchChatWindowOpen;
+			}
+			set
+			{
+				SetProperty(_data.TwitchChatWindowOpen, value, delegate(bool v)
+				{
+					_data.TwitchChatWindowOpen = v;
+				});
+			}
+		}
+
+		public Point TwitchChatWindowSize
+		{
+			get
+			{
+				//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+				return _data.TwitchChatWindowSize;
+			}
+			set
+			{
+				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+				//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+				SetProperty(_data.TwitchChatWindowSize, value, delegate(Point v)
+				{
+					//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+					_data.TwitchChatWindowSize = v;
+				});
+			}
+		}
+
+		public string TwitchChatWindowChannel
+		{
+			get
+			{
+				return _data.TwitchChatWindowChannel;
+			}
+			set
+			{
+				SetProperty(_data.TwitchChatWindowChannel, value ?? "", delegate(string v)
+				{
+					_data.TwitchChatWindowChannel = v;
+				});
 			}
 		}
 
@@ -226,6 +407,8 @@ namespace CinemaModule.Settings
 		public event EventHandler<int> VolumeChanged;
 
 		public event EventHandler<StreamSourceType> CurrentStreamSourceTypeChanged;
+
+		public event EventHandler<StreamPresetData> CurrentStreamPresetChanged;
 
 		public event EventHandler SavedLocationsChanged;
 
@@ -259,17 +442,17 @@ namespace CinemaModule.Settings
 
 		public bool DeleteSavedLocation(string id)
 		{
-			if (SavedLocations.Locations.RemoveAll((SavedLocation l) => l.Id == id) > 0)
+			if (SavedLocations.Locations.RemoveAll((SavedLocation l) => l.Id == id) <= 0)
 			{
-				if (SelectedSavedLocationId == id)
-				{
-					_data.SelectedSavedLocationId = "";
-				}
-				Save();
-				RaiseEvent(this.SavedLocationsChanged);
-				return true;
+				return false;
 			}
-			return false;
+			if (SelectedSavedLocationId == id)
+			{
+				_data.SelectedSavedLocationId = "";
+			}
+			Save();
+			RaiseEvent(this.SavedLocationsChanged);
+			return true;
 		}
 
 		public SavedStream AddSavedStream(string name, StreamSourceType sourceType, string value)
@@ -307,16 +490,37 @@ namespace CinemaModule.Settings
 			return num;
 		}
 
-		public string GetCurrentTwitchChannel()
+		public void SelectTwitchChannel(string channelName)
 		{
-			if (!string.IsNullOrEmpty(CurrentTwitchChannel))
-			{
-				return CurrentTwitchChannel;
-			}
-			return null;
+			SelectedSavedStreamId = "";
+			CurrentTwitchChannel = channelName;
+			CurrentStreamSourceType = StreamSourceType.TwitchChannel;
+			CurrentStreamPreset = null;
 		}
 
-		private bool SetPropertyWithEvent<T>(T currentValue, T newValue, Action<T> setter, EventHandler<T> eventHandler)
+		public void SelectUrlChannel(ChannelData channel)
+		{
+			SelectedSavedStreamId = "";
+			CurrentTwitchChannel = "";
+			SelectedUrlChannelId = channel.Id;
+			CurrentStreamSourceType = StreamSourceType.Url;
+			CurrentStreamPreset = channel.ToStreamPresetData();
+			StreamUrl = channel.Url;
+		}
+
+		public void SelectSavedStream(SavedStream stream)
+		{
+			SelectedSavedStreamId = stream.Id;
+			CurrentStreamSourceType = stream.SourceType;
+			CurrentTwitchChannel = ((stream.SourceType == StreamSourceType.TwitchChannel) ? stream.Value : "");
+			if (stream.SourceType == StreamSourceType.Url)
+			{
+				StreamUrl = stream.Value;
+			}
+			CurrentStreamPreset = null;
+		}
+
+		private bool SetProperty<T>(T currentValue, T newValue, Action<T> setter)
 		{
 			if (object.Equals(currentValue, newValue))
 			{
@@ -324,6 +528,15 @@ namespace CinemaModule.Settings
 			}
 			setter(newValue);
 			Save();
+			return true;
+		}
+
+		private bool SetPropertyWithEvent<T>(T currentValue, T newValue, Action<T> setter, EventHandler<T> eventHandler)
+		{
+			if (!SetProperty(currentValue, newValue, setter))
+			{
+				return false;
+			}
 			RaiseEvent(eventHandler, newValue);
 			return true;
 		}
@@ -338,14 +551,30 @@ namespace CinemaModule.Settings
 			eventHandler?.Invoke(this, EventArgs.Empty);
 		}
 
-		private static int Clamp(int value, int min, int max)
+		private static T Clamp<T>(T value, T min, T max) where T : IComparable<T>
 		{
-			return Math.Max(min, Math.Min(max, value));
+			if (value.CompareTo(min) < 0)
+			{
+				return min;
+			}
+			if (value.CompareTo(max) > 0)
+			{
+				return max;
+			}
+			return value;
 		}
 
-		private static float Clamp(float value, float min, float max)
+		private void MigrateTwitchChannelFromSelectedStream()
 		{
-			return Math.Max(min, Math.Min(max, value));
+			if (string.IsNullOrEmpty(_data.CurrentTwitchChannel) && !string.IsNullOrEmpty(_data.SelectedSavedStreamId))
+			{
+				SavedStream selectedStream = _data.SavedStreams.Streams.Find((SavedStream s) => s.Id == _data.SelectedSavedStreamId);
+				if (selectedStream != null && selectedStream.SourceType == StreamSourceType.TwitchChannel)
+				{
+					_data.CurrentTwitchChannel = selectedStream.Value;
+					Save();
+				}
+			}
 		}
 
 		private void Load()
@@ -356,20 +585,19 @@ namespace CinemaModule.Settings
 				{
 					string json = File.ReadAllText(_settingsFilePath);
 					_data = JsonConvert.DeserializeObject<CinemaUserSettingsData>(json) ?? new CinemaUserSettingsData();
-					_data.SavedLocations = _data.SavedLocations ?? new SavedLocationCollection();
-					_data.SavedStreams = _data.SavedStreams ?? new SavedStreamCollection();
-					_data.WorldPosition = _data.WorldPosition ?? new WorldPosition3D(0f, 0f, 0f, 0);
-					if (string.IsNullOrEmpty(_data.CurrentTwitchChannel) && !string.IsNullOrEmpty(_data.SelectedSavedStreamId))
+					if (_data.SavedLocations == null)
 					{
-						SavedStream selectedStream = _data.SavedStreams?.Streams.Find((SavedStream s) => s.Id == _data.SelectedSavedStreamId);
-						if (selectedStream != null && selectedStream.SourceType == StreamSourceType.TwitchChannel)
-						{
-							_data.CurrentTwitchChannel = selectedStream.Value;
-							Save();
-							Logger.Debug("Populated CurrentTwitchChannel from selected stream: " + selectedStream.Value);
-						}
+						_data.SavedLocations = new SavedLocationCollection();
 					}
-					Logger.Info("Loaded CinemaHUD settings from JSON");
+					if (_data.SavedStreams == null)
+					{
+						_data.SavedStreams = new SavedStreamCollection();
+					}
+					if (_data.WorldPosition == null)
+					{
+						_data.WorldPosition = new WorldPosition3D(0f, 0f, 0f, 0);
+					}
+					MigrateTwitchChannelFromSelectedStream();
 				}
 				catch (Exception ex)
 				{

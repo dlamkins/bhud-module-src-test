@@ -28,13 +28,13 @@ namespace CinemaHUD.UI.Windows.SettingsSmall
 
 		private const float DefaultScreenDistanceFromPlayer = 10f;
 
-		private const float DefaultScreenHeightAbovePlayer = 3f;
+		private const float DefaultScreenHeightAbovePlayer = 2f;
 
 		private readonly CinemaUserSettings _settings;
 
 		private readonly CinemaController _controller;
 
-		private SavedLocation _location;
+		private SavedLocation _editingLocation;
 
 		private TextBox _nameTextBox;
 
@@ -49,6 +49,7 @@ namespace CinemaHUD.UI.Windows.SettingsSmall
 		{
 			_settings = settings;
 			_controller = controller;
+			Initialize();
 		}
 
 		protected override void BuildContent()
@@ -462,8 +463,8 @@ namespace CinemaHUD.UI.Windows.SettingsSmall
 		public void CreateNew()
 		{
 			WorldPosition3D position = CreatePositionFromPlayer();
-			_location = _settings.AddSavedLocation("New Location", position, _settings.WorldScreenWidth);
-			_controller.SelectSavedLocation(_location.Id);
+			_editingLocation = _settings.AddSavedLocation("New Location", position, _settings.WorldScreenWidth);
+			_controller.SelectSavedLocation(_editingLocation.Id);
 			((WindowBase2)this).set_Title("New Location");
 			LoadLocationIntoUI();
 			((Control)this).Show();
@@ -497,7 +498,7 @@ namespace CinemaHUD.UI.Windows.SettingsSmall
 			Vector3 position = mumble.get_PlayerCharacter().get_Position();
 			Vector3 playerForward = mumble.get_PlayerCharacter().get_Forward();
 			int mapId = mumble.get_CurrentMap().get_Id();
-			Vector3 screenPos = position + playerForward * 10f + new Vector3(0f, 0f, 3f);
+			Vector3 screenPos = position + playerForward * 10f + new Vector3(0f, 0f, 2f);
 			Vector3 toPlayer = position - screenPos;
 			float yaw = MathHelper.ToDegrees((float)Math.Atan2(toPlayer.X, toPlayer.Y));
 			yaw = WorldPosition3D.NormalizeYaw(yaw);
@@ -506,7 +507,7 @@ namespace CinemaHUD.UI.Windows.SettingsSmall
 
 		public void Edit(SavedLocation location)
 		{
-			_location = location;
+			_editingLocation = location;
 			if (_settings.SelectedSavedLocationId != location.Id)
 			{
 				_controller.SelectSavedLocation(location.Id);
@@ -518,17 +519,17 @@ namespace CinemaHUD.UI.Windows.SettingsSmall
 
 		private void LoadLocationIntoUI()
 		{
-			((TextInputBase)_nameTextBox).set_Text(_location?.Name ?? "");
-			_widthTrackBar.set_Value(_location?.ScreenWidth ?? 10f);
+			((TextInputBase)_nameTextBox).set_Text(_editingLocation?.Name ?? "");
+			_widthTrackBar.set_Value(_editingLocation?.ScreenWidth ?? 10f);
 			_widthValueLabel.set_Text($"{_widthTrackBar.get_Value():F0}m");
 			UpdatePositionLabel();
 		}
 
 		private void UpdatePositionLabel()
 		{
-			if (_location?.Position != null && _location.Position.MapId != 0)
+			if (_editingLocation?.Position != null && _editingLocation.Position.MapId != 0)
 			{
-				WorldPosition3D pos = _location.Position;
+				WorldPosition3D pos = _editingLocation.Position;
 				_positionLabel.set_Text($"X: {pos.X:F1} Y: {pos.Y:F1} Z: {pos.Z:F1} | Yaw: {pos.Yaw:F0}° Tilt: {pos.Pitch:F0}° | Map: {pos.MapId}");
 			}
 			else
@@ -539,68 +540,43 @@ namespace CinemaHUD.UI.Windows.SettingsSmall
 
 		private void ApplyNameChange()
 		{
-			if (_location != null)
+			if (_editingLocation != null)
 			{
-				_location.Name = (string.IsNullOrWhiteSpace(((TextInputBase)_nameTextBox).get_Text()) ? "Unnamed Location" : ((TextInputBase)_nameTextBox).get_Text());
-				_settings.UpdateSavedLocation(_location);
+				_editingLocation.Name = (string.IsNullOrWhiteSpace(((TextInputBase)_nameTextBox).get_Text()) ? "Unnamed Location" : ((TextInputBase)_nameTextBox).get_Text());
+				_settings.UpdateSavedLocation(_editingLocation);
 			}
 		}
 
 		private void ApplyWidthChange()
 		{
-			if (_location != null)
+			if (_editingLocation != null)
 			{
-				_location.ScreenWidth = _widthTrackBar.get_Value();
-				_settings.UpdateSavedLocation(_location);
+				_editingLocation.ScreenWidth = _widthTrackBar.get_Value();
+				_settings.UpdateSavedLocation(_editingLocation);
 				_settings.WorldScreenWidth = _widthTrackBar.get_Value();
 			}
 		}
 
 		private void ApplyPositionChange()
 		{
-			if (_location != null)
+			if (_editingLocation != null)
 			{
-				_settings.UpdateSavedLocation(_location);
-				if (_location.Position != null)
+				_settings.UpdateSavedLocation(_editingLocation);
+				if (_editingLocation.Position != null)
 				{
-					_settings.WorldPosition = new WorldPosition3D(_location.Position.X, _location.Position.Y, _location.Position.Z, _location.Position.Yaw, _location.Position.Pitch, _location.Position.MapId);
+					_settings.WorldPosition = new WorldPosition3D(_editingLocation.Position.X, _editingLocation.Position.Y, _editingLocation.Position.Z, _editingLocation.Position.Yaw, _editingLocation.Position.Pitch, _editingLocation.Position.MapId);
 				}
 			}
 		}
 
 		private void SetPositionFromPlayer()
 		{
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
-			if (_location != null)
+			if (_editingLocation != null)
 			{
-				Gw2MumbleService mumble = GameService.Gw2Mumble;
-				if (mumble != null && mumble.get_IsAvailable())
+				WorldPosition3D position = CreatePositionFromPlayer();
+				if (position.MapId != 0)
 				{
-					Vector3 position = mumble.get_PlayerCharacter().get_Position();
-					Vector3 playerForward = mumble.get_PlayerCharacter().get_Forward();
-					int mapId = mumble.get_CurrentMap().get_Id();
-					Vector3 screenPos = position + playerForward * 10f + new Vector3(0f, 0f, 3f);
-					Vector3 toPlayer = position - screenPos;
-					float yaw = MathHelper.ToDegrees((float)Math.Atan2(toPlayer.X, toPlayer.Y));
-					yaw = WorldPosition3D.NormalizeYaw(yaw);
-					_location.Position = new WorldPosition3D(screenPos.X, screenPos.Y, screenPos.Z, yaw, 0f, mapId);
+					_editingLocation.Position = position;
 					ApplyPositionChange();
 					UpdatePositionLabel();
 				}
@@ -609,11 +585,11 @@ namespace CinemaHUD.UI.Windows.SettingsSmall
 
 		private void MovePosition(float deltaX, float deltaY, float deltaZ)
 		{
-			if (_location?.Position != null && _location.Position.MapId != 0)
+			if (_editingLocation?.Position != null && _editingLocation.Position.MapId != 0)
 			{
-				_location.Position.X += deltaX;
-				_location.Position.Y += deltaY;
-				_location.Position.Z += deltaZ;
+				_editingLocation.Position.X += deltaX;
+				_editingLocation.Position.Y += deltaY;
+				_editingLocation.Position.Z += deltaZ;
 				ApplyPositionChange();
 				UpdatePositionLabel();
 			}
@@ -621,10 +597,10 @@ namespace CinemaHUD.UI.Windows.SettingsSmall
 
 		private void RotatePosition(float deltaYaw, float deltaPitch)
 		{
-			if (_location?.Position != null && _location.Position.MapId != 0)
+			if (_editingLocation?.Position != null && _editingLocation.Position.MapId != 0)
 			{
-				_location.Position.Yaw = WorldPosition3D.NormalizeYaw(_location.Position.Yaw + deltaYaw);
-				_location.Position.Pitch = MathHelper.Clamp(_location.Position.Pitch + deltaPitch, -89f, 89f);
+				_editingLocation.Position.Yaw = WorldPosition3D.NormalizeYaw(_editingLocation.Position.Yaw + deltaYaw);
+				_editingLocation.Position.Pitch = MathHelper.Clamp(_editingLocation.Position.Pitch + deltaPitch, -89f, 89f);
 				ApplyPositionChange();
 				UpdatePositionLabel();
 			}
@@ -632,10 +608,10 @@ namespace CinemaHUD.UI.Windows.SettingsSmall
 
 		private void ResetRotation()
 		{
-			if (_location?.Position != null)
+			if (_editingLocation?.Position != null)
 			{
-				_location.Position.Yaw = 0f;
-				_location.Position.Pitch = 0f;
+				_editingLocation.Position.Yaw = 0f;
+				_editingLocation.Position.Pitch = 0f;
 				ApplyPositionChange();
 				UpdatePositionLabel();
 			}
@@ -651,17 +627,17 @@ namespace CinemaHUD.UI.Windows.SettingsSmall
 			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-			if (_location?.Position != null && _location.Position.MapId != 0)
+			if (_editingLocation?.Position != null && _editingLocation.Position.MapId != 0)
 			{
 				Gw2MumbleService mumble = GameService.Gw2Mumble;
 				if (mumble != null && mumble.get_IsAvailable())
 				{
 					Vector3 position = mumble.get_PlayerCharacter().get_Position();
-					Vector3 screenPos = _location.Position.ToVector3();
+					Vector3 screenPos = _editingLocation.Position.ToVector3();
 					Vector3 toPlayer = position - screenPos;
 					float yaw = MathHelper.ToDegrees((float)Math.Atan2(toPlayer.X, toPlayer.Y));
-					_location.Position.Yaw = WorldPosition3D.NormalizeYaw(yaw);
-					_location.Position.Pitch = 0f;
+					_editingLocation.Position.Yaw = WorldPosition3D.NormalizeYaw(yaw);
+					_editingLocation.Position.Pitch = 0f;
 					ApplyPositionChange();
 					UpdatePositionLabel();
 				}
@@ -670,17 +646,17 @@ namespace CinemaHUD.UI.Windows.SettingsSmall
 
 		private void CopyLocationToClipboard()
 		{
-			if (_location != null)
+			if (_editingLocation != null)
 			{
 				try
 				{
 					Clipboard.SetText(JsonConvert.SerializeObject((object)new SavedLocationExport
 					{
-						Name = _location.Name,
-						Position = _location.Position,
-						ScreenWidth = _location.ScreenWidth
+						Name = _editingLocation.Name,
+						Position = _editingLocation.Position,
+						ScreenWidth = _editingLocation.ScreenWidth
 					}, (Formatting)0));
-					Logger.GetLogger(((object)this).GetType()).Info("Copied location '" + _location.Name + "' to clipboard");
+					Logger.GetLogger(((object)this).GetType()).Info("Copied location '" + _editingLocation.Name + "' to clipboard");
 				}
 				catch (Exception ex)
 				{

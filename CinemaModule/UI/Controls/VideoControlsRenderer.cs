@@ -1,12 +1,19 @@
+using Blish_HUD;
 using Blish_HUD.Content;
 using CinemaModule.Services;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended;
+using MonoGame.Extended.BitmapFonts;
 
 namespace CinemaModule.UI.Controls
 {
 	public class VideoControlsRenderer
 	{
+		private const int IconPadding = 4;
+
+		private const int CloseIconOffset = 3;
+
 		private readonly TextureService _textureService;
 
 		private readonly AsyncTexture2D _playTexture;
@@ -27,7 +34,11 @@ namespace CinemaModule.UI.Controls
 
 		private readonly AsyncTexture2D _closeIconTexture;
 
-		private readonly AsyncTexture2D _qualityIconTexture;
+		private readonly AsyncTexture2D _seekBarBgTexture;
+
+		private readonly AsyncTexture2D _lockIconTexture;
+
+		private readonly AsyncTexture2D _lockActiveIconTexture;
 
 		public VideoControlsRenderer(TextureService textureService)
 		{
@@ -40,8 +51,10 @@ namespace CinemaModule.UI.Controls
 			_settingsBgTexture = _textureService.GetSettingsBackground();
 			_twitchChatIconTexture = _textureService.GetTwitchChatIcon();
 			_closeIconTexture = _textureService.GetCloseIcon();
-			_qualityIconTexture = _textureService.GetQualityIcon();
 			_volumeBgTexture = _textureService.GetVolumeBackground();
+			_seekBarBgTexture = _textureService.GetSeekBarBackground();
+			_lockIconTexture = _textureService.GetLockIcon();
+			_lockActiveIconTexture = _textureService.GetLockActiveIcon();
 		}
 
 		public AsyncTexture2D GetVolumeTexture(int volume)
@@ -55,201 +68,88 @@ namespace CinemaModule.UI.Controls
 
 		public void DrawPlayPauseButton(SpriteBatch spriteBatch, Rectangle bounds, bool isPaused, bool isHovering, float opacity, bool drawBackground = true)
 		{
-			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
-			Rectangle iconBounds = default(Rectangle);
+			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+			Rectangle iconBounds;
 			if (drawBackground)
 			{
-				if (_textureService.IsTextureReady(_settingsBgTexture))
-				{
-					Color bgColor = ApplyOpacity(Color.get_White(), opacity);
-					spriteBatch.Draw(AsyncTexture2D.op_Implicit(_settingsBgTexture), bounds, bgColor);
-				}
-				int iconPadding = 4;
-				((Rectangle)(ref iconBounds))._002Ector(bounds.X + iconPadding, bounds.Y + iconPadding, bounds.Width - iconPadding * 2, bounds.Height - iconPadding * 2);
+				DrawBackground(spriteBatch, _settingsBgTexture, bounds, opacity);
+				iconBounds = GetPaddedIconBounds(bounds, 4);
 			}
 			else
 			{
 				iconBounds = bounds;
 			}
-			Color iconColor = GetIconColor(isHovering, opacity);
-			if (isPaused)
-			{
-				if (_textureService.IsTextureReady(_playTexture))
-				{
-					spriteBatch.Draw(AsyncTexture2D.op_Implicit(_playTexture), iconBounds, iconColor);
-				}
-			}
-			else if (_textureService.IsTextureReady(_pauseTexture))
-			{
-				spriteBatch.Draw(AsyncTexture2D.op_Implicit(_pauseTexture), iconBounds, iconColor);
-			}
+			AsyncTexture2D texture = (isPaused ? _playTexture : _pauseTexture);
+			DrawIcon(spriteBatch, texture, iconBounds, isHovering, opacity);
 		}
 
 		public void DrawVolumeIcon(SpriteBatch spriteBatch, Rectangle bounds, int volume, bool isHovering, float opacity)
 		{
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-			AsyncTexture2D texture = GetVolumeTexture(volume);
-			if (_textureService.IsTextureReady(texture))
-			{
-				Color iconColor = GetIconColor(isHovering, opacity);
-				spriteBatch.Draw(AsyncTexture2D.op_Implicit(texture), bounds, iconColor);
-			}
+			//IL_0009: Unknown result type (might be due to invalid IL or missing references)
+			DrawIcon(spriteBatch, GetVolumeTexture(volume), bounds, isHovering, opacity);
 		}
 
 		public void DrawVolumeIconWithBackground(SpriteBatch spriteBatch, Rectangle iconBounds, Rectangle backgroundBounds, int volume, bool isHovering, float opacity)
 		{
-			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			if (_textureService.IsTextureReady(_volumeBgTexture))
-			{
-				Color bgColor = ApplyOpacity(Color.get_White(), opacity);
-				spriteBatch.Draw(AsyncTexture2D.op_Implicit(_volumeBgTexture), backgroundBounds, bgColor);
-			}
+			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+			DrawBackground(spriteBatch, _volumeBgTexture, backgroundBounds, opacity);
 			DrawVolumeIcon(spriteBatch, iconBounds, volume, isHovering, opacity);
 		}
 
 		public void DrawSettingsButtonWithBackground(SpriteBatch spriteBatch, Rectangle bounds, bool isHovering, float opacity)
 		{
-			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-			if (_textureService.IsTextureReady(_settingsBgTexture))
-			{
-				Color bgColor = ApplyOpacity(Color.get_White(), opacity);
-				spriteBatch.Draw(AsyncTexture2D.op_Implicit(_settingsBgTexture), bounds, bgColor);
-			}
-			if (_textureService.IsTextureReady(_settingsIconTexture))
-			{
-				int iconPadding = 4;
-				Rectangle iconBounds = default(Rectangle);
-				((Rectangle)(ref iconBounds))._002Ector(bounds.X + iconPadding, bounds.Y + iconPadding, bounds.Width - iconPadding * 2, bounds.Height - iconPadding * 2);
-				Color iconColor = GetIconColor(isHovering, opacity);
-				spriteBatch.Draw(AsyncTexture2D.op_Implicit(_settingsIconTexture), iconBounds, iconColor);
-			}
+			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+			DrawIconWithBackground(spriteBatch, _settingsIconTexture, bounds, isHovering, opacity);
 		}
 
 		public void DrawSettingsIconOnly(SpriteBatch spriteBatch, Rectangle bounds, bool isHovering, float opacity)
 		{
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-			if (_textureService.IsTextureReady(_settingsIconTexture))
-			{
-				Color iconColor = GetIconColor(isHovering, opacity);
-				spriteBatch.Draw(AsyncTexture2D.op_Implicit(_settingsIconTexture), bounds, iconColor);
-			}
+			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+			DrawIcon(spriteBatch, _settingsIconTexture, bounds, isHovering, opacity);
 		}
 
 		public void DrawTwitchChatIconOnly(SpriteBatch spriteBatch, Rectangle bounds, bool isHovering, float opacity)
 		{
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-			if (_textureService.IsTextureReady(_twitchChatIconTexture))
-			{
-				Color iconColor = GetIconColor(isHovering, opacity);
-				spriteBatch.Draw(AsyncTexture2D.op_Implicit(_twitchChatIconTexture), bounds, iconColor);
-			}
+			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+			DrawIcon(spriteBatch, _twitchChatIconTexture, bounds, isHovering, opacity);
 		}
 
 		public void DrawTwitchChatButton(SpriteBatch spriteBatch, Rectangle bounds, bool isHovering, float opacity)
 		{
-			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-			if (_textureService.IsTextureReady(_settingsBgTexture))
-			{
-				Color bgColor = ApplyOpacity(Color.get_White(), opacity);
-				spriteBatch.Draw(AsyncTexture2D.op_Implicit(_settingsBgTexture), bounds, bgColor);
-			}
-			if (_textureService.IsTextureReady(_twitchChatIconTexture))
-			{
-				int iconPadding = 4;
-				Rectangle iconBounds = default(Rectangle);
-				((Rectangle)(ref iconBounds))._002Ector(bounds.X + iconPadding, bounds.Y + iconPadding, bounds.Width - iconPadding * 2, bounds.Height - iconPadding * 2);
-				Color iconColor = GetIconColor(isHovering, opacity);
-				spriteBatch.Draw(AsyncTexture2D.op_Implicit(_twitchChatIconTexture), iconBounds, iconColor);
-			}
+			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+			DrawIconWithBackground(spriteBatch, _twitchChatIconTexture, bounds, isHovering, opacity);
 		}
 
 		public void DrawCloseButton(SpriteBatch spriteBatch, Rectangle bounds, bool isHovering, float opacity)
 		{
-			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0107: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0138: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013d: Unknown result type (might be due to invalid IL or missing references)
-			if (_textureService.IsTextureReady(_settingsBgTexture))
-			{
-				Color bgColor = ApplyOpacity(Color.get_White(), opacity);
-				spriteBatch.Draw(AsyncTexture2D.op_Implicit(_settingsBgTexture), bounds, bgColor);
-			}
+			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
+			DrawBackground(spriteBatch, _settingsBgTexture, bounds, opacity);
 			if (_textureService.IsTextureReady(_closeIconTexture))
 			{
-				int iconPadding = 4;
-				Rectangle iconBounds = default(Rectangle);
-				((Rectangle)(ref iconBounds))._002Ector(bounds.X + iconPadding - 3, bounds.Y + iconPadding - 3, bounds.Width - (iconPadding - 3) * 2, bounds.Height - (iconPadding - 3) * 2);
+				int adjustedPadding = 1;
+				Rectangle iconBounds = GetPaddedIconBounds(bounds, adjustedPadding);
 				Color iconColor = GetIconColor(isHovering, opacity);
 				float rotation = MathHelper.ToRadians(45f);
 				Vector2 origin = default(Vector2);
@@ -260,6 +160,129 @@ namespace CinemaModule.UI.Controls
 				((Vector2)(ref scale))._002Ector((float)iconBounds.Width / (float)_closeIconTexture.get_Width(), (float)iconBounds.Height / (float)_closeIconTexture.get_Height());
 				spriteBatch.Draw(AsyncTexture2D.op_Implicit(_closeIconTexture), position, (Rectangle?)null, iconColor, rotation, origin, scale, (SpriteEffects)0, 0f);
 			}
+		}
+
+		public void DrawTimeText(SpriteBatch spriteBatch, string timeText, Rectangle bounds, float opacity)
+		{
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+			BitmapFont font = GameService.Content.get_DefaultFont14();
+			if (font != null)
+			{
+				Color textColor = ApplyOpacity(Color.get_White(), opacity);
+				Size2 textSize = font.MeasureString(timeText);
+				Vector2 textPos = default(Vector2);
+				((Vector2)(ref textPos))._002Ector((float)bounds.X + ((float)bounds.Width - textSize.Width) / 2f, (float)bounds.Y + ((float)bounds.Height - textSize.Height) / 2f);
+				BitmapFontExtensions.DrawString(spriteBatch, font, timeText, textPos, textColor, (Rectangle?)null);
+			}
+		}
+
+		public void DrawSeekBarBackground(SpriteBatch spriteBatch, Rectangle bounds, float opacity)
+		{
+			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+			DrawBackground(spriteBatch, _seekBarBgTexture, bounds, opacity);
+		}
+
+		public void DrawLockButton(SpriteBatch spriteBatch, Rectangle bounds, bool isLocked, bool isHovering, float opacity)
+		{
+			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+			AsyncTexture2D texture = (isLocked ? _lockActiveIconTexture : _lockIconTexture);
+			DrawIconWithBackground(spriteBatch, texture, bounds, isHovering, opacity);
+		}
+
+		public void DrawStreamInfo(SpriteBatch spriteBatch, Rectangle bounds, string streamTitle, int? viewerCount, string gameName, float opacity)
+		{
+			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
+			BitmapFont font = GameService.Content.get_DefaultFont16();
+			if (font != null && !string.IsNullOrEmpty(streamTitle))
+			{
+				string displayText = BuildStreamDisplayText(streamTitle, viewerCount, gameName);
+				Color textColor = ApplyOpacity(new Color(220, 220, 220), opacity);
+				Vector2 textPos = default(Vector2);
+				((Vector2)(ref textPos))._002Ector((float)bounds.X, (float)bounds.Y + (float)(bounds.Height - font.get_LineHeight()) / 2f);
+				BitmapFontExtensions.DrawString(spriteBatch, font, displayText, textPos, textColor, (Rectangle?)null);
+			}
+		}
+
+		private void DrawBackground(SpriteBatch spriteBatch, AsyncTexture2D texture, Rectangle bounds, float opacity)
+		{
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+			if (_textureService.IsTextureReady(texture))
+			{
+				Color bgColor = ApplyOpacity(Color.get_White(), opacity);
+				spriteBatch.Draw(AsyncTexture2D.op_Implicit(texture), bounds, bgColor);
+			}
+		}
+
+		private void DrawIcon(SpriteBatch spriteBatch, AsyncTexture2D texture, Rectangle bounds, bool isHovering, float opacity)
+		{
+			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+			if (_textureService.IsTextureReady(texture))
+			{
+				Color iconColor = GetIconColor(isHovering, opacity);
+				spriteBatch.Draw(AsyncTexture2D.op_Implicit(texture), bounds, iconColor);
+			}
+		}
+
+		private void DrawIconWithBackground(SpriteBatch spriteBatch, AsyncTexture2D iconTexture, Rectangle bounds, bool isHovering, float opacity)
+		{
+			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+			DrawBackground(spriteBatch, _settingsBgTexture, bounds, opacity);
+			Rectangle iconBounds = GetPaddedIconBounds(bounds, 4);
+			DrawIcon(spriteBatch, iconTexture, iconBounds, isHovering, opacity);
+		}
+
+		private Rectangle GetPaddedIconBounds(Rectangle bounds, int padding)
+		{
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+			return new Rectangle(bounds.X + padding, bounds.Y + padding, bounds.Width - padding * 2, bounds.Height - padding * 2);
+		}
+
+		private string BuildStreamDisplayText(string streamTitle, int? viewerCount, string gameName)
+		{
+			string displayText = streamTitle;
+			if (!string.IsNullOrEmpty(gameName))
+			{
+				displayText = displayText + " • " + gameName;
+			}
+			if (viewerCount.HasValue)
+			{
+				displayText += $" • {viewerCount.Value:N0} viewers";
+			}
+			return displayText;
 		}
 
 		private Color ApplyOpacity(Color color, float opacity)

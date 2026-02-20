@@ -15,21 +15,27 @@ namespace CinemaModule.UI.Controls
 
 		public const int TrackBarHeight = 16;
 
+		public const int SeekBarHeight = 16;
+
 		public const int ControlSpacing = 8;
 
 		public const int QualityDropdownWidth = 140;
 
 		public const float FadeDuration = 0.2f;
 
-		protected bool IsHoveringPlayPause;
-
-		protected bool IsHoveringVolume;
-
-		protected bool IsHoveringSettings;
-
 		protected int LastVolume = 100;
 
 		protected Tween FadeAnimation;
+
+		private bool _wasSeekBarDragging;
+
+		private float _currentPosition;
+
+		private long _duration;
+
+		private float _pendingSeekPosition = -1f;
+
+		private const float SeekPositionTolerance = 0.02f;
 
 		private int _volume = 100;
 
@@ -38,6 +44,8 @@ namespace CinemaModule.UI.Controls
 		public VideoControlsRenderer Renderer { get; }
 
 		public TrackBar VolumeTrackBar { get; }
+
+		public TrackBar SeekBar { get; }
 
 		public Dropdown QualityDropdown { get; }
 
@@ -71,6 +79,70 @@ namespace CinemaModule.UI.Controls
 			}
 		}
 
+		public bool IsSeekBarDragging
+		{
+			get
+			{
+				TrackBar seekBar = SeekBar;
+				if (seekBar == null)
+				{
+					return false;
+				}
+				return seekBar.get_Dragging();
+			}
+		}
+
+		private bool IsSeekPending => _pendingSeekPosition >= 0f;
+
+		private bool JustStoppedDragging
+		{
+			get
+			{
+				if (_wasSeekBarDragging)
+				{
+					return !IsSeekBarDragging;
+				}
+				return false;
+			}
+		}
+
+		public float CurrentPosition
+		{
+			get
+			{
+				return _currentPosition;
+			}
+			set
+			{
+				if (SeekBar == null || IsSeekBarDragging || JustStoppedDragging)
+				{
+					return;
+				}
+				if (IsSeekPending)
+				{
+					if (!(Math.Abs(value - _pendingSeekPosition) < 0.02f))
+					{
+						return;
+					}
+					_pendingSeekPosition = -1f;
+				}
+				_currentPosition = value;
+				SeekBar.set_Value(value * 100f);
+			}
+		}
+
+		public long Duration
+		{
+			get
+			{
+				return _duration;
+			}
+			set
+			{
+				_duration = value;
+			}
+		}
+
 		public event EventHandler PlayPauseClicked;
 
 		public event EventHandler<int> VolumeChanged;
@@ -79,13 +151,20 @@ namespace CinemaModule.UI.Controls
 
 		public event EventHandler<int> QualityChanged;
 
-		public BaseVideoControls(Container parent, int trackBarWidth, int trackBarHeight, int dropdownWidth)
+		public event EventHandler<float> SeekRequested;
+
+		public BaseVideoControls(Container parent, int trackBarWidth, int trackBarHeight, int dropdownWidth, bool createSeekBar = false)
 		{
 			Renderer = new VideoControlsRenderer(CinemaModule.Instance.TextureService);
 			VolumeTrackBar = CreateVolumeTrackBar(parent, trackBarWidth, trackBarHeight);
 			VolumeTrackBar.add_ValueChanged((EventHandler<ValueEventArgs<float>>)OnVolumeTrackBarChanged);
 			QualityDropdown = CreateQualityDropdown(parent, dropdownWidth);
 			QualityDropdown.add_ValueChanged((EventHandler<ValueChangedEventArgs>)OnQualityDropdownChanged);
+			if (createSeekBar)
+			{
+				SeekBar = CreateSeekBar(parent);
+				SeekBar.add_ValueChanged((EventHandler<ValueEventArgs<float>>)OnSeekBarValueChanged);
+			}
 		}
 
 		private TrackBar CreateVolumeTrackBar(Container parent, int width, int height)
@@ -124,9 +203,68 @@ namespace CinemaModule.UI.Controls
 			return val;
 		}
 
+		private TrackBar CreateSeekBar(Container parent)
+		{
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004e: Expected O, but got Unknown
+			TrackBar val = new TrackBar();
+			((Control)val).set_Parent(parent);
+			val.set_MinValue(0f);
+			val.set_MaxValue(100f);
+			val.set_Value(0f);
+			val.set_SmallStep(false);
+			((Control)val).set_Size(new Point(200, 16));
+			((Control)val).set_Visible(false);
+			return val;
+		}
+
+		private void OnSeekBarValueChanged(object sender, ValueEventArgs<float> e)
+		{
+			if (SeekBar.get_Dragging())
+			{
+				_currentPosition = e.get_Value() / 100f;
+			}
+		}
+
+		public void UpdateSeekBarDragState()
+		{
+			if (SeekBar != null)
+			{
+				if (_wasSeekBarDragging && !SeekBar.get_Dragging())
+				{
+					float seekPosition = (_currentPosition = (_pendingSeekPosition = SeekBar.get_Value() / 100f));
+					this.SeekRequested?.Invoke(this, seekPosition);
+				}
+				_wasSeekBarDragging = SeekBar.get_Dragging();
+			}
+		}
+
+		public string FormatTimeDisplay()
+		{
+			TimeSpan ts = TimeSpan.FromMilliseconds((float)_duration * _currentPosition);
+			return string.Concat(str2: FormatTime(TimeSpan.FromMilliseconds(_duration)), str0: FormatTime(ts), str1: " / ");
+		}
+
+		private static string FormatTime(TimeSpan ts)
+		{
+			if (ts.Hours <= 0)
+			{
+				return $"{ts.Minutes}:{ts.Seconds:D2}";
+			}
+			return $"{ts.Hours}:{ts.Minutes:D2}:{ts.Seconds:D2}";
+		}
+
 		protected virtual void OnVolumePropertyChanged(int newValue)
 		{
-			if (VolumeTrackBar != null && !VolumeTrackBar.get_Dragging())
+			if (!VolumeTrackBar.get_Dragging())
 			{
 				VolumeTrackBar.set_Value((float)newValue);
 			}
@@ -158,16 +296,13 @@ namespace CinemaModule.UI.Controls
 			{
 				_volume = ((LastVolume > 0) ? LastVolume : 50);
 			}
-			if (VolumeTrackBar != null)
-			{
-				VolumeTrackBar.set_Value((float)_volume);
-			}
+			VolumeTrackBar.set_Value((float)_volume);
 			RaiseVolumeChanged(_volume);
 		}
 
 		private void OnQualityDropdownChanged(object sender, ValueChangedEventArgs e)
 		{
-			int selectedIndex = ((QualityDropdown.get_SelectedItem() != null) ? QualityDropdown.get_Items().IndexOf(QualityDropdown.get_SelectedItem()) : (-1));
+			int selectedIndex = QualityDropdown.get_Items().IndexOf(QualityDropdown.get_SelectedItem());
 			if (selectedIndex >= 0)
 			{
 				RaiseQualityChanged(selectedIndex);
@@ -176,10 +311,6 @@ namespace CinemaModule.UI.Controls
 
 		public void UpdateAvailableQualities(IReadOnlyList<string> qualityNames, int selectedIndex)
 		{
-			if (QualityDropdown == null)
-			{
-				return;
-			}
 			QualityDropdown.get_Items().Clear();
 			if (qualityNames == null || qualityNames.Count == 0)
 			{
@@ -250,27 +381,22 @@ namespace CinemaModule.UI.Controls
 		public virtual void Dispose()
 		{
 			CleanupEventHandlers();
-			TrackBar volumeTrackBar = VolumeTrackBar;
-			if (volumeTrackBar != null)
+			((Control)VolumeTrackBar).Dispose();
+			TrackBar seekBar = SeekBar;
+			if (seekBar != null)
 			{
-				((Control)volumeTrackBar).Dispose();
+				((Control)seekBar).Dispose();
 			}
-			Dropdown qualityDropdown = QualityDropdown;
-			if (qualityDropdown != null)
-			{
-				((Control)qualityDropdown).Dispose();
-			}
+			((Control)QualityDropdown).Dispose();
 		}
 
 		protected virtual void CleanupEventHandlers()
 		{
-			if (VolumeTrackBar != null)
+			VolumeTrackBar.remove_ValueChanged((EventHandler<ValueEventArgs<float>>)OnVolumeTrackBarChanged);
+			QualityDropdown.remove_ValueChanged((EventHandler<ValueChangedEventArgs>)OnQualityDropdownChanged);
+			if (SeekBar != null)
 			{
-				VolumeTrackBar.remove_ValueChanged((EventHandler<ValueEventArgs<float>>)OnVolumeTrackBarChanged);
-			}
-			if (QualityDropdown != null)
-			{
-				QualityDropdown.remove_ValueChanged((EventHandler<ValueChangedEventArgs>)OnQualityDropdownChanged);
+				SeekBar.remove_ValueChanged((EventHandler<ValueEventArgs<float>>)OnSeekBarValueChanged);
 			}
 		}
 	}

@@ -14,15 +14,13 @@ namespace CinemaHUD.UI.Windows.MainSettings
 {
 	public class CinemaSettingsWindow : TabbedWindow2
 	{
-		private static readonly Logger Logger = Logger.GetLogger<CinemaSettingsWindow>();
+		private const int WindowWidth = 890;
 
-		private const int WindowWidth = 560;
+		private const int WindowHeight = 680;
 
-		private const int WindowHeight = 645;
+		private const int ContentWidth = 836;
 
-		private const int ContentWidth = 520;
-
-		private const int ContentHeight = 555;
+		private const int ContentHeight = 631;
 
 		private readonly CinemaSettings _settings;
 
@@ -34,27 +32,27 @@ namespace CinemaHUD.UI.Windows.MainSettings
 
 		private readonly TwitchService _twitchService;
 
-		private readonly PresetService _presetService;
+		private readonly TwitchAuthService _twitchAuthService;
 
-		private readonly AsyncTexture2D _emblemTexture;
+		private readonly PresetService _presetService;
 
 		private ThirdPartyNoticesWindow _thirdPartyNoticesWindow;
 
 		private StandardButton _infoButton;
 
-		public CinemaSettingsWindow(AsyncTexture2D backgroundTexture, CinemaSettings settings, CinemaUserSettings userSettings, CinemaController controller, AsyncTexture2D emblemTexture, Gw2MapService mapService, TwitchService twitchService, PresetService presetService)
-			: this(backgroundTexture, new Rectangle(25, 26, 560, 645), new Rectangle(40, 50, 520, 555))
+		public CinemaSettingsWindow(CinemaSettings settings, CinemaUserSettings userSettings, CinemaController controller, AsyncTexture2D emblemTexture, Gw2MapService mapService, TwitchService twitchService, TwitchAuthService twitchAuthService, PresetService presetService)
+			: this(AsyncTexture2D.FromAssetId(155985), new Rectangle(40, 26, 890, 680), new Rectangle(70, 36, 836, 631))
 		{
-			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
 			_settings = settings;
 			_userSettings = userSettings;
 			_controller = controller;
 			_mapService = mapService;
 			_twitchService = twitchService;
+			_twitchAuthService = twitchAuthService;
 			_presetService = presetService;
-			_emblemTexture = emblemTexture;
 			((Control)this).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			((WindowBase2)this).set_Title("CinemaHUD");
 			((WindowBase2)this).set_Emblem(AsyncTexture2D.op_Implicit(emblemTexture));
@@ -67,6 +65,12 @@ namespace CinemaHUD.UI.Windows.MainSettings
 			UpdateSubtitleForCurrentTab();
 		}
 
+		public override void Show()
+		{
+			((WindowBase2)this).Show();
+			RestoreSelectedTab();
+		}
+
 		private void BuildTabs()
 		{
 			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
@@ -75,9 +79,9 @@ namespace CinemaHUD.UI.Windows.MainSettings
 			//IL_006c: Expected O, but got Unknown
 			AsyncTexture2D displayIcon = global::CinemaModule.CinemaModule.Instance.TextureService.GetDisplayIcon();
 			AsyncTexture2D sourceIcon = global::CinemaModule.CinemaModule.Instance.TextureService.GetSourceIcon();
-			Tab displayTab = new Tab(displayIcon, (Func<IView>)(() => (IView)(object)new DisplayTabView(_settings, _userSettings, _controller, _mapService, _presetService)), "Display", (int?)null);
+			Tab displayTab = new Tab(displayIcon, (Func<IView>)(() => (IView)(object)new DisplayTabView(_settings, _userSettings, _controller, _mapService, _presetService)), "Display settings", (int?)null);
 			((TabbedWindow2)this).get_Tabs().Add(displayTab);
-			Tab sourceTab = new Tab(sourceIcon, (Func<IView>)(() => (IView)(object)new SourceTabView(_userSettings, _controller, _twitchService, _presetService)), "Source", (int?)null);
+			Tab sourceTab = new Tab(sourceIcon, (Func<IView>)(() => (IView)(object)new SourceTabView(_userSettings, _controller, _twitchService, _twitchAuthService, _presetService)), "Channel guide", (int?)null);
 			((TabbedWindow2)this).get_Tabs().Add(sourceTab);
 		}
 
@@ -106,40 +110,40 @@ namespace CinemaHUD.UI.Windows.MainSettings
 
 		private void ShowThirdPartyNotices()
 		{
-			if (_thirdPartyNoticesWindow == null)
-			{
-				_thirdPartyNoticesWindow = new ThirdPartyNoticesWindow();
-			}
+			_thirdPartyNoticesWindow = _thirdPartyNoticesWindow ?? new ThirdPartyNoticesWindow();
 			((Control)_thirdPartyNoticesWindow).Show();
 		}
 
 		private void OnTabChanged(object sender, ValueChangedEventArgs<Tab> e)
 		{
 			UpdateSubtitleForCurrentTab();
+			SaveSelectedTab();
 		}
 
 		private void UpdateSubtitleForCurrentTab()
 		{
-			if (((TabbedWindow2)this).get_SelectedTab() == null)
+			Tab selectedTab = ((TabbedWindow2)this).get_SelectedTab();
+			((WindowBase2)this).set_Subtitle(((selectedTab != null) ? selectedTab.get_Name() : null) ?? "Settings");
+		}
+
+		private void SaveSelectedTab()
+		{
+			if (((TabbedWindow2)this).get_SelectedTab() != null)
 			{
-				((WindowBase2)this).set_Subtitle("Settings");
-				return;
-			}
-			string name = ((TabbedWindow2)this).get_SelectedTab().get_Name();
-			if (!(name == "Display"))
-			{
-				if (name == "Source")
+				int tabIndex = ((TabbedWindow2)this).get_Tabs().IndexOf(((TabbedWindow2)this).get_SelectedTab());
+				if (tabIndex >= 0)
 				{
-					((WindowBase2)this).set_Subtitle("Stream settings");
-				}
-				else
-				{
-					((WindowBase2)this).set_Subtitle("Settings");
+					_userSettings.SelectedSettingsTab = tabIndex;
 				}
 			}
-			else
+		}
+
+		private void RestoreSelectedTab()
+		{
+			int savedTabIndex = _userSettings.SelectedSettingsTab;
+			if (savedTabIndex >= 0 && savedTabIndex < ((TabbedWindow2)this).get_Tabs().get_Count() && savedTabIndex != ((TabbedWindow2)this).get_Tabs().IndexOf(((TabbedWindow2)this).get_SelectedTab()))
 			{
-				((WindowBase2)this).set_Subtitle("Display settings");
+				((TabbedWindow2)this).set_SelectedTab(((TabbedWindow2)this).get_Tabs().FromIndex(savedTabIndex));
 			}
 		}
 

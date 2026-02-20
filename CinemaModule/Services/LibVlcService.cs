@@ -74,7 +74,6 @@ namespace CinemaModule.Services
 			try
 			{
 				File.WriteAllText(Path.Combine(targetDir, ".libvlc_version"), "1");
-				Logger.Info("LibVLC version 1 marker written");
 			}
 			catch (Exception ex)
 			{
@@ -117,7 +116,6 @@ namespace CinemaModule.Services
 						Logger.Warn("Failed to delete directory " + dir + ": " + ex3.Message);
 					}
 				}
-				Logger.Info("Cleared existing LibVLC files");
 			}
 			catch (Exception ex)
 			{
@@ -135,11 +133,8 @@ namespace CinemaModule.Services
 				{
 					Directory.CreateDirectory(targetDirectory);
 				}
-				using (FileStream fileStream = File.Create(targetPath))
-				{
-					await stream.CopyToAsync(fileStream);
-				}
-				Logger.Info("Extracted " + sourceFile + " to " + targetPath);
+				using FileStream fileStream = File.Create(targetPath);
+				await stream.CopyToAsync(fileStream);
 			}
 			else
 			{

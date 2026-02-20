@@ -15,7 +15,7 @@ namespace CinemaModule.Services
 	{
 		private static readonly Logger Logger = Logger.GetLogger<PresetService>();
 
-		private const string DefaultApiBaseUrl = "https://www.gw2opus.com/wp-json/cinemahud/v1";
+		private const string DefaultApiBaseUrl = "https://www.gw2opus.com/wp-json/cinemahud/v2";
 
 		private const string ImageCacheSubfolder = "presets";
 
@@ -33,16 +33,35 @@ namespace CinemaModule.Services
 
 		public IReadOnlyList<WorldLocationPresetData> WorldLocationPresets => _cachedPresets?.WorldLocations ?? new List<WorldLocationPresetData>();
 
-		public IReadOnlyList<StreamPresetData> StreamPresets => _cachedPresets?.Streams ?? new List<StreamPresetData>();
+		public IReadOnlyList<StreamCategory> StreamCategories => _cachedPresets?.StreamCategories ?? new List<StreamCategory>();
 
-		public IReadOnlyList<string> TwitchChannels => _cachedPresets?.TwitchChannels ?? new List<string>();
+		public IReadOnlyList<string> TwitchChannels => StreamCategories.Where((StreamCategory c) => c.IsTwitch).SelectMany((StreamCategory c) => c.TwitchChannelNames).ToList();
 
 		public bool IsLoaded => _isLoaded;
 
 		public event EventHandler PresetsLoaded;
 
+		public event EventHandler PresetImagesLoaded;
+
+		public ChannelData FindChannelById(string channelId)
+		{
+			if (string.IsNullOrEmpty(channelId) || _cachedPresets?.StreamCategories == null)
+			{
+				return null;
+			}
+			foreach (StreamCategory streamCategory in _cachedPresets.StreamCategories)
+			{
+				ChannelData channel = streamCategory.Channels.FirstOrDefault((ChannelData c) => c.Id == channelId);
+				if (channel != null)
+				{
+					return channel;
+				}
+			}
+			return null;
+		}
+
 		public PresetService(string cacheDirectory)
-			: this(cacheDirectory, "https://www.gw2opus.com/wp-json/cinemahud/v1")
+			: this(cacheDirectory, "https://www.gw2opus.com/wp-json/cinemahud/v2")
 		{
 		}
 
@@ -64,7 +83,6 @@ namespace CinemaModule.Services
 			_ = 1;
 			try
 			{
-				Logger.Info("Loading presets from API...");
 				HttpResponseMessage response = await _httpClient.GetAsync(_apiBaseUrl + "/config");
 				if (!response.get_IsSuccessStatusCode())
 				{
@@ -72,8 +90,8 @@ namespace CinemaModule.Services
 					return;
 				}
 				_cachedPresets = JsonConvert.DeserializeObject<PresetsResponse>(await response.get_Content().ReadAsStringAsync());
+				ParseStreamCategories();
 				_isLoaded = true;
-				Logger.Info($"Loaded {WorldLocationPresets.Count} world locations, {StreamPresets.Count} streams, {TwitchChannels.Count} Twitch channels");
 				LoadPresetImagesAsync();
 				this.PresetsLoaded?.Invoke(this, EventArgs.Empty);
 			}
@@ -83,22 +101,75 @@ namespace CinemaModule.Services
 			}
 		}
 
-		private async Task LoadPresetImagesAsync()
+		private void ParseStreamCategories()
 		{
-			if (_cachedPresets?.WorldLocations != null && _cachedPresets.WorldLocations.Count != 0)
+			if (_cachedPresets?.StreamCategories == null)
 			{
-				await Task.WhenAll(_cachedPresets.WorldLocations.Select(LoadImagesForPresetAsync));
-				Logger.Debug($"Finished loading images for {_cachedPresets.WorldLocations.Count} world location presets");
+				return;
+			}
+			foreach (StreamCategory streamCategory in _cachedPresets.StreamCategories)
+			{
+				streamCategory.ParseChannels();
 			}
 		}
 
-		private async Task LoadImagesForPresetAsync(WorldLocationPresetData preset)
+		private async Task LoadPresetImagesAsync()
+		{
+			List<Task> tasks = new List<Task>();
+			if (_cachedPresets?.WorldLocations != null && _cachedPresets.WorldLocations.Count > 0)
+			{
+				tasks.AddRange(_cachedPresets.WorldLocations.Select(LoadImagesForWorldLocationAsync));
+			}
+			if (_cachedPresets?.StreamCategories != null)
+			{
+				foreach (StreamCategory category in _cachedPresets.StreamCategories)
+				{
+					if (!string.IsNullOrEmpty(category.Icon))
+					{
+						tasks.Add(LoadCategoryIconAsync(category));
+					}
+					foreach (ChannelData channel in category.Channels)
+					{
+						tasks.Add(LoadImagesForChannelAsync(channel));
+					}
+				}
+			}
+			await Task.WhenAll(tasks);
+			this.PresetImagesLoaded?.Invoke(this, EventArgs.Empty);
+		}
+
+		private async Task LoadImagesForWorldLocationAsync(WorldLocationPresetData preset)
 		{
 			Task<AsyncTexture2D> avatarTask = _imageCache.GetImageAsync(preset.Id + "_avatar", preset.Avatar);
 			Task<AsyncTexture2D> pictureTask = _imageCache.GetImageAsync(preset.Id + "_picture", preset.Picture);
 			await Task.WhenAll<AsyncTexture2D>(avatarTask, pictureTask);
 			preset.AvatarTexture = avatarTask.Result;
 			preset.PictureTexture = pictureTask.Result;
+		}
+
+		private async Task LoadCategoryIconAsync(StreamCategory category)
+		{
+			if (!string.IsNullOrEmpty(category.Icon))
+			{
+				category.IconTexture = await _imageCache.GetImageAsync("cat_" + category.Id + "_icon", category.Icon);
+			}
+		}
+
+		private async Task LoadImagesForChannelAsync(ChannelData channel)
+		{
+			List<Task> tasks = new List<Task>();
+			if (!string.IsNullOrEmpty(channel.Avatar))
+			{
+				tasks.Add(_imageCache.GetImageAsync("ch_" + channel.Id + "_avatar", channel.Avatar).ContinueWith((Task<AsyncTexture2D> t) => channel.AvatarTexture = t.Result, TaskContinuationOptions.OnlyOnRanToCompletion));
+			}
+			if (!string.IsNullOrEmpty(channel.StaticImage))
+			{
+				tasks.Add(_imageCache.GetImageAsync("ch_" + channel.Id + "_static", channel.StaticImage).ContinueWith((Task<AsyncTexture2D> t) => channel.StaticImageTexture = t.Result, TaskContinuationOptions.OnlyOnRanToCompletion));
+			}
+			if (tasks.Count > 0)
+			{
+				await Task.WhenAll(tasks);
+			}
 		}
 
 		public void Dispose()

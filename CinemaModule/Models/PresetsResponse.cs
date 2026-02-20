@@ -10,11 +10,7 @@ namespace CinemaModule.Models
 
 
 		[JsonProperty("streams")]
-		public List<StreamPresetData> Streams { get; set; } = new List<StreamPresetData>();
-
-
-		[JsonProperty("twitchChannels")]
-		public List<string> TwitchChannels { get; set; } = new List<string>();
+		public List<StreamCategory> StreamCategories { get; set; } = new List<StreamCategory>();
 
 	}
 }

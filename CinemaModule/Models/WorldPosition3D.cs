@@ -6,6 +6,10 @@ namespace CinemaModule.Models
 {
 	public class WorldPosition3D
 	{
+		private const float MinLengthSquared = 0.0001f;
+
+		private const float FullRotation = 360f;
+
 		[JsonProperty("x")]
 		public float X { get; set; }
 
@@ -50,55 +54,60 @@ namespace CinemaModule.Models
 			return new Vector3(X, Y, Z);
 		}
 
-		public Vector3 GetRightDirection()
+		public void GetDirections(out Vector3 normal, out Vector3 up, out Vector3 right)
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-			Vector3 normal = GetNormalDirection();
-			Vector3 right = Vector3.Cross(GetUpDirection(), normal);
+			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
+			float num = MathHelper.ToRadians(Pitch);
+			float yawRad = MathHelper.ToRadians(Yaw);
+			float cosP = (float)Math.Cos(num);
+			float sinP = (float)Math.Sin(num);
+			float sinY = (float)Math.Sin(yawRad);
+			float cosY = (float)Math.Cos(yawRad);
+			normal = new Vector3(cosP * sinY, cosP * cosY, sinP);
+			up = new Vector3((0f - sinP) * sinY, (0f - sinP) * cosY, cosP);
+			right = Vector3.Cross(up, normal);
 			if (((Vector3)(ref right)).LengthSquared() > 0.0001f)
 			{
 				((Vector3)(ref right)).Normalize();
 			}
-			return right;
-		}
-
-		public Vector3 GetUpDirection()
-		{
-			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-			float num = MathHelper.ToRadians(Pitch);
-			float yawRad = MathHelper.ToRadians(Yaw);
-			float cosP = (float)Math.Cos(num);
-			float sinP = (float)Math.Sin(num);
-			return new Vector3((0f - sinP) * (float)Math.Sin(yawRad), (0f - sinP) * (float)Math.Cos(yawRad), cosP);
 		}
 
 		public Vector3 GetNormalDirection()
 		{
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			float num = MathHelper.ToRadians(Pitch);
-			float yawRad = MathHelper.ToRadians(Yaw);
-			float cosP = (float)Math.Cos(num);
-			float sinP = (float)Math.Sin(num);
-			return new Vector3(cosP * (float)Math.Sin(yawRad), cosP * (float)Math.Cos(yawRad), sinP);
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			GetDirections(out var normal, out var _, out var _);
+			return normal;
+		}
+
+		public Vector3 GetUpDirection()
+		{
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			GetDirections(out var _, out var up, out var _);
+			return up;
+		}
+
+		public Vector3 GetRightDirection()
+		{
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			GetDirections(out var _, out var _, out var right);
+			return right;
 		}
 
 		public static float NormalizeYaw(float yaw)
 		{
-			while (yaw < 0f)
+			yaw %= 360f;
+			if (!(yaw < 0f))
 			{
-				yaw += 360f;
+				return yaw;
 			}
-			while (yaw >= 360f)
-			{
-				yaw -= 360f;
-			}
-			return yaw;
+			return yaw + 360f;
 		}
 	}
 }

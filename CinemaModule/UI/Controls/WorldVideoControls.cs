@@ -15,6 +15,12 @@ namespace CinemaModule.UI.Controls
 
 		private const int ScreenMargin = 60;
 
+		private const int TimeDisplayWidth = 90;
+
+		private const int SeekBarWidth = 150;
+
+		private const int VideoControlsOffset = 30;
+
 		private readonly BaseVideoControls _base;
 
 		private Rectangle _playPauseBounds;
@@ -26,6 +32,8 @@ namespace CinemaModule.UI.Controls
 		private Rectangle _twitchChatBounds;
 
 		private Rectangle _closeBounds;
+
+		private Rectangle _timeDisplayBounds;
 
 		private bool _isHoveringPlayPause;
 
@@ -40,6 +48,8 @@ namespace CinemaModule.UI.Controls
 		private Tween _fadeAnimation;
 
 		private bool _shouldBeVisible;
+
+		private bool _isSeekable;
 
 		private bool _isTwitchStream;
 
@@ -74,7 +84,7 @@ namespace CinemaModule.UI.Controls
 				TrackBar volumeTrackBar = _base.VolumeTrackBar;
 				if (volumeTrackBar == null)
 				{
-					return false;
+					return _base.IsSeekBarDragging;
 				}
 				return volumeTrackBar.get_Dragging();
 			}
@@ -93,6 +103,58 @@ namespace CinemaModule.UI.Controls
 			}
 		}
 
+		public bool IsSeekable
+		{
+			get
+			{
+				return _isSeekable;
+			}
+			set
+			{
+				if (_isSeekable != value)
+				{
+					_isSeekable = value;
+					UpdateLayout();
+				}
+			}
+		}
+
+		public float CurrentPosition
+		{
+			get
+			{
+				return _base.CurrentPosition;
+			}
+			set
+			{
+				_base.CurrentPosition = value;
+			}
+		}
+
+		public long Duration
+		{
+			get
+			{
+				return _base.Duration;
+			}
+			set
+			{
+				_base.Duration = value;
+			}
+		}
+
+		private bool ShowSeekBar
+		{
+			get
+			{
+				if (_isSeekable)
+				{
+					return !_isTwitchStream;
+				}
+				return false;
+			}
+		}
+
 		public bool IsTwitchStream
 		{
 			get
@@ -104,7 +166,7 @@ namespace CinemaModule.UI.Controls
 				if (_isTwitchStream != value)
 				{
 					_isTwitchStream = value;
-					UpdateQualityDropdownBounds();
+					UpdateLayout();
 				}
 			}
 		}
@@ -157,6 +219,18 @@ namespace CinemaModule.UI.Controls
 			}
 		}
 
+		public event EventHandler<float> SeekRequested
+		{
+			add
+			{
+				_base.SeekRequested += value;
+			}
+			remove
+			{
+				_base.SeekRequested -= value;
+			}
+		}
+
 		public event EventHandler TwitchChatClicked;
 
 		public event EventHandler CloseClicked;
@@ -168,8 +242,14 @@ namespace CinemaModule.UI.Controls
 			((Control)this).set_BackgroundColor(new Color(20, 20, 20, 200));
 			((Control)this).set_Opacity(0f);
 			((Control)this).set_Visible(false);
-			_base = new BaseVideoControls((Container)(object)this, 100, 16, 140);
+			_base = new BaseVideoControls((Container)(object)this, 100, 16, 140, createSeekBar: true);
+			UpdateLayout();
+		}
+
+		private void UpdateLayout()
+		{
 			UpdateControlBounds();
+			UpdateSeekBarBounds();
 			UpdateTrackBarBounds();
 			UpdateQualityDropdownBounds();
 		}
@@ -188,42 +268,64 @@ namespace CinemaModule.UI.Controls
 		{
 			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
 			int centerY = 25;
 			_playPauseBounds = new Rectangle(8, centerY - 16, 32, 32);
-			_volumeIconBounds = new Rectangle(((Rectangle)(ref _playPauseBounds)).get_Right() + 8, centerY - 16, 32, 32);
+		}
+
+		private void UpdateSeekBarBounds()
+		{
+			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
+			int centerY = 25;
+			int nextX = ((Rectangle)(ref _playPauseBounds)).get_Right() + 8;
+			if (ShowSeekBar)
+			{
+				((Control)_base.SeekBar).set_Visible(((Control)this).get_Visible());
+				((Control)_base.SeekBar).set_Location(new Point(nextX, centerY - 8));
+				((Control)_base.SeekBar).set_Size(new Point(150, 16));
+				nextX = ((Control)_base.SeekBar).get_Location().X + 150 + 8;
+				_timeDisplayBounds = new Rectangle(nextX, centerY - 16, 90, 32);
+				nextX += 98;
+			}
+			else
+			{
+				((Control)_base.SeekBar).set_Visible(false);
+			}
+			_volumeIconBounds = new Rectangle(nextX, centerY - 16, 32, 32);
 		}
 
 		private void UpdateTrackBarBounds()
 		{
-			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
 			int centerY = 25;
-			((Control)_base.VolumeTrackBar).set_Location(new Point(((Rectangle)(ref _volumeIconBounds)).get_Right() + 8, centerY - 8));
+			int trackBarX = ((Rectangle)(ref _volumeIconBounds)).get_Right() + 8;
+			((Control)_base.VolumeTrackBar).set_Location(new Point(trackBarX, centerY - 8));
 			((Control)_base.VolumeTrackBar).set_Size(new Point(100, 16));
 		}
 
 		private void UpdateQualityDropdownBounds()
 		{
 			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0099: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0113: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0107: Unknown result type (might be due to invalid IL or missing references)
 			int centerY = 25;
 			int dropdownX = ((Control)_base.VolumeTrackBar).get_Location().X + 100 + 8;
-			if (_base.QualityDropdown != null)
-			{
-				int dropdownY = centerY - ((Control)_base.QualityDropdown).get_Height() / 2;
-				((Control)_base.QualityDropdown).set_Location(new Point(dropdownX, dropdownY));
-				bool hasQualities = _base.QualityDropdown.get_Items().Count > 0;
-				((Control)_base.QualityDropdown).set_Visible(hasQualities);
-			}
+			int dropdownY = centerY - ((Control)_base.QualityDropdown).get_Height() / 2;
+			((Control)_base.QualityDropdown).set_Location(new Point(dropdownX, dropdownY));
+			bool hasQualities = _base.QualityDropdown.get_Items().Count > 0;
+			((Control)_base.QualityDropdown).set_Visible(hasQualities);
 			int twitchChatX = dropdownX + 140 + 8;
 			_twitchChatBounds = new Rectangle(twitchChatX, centerY - 16, 32, 32);
 			int settingsX = (IsTwitchStream ? ((Rectangle)(ref _twitchChatBounds)).get_Right() : twitchChatX) + (IsTwitchStream ? 8 : 0);
@@ -264,6 +366,10 @@ namespace CinemaModule.UI.Controls
 			{
 				_shouldBeVisible = true;
 				((Control)this).set_Visible(true);
+				if (ShowSeekBar)
+				{
+					((Control)_base.SeekBar).set_Visible(true);
+				}
 				Tween fadeAnimation = _fadeAnimation;
 				if (fadeAnimation != null)
 				{
@@ -292,6 +398,7 @@ namespace CinemaModule.UI.Controls
 				}, 0.2f, 0f, true).Ease((Func<float, float>)Ease.QuadIn).OnComplete((Action)delegate
 				{
 					((Control)this).set_Visible(false);
+					((Control)_base.SeekBar).set_Visible(false);
 				});
 			}
 		}
@@ -313,6 +420,12 @@ namespace CinemaModule.UI.Controls
 			_isHoveringSettings = false;
 			_isHoveringTwitchChat = false;
 			_isHoveringClose = false;
+			_base.CurrentPosition = 0f;
+			_base.Duration = 0L;
+			_isSeekable = false;
+			_base.SeekBar.set_Value(0f);
+			((Control)_base.SeekBar).set_Visible(false);
+			UpdateLayout();
 		}
 
 		public void UpdateAvailableQualities(IReadOnlyList<string> qualityNames, int selectedIndex)
@@ -326,41 +439,53 @@ namespace CinemaModule.UI.Controls
 			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0107: Unknown result type (might be due to invalid IL or missing references)
 			Rectangle absoluteBounds = ((Control)_base.VolumeTrackBar).get_AbsoluteBounds();
-			if (!((Rectangle)(ref absoluteBounds)).Contains(e.get_MousePosition()))
+			if (((Rectangle)(ref absoluteBounds)).Contains(e.get_MousePosition()))
 			{
-				((Control)this).OnLeftMouseButtonPressed(e);
-				Point localPos = default(Point);
-				((Point)(ref localPos))._002Ector(e.get_MousePosition().X - ((Control)this).get_AbsoluteBounds().X, e.get_MousePosition().Y - ((Control)this).get_AbsoluteBounds().Y);
-				if (((Rectangle)(ref _playPauseBounds)).Contains(localPos))
+				return;
+			}
+			if (ShowSeekBar)
+			{
+				absoluteBounds = ((Control)_base.SeekBar).get_AbsoluteBounds();
+				if (((Rectangle)(ref absoluteBounds)).Contains(e.get_MousePosition()))
 				{
-					_base.RaisePlayPauseClicked();
+					return;
 				}
-				else if (((Rectangle)(ref _volumeIconBounds)).Contains(localPos))
-				{
-					_base.ToggleMuteAndNotify();
-				}
-				else if (((Rectangle)(ref _settingsBounds)).Contains(localPos))
-				{
-					_base.RaiseSettingsClicked();
-				}
-				else if (IsTwitchStream && ((Rectangle)(ref _twitchChatBounds)).Contains(localPos))
-				{
-					this.TwitchChatClicked?.Invoke(this, EventArgs.Empty);
-				}
-				else if (((Rectangle)(ref _closeBounds)).Contains(localPos))
-				{
-					this.CloseClicked?.Invoke(this, EventArgs.Empty);
-				}
+			}
+			((Control)this).OnLeftMouseButtonPressed(e);
+			Point localPos = default(Point);
+			((Point)(ref localPos))._002Ector(e.get_MousePosition().X - ((Control)this).get_AbsoluteBounds().X, e.get_MousePosition().Y - ((Control)this).get_AbsoluteBounds().Y);
+			if (((Rectangle)(ref _playPauseBounds)).Contains(localPos))
+			{
+				_base.RaisePlayPauseClicked();
+			}
+			else if (((Rectangle)(ref _volumeIconBounds)).Contains(localPos))
+			{
+				_base.ToggleMuteAndNotify();
+			}
+			else if (((Rectangle)(ref _settingsBounds)).Contains(localPos))
+			{
+				_base.RaiseSettingsClicked();
+			}
+			else if (IsTwitchStream && ((Rectangle)(ref _twitchChatBounds)).Contains(localPos))
+			{
+				this.TwitchChatClicked?.Invoke(this, EventArgs.Empty);
+			}
+			else if (((Rectangle)(ref _closeBounds)).Contains(localPos))
+			{
+				this.CloseClicked?.Invoke(this, EventArgs.Empty);
 			}
 		}
 
@@ -377,6 +502,7 @@ namespace CinemaModule.UI.Controls
 			//IL_0082: Unknown result type (might be due to invalid IL or missing references)
 			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
 			((Container)this).UpdateContainer(gameTime);
 			Point mousePos = GameService.Input.get_Mouse().get_Position();
 			Point localPos = default(Point);
@@ -386,6 +512,8 @@ namespace CinemaModule.UI.Controls
 			_isHoveringSettings = ((Rectangle)(ref _settingsBounds)).Contains(localPos);
 			_isHoveringTwitchChat = IsTwitchStream && ((Rectangle)(ref _twitchChatBounds)).Contains(localPos);
 			_isHoveringClose = ((Rectangle)(ref _closeBounds)).Contains(localPos);
+			_base.UpdateSeekBarDragState();
+			UpdateTooltip(localPos);
 		}
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
@@ -394,24 +522,28 @@ namespace CinemaModule.UI.Controls
 			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
 			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0100: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0154: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0181: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0227: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0126: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0163: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0179: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0190: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01cd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0236: Unknown result type (might be due to invalid IL or missing references)
 			((Container)this).PaintBeforeChildren(spriteBatch, bounds);
 			if (!(((Control)this).get_Opacity() < 0.01f))
 			{
 				Rectangle playPauseRect = default(Rectangle);
 				((Rectangle)(ref playPauseRect))._002Ector(((Control)this).get_AbsoluteBounds().X + _playPauseBounds.X, ((Control)this).get_AbsoluteBounds().Y + _playPauseBounds.Y, _playPauseBounds.Width, _playPauseBounds.Height);
 				_base.Renderer.DrawPlayPauseButton(spriteBatch, playPauseRect, IsPaused, _isHoveringPlayPause, ((Control)this).get_Opacity(), drawBackground: false);
+				if (ShowSeekBar)
+				{
+					DrawSeekBarSection(spriteBatch);
+				}
 				Rectangle volumeRect = default(Rectangle);
 				((Rectangle)(ref volumeRect))._002Ector(((Control)this).get_AbsoluteBounds().X + _volumeIconBounds.X, ((Control)this).get_AbsoluteBounds().Y + _volumeIconBounds.Y, _volumeIconBounds.Width, _volumeIconBounds.Height);
 				_base.Renderer.DrawVolumeIcon(spriteBatch, volumeRect, Volume, _isHoveringVolume, ((Control)this).get_Opacity());
@@ -428,6 +560,49 @@ namespace CinemaModule.UI.Controls
 				((Rectangle)(ref closeRect))._002Ector(((Control)this).get_AbsoluteBounds().X + _closeBounds.X, ((Control)this).get_AbsoluteBounds().Y + _closeBounds.Y, _closeBounds.Width, _closeBounds.Height);
 				_base.Renderer.DrawCloseButton(spriteBatch, closeRect, _isHoveringClose, ((Control)this).get_Opacity());
 			}
+		}
+
+		private void UpdateTooltip(Point localPos)
+		{
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
+			if (((Rectangle)(ref _playPauseBounds)).Contains(localPos))
+			{
+				((Control)this).set_BasicTooltipText(IsPaused ? "Play" : "Pause");
+			}
+			else if (((Rectangle)(ref _volumeIconBounds)).Contains(localPos))
+			{
+				((Control)this).set_BasicTooltipText((Volume == 0) ? "Unmute" : "Mute");
+			}
+			else if (((Rectangle)(ref _settingsBounds)).Contains(localPos))
+			{
+				((Control)this).set_BasicTooltipText("Settings");
+			}
+			else if (IsTwitchStream && ((Rectangle)(ref _twitchChatBounds)).Contains(localPos))
+			{
+				((Control)this).set_BasicTooltipText("Toggle Twitch Chat");
+			}
+			else if (((Rectangle)(ref _closeBounds)).Contains(localPos))
+			{
+				((Control)this).set_BasicTooltipText("Close");
+			}
+			else
+			{
+				((Control)this).set_BasicTooltipText((string)null);
+			}
+		}
+
+		private void DrawSeekBarSection(SpriteBatch spriteBatch)
+		{
+			//IL_0003: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
+			Rectangle timeRect = default(Rectangle);
+			((Rectangle)(ref timeRect))._002Ector(((Control)this).get_AbsoluteBounds().X + _timeDisplayBounds.X, ((Control)this).get_AbsoluteBounds().Y + _timeDisplayBounds.Y, _timeDisplayBounds.Width, _timeDisplayBounds.Height);
+			_base.Renderer.DrawTimeText(spriteBatch, _base.FormatTimeDisplay(), timeRect, ((Control)this).get_Opacity());
 		}
 
 		protected override void DisposeControl()

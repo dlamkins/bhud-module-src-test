@@ -5,6 +5,8 @@ namespace CinemaModule.Models
 {
 	public class WorldLocationPresetData
 	{
+		private const float DefaultScreenWidth = 10f;
+
 		[JsonProperty("id")]
 		public string Id { get; set; }
 

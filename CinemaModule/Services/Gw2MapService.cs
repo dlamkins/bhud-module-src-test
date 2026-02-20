@@ -31,12 +31,8 @@ namespace CinemaModule.Services
 
 		public Gw2MapService(string cacheDirectory)
 		{
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0029: Expected O, but got Unknown
-			if (string.IsNullOrWhiteSpace(cacheDirectory))
-			{
-				throw new ArgumentException("Cache directory cannot be null or empty.", "cacheDirectory");
-			}
+			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0011: Expected O, but got Unknown
 			_httpClient = new HttpClient();
 			_mapNameCache = new Dictionary<int, string>();
 			_cacheFilePath = Path.Combine(cacheDirectory, "gw2_map_cache.json");

@@ -20,27 +20,43 @@ namespace CinemaModule.Services
 
 		private Texture2D _whitePixel;
 
-		private const string CornerIconTexture = "cinemahudx64.png";
+		private const string CornerIconTexture = "logo_64.png";
 
-		private const string EmblemTexture = "cinemahudx90.png";
+		private const string EmblemTexture = "logo_90.png";
 
-		private const string LogoTexture = "quaggantv_highres.png";
+		private const string LogoTexture = "logo_highres.png";
 
-		private const string LogoTextTexture = "cinemahudtext.png";
+		private const string LogoTextTexture = "logo_text.png";
 
-		private const string SmallWindowBackgroundTexture = "bgwindow3.png";
+		private const string SmallWindowBackgroundTexture = "window_background.png";
 
-		private const string TwitchIconTextureName = "twitchicon.png";
+		private const string TwitchIconTextureName = "icon_twitch.png";
 
-		private const string PauseIconTexture = "pause.png";
+		private const string TwitchBigTexture = "icon_twitch_large.png";
 
-		private const string TvSideTexture = "tv_side.png";
+		private const string PauseIconTexture = "icon_pause.png";
 
-		private const string TvTopBottomTexture = "tv_topbottom.png";
+		private const string WaypointIconTexture = "icon_waypoint.png";
 
-		private const string TvBackTexture = "tv_back.png";
+		private const string DeleteIconTexture = "icon_delete.png";
 
-		private const string TvScreenOffTexture = "tv_screenoff.png";
+		private const string ExportIconTexture = "icon_export.png";
+
+		private const string ImportIconTexture = "icon_import.png";
+
+		private const string YoutubeIconTexture = "icon_youtube.png";
+
+		private const string TvSideTexture = "tv_frame_side.png";
+
+		private const string TvTopBottomTexture = "tv_frame_topbottom.png";
+
+		private const string TvBackTexture = "tv_frame_back.png";
+
+		private const string TvScreenOffTexture = "tv_screen_off.png";
+
+		private const string SeekBarBackgroundTexture = "155208_background.png";
+
+		private const string ChatBackgroundTexture = "window_background_chat.png";
 
 		public TextureService(string cacheDirectory)
 		{
@@ -56,62 +72,92 @@ namespace CinemaModule.Services
 
 		public AsyncTexture2D GetCornerIcon()
 		{
-			return GetTexture("cinemahudx64.png");
+			return GetTexture("logo_64.png");
 		}
 
 		public AsyncTexture2D GetEmblem()
 		{
-			return GetTexture("cinemahudx90.png");
+			return GetTexture("logo_90.png");
 		}
 
 		public AsyncTexture2D GetLogo()
 		{
-			return GetTexture("quaggantv_highres.png");
+			return GetTexture("logo_highres.png");
 		}
 
 		public AsyncTexture2D GetLogoText()
 		{
-			return GetTexture("cinemahudtext.png");
+			return GetTexture("logo_text.png");
 		}
 
 		public AsyncTexture2D GetSmallWindowBackground()
 		{
-			return GetTexture("bgwindow3.png");
+			return GetTexture("window_background.png");
 		}
 
 		public AsyncTexture2D GetTwitchIcon()
 		{
-			return GetTexture("twitchicon.png");
+			return GetTexture("icon_twitch.png");
+		}
+
+		public AsyncTexture2D GetTwitchBigIcon()
+		{
+			return GetTexture("icon_twitch_large.png");
 		}
 
 		public AsyncTexture2D GetPauseIcon()
 		{
-			return GetTexture("pause.png");
+			return GetTexture("icon_pause.png");
+		}
+
+		public AsyncTexture2D GetDeleteIcon()
+		{
+			return GetTexture("icon_delete.png");
+		}
+
+		public AsyncTexture2D GetExportIcon()
+		{
+			return GetTexture("icon_export.png");
+		}
+
+		public AsyncTexture2D GetImportIcon()
+		{
+			return GetTexture("icon_import.png");
+		}
+
+		public AsyncTexture2D GetYoutubeIcon()
+		{
+			return GetTexture("icon_youtube.png");
 		}
 
 		public AsyncTexture2D GetDefaultAvatar()
 		{
-			return GetTexture("cinemahudx64.png");
+			return GetTexture("logo_64.png");
 		}
 
 		public AsyncTexture2D GetTvSide()
 		{
-			return GetTexture("tv_side.png");
+			return GetTexture("tv_frame_side.png");
 		}
 
 		public AsyncTexture2D GetTvTopBottom()
 		{
-			return GetTexture("tv_topbottom.png");
+			return GetTexture("tv_frame_topbottom.png");
 		}
 
 		public AsyncTexture2D GetTvBack()
 		{
-			return GetTexture("tv_back.png");
+			return GetTexture("tv_frame_back.png");
 		}
 
 		public AsyncTexture2D GetTvScreenOff()
 		{
-			return GetTexture("tv_screenoff.png");
+			return GetTexture("tv_screen_off.png");
+		}
+
+		public AsyncTexture2D GetChatBackground()
+		{
+			return GetTexture("window_background_chat.png");
 		}
 
 		public AsyncTexture2D GetPlayIcon()
@@ -159,6 +205,11 @@ namespace CinemaModule.Services
 			return AsyncTexture2D.FromAssetId(155208);
 		}
 
+		public AsyncTexture2D GetSeekBarBackground()
+		{
+			return GetTexture("155208_background.png");
+		}
+
 		public AsyncTexture2D GetResizeCorner()
 		{
 			return AsyncTexture2D.FromAssetId(156009);
@@ -167,6 +218,16 @@ namespace CinemaModule.Services
 		public AsyncTexture2D GetResizeCornerActive()
 		{
 			return AsyncTexture2D.FromAssetId(156010);
+		}
+
+		public AsyncTexture2D GetLockIcon()
+		{
+			return AsyncTexture2D.FromAssetId(733265);
+		}
+
+		public AsyncTexture2D GetLockActiveIcon()
+		{
+			return AsyncTexture2D.FromAssetId(733266);
 		}
 
 		public AsyncTexture2D GetDisplayIcon()
@@ -184,11 +245,6 @@ namespace CinemaModule.Services
 			return AsyncTexture2D.FromAssetId(2208347);
 		}
 
-		public AsyncTexture2D GetImportIcon()
-		{
-			return AsyncTexture2D.FromAssetId(2208351);
-		}
-
 		public AsyncTexture2D GetCardBackground()
 		{
 			return AsyncTexture2D.FromAssetId(154960);
@@ -197,6 +253,26 @@ namespace CinemaModule.Services
 		public AsyncTexture2D GetWindowTexture()
 		{
 			return AsyncTexture2D.FromAssetId(155997);
+		}
+
+		public AsyncTexture2D GetSetScreenIcon()
+		{
+			return AsyncTexture2D.FromAssetId(528726);
+		}
+
+		public AsyncTexture2D GetWaypointIcon()
+		{
+			return AsyncTexture2D.FromAssetId(156628);
+		}
+
+		public AsyncTexture2D GetInfoIcon()
+		{
+			return AsyncTexture2D.FromAssetId(1508665);
+		}
+
+		public AsyncTexture2D GetRefreshIcon()
+		{
+			return AsyncTexture2D.FromAssetId(156749);
 		}
 
 		public async Task<AsyncTexture2D> GetImageFromUrlAsync(string cacheKey, string imageUrl)

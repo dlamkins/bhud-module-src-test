@@ -26,6 +26,10 @@ namespace CinemaHUD.UI.Windows.SettingsSmall
 			((Control)this).set_Location(new Point((((Control)GameService.Graphics.get_SpriteScreen()).get_Width() - ((Control)this).get_Width()) / 2, (((Control)GameService.Graphics.get_SpriteScreen()).get_Height() - ((Control)this).get_Height()) / 2));
 			((WindowBase2)this).set_SavesPosition(false);
 			((WindowBase2)this).set_CanResize(false);
+		}
+
+		protected void Initialize()
+		{
 			BuildContent();
 		}
 

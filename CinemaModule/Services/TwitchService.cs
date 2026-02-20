@@ -21,7 +21,11 @@ namespace CinemaModule.Services
 
 		private const string TwitchGqlUrl = "https://gql.twitch.tv/gql";
 
+		private const string TwitchHelixUrl = "https://api.twitch.tv/helix";
+
 		private const string TwitchClientId = "kimne78kx3ncx6brgo4mv6wki5h1ko";
+
+		private const string TwitchAuthClientId = "8m7h0mxthjx16qofx82mruz640ke67";
 
 		private const string TwitchUsherUrl = "https://usher.ttvnw.net/api/channel/hls";
 
@@ -39,30 +43,41 @@ namespace CinemaModule.Services
 
 		private bool _isFetchingQualities;
 
+		private string _authToken;
+
+		private string _userId;
+
 		public ImageCacheService ImageCache => _imageCache;
+
+		public bool IsAuthenticated => !string.IsNullOrEmpty(_authToken);
 
 		public IReadOnlyList<TwitchStreamQuality> CachedQualities => _cachedQualities;
 
 		public event EventHandler<TwitchQualitiesEventArgs> QualitiesChanged;
+
+		public event EventHandler ScopeError;
 
 		public TwitchService(string cacheDirectory)
 		{
 			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001c: Expected O, but got Unknown
 			_httpClient = new HttpClient();
-			((HttpHeaders)_httpClient.get_DefaultRequestHeaders()).Add("Client-ID", "kimne78kx3ncx6brgo4mv6wki5h1ko");
 			string avatarCacheDir = Path.Combine(cacheDirectory, "avatars");
 			_imageCache = new ImageCacheService(avatarCacheDir, _httpClient);
+		}
+
+		public void SetAuthToken(string token, string userId = null)
+		{
+			_authToken = token;
+			_userId = userId;
 		}
 
 		public async Task<TwitchStreamInfo> GetStreamInfoAsync(string channelName)
 		{
 			if (string.IsNullOrWhiteSpace(channelName))
 			{
-				Logger.Warn("GetStreamInfoAsync called with null or empty channel name");
 				return null;
 			}
-			Logger.Debug("Fetching stream info for channel: " + channelName);
 			try
 			{
 				JObject query = BuildStreamInfoQuery(channelName);
@@ -85,7 +100,6 @@ namespace CinemaModule.Services
 			Dictionary<string, TwitchStreamInfo> result = new Dictionary<string, TwitchStreamInfo>(StringComparer.OrdinalIgnoreCase);
 			if (channelNames == null || channelNames.Count == 0)
 			{
-				Logger.Debug("GetMultipleStreamInfoAsync called with empty channel list");
 				return result;
 			}
 			List<string> validChannels = (from name in channelNames
@@ -95,7 +109,6 @@ namespace CinemaModule.Services
 			{
 				return result;
 			}
-			Logger.Debug($"Fetching stream info for {validChannels.Count} channels in batch");
 			try
 			{
 				JObject query = BuildMultipleStreamInfoQuery(validChannels);
@@ -113,6 +126,139 @@ namespace CinemaModule.Services
 			}
 		}
 
+		public async Task<List<TwitchStreamInfo>> GetFollowedChannelsAsync()
+		{
+			if (!IsAuthenticated || string.IsNullOrEmpty(_userId))
+			{
+				return new List<TwitchStreamInfo>();
+			}
+			try
+			{
+				return await GetFollowedLiveStreamsHelixAsync();
+			}
+			catch (Exception ex)
+			{
+				Logger.Error(ex, "Failed to get followed channels");
+				return new List<TwitchStreamInfo>();
+			}
+		}
+
+		private async Task<List<TwitchStreamInfo>> GetFollowedLiveStreamsHelixAsync()
+		{
+			string url = "https://api.twitch.tv/helix/streams/followed?user_id=" + _userId + "&first=50";
+			HttpRequestMessage request = new HttpRequestMessage(HttpMethod.get_Get(), url);
+			try
+			{
+				((HttpHeaders)request.get_Headers()).Add("Client-ID", "8m7h0mxthjx16qofx82mruz640ke67");
+				((HttpHeaders)request.get_Headers()).Add("Authorization", "Bearer " + _authToken);
+				HttpResponseMessage response = await _httpClient.SendAsync(request);
+				if (!response.get_IsSuccessStatusCode())
+				{
+					string error = await response.get_Content().ReadAsStringAsync();
+					Logger.Warn("Failed to get followed streams: " + error);
+					if (error.Contains("Missing scope"))
+					{
+						Logger.Info("Token missing required scope - triggering re-authentication");
+						this.ScopeError?.Invoke(this, EventArgs.Empty);
+					}
+					return new List<TwitchStreamInfo>();
+				}
+				JObject json = JObject.Parse(await response.get_Content().ReadAsStringAsync());
+				List<TwitchStreamInfo> streams = ParseHelixFollowedStreams(json);
+				return await EnrichWithUserAvatars(streams);
+			}
+			finally
+			{
+				((IDisposable)request)?.Dispose();
+			}
+		}
+
+		private async Task<List<TwitchStreamInfo>> EnrichWithUserAvatars(List<TwitchStreamInfo> streams)
+		{
+			if (streams.Count == 0)
+			{
+				return streams;
+			}
+			List<string> userIds = (from s in streams
+				select s.UserId into id
+				where !string.IsNullOrEmpty(id)
+				select id).Distinct().ToList();
+			if (userIds.Count == 0)
+			{
+				return streams;
+			}
+			string url = "https://api.twitch.tv/helix/users?" + string.Join("&", userIds.Select((string id) => "id=" + id));
+			HttpRequestMessage request = new HttpRequestMessage(HttpMethod.get_Get(), url);
+			try
+			{
+				((HttpHeaders)request.get_Headers()).Add("Client-ID", "8m7h0mxthjx16qofx82mruz640ke67");
+				((HttpHeaders)request.get_Headers()).Add("Authorization", "Bearer " + _authToken);
+				HttpResponseMessage response = await _httpClient.SendAsync(request);
+				if (!response.get_IsSuccessStatusCode())
+				{
+					return streams;
+				}
+				JToken obj = JObject.Parse(await response.get_Content().ReadAsStringAsync()).get_Item("data");
+				JArray users = (JArray)(object)((obj is JArray) ? obj : null);
+				if (users == null)
+				{
+					return streams;
+				}
+				Dictionary<string, string> avatarMap = new Dictionary<string, string>();
+				foreach (JToken item in users)
+				{
+					string id2 = ((object)item.get_Item((object)"id"))?.ToString();
+					string avatar = ((object)item.get_Item((object)"profile_image_url"))?.ToString();
+					if (!string.IsNullOrEmpty(id2) && !string.IsNullOrEmpty(avatar))
+					{
+						avatarMap[id2] = avatar;
+					}
+				}
+				foreach (TwitchStreamInfo stream in streams)
+				{
+					if (!string.IsNullOrEmpty(stream.UserId) && avatarMap.TryGetValue(stream.UserId, out var avatarUrl))
+					{
+						stream.AvatarUrl = avatarUrl;
+					}
+				}
+			}
+			finally
+			{
+				((IDisposable)request)?.Dispose();
+			}
+			return streams;
+		}
+
+		private List<TwitchStreamInfo> ParseHelixFollowedStreams(JObject json)
+		{
+			List<TwitchStreamInfo> result = new List<TwitchStreamInfo>();
+			JToken obj = json.get_Item("data");
+			JArray data = (JArray)(object)((obj is JArray) ? obj : null);
+			if (data == null)
+			{
+				return result;
+			}
+			foreach (JToken stream in data)
+			{
+				string login = ((object)stream.get_Item((object)"user_login"))?.ToString();
+				if (!string.IsNullOrEmpty(login))
+				{
+					TwitchStreamInfo obj2 = new TwitchStreamInfo
+					{
+						ChannelName = login,
+						UserId = ((object)stream.get_Item((object)"user_id"))?.ToString(),
+						IsLive = true,
+						Title = ((object)stream.get_Item((object)"title"))?.ToString(),
+						GameName = ((object)stream.get_Item((object)"game_name"))?.ToString()
+					};
+					JToken obj3 = stream.get_Item((object)"viewer_count");
+					obj2.ViewerCount = ((obj3 != null) ? Extensions.Value<int>((IEnumerable<JToken>)obj3) : 0);
+					result.Add(obj2);
+				}
+			}
+			return result;
+		}
+
 		public async Task<string> GetPlayableStreamUrlAsync(string channelName)
 		{
 			if (string.IsNullOrWhiteSpace(channelName))
@@ -127,7 +273,6 @@ namespace CinemaModule.Services
 					Logger.Warn("Could not get access token for channel: " + channelName);
 					return null;
 				}
-				Logger.Info("Generated HLS URL for channel: " + channelName);
 				return BuildHlsUrl(channelName, accessToken.Token, accessToken.Signature);
 			}
 			catch (Exception ex)
@@ -162,26 +307,19 @@ namespace CinemaModule.Services
 
 		public async void FetchAndCacheQualitiesAsync(string channelName)
 		{
-			if (_isFetchingQualities)
+			if (_isFetchingQualities || string.IsNullOrWhiteSpace(channelName))
 			{
-				return;
-			}
-			if (string.IsNullOrWhiteSpace(channelName))
-			{
-				Logger.Debug("Cannot fetch Twitch qualities - no channel name");
 				return;
 			}
 			_isFetchingQualities = true;
-			Logger.Info("Fetching Twitch qualities for channel: " + channelName);
 			try
 			{
 				List<TwitchStreamQuality> qualities = await GetStreamQualitiesAsync(channelName);
-				if (qualities != null && qualities.Count > 0)
+				if (qualities.Count > 0)
 				{
 					_cachedQualities = qualities;
 					_cachedQualitiesChannel = channelName;
 					_selectedQualityIndex = 0;
-					Logger.Info($"Cached {_cachedQualities.Count} Twitch quality options for {channelName}");
 					List<string> qualityNames = _cachedQualities.Select((TwitchStreamQuality q) => q.DisplayName).ToList();
 					this.QualitiesChanged?.Invoke(this, new TwitchQualitiesEventArgs(qualityNames, _selectedQualityIndex));
 				}
@@ -208,9 +346,7 @@ namespace CinemaModule.Services
 				return null;
 			}
 			_selectedQualityIndex = qualityIndex;
-			TwitchStreamQuality selectedQuality = _cachedQualities[qualityIndex];
-			Logger.Info("Twitch quality selected: " + selectedQuality.DisplayName);
-			return selectedQuality.StreamUrl;
+			return _cachedQualities[qualityIndex].StreamUrl;
 		}
 
 		public void ClearCachedQualities()
@@ -283,17 +419,11 @@ namespace CinemaModule.Services
 				isAudioOnly = (name != null && name.IndexOf("audio", StringComparison.OrdinalIgnoreCase) >= 0) || height == 0;
 				isSource = name != null && name.IndexOf("chunked", StringComparison.OrdinalIgnoreCase) >= 0;
 				string displayName = BuildQualityDisplayName(isAudioOnly, isSource, height, frameRate, name);
-				qualities.Add(new TwitchStreamQuality
-				{
-					DisplayName = displayName,
-					StreamUrl = streamUrl
-				});
+				qualities.Add(new TwitchStreamQuality(displayName, streamUrl));
 			}
-			qualities = (from q in qualities
+			return (from q in qualities
 				orderby q.DisplayName.StartsWith("Source") descending, ExtractHeightFromDisplayName(q.DisplayName) descending
 				select q).ToList();
-			Logger.Debug($"Parsed {qualities.Count} quality options from M3U8 playlist");
-			return qualities;
 		}
 
 		private string BuildQualityDisplayName(bool isAudioOnly, bool isSource, int height, int frameRate, string name)
@@ -337,9 +467,8 @@ namespace CinemaModule.Services
 
 		private async Task<StreamAccessToken> GetStreamAccessTokenAsync(string channelName)
 		{
-			Logger.Debug("Requesting PlaybackAccessToken for channel: " + channelName);
 			JObject query = BuildPlaybackAccessTokenQuery(channelName);
-			JObject json = await ExecuteGqlRequestAsync(query, "PlaybackAccessToken");
+			JObject json = await ExecuteGqlRequestAsync(query, "PlaybackAccessToken", useAuth: true);
 			if (json == null)
 			{
 				return null;
@@ -370,7 +499,6 @@ namespace CinemaModule.Services
 				return false;
 			}
 			string chatUrl = "https://www.twitch.tv/popout/" + channelName.ToLowerInvariant() + "/chat?popout=";
-			Logger.Info("Opening Twitch chat for channel: " + channelName);
 			try
 			{
 				Process.Start(chatUrl);
@@ -398,7 +526,7 @@ namespace CinemaModule.Services
 				HttpRequestMessage request = new HttpRequestMessage(HttpMethod.get_Head(), url);
 				try
 				{
-					HttpResponseMessage response = await _httpClient.SendAsync(request);
+					HttpResponseMessage response = await _httpClient.SendAsync(request, (HttpCompletionOption)1);
 					try
 					{
 						return response.get_IsSuccessStatusCode() ? new UrlAvailabilityResult
@@ -425,9 +553,8 @@ namespace CinemaModule.Services
 			{
 				throw;
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
-				Logger.Debug("URL check failed for " + url + ": " + ex.Message);
 				return new UrlAvailabilityResult
 				{
 					IsAvailable = null,
@@ -451,7 +578,7 @@ namespace CinemaModule.Services
 			//IL_0040: Expected O, but got Unknown
 			//IL_0041: Expected O, but got Unknown
 			JObject val = new JObject();
-			val.set_Item("query", JToken.op_Implicit("\n                    query GetStreamInfo($login: String!) {\n                        user(login: $login) {\n                            id\n                            login\n                            displayName\n                            profileImageURL(width: 70)\n                            stream {\n                                id\n                                title\n                                viewersCount\n                                game {\n                                    id\n                                    name\n                                }\n                            }\n                        }\n                    }"));
+			val.set_Item("query", JToken.op_Implicit("\n                    query GetStreamInfo($login: String!) {\n                        user(login: $login) {\n                            id\n                            login\n                            displayName\n                            profileImageURL(width: 600)\n                            stream {\n                                id\n                                title\n                                viewersCount\n                                game {\n                                    id\n                                    name\n                                }\n                            }\n                        }\n                    }"));
 			JObject val2 = new JObject();
 			val2.set_Item("login", JToken.op_Implicit(channelName.ToLowerInvariant()));
 			val.set_Item("variables", (JToken)val2);
@@ -471,7 +598,7 @@ namespace CinemaModule.Services
 			//IL_003e: Expected O, but got Unknown
 			JArray loginsArray = new JArray((object)channelNames);
 			JObject val = new JObject();
-			val.set_Item("query", JToken.op_Implicit("\n                    query GetMultipleStreamInfo($logins: [String!]!) {\n                        users(logins: $logins) {\n                            id\n                            login\n                            displayName\n                            profileImageURL(width: 70)\n                            stream {\n                                id\n                                title\n                                viewersCount\n                                game {\n                                    id\n                                    name\n                                }\n                            }\n                        }\n                    }"));
+			val.set_Item("query", JToken.op_Implicit("\n                    query GetMultipleStreamInfo($logins: [String!]!) {\n                        users(logins: $logins) {\n                            id\n                            login\n                            displayName\n                            profileImageURL(width: 600)\n                            stream {\n                                id\n                                title\n                                viewersCount\n                                game {\n                                    id\n                                    name\n                                }\n                            }\n                        }\n                    }"));
 			JObject val2 = new JObject();
 			val2.set_Item("logins", (JToken)(object)loginsArray);
 			val.set_Item("variables", (JToken)val2);
@@ -505,22 +632,29 @@ namespace CinemaModule.Services
 			return val;
 		}
 
-		private async Task<JObject> ExecuteGqlRequestAsync(JObject query, string operationName)
+		private Task<JObject> ExecuteGqlRequestAsync(JObject query, string operationName)
+		{
+			return ExecuteGqlRequestAsync(query, operationName, useAuth: false);
+		}
+
+		private async Task<JObject> ExecuteGqlRequestAsync(JObject query, string operationName, bool useAuth)
 		{
 			HttpRequestMessage val = new HttpRequestMessage(HttpMethod.get_Post(), "https://gql.twitch.tv/gql");
 			val.set_Content((HttpContent)new StringContent(((object)query).ToString(), Encoding.UTF8, "application/json"));
 			HttpRequestMessage request = val;
+			((HttpHeaders)request.get_Headers()).Add("Client-ID", "kimne78kx3ncx6brgo4mv6wki5h1ko");
+			if (useAuth && !string.IsNullOrEmpty(_authToken))
+			{
+				((HttpHeaders)request.get_Headers()).Add("Authorization", "Bearer " + _authToken);
+			}
 			HttpResponseMessage response = await _httpClient.SendAsync(request);
-			Logger.Debug($"GQL {operationName} response status: {response.get_StatusCode()}");
 			if (!response.get_IsSuccessStatusCode())
 			{
 				string errorContent = await response.get_Content().ReadAsStringAsync();
 				Logger.Warn("GQL " + operationName + " request failed: " + errorContent);
 				return null;
 			}
-			string content = await response.get_Content().ReadAsStringAsync();
-			Logger.Debug("GQL " + operationName + " response: " + content);
-			JObject json = JObject.Parse(content);
+			JObject json = JObject.Parse(await response.get_Content().ReadAsStringAsync());
 			LogGqlErrors(json, operationName);
 			return json;
 		}
@@ -539,13 +673,12 @@ namespace CinemaModule.Services
 		{
 			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0028: Invalid comparison between Unknown and I4
-			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006a: Invalid comparison between Unknown and I4
+			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0055: Invalid comparison between Unknown and I4
 			JToken obj = json.get_Item("data");
 			JToken user = ((obj != null) ? obj.get_Item((object)"user") : null);
 			if (user == null || (int)user.get_Type() == 10)
 			{
-				Logger.Debug("User not found: " + channelName);
 				return new TwitchStreamInfo
 				{
 					ChannelName = channelName,
@@ -583,9 +716,7 @@ namespace CinemaModule.Services
 			}
 			obj2.ViewerCount = viewerCount;
 			obj2.AvatarUrl = ((object)user.get_Item((object)"profileImageURL"))?.ToString();
-			TwitchStreamInfo result = obj2;
-			Logger.Debug(string.Format("Stream info for {0}: IsLive={1}, Game={2}, Viewers={3}", channelName, result.IsLive, result.GameName ?? "N/A", result.ViewerCount));
-			return result;
+			return obj2;
 		}
 
 		private Dictionary<string, TwitchStreamInfo> ParseMultipleStreamInfo(JObject json, List<string> requestedChannels)
@@ -634,8 +765,7 @@ namespace CinemaModule.Services
 						}
 						obj3.ViewerCount = viewerCount;
 						obj3.AvatarUrl = ((object)user.get_Item((object)"profileImageURL"))?.ToString();
-						TwitchStreamInfo streamInfo = (result[login] = obj3);
-						Logger.Debug(string.Format("Stream info for {0}: IsLive={1}, Game={2}, Viewers={3}", login, streamInfo.IsLive, streamInfo.GameName ?? "N/A", streamInfo.ViewerCount));
+						result[login] = obj3;
 					}
 				}
 			}
@@ -643,7 +773,6 @@ namespace CinemaModule.Services
 			{
 				if (!result.ContainsKey(channelName))
 				{
-					Logger.Debug("User not found in batch response: " + channelName);
 					result[channelName] = new TwitchStreamInfo
 					{
 						ChannelName = channelName,
@@ -651,7 +780,6 @@ namespace CinemaModule.Services
 					};
 				}
 			}
-			Logger.Debug($"Parsed stream info for {result.Count} channels");
 			return result;
 		}
 
@@ -673,7 +801,6 @@ namespace CinemaModule.Services
 				Logger.Warn("Token or signature is empty for channel: " + channelName);
 				return null;
 			}
-			Logger.Debug("PlaybackAccessToken obtained for " + channelName);
 			return new StreamAccessToken
 			{
 				Token = token,

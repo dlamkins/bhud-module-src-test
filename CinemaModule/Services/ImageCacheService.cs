@@ -83,9 +83,8 @@ namespace CinemaModule.Services
 					return CreateTextureFromBytes(bytes);
 				}
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
-				Logger.Debug("Failed to read cached image from " + cachePath + ": " + ex.Message);
 			}
 			return null;
 		}
@@ -119,9 +118,8 @@ namespace CinemaModule.Services
 				SaveToCache(cachePath, bytes, imageUrl);
 				return CreateTextureFromBytes(bytes);
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
-				Logger.Debug("Failed to download image from " + imageUrl + ": " + ex.Message);
 				return null;
 			}
 		}
@@ -137,9 +135,8 @@ namespace CinemaModule.Services
 				byte[] bytes = await _httpClient.GetByteArrayAsync(imageUrl);
 				return IsValidImageData(bytes) ? CreateTextureFromBytes(bytes) : null;
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
-				Logger.Debug("Failed to download image from " + imageUrl + ": " + ex.Message);
 				return null;
 			}
 		}
@@ -151,9 +148,8 @@ namespace CinemaModule.Services
 				File.WriteAllBytes(cachePath, bytes);
 				File.WriteAllText(GetUrlMetadataPath(cachePath), imageUrl);
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
-				Logger.Debug("Failed to cache image: " + ex.Message);
 			}
 		}
 
@@ -191,9 +187,8 @@ namespace CinemaModule.Services
 					((GraphicsDeviceContext)(ref graphicsContext)).Dispose();
 				}
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
-				Logger.Debug("Failed to create texture from bytes: " + ex.Message);
 				return null;
 			}
 		}

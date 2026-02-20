@@ -2,21 +2,43 @@ using Newtonsoft.Json;
 
 namespace CinemaModule.Models
 {
-	public class StreamPresetData
+	public class StreamPresetData : StreamDataBase
 	{
+		private string _name;
+
 		[JsonProperty("id")]
-		public string Id { get; set; }
+		public override string Id { get; set; }
 
 		[JsonProperty("name")]
-		public string Name { get; set; }
+		public string NameValue
+		{
+			get
+			{
+				return _name;
+			}
+			set
+			{
+				_name = value;
+			}
+		}
+
+		[JsonIgnore]
+		public override string Name => _name;
+
+		[JsonProperty("type")]
+		public override string TypeString { get; set; } = "video";
+
 
 		[JsonProperty("url")]
-		public string Url { get; set; }
+		public override string Url { get; set; }
 
 		[JsonProperty("avatar")]
 		public string Avatar { get; set; }
 
 		[JsonProperty("infoUrl")]
-		public string InfoUrl { get; set; }
+		public override string InfoUrl { get; set; }
+
+		[JsonProperty("staticImage")]
+		public override string StaticImage { get; set; }
 	}
 }

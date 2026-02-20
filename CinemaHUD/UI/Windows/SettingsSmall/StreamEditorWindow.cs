@@ -10,6 +10,18 @@ namespace CinemaHUD.UI.Windows.SettingsSmall
 {
 	public class StreamEditorWindow : SmallWindow
 	{
+		private const int TextBoxWidth = 350;
+
+		private const int DropdownWidth = 200;
+
+		private const int ButtonWidth = 100;
+
+		private const string SourceTypeTwitch = "Twitch Channel";
+
+		private const string SourceTypeUrl = "URL";
+
+		private const string UrlHelpText = "Supported formats:\n• Video files: MP4, MKV, AVI, WEBM\n• Live streams: M3U8, HLS, RTSP, RTMP\n• Radio/Audio: MP3, AAC, OGG streams\n• Local files: file:///C:/path/to/video.mp4";
+
 		private readonly CinemaUserSettings _settings;
 
 		private SavedStream _stream;
@@ -38,6 +50,7 @@ namespace CinemaHUD.UI.Windows.SettingsSmall
 			: base("Add Stream")
 		{
 			_settings = settings;
+			Initialize();
 		}
 
 		protected override void BuildContent()
@@ -53,68 +66,6 @@ namespace CinemaHUD.UI.Windows.SettingsSmall
 			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0053: Expected O, but got Unknown
-			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00af: Expected O, but got Unknown
-			//IL_00af: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0100: Expected O, but got Unknown
-			//IL_0152: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0157: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0162: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0169: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0170: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0180: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018c: Expected O, but got Unknown
-			//IL_018d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0192: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b4: Expected O, but got Unknown
-			//IL_01b5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ba: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ea: Expected O, but got Unknown
-			//IL_01ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ef: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01fd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0204: Unknown result type (might be due to invalid IL or missing references)
-			//IL_020f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0219: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0221: Expected O, but got Unknown
-			//IL_0222: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0227: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0232: Unknown result type (might be due to invalid IL or missing references)
-			//IL_023a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0246: Expected O, but got Unknown
-			//IL_025e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0263: Unknown result type (might be due to invalid IL or missing references)
-			//IL_026e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0276: Unknown result type (might be due to invalid IL or missing references)
-			//IL_027d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0289: Expected O, but got Unknown
-			//IL_02a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b8: Unknown result type (might be due to invalid IL or missing references)
 			FlowPanel val = new FlowPanel();
 			val.set_FlowDirection((ControlFlowDirection)3);
 			((Container)val).set_WidthSizingMode((SizingMode)2);
@@ -124,27 +75,58 @@ namespace CinemaHUD.UI.Windows.SettingsSmall
 			((Panel)val).set_CanScroll(true);
 			((Control)val).set_Parent((Container)(object)this);
 			FlowPanel panel = val;
-			Label val2 = new Label();
-			val2.set_Text("Stream Name");
-			val2.set_AutoSizeHeight(true);
-			val2.set_AutoSizeWidth(true);
-			val2.set_Font(GameService.Content.get_DefaultFont16());
-			((Control)val2).set_Parent((Container)(object)panel);
-			TextBox val3 = new TextBox();
-			((Control)val3).set_Width(350);
-			((TextInputBase)val3).set_PlaceholderText("Enter a name for this stream");
-			((Control)val3).set_Parent((Container)(object)panel);
-			_nameTextBox = val3;
-			Label val4 = new Label();
-			val4.set_Text("Source Type");
-			val4.set_AutoSizeHeight(true);
-			val4.set_AutoSizeWidth(true);
-			val4.set_Font(GameService.Content.get_DefaultFont16());
-			((Control)val4).set_Parent((Container)(object)panel);
-			Dropdown val5 = new Dropdown();
-			((Control)val5).set_Width(200);
-			((Control)val5).set_Parent((Container)(object)panel);
-			_sourceTypeDropdown = val5;
+			BuildNameSection((Container)(object)panel);
+			BuildSourceTypeSection((Container)(object)panel);
+			BuildValueSection((Container)(object)panel);
+			BuildButtons((Container)(object)panel);
+		}
+
+		private void BuildNameSection(Container parent)
+		{
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005c: Expected O, but got Unknown
+			Label val = new Label();
+			val.set_Text("Stream Name");
+			val.set_AutoSizeHeight(true);
+			val.set_AutoSizeWidth(true);
+			val.set_Font(GameService.Content.get_DefaultFont16());
+			((Control)val).set_Parent(parent);
+			TextBox val2 = new TextBox();
+			((Control)val2).set_Width(350);
+			((TextInputBase)val2).set_PlaceholderText("Enter a name for this stream");
+			((Control)val2).set_Parent(parent);
+			_nameTextBox = val2;
+		}
+
+		private void BuildSourceTypeSection(Container parent)
+		{
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0051: Expected O, but got Unknown
+			Label val = new Label();
+			val.set_Text("Source Type");
+			val.set_AutoSizeHeight(true);
+			val.set_AutoSizeWidth(true);
+			val.set_Font(GameService.Content.get_DefaultFont16());
+			((Control)val).set_Parent(parent);
+			Dropdown val2 = new Dropdown();
+			((Control)val2).set_Width(200);
+			((Control)val2).set_Parent(parent);
+			_sourceTypeDropdown = val2;
 			_sourceTypeDropdown.get_Items().Add("URL");
 			_sourceTypeDropdown.get_Items().Add("Twitch Channel");
 			_sourceTypeDropdown.set_SelectedItem("Twitch Channel");
@@ -152,56 +134,107 @@ namespace CinemaHUD.UI.Windows.SettingsSmall
 			{
 				OnSourceTypeChanged();
 			});
-			Label val6 = new Label();
-			val6.set_Text("Stream URL / Channel");
-			val6.set_AutoSizeHeight(true);
-			val6.set_AutoSizeWidth(true);
-			val6.set_Font(GameService.Content.get_DefaultFont16());
-			((Control)val6).set_Parent((Container)(object)panel);
-			_valueLabel = val6;
-			TextBox val7 = new TextBox();
-			((Control)val7).set_Width(350);
-			((TextInputBase)val7).set_PlaceholderText("Enter URL or Twitch channel name");
-			((Control)val7).set_Parent((Container)(object)panel);
-			_valueTextBox = val7;
-			Label val8 = new Label();
-			val8.set_Text("");
-			val8.set_AutoSizeHeight(true);
-			val8.set_AutoSizeWidth(true);
-			val8.set_TextColor(Color.get_White());
-			((Control)val8).set_Parent((Container)(object)panel);
-			_helpLabel = val8;
-			FlowPanel val9 = new FlowPanel();
-			val9.set_FlowDirection((ControlFlowDirection)0);
-			((Container)val9).set_WidthSizingMode((SizingMode)2);
-			((Container)val9).set_HeightSizingMode((SizingMode)1);
-			val9.set_ControlPadding(new Vector2(10f, 0f));
-			((Control)val9).set_Parent((Container)(object)panel);
-			FlowPanel buttonPanel = val9;
-			StandardButton val10 = new StandardButton();
-			val10.set_Text("Save");
-			((Control)val10).set_Width(100);
-			((Control)val10).set_Parent((Container)(object)buttonPanel);
-			_saveButton = val10;
+		}
+
+		private void BuildValueSection(Container parent)
+		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003b: Expected O, but got Unknown
+			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0063: Expected O, but got Unknown
+			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0069: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0082: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0099: Expected O, but got Unknown
+			Label val = new Label();
+			val.set_Text("Stream URL / Channel");
+			val.set_AutoSizeHeight(true);
+			val.set_AutoSizeWidth(true);
+			val.set_Font(GameService.Content.get_DefaultFont16());
+			((Control)val).set_Parent(parent);
+			_valueLabel = val;
+			TextBox val2 = new TextBox();
+			((Control)val2).set_Width(350);
+			((TextInputBase)val2).set_PlaceholderText("Enter URL or Twitch channel name");
+			((Control)val2).set_Parent(parent);
+			_valueTextBox = val2;
+			Label val3 = new Label();
+			val3.set_Text("");
+			val3.set_AutoSizeHeight(true);
+			val3.set_AutoSizeWidth(true);
+			val3.set_TextColor(Color.get_White());
+			((Control)val3).set_Parent(parent);
+			_helpLabel = val3;
+		}
+
+		private void BuildButtons(Container parent)
+		{
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0037: Expected O, but got Unknown
+			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005c: Expected O, but got Unknown
+			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009f: Expected O, but got Unknown
+			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
+			FlowPanel val = new FlowPanel();
+			val.set_FlowDirection((ControlFlowDirection)0);
+			((Container)val).set_WidthSizingMode((SizingMode)2);
+			((Container)val).set_HeightSizingMode((SizingMode)1);
+			val.set_ControlPadding(new Vector2(10f, 0f));
+			((Control)val).set_Parent(parent);
+			FlowPanel buttonPanel = val;
+			StandardButton val2 = new StandardButton();
+			val2.set_Text("Save");
+			((Control)val2).set_Width(100);
+			((Control)val2).set_Parent((Container)(object)buttonPanel);
+			_saveButton = val2;
 			((Control)_saveButton).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				Save();
 			});
-			StandardButton val11 = new StandardButton();
-			val11.set_Text("Delete");
-			((Control)val11).set_Width(100);
-			((Control)val11).set_Visible(false);
-			((Control)val11).set_Parent((Container)(object)buttonPanel);
-			_deleteButton = val11;
+			StandardButton val3 = new StandardButton();
+			val3.set_Text("Delete");
+			((Control)val3).set_Width(100);
+			((Control)val3).set_Visible(false);
+			((Control)val3).set_Parent((Container)(object)buttonPanel);
+			_deleteButton = val3;
 			((Control)_deleteButton).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				Delete();
 			});
-			StandardButton val12 = new StandardButton();
-			val12.set_Text("Cancel");
-			((Control)val12).set_Width(100);
-			((Control)val12).set_Parent((Container)(object)buttonPanel);
-			((Control)val12).add_Click((EventHandler<MouseEventArgs>)delegate
+			StandardButton val4 = new StandardButton();
+			val4.set_Text("Cancel");
+			((Control)val4).set_Width(100);
+			((Control)val4).set_Parent((Container)(object)buttonPanel);
+			((Control)val4).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				((Control)this).Hide();
 			});
@@ -221,7 +254,7 @@ namespace CinemaHUD.UI.Windows.SettingsSmall
 			_stream = new SavedStream();
 			((WindowBase2)this).set_Title("Add Stream");
 			((TextInputBase)_nameTextBox).set_Text("");
-			_sourceTypeDropdown.set_SelectedItem((sourceType == StreamSourceType.TwitchChannel) ? "Twitch Channel" : "URL");
+			_sourceTypeDropdown.set_SelectedItem(GetDropdownValue(sourceType));
 			((TextInputBase)_valueTextBox).set_Text("");
 			((Control)_deleteButton).set_Visible(false);
 			OnSourceTypeChanged();
@@ -230,18 +263,24 @@ namespace CinemaHUD.UI.Windows.SettingsSmall
 
 		public void OpenForEdit(SavedStream stream)
 		{
-			if (stream != null)
+			_isNewStream = false;
+			_stream = stream;
+			((WindowBase2)this).set_Title("Edit Stream");
+			((TextInputBase)_nameTextBox).set_Text(stream.Name ?? "");
+			_sourceTypeDropdown.set_SelectedItem(GetDropdownValue(stream.SourceType));
+			((TextInputBase)_valueTextBox).set_Text(stream.Value ?? "");
+			((Control)_deleteButton).set_Visible(true);
+			OnSourceTypeChanged();
+			((Control)this).Show();
+		}
+
+		private string GetDropdownValue(StreamSourceType sourceType)
+		{
+			if (sourceType != StreamSourceType.TwitchChannel)
 			{
-				_isNewStream = false;
-				_stream = stream;
-				((WindowBase2)this).set_Title("Edit Stream");
-				((TextInputBase)_nameTextBox).set_Text(stream.Name ?? "");
-				_sourceTypeDropdown.set_SelectedItem((stream.SourceType == StreamSourceType.TwitchChannel) ? "Twitch Channel" : "URL");
-				((TextInputBase)_valueTextBox).set_Text(stream.Value ?? "");
-				((Control)_deleteButton).set_Visible(true);
-				OnSourceTypeChanged();
-				((Control)this).Show();
+				return "URL";
 			}
+			return "Twitch Channel";
 		}
 
 		private void Save()

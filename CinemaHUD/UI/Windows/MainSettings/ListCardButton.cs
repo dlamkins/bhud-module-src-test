@@ -1,4 +1,5 @@
 using System;
+using Blish_HUD.Content;
 
 namespace CinemaHUD.UI.Windows.MainSettings
 {
@@ -10,5 +11,9 @@ namespace CinemaHUD.UI.Windows.MainSettings
 
 
 		public Action OnClick { get; set; }
+
+		public AsyncTexture2D Icon { get; set; }
+
+		public string Tooltip { get; set; }
 	}
 }
