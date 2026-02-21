@@ -27,20 +27,25 @@
       </xsd:complexType>
     </xsd:element>
   </xsd:schema>
-<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="NoData"><value>No data, please wait a moment and refresh!</value></data>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="MainWindow_Label_ClearTrack_Notice"><value>This module does not track raid encounters (strike) clear, they will always appear "To do"</value></data>
+  <data name="NoData"><value>No data, please wait a moment and refresh!</value></data>
+  <data name="MainWindow_Button_ToggleTableDrawMode_Areas"><value>Show week</value></data>
+  <data name="MainWindow_Button_ToggleTableDrawMode_Tooltip"><value>Toggle between week / areas display</value></data>
   <data name="MainWindow_Button_Refresh_Label"><value>Refresh </value></data>
-  <data name="MainWindow_Button_Toggle_Tooltip"><value>Hide / Show clears</value></data>
-  <data name="MainWindow_Button_Toggle_Week_Tooltip"><value>Hide / Show week display</value></data>
+  <data name="Legend_None_Tooltip"><value>These are never on the weekly rotation</value></data>
+  <data name="Legend_Todo_Tooltip"><value>Not in the weekly rotation</value></data>
   <data name="CornerIcon_Tooltip_Warning"><value>RaidWeekPlanner - api error, please wait</value></data>
+  <data name="MainWindow_Button_ToggleTableDrawMode_Week"><value>Show areas</value></data>
   <data name="Legend_Title"><value>Legend:</value></data>
-  <data name="Legend_Planned"><value>Planned</value></data>
+  <data name="Legend_None_Label"><value>Never</value></data>
   <data name="LoadingSpinner_Fetch"><value>Fetching Api Data</value></data>
-  <data name="MainWindow_Button_Toggle_Week_Label"><value>Toggle Week display</value></data>
-  <data name="MainWindow_Button_Toggle_Label"><value>Toggle Clears</value></data>
+  <data name="Legend_Done_Label"><value>Done</value></data>
+  <data name="Legend_Done_Tooltip"><value>Already cleared</value></data>
+  <data name="Legend_Planned_Label"><value>Planned</value></data>
+  <data name="MainWindow_Button_Refresh_Tooltip"><value>Refresh clears and update colors</value></data>
+  <data name="Legend_Todo_Label"><value>Not planned</value></data>
   <data name="CornerIcon_Tooltip"><value>RaidWeekPlanner</value></data>
-  <data name="Legend_Todo"><value>To do</value></data>
-  <data name="Legend_None"><value>N/A</value></data>
-  <data name="Legend_Done"><value>Done</value></data>
+  <data name="Legend_Planned_Tooltip"><value>Planned this week</value></data>
   <data name="day1"><value>Tueday</value></data>
   <data name="day0"><value>Monday</value></data>
   <data name="day3"><value>Thursday</value></data>

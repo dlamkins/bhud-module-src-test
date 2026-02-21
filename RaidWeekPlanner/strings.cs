@@ -60,27 +60,37 @@ namespace RaidWeekPlanner
 
 		internal static string day6 => ResourceManager.GetString("day6", resourceCulture);
 
-		internal static string Legend_Done => ResourceManager.GetString("Legend_Done", resourceCulture);
+		internal static string Legend_Done_Label => ResourceManager.GetString("Legend_Done_Label", resourceCulture);
 
-		internal static string Legend_None => ResourceManager.GetString("Legend_None", resourceCulture);
+		internal static string Legend_Done_Tooltip => ResourceManager.GetString("Legend_Done_Tooltip", resourceCulture);
 
-		internal static string Legend_Planned => ResourceManager.GetString("Legend_Planned", resourceCulture);
+		internal static string Legend_None_Label => ResourceManager.GetString("Legend_None_Label", resourceCulture);
+
+		internal static string Legend_None_Tooltip => ResourceManager.GetString("Legend_None_Tooltip", resourceCulture);
+
+		internal static string Legend_Planned_Label => ResourceManager.GetString("Legend_Planned_Label", resourceCulture);
+
+		internal static string Legend_Planned_Tooltip => ResourceManager.GetString("Legend_Planned_Tooltip", resourceCulture);
 
 		internal static string Legend_Title => ResourceManager.GetString("Legend_Title", resourceCulture);
 
-		internal static string Legend_Todo => ResourceManager.GetString("Legend_Todo", resourceCulture);
+		internal static string Legend_Todo_Label => ResourceManager.GetString("Legend_Todo_Label", resourceCulture);
+
+		internal static string Legend_Todo_Tooltip => ResourceManager.GetString("Legend_Todo_Tooltip", resourceCulture);
 
 		internal static string LoadingSpinner_Fetch => ResourceManager.GetString("LoadingSpinner_Fetch", resourceCulture);
 
 		internal static string MainWindow_Button_Refresh_Label => ResourceManager.GetString("MainWindow_Button_Refresh_Label", resourceCulture);
 
-		internal static string MainWindow_Button_Toggle_Label => ResourceManager.GetString("MainWindow_Button_Toggle_Label", resourceCulture);
+		internal static string MainWindow_Button_Refresh_Tooltip => ResourceManager.GetString("MainWindow_Button_Refresh_Tooltip", resourceCulture);
 
-		internal static string MainWindow_Button_Toggle_Tooltip => ResourceManager.GetString("MainWindow_Button_Toggle_Tooltip", resourceCulture);
+		internal static string MainWindow_Button_ToggleTableDrawMode_Areas => ResourceManager.GetString("MainWindow_Button_ToggleTableDrawMode_Areas", resourceCulture);
 
-		internal static string MainWindow_Button_Toggle_Week_Label => ResourceManager.GetString("MainWindow_Button_Toggle_Week_Label", resourceCulture);
+		internal static string MainWindow_Button_ToggleTableDrawMode_Tooltip => ResourceManager.GetString("MainWindow_Button_ToggleTableDrawMode_Tooltip", resourceCulture);
 
-		internal static string MainWindow_Button_Toggle_Week_Tooltip => ResourceManager.GetString("MainWindow_Button_Toggle_Week_Tooltip", resourceCulture);
+		internal static string MainWindow_Button_ToggleTableDrawMode_Week => ResourceManager.GetString("MainWindow_Button_ToggleTableDrawMode_Week", resourceCulture);
+
+		internal static string MainWindow_Label_ClearTrack_Notice => ResourceManager.GetString("MainWindow_Label_ClearTrack_Notice", resourceCulture);
 
 		internal static string NoData => ResourceManager.GetString("NoData", resourceCulture);
 
