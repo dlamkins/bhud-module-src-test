@@ -64,6 +64,7 @@
   <data name="StrikeGroup_Icebrood_abbr"><value>IBS</value></data>
   <data name="Setting_Strike_CW_Label"><value>Cold War</value></data>
   <data name="Settings_OrganicGridBoxBackgrounds_Label"><value>'GW2 Style' background boxes</value></data>
+  <data name="Setting_Raid_MentorProgressPopupReposition_Label"><value>Reposition mentor progress popup</value></data>
   <data name="Tooltip_MentorProgress"><value>Mentor: {0} / {1}</value></data>
   <data name="Raid_Wing_2_3_Short"><value>M</value></data>
   <data name="Raid_Wing_8_2_Short"><value>D</value></data>
@@ -200,6 +201,7 @@ Off: Background will be rectangles</value></data>
   <data name="Setting_APIPoll_Tooltip"><value>How often should the GW2 API be checked for updated information?</value></data>
   <data name="Raid_Wing_7_Short"><value>TKoA</value></data>
   <data name="Setting_Raid_MentorProgressPopup_Tooltip"><value>Show a popup when mentor progress increases (tracking must be enabled).</value></data>
+  <data name="MentorProgress_ExamplePopup_Title"><value>Example Mentor Progress Update</value></data>
   <data name="Raid_Wing_2_1_Name"><value>Slothasor</value></data>
   <data name="EncounterClearStatus_MarkComplete"><value>Mark Complete</value></data>
   <data name="Setting_Strike_HT_Label"><value>Harvest Temple</value></data>
@@ -369,6 +371,7 @@ Off: Background will be rectangles</value></data>
   <data name="Setting_Raid_MentorProgress_Tooltip"><value>Show your raid mentor achievement progress in raid boss tooltips.  (Restart module to take effect)</value></data>
   <data name="Setting_Fractals_ColBG_Label"><value>Overlay background color</value></data>
   <data name="Setting_Raid_W3_Tooltip"><value>Enable Stronghold of the Faithful on the Raid Wings overlay</value></data>
+  <data name="Setting_Raid_MentorProgressPopupReposition_Tooltip"><value>When enabled, a sample popup appears that you can drag to set where mentor progress popups appear. Disable to lock the position.</value></data>
   <data name="Setting_Dun_ColFreqText_Tooltip"><value>Hex color code (#rrggbb) for Paths that count for dungeon frequenter achievement</value></data>
   <data name="Setting_Raid_W7_Label"><value>W7 / The Key of Ahdashim</value></data>
   <data name="Settings_Fractals_ShowChallengeMotes_Tooltip"><value>Display the CM fractals, hover tooltip shows Instabilities</value></data>

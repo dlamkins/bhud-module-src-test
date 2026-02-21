@@ -34,7 +34,8 @@ namespace RaidClears.Settings.Views.Tabs
 				(SettingEntry)(object)Service.Settings.RaidSettings.RaidPanelHighlightNonWeeklyBounty,
 				(SettingEntry)(object)Service.Settings.RaidSettings.RaidPanelOmitEventEncounters,
 				(SettingEntry)(object)Service.Settings.RaidSettings.RaidPanelMentorProgress,
-				(SettingEntry)(object)Service.Settings.RaidSettings.RaidPanelMentorProgressPopup
+				(SettingEntry)(object)Service.Settings.RaidSettings.RaidPanelMentorProgressPopup,
+				(SettingEntry)(object)Service.Settings.RaidSettings.RaidPanelMentorProgressPopupReposition
 			})));
 			_registeredMenuItems.Add(new MenuViewItem(new MenuItem(Strings.SettingsPanel_Raids_Heading_Layout), (MenuItem _) => (IView)(object)new GenericStyleView(Service.Settings.RaidSettings.Style, new List<SettingEntry<string>>
 			{

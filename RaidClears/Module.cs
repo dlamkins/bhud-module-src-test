@@ -32,6 +32,8 @@ namespace RaidClears
 	[Export(typeof(Module))]
 	public class Module : Module
 	{
+		private MentorProgressExamplePopupPanel? _mentorProgressExamplePopup;
+
 		public static string DIRECTORY_PATH = "clearsTracker";
 
 		public static string STATIC_HOST_URL = "https://bhm.blishhud.com/Soeed.RaidClears/static/";
@@ -120,6 +122,8 @@ namespace RaidClears
 				}
 				Service.Gw2ApiManager.add_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)Gw2ApiManager_SubtokenUpdated);
 				Service.MentorAchievementProgress.ProgressUpdated += new EventHandler<MentorProgressUpdatedEventArgs>(MentorAchievementProgress_ProgressUpdated);
+				Service.Settings.RaidSettings.RaidPanelMentorProgressPopupReposition.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)MentorProgressPopupReposition_SettingChanged);
+				UpdateMentorProgressExamplePopup(Service.Settings.RaidSettings.RaidPanelMentorProgressPopupReposition.get_Value());
 				DispatchClears();
 			}
 			catch (Exception e2)
@@ -145,6 +149,8 @@ namespace RaidClears
 
 		protected override void Unload()
 		{
+			Service.Settings.RaidSettings.RaidPanelMentorProgressPopupReposition.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)MentorProgressPopupReposition_SettingChanged);
+			RemoveMentorProgressExamplePopup();
 			Service.MentorAchievementProgress.ProgressUpdated -= new EventHandler<MentorProgressUpdatedEventArgs>(MentorAchievementProgress_ProgressUpdated);
 			Service.Gw2ApiManager.remove_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)Gw2ApiManager_SubtokenUpdated);
 			if (Service.CornerIcon != null)
@@ -197,6 +203,7 @@ namespace RaidClears
 			Service.StrikesWindow?.Update();
 			Service.FractalWindow?.Update();
 			Service.ResetWatcher?.Update(gameTime);
+			_mentorProgressExamplePopup?.UpdateDrag();
 		}
 
 		private void CornerIcon_IconLeftClicked(object sender, bool e)
@@ -215,6 +222,8 @@ namespace RaidClears
 
 		private void MentorAchievementProgress_ProgressUpdated(object? sender, MentorProgressUpdatedEventArgs e)
 		{
+			//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0104: Unknown result type (might be due to invalid IL or missing references)
 			SettingService settings = Service.Settings;
 			if (settings == null || !(settings.RaidSettings?.RaidPanelMentorProgress?.get_Value()).GetValueOrDefault())
 			{
@@ -232,12 +241,26 @@ namespace RaidClears
 				return;
 			}
 			List<MentorProgressChange> changes = new List<MentorProgressChange>(e.Changes);
+			Point savedPos = Service.Settings.RaidSettings.RaidPanelMentorProgressPopupPosition.get_Value();
 			GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate
 			{
 				//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-				//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
-				int num = ((Control)GameService.Graphics.get_SpriteScreen()).get_Size().X - 300 - 20;
-				int num2 = 80;
+				//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0132: Unknown result type (might be due to invalid IL or missing references)
+				Point size = ((Control)GameService.Graphics.get_SpriteScreen()).get_Size();
+				int num;
+				int num2;
+				if (savedPos.X >= 0 && savedPos.Y >= 0)
+				{
+					num = savedPos.X;
+					num2 = savedPos.Y;
+				}
+				else
+				{
+					num = size.X - 300 - 20;
+					num2 = 80;
+				}
 				foreach (MentorProgressChange current in changes)
 				{
 					if (current.Delta > 0)
@@ -249,6 +272,71 @@ namespace RaidClears
 						((Control)obj).set_Location(new Point(num, num2));
 						num2 += 80;
 					}
+				}
+			});
+		}
+
+		private void MentorProgressPopupReposition_SettingChanged(object sender, ValueChangedEventArgs<bool> e)
+		{
+			UpdateMentorProgressExamplePopup(e.get_NewValue());
+		}
+
+		private void UpdateMentorProgressExamplePopup(bool repositionEnabled)
+		{
+			GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate
+			{
+				//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+				//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+				//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+				//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+				//IL_008f: Unknown result type (might be due to invalid IL or missing references)
+				if (repositionEnabled)
+				{
+					if (_mentorProgressExamplePopup == null)
+					{
+						Point value = Service.Settings.RaidSettings.RaidPanelMentorProgressPopupPosition.get_Value();
+						int num;
+						int num2;
+						if (value.X >= 0 && value.Y >= 0)
+						{
+							num = value.X;
+							num2 = value.Y;
+						}
+						else
+						{
+							num = ((Control)GameService.Graphics.get_SpriteScreen()).get_Size().X - 300 - 20;
+							num2 = 80;
+						}
+						Module module = this;
+						MentorProgressExamplePopupPanel mentorProgressExamplePopupPanel = new MentorProgressExamplePopupPanel();
+						((Control)mentorProgressExamplePopupPanel).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+						((Control)mentorProgressExamplePopupPanel).set_Location(new Point(num, num2));
+						module._mentorProgressExamplePopup = mentorProgressExamplePopupPanel;
+					}
+				}
+				else
+				{
+					RemoveMentorProgressExamplePopup();
+				}
+			});
+		}
+
+		private void RemoveMentorProgressExamplePopup()
+		{
+			GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate
+			{
+				//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+				if (_mentorProgressExamplePopup != null)
+				{
+					Point location = ((Control)_mentorProgressExamplePopup).get_Location();
+					Service.Settings.RaidSettings.RaidPanelMentorProgressPopupPosition.set_Value(location);
+					((Control)_mentorProgressExamplePopup).Dispose();
+					_mentorProgressExamplePopup = null;
 				}
 			});
 		}

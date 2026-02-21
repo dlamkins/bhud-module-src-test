@@ -142,6 +142,10 @@ namespace RaidClears.Settings.Models
 				public static Setting<bool> mentorProgress = new Setting<bool>("RCMentorProgress", DefaultValue: true, () => Strings.Setting_Raid_MentorProgress_Label, () => Strings.Setting_Raid_MentorProgress_Tooltip);
 
 				public static Setting<bool> mentorProgressPopup = new Setting<bool>("RCMentorProgressPopup", DefaultValue: false, () => Strings.Setting_Raid_MentorProgressPopup_Label, () => Strings.Setting_Raid_MentorProgressPopup_Tooltip);
+
+				public static Setting<bool> mentorProgressPopupReposition = new Setting<bool>("RCMentorProgressPopupReposition", DefaultValue: false, () => Strings.Setting_Raid_MentorProgressPopupReposition_Label, () => Strings.Setting_Raid_MentorProgressPopupReposition_Tooltip);
+
+				public static Setting<Point> mentorProgressPopupPosition = new Setting<Point>("RCMentorProgressPopupPosition", new Point(-1, -1));
 			}
 		}
 

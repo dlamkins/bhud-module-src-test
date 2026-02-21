@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Blish_HUD.Settings;
+using Microsoft.Xna.Framework;
 
 namespace RaidClears.Settings.Models
 {
@@ -18,6 +19,10 @@ namespace RaidClears.Settings.Models
 		public SettingEntry<bool> RaidPanelMentorProgress { get; set; }
 
 		public SettingEntry<bool> RaidPanelMentorProgressPopup { get; set; }
+
+		public SettingEntry<bool> RaidPanelMentorProgressPopupReposition { get; set; }
+
+		public SettingEntry<Point> RaidPanelMentorProgressPopupPosition { get; set; }
 
 		public SettingEntry<string> RaidPanelColorEmbolden { get; set; }
 
@@ -47,6 +52,8 @@ namespace RaidClears.Settings.Models
 			RaidPanelOmitEventEncounters = settings.DefineSetting(Settings.Raids.Module.omitEventEncounters);
 			RaidPanelMentorProgress = settings.DefineSetting(Settings.Raids.Module.mentorProgress);
 			RaidPanelMentorProgressPopup = settings.DefineSetting(Settings.Raids.Module.mentorProgressPopup);
+			RaidPanelMentorProgressPopupReposition = settings.DefineSetting(Settings.Raids.Module.mentorProgressPopupReposition);
+			RaidPanelMentorProgressPopupPosition = settings.DefineSetting(Settings.Raids.Module.mentorProgressPopupPosition);
 			Style = new DisplayStyle
 			{
 				Color = new DisplayColor

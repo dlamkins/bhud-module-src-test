@@ -398,6 +398,12 @@ namespace RaidClears.Localization
 
 		internal static string Setting_Raid_MentorProgressPopup_Tooltip => ResourceManager.GetString("Setting_Raid_MentorProgressPopup_Tooltip", resourceCulture);
 
+		internal static string Setting_Raid_MentorProgressPopupReposition_Label => ResourceManager.GetString("Setting_Raid_MentorProgressPopupReposition_Label", resourceCulture);
+
+		internal static string Setting_Raid_MentorProgressPopupReposition_Tooltip => ResourceManager.GetString("Setting_Raid_MentorProgressPopupReposition_Tooltip", resourceCulture);
+
+		internal static string MentorProgress_ExamplePopup_Title => ResourceManager.GetString("MentorProgress_ExamplePopup_Title", resourceCulture);
+
 		internal static string Setting_Raid_Drag_Label => ResourceManager.GetString("Setting_Raid_Drag_Label", resourceCulture);
 
 		internal static string Setting_Raid_Drag_Tooltip => ResourceManager.GetString("Setting_Raid_Drag_Tooltip", resourceCulture);
