@@ -52,7 +52,13 @@ namespace CinemaHUD.UI.Windows.MainSettings
 
 		private Menu _categoryMenu;
 
-		private FlowPanel _contentPanel;
+		private Panel _menuPanel;
+
+		private Panel _contentContainer;
+
+		private Panel _headerSection;
+
+		private FlowPanel _cardsPanel;
 
 		private readonly Dictionary<string, ListCard> _streamCards = new Dictionary<string, ListCard>();
 
@@ -133,34 +139,34 @@ namespace CinemaHUD.UI.Windows.MainSettings
 
 		private void BuildCategoryMenu(Container parent)
 		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004e: Expected O, but got Unknown
-			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0053: Expected O, but got Unknown
 			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
 			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0099: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ec: Expected O, but got Unknown
+			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fb: Expected O, but got Unknown
 			Panel val = new Panel();
 			val.set_ShowBorder(true);
 			((Control)val).set_Size(new Point(240, ((Control)parent).get_Height() - 110));
@@ -168,7 +174,7 @@ namespace CinemaHUD.UI.Windows.MainSettings
 			val.set_Title("Categories");
 			((Control)val).set_Parent(parent);
 			val.set_CanScroll(true);
-			Panel menuPanel = val;
+			_menuPanel = val;
 			Image val2 = new Image();
 			val2.set_Texture(global::CinemaModule.CinemaModule.Instance.TextureService.GetRefreshIcon());
 			((Control)val2).set_Size(new Point(24, 24));
@@ -181,14 +187,15 @@ namespace CinemaHUD.UI.Windows.MainSettings
 				await RefreshAllAsync();
 			});
 			Menu val3 = new Menu();
-			Rectangle contentRegion = ((Container)menuPanel).get_ContentRegion();
+			Rectangle contentRegion = ((Container)_menuPanel).get_ContentRegion();
 			((Control)val3).set_Size(((Rectangle)(ref contentRegion)).get_Size());
 			val3.set_MenuItemHeight(50);
-			((Control)val3).set_Parent((Container)(object)menuPanel);
+			((Control)val3).set_Parent((Container)(object)_menuPanel);
 			val3.set_CanSelect(true);
 			_categoryMenu = val3;
 			PopulateCategoryMenu();
 			_categoryMenu.add_ItemSelected((EventHandler<ControlActivatedEventArgs>)OnCategorySelected);
+			((Control)parent).add_Resized((EventHandler<ResizedEventArgs>)OnParentResized);
 		}
 
 		private void PopulateCategoryMenu()
@@ -208,25 +215,66 @@ namespace CinemaHUD.UI.Windows.MainSettings
 		{
 			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0071: Expected O, but got Unknown
-			FlowPanel val = new FlowPanel();
-			val.set_FlowDirection((ControlFlowDirection)3);
+			//IL_004e: Expected O, but got Unknown
+			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0073: Expected O, but got Unknown
+			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0087: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e5: Expected O, but got Unknown
+			Panel val = new Panel();
 			((Control)val).set_Size(new Point(((Control)parent).get_Width() - 240 - 90, ((Control)parent).get_Height() - 110));
 			((Control)val).set_Location(new Point(269, 10));
-			val.set_ControlPadding(new Vector2(0f, 4f));
-			((Panel)val).set_CanScroll(true);
-			((Panel)val).set_ShowBorder(true);
+			val.set_ShowBorder(true);
 			((Control)val).set_Parent(parent);
-			_contentPanel = val;
+			_contentContainer = val;
+			Panel val2 = new Panel();
+			((Container)val2).set_WidthSizingMode((SizingMode)2);
+			((Control)val2).set_Height(0);
+			((Control)val2).set_Parent((Container)(object)_contentContainer);
+			_headerSection = val2;
+			FlowPanel val3 = new FlowPanel();
+			val3.set_FlowDirection((ControlFlowDirection)3);
+			((Control)val3).set_Size(new Point(((Container)_contentContainer).get_ContentRegion().Width, ((Container)_contentContainer).get_ContentRegion().Height));
+			((Control)val3).set_Location(new Point(0, 0));
+			val3.set_ControlPadding(new Vector2(0f, 4f));
+			((Panel)val3).set_CanScroll(true);
+			((Control)val3).set_Parent((Container)(object)_contentContainer);
+			_cardsPanel = val3;
+		}
+
+		private void OnParentResized(object sender, ResizedEventArgs e)
+		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+			Container val = (Container)sender;
+			int newHeight = ((Control)val).get_Height() - 110;
+			int newWidth = ((Control)val).get_Width() - 240 - 90;
+			((Control)_menuPanel).set_Height(newHeight);
+			((Control)_categoryMenu).set_Height(((Container)_menuPanel).get_ContentRegion().Height);
+			((Control)_contentContainer).set_Size(new Point(newWidth, newHeight));
+			((Control)_cardsPanel).set_Width(((Container)_contentContainer).get_ContentRegion().Width);
+			UpdateCardsPanelLayout();
 		}
 
 		private void SelectInitialCategory()
@@ -281,13 +329,24 @@ namespace CinemaHUD.UI.Windows.MainSettings
 			}
 		}
 
+		private void UpdateCardsPanelLayout()
+		{
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+			((Control)_cardsPanel).set_Location(new Point(0, ((Control)_headerSection).get_Height()));
+			((Control)_cardsPanel).set_Height(((Container)_contentContainer).get_ContentRegion().Height - ((Control)_headerSection).get_Height());
+		}
+
 		private void RefreshContent()
 		{
 			_contentCts?.Cancel();
 			_contentCts?.Dispose();
 			_contentCts = new CancellationTokenSource();
 			_streamCards.Clear();
-			((Container)_contentPanel).ClearChildren();
+			((Container)_headerSection).ClearChildren();
+			((Control)_headerSection).set_Height(0);
+			((Container)_cardsPanel).ClearChildren();
+			UpdateCardsPanelLayout();
 			if (_selectedCategoryId == "Followed Channels")
 			{
 				LoadFollowedContentAsync(_contentCts.Token);
@@ -334,7 +393,7 @@ namespace CinemaHUD.UI.Windows.MainSettings
 						return;
 					}
 					string key = "followed:" + stream.ChannelName;
-					_cardFactory.CreateFollowedCard(_contentPanel, key, stream, SelectFollowedChannel);
+					_cardFactory.CreateFollowedCard(_cardsPanel, key, stream, SelectFollowedChannel);
 				}
 				LoadFollowedAvatarsAsync(followedStreams, token);
 			}
@@ -343,7 +402,7 @@ namespace CinemaHUD.UI.Windows.MainSettings
 				if (!token.IsCancellationRequested)
 				{
 					Logger.Warn(ex, "Failed to load followed channels");
-					((Container)_contentPanel).ClearChildren();
+					((Container)_cardsPanel).ClearChildren();
 					BuildTwitchToolbar();
 					ShowEmptyMessage("Failed to load followed channels");
 				}
@@ -386,7 +445,7 @@ namespace CinemaHUD.UI.Windows.MainSettings
 				{
 					return;
 				}
-				_cardFactory.CreateTwitchCard(_contentPanel, item, SelectTwitchChannel);
+				_cardFactory.CreateTwitchCard(_cardsPanel, item, SelectTwitchChannel);
 			}
 			LoadAvatarsAsync(items, token);
 		}
@@ -426,7 +485,7 @@ namespace CinemaHUD.UI.Windows.MainSettings
 				{
 					return;
 				}
-				_cardFactory.CreateChannelCard(_contentPanel, item2, SelectChannel);
+				_cardFactory.CreateChannelCard(_cardsPanel, item2, SelectChannel);
 			}
 			if (hasBothSections)
 			{
@@ -438,7 +497,7 @@ namespace CinemaHUD.UI.Windows.MainSettings
 				{
 					return;
 				}
-				_cardFactory.CreateChannelCard(_contentPanel, item, SelectChannel);
+				_cardFactory.CreateChannelCard(_cardsPanel, item, SelectChannel);
 			}
 			LoadAvatarsAsync(items, token);
 		}
@@ -464,7 +523,7 @@ namespace CinemaHUD.UI.Windows.MainSettings
 			{
 				statusMap.TryGetValue(stream.Id, out var status);
 				string key = GetSavedStreamKey(stream.Id);
-				_cardFactory.CreateCustomCard(_contentPanel, key, stream, status, delegate
+				_cardFactory.CreateCustomCard(_cardsPanel, key, stream, status, delegate
 				{
 					_settings.DeleteSavedStream(stream.Id);
 				}, delegate
@@ -515,17 +574,17 @@ namespace CinemaHUD.UI.Windows.MainSettings
 			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
 			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-			((Container)_contentPanel).ClearChildren();
+			((Container)_cardsPanel).ClearChildren();
 			Panel val = new Panel();
 			((Container)val).set_WidthSizingMode((SizingMode)2);
 			((Control)val).set_Height(200);
-			((Control)val).set_Parent((Container)(object)_contentPanel);
+			((Control)val).set_Parent((Container)(object)_cardsPanel);
 			Panel container = val;
 			StandardButton val2 = new StandardButton();
 			val2.set_Text("Login to Twitch");
 			((Control)val2).set_Width(160);
 			((Control)val2).set_Height(40);
-			((Control)val2).set_Left((((Control)_contentPanel).get_Width() - 160) / 2);
+			((Control)val2).set_Left((((Control)_contentContainer).get_Width() - 160) / 2);
 			((Control)val2).set_Top(80);
 			((Control)val2).set_Parent((Container)(object)container);
 			((Control)val2).add_Click((EventHandler<MouseEventArgs>)delegate
@@ -536,21 +595,22 @@ namespace CinemaHUD.UI.Windows.MainSettings
 
 		private void BuildTwitchToolbar()
 		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0021: Expected O, but got Unknown
-			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0082: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002e: Expected O, but got Unknown
+			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
+			((Control)_headerSection).set_Height(40);
 			Panel val = new Panel();
 			((Container)val).set_WidthSizingMode((SizingMode)2);
 			((Control)val).set_Height(40);
-			((Control)val).set_Parent((Container)(object)_contentPanel);
+			((Control)val).set_Parent((Container)(object)_headerSection);
 			Panel toolbar = val;
 			string text = ((_twitchAuthService.IsAuthenticated && !string.IsNullOrEmpty(_twitchAuthService.Username)) ? ("Twitch: " + _twitchAuthService.Username) : "Twitch Login");
 			StandardButton val2 = new StandardButton();
@@ -563,35 +623,37 @@ namespace CinemaHUD.UI.Windows.MainSettings
 			{
 				ShowTwitchAuthWindow();
 			});
+			UpdateCardsPanelLayout();
 		}
 
 		private void BuildFollowedHeader(int liveCount)
 		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0021: Expected O, but got Unknown
-			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002e: Expected O, but got Unknown
+			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
+			((Control)_headerSection).set_Height(50);
 			Panel val = new Panel();
 			((Container)val).set_WidthSizingMode((SizingMode)2);
 			((Control)val).set_Height(50);
-			((Control)val).set_Parent((Container)(object)_contentPanel);
+			((Control)val).set_Parent((Container)(object)_headerSection);
 			Panel headerPanel = val;
 			string username = _twitchAuthService.Username ?? "Unknown";
 			string statsText = ((liveCount > 0) ? $"Logged in as {username}  •  {liveCount} followed channels live" : ("Logged in as " + username));
@@ -608,7 +670,7 @@ namespace CinemaHUD.UI.Windows.MainSettings
 			val3.set_Text("Logout");
 			((Control)val3).set_Width(80);
 			((Control)val3).set_Height(26);
-			((Control)val3).set_Left(((Control)_contentPanel).get_Width() - 110);
+			((Control)val3).set_Left(((Control)_contentContainer).get_Width() - 110);
 			((Control)val3).set_Top(12);
 			((Control)val3).set_Parent((Container)(object)headerPanel);
 			((Control)val3).add_Click((EventHandler<MouseEventArgs>)async delegate
@@ -618,33 +680,35 @@ namespace CinemaHUD.UI.Windows.MainSettings
 				_settings.TwitchRefreshToken = string.Empty;
 				RefreshContent();
 			});
+			UpdateCardsPanelLayout();
 		}
 
 		private void BuildCustomToolbar()
 		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0021: Expected O, but got Unknown
+			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002e: Expected O, but got Unknown
+			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0099: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
+			((Control)_headerSection).set_Height(40);
 			Panel val = new Panel();
 			((Container)val).set_WidthSizingMode((SizingMode)2);
 			((Control)val).set_Height(40);
-			((Control)val).set_Parent((Container)(object)_contentPanel);
+			((Control)val).set_Parent((Container)(object)_headerSection);
 			Panel toolbar = val;
 			Label val2 = new Label();
 			val2.set_Text("Add your own Twitch channels or streams");
@@ -657,13 +721,14 @@ namespace CinemaHUD.UI.Windows.MainSettings
 			StandardButton val3 = new StandardButton();
 			val3.set_Text("+ Add New");
 			((Control)val3).set_Width(100);
-			((Control)val3).set_Left(((Control)_contentPanel).get_Width() - 110);
+			((Control)val3).set_Left(((Control)_contentContainer).get_Width() - 110);
 			((Control)val3).set_Top(5);
 			((Control)val3).set_Parent((Container)(object)toolbar);
 			((Control)val3).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				OpenEditorForNew();
 			});
+			UpdateCardsPanelLayout();
 		}
 
 		private void BuildCategoryHeader(StreamCategory category)
@@ -683,27 +748,27 @@ namespace CinemaHUD.UI.Windows.MainSettings
 			//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0109: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0119: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0121: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0129: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0132: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_014e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0155: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0166: Unknown result type (might be due to invalid IL or missing references)
 			if (string.IsNullOrEmpty(category.Description) && string.IsNullOrEmpty(category.InfoUrl))
 			{
 				return;
 			}
 			Panel val = new Panel();
 			((Container)val).set_WidthSizingMode((SizingMode)2);
-			((Control)val).set_Parent((Container)(object)_contentPanel);
+			((Control)val).set_Parent((Container)(object)_headerSection);
 			Panel headerPanel = val;
 			int contentHeight = 0;
 			if (!string.IsNullOrEmpty(category.Description))
 			{
 				bool hasInfoButton = !string.IsNullOrEmpty(category.InfoUrl);
-				int labelWidth = ((Control)_contentPanel).get_Width() - (hasInfoButton ? 90 : 40);
+				int labelWidth = ((Control)_contentContainer).get_Width() - (hasInfoButton ? 90 : 40);
 				Label val2 = new Label();
 				val2.set_Text(category.Description);
 				((Control)val2).set_Width(Math.Max(labelWidth, 100));
@@ -717,6 +782,7 @@ namespace CinemaHUD.UI.Windows.MainSettings
 				contentHeight = ((Control)val2).get_Height();
 			}
 			((Control)headerPanel).set_Height(Math.Max(contentHeight + 20, 46));
+			((Control)_headerSection).set_Height(((Control)headerPanel).get_Height());
 			if (!string.IsNullOrEmpty(category.InfoUrl))
 			{
 				string infoUrl = category.InfoUrl;
@@ -724,7 +790,7 @@ namespace CinemaHUD.UI.Windows.MainSettings
 				val3.set_Text("Info");
 				((Control)val3).set_Width(50);
 				((Control)val3).set_Height(26);
-				((Control)val3).set_Left(((Control)_contentPanel).get_Width() - 80);
+				((Control)val3).set_Left(((Control)_contentContainer).get_Width() - 80);
 				((Control)val3).set_Top((((Control)headerPanel).get_Height() - 26) / 2);
 				((Control)val3).set_Parent((Container)(object)headerPanel);
 				((Control)val3).set_BasicTooltipText("Open in browser");
@@ -733,6 +799,7 @@ namespace CinemaHUD.UI.Windows.MainSettings
 					OpenUrlInBrowser(infoUrl);
 				});
 			}
+			UpdateCardsPanelLayout();
 		}
 
 		private void BuildSectionHeader(string title)
@@ -754,7 +821,7 @@ namespace CinemaHUD.UI.Windows.MainSettings
 			Panel val = new Panel();
 			((Container)val).set_WidthSizingMode((SizingMode)2);
 			((Control)val).set_Height(32);
-			((Control)val).set_Parent((Container)(object)_contentPanel);
+			((Control)val).set_Parent((Container)(object)_cardsPanel);
 			Panel headerPanel = val;
 			Label val2 = new Label();
 			val2.set_Text(title);
@@ -777,22 +844,22 @@ namespace CinemaHUD.UI.Windows.MainSettings
 			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0039: Expected O, but got Unknown
-			((Container)_contentPanel).ClearChildren();
+			((Container)_cardsPanel).ClearChildren();
 			Panel val = new Panel();
 			((Container)val).set_WidthSizingMode((SizingMode)2);
 			((Control)val).set_Height(100);
-			((Control)val).set_Parent((Container)(object)_contentPanel);
+			((Control)val).set_Parent((Container)(object)_cardsPanel);
 			Panel container = val;
 			LoadingSpinner val2 = new LoadingSpinner();
 			((Control)val2).set_Parent((Container)(object)container);
 			LoadingSpinner spinner = val2;
-			((Control)spinner).set_Left((((Control)_contentPanel).get_Width() - ((Control)spinner).get_Width()) / 2);
+			((Control)spinner).set_Left((((Control)_contentContainer).get_Width() - ((Control)spinner).get_Width()) / 2);
 			((Control)spinner).set_Top((((Control)container).get_Height() - ((Control)spinner).get_Height()) / 2);
 		}
 
 		private void ReplaceSpinnerWithContent()
 		{
-			((Container)_contentPanel).ClearChildren();
+			((Container)_cardsPanel).ClearChildren();
 		}
 
 		private void ShowEmptyMessage(string message)
@@ -813,7 +880,7 @@ namespace CinemaHUD.UI.Windows.MainSettings
 			Panel val = new Panel();
 			((Container)val).set_WidthSizingMode((SizingMode)2);
 			((Control)val).set_Height(40);
-			((Control)val).set_Parent((Container)(object)_contentPanel);
+			((Control)val).set_Parent((Container)(object)_cardsPanel);
 			Panel container = val;
 			Label val2 = new Label();
 			val2.set_Text(message);
@@ -1080,6 +1147,11 @@ namespace CinemaHUD.UI.Windows.MainSettings
 			_contentCts?.Dispose();
 			_cts?.Cancel();
 			_cts?.Dispose();
+			Panel contentContainer = _contentContainer;
+			if (((contentContainer != null) ? ((Control)contentContainer).get_Parent() : null) != null)
+			{
+				((Control)((Control)_contentContainer).get_Parent()).remove_Resized((EventHandler<ResizedEventArgs>)OnParentResized);
+			}
 			_categoryMenu.remove_ItemSelected((EventHandler<ControlActivatedEventArgs>)OnCategorySelected);
 			_settings.SavedStreamsChanged -= OnSavedStreamsChanged;
 			_presetService.PresetsLoaded -= OnPresetsLoaded;

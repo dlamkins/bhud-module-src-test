@@ -26,8 +26,6 @@ namespace CinemaModule.UI.VideoDisplays
 
 		private const float CrossProductEpsilon = 0.001f;
 
-		private const int SpinnerSize = 64;
-
 		private Texture2D _videoTexture;
 
 		private WorldPosition3D _worldPosition;
@@ -145,8 +143,6 @@ namespace CinemaModule.UI.VideoDisplays
 				}
 			}
 		}
-
-		public bool IsBuffering { get; set; }
 
 		public bool IsOffline { get; set; }
 
@@ -627,7 +623,6 @@ namespace CinemaModule.UI.VideoDisplays
 			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00af: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
 			if (_isOnScreen)
 			{
 				GraphicsDevice graphicsDevice = ((GraphicsResource)spriteBatch).get_GraphicsDevice();
@@ -648,23 +643,7 @@ namespace CinemaModule.UI.VideoDisplays
 				{
 					spriteBatch.Begin((SpriteSortMode)0, BlendState.AlphaBlend, SamplerState.LinearClamp, (DepthStencilState)null, (RasterizerState)null, (Effect)null, (Matrix?)null);
 				}
-				if (IsBuffering)
-				{
-					DrawBufferingSpinner(spriteBatch, bounds);
-				}
 			}
-		}
-
-		private void DrawBufferingSpinner(SpriteBatch spriteBatch, Rectangle bounds)
-		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-			Rectangle spinnerRect = default(Rectangle);
-			((Rectangle)(ref spinnerRect))._002Ector(bounds.X + (bounds.Width - 64) / 2, bounds.Y + (bounds.Height - 64) / 2, 64, 64);
-			LoadingSpinnerUtil.DrawLoadingSpinner((Control)(object)this, spriteBatch, spinnerRect);
 		}
 
 		protected override void DisposeControl()

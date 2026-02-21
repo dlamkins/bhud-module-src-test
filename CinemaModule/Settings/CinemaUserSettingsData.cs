@@ -58,6 +58,8 @@ namespace CinemaModule.Settings
 
 		public int SelectedSettingsTab { get; set; }
 
+		public int SettingsWindowHeight { get; set; }
+
 		public bool TwitchChatWindowLocked { get; set; }
 
 		public bool TwitchChatWindowOpen { get; set; }

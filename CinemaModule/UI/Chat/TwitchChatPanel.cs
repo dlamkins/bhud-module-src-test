@@ -6,7 +6,6 @@ using Blish_HUD.Input;
 using CinemaModule.Models;
 using CinemaModule.Services;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace CinemaModule.UI.Chat
 {
@@ -23,8 +22,6 @@ namespace CinemaModule.UI.Chat
 		private const int SendButtonWidth = 50;
 
 		private const int PauseButtonWidth = 80;
-
-		private static readonly Color BorderColor = new Color(100, 65, 165);
 
 		private readonly TwitchChatService _chatService;
 
@@ -523,35 +520,6 @@ namespace CinemaModule.UI.Chat
 			((Control)_inputBox).set_Enabled(canSend);
 			int pauseX = (isAuthenticated ? (((Control)_inputPanel).get_Width() - 50 - 80 - 10) : (((Control)_inputPanel).get_Width() - 80 - 5));
 			((Control)_pauseButton).set_Location(new Point(pauseX, 5));
-		}
-
-		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
-		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-			((Panel)this).PaintBeforeChildren(spriteBatch, bounds);
-			Texture2D pixel = Textures.get_Pixel();
-			spriteBatch.Draw(pixel, new Rectangle(bounds.X, bounds.Y, bounds.Width, 1), BorderColor);
-			spriteBatch.Draw(pixel, new Rectangle(bounds.X, ((Rectangle)(ref bounds)).get_Bottom() - 1, bounds.Width, 1), BorderColor);
-			spriteBatch.Draw(pixel, new Rectangle(bounds.X, bounds.Y, 1, bounds.Height), BorderColor);
-			spriteBatch.Draw(pixel, new Rectangle(((Rectangle)(ref bounds)).get_Right() - 1, bounds.Y, 1, bounds.Height), BorderColor);
 		}
 
 		protected override void DisposeControl()

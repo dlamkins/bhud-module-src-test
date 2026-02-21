@@ -16,11 +16,15 @@ namespace CinemaHUD.UI.Windows.MainSettings
 	{
 		private const int WindowWidth = 890;
 
-		private const int WindowHeight = 680;
+		private const int BackgroundHeight = 688;
+
+		private const int MinWindowHeight = 460;
+
+		private const int MaxWindowHeight = 1400;
 
 		private const int ContentWidth = 836;
 
-		private const int ContentHeight = 631;
+		private const int ContentHeightOffset = 49;
 
 		private readonly CinemaSettings _settings;
 
@@ -40,8 +44,10 @@ namespace CinemaHUD.UI.Windows.MainSettings
 
 		private StandardButton _infoButton;
 
+		private int _fixedWidth;
+
 		public CinemaSettingsWindow(CinemaSettings settings, CinemaUserSettings userSettings, CinemaController controller, AsyncTexture2D emblemTexture, Gw2MapService mapService, TwitchService twitchService, TwitchAuthService twitchAuthService, PresetService presetService)
-			: this(AsyncTexture2D.FromAssetId(155985), new Rectangle(40, 26, 890, 680), new Rectangle(70, 36, 836, 631))
+			: this(AsyncTexture2D.FromAssetId(155985), new Rectangle(40, 26, 890, 688), new Rectangle(70, 36, 836, 639))
 		{
 			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
@@ -59,10 +65,24 @@ namespace CinemaHUD.UI.Windows.MainSettings
 			((Control)this).set_Location(new Point(300, 300));
 			((WindowBase2)this).set_SavesPosition(true);
 			((WindowBase2)this).set_Id("CinemaModule_SettingsWindow");
+			((WindowBase2)this).set_CanResize(true);
 			BuildTabs();
 			BuildInfoButton();
+			_fixedWidth = ((Control)this).get_Width();
 			((TabbedWindow2)this).add_TabChanged((EventHandler<ValueChangedEventArgs<Tab>>)OnTabChanged);
+			((Control)this).add_Resized((EventHandler<ResizedEventArgs>)OnWindowResized);
 			UpdateSubtitleForCurrentTab();
+			ApplySavedHeight();
+		}
+
+		private void ApplySavedHeight()
+		{
+			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+			int savedHeight = _userSettings.SettingsWindowHeight;
+			if (savedHeight >= 460 && savedHeight <= 1400 && savedHeight != ((Control)this).get_Height())
+			{
+				((Control)this).set_Size(new Point(_fixedWidth, savedHeight));
+			}
 		}
 
 		public override void Show()
@@ -145,6 +165,26 @@ namespace CinemaHUD.UI.Windows.MainSettings
 			{
 				((TabbedWindow2)this).set_SelectedTab(((TabbedWindow2)this).get_Tabs().FromIndex(savedTabIndex));
 			}
+		}
+
+		private void OnWindowResized(object sender, ResizedEventArgs e)
+		{
+			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+			int clampedHeight = Math.Max(460, Math.Min(((Control)this).get_Height(), 1400));
+			if (((Control)this).get_Width() != _fixedWidth || ((Control)this).get_Height() != clampedHeight)
+			{
+				((Control)this).set_Size(new Point(_fixedWidth, clampedHeight));
+			}
+			_userSettings.SettingsWindowHeight = ((Control)this).get_Height() - 40;
+			UpdateInfoButtonPosition();
+		}
+
+		private void UpdateInfoButtonPosition()
+		{
+			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+			((Control)_infoButton).set_Location(new Point(((Container)this).get_ContentRegion().Width - 150, ((Container)this).get_ContentRegion().Height + 10));
 		}
 
 		protected override void DisposeControl()

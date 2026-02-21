@@ -143,8 +143,6 @@ namespace CinemaModule.UI.VideoDisplays
 			}
 		}
 
-		public bool IsBuffering { get; set; }
-
 		public bool IsLocked
 		{
 			get
@@ -364,11 +362,10 @@ namespace CinemaModule.UI.VideoDisplays
 			//IL_010c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0130: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0131: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0145: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0159: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0165: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0171: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0149: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0155: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0161: Unknown result type (might be due to invalid IL or missing references)
 			Rectangle panelRect = default(Rectangle);
 			((Rectangle)(ref panelRect))._002Ector(Location.X, Location.Y, Size.X, Size.Y);
 			Point mousePos = GameService.Input.get_Mouse().get_Position();
@@ -385,10 +382,6 @@ namespace CinemaModule.UI.VideoDisplays
 			else if (_currentTexture != null && !((GraphicsResource)_currentTexture).get_IsDisposed())
 			{
 				spriteBatch.Draw(_currentTexture, videoRect, Color.get_White());
-			}
-			if (IsBuffering)
-			{
-				DrawBufferingSpinner(spriteBatch, panelRect);
 			}
 			DrawBorder(spriteBatch, panelRect, new Color(80, 80, 80, 210));
 			DrawCornerHandles(spriteBatch, panelRect);
@@ -480,18 +473,6 @@ namespace CinemaModule.UI.VideoDisplays
 					spriteBatch.Draw(AsyncTexture2D.op_Implicit(resizeTexture), resizeRect, Color.get_White());
 				}
 			}
-		}
-
-		private void DrawBufferingSpinner(SpriteBatch spriteBatch, Rectangle panelRect)
-		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-			Rectangle spinnerRect = default(Rectangle);
-			((Rectangle)(ref spinnerRect))._002Ector(panelRect.X + (panelRect.Width - 64) / 2, panelRect.Y + (panelRect.Height - 64) / 2, 64, 64);
-			LoadingSpinnerUtil.DrawLoadingSpinner((Control)(object)this, spriteBatch, spinnerRect);
 		}
 
 		protected override void OnLeftMouseButtonPressed(MouseEventArgs e)

@@ -332,6 +332,21 @@ namespace CinemaModule.Settings
 			}
 		}
 
+		public int SettingsWindowHeight
+		{
+			get
+			{
+				return _data.SettingsWindowHeight;
+			}
+			set
+			{
+				SetProperty(_data.SettingsWindowHeight, value, delegate(int v)
+				{
+					_data.SettingsWindowHeight = v;
+				});
+			}
+		}
+
 		public bool TwitchChatWindowLocked
 		{
 			get

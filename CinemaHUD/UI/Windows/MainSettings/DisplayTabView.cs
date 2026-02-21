@@ -62,6 +62,10 @@ namespace CinemaHUD.UI.Windows.MainSettings
 
 		private EventHandler<ValueChangedEventArgs<bool>> _enabledSettingChangedHandler;
 
+		private EventHandler<ResizedEventArgs> _parentResizedHandler;
+
+		private Container _buildPanel;
+
 		public DisplayTabView(CinemaSettings cinemaSettings, CinemaUserSettings settings, CinemaController controller, Gw2MapService mapService, PresetService presetService)
 			: this()
 		{
@@ -74,32 +78,33 @@ namespace CinemaHUD.UI.Windows.MainSettings
 
 		protected override void Build(Container buildPanel)
 		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0044: Expected O, but got Unknown
-			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004b: Expected O, but got Unknown
+			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009a: Expected O, but got Unknown
-			//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a1: Expected O, but got Unknown
+			//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00df: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00eb: Expected O, but got Unknown
+			//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f2: Expected O, but got Unknown
+			_buildPanel = buildPanel;
 			Panel val = new Panel();
 			val.set_ShowBorder(true);
 			val.set_Title("Display Settings");
@@ -134,6 +139,11 @@ namespace CinemaHUD.UI.Windows.MainSettings
 				RebuildLocationCards();
 			};
 			_presetService.PresetsLoaded += _presetsLoadedHandler;
+			_parentResizedHandler = delegate
+			{
+				UpdateSectionSizes();
+			};
+			((Control)buildPanel).add_Resized(_parentResizedHandler);
 		}
 
 		private void BuildDisplayModeSection(Container parent)
@@ -523,6 +533,19 @@ namespace CinemaHUD.UI.Windows.MainSettings
 			}
 		}
 
+		private void UpdateSectionSizes()
+		{
+			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
+			if (_buildPanel != null && _locationSection != null && _locationsContainer != null)
+			{
+				((Control)_locationSection).set_Size(new Point(((Control)_buildPanel).get_Width() - 70, ((Control)_buildPanel).get_Height() - 280));
+				((Control)_locationsContainer).set_Size(new Point(((Container)_locationSection).get_ContentRegion().Width, ((Container)_locationSection).get_ContentRegion().Height - 50));
+			}
+		}
+
 		private CinemaDisplayMode ParseDisplayMode(string name)
 		{
 			if (name == "On-Screen Window")
@@ -581,6 +604,10 @@ namespace CinemaHUD.UI.Windows.MainSettings
 			_settings.SavedLocationsChanged -= _savedLocationsChangedHandler;
 			_presetService.PresetsLoaded -= _presetsLoadedHandler;
 			_cinemaSettings.EnabledSetting.remove_SettingChanged(_enabledSettingChangedHandler);
+			if (_buildPanel != null)
+			{
+				((Control)_buildPanel).remove_Resized(_parentResizedHandler);
+			}
 			LocationEditorWindow editorWindow = _editorWindow;
 			if (editorWindow != null)
 			{

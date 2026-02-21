@@ -326,14 +326,6 @@ namespace CinemaModule.Controllers
 			});
 		}
 
-		public void UpdateBufferingState(bool isBuffering)
-		{
-			ForEachDisplay(delegate(IVideoDisplay d)
-			{
-				d.IsBuffering = isBuffering;
-			});
-		}
-
 		public void UpdateStreamInfo(string title, int? viewerCount, string gameName)
 		{
 			if (_windowDisplay != null)
