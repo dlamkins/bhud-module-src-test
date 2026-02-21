@@ -126,7 +126,19 @@ namespace CinemaHUD.UI.Windows.MainSettings
 		private List<ListCardButton> CreateChannelButtons(ChannelData channel)
 		{
 			List<ListCardButton> buttons = new List<ListCardButton>();
-			if (!string.IsNullOrEmpty(channel?.InfoUrl))
+			if (channel.IsTwitchChannel && !string.IsNullOrEmpty(channel.TwitchName))
+			{
+				string twitchUrl = _twitchService.GetChannelUrl(channel.TwitchName);
+				buttons.Add(CreateIconButton(_textureService.GetInfoIcon(), "Open in Browser", delegate
+				{
+					OpenUrl(twitchUrl);
+				}));
+				buttons.Add(CreateIconButton(_textureService.GetTwitchChatIcon(), "Open Chat", delegate
+				{
+					OnOpenChat?.Invoke(channel.TwitchName);
+				}));
+			}
+			else if (!string.IsNullOrEmpty(channel?.InfoUrl))
 			{
 				buttons.Add(CreateIconButton(_textureService.GetInfoIcon(), "Open in Browser", delegate
 				{

@@ -552,8 +552,9 @@ namespace CinemaHUD.UI.Windows.MainSettings
 			{
 				Key = GetChannelKey(channel.Id),
 				Title = channel.Title,
-				Subtitle = (string.IsNullOrEmpty(channel.Url) ? "No URL configured" : null),
+				Subtitle = ((string.IsNullOrEmpty(channel.Url) && !channel.IsTwitchChannel) ? "No URL configured" : null),
 				ChannelData = channel,
+				TwitchChannel = (channel.IsTwitchChannel ? channel.TwitchName : null),
 				AvatarTexture = (channel.AvatarTexture ?? global::CinemaModule.CinemaModule.Instance.TextureService.GetDefaultAvatar()),
 				IsOnDemand = channel.IsOnDemand,
 				Index = index
@@ -985,11 +986,20 @@ namespace CinemaHUD.UI.Windows.MainSettings
 			await TrySetStreamUrlAsync(() => _twitchService.GetPlayableStreamUrlAsync(channelName), description + ": " + channelName);
 		}
 
-		private void SelectChannel(ChannelData channel, string key)
+		private async void SelectChannel(ChannelData channel, string key)
 		{
 			_selectedStreamKey = key;
-			_settings.SelectUrlChannel(channel);
-			UpdateCardSelection();
+			if (channel.IsTwitchChannel && !string.IsNullOrEmpty(channel.TwitchName))
+			{
+				_settings.SelectTwitchChannel(channel.TwitchName);
+				UpdateCardSelection();
+				await TrySetStreamUrlAsync(() => _twitchService.GetPlayableStreamUrlAsync(channel.TwitchName), "channel: " + channel.Title);
+			}
+			else
+			{
+				_settings.SelectUrlChannel(channel);
+				UpdateCardSelection();
+			}
 		}
 
 		private async void SelectSavedStream(SavedStream stream)

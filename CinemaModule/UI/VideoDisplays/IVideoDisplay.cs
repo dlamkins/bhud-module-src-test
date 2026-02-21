@@ -22,6 +22,8 @@ namespace CinemaModule.UI.VideoDisplays
 
 		Texture2D OfflineTexture { get; set; }
 
+		string RadioTrackName { get; set; }
+
 		event EventHandler PlayPauseClicked;
 
 		event EventHandler<int> VolumeChanged;

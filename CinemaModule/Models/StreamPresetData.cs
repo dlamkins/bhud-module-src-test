@@ -40,5 +40,8 @@ namespace CinemaModule.Models
 
 		[JsonProperty("staticImage")]
 		public override string StaticImage { get; set; }
+
+		[JsonProperty("asylumInfo")]
+		public bool AsylumInfo { get; set; }
 	}
 }

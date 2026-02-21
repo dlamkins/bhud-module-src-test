@@ -46,6 +46,8 @@ namespace CinemaModule.UI.VideoDisplays
 
 		private WorldScreenRenderer _renderer;
 
+		private VideoControlsRenderer _controlsRenderer;
+
 		private float _fadeStartDistance = 65f;
 
 		private float _maxDistance = 70f;
@@ -148,6 +150,8 @@ namespace CinemaModule.UI.VideoDisplays
 
 		public Texture2D OfflineTexture { get; set; }
 
+		public string RadioTrackName { get; set; }
+
 		public WorldPosition3D WorldPosition
 		{
 			get
@@ -196,6 +200,7 @@ namespace CinemaModule.UI.VideoDisplays
 		{
 			_worldPosition = new WorldPosition3D();
 			_renderer = new WorldScreenRenderer(_cornerCalculator);
+			_controlsRenderer = new VideoControlsRenderer(CinemaModule.Instance.TextureService);
 			((Control)this).set_ClipsBounds(false);
 		}
 
@@ -623,26 +628,34 @@ namespace CinemaModule.UI.VideoDisplays
 			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00af: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-			if (_isOnScreen)
+			//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
+			if (!_isOnScreen)
 			{
-				GraphicsDevice graphicsDevice = ((GraphicsResource)spriteBatch).get_GraphicsDevice();
-				_renderer.Initialize(graphicsDevice);
-				spriteBatch.End();
-				try
+				return;
+			}
+			GraphicsDevice graphicsDevice = ((GraphicsResource)spriteBatch).get_GraphicsDevice();
+			_renderer.Initialize(graphicsDevice);
+			spriteBatch.End();
+			try
+			{
+				Gw2MumbleService gw2Mumble = GameService.Gw2Mumble;
+				Vector3 cameraPos = gw2Mumble.get_PlayerCamera().get_Position();
+				Vector3 cameraForward = gw2Mumble.get_PlayerCamera().get_Forward();
+				float fov = gw2Mumble.get_PlayerCamera().get_FieldOfView();
+				float aspectRatio = (float)((Control)GameService.Graphics.get_SpriteScreen()).get_Width() / (float)((Control)GameService.Graphics.get_SpriteScreen()).get_Height();
+				CameraProjection.CreateViewProjectionMatrices(cameraPos, cameraForward, fov, aspectRatio, out var viewMatrix, out var projectionMatrix);
+				Texture2D textureToRender = ((IsOffline && OfflineTexture != null && !((GraphicsResource)OfflineTexture).get_IsDisposed()) ? OfflineTexture : _videoTexture);
+				_renderer.Render(graphicsDevice, viewMatrix, projectionMatrix, textureToRender, _currentOpacity);
+				if (!string.IsNullOrEmpty(RadioTrackName))
 				{
-					Gw2MumbleService gw2Mumble = GameService.Gw2Mumble;
-					Vector3 cameraPos = gw2Mumble.get_PlayerCamera().get_Position();
-					Vector3 cameraForward = gw2Mumble.get_PlayerCamera().get_Forward();
-					float fov = gw2Mumble.get_PlayerCamera().get_FieldOfView();
-					float aspectRatio = (float)((Control)GameService.Graphics.get_SpriteScreen()).get_Width() / (float)((Control)GameService.Graphics.get_SpriteScreen()).get_Height();
-					CameraProjection.CreateViewProjectionMatrices(cameraPos, cameraForward, fov, aspectRatio, out var viewMatrix, out var projectionMatrix);
-					Texture2D textureToRender = ((IsOffline && OfflineTexture != null && !((GraphicsResource)OfflineTexture).get_IsDisposed()) ? OfflineTexture : _videoTexture);
-					_renderer.Render(graphicsDevice, viewMatrix, projectionMatrix, textureToRender, _currentOpacity);
+					Texture2D trackNameTexture = _controlsRenderer.GetOrCreateTrackNameTexture(graphicsDevice, RadioTrackName);
+					_renderer.RenderOverlay(graphicsDevice, viewMatrix, projectionMatrix, trackNameTexture, _currentOpacity);
 				}
-				finally
-				{
-					spriteBatch.Begin((SpriteSortMode)0, BlendState.AlphaBlend, SamplerState.LinearClamp, (DepthStencilState)null, (RasterizerState)null, (Effect)null, (Matrix?)null);
-				}
+			}
+			finally
+			{
+				spriteBatch.Begin((SpriteSortMode)0, BlendState.AlphaBlend, SamplerState.LinearClamp, (DepthStencilState)null, (RasterizerState)null, (Effect)null, (Matrix?)null);
 			}
 		}
 
@@ -654,6 +667,7 @@ namespace CinemaModule.UI.VideoDisplays
 				((Control)controlPanel).Dispose();
 			}
 			_renderer?.Dispose();
+			_controlsRenderer?.DisposeTrackNameTexture();
 			((Control)this).DisposeControl();
 		}
 	}

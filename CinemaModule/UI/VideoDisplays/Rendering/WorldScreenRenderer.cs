@@ -46,6 +46,8 @@ namespace CinemaModule.UI.VideoDisplays.Rendering
 
 		private VertexPositionColorTexture[] _textVertices = (VertexPositionColorTexture[])(object)new VertexPositionColorTexture[4];
 
+		private VertexPositionColorTexture[] _overlayVertices = (VertexPositionColorTexture[])(object)new VertexPositionColorTexture[4];
+
 		private BasicEffect _basicEffect;
 
 		private AsyncTexture2D _logoTexture;
@@ -392,6 +394,137 @@ namespace CinemaModule.UI.VideoDisplays.Rendering
 		{
 			_basicEffect.set_Texture(CinemaModule.Instance.TextureService.IsTextureReady(videoTexture) ? videoTexture : GetTextureOrFallback(_screenOffTexture));
 			ApplyEffectAndDrawQuad(graphicsDevice, _quadVertices, 0);
+		}
+
+		public void RenderOverlay(GraphicsDevice graphicsDevice, Matrix viewMatrix, Matrix projectionMatrix, Texture2D overlayTexture, float opacity)
+		{
+			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0149: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0151: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0153: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0158: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0161: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0168: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0172: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0179: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0183: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0185: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0196: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0201: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0206: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0217: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0219: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0220: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0222: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0227: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0232: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0237: Unknown result type (might be due to invalid IL or missing references)
+			//IL_023c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0248: Unknown result type (might be due to invalid IL or missing references)
+			//IL_024a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_024c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0251: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0253: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0258: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0263: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0268: Unknown result type (might be due to invalid IL or missing references)
+			//IL_026d: Unknown result type (might be due to invalid IL or missing references)
+			if (!_initialized || !_corners.IsValid || !CinemaModule.Instance.TextureService.IsTextureReady(overlayTexture))
+			{
+				return;
+			}
+			(RasterizerState, SamplerState, BlendState, DepthStencilState) savedState = SaveGraphicsState(graphicsDevice);
+			try
+			{
+				SetRenderState(graphicsDevice);
+				_basicEffect.set_World(Matrix.get_Identity());
+				_basicEffect.set_View(viewMatrix);
+				_basicEffect.set_Projection(projectionMatrix);
+				Color color = CreateOpaqueColorWithAlpha(CalculateAlpha(opacity));
+				Vector3[] corners = _corners.WorldCorners;
+				Vector3 right = corners[1] - corners[0];
+				Vector3 down = corners[3] - corners[0];
+				Vector3 overlayOffset = Vector3.Normalize(Vector3.Cross(down, right)) * 0.02f;
+				float textureAspect = (float)overlayTexture.get_Width() / (float)overlayTexture.get_Height();
+				float quadWidth = ((Vector3)(ref right)).Length();
+				float quadHeight = ((Vector3)(ref down)).Length();
+				float boxLeftRatio = 0.42f;
+				float boxRightRatio = 0.92f;
+				float boxTopRatio = 0.07f;
+				float boxBottomRatio = 0.27f;
+				float num = quadWidth * (boxRightRatio - boxLeftRatio);
+				float boxHeight = quadHeight * (boxBottomRatio - boxTopRatio);
+				float fitWidth = num;
+				float fitHeight = fitWidth / textureAspect;
+				if (fitHeight > boxHeight)
+				{
+					fitHeight = boxHeight;
+					fitWidth = fitHeight * textureAspect;
+				}
+				float boxCenterX = boxLeftRatio + (boxRightRatio - boxLeftRatio) / 2f;
+				float boxCenterY = boxTopRatio + (boxBottomRatio - boxTopRatio) / 2f;
+				Vector3 rightNorm = Vector3.Normalize(right);
+				Vector3 downNorm = Vector3.Normalize(down);
+				Vector3 boxCenter = corners[0] + rightNorm * (quadWidth * boxCenterX) + downNorm * (quadHeight * boxCenterY) + overlayOffset;
+				Vector3 halfRight = rightNorm * (fitWidth / 2f);
+				Vector3 halfDown = downNorm * (fitHeight / 2f);
+				_overlayVertices[0] = new VertexPositionColorTexture(boxCenter - halfRight - halfDown, color, new Vector2(0f, 0f));
+				_overlayVertices[1] = new VertexPositionColorTexture(boxCenter + halfRight - halfDown, color, new Vector2(1f, 0f));
+				_overlayVertices[2] = new VertexPositionColorTexture(boxCenter + halfRight + halfDown, color, new Vector2(1f, 1f));
+				_overlayVertices[3] = new VertexPositionColorTexture(boxCenter - halfRight + halfDown, color, new Vector2(0f, 1f));
+				_basicEffect.set_Texture(overlayTexture);
+				ApplyEffectAndDrawQuad(graphicsDevice, _overlayVertices, 0);
+			}
+			finally
+			{
+				RestoreGraphicsState(graphicsDevice, savedState);
+			}
 		}
 
 		private void DrawIndexedQuad(GraphicsDevice graphicsDevice, VertexPositionColorTexture[] vertices, int vertexOffset)

@@ -336,6 +336,14 @@ namespace CinemaModule.Controllers
 			}
 		}
 
+		public void UpdateRadioTrackInfo(string trackName)
+		{
+			ForEachDisplay(delegate(IVideoDisplay d)
+			{
+				d.RadioTrackName = trackName;
+			});
+		}
+
 		public void Dispose()
 		{
 			if (!_isDisposed)

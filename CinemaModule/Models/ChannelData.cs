@@ -1,3 +1,4 @@
+using System;
 using Blish_HUD.Content;
 using Newtonsoft.Json;
 
@@ -40,11 +41,20 @@ namespace CinemaModule.Models
 		[JsonProperty("staticImage")]
 		public override string StaticImage { get; set; }
 
+		[JsonProperty("twitchName")]
+		public string TwitchName { get; set; }
+
 		[JsonProperty("position")]
 		public WorldPosition3D Position { get; set; }
 
 		[JsonProperty("screenWidth")]
 		public float? ScreenWidth { get; set; }
+
+		[JsonProperty("asylumInfo")]
+		public bool AsylumInfo { get; set; }
+
+		[JsonIgnore]
+		public bool IsTwitchChannel => string.Equals(TypeString, "twitch", StringComparison.OrdinalIgnoreCase);
 
 		[JsonIgnore]
 		public bool HasWorldPosition
@@ -101,7 +111,8 @@ namespace CinemaModule.Models
 				Url = Url,
 				InfoUrl = InfoUrl,
 				StaticImage = StaticImage,
-				StaticImageTexture = base.StaticImageTexture
+				StaticImageTexture = base.StaticImageTexture,
+				AsylumInfo = AsylumInfo
 			};
 		}
 	}

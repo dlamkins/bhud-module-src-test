@@ -53,9 +53,49 @@ namespace CinemaHUD.UI.Windows.MainSettings
 
 		public async Task FetchUrlStatusesAsync(List<StreamListItem> items, CancellationToken token)
 		{
-			await Task.WhenAll(from i in items
-				where !string.IsNullOrEmpty(i.ChannelData?.Url)
-				select FetchUrlStatusAsync(i, token));
+			List<StreamListItem> twitchItems = items.Where((StreamListItem i) => (i.ChannelData?.IsTwitchChannel ?? false) && !string.IsNullOrEmpty(i.TwitchChannel)).ToList();
+			List<StreamListItem> source = items.Where(delegate(StreamListItem i)
+			{
+				ChannelData channelData = i.ChannelData;
+				return (channelData == null || !channelData.IsTwitchChannel) && !string.IsNullOrEmpty(i.ChannelData?.Url);
+			}).ToList();
+			Task twitchTask = FetchTwitchStatusesForItemsAsync(twitchItems, token);
+			await Task.WhenAll(source.Select((StreamListItem i) => FetchUrlStatusAsync(i, token)).Concat(new Task[1] { twitchTask }));
+		}
+
+		private async Task FetchTwitchStatusesForItemsAsync(List<StreamListItem> items, CancellationToken token)
+		{
+			if (items.Count == 0)
+			{
+				return;
+			}
+			List<string> channelNames = (from i in items
+				select i.TwitchChannel into c
+				where !string.IsNullOrEmpty(c)
+				select c).ToList();
+			if (channelNames.Count == 0)
+			{
+				return;
+			}
+			try
+			{
+				Dictionary<string, TwitchStreamInfo> infos = await _twitchService.GetMultipleStreamInfoAsync(channelNames);
+				if (token.IsCancellationRequested)
+				{
+					return;
+				}
+				foreach (StreamListItem item in items)
+				{
+					item.ApplyStatus(CreateTwitchStatus(infos, item.TwitchChannel));
+				}
+			}
+			catch (Exception ex)
+			{
+				if (!token.IsCancellationRequested)
+				{
+					Logger.Debug("Failed to fetch Twitch statuses for channel items: " + ex.Message);
+				}
+			}
 		}
 
 		public async Task<Dictionary<string, StreamStatus>> FetchCustomStreamStatusesAsync(List<SavedStream> streams, CancellationToken token)

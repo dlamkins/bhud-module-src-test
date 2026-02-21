@@ -45,6 +45,8 @@ namespace CinemaModule.UI.VideoDisplays
 
 		private WindowVideoControls _controlsOverlay;
 
+		private VideoControlsRenderer _renderer;
+
 		private readonly AsyncTexture2D _textureResizeCorner = CinemaModule.Instance.TextureService.GetResizeCorner();
 
 		private readonly AsyncTexture2D _textureResizeCornerActive = CinemaModule.Instance.TextureService.GetResizeCornerActive();
@@ -195,6 +197,8 @@ namespace CinemaModule.UI.VideoDisplays
 
 		public Texture2D OfflineTexture { get; set; }
 
+		public string RadioTrackName { get; set; }
+
 		public Point Size
 		{
 			get
@@ -275,6 +279,7 @@ namespace CinemaModule.UI.VideoDisplays
 			((Panel)this).set_ShowBorder(false);
 			Size = new Point(800, 450);
 			Location = new Point(100, 50);
+			_renderer = new VideoControlsRenderer(CinemaModule.Instance.TextureService);
 			_controlsOverlay = new WindowVideoControls((Container)(object)this);
 			_controlsOverlay.PlayPauseClicked += delegate
 			{
@@ -362,10 +367,11 @@ namespace CinemaModule.UI.VideoDisplays
 			//IL_010c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0130: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0131: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0149: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0155: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0161: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0162: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0186: Unknown result type (might be due to invalid IL or missing references)
 			Rectangle panelRect = default(Rectangle);
 			((Rectangle)(ref panelRect))._002Ector(Location.X, Location.Y, Size.X, Size.Y);
 			Point mousePos = GameService.Input.get_Mouse().get_Position();
@@ -382,6 +388,10 @@ namespace CinemaModule.UI.VideoDisplays
 			else if (_currentTexture != null && !((GraphicsResource)_currentTexture).get_IsDisposed())
 			{
 				spriteBatch.Draw(_currentTexture, videoRect, Color.get_White());
+			}
+			if (!string.IsNullOrEmpty(RadioTrackName))
+			{
+				_renderer.DrawRadioTrackInfo(spriteBatch, videoRect, RadioTrackName, 1f);
 			}
 			DrawBorder(spriteBatch, panelRect, new Color(80, 80, 80, 210));
 			DrawCornerHandles(spriteBatch, panelRect);

@@ -40,6 +40,10 @@ namespace CinemaModule.UI.Controls
 
 		private readonly AsyncTexture2D _lockActiveIconTexture;
 
+		private RenderTarget2D _trackNameTexture;
+
+		private string _cachedTrackName;
+
 		public VideoControlsRenderer(TextureService textureService)
 		{
 			_textureService = textureService;
@@ -220,6 +224,125 @@ namespace CinemaModule.UI.Controls
 				((Vector2)(ref textPos))._002Ector((float)bounds.X, (float)bounds.Y + (float)(bounds.Height - font.get_LineHeight()) / 2f);
 				BitmapFontExtensions.DrawString(spriteBatch, font, displayText, textPos, textColor, (Rectangle?)null);
 			}
+		}
+
+		public void DrawRadioTrackInfo(SpriteBatch spriteBatch, Rectangle bounds, string trackName, float opacity)
+		{
+			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0100: Unknown result type (might be due to invalid IL or missing references)
+			if (string.IsNullOrEmpty(trackName))
+			{
+				return;
+			}
+			GraphicsDevice graphicsDevice = ((GraphicsResource)spriteBatch).get_GraphicsDevice();
+			UpdateTrackNameTexture(graphicsDevice, trackName);
+			if (_trackNameTexture != null && !((GraphicsResource)_trackNameTexture).get_IsDisposed())
+			{
+				float boxLeftRatio = 0.42f;
+				float boxRightRatio = 0.92f;
+				float boxTopRatio = 0.07f;
+				float boxBottomRatio = 0.27f;
+				int boxX = bounds.X + (int)((float)bounds.Width * boxLeftRatio);
+				int num = bounds.Y + (int)((float)bounds.Height * boxTopRatio);
+				int boxWidth = (int)((float)bounds.Width * (boxRightRatio - boxLeftRatio));
+				int boxHeight = (int)((float)bounds.Height * (boxBottomRatio - boxTopRatio));
+				float textureAspect = (float)((Texture2D)_trackNameTexture).get_Width() / (float)((Texture2D)_trackNameTexture).get_Height();
+				int drawWidth = boxWidth;
+				int drawHeight = (int)((float)drawWidth / textureAspect);
+				if (drawHeight > boxHeight)
+				{
+					drawHeight = boxHeight;
+					drawWidth = (int)((float)drawHeight * textureAspect);
+				}
+				int drawX = boxX + (boxWidth - drawWidth) / 2;
+				int drawY = num + (boxHeight - drawHeight) / 2;
+				Rectangle destRect = default(Rectangle);
+				((Rectangle)(ref destRect))._002Ector(drawX, drawY, drawWidth, drawHeight);
+				Color color = ApplyOpacity(Color.get_White(), opacity);
+				spriteBatch.Draw((Texture2D)(object)_trackNameTexture, destRect, color);
+			}
+		}
+
+		private void UpdateTrackNameTexture(GraphicsDevice graphicsDevice, string trackName)
+		{
+			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0096: Expected O, but got Unknown
+			//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010c: Expected O, but got Unknown
+			//IL_010c: Unknown result type (might be due to invalid IL or missing references)
+			if (_cachedTrackName == trackName && _trackNameTexture != null && !((GraphicsResource)_trackNameTexture).get_IsDisposed())
+			{
+				return;
+			}
+			_cachedTrackName = trackName;
+			RenderTarget2D trackNameTexture = _trackNameTexture;
+			if (trackNameTexture != null)
+			{
+				((GraphicsResource)trackNameTexture).Dispose();
+			}
+			BitmapFont font = GameService.Content.get_DefaultFont32();
+			if (font != null)
+			{
+				string displayText = "Now Playing: " + trackName;
+				Size2 val = font.MeasureString(displayText);
+				int padding = 8;
+				int width = (int)val.Width + padding * 2;
+				int height = (int)val.Height + padding * 2;
+				if (width > 0 && height > 0)
+				{
+					_trackNameTexture = new RenderTarget2D(graphicsDevice, width, height, false, (SurfaceFormat)0, (DepthFormat)0, 0, (RenderTargetUsage)1);
+					RenderTargetBinding[] previousTargets = graphicsDevice.GetRenderTargets();
+					graphicsDevice.SetRenderTarget(_trackNameTexture);
+					graphicsDevice.Clear(Color.get_Transparent());
+					SpriteBatch val2 = new SpriteBatch(graphicsDevice);
+					val2.Begin((SpriteSortMode)0, BlendState.AlphaBlend, (SamplerState)null, (DepthStencilState)null, (RasterizerState)null, (Effect)null, (Matrix?)null);
+					Color textColor = default(Color);
+					((Color)(ref textColor))._002Ector(200, 225, 255);
+					Vector2 textPos = default(Vector2);
+					((Vector2)(ref textPos))._002Ector((float)padding, (float)padding);
+					BitmapFontExtensions.DrawString(val2, font, displayText, textPos, textColor, (Rectangle?)null);
+					val2.End();
+					((GraphicsResource)val2).Dispose();
+					graphicsDevice.SetRenderTargets(previousTargets);
+				}
+			}
+		}
+
+		public Texture2D GetOrCreateTrackNameTexture(GraphicsDevice graphicsDevice, string trackName)
+		{
+			if (string.IsNullOrEmpty(trackName))
+			{
+				return null;
+			}
+			UpdateTrackNameTexture(graphicsDevice, trackName);
+			return (Texture2D)(object)_trackNameTexture;
+		}
+
+		public void DisposeTrackNameTexture()
+		{
+			RenderTarget2D trackNameTexture = _trackNameTexture;
+			if (trackNameTexture != null)
+			{
+				((GraphicsResource)trackNameTexture).Dispose();
+			}
+			_trackNameTexture = null;
+			_cachedTrackName = null;
 		}
 
 		private void DrawBackground(SpriteBatch spriteBatch, AsyncTexture2D texture, Rectangle bounds, float opacity)

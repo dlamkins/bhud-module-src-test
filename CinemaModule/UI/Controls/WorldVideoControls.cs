@@ -313,22 +313,22 @@ namespace CinemaModule.UI.Controls
 		{
 			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0107: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0102: Unknown result type (might be due to invalid IL or missing references)
 			int centerY = 25;
 			int dropdownX = ((Control)_base.VolumeTrackBar).get_Location().X + 100 + 8;
 			int dropdownY = centerY - ((Control)_base.QualityDropdown).get_Height() / 2;
 			((Control)_base.QualityDropdown).set_Location(new Point(dropdownX, dropdownY));
 			bool hasQualities = _base.QualityDropdown.get_Items().Count > 0;
 			((Control)_base.QualityDropdown).set_Visible(hasQualities);
-			int twitchChatX = dropdownX + 140 + 8;
-			_twitchChatBounds = new Rectangle(twitchChatX, centerY - 16, 32, 32);
-			int settingsX = (IsTwitchStream ? ((Rectangle)(ref _twitchChatBounds)).get_Right() : twitchChatX) + (IsTwitchStream ? 8 : 0);
+			int nextX = (hasQualities ? (dropdownX + 140 + 8) : dropdownX);
+			_twitchChatBounds = new Rectangle(nextX, centerY - 16, 32, 32);
+			int settingsX = (IsTwitchStream ? (((Rectangle)(ref _twitchChatBounds)).get_Right() + 8) : nextX);
 			_settingsBounds = new Rectangle(settingsX, centerY - 16, 32, 32);
 			int closeX = ((Rectangle)(ref _settingsBounds)).get_Right() + 8;
 			_closeBounds = new Rectangle(closeX, centerY - 16, 32, 32);
