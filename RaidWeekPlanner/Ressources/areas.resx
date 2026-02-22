@@ -27,10 +27,10 @@
       </xsd:complexType>
     </xsd:element>
   </xsd:schema>
-<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="W4Tooltip"><value>W4</value></data>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="W4Tooltip"><value>Bastion of the Penitent</value></data>
   <data name="SOTOTooltip"><value>Secrets of the Obscure</value></data>
   <data name="SOTOLabel"><value>Soto</value></data>
-  <data name="W5Tooltip"><value>W5</value></data>
+  <data name="W5Tooltip"><value>Hall of Chains</value></data>
   <data name="W1Label"><value>W1</value></data>
   <data name="W2Label"><value>W2</value></data>
   <data name="W3Label"><value>W3</value></data>
@@ -40,15 +40,15 @@
   <data name="W6Label"><value>W6</value></data>
   <data name="W7Label"><value>W7</value></data>
   <data name="W8Label"><value>W8</value></data>
-  <data name="W2Tooltip"><value>W2</value></data>
+  <data name="W2Tooltip"><value>Salvation Pass</value></data>
   <data name="IBSLabel"><value>IBS</value></data>
   <data name="IBSTooltip"><value>Icebrood Saga</value></data>
-  <data name="W3Tooltip"><value>W3</value></data>
+  <data name="W3Tooltip"><value>Stronghold of the Faithful</value></data>
   <data name="EODTooltip"><value>End of Dragons</value></data>
-  <data name="W1Tooltip"><value>W1</value></data>
-  <data name="W6Tooltip"><value>W6</value></data>
-  <data name="W7Tooltip"><value>W7</value></data>
-  <data name="W8Tooltip"><value>W8</value></data>
+  <data name="W1Tooltip"><value>Spirit Vale</value></data>
+  <data name="W6Tooltip"><value>Mythwright Gambit</value></data>
+  <data name="W7Tooltip"><value>The key of Ahdashim</value></data>
+  <data name="W8Tooltip"><value>Mount Balrior</value></data>
   <data name="VOETooltip"><value>Visions of Eternity</value></data>
   <data name="VOELabel"><value>VoE</value></data>
   </root>

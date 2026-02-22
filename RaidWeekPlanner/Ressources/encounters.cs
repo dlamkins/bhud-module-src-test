@@ -66,6 +66,10 @@ namespace RaidWeekPlanner.Ressources
 
 		internal static string campTooltip => ResourceManager.GetString("campTooltip", resourceCulture);
 
+		internal static string cold_warLabel => ResourceManager.GetString("cold_warLabel", resourceCulture);
+
+		internal static string cold_warTooltip => ResourceManager.GetString("cold_warTooltip", resourceCulture);
+
 		internal static string conjured_amalgamateLabel => ResourceManager.GetString("conjured_amalgamateLabel", resourceCulture);
 
 		internal static string conjured_amalgamateTooltip => ResourceManager.GetString("conjured_amalgamateTooltip", resourceCulture);
@@ -85,6 +89,10 @@ namespace RaidWeekPlanner.Ressources
 		internal static string escortLabel => ResourceManager.GetString("escortLabel", resourceCulture);
 
 		internal static string escortTooltip => ResourceManager.GetString("escortTooltip", resourceCulture);
+
+		internal static string forging_steelLabel => ResourceManager.GetString("forging_steelLabel", resourceCulture);
+
+		internal static string forging_steelTooltip => ResourceManager.GetString("forging_steelTooltip", resourceCulture);
 
 		internal static string fraenir_of_jormagLabel => ResourceManager.GetString("fraenir_of_jormagLabel", resourceCulture);
 

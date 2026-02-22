@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 
 namespace RaidWeekPlanner.Ressources
 {
-	[GeneratedCode("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
+	[GeneratedCode("System.Resources.Tools.StronglyTypedResourceBuilder", "18.0.0.0")]
 	[DebuggerNonUserCode]
 	[CompilerGenerated]
 	internal class areas
