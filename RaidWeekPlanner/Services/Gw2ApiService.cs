@@ -51,14 +51,55 @@ namespace RaidWeekPlanner.Services
 			}
 			try
 			{
-				return ((IEnumerable<string>)(await ((IBlobClient<IApiV2ObjectList<string>>)(object)_gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
-					.get_Raids()).GetAsync(default(CancellationToken))))?.Select((string d) => d).ToList();
+				IApiV2ObjectList<string> raidData = await ((IBlobClient<IApiV2ObjectList<string>>)(object)_gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
+					.get_Raids()).GetAsync(default(CancellationToken));
+				List<string> strikeData = await GetStrikeClear();
+				if (raidData == null && strikeData == null)
+				{
+					return null;
+				}
+				List<string> obj = ((IEnumerable<string>)raidData)?.Select((string d) => d)?.ToList() ?? new List<string>();
+				obj.AddRange(strikeData ?? new List<string>());
+				return obj;
 			}
 			catch (Exception ex)
 			{
 				_logger.Warn("Error while getting raid clears : " + ex.Message);
 				return null;
 			}
+		}
+
+		private async Task<List<string>> GetStrikeClear()
+		{
+			AccountAchievement strikeWeeklyClearAchievement = ((IEnumerable<AccountAchievement>)(await ((IBlobClient<IApiV2ObjectList<AccountAchievement>>)(object)_gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
+				.get_Achievements()).GetAsync(default(CancellationToken))))?.FirstOrDefault((AccountAchievement a) => a.get_Id() == 9125);
+			if (strikeWeeklyClearAchievement == null || strikeWeeklyClearAchievement.get_Bits() == null)
+			{
+				return null;
+			}
+			return strikeWeeklyClearAchievement.get_Bits().Select(GetStrikeName).ToList();
+		}
+
+		private string GetStrikeName(int bit)
+		{
+			return bit switch
+			{
+				0 => "shiverpeaks_pass", 
+				1 => "fraenir_of_jormag", 
+				2 => "voice_and_claw", 
+				3 => "whisper_of_jormag", 
+				4 => "boneskinner", 
+				5 => "cold_war", 
+				6 => "aetherblade_hideout", 
+				7 => "xunlai_jade_junkyard", 
+				8 => "kaineng_overlook", 
+				9 => "harvest_temple", 
+				10 => "cosmic_observatory", 
+				11 => "temple_of_febe", 
+				12 => "old_lion_court", 
+				13 => "kela", 
+				_ => string.Empty, 
+			};
 		}
 	}
 }
