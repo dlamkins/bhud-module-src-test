@@ -28,6 +28,10 @@ namespace RaidClears.Features.Shared.Models
 		[JsonProperty("daily_bounty_achievement_id", NullValueHandling = NullValueHandling.Ignore)]
 		public int? DailyBountyAchievementId { get; set; }
 
+		[JsonProperty("resets", NullValueHandling = NullValueHandling.Ignore)]
+		public string Resets { get; set; } = string.Empty;
+
+
 		public string EncounterId
 		{
 			get

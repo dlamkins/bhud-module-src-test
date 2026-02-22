@@ -9,6 +9,10 @@ namespace RaidClears.Settings.Models
 
 		public SettingEntry<StrikeComplete> StrikeCompletion { get; set; }
 
+		public SettingEntry<bool> StrikePanelHighlightNonWeeklyBounty { get; set; }
+
+		public SettingEntry<string> StrikePanelColorNonWeeklyBounty { get; set; }
+
 		public DisplayStyle Style { get; set; }
 
 		public GenericSettings Generic { get; set; }
@@ -47,6 +51,8 @@ namespace RaidClears.Settings.Models
 			};
 			AnchorToRaidPanel = settings.DefineSetting(Settings.Strikes.Module.anchorToRaids);
 			StrikeCompletion = settings.DefineSetting(Settings.Strikes.Module.strikeCompletion);
+			StrikePanelHighlightNonWeeklyBounty = settings.DefineSetting(Settings.Strikes.Module.highlightNonWeeklyBounty);
+			StrikePanelColorNonWeeklyBounty = settings.DefineSetting(Settings.Strikes.Style.Color.nonWeeklyBounty);
 			CleanUpOldSettings(settings);
 		}
 

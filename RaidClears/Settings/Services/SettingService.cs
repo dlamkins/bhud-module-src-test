@@ -82,6 +82,11 @@ namespace RaidClears.Settings.Services
 			settings.Color.NotCleared.set_Value(RaidSettings.Style.Color.NotCleared.get_Value());
 			settings.Color.Cleared.set_Value(RaidSettings.Style.Color.Cleared.get_Value());
 			settings.Color.Text.set_Value(RaidSettings.Style.Color.Text.get_Value());
+			if (settings == StrikeSettings.Style)
+			{
+				StrikeSettings.StrikePanelColorNonWeeklyBounty.set_Value(RaidSettings.RaidPanelColorNonWeeklyBounty.get_Value());
+				StrikeSettings.StrikePanelHighlightNonWeeklyBounty.set_Value(RaidSettings.RaidPanelHighlightNonWeeklyBounty.get_Value());
+			}
 		}
 
 		public void AlignStrikesWithRaidPanel()

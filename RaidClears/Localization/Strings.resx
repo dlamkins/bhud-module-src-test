@@ -166,6 +166,7 @@ Off: Background will be rectangles</value></data>
   <data name="Settings_Keybind_tooltip"><value>Show/Hide this window with a keybind</value></data>
   <data name="FractalClearCorrection_LastClears"><value>Last Fractal Clears (Profile: {0})</value></data>
   <data name="RaidLabelCustomization_Heading"><value>Customize Raid Wing Boss Labels</value></data>
+  <data name="Setting_Strike_NonWeeklyBounty_Label"><value>Highlight non-weekly bounty encounters</value></data>
   <data name="Fractal_TierNLabel"><value>Tier #</value></data>
   <data name="Raid_Wing_8_1_Short"><value>C</value></data>
   <data name="Raid_Wing_5_3_Short"><value>S</value></data>
@@ -197,6 +198,7 @@ Off: Background will be rectangles</value></data>
   <data name="Setting_Raid_Cotm_Tooltip"><value>Colors the text for the weekly Call of the Mists raid wing\nCall of the Mists doubles all gold in the boss loot chest</value></data>
   <data name="Module_Title"><value>Clears Tracker</value></data>
   <data name="Raid_Wing_1_2_Short"><value>SR</value></data>
+  <data name="Setting_Strike_NonWeeklyBounty_Tooltip"><value>Highlight strike encounters that will not be daily bounties for the rest of the week</value></data>
   <data name="Setting_Fractals_GridOpactiy_Tooltip"><value>Hidden &lt;---&gt; Fully Visible</value></data>
   <data name="Setting_APIPoll_Tooltip"><value>How often should the GW2 API be checked for updated information?</value></data>
   <data name="Raid_Wing_7_Short"><value>TKoA</value></data>
@@ -257,6 +259,7 @@ Off: Background will be rectangles</value></data>
   <data name="Settings_Fractals_Completion"><value>Mark complete</value></data>
   <data name="SettingsPanel_Subtitle"><value>customization options</value></data>
   <data name="Setting_Strike_Visible_Tooltip"><value>Show the Raid Encounters overlay on screen</value></data>
+  <data name="Setting_Strike_ColNonWeeklyBounty_Tooltip"><value>Background color for strike encounters that will not be daily bounties this week</value></data>
   <data name="Raid_Wing_7_2_Short"><value>A</value></data>
   <data name="Raid_Wing_4_Short"><value>BotP</value></data>
   <data name="Setting_Dun_Tooltips_Tooltip"><value>Hovering the mouse over an path will display the full name</value></data>
@@ -327,6 +330,7 @@ Off: Background will be rectangles</value></data>
   <data name="StrikeGroup_Icebrood"><value>Icebrood Saga</value></data>
   <data name="SettingsPanel_Dun_Heading_Layout"><value>Layout / Colors</value></data>
   <data name="Setting_Raid_Drag_Label"><value>Unlock Raid Wings overlay position</value></data>
+  <data name="Setting_Strike_ColNonWeeklyBounty_Label"><value>Non-weekly bounty encounter color</value></data>
   <data name="Strike_Short_Overlook"><value>KO</value></data>
   <data name="Setting_Raid_W3_Label"><value>W3 / Stronghold of the Faithful</value></data>
   <data name="SettingsPanel_Raids_Heading_General"><value>Options / Keybind</value></data>

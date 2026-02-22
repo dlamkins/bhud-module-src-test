@@ -44,17 +44,11 @@ namespace RaidClears.Features.Strikes.Services
 					if (entry.Value >= Service.ResetWatcher.LastDailyReset)
 					{
 						clearedStrikesThisReset.Add(entry.Key);
-						clearedStrikesThisReset.Add("priority_" + entry.Key);
 					}
-					continue;
 				}
-				if (entry.Value >= Service.ResetWatcher.LastWeeklyReset)
+				else if (entry.Value >= Service.ResetWatcher.LastWeeklyReset)
 				{
 					clearedStrikesThisReset.Add(entry.Key);
-				}
-				if (entry.Value >= Service.ResetWatcher.LastDailyReset)
-				{
-					clearedStrikesThisReset.Add("priority_" + entry.Key);
 				}
 			}
 			this.CompletedStrikes?.Invoke(this, clearedStrikesThisReset);
@@ -82,7 +76,7 @@ namespace RaidClears.Features.Strikes.Services
 
 		private async Task CompleteAndResetStrikeAsync()
 		{
-			if (!_isOnStrikeMap || _strikeMission == null)
+			if (!_isOnStrikeMap || _strikeMission == null || !Service.StrikeData.IsMapTracked(_strikeMission!.EncounterId))
 			{
 				return;
 			}

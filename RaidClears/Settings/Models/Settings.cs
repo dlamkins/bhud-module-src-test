@@ -161,6 +161,8 @@ namespace RaidClears.Settings.Models
 
 					public static Setting<string> text = new Setting<string>("StkColText", "#FFFFFF", () => Strings.Setting_Strike_ColText_Label, () => Strings.Setting_Strike_ColText_Tooltip);
 
+					public static Setting<string> nonWeeklyBounty = new Setting<string>("StkColNonWeeklyBounty", "#CC8800", () => Strings.Setting_Strike_ColNonWeeklyBounty_Label, () => Strings.Setting_Strike_ColNonWeeklyBounty_Tooltip);
+
 					public static Setting<string> background = new Setting<string>("colStrikeBG", "#000000", () => Strings.Setting_Strike_ColBG_Label, () => Strings.Setting_Strike_ColBG_Tooltip);
 				}
 
@@ -199,6 +201,8 @@ namespace RaidClears.Settings.Models
 				public static Setting<bool> anchorToRaids = new Setting<bool>("RCAnchorToRaids", DefaultValue: false, () => Strings.Settings_Strike_AnchorToRaidLabel, () => Strings.Settings_Strike_AnchorToRaidTooltip);
 
 				public static Setting<StrikeComplete> strikeCompletion = new Setting<StrikeComplete>("RCStrikeComplete", StrikeComplete.MAP_CHANGE, () => Strings.Settings_Strike_Completion, () => Strings.Settings_Strike_CompletionTooltip);
+
+				public static Setting<bool> highlightNonWeeklyBounty = new Setting<bool>("RCStkNonWeeklyBounty", DefaultValue: true, () => Strings.Setting_Strike_NonWeeklyBounty_Label, () => Strings.Setting_Strike_NonWeeklyBounty_Tooltip);
 			}
 		}
 

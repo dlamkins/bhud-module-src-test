@@ -27,17 +27,14 @@ namespace RaidClears.Settings.Views.Tabs
 			//IL_00b7: Expected O, but got Unknown
 			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00f0: Expected O, but got Unknown
-			//IL_0100: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0129: Expected O, but got Unknown
 			_registeredMenuItems.Add(new MenuViewItem(new MenuItem(Strings.SettingsPanel_Raids_Heading_General), (MenuItem _) => (IView)(object)new GenericGeneralView(Service.Settings.StrikeSettings.Generic, new List<SettingEntry>
 			{
-				(SettingEntry)(object)Service.Settings.StrikeSettings.StrikeCompletion,
-				(SettingEntry)(object)Service.Settings.StrikeSettings.AnchorToRaidPanel
+				(SettingEntry)(object)Service.Settings.StrikeSettings.AnchorToRaidPanel,
+				(SettingEntry)(object)Service.Settings.StrikeSettings.StrikePanelHighlightNonWeeklyBounty
 			})));
-			_registeredMenuItems.Add(new MenuViewItem(new MenuItem(Strings.SettingsPanel_Raids_Heading_Layout), (MenuItem _) => (IView)(object)new GenericStyleView(Service.Settings.StrikeSettings.Style, null, showCopyRaids: true)));
+			_registeredMenuItems.Add(new MenuViewItem(new MenuItem(Strings.SettingsPanel_Raids_Heading_Layout), (MenuItem _) => (IView)(object)new GenericStyleView(Service.Settings.StrikeSettings.Style, new List<SettingEntry<string>> { Service.Settings.StrikeSettings.StrikePanelColorNonWeeklyBounty }, showCopyRaids: true)));
 			_registeredMenuItems.Add(new MenuViewItem(new MenuItem(Strings.SettingsPanel_Strikes_Heading_Selection), (MenuItem _) => (IView)(object)new DynamicStrikeSelectionView()));
 			_registeredMenuItems.Add(new MenuViewItem(new MenuItem(Strings.SettingsPanel_Strikes_Heading_CustomizeLabels), (MenuItem _) => (IView)(object)new StrikeLabelCustomizationView()));
-			_registeredMenuItems.Add(new MenuViewItem(new MenuItem(Strings.SettingsPanel_Strikes_Heading_ManageClears), (MenuItem _) => (IView)(object)new StrikeClearCorrectionView()));
 		}
 
 		public IEnumerable<MenuItem> GetSettingMenus()

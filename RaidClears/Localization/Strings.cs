@@ -512,6 +512,14 @@ namespace RaidClears.Localization
 
 		internal static string Setting_Strike_ColText_Tooltip => ResourceManager.GetString("Setting_Strike_ColText_Tooltip", resourceCulture);
 
+		internal static string Setting_Strike_ColNonWeeklyBounty_Label => ResourceManager.GetString("Setting_Strike_ColNonWeeklyBounty_Label", resourceCulture);
+
+		internal static string Setting_Strike_ColNonWeeklyBounty_Tooltip => ResourceManager.GetString("Setting_Strike_ColNonWeeklyBounty_Tooltip", resourceCulture);
+
+		internal static string Setting_Strike_NonWeeklyBounty_Label => ResourceManager.GetString("Setting_Strike_NonWeeklyBounty_Label", resourceCulture);
+
+		internal static string Setting_Strike_NonWeeklyBounty_Tooltip => ResourceManager.GetString("Setting_Strike_NonWeeklyBounty_Tooltip", resourceCulture);
+
 		internal static string Setting_Strike_CW_Label => ResourceManager.GetString("Setting_Strike_CW_Label", resourceCulture);
 
 		internal static string Setting_Strike_Drag_Label => ResourceManager.GetString("Setting_Strike_Drag_Label", resourceCulture);

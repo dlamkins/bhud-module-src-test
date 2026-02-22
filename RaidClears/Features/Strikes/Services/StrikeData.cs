@@ -32,6 +32,17 @@ namespace RaidClears.Features.Strikes.Services
 		public ExpansionStrikes PriorityTomorrow { get; set; } = new ExpansionStrikes();
 
 
+		[JsonProperty("weekly_achievement_id")]
+		public int WeeklyAchievementId { get; set; }
+
+		[JsonProperty("weekly_achievement_bit_strike_ids")]
+		public List<string> WeeklyAchievementBitStrikeIds { get; set; } = new List<string>();
+
+
+		[JsonProperty("map_tracked_strike_ids")]
+		public List<string> MapTrackedStrikeIds { get; set; } = new List<string>();
+
+
 		[JsonProperty("expansions")]
 		public List<ExpansionStrikes> Expansions { get; set; } = new List<ExpansionStrikes>();
 
@@ -135,11 +146,20 @@ namespace RaidClears.Features.Strikes.Services
 				{
 					if (mission.Id == name)
 					{
-						return expansion.Resets;
+						return (!string.IsNullOrEmpty(mission.Resets)) ? mission.Resets : expansion.Resets;
 					}
 				}
 			}
 			return "weekly";
+		}
+
+		public bool IsMapTracked(string encounterId)
+		{
+			if (MapTrackedStrikeIds != null)
+			{
+				return MapTrackedStrikeIds.Contains(encounterId);
+			}
+			return false;
 		}
 
 		public List<StrikeInfo> GetPriorityStrikes(int index)
