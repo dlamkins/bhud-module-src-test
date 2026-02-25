@@ -96,6 +96,8 @@ namespace Gorthax.GilledWarsAnglers
 
 		private bool _isCasualLoggingActive;
 
+		private DateTime _lastSubmitTime = DateTime.MinValue;
+
 		private bool _isTournamentActive;
 
 		private bool _isTourneyWaitingRoom;
@@ -855,7 +857,8 @@ namespace Gorthax.GilledWarsAnglers
 					IsCheater = false,
 					IsSuperPb = isSuperPb,
 					CaughtWithDrf = usedDrf,
-					CharacterName = charName
+					CharacterName = charName,
+					IsSubmitted = false
 				};
 			}
 			if (pbObj.BestLength == null || length > pbObj.BestLength.Length)
@@ -869,7 +872,8 @@ namespace Gorthax.GilledWarsAnglers
 					IsCheater = false,
 					IsSuperPb = isSuperPb,
 					CaughtWithDrf = usedDrf,
-					CharacterName = charName
+					CharacterName = charName,
+					IsSubmitted = false
 				};
 			}
 			if (isNewPbWeight || isNewPbLength)
@@ -1259,12 +1263,18 @@ namespace Gorthax.GilledWarsAnglers
 				{
 					ScreenNotification.ShowNotification("Submission Rejected: Tampered Data Detected", ScreenNotification.NotificationType.Error);
 				}
+				else if ((DateTime.Now - _lastSubmitTime).TotalMinutes < 5.0)
+				{
+					ScreenNotification.ShowNotification("Button on Cool down. Please wait a few minutes.", ScreenNotification.NotificationType.Warning);
+				}
 				else
 				{
 					pushLeaderboardBtn.Enabled = false;
 					pushLeaderboardBtn.Text = "Pushing...";
 					List<object> eligibleCatches = new List<object>();
 					_ = GameService.Gw2Mumble.PlayerCharacter.Name;
+					List<SubRecord> submittedWeights = new List<SubRecord>();
+					List<SubRecord> submittedLengths = new List<SubRecord>();
 					foreach (KeyValuePair<int, PersonalBestRecord> kvp in _personalBests)
 					{
 						int fId = kvp.Key;
@@ -1272,7 +1282,7 @@ namespace Gorthax.GilledWarsAnglers
 						FishData dbFish = _allFishEntries.FirstOrDefault((FishUIEntry x) => x.Data.ItemId == fId)?.Data;
 						string fName = ((dbFish != null) ? dbFish.Name : "Unknown");
 						string fLoc = ((dbFish != null) ? dbFish.Location : "Unknown");
-						if (rec2.BestWeight != null && rec2.BestWeight.CaughtWithDrf && !rec2.BestWeight.IsCheater)
+						if (rec2.BestWeight != null && rec2.BestWeight.CaughtWithDrf && !rec2.BestWeight.IsCheater && !rec2.BestWeight.IsSubmitted)
 						{
 							string cName2 = rec2.BestWeight.CharacterName ?? "Unknown";
 							eligibleCatches.Add(new
@@ -1287,8 +1297,9 @@ namespace Gorthax.GilledWarsAnglers
 								characterName = cName2,
 								location = fLoc
 							});
+							submittedWeights.Add(rec2.BestWeight);
 						}
-						if (rec2.BestLength != null && rec2.BestLength.CaughtWithDrf && !rec2.BestLength.IsCheater)
+						if (rec2.BestLength != null && rec2.BestLength.CaughtWithDrf && !rec2.BestLength.IsCheater && !rec2.BestLength.IsSubmitted)
 						{
 							string cName = rec2.BestLength.CharacterName ?? "Unknown";
 							eligibleCatches.Add(new
@@ -1303,16 +1314,18 @@ namespace Gorthax.GilledWarsAnglers
 								characterName = cName,
 								location = fLoc
 							});
+							submittedLengths.Add(rec2.BestLength);
 						}
 					}
 					if (eligibleCatches.Count == 0)
 					{
-						ScreenNotification.ShowNotification("No DRF-tracked PBs to submit!", ScreenNotification.NotificationType.Warning);
+						ScreenNotification.ShowNotification("No new PB recorded.", ScreenNotification.NotificationType.Warning);
 						pushLeaderboardBtn.Enabled = true;
 						pushLeaderboardBtn.Text = "Push PBs to Leaderboard";
 					}
 					else
 					{
+						_lastSubmitTime = DateTime.Now;
 						var payload = new
 						{
 							catches = eligibleCatches
@@ -1322,7 +1335,16 @@ namespace Gorthax.GilledWarsAnglers
 							StringContent content = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
 							if ((await _httpClient.PostAsync("https://api.gilledwars.com/submit-leaderboard", (HttpContent)(object)content)).get_IsSuccessStatusCode())
 							{
-								ScreenNotification.ShowNotification($"Successfully submitted {eligibleCatches.Count} records!");
+								foreach (SubRecord item in submittedWeights)
+								{
+									item.IsSubmitted = true;
+								}
+								foreach (SubRecord item2 in submittedLengths)
+								{
+									item2.IsSubmitted = true;
+								}
+								SavePersonalBests();
+								ScreenNotification.ShowNotification("PB submitted to the Leaderboards, good luck!");
 							}
 							else
 							{

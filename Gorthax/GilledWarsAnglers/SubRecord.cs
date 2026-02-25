@@ -15,5 +15,7 @@ namespace Gorthax.GilledWarsAnglers
 		public bool CaughtWithDrf { get; set; }
 
 		public string CharacterName { get; set; }
+
+		public bool IsSubmitted { get; set; }
 	}
 }
