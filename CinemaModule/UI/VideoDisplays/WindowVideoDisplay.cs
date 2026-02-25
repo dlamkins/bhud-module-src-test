@@ -279,6 +279,7 @@ namespace CinemaModule.UI.VideoDisplays
 			((Panel)this).set_ShowBorder(false);
 			Size = new Point(800, 450);
 			Location = new Point(100, 50);
+			((Control)this).set_ZIndex(-9001);
 			_renderer = new VideoControlsRenderer(CinemaModule.Instance.TextureService);
 			_controlsOverlay = new WindowVideoControls((Container)(object)this);
 			_controlsOverlay.PlayPauseClicked += delegate

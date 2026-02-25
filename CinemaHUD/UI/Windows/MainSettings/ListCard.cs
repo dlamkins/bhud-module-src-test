@@ -60,6 +60,8 @@ namespace CinemaHUD.UI.Windows.MainSettings
 
 		private readonly List<Control> _buttons = new List<Control>();
 
+		private readonly object _buttonsLock = new object();
+
 		private readonly ScrollingHighlightEffect _scrollEffect;
 
 		private bool _isSelected;
@@ -97,58 +99,58 @@ namespace CinemaHUD.UI.Windows.MainSettings
 		public ListCard(Container parent, string title, string subtitle, bool isSelected, int textPanelWidth = 400, IEnumerable<ListCardButton> buttons = null, AsyncTexture2D avatarTexture = null, AsyncTexture2D iconTexture = null)
 			: this()
 		{
-			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0054: Expected O, but got Unknown
-			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a8: Expected O, but got Unknown
-			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005f: Expected O, but got Unknown
+			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b3: Expected O, but got Unknown
+			//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f4: Expected O, but got Unknown
-			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0102: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0109: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011a: Expected O, but got Unknown
-			//IL_0124: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0129: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0138: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0146: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015f: Expected O, but got Unknown
-			//IL_0167: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0173: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0182: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0189: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0199: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01aa: Expected O, but got Unknown
-			//IL_01ab: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ff: Expected O, but got Unknown
+			//IL_0100: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0105: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0114: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0125: Expected O, but got Unknown
+			//IL_012f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0134: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0139: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0143: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0151: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0159: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016a: Expected O, but got Unknown
+			//IL_0172: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0177: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0186: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0194: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b5: Expected O, but got Unknown
+			//IL_01b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ca: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f3: Expected O, but got Unknown
+			//IL_01d3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ed: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01fe: Expected O, but got Unknown
 			((Container)this).set_WidthSizingMode((SizingMode)2);
 			((Control)this).set_Height(60);
 			((Control)this).set_Parent(parent);
@@ -279,13 +281,19 @@ namespace CinemaHUD.UI.Windows.MainSettings
 		{
 			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
 			Point mousePos = e.get_MousePosition();
-			foreach (Control button in _buttons)
+			Control[] buttonsCopy;
+			lock (_buttonsLock)
 			{
-				Rectangle absoluteBounds = button.get_AbsoluteBounds();
+				buttonsCopy = _buttons.ToArray();
+			}
+			Control[] array = buttonsCopy;
+			for (int i = 0; i < array.Length; i++)
+			{
+				Rectangle absoluteBounds = array[i].get_AbsoluteBounds();
 				if (((Rectangle)(ref absoluteBounds)).Contains(mousePos))
 				{
 					return;
@@ -305,15 +313,15 @@ namespace CinemaHUD.UI.Windows.MainSettings
 			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00b3: Expected O, but got Unknown
-			//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0102: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0113: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0103: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0108: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0122: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0133: Unknown result type (might be due to invalid IL or missing references)
 			//IL_013b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0144: Expected O, but got Unknown
+			//IL_0142: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0164: Expected O, but got Unknown
 			int rightPosition = ((Control)this).get_Width() - 5 - 15;
 			foreach (ListCardButton buttonConfig in buttonConfigs)
 			{
@@ -335,7 +343,10 @@ namespace CinemaHUD.UI.Windows.MainSettings
 							buttonConfig.OnClick();
 						});
 					}
-					_buttons.Add((Control)(object)glowButton);
+					lock (_buttonsLock)
+					{
+						_buttons.Add((Control)(object)glowButton);
+					}
 				}
 				else
 				{
@@ -359,7 +370,10 @@ namespace CinemaHUD.UI.Windows.MainSettings
 							buttonConfig.OnClick();
 						});
 					}
-					_buttons.Add((Control)(object)button);
+					lock (_buttonsLock)
+					{
+						_buttons.Add((Control)(object)button);
+					}
 				}
 				rightPosition -= 5;
 			}
@@ -384,9 +398,12 @@ namespace CinemaHUD.UI.Windows.MainSettings
 				return;
 			}
 			int totalButtonWidth = 0;
-			foreach (Control button in _buttons)
+			lock (_buttonsLock)
 			{
-				totalButtonWidth += button.get_Width() + 5;
+				foreach (Control button in _buttons)
+				{
+					totalButtonWidth += button.get_Width() + 5;
+				}
 			}
 			int availableWidth = ((Control)this).get_Width() - ((Control)_textPanel).get_Left() - totalButtonWidth - 5 - 20;
 			if (availableWidth > 0)
@@ -400,13 +417,18 @@ namespace CinemaHUD.UI.Windows.MainSettings
 
 		private void RepositionButtons()
 		{
-			if (_buttons.Count == 0)
+			Control[] buttonsCopy;
+			lock (_buttonsLock)
 			{
-				return;
+				if (_buttons.Count == 0)
+				{
+					return;
+				}
+				buttonsCopy = _buttons.ToArray();
 			}
-			List<Control> list = new List<Control>(_buttons);
 			int rightPosition = ((Control)this).get_Width() - 5 - 15;
-			foreach (Control button in list)
+			Control[] array = buttonsCopy;
+			foreach (Control button in array)
 			{
 				rightPosition -= button.get_Width();
 				button.set_Left(rightPosition);

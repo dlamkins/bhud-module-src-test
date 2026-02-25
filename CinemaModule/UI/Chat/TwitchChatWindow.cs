@@ -85,7 +85,7 @@ namespace CinemaModule.UI.Chat
 		{
 			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
 			_chatService = chatService;
 			_authService = authService;
 			_settings = settings;
@@ -97,6 +97,7 @@ namespace CinemaModule.UI.Chat
 			((WindowBase2)this).set_Id("CinemaModule_TwitchChatWindow");
 			((WindowBase2)this).set_SavesPosition(true);
 			((WindowBase2)this).set_SavesSize(false);
+			((Control)this).set_ZIndex(-9001);
 			((Control)this).set_Location(new Point((((Control)GameService.Graphics.get_SpriteScreen()).get_Width() - ((Control)this).get_Width()) / 2, (((Control)GameService.Graphics.get_SpriteScreen()).get_Height() - ((Control)this).get_Height()) / 2));
 			RestoreSavedSize();
 			_isLocked = _settings.TwitchChatWindowLocked;

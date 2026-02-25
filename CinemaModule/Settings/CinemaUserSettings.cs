@@ -317,6 +317,21 @@ namespace CinemaModule.Settings
 			}
 		}
 
+		public string LastSelectedLocationCategory
+		{
+			get
+			{
+				return _data.LastSelectedLocationCategory;
+			}
+			set
+			{
+				SetProperty(_data.LastSelectedLocationCategory, value, delegate(string v)
+				{
+					_data.LastSelectedLocationCategory = v;
+				});
+			}
+		}
+
 		public int SelectedSettingsTab
 		{
 			get

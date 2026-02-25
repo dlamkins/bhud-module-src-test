@@ -56,6 +56,8 @@ namespace CinemaModule.Settings
 
 		public string LastSelectedSourceCategory { get; set; }
 
+		public string LastSelectedLocationCategory { get; set; }
+
 		public int SelectedSettingsTab { get; set; }
 
 		public int SettingsWindowHeight { get; set; }

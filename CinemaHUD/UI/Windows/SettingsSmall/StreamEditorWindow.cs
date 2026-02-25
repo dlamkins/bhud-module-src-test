@@ -256,6 +256,7 @@ namespace CinemaHUD.UI.Windows.SettingsSmall
 			((TextInputBase)_nameTextBox).set_Text("");
 			_sourceTypeDropdown.set_SelectedItem(GetDropdownValue(sourceType));
 			((TextInputBase)_valueTextBox).set_Text("");
+			((Control)_saveButton).set_Visible(true);
 			((Control)_deleteButton).set_Visible(false);
 			OnSourceTypeChanged();
 			((Control)this).Show();
@@ -269,6 +270,7 @@ namespace CinemaHUD.UI.Windows.SettingsSmall
 			((TextInputBase)_nameTextBox).set_Text(stream.Name ?? "");
 			_sourceTypeDropdown.set_SelectedItem(GetDropdownValue(stream.SourceType));
 			((TextInputBase)_valueTextBox).set_Text(stream.Value ?? "");
+			((Control)_saveButton).set_Visible(true);
 			((Control)_deleteButton).set_Visible(true);
 			OnSourceTypeChanged();
 			((Control)this).Show();

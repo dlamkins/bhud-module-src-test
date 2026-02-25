@@ -15,7 +15,7 @@ namespace CinemaModule.Services
 	{
 		private static readonly Logger Logger = Logger.GetLogger<PresetService>();
 
-		private const string DefaultApiBaseUrl = "https://www.gw2opus.com/wp-json/cinemahud/v2";
+		private const string DefaultApiBaseUrl = "https://www.gw2opus.com/wp-json/cinemahud/v3";
 
 		private const string ImageCacheSubfolder = "presets";
 
@@ -31,7 +31,9 @@ namespace CinemaModule.Services
 
 		private bool _isLoaded;
 
-		public IReadOnlyList<WorldLocationPresetData> WorldLocationPresets => _cachedPresets?.WorldLocations ?? new List<WorldLocationPresetData>();
+		public IReadOnlyList<WorldLocationCategory> WorldLocationCategories => _cachedPresets?.WorldLocationCategories ?? new List<WorldLocationCategory>();
+
+		public IReadOnlyList<WorldLocationPresetData> WorldLocationPresets => WorldLocationCategories.SelectMany((WorldLocationCategory c) => c.Locations).ToList();
 
 		public IReadOnlyList<StreamCategory> StreamCategories => _cachedPresets?.StreamCategories ?? new List<StreamCategory>();
 
@@ -61,7 +63,7 @@ namespace CinemaModule.Services
 		}
 
 		public PresetService(string cacheDirectory)
-			: this(cacheDirectory, "https://www.gw2opus.com/wp-json/cinemahud/v2")
+			: this(cacheDirectory, "https://www.gw2opus.com/wp-json/cinemahud/v3")
 		{
 		}
 
@@ -116,9 +118,19 @@ namespace CinemaModule.Services
 		private async Task LoadPresetImagesAsync()
 		{
 			List<Task> tasks = new List<Task>();
-			if (_cachedPresets?.WorldLocations != null && _cachedPresets.WorldLocations.Count > 0)
+			if (_cachedPresets?.WorldLocationCategories != null)
 			{
-				tasks.AddRange(_cachedPresets.WorldLocations.Select(LoadImagesForWorldLocationAsync));
+				foreach (WorldLocationCategory category2 in _cachedPresets.WorldLocationCategories)
+				{
+					if (!string.IsNullOrEmpty(category2.Icon))
+					{
+						tasks.Add(LoadWorldLocationCategoryIconAsync(category2));
+					}
+					foreach (WorldLocationPresetData location in category2.Locations)
+					{
+						tasks.Add(LoadImagesForWorldLocationAsync(location));
+					}
+				}
 			}
 			if (_cachedPresets?.StreamCategories != null)
 			{
@@ -136,6 +148,14 @@ namespace CinemaModule.Services
 			}
 			await Task.WhenAll(tasks);
 			this.PresetImagesLoaded?.Invoke(this, EventArgs.Empty);
+		}
+
+		private async Task LoadWorldLocationCategoryIconAsync(WorldLocationCategory category)
+		{
+			if (!string.IsNullOrEmpty(category.Icon))
+			{
+				category.IconTexture = await _imageCache.GetImageAsync("loc_cat_" + category.Id + "_icon", category.Icon);
+			}
 		}
 
 		private async Task LoadImagesForWorldLocationAsync(WorldLocationPresetData preset)

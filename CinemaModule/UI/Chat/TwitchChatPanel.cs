@@ -512,7 +512,7 @@ namespace CinemaModule.UI.Chat
 			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
 			bool isAuthenticated = _chatService.IsAuthenticated;
 			bool canSend = isAuthenticated && _chatService.IsConnected;
-			_loginStatusLabel.set_Text(isAuthenticated ? ("Logged in: " + _chatService.Username) : "Not logged in - read only");
+			_loginStatusLabel.set_Text(isAuthenticated ? ("as: " + _chatService.Username) : "Not logged in - read only");
 			_loginStatusLabel.set_TextColor(isAuthenticated ? Color.get_LightGreen() : Color.get_Gray());
 			((Control)_sendButton).set_Visible(isAuthenticated);
 			((Control)_sendButton).set_Enabled(canSend);

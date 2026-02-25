@@ -6,7 +6,7 @@ namespace CinemaModule.Models
 	public class PresetsResponse
 	{
 		[JsonProperty("worldLocations")]
-		public List<WorldLocationPresetData> WorldLocations { get; set; } = new List<WorldLocationPresetData>();
+		public List<WorldLocationCategory> WorldLocationCategories { get; set; } = new List<WorldLocationCategory>();
 
 
 		[JsonProperty("streams")]

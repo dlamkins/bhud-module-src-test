@@ -354,7 +354,7 @@ namespace CinemaHUD.UI.Windows.MainSettings
 			}
 			if (_selectedCategoryId == "My Streams")
 			{
-				LoadCustomContent();
+				LoadCustomContent(_contentCts.Token);
 				return;
 			}
 			StreamCategory category = _presetService.StreamCategories.FirstOrDefault((StreamCategory c) => c.Name == _selectedCategoryId);
@@ -502,7 +502,7 @@ namespace CinemaHUD.UI.Windows.MainSettings
 			LoadAvatarsAsync(items, token);
 		}
 
-		private async void LoadCustomContent()
+		private async void LoadCustomContent(CancellationToken token)
 		{
 			List<SavedStream> customStreams = _settings.SavedStreams.Streams.ToList();
 			if (customStreams.Count == 0)
@@ -512,8 +512,8 @@ namespace CinemaHUD.UI.Windows.MainSettings
 				return;
 			}
 			ShowLoadingSpinner();
-			Dictionary<string, StreamStatus> statusMap = await _statusLoader.FetchCustomStreamStatusesAsync(customStreams, _contentCts.Token);
-			if (_contentCts.Token.IsCancellationRequested)
+			Dictionary<string, StreamStatus> statusMap = await _statusLoader.FetchCustomStreamStatusesAsync(customStreams, token);
+			if (token.IsCancellationRequested)
 			{
 				return;
 			}
@@ -531,7 +531,7 @@ namespace CinemaHUD.UI.Windows.MainSettings
 					OpenEditorForEdit(stream);
 				}, SelectSavedStream);
 			}
-			LoadCustomAvatarsAsync(customStreams, statusMap, _contentCts.Token);
+			LoadCustomAvatarsAsync(customStreams, statusMap, token);
 		}
 
 		private List<StreamListItem> BuildTwitchItems(StreamCategory category)
