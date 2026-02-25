@@ -1,6 +1,6 @@
-namespace Gorthax.GilledWarsAnglers
+namespace Gorthax.GilledWars
 {
-	public class PersonalBestRecord
+	public class SubRecord
 	{
 		public double Weight { get; set; }
 
@@ -12,8 +12,10 @@ namespace Gorthax.GilledWarsAnglers
 
 		public bool IsSuperPb { get; set; }
 
-		public SubRecord BestWeight { get; set; }
+		public bool CaughtWithDrf { get; set; }
 
-		public SubRecord BestLength { get; set; }
+		public string CharacterName { get; set; }
+
+		public bool IsSubmitted { get; set; }
 	}
 }

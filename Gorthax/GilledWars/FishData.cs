@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace Gorthax.GilledWarsAnglers
+namespace Gorthax.GilledWars
 {
 	public class FishData
 	{

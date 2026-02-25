@@ -27,7 +27,7 @@ using Microsoft.Xna.Framework.Input;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace Gorthax.GilledWarsAnglers
+namespace Gorthax.GilledWars
 {
 	[Export(typeof(Blish_HUD.Modules.Module))]
 	public class GilledWars : Blish_HUD.Modules.Module
