@@ -27,7 +27,7 @@ using Microsoft.Xna.Framework.Input;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace Gorthax.GilledWars
+namespace Gorthax.GilledWarsAnglers
 {
 	[Export(typeof(Blish_HUD.Modules.Module))]
 	public class GilledWars : Blish_HUD.Modules.Module
@@ -97,6 +97,8 @@ namespace Gorthax.GilledWars
 		private bool _isCasualLoggingActive;
 
 		private DateTime _lastSubmitTime = DateTime.MinValue;
+
+		private string _localAccountName = "UnknownAccount";
 
 		private bool _isTournamentActive;
 
@@ -229,7 +231,7 @@ namespace Gorthax.GilledWars
 		protected override void OnModuleLoaded(EventArgs e)
 		{
 			LoadFishDatabase();
-			LoadPersonalBests();
+			InitializeAccountAndLoadAsync();
 			BuildMainWindow();
 			BuildCasualCompactPanel();
 			GameService.Input.Mouse.LeftMouseButtonReleased += OnMouseLeftButtonReleased;
@@ -471,11 +473,76 @@ namespace Gorthax.GilledWars
 			}
 		}
 
+		private async Task InitializeAccountAndLoadAsync()
+		{
+			string dir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "Guild Wars 2", "addons", "blishhud", "gilledwarsanglers");
+			Directory.CreateDirectory(dir);
+			try
+			{
+				bool accountFound = false;
+				if (!string.IsNullOrWhiteSpace(_customApiKey.Value))
+				{
+					try
+					{
+						Connection connection = new Connection(_customApiKey.Value);
+						using Gw2Client client = new Gw2Client(connection);
+						_localAccountName = (await client.WebApi.V2.Account.GetAsync()).Name.Replace(".", "_");
+						accountFound = true;
+					}
+					catch
+					{
+						Logger.Warn("Custom API Key failed. Falling back to Blish HUD API.");
+					}
+				}
+				if (!accountFound)
+				{
+					for (int retries = 10; retries > 0; retries--)
+					{
+						if (Gw2ApiManager.HasPermissions(new TokenPermission[1] { TokenPermission.Account }))
+						{
+							_localAccountName = (await Gw2ApiManager.Gw2ApiClient.V2.Account.GetAsync()).Name.Replace(".", "_");
+							accountFound = true;
+							break;
+						}
+						await Task.Delay(1000);
+					}
+				}
+				if (accountFound)
+				{
+					string oldPath = Path.Combine(dir, "personal_bests.json");
+					string newPath = Path.Combine(dir, "personal_bests_" + _localAccountName + ".json");
+					if (System.IO.File.Exists(oldPath) && !System.IO.File.Exists(newPath))
+					{
+						try
+						{
+							System.IO.File.Move(oldPath, newPath);
+							Logger.Info("Successfully migrated legacy personal_bests.json to " + Path.GetFileName(newPath));
+						}
+						catch (Exception ex2)
+						{
+							Logger.Warn(ex2, "Failed to migrate legacy personal bests file.");
+						}
+					}
+				}
+				else
+				{
+					Logger.Warn("Could not fetch Account Name after 10 seconds. Defaulting to standard file.");
+				}
+			}
+			catch (Exception ex)
+			{
+				Logger.Error(ex, "Fatal error during account initialization.");
+			}
+			LoadPersonalBests();
+			RefreshFishLogUI();
+		}
+
 		private void LoadPersonalBests()
 		{
-			string text = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "Guild Wars 2", "addons", "blishhud", "gilledwarsanglers");
+			string text = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "Guild Wars 2", "addons", "blishhud", "gilledwars");
 			Directory.CreateDirectory(text);
-			string path = Path.Combine(text, "personal_bests.json");
+			string fileName = ((_localAccountName == "UnknownAccount") ? "personal_bests.json" : ("personal_bests_" + _localAccountName + ".json"));
+			string path = Path.Combine(text, fileName);
 			_isCheater = false;
 			if (!System.IO.File.Exists(path))
 			{
@@ -492,36 +559,38 @@ namespace Gorthax.GilledWars
 					PersonalBestRecord rec = kvp.Value;
 					FishData dbFish = _allFishEntries.FirstOrDefault((FishUIEntry x) => x.Data.ItemId == itemId)?.Data;
 					string fishName = ((dbFish != null) ? dbFish.Name : "Unknown");
-					if (rec.BestWeight != null)
-					{
-						string cNameW = rec.BestWeight.CharacterName ?? "Unknown";
-						string expectedSig2 = GenerateSignature(rec.BestWeight.Weight, rec.BestWeight.Length, fishName, rec.BestWeight.IsSuperPb, seed + cNameW);
-						if (rec.BestWeight.Signature != expectedSig2)
-						{
-							rec.BestWeight.IsCheater = true;
-						}
-						if (rec.BestWeight.IsCheater)
-						{
-							_isCheater = true;
-						}
-					}
-					if (rec.BestLength != null)
-					{
-						string cNameL = rec.BestLength.CharacterName ?? "Unknown";
-						string expectedSig = GenerateSignature(rec.BestLength.Weight, rec.BestLength.Length, fishName, rec.BestLength.IsSuperPb, seed + cNameL);
-						if (rec.BestLength.Signature != expectedSig)
-						{
-							rec.BestLength.IsCheater = true;
-						}
-						if (rec.BestLength.IsCheater)
-						{
-							_isCheater = true;
-						}
-					}
+					bool fileNeedsSaving = false;
+					MigrateRecord(rec.BestWeight);
+					MigrateRecord(rec.BestLength);
 					_personalBests.Add(itemId, rec);
 					_caughtFishIds.Add(itemId);
+					if (fileNeedsSaving)
+					{
+						SavePersonalBests();
+					}
+					void MigrateRecord(SubRecord sub)
+					{
+						if (sub != null)
+						{
+							string cName = sub.CharacterName ?? "Unknown";
+							string newStyleSig = GenerateSignature(sub.Weight, sub.Length, fishName, sub.IsSuperPb, seed + cName + _localAccountName);
+							if (sub.Signature != newStyleSig)
+							{
+								string oldStyleSig = GenerateSignature(sub.Weight, sub.Length, fishName, sub.IsSuperPb, seed + cName);
+								if (sub.Signature == oldStyleSig)
+								{
+									sub.Signature = newStyleSig;
+									fileNeedsSaving = true;
+								}
+								else
+								{
+									sub.IsCheater = true;
+									_isCheater = true;
+								}
+							}
+						}
+					}
 				}
-				RefreshFishLogUI();
 			}
 			catch (Exception ex)
 			{
@@ -533,7 +602,8 @@ namespace Gorthax.GilledWars
 		{
 			string text = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "Guild Wars 2", "addons", "blishhud", "gilledwarsanglers");
 			Directory.CreateDirectory(text);
-			System.IO.File.WriteAllText(Path.Combine(text, "personal_bests.json"), JsonConvert.SerializeObject(_personalBests));
+			string fileName = ((_localAccountName == "UnknownAccount") ? "personal_bests.json" : ("personal_bests_" + _localAccountName + ".json"));
+			System.IO.File.WriteAllText(Path.Combine(text, fileName), JsonConvert.SerializeObject(_personalBests));
 		}
 
 		private async Task<Dictionary<int, int>> GetActiveCharacterBags()
@@ -835,8 +905,8 @@ namespace Gorthax.GilledWars
 				length = Math.Round(maxL * bonusMult, 2);
 			}
 			string charName = GameService.Gw2Mumble.PlayerCharacter.Name ?? "Unknown";
-			string saltedSeed = GetGlobalSeed() + charName;
-			string globalSig = GenerateSignature(weight, length, matchingFish.Name, isSuperPb, saltedSeed);
+			_ = GetGlobalSeed() + charName;
+			string globalSig = GenerateSignature(weight, length, matchingFish.Name, isSuperPb, GetGlobalSeed() + charName + _localAccountName);
 			string tSig = (_isTournamentActive ? GenerateSignature(weight, length, matchingFish.Name, isSuperPb, _tourneyRoomCode) : "");
 			bool isNewPbWeight = false;
 			bool isNewPbLength = false;
@@ -1271,6 +1341,18 @@ namespace Gorthax.GilledWars
 				{
 					pushLeaderboardBtn.Enabled = false;
 					pushLeaderboardBtn.Text = "Pushing...";
+					string accountName = "UnknownAccount";
+					try
+					{
+						if (Gw2ApiManager.HasPermissions(new TokenPermission[1] { TokenPermission.Account }))
+						{
+							accountName = (await Gw2ApiManager.Gw2ApiClient.V2.Account.GetAsync()).Name;
+						}
+					}
+					catch
+					{
+						Logger.Warn("Could not fetch Account Name for Leaderboard.");
+					}
 					List<object> eligibleCatches = new List<object>();
 					_ = GameService.Gw2Mumble.PlayerCharacter.Name;
 					List<SubRecord> submittedWeights = new List<SubRecord>();
@@ -1282,16 +1364,19 @@ namespace Gorthax.GilledWars
 						FishData dbFish = _allFishEntries.FirstOrDefault((FishUIEntry x) => x.Data.ItemId == fId)?.Data;
 						string fName = ((dbFish != null) ? dbFish.Name : "Unknown");
 						string fLoc = ((dbFish != null) ? dbFish.Location : "Unknown");
+						string seed = GetGlobalSeed();
 						if (rec2.BestWeight != null && rec2.BestWeight.CaughtWithDrf && !rec2.BestWeight.IsCheater && !rec2.BestWeight.IsSubmitted)
 						{
 							string cName2 = rec2.BestWeight.CharacterName ?? "Unknown";
+							string apiSig2 = GenerateSignature(rec2.BestWeight.Weight, rec2.BestWeight.Length, fName, rec2.BestWeight.IsSuperPb, seed + cName2 + accountName);
 							eligibleCatches.Add(new
 							{
+								accountName = accountName,
 								itemId = fId,
 								name = fName,
 								weight = rec2.BestWeight.Weight,
 								length = rec2.BestWeight.Length,
-								signature = rec2.BestWeight.Signature,
+								signature = apiSig2,
 								isSuper = rec2.BestWeight.IsSuperPb,
 								type = "weight",
 								characterName = cName2,
@@ -1302,13 +1387,15 @@ namespace Gorthax.GilledWars
 						if (rec2.BestLength != null && rec2.BestLength.CaughtWithDrf && !rec2.BestLength.IsCheater && !rec2.BestLength.IsSubmitted)
 						{
 							string cName = rec2.BestLength.CharacterName ?? "Unknown";
+							string apiSig = GenerateSignature(rec2.BestLength.Weight, rec2.BestLength.Length, fName, rec2.BestLength.IsSuperPb, seed + cName + accountName);
 							eligibleCatches.Add(new
 							{
+								accountName = accountName,
 								itemId = fId,
 								name = fName,
 								weight = rec2.BestLength.Weight,
 								length = rec2.BestLength.Length,
-								signature = rec2.BestLength.Signature,
+								signature = apiSig,
 								isSuper = rec2.BestLength.IsSuperPb,
 								type = "length",
 								characterName = cName,
@@ -1880,9 +1967,9 @@ namespace Gorthax.GilledWars
 					if (response2.get_IsSuccessStatusCode())
 					{
 						Dictionary<string, string> resultObj = JsonConvert.DeserializeObject<Dictionary<string, string>>(resultString2);
-						if (resultObj != null && resultObj.ContainsKey("code"))
+						if (resultObj != null && resultObj.ContainsKey("roomCode"))
 						{
-							string code = resultObj["code"];
+							string code = resultObj["roomCode"];
 							CopyToClipboard(code);
 							ScreenNotification.ShowNotification("Room " + code + " created & copied!");
 						}
@@ -2003,9 +2090,9 @@ namespace Gorthax.GilledWars
 				try
 				{
 					string roomCode = partSessionKey.Text.Trim().ToUpper();
-					if (!roomCode.StartsWith("GW-"))
+					if (!roomCode.StartsWith("GW-") || roomCode.Length != 8)
 					{
-						ScreenNotification.ShowNotification("Invalid Code Format!", ScreenNotification.NotificationType.Error);
+						ScreenNotification.ShowNotification("Invalid Code Format! Use GW-XXXXX", ScreenNotification.NotificationType.Error);
 						joinBtn.Enabled = true;
 						joinBtn.Text = "Join Room";
 						return;
@@ -2415,8 +2502,14 @@ namespace Gorthax.GilledWars
 			_lastGeneratedCode = Convert.ToBase64String(Encoding.UTF8.GetBytes(rawPayload + "|" + masterSig));
 			try
 			{
+				string accountName = "UnknownAccount";
+				if (Gw2ApiManager.HasPermissions(new TokenPermission[1] { TokenPermission.Account }))
+				{
+					accountName = (await Gw2ApiManager.Gw2ApiClient.V2.Account.GetAsync()).Name;
+				}
 				StringContent content = new StringContent(JsonConvert.SerializeObject(new
 				{
+					accountName = accountName,
 					playerName = charName,
 					verifyCode = _lastGeneratedCode,
 					catches = catchPayloadList

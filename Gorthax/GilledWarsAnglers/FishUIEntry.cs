@@ -1,6 +1,6 @@
 using Blish_HUD.Controls;
 
-namespace Gorthax.GilledWars
+namespace Gorthax.GilledWarsAnglers
 {
 	public class FishUIEntry
 	{

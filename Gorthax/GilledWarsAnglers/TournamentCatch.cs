@@ -1,4 +1,4 @@
-namespace Gorthax.GilledWars
+namespace Gorthax.GilledWarsAnglers
 {
 	public class TournamentCatch
 	{
