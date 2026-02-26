@@ -1,4 +1,4 @@
-namespace Gorthax.GilledWarsAnglers
+namespace Gorthax.Gilledwars
 {
 	public class SubRecord
 	{
