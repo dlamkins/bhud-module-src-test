@@ -116,6 +116,8 @@ namespace KpRefresher.Ressources
 
 		public static string GuardiansGlade => ResourceManager.GetString("GuardiansGlade", resourceCulture);
 
+		public static string GuardiansGladeCM => ResourceManager.GetString("GuardiansGladeCM", resourceCulture);
+
 		public static string HarvestTemple => ResourceManager.GetString("HarvestTemple", resourceCulture);
 
 		public static string HarvestTemple_Old => ResourceManager.GetString("HarvestTemple_Old", resourceCulture);
