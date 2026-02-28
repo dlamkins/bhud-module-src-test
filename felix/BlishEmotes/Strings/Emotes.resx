@@ -33,6 +33,7 @@
   <data name="magicjuggle"><value>Magic Juggle</value></data>
   <data name="shiverplus"><value>Shiver plus</value></data>
   <data name="breakdance"><value>Breakdance</value></data>
+  <data name="poseshy"><value>Pose shy</value></data>
   <data name="readbook"><value>Read book</value></data>
   <data name="shuffle"><value>Shuffle</value></data>
   <data name="crossarms"><value>Crossarms</value></data>
@@ -41,6 +42,9 @@
   <data name="unleash"><value>Unleash</value></data>
   <data name="thumbsup"><value>Thumbs up</value></data>
   <data name="threaten"><value>Threaten</value></data>
+  <data name="poseheart"><value>Pose heart</value></data>
+  <data name="posepeace"><value>Pose peace</value></data>
+  <data name="posesassy"><value>Pose sassy</value></data>
   <data name="magictrick"><value>Magic trick</value></data>
   <data name="channel"><value>Channel</value></data>
   <data name="possessed"><value>Possessed</value></data>

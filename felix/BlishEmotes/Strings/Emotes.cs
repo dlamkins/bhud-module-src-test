@@ -21,7 +21,7 @@ namespace felix.BlishEmotes.Strings
 		{
 			get
 			{
-				if (resourceMan == null)
+				if (object.Equals(null, resourceMan))
 				{
 					resourceMan = new ResourceManager("felix.BlishEmotes.Strings.Emotes", typeof(Emotes).Assembly);
 				}
@@ -155,6 +155,14 @@ namespace felix.BlishEmotes.Strings
 		internal static string wave => ResourceManager.GetString("wave", resourceCulture);
 
 		internal static string yes => ResourceManager.GetString("yes", resourceCulture);
+
+		internal static string poseshy => ResourceManager.GetString("poseshy", resourceCulture);
+
+		internal static string poseheart => ResourceManager.GetString("poseheart", resourceCulture);
+
+		internal static string posepeace => ResourceManager.GetString("posepeace", resourceCulture);
+
+		internal static string posesassy => ResourceManager.GetString("posesassy", resourceCulture);
 
 		internal Emotes()
 		{
