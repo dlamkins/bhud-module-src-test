@@ -360,7 +360,7 @@ namespace EmoteTome
 			_showCrabDance = settings.DefineSetting<bool>("Show CrabDance", true, (Func<string>)(() => BadLocalization.CRABDANCE[language]), (Func<string>)(() => BadLocalization.EMOTETEXT[language]));
 			_showShocked = settings.DefineSetting<bool>("Show Shocked", true, (Func<string>)(() => BadLocalization.SHOCKED[language]), (Func<string>)(() => BadLocalization.EMOTETEXT[language]));
 			_showThumbsUp = settings.DefineSetting<bool>("Show ThumbsUp", true, (Func<string>)(() => BadLocalization.THUMBSUP[language]), (Func<string>)(() => BadLocalization.EMOTETEXT[language]));
-			_showThumbsDown = settings.DefineSetting<bool>("Show ThumbsDown", true, (Func<string>)(() => BadLocalization.POSEHEART[language]), (Func<string>)(() => BadLocalization.EMOTETEXT[language]));
+			_showThumbsDown = settings.DefineSetting<bool>("Show ThumbsDown", true, (Func<string>)(() => BadLocalization.THUMBSDOWN[language]), (Func<string>)(() => BadLocalization.EMOTETEXT[language]));
 			_showPoseHeart = settings.DefineSetting<bool>("Show PoseHeart", true, (Func<string>)(() => BadLocalization.POSEHEART[language]), (Func<string>)(() => BadLocalization.EMOTETEXT[language]));
 			_showPosePeace = settings.DefineSetting<bool>("Show PosePeace", true, (Func<string>)(() => BadLocalization.POSEPEACE[language]), (Func<string>)(() => BadLocalization.EMOTETEXT[language]));
 			_showPoseSassy = settings.DefineSetting<bool>("Show PoseSassy", true, (Func<string>)(() => BadLocalization.POSESASSY[language]), (Func<string>)(() => BadLocalization.EMOTETEXT[language]));
