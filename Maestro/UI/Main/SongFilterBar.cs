@@ -55,7 +55,7 @@ namespace Maestro.UI.Main
 			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0054: Expected O, but got Unknown
-			//IL_0165: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016d: Unknown result type (might be due to invalid IL or missing references)
 			((Control)this).set_Size(new Point(width, 36));
 			((Control)this).set_BackgroundColor(Color.get_Transparent());
 			TextBox val = new TextBox();
@@ -76,7 +76,7 @@ namespace Maestro.UI.Main
 				}
 				IsTextInputFocused = e.get_Value();
 			});
-			string[] sourceItems = new string[5] { "All", "Bundled", "Created", "Imported", "Community" };
+			string[] sourceItems = new string[6] { "All", "Favorites", "Bundled", "Created", "Imported", "Community" };
 			GenericFilterButton genericFilterButton = new GenericFilterButton(new FilterSection
 			{
 				Items = sourceItems,

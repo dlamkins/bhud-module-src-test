@@ -4,6 +4,7 @@ using Blish_HUD.Controls;
 using Blish_HUD.Controls.Effects;
 using Blish_HUD.Input;
 using Maestro.Models;
+using Maestro.UI.Controls;
 using Microsoft.Xna.Framework;
 
 namespace Maestro.UI.Main
@@ -24,6 +25,10 @@ namespace Maestro.UI.Main
 
 			public const int ArtistY = 40;
 
+			public const int StarButtonSize = 20;
+
+			public const int StarButtonGap = 4;
+
 			public const int PlayButtonWidth = 40;
 
 			public const int PlayButtonHeight = 26;
@@ -32,7 +37,7 @@ namespace Maestro.UI.Main
 
 			public const int PlayButtonRightMargin = 15;
 
-			public static int LabelRightMargin => 55;
+			public static int LabelRightMargin => 79;
 		}
 
 		private readonly Panel _indicator;
@@ -42,6 +47,8 @@ namespace Maestro.UI.Main
 		private readonly Label _titleLabel;
 
 		private readonly Label _artistLabel;
+
+		private readonly StarButton _starButton;
 
 		private readonly StandardButton _playButton;
 
@@ -79,6 +86,18 @@ namespace Maestro.UI.Main
 			}
 		}
 
+		public bool IsFavorite
+		{
+			get
+			{
+				return _starButton.IsFavorite;
+			}
+			set
+			{
+				_starButton.IsFavorite = value;
+			}
+		}
+
 		public event EventHandler<MouseEventArgs> PlayClicked;
 
 		public event EventHandler<MouseEventArgs> CardClicked;
@@ -88,6 +107,8 @@ namespace Maestro.UI.Main
 		public event EventHandler EditRequested;
 
 		public event EventHandler AddToQueueRequested;
+
+		public event EventHandler FavoriteToggleRequested;
 
 		public SongCard(Song song, int width)
 			: this()
@@ -136,15 +157,16 @@ namespace Maestro.UI.Main
 			//IL_01b0: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01b1: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01c0: Expected O, but got Unknown
-			//IL_01c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ec: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f9: Expected O, but got Unknown
-			//IL_0210: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0216: Expected O, but got Unknown
+			//IL_01dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0203: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0208: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0224: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_023b: Expected O, but got Unknown
+			//IL_0252: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0258: Expected O, but got Unknown
 			Song = song;
 			((Control)this).set_Size(new Point(width, 70));
 			((Control)this).set_BackgroundColor(MaestroTheme.PanelBackground);
@@ -185,6 +207,14 @@ namespace Maestro.UI.Main
 			val4.set_Font(GameService.Content.get_DefaultFont12());
 			val4.set_TextColor(MaestroTheme.MutedCream);
 			_artistLabel = val4;
+			StarButton starButton = new StarButton();
+			((Control)starButton).set_Parent((Container)(object)this);
+			((Control)starButton).set_Location(new Point(width - 40 - 15 - 20 - 4, 25));
+			_starButton = starButton;
+			((Control)_starButton).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				this.FavoriteToggleRequested?.Invoke(this, EventArgs.Empty);
+			});
 			StandardButton val5 = new StandardButton();
 			((Control)val5).set_Parent((Container)(object)this);
 			val5.set_Text(">");
@@ -199,6 +229,10 @@ namespace Maestro.UI.Main
 			((Control)contextMenu.AddMenuItem("Add to Queue")).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				this.AddToQueueRequested?.Invoke(this, EventArgs.Empty);
+			});
+			((Control)contextMenu.AddMenuItem("Toggle Favorite")).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				this.FavoriteToggleRequested?.Invoke(this, EventArgs.Empty);
 			});
 			if (song.IsUserImported || song.IsCreated)
 			{
@@ -269,6 +303,11 @@ namespace Maestro.UI.Main
 			if (artistLabel != null)
 			{
 				((Control)artistLabel).Dispose();
+			}
+			StarButton starButton = _starButton;
+			if (starButton != null)
+			{
+				((Control)starButton).Dispose();
 			}
 			StandardButton playButton = _playButton;
 			if (playButton != null)

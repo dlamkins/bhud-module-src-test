@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Maestro.Models;
+using Maestro.Services;
 using Maestro.Services.Playback;
 using Microsoft.Xna.Framework;
 
@@ -39,6 +40,8 @@ namespace Maestro.UI.Main
 
 		public event EventHandler<Song> AddToQueueRequested;
 
+		public event EventHandler<Song> FavoriteToggleRequested;
+
 		public event EventHandler<int> CountChanged;
 
 		public SongListPanel(SongPlayer songPlayer, int contentWidth)
@@ -71,6 +74,7 @@ namespace Maestro.UI.Main
 				card.DeleteRequested += OnCardDeleteRequested;
 				card.EditRequested += OnCardEditRequested;
 				card.AddToQueueRequested += OnCardAddToQueueRequested;
+				card.FavoriteToggleRequested += OnCardFavoriteToggleRequested;
 				_songCards[song] = card;
 			}
 			UpdateCardStates();
@@ -135,6 +139,15 @@ namespace Maestro.UI.Main
 			}
 		}
 
+		private void OnCardFavoriteToggleRequested(object sender, EventArgs e)
+		{
+			SongCard card = sender as SongCard;
+			if (card?.Song != null)
+			{
+				this.FavoriteToggleRequested?.Invoke(this, card.Song);
+			}
+		}
+
 		public void SelectSong(Song song)
 		{
 			SelectedSong = song;
@@ -153,6 +166,15 @@ namespace Maestro.UI.Main
 			}
 		}
 
+		public void UpdateFavoriteStates(HashSet<string> favoriteKeys)
+		{
+			foreach (KeyValuePair<Song, SongCard> kvp in _songCards)
+			{
+				string key = FavoriteService.GetSongKey(kvp.Key);
+				kvp.Value.IsFavorite = favoriteKeys.Contains(key);
+			}
+		}
+
 		protected override void DisposeControl()
 		{
 			foreach (SongCard value in _songCards.Values)
@@ -162,6 +184,7 @@ namespace Maestro.UI.Main
 				value.DeleteRequested -= OnCardDeleteRequested;
 				value.EditRequested -= OnCardEditRequested;
 				value.AddToQueueRequested -= OnCardAddToQueueRequested;
+				value.FavoriteToggleRequested -= OnCardFavoriteToggleRequested;
 				((Control)value).Dispose();
 			}
 			_songCards.Clear();
