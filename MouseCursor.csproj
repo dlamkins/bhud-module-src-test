@@ -1,7 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
     <AssemblyName>MouseCursor</AssemblyName>
     <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+    <UseWindowsForms>True</UseWindowsForms>
     <TargetFramework>net48</TargetFramework>
   </PropertyGroup>
   <PropertyGroup>
@@ -11,11 +12,11 @@
   <PropertyGroup />
   <ItemGroup />
   <ItemGroup>
-    <Reference Include="Blish HUD" />
-    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="MonoGame.Framework">
       <HintPath>..\..\working\MonoGame.Framework.dll</HintPath>
     </Reference>
+    <Reference Include="Blish HUD" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="Gw2Sharp" />
   </ItemGroup>
 </Project>

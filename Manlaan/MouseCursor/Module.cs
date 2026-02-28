@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Drawing;
 using System.IO;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics;
@@ -23,7 +25,23 @@ namespace Manlaan.MouseCursor
 	[Export(typeof(Module))]
 	public class Module : Module
 	{
+		public enum ClipMode
+		{
+			Never,
+			Always
+		}
+
+		public enum ShowMode
+		{
+			Never,
+			Always,
+			Dragging,
+			NotDragging
+		}
+
 		internal static Module ModuleInstance;
+
+		private static readonly Logger Logger = Logger.GetLogger<Module>();
 
 		public static SettingCollection _settingsHidden;
 
@@ -39,17 +57,49 @@ namespace Manlaan.MouseCursor
 
 		public static SettingEntry<bool> _settingMouseCursorAboveBlish;
 
-		public static SettingEntry<bool> _settingMouseCursorOnlyCombat;
+		public static SettingEntry<ShowMode> _settingMouseCursorShow;
 
-		private DrawMouseCursor _mouseImg;
+		public static SettingEntry<ClipMode> _settingMouseCursorClip;
 
-		private Point _mousePos = new Point(0, 0);
+		public static SettingEntry<ShowMode> _settingMouseCursorShowCombat;
 
-		private bool _inActionCam;
+		public static SettingEntry<ClipMode> _settingMouseCursorClipCombat;
+
+		public static SettingEntry<bool> _settingMouseCursorFreezeCursor;
+
+		public static SettingEntry<float> _settingMouseCursorFreezeCursorPeriod;
 
 		public static List<MouseFile> _mouseFiles = new List<MouseFile>();
 
 		public static List<Color> _colors = new List<Color>();
+
+		private DrawMouseCursor _mouseImg;
+
+		private TimeSpan _freezeStart;
+
+		private Microsoft.Xna.Framework.Point _freezeStartPoint;
+
+		private bool _freezeCursor;
+
+		private bool _shouldClip;
+
+		private bool _inActionCam;
+
+		private bool _inActionCamChanged;
+
+		private bool _camDragged;
+
+		private bool _camDraggedChanged;
+
+		private bool _cursorVis = true;
+
+		private bool _cursorVisChanged;
+
+		private double _cursorVel;
+
+		private bool _cursorVelChanged;
+
+		private MouseState _lastMouseState;
 
 		internal SettingsManager SettingsManager => base.ModuleParameters.get_SettingsManager();
 
@@ -68,22 +118,26 @@ namespace Manlaan.MouseCursor
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
-			_settingMouseCursorImage = settings.DefineSetting<string>("MouseCursorImage", "Circle Cyan.png", (Func<string>)null, (Func<string>)null);
-			_settingMouseCursorColor = settings.DefineSetting<string>("MouseCursorColor", "White0", (Func<string>)null, (Func<string>)null);
-			_settingMouseCursorSize = settings.DefineSetting<int>("MouseCursorSize", 70, (Func<string>)(() => "Size"), (Func<string>)(() => ""));
-			_settingMouseCursorOpacity = settings.DefineSetting<float>("MouseCursorOpacity", 1f, (Func<string>)(() => "Opacity"), (Func<string>)(() => ""));
+			_settingMouseCursorImage = settings.DefineSetting<string>("MouseCursorImage", "Circle Cyan.png", (Func<string>)(() => ""), (Func<string>)null);
+			_settingMouseCursorColor = settings.DefineSetting<string>("MouseCursorColor", "White0", (Func<string>)(() => ""), (Func<string>)null);
+			_settingMouseCursorSize = settings.DefineSetting<int>("MouseCursorSize", 70, (Func<string>)(() => "Size"), (Func<string>)null);
+			_settingMouseCursorOpacity = settings.DefineSetting<float>("MouseCursorOpacity", 1f, (Func<string>)(() => "Opacity"), (Func<string>)null);
 			_settingMouseCursorCameraDrag = settings.DefineSetting<bool>("MouseCursorCameraDrag", false, (Func<string>)(() => "Show When Camera Dragging"), (Func<string>)(() => "Shows the cursor when you move the camera."));
-			_settingMouseCursorAboveBlish = settings.DefineSetting<bool>("MouseCursorAboveBlish", false, (Func<string>)(() => "Show Above Blish Windows"), (Func<string>)(() => ""));
-			_settingMouseCursorOnlyCombat = settings.DefineSetting<bool>("MouseCursorOnlyCombat", false, (Func<string>)(() => "Only Show During Combat"), (Func<string>)(() => ""));
-			_settingMouseCursorImage.add_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)UpdateMouseSettings_string);
-			_settingMouseCursorColor.add_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)UpdateMouseSettings_string);
-			_settingMouseCursorSize.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)UpdateMouseSettings_int);
-			_settingMouseCursorOpacity.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)UpdateMouseSettings_float);
-			_settingMouseCursorCameraDrag.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)UpdateMouseSettings_bool);
-			_settingMouseCursorAboveBlish.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)UpdateMouseSettings_bool);
-			_settingMouseCursorOnlyCombat.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)UpdateMouseSettings_bool);
+			_settingMouseCursorAboveBlish = settings.DefineSetting<bool>("MouseCursorAboveBlish", false, (Func<string>)(() => "Show Above Blish Windows"), (Func<string>)null);
+			_settingMouseCursorShow = settings.DefineSetting<ShowMode>("MouseCursorShow", ShowMode.Never, (Func<string>)(() => ""), (Func<string>)null);
+			_settingMouseCursorShowCombat = settings.DefineSetting<ShowMode>("MouseCursorShowCombat", ShowMode.Never, (Func<string>)(() => ""), (Func<string>)null);
+			_settingMouseCursorClip = settings.DefineSetting<ClipMode>("MouseCursorClip", ClipMode.Never, (Func<string>)(() => ""), (Func<string>)null);
+			_settingMouseCursorClipCombat = settings.DefineSetting<ClipMode>("MouseCursorClipCombat", ClipMode.Never, (Func<string>)(() => ""), (Func<string>)null);
+			_settingMouseCursorFreezeCursor = settings.DefineSetting<bool>("MouseCursorCenterAfterDrag", false, (Func<string>)(() => "Freeze Cursor After Dragging"), (Func<string>)null);
+			_settingMouseCursorFreezeCursorPeriod = settings.DefineSetting<float>("MouseCursorFreezePeriod", 2f, (Func<string>)(() => ""), (Func<string>)(() => $"{_settingMouseCursorFreezeCursorPeriod.get_Value():0} ms"));
+			_settingMouseCursorImage.add_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)UpdateMouseCursorSettingsCursorImageNColor);
+			_settingMouseCursorColor.add_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)UpdateMouseCursorSettingsCursorImageNColor);
+			_settingMouseCursorSize.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)UpdateMouseCursorSettingsCursorSize);
+			_settingMouseCursorOpacity.add_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)UpdateMouseCursorSettingsOpacity);
+			_settingMouseCursorAboveBlish.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)UpdateMouseCursorSettingsAboveBlish);
 			SettingComplianceExtensions.SetRange(_settingMouseCursorSize, 0, 300);
 			SettingComplianceExtensions.SetRange(_settingMouseCursorOpacity, 0f, 1f);
+			SettingComplianceExtensions.SetRange(_settingMouseCursorFreezeCursorPeriod, 1f, 500f);
 		}
 
 		public override IView GetSettingsView()
@@ -158,50 +212,88 @@ namespace Manlaan.MouseCursor
 
 		protected override void OnModuleLoaded(EventArgs e)
 		{
-			UpdateMouseSettings_int();
-			UpdateMouseSettings_float();
-			UpdateMouseSettings_bool();
-			UpdateMouseSettings_string();
+			UpdateMouseCursorSettingsCursorSize();
+			UpdateMouseCursorSettingsOpacity();
+			UpdateMouseCursorSettingsAboveBlish();
+			UpdateMouseCursorSettingsCursorImageNColor();
 			((Module)this).OnModuleLoaded(e);
 		}
 
 		protected override void Update(GameTime gameTime)
 		{
-			bool lrBtnPressed = GameService.Input.get_Mouse().get_CameraDragging() || GameService.Input.get_Mouse().get_State().LeftButton == ButtonState.Pressed;
-			bool camIsDragged = !GameService.Input.get_Mouse().get_CursorIsVisible() || lrBtnPressed;
-			if (!_inActionCam && !GameService.Input.get_Mouse().get_CursorIsVisible() && !lrBtnPressed)
+			UpdateCursorState(gameTime);
+			UpdateCursorClipping();
+			UpdateCursorFreeze(gameTime);
+			UpdateCursorImg();
+			_lastMouseState = Mouse.GetState();
+		}
+
+		private void UpdateCursorState(GameTime gt)
+		{
+			bool cursorVis = GameService.Input.get_Mouse().get_CursorIsVisible();
+			_cursorVisChanged = _cursorVis != cursorVis;
+			_cursorVis = cursorVis;
+			bool camDragged = !cursorVis && !_inActionCam && (Mouse.GetState().RightButton == Microsoft.Xna.Framework.Input.ButtonState.Pressed || Mouse.GetState().LeftButton == Microsoft.Xna.Framework.Input.ButtonState.Pressed);
+			_camDraggedChanged = _camDragged != camDragged;
+			_camDragged = camDragged;
+			bool inActionCam = !cursorVis && !_camDragged && WinApi.GetClientRect(GameService.GameIntegration.get_Gw2Instance().get_Gw2WindowHandle()).GetValueOrDefault().Contains(Mouse.GetState().Position.X, Mouse.GetState().Position.Y);
+			_inActionCamChanged = _inActionCam != inActionCam;
+			_inActionCam = inActionCam;
+			double cursorVel = (double)(Mouse.GetState().Position.ToVector2() - _lastMouseState.Position.ToVector2()).Length() / gt.ElapsedGameTime.TotalSeconds;
+			_cursorVelChanged = cursorVel - _cursorVel < 1E-09;
+			_cursorVel = cursorVel;
+		}
+
+		private void UpdateCursorImg()
+		{
+			((Control)_mouseImg).set_Visible(GameService.GameIntegration.get_Gw2Instance().get_Gw2HasFocus() && GameService.GameIntegration.get_Gw2Instance().get_IsInGame() && !_inActionCam);
+			((Control)_mouseImg).set_Visible(((Control)_mouseImg).get_Visible() && ((!GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat() && (_settingMouseCursorShow.get_Value() == ShowMode.Always || (_settingMouseCursorShow.get_Value() == ShowMode.Dragging && _camDragged) || (_settingMouseCursorShow.get_Value() == ShowMode.NotDragging && !_camDragged))) || (GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat() && (_settingMouseCursorShowCombat.get_Value() == ShowMode.Always || (_settingMouseCursorShowCombat.get_Value() == ShowMode.Dragging && _camDragged) || (_settingMouseCursorShowCombat.get_Value() == ShowMode.NotDragging && !_camDragged)))));
+			if (_cursorVis)
 			{
-				_inActionCam = true;
+				((Control)_mouseImg).set_Location(new Microsoft.Xna.Framework.Point(Clamp(Mouse.GetState().Position.X - _settingMouseCursorSize.get_Value() / 2, -_settingMouseCursorSize.get_Value() / 2, GameService.Graphics.get_WindowWidth() - _settingMouseCursorSize.get_Value() / 2), Clamp(Mouse.GetState().Position.Y - _settingMouseCursorSize.get_Value() / 2, -_settingMouseCursorSize.get_Value() / 2, GameService.Graphics.get_WindowHeight() - _settingMouseCursorSize.get_Value() / 2)));
 			}
-			if (GameService.Input.get_Mouse().get_CursorIsVisible())
+		}
+
+		private void UpdateCursorFreeze(GameTime gameTime)
+		{
+			_freezeCursor = (((_camDraggedChanged && !_camDragged && !_inActionCam) || (_inActionCamChanged && !_inActionCam)) ? _settingMouseCursorFreezeCursor.get_Value() : _freezeCursor);
+			_freezeStart = (((_camDraggedChanged && !_camDragged && !_inActionCam) || (_inActionCamChanged && !_inActionCam)) ? gameTime.TotalGameTime : _freezeStart);
+			_freezeStartPoint = (((_camDraggedChanged && _camDragged && !_inActionCamChanged) || (_inActionCamChanged && _inActionCam && !_camDraggedChanged)) ? new Microsoft.Xna.Framework.Point(Mouse.GetState().Position.X, Mouse.GetState().Position.Y) : _freezeStartPoint);
+			if (_freezeCursor)
 			{
-				_inActionCam = false;
+				if (gameTime.TotalGameTime.Subtract(_freezeStart).TotalMilliseconds > (double)_settingMouseCursorFreezeCursorPeriod.get_Value() || !GameService.GameIntegration.get_Gw2Instance().get_IsInGame() || !GameService.GameIntegration.get_Gw2Instance().get_Gw2HasFocus())
+				{
+					_freezeCursor = false;
+				}
+				System.Drawing.Point? clientToScr = WinApi.ClientToScreen(GameService.GameIntegration.get_Gw2Instance().get_Gw2WindowHandle());
+				System.Drawing.Rectangle? clientRect = WinApi.GetClientRect(GameService.GameIntegration.get_Gw2Instance().get_Gw2WindowHandle());
+				Cursor.Position = (_freezeCursor ? Cursor.Clip.Location : Cursor.Position);
+				Cursor.Clip = new System.Drawing.Rectangle(_freezeCursor ? (clientToScr.GetValueOrDefault().X + _freezeStartPoint.X) : (_shouldClip ? clientToScr.GetValueOrDefault().X : 0), _freezeCursor ? (clientToScr.GetValueOrDefault().Y + _freezeStartPoint.Y) : (_shouldClip ? clientToScr.GetValueOrDefault().Y : 0), _freezeCursor ? 1 : (_shouldClip ? clientRect.GetValueOrDefault().Width : 0), _freezeCursor ? 1 : (_shouldClip ? clientRect.GetValueOrDefault().Height : 0));
 			}
-			GameService.Debug.get_OverlayTexts().TryAdd("RightButton.Pressed ", (Func<GameTime, string>)((GameTime _) => "RightButton     " + ((GameService.Input.get_Mouse().get_State().RightButton == ButtonState.Pressed) ? "Yes" : "No")));
-			GameService.Debug.get_OverlayTexts().TryAdd("LeftButton.Pressed  ", (Func<GameTime, string>)((GameTime _) => "LeftButton      " + ((GameService.Input.get_Mouse().get_State().LeftButton == ButtonState.Pressed) ? "Yes" : "No")));
-			GameService.Debug.get_OverlayTexts().TryAdd("CursorIsVisible     ", (Func<GameTime, string>)((GameTime _) => "CursorIsVisible " + (GameService.Input.get_Mouse().get_CursorIsVisible() ? "Yes" : "No")));
-			GameService.Debug.get_OverlayTexts().TryAdd("CameraDragging      ", (Func<GameTime, string>)((GameTime _) => "CameraDragging  " + (GameService.Input.get_Mouse().get_CameraDragging() ? "Yes" : "No")));
-			GameService.Debug.get_OverlayTexts().TryAdd("InActionCam         ", (Func<GameTime, string>)((GameTime _) => "InActionCam     " + (_inActionCam ? "Yes" : "No")));
-			((Control)_mouseImg).set_Visible(GameService.GameIntegration.get_Gw2Instance().get_IsInGame() && GameService.GameIntegration.get_Gw2Instance().get_Gw2HasFocus() && !_inActionCam);
-			((Control)_mouseImg).set_Visible(((Control)_mouseImg).get_Visible() && (!_settingMouseCursorOnlyCombat.get_Value() || GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat()));
-			((Control)_mouseImg).set_Visible(((Control)_mouseImg).get_Visible() && (_settingMouseCursorCameraDrag.get_Value() || !camIsDragged));
-			if (GameService.Input.get_Mouse().get_CursorIsVisible())
+		}
+
+		private void UpdateCursorClipping()
+		{
+			System.Drawing.Rectangle? clientRect = WinApi.GetClientRect(GameService.GameIntegration.get_Gw2Instance().get_Gw2WindowHandle());
+			System.Drawing.Point? clientToScr = WinApi.ClientToScreen(GameService.GameIntegration.get_Gw2Instance().get_Gw2WindowHandle());
+			bool shouldClip = !_freezeCursor && GameService.GameIntegration.get_Gw2Instance().get_IsInGame() && GameService.GameIntegration.get_Gw2Instance().get_Gw2HasFocus() && (_inActionCam || _camDragged || (!GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat() && _settingMouseCursorClip.get_Value() == ClipMode.Always) || (GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat() && _settingMouseCursorClipCombat.get_Value() == ClipMode.Always));
+			clientRect.GetValueOrDefault().Contains(Mouse.GetState().Position.X, Mouse.GetState().Position.Y);
+			bool num = _shouldClip != shouldClip;
+			_shouldClip = shouldClip;
+			if (num || (_cursorVisChanged && _cursorVis))
 			{
-				_mousePos.X = GameService.Input.get_Mouse().get_Position().X;
-				_mousePos.Y = GameService.Input.get_Mouse().get_Position().Y;
+				Cursor.Clip = new System.Drawing.Rectangle(_shouldClip ? clientToScr.GetValueOrDefault().X : 0, _shouldClip ? clientToScr.GetValueOrDefault().Y : 0, _shouldClip ? clientRect.GetValueOrDefault().Width : 0, _shouldClip ? clientRect.GetValueOrDefault().Height : 0);
 			}
-			((Control)_mouseImg).set_Location(new Point(_mousePos.X - _settingMouseCursorSize.get_Value() / 2, _mousePos.Y - _settingMouseCursorSize.get_Value() / 2));
 		}
 
 		protected override void Unload()
 		{
-			_settingMouseCursorImage.remove_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)UpdateMouseSettings_string);
-			_settingMouseCursorColor.remove_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)UpdateMouseSettings_string);
-			_settingMouseCursorSize.remove_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)UpdateMouseSettings_int);
-			_settingMouseCursorOpacity.remove_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)UpdateMouseSettings_float);
-			_settingMouseCursorCameraDrag.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)UpdateMouseSettings_bool);
-			_settingMouseCursorAboveBlish.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)UpdateMouseSettings_bool);
-			_settingMouseCursorOnlyCombat.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)UpdateMouseSettings_bool);
+			_settingMouseCursorImage.remove_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)UpdateMouseCursorSettingsCursorImageNColor);
+			_settingMouseCursorColor.remove_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)UpdateMouseCursorSettingsCursorImageNColor);
+			_settingMouseCursorSize.remove_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)UpdateMouseCursorSettingsCursorSize);
+			_settingMouseCursorOpacity.remove_SettingChanged((EventHandler<ValueChangedEventArgs<float>>)UpdateMouseCursorSettingsOpacity);
+			_settingMouseCursorAboveBlish.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)UpdateMouseCursorSettingsAboveBlish);
+			Cursor.Clip = default(System.Drawing.Rectangle);
 			DrawMouseCursor mouseImg = _mouseImg;
 			if (mouseImg != null)
 			{
@@ -212,17 +304,30 @@ namespace Manlaan.MouseCursor
 			ModuleInstance = null;
 		}
 
-		private void UpdateMouseSettings_int(object sender = null, ValueChangedEventArgs<int> e = null)
+		private static T Clamp<T>(T value, T min, T max) where T : IComparable<T>
 		{
-			((Control)_mouseImg).set_Size(new Point(_settingMouseCursorSize.get_Value(), _settingMouseCursorSize.get_Value()));
+			if (value.CompareTo(min) < 0)
+			{
+				return min;
+			}
+			if (value.CompareTo(max) > 0)
+			{
+				return max;
+			}
+			return value;
 		}
 
-		private void UpdateMouseSettings_float(object sender = null, ValueChangedEventArgs<float> e = null)
+		private void UpdateMouseCursorSettingsCursorSize(object sender = null, ValueChangedEventArgs<int> e = null)
+		{
+			((Control)_mouseImg).set_Size(new Microsoft.Xna.Framework.Point(_settingMouseCursorSize.get_Value(), _settingMouseCursorSize.get_Value()));
+		}
+
+		private void UpdateMouseCursorSettingsOpacity(object sender = null, ValueChangedEventArgs<float> e = null)
 		{
 			((Control)_mouseImg).set_Opacity(_settingMouseCursorOpacity.get_Value());
 		}
 
-		private void UpdateMouseSettings_string(object sender = null, ValueChangedEventArgs<string> e = null)
+		private void UpdateMouseCursorSettingsCursorImageNColor(object sender = null, ValueChangedEventArgs<string> e = null)
 		{
 			//IL_0069: Unknown result type (might be due to invalid IL or missing references)
 			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
@@ -246,7 +351,7 @@ namespace Manlaan.MouseCursor
 			_mouseImg.Tint = ToRGB(_colors.Find((Color x) => x.get_Name().Equals(_settingMouseCursorColor.get_Value())));
 		}
 
-		private void UpdateMouseSettings_bool(object sender = null, ValueChangedEventArgs<bool> e = null)
+		private void UpdateMouseCursorSettingsAboveBlish(object sender = null, ValueChangedEventArgs<bool> e = null)
 		{
 			_mouseImg.AboveBlish = _settingMouseCursorAboveBlish.get_Value();
 		}
@@ -269,11 +374,11 @@ namespace Manlaan.MouseCursor
 				FileStream titleStream = File.OpenRead(FilePath);
 				Texture2D texture = Texture2D.FromStream(device, titleStream);
 				titleStream.Close();
-				Color[] buffer = new Color[texture.Width * texture.Height];
+				Microsoft.Xna.Framework.Color[] buffer = new Microsoft.Xna.Framework.Color[texture.Width * texture.Height];
 				texture.GetData(buffer);
 				for (int i = 0; i < buffer.Length; i++)
 				{
-					buffer[i] = Color.FromNonPremultiplied(buffer[i].R, buffer[i].G, buffer[i].B, buffer[i].A);
+					buffer[i] = Microsoft.Xna.Framework.Color.FromNonPremultiplied(buffer[i].R, buffer[i].G, buffer[i].B, buffer[i].A);
 				}
 				texture.SetData(buffer);
 				return texture;
@@ -284,13 +389,13 @@ namespace Manlaan.MouseCursor
 			}
 		}
 
-		private Color ToRGB(Color color)
+		private Microsoft.Xna.Framework.Color ToRGB(Color color)
 		{
 			if (color == null)
 			{
-				return new Color(255, 255, 255);
+				return new Microsoft.Xna.Framework.Color(255, 255, 255);
 			}
-			return new Color(color.get_Cloth().get_Rgb()[0], color.get_Cloth().get_Rgb()[1], color.get_Cloth().get_Rgb()[2]);
+			return new Microsoft.Xna.Framework.Color(color.get_Cloth().get_Rgb()[0], color.get_Cloth().get_Rgb()[1], color.get_Cloth().get_Rgb()[2]);
 		}
 	}
 }
