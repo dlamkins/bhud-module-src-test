@@ -272,7 +272,16 @@ namespace Gorthax.Gilledwars
 			};
 			_cornerIcon.Click += delegate
 			{
-				if (_mainWindow != null)
+				if (_casualCompactPanel != null && _casualCompactPanel.Visible)
+				{
+					_casualCompactPanel.Visible = false;
+					if (_mainWindow != null)
+					{
+						_mainWindow.Visible = true;
+					}
+					ScreenNotification.ShowNotification("Expanding to Main View");
+				}
+				else if (_mainWindow != null)
 				{
 					_mainWindow.Visible = !_mainWindow.Visible;
 				}
@@ -325,6 +334,32 @@ namespace Gorthax.Gilledwars
 					_speciesSelectionWindow.Visible = false;
 				}
 			};
+			StandardButton refreshBtn = new StandardButton
+			{
+				Text = "Refresh",
+				Parent = _leaderboardWindow,
+				Location = new Point(340, 45),
+				Width = 90,
+				BasicTooltipText = "Force fetch latest leaderboard data (5-minute cooldown)."
+			};
+			refreshBtn.Click += async delegate
+			{
+				double elapsedMinutes = (DateTime.Now - _lastLeaderboardFetchTime).TotalMinutes;
+				if (elapsedMinutes < 5.0 && _cachedLeaderboardData != null)
+				{
+					int remaining = 5 - (int)elapsedMinutes;
+					ScreenNotification.ShowNotification($"Refresh is on cooldown! Wait {remaining}m.", ScreenNotification.NotificationType.Warning);
+				}
+				else
+				{
+					refreshBtn.Enabled = false;
+					_cachedLeaderboardData = null;
+					_lastLeaderboardFetchTime = DateTime.MinValue;
+					await RefreshLeaderboardData();
+					refreshBtn.Enabled = true;
+					ScreenNotification.ShowNotification("Leaderboard Refreshed!");
+				}
+			};
 			_leaderboardWindow.LeftMouseButtonPressed += delegate
 			{
 				if (GameService.Input.Mouse.ActiveControl == _leaderboardWindow)
@@ -375,8 +410,8 @@ namespace Gorthax.Gilledwars
 			_lbListPanel = new FlowPanel
 			{
 				Parent = _leaderboardWindow,
-				Location = new Point(10, 50),
-				Size = new Point(440, 530),
+				Location = new Point(10, 85),
+				Size = new Point(440, 500),
 				CanScroll = true,
 				FlowDirection = ControlFlowDirection.SingleTopToBottom
 			};
@@ -679,12 +714,7 @@ namespace Gorthax.Gilledwars
 				CanScroll = true,
 				FlowDirection = ControlFlowDirection.SingleTopToBottom
 			};
-			PopulateList();
-			_speciesSearchBox.TextChanged += delegate
-			{
-				PopulateList(_speciesSearchBox.Text);
-			};
-			void PopulateList(string filter = "")
+			Action<string> populateList = delegate(string filter)
 			{
 				scroll.ClearChildren();
 				StandardButton standardButton = new StandardButton();
@@ -715,7 +745,12 @@ namespace Gorthax.Gilledwars
 						await RefreshLeaderboardData();
 					};
 				}
-			}
+			};
+			populateList("");
+			_speciesSearchBox.TextChanged += delegate
+			{
+				populateList(_speciesSearchBox.Text);
+			};
 		}
 
 		private void CopyToClipboard(string text)
@@ -921,8 +956,19 @@ namespace Gorthax.Gilledwars
 		private async Task InitializeAccountAndLoadAsync()
 		{
 			string newDir = ModuleDirectory;
-			Directory.CreateDirectory(newDir);
-			Logger.Info("[GilledWars] Using correct folder: " + newDir);
+			try
+			{
+				Directory.CreateDirectory(newDir);
+				string path = Path.Combine(newDir, "permissions_check.txt");
+				System.IO.File.WriteAllText(path, "Gilled Wars Write Test - Success");
+				System.IO.File.Delete(path);
+				Logger.Info("[GilledWars] Storage directory verified: " + newDir);
+			}
+			catch (Exception ex3)
+			{
+				Logger.Error(ex3, "CRITICAL: Could not write to module storage. OneDrive or Permissions issue.");
+				ScreenNotification.ShowNotification("Gilled Wars: Folder Access Error! Check your Documents permissions.", ScreenNotification.NotificationType.Error);
+			}
 			string[] obj = new string[2]
 			{
 				Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "Guild Wars 2", "addons", "blishhud", "gilledwarsanglers"),
@@ -1004,7 +1050,7 @@ namespace Gorthax.Gilledwars
 			}
 			LoadPersonalBests();
 			RefreshFishLogUI();
-			Logger.Info("[GilledWars] Loaded with account: " + _localAccountName);
+			Logger.Info("[GilledWars] Module fully initialized for: " + _localAccountName);
 		}
 
 		private void LoadPersonalBests()
@@ -1916,6 +1962,8 @@ namespace Gorthax.Gilledwars
 									item2.IsSubmitted = true;
 								}
 								SavePersonalBests();
+								_cachedLeaderboardData = null;
+								_lastLeaderboardFetchTime = DateTime.MinValue;
 								ScreenNotification.ShowNotification("PB submitted to the Leaderboards, good luck!");
 							}
 							else
