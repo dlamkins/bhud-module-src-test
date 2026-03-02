@@ -12,6 +12,7 @@ using System.Net.WebSockets;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -22,6 +23,7 @@ using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
 using Gw2Sharp;
+using Gw2Sharp.WebApi.V2;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -125,6 +127,36 @@ namespace Gorthax.Gilledwars
 		private string _currentlySelectedSpecies = "All Species";
 
 		private Blish_HUD.Controls.TextBox _speciesSearchBox;
+
+		private static readonly string[] _junkMessages = new string[5] { "You caught... trash! The oceans are healing.", "A soggy boot! A true angler's prize.", "Just some literal garbage. Better luck next cast!", "You reeled in a tangled mess. Peak gameplay.", "Is it a legendary fish?! No... it's just debris." };
+
+		private static readonly string[] _treasureMessages = new string[5] { "Woah, Shiny! You caught some actual treasure!", "A sunken chest! Hope it's not full of more boots.", "Treasure! You're gonna be rich... probably.", "You reeled in the jackpot! Nice catch!", "Move over, Blackbeard! Sunken loot acquired." };
+
+		private Blish_HUD.Controls.Panel _achievementPanel;
+
+		private Blish_HUD.Controls.Panel _achievementResultsPanel;
+
+		private Blish_HUD.Controls.Panel _achievementLegendPanel;
+
+		private bool _isDraggingAchievement;
+
+		private Point _achievementDragOffset;
+
+		private bool _isSpeciesSelectionDragging;
+
+		private Point _speciesSelectionDragOffset;
+
+		private Blish_HUD.Controls.Panel _metaProgressWindow;
+
+		private Point _metaDragOffset;
+
+		private bool _isMetaDragging;
+
+		private List<FlowPanel> _allMetaSubPanels = new List<FlowPanel>();
+
+		private FlowPanel _metaSubContainer;
+
+		private Blish_HUD.Controls.Panel _currentlyExpandedRow;
 
 		private bool _isTournamentActive;
 
@@ -255,6 +287,9 @@ namespace Gorthax.Gilledwars
 			_isCompactDragging = false;
 			_isDraggingTarget = false;
 			_isDraggingLeaderboard = false;
+			_isDraggingAchievement = false;
+			_isSpeciesSelectionDragging = false;
+			_isMetaDragging = false;
 		}
 
 		protected override void OnModuleLoaded(EventArgs e)
@@ -682,6 +717,244 @@ namespace Gorthax.Gilledwars
 			}
 		}
 
+		private async Task ShowMetaProgressWindow()
+		{
+			if (_metaProgressWindow == null)
+			{
+				_metaProgressWindow = new Blish_HUD.Controls.Panel
+				{
+					ShowBorder = true,
+					Size = new Point(540, 550),
+					Location = new Point(350, 150),
+					Parent = GameService.Graphics.SpriteScreen,
+					BackgroundColor = new Microsoft.Xna.Framework.Color(20, 20, 20, 240),
+					ZIndex = 1100,
+					ClipsBounds = false
+				};
+			}
+			_metaProgressWindow.ClearChildren();
+			_allMetaSubPanels.Clear();
+			_currentlyExpandedRow = null;
+			_metaProgressWindow.Visible = true;
+			FlowPanel scroll = new FlowPanel
+			{
+				Parent = _metaProgressWindow,
+				Size = new Point(_metaProgressWindow.Width - 10, _metaProgressWindow.Height - 40),
+				Location = new Point(5, 35),
+				FlowDirection = ControlFlowDirection.SingleTopToBottom,
+				CanScroll = true,
+				ControlPadding = new Vector2(0f, 5f)
+			};
+			new Blish_HUD.Controls.Label
+			{
+				Text = "Fetching all achievement data...",
+				Parent = scroll,
+				Font = GameService.Content.DefaultFont14,
+				TextColor = Microsoft.Xna.Framework.Color.Yellow,
+				AutoSizeWidth = true
+			};
+			try
+			{
+				List<int> metaIds = new List<int> { 6478, 6109, 6284, 6201, 6279, 6111 };
+				int[] metaMaxes = new int[6] { 5, 10, 15, 20, 25, 30 };
+				int[] base30 = new int[30]
+				{
+					6068, 6179, 6330, 6344, 6363, 6317, 6106, 6489, 6336, 6342,
+					6258, 6506, 6471, 6224, 6439, 6505, 6263, 6153, 6484, 6475,
+					6227, 6509, 6250, 6339, 6264, 6192, 6466, 6402, 6393, 6110
+				};
+				List<int> allTargetIds = metaIds.Concat(base30).Distinct().ToList();
+				IReadOnlyList<Achievement> allDefs = await Gw2ApiManager.Gw2ApiClient.V2.Achievements.ManyAsync(allTargetIds);
+				IApiV2ObjectList<AccountAchievement> accAchievements = await Gw2ApiManager.Gw2ApiClient.V2.Account.Achievements.GetAsync();
+				int realCompletedCollections = 0;
+				int[] array = base30;
+				foreach (int bId in array)
+				{
+					if (accAchievements.FirstOrDefault((AccountAchievement a) => a.Id == bId)?.Done ?? false)
+					{
+						realCompletedCollections++;
+					}
+				}
+				scroll.ClearChildren();
+				Blish_HUD.Controls.Panel hBar = new Blish_HUD.Controls.Panel
+				{
+					Parent = _metaProgressWindow,
+					Size = new Point(_metaProgressWindow.Width, 30),
+					BackgroundColor = Microsoft.Xna.Framework.Color.Black * 0.8f,
+					Location = new Point(0, 0)
+				};
+				new Blish_HUD.Controls.Label
+				{
+					Text = "Meta Achievement Tracker",
+					Parent = hBar,
+					Location = new Point(10, 5),
+					Font = GameService.Content.DefaultFont16,
+					TextColor = Microsoft.Xna.Framework.Color.Gold,
+					AutoSizeWidth = true
+				};
+				Blish_HUD.Controls.Label label = new Blish_HUD.Controls.Label();
+				label.Text = "X";
+				label.Parent = hBar;
+				label.Location = new Point(hBar.Width - 25, 5);
+				label.Font = GameService.Content.DefaultFont16;
+				label.TextColor = Microsoft.Xna.Framework.Color.Red;
+				label.AutoSizeWidth = true;
+				label.Click += delegate
+				{
+					_metaProgressWindow.Visible = false;
+				};
+				hBar.LeftMouseButtonPressed += delegate
+				{
+					_isMetaDragging = true;
+					_metaDragOffset = new Point(GameService.Input.Mouse.PositionRaw.X - _metaProgressWindow.Location.X, GameService.Input.Mouse.PositionRaw.Y - _metaProgressWindow.Location.Y);
+				};
+				for (int i = 0; i < metaIds.Count; i++)
+				{
+					int mId = metaIds[i];
+					Achievement def = allDefs.FirstOrDefault((Achievement x) => x.Id == mId);
+					if (def == null)
+					{
+						continue;
+					}
+					AccountAchievement progress = accAchievements.FirstOrDefault((AccountAchievement a) => a.Id == mId);
+					int max = metaMaxes[i];
+					int current = ((mId != 6279) ? realCompletedCollections : (progress?.Current ?? 0));
+					bool isDone = progress?.Done ?? false;
+					if (isDone || current > max)
+					{
+						current = max;
+					}
+					Blish_HUD.Controls.Panel row = new Blish_HUD.Controls.Panel
+					{
+						Parent = scroll,
+						Width = 500,
+						Height = 55,
+						BackgroundColor = Microsoft.Xna.Framework.Color.Black * 0.4f,
+						ShowBorder = true
+					};
+					new Blish_HUD.Controls.Label
+					{
+						Text = def.Name,
+						Parent = row,
+						Location = new Point(10, 5),
+						Font = GameService.Content.DefaultFont16,
+						TextColor = (isDone ? Microsoft.Xna.Framework.Color.LimeGreen : Microsoft.Xna.Framework.Color.White),
+						AutoSizeWidth = true
+					};
+					new Blish_HUD.Controls.Label
+					{
+						Text = $"{current} / {max}",
+						Parent = row,
+						Location = new Point(430, 5),
+						Font = GameService.Content.DefaultFont14,
+						TextColor = Microsoft.Xna.Framework.Color.Cyan,
+						AutoSizeWidth = true
+					};
+					Blish_HUD.Controls.Panel barBg = new Blish_HUD.Controls.Panel
+					{
+						Parent = row,
+						Location = new Point(10, 30),
+						Size = new Point(480, 15),
+						BackgroundColor = Microsoft.Xna.Framework.Color.DarkGray * 0.5f
+					};
+					new Blish_HUD.Controls.Panel
+					{
+						Parent = barBg,
+						Size = new Point((int)(480f * ((float)current / (float)((max <= 0) ? 1 : max))), 15),
+						BackgroundColor = (isDone ? Microsoft.Xna.Framework.Color.LimeGreen : Microsoft.Xna.Framework.Color.Cyan)
+					};
+					FlowPanel subContainer = new FlowPanel
+					{
+						Parent = scroll,
+						Width = 500,
+						HeightSizingMode = SizingMode.AutoSize,
+						FlowDirection = ControlFlowDirection.LeftToRight,
+						ControlPadding = new Vector2(5f, 5f),
+						Visible = false
+					};
+					_allMetaSubPanels.Add(subContainer);
+					row.Click += delegate
+					{
+						bool flag = _currentlyExpandedRow == row;
+						foreach (FlowPanel allMetaSubPanel in _allMetaSubPanels)
+						{
+							allMetaSubPanel.Visible = false;
+						}
+						if (flag)
+						{
+							_currentlyExpandedRow = null;
+						}
+						else
+						{
+							subContainer.ClearChildren();
+							BuildSubAchievements(def, subContainer, current, isDone, accAchievements);
+							subContainer.Visible = true;
+							_currentlyExpandedRow = row;
+						}
+						scroll.RecalculateLayout();
+					};
+				}
+			}
+			catch (Exception ex)
+			{
+				Logger.Error(ex, "Meta Tracker failed.");
+			}
+		}
+
+		private void BuildSubAchievements(Achievement metaDef, FlowPanel container, int currentProgress, bool isFullyDone, IReadOnlyList<AccountAchievement> accProgress)
+		{
+			int[] obj = new int[35]
+			{
+				6068, 6179, 6330, 6344, 6363, 6317, 6106, 6489, 6336, 6342,
+				6258, 6506, 6471, 6224, 6439, 6505, 6263, 6153, 6484, 6475,
+				6227, 6509, 6250, 6339, 6264, 6192, 6466, 6402, 6393, 6110,
+				7114, 7804, 8168, 8246, 8554
+			};
+			FlowPanel gridPanel = new FlowPanel
+			{
+				Parent = container,
+				FlowDirection = ControlFlowDirection.LeftToRight,
+				OuterControlPadding = new Vector2(5f, 5f),
+				ControlPadding = new Vector2(5f, 5f),
+				Width = container.Width - 20,
+				CanScroll = true,
+				HeightSizingMode = SizingMode.AutoSize
+			};
+			int[] array = obj;
+			foreach (int subId in array)
+			{
+				StandardButton btn = new StandardButton
+				{
+					Parent = gridPanel,
+					Text = "Loading...",
+					Width = 150,
+					Height = 35
+				};
+				Task<Achievement> subTask = Gw2ApiManager.Gw2ApiClient.V2.Achievements.GetAsync(subId);
+				subTask.ContinueWith(delegate(Task<Achievement> t)
+				{
+					if (t.Status == TaskStatus.RanToCompletion)
+					{
+						Achievement result = t.Result;
+						bool flag = accProgress.FirstOrDefault((AccountAchievement a) => a.Id == subId)?.Done ?? false;
+						string text = result.Name.Replace(" Fisher", "");
+						btn.Text = (flag ? "✓ " : "") + text;
+						btn.BasicTooltipText = result.Description ?? "";
+					}
+				}, TaskScheduler.FromCurrentSynchronizationContext());
+				btn.Click += async delegate
+				{
+					btn.Enabled = false;
+					Achievement subAch = await subTask;
+					int subCurrent = accProgress.FirstOrDefault((AccountAchievement a) => a.Id == subId)?.Current ?? 0;
+					int subMax = subAch.Bits?.Count ?? 0;
+					string cleanName = subAch.Name.Replace(" Fisher", "");
+					await ShowAchievementResultsPanel(cleanName, subId, subCurrent, subMax, subAch.Description ?? "");
+					btn.Enabled = true;
+				};
+			}
+		}
+
 		private void ShowSpeciesPicker()
 		{
 			if (_speciesSelectionWindow != null)
@@ -1050,6 +1323,7 @@ namespace Gorthax.Gilledwars
 			}
 			LoadPersonalBests();
 			RefreshFishLogUI();
+			FetchTrueFishingAchievementsAsync();
 			Logger.Info("[GilledWars] Module fully initialized for: " + _localAccountName);
 		}
 
@@ -1106,6 +1380,41 @@ namespace Gorthax.Gilledwars
 			catch (Exception ex)
 			{
 				Logger.Error(ex, "Failed to save personal bests");
+			}
+		}
+
+		public async Task FetchTrueFishingAchievementsAsync()
+		{
+			_ = 1;
+			try
+			{
+				int codAchievementId = 6112;
+				Achievement obj = await Gw2ApiManager.Gw2ApiClient.V2.Achievements.GetAsync(codAchievementId);
+				List<int> fishingAchievementIds = new List<int>();
+				foreach (AchievementBit bit in obj.Bits!)
+				{
+					if (bit.Type.ToString()!.Contains("Achievement"))
+					{
+						PropertyInfo idProp = bit.GetType().GetProperty("Id");
+						if (idProp != null)
+						{
+							int bitId = (int)idProp.GetValue(bit);
+							fishingAchievementIds.Add(bitId);
+						}
+					}
+				}
+				fishingAchievementIds.Add(7114);
+				fishingAchievementIds.Add(8168);
+				fishingAchievementIds.Add(8554);
+				fishingAchievementIds.Add(8900);
+				foreach (Achievement collection in await Gw2ApiManager.Gw2ApiClient.V2.Achievements.ManyAsync(fishingAchievementIds))
+				{
+					Logger.Info("[GilledWars] Clean Fishing Collection Loaded: " + collection.Name);
+				}
+			}
+			catch (Exception ex)
+			{
+				Logger.Error(ex, "Failed to fetch verified fishing achievements.");
 			}
 		}
 
@@ -1392,6 +1701,18 @@ namespace Gorthax.Gilledwars
 			{
 				return;
 			}
+			bool num = (matchingFish.Rarity != null && matchingFish.Rarity.Equals("Junk", StringComparison.OrdinalIgnoreCase)) || (matchingFish.Location != null && matchingFish.Location.Contains("Trash Collector"));
+			bool isTreasure = (matchingFish.Name != null && (matchingFish.Name.Contains("Treasure") || matchingFish.Name.Contains("Chest"))) || (matchingFish.Location != null && matchingFish.Location.Contains("Treasure Collector"));
+			if (num)
+			{
+				ScreenNotification.ShowNotification(_junkMessages[_rnd.Next(_junkMessages.Length)], ScreenNotification.NotificationType.Error);
+				return;
+			}
+			if (isTreasure)
+			{
+				ScreenNotification.ShowNotification(_treasureMessages[_rnd.Next(_treasureMessages.Length)], ScreenNotification.NotificationType.Warning);
+				return;
+			}
 			double minW = ((matchingFish.MinW > 0.0) ? matchingFish.MinW : 1.0);
 			double maxW = ((matchingFish.MaxW > minW) ? matchingFish.MaxW : (minW + 5.0));
 			double minL = ((matchingFish.MinL > 0.0) ? matchingFish.MinL : 5.0);
@@ -1408,7 +1729,6 @@ namespace Gorthax.Gilledwars
 				length = Math.Round(maxL * bonusMult, 2);
 			}
 			string charName = GameService.Gw2Mumble.PlayerCharacter.Name ?? "Unknown";
-			_ = GetGlobalSeed() + charName;
 			string globalSig = GenerateSignature(weight, length, matchingFish.Name, isSuperPb, GetGlobalSeed() + charName + _localAccountName);
 			string tSig = (_isTournamentActive ? GenerateSignature(weight, length, matchingFish.Name, isSuperPb, _tourneyRoomCode) : "");
 			bool isNewPbWeight = false;
@@ -1452,8 +1772,8 @@ namespace Gorthax.Gilledwars
 			if (isNewPbWeight || isNewPbLength)
 			{
 				SavePersonalBests();
+				RefreshFishLogUI();
 			}
-			RefreshFishLogUI();
 			_caughtFishIds.Add(itemId);
 			string characterName = GameService.Gw2Mumble.PlayerCharacter.Name;
 			if (string.IsNullOrEmpty(characterName))
@@ -1511,17 +1831,55 @@ namespace Gorthax.Gilledwars
 		{
 			_mainWindow = new Blish_HUD.Controls.Panel
 			{
-				Title = "Gilled Wars Anglers",
 				ShowBorder = true,
 				Size = new Point(620, 580),
 				Location = new Point(300, 300),
 				Parent = GameService.Graphics.SpriteScreen,
 				Visible = false,
-				BackgroundColor = new Microsoft.Xna.Framework.Color(30, 30, 30, 180)
+				BackgroundColor = new Microsoft.Xna.Framework.Color(30, 30, 30, 230),
+				ClipsBounds = false
 			};
-			_mainWindow.LeftMouseButtonPressed += delegate
+			Blish_HUD.Controls.Panel headerBar = new Blish_HUD.Controls.Panel
 			{
-				if (GameService.Input.Mouse.ActiveControl == _mainWindow)
+				Parent = _mainWindow,
+				Size = new Point(_mainWindow.Width, 30),
+				Location = new Point(0, 0),
+				BackgroundColor = Microsoft.Xna.Framework.Color.Black * 0.8f
+			};
+			Blish_HUD.Controls.Label titleLabel = new Blish_HUD.Controls.Label
+			{
+				Text = "Gilled Wars (visit www.GilledWars.com)",
+				Parent = headerBar,
+				Location = new Point(10, 5),
+				Font = GameService.Content.DefaultFont16,
+				TextColor = Microsoft.Xna.Framework.Color.Gold,
+				AutoSizeWidth = true
+			};
+			Blish_HUD.Controls.Label xCloseBtn = new Blish_HUD.Controls.Label
+			{
+				Text = "X",
+				Parent = headerBar,
+				Location = new Point(headerBar.Width - 25, 5),
+				Font = GameService.Content.DefaultFont16,
+				TextColor = Microsoft.Xna.Framework.Color.Red,
+				AutoSizeWidth = true,
+				BasicTooltipText = "Close Gilled Wars"
+			};
+			xCloseBtn.Click += delegate
+			{
+				_mainWindow.Visible = false;
+			};
+			xCloseBtn.MouseEntered += delegate
+			{
+				xCloseBtn.TextColor = Microsoft.Xna.Framework.Color.White;
+			};
+			xCloseBtn.MouseLeft += delegate
+			{
+				xCloseBtn.TextColor = Microsoft.Xna.Framework.Color.Red;
+			};
+			headerBar.LeftMouseButtonPressed += delegate
+			{
+				if (GameService.Input.Mouse.ActiveControl == headerBar || GameService.Input.Mouse.ActiveControl == titleLabel)
 				{
 					_isDragging = true;
 					_dragOffset = new Point(GameService.Input.Mouse.PositionRaw.X - _mainWindow.Location.X, GameService.Input.Mouse.PositionRaw.Y - _mainWindow.Location.Y);
@@ -1531,21 +1889,21 @@ namespace Gorthax.Gilledwars
 			{
 				Text = "Casual Fishing",
 				Parent = _mainWindow,
-				Location = new Point(10, 10),
+				Location = new Point(10, 40),
 				Width = 150
 			};
 			StandardButton obj = new StandardButton
 			{
 				Text = "Tournament Mode",
 				Parent = _mainWindow,
-				Location = new Point(170, 10),
+				Location = new Point(170, 40),
 				Width = 150
 			};
 			StandardButton standardButton = new StandardButton();
-			standardButton.Text = "Open Leaderboards";
+			standardButton.Text = "Website";
 			standardButton.Parent = _mainWindow;
-			standardButton.Location = new Point(330, 10);
-			standardButton.Width = 150;
+			standardButton.Location = new Point(330, 40);
+			standardButton.Width = 100;
 			standardButton.BasicTooltipText = "Opens gilledwars.com in your web browser.";
 			standardButton.Click += delegate
 			{
@@ -1558,8 +1916,8 @@ namespace Gorthax.Gilledwars
 			StandardButton standardButton2 = new StandardButton();
 			standardButton2.Text = "In-Game Top 10";
 			standardButton2.Parent = _mainWindow;
-			standardButton2.Location = new Point(490, 10);
-			standardButton2.Width = 115;
+			standardButton2.Location = new Point(440, 40);
+			standardButton2.Width = 150;
 			standardButton2.BasicTooltipText = "View the live top 10 without leaving the game!";
 			standardButton2.Click += delegate
 			{
@@ -1569,15 +1927,29 @@ namespace Gorthax.Gilledwars
 			_casualPanel = new Blish_HUD.Controls.Panel
 			{
 				Parent = _mainWindow,
-				Size = new Point(600, 500),
-				Location = new Point(10, 50),
+				Size = new Point(600, 490),
+				Location = new Point(10, 80),
 				Visible = true
 			};
 			_tournamentPanel = new Blish_HUD.Controls.Panel
 			{
 				Parent = _mainWindow,
-				Size = new Point(600, 500),
-				Location = new Point(10, 50),
+				Size = new Point(600, 490),
+				Location = new Point(10, 80),
+				Visible = false
+			};
+			_fishLogPanel = new Blish_HUD.Controls.Panel
+			{
+				Parent = _casualPanel,
+				Location = new Point(0, 65),
+				Size = new Point(_casualPanel.Width, _casualPanel.Height - 65),
+				Visible = false
+			};
+			_achievementPanel = new Blish_HUD.Controls.Panel
+			{
+				Parent = _casualPanel,
+				Location = new Point(0, 65),
+				Size = new Point(_casualPanel.Width, _casualPanel.Height - 65),
 				Visible = false
 			};
 			casualBtn.Click += delegate
@@ -1590,17 +1962,948 @@ namespace Gorthax.Gilledwars
 				_casualPanel.Visible = false;
 				_tournamentPanel.Visible = true;
 			};
-			_fishLogPanel = new Blish_HUD.Controls.Panel
-			{
-				Parent = _casualPanel,
-				Location = new Point(0, 65),
-				Size = new Point(_casualPanel.Width, _casualPanel.Height - 65),
-				Visible = false
-			};
 			BuildFishLogGrid(_fishLogPanel);
 			BuildCasualUI(_casualPanel);
 			BuildTournamentUI(_tournamentPanel);
 			BuildActiveTournamentWidget();
+		}
+
+		private void BuildFishLogGrid(Blish_HUD.Controls.Panel parent)
+		{
+			if (parent == null)
+			{
+				return;
+			}
+			Blish_HUD.Controls.Panel filterPanel = new Blish_HUD.Controls.Panel
+			{
+				Parent = parent,
+				Location = new Point(10, 0),
+				Size = new Point(580, 110)
+			};
+			Blish_HUD.Controls.TextBox searchBar = new Blish_HUD.Controls.TextBox
+			{
+				Parent = filterPanel,
+				Location = new Point(0, 0),
+				Width = 115,
+				PlaceholderText = "Search..."
+			};
+			Dropdown rarityDrop = new Dropdown
+			{
+				Parent = filterPanel,
+				Location = new Point(120, 0),
+				Width = 125
+			};
+			Dropdown locationDrop = new Dropdown
+			{
+				Parent = filterPanel,
+				Location = new Point(250, 0),
+				Width = 150
+			};
+			Dropdown holeDrop = new Dropdown
+			{
+				Parent = filterPanel,
+				Location = new Point(405, 0),
+				Width = 165
+			};
+			Dropdown timeDrop = new Dropdown
+			{
+				Parent = filterPanel,
+				Location = new Point(0, 35),
+				Width = 115
+			};
+			Dropdown baitDrop = new Dropdown
+			{
+				Parent = filterPanel,
+				Location = new Point(120, 35),
+				Width = 125
+			};
+			StandardButton collapseBtn = new StandardButton
+			{
+				Text = "Collapse",
+				Parent = filterPanel,
+				Location = new Point(250, 35),
+				Width = 75
+			};
+			StandardButton revealBtn = new StandardButton
+			{
+				Text = "Reveal",
+				Parent = filterPanel,
+				Location = new Point(330, 35),
+				Width = 70
+			};
+			StandardButton obj = new StandardButton
+			{
+				Text = "Reset Filters",
+				Parent = filterPanel,
+				Location = new Point(0, 70),
+				Width = 100
+			};
+			StandardButton pushLeaderboardBtn = new StandardButton
+			{
+				Text = "Push PBs to Leaderboard",
+				Parent = filterPanel,
+				Location = new Point(120, 70),
+				Width = 200,
+				BasicTooltipText = "Submit your valid DRF-tracked catches to the global leaderboards!"
+			};
+			StandardButton zoneAnalyzerBtn = new StandardButton
+			{
+				Text = "Zone Analyzer",
+				Parent = filterPanel,
+				Location = new Point(330, 70),
+				Width = 110,
+				BasicTooltipText = "Analyze current map for missing achievement fish via API!"
+			};
+			StandardButton metaProgressBtn = new StandardButton
+			{
+				Text = "Meta Progress",
+				Parent = filterPanel,
+				Location = new Point(450, 70),
+				Width = 120,
+				BasicTooltipText = "Track your progress towards Cod Swimming and other big titles!"
+			};
+			FlowPanel scroll = new FlowPanel
+			{
+				Parent = parent,
+				Location = new Point(10, 135),
+				Size = new Point(580, parent.Height - 140),
+				CanScroll = true,
+				FlowDirection = ControlFlowDirection.SingleTopToBottom
+			};
+			searchBar.TextChanged += delegate
+			{
+				ApplyFilters();
+			};
+			rarityDrop.ValueChanged += delegate
+			{
+				ApplyFilters();
+			};
+			locationDrop.ValueChanged += delegate
+			{
+				ApplyFilters();
+			};
+			holeDrop.ValueChanged += delegate
+			{
+				ApplyFilters();
+			};
+			timeDrop.ValueChanged += delegate
+			{
+				ApplyFilters();
+			};
+			baitDrop.ValueChanged += delegate
+			{
+				ApplyFilters();
+			};
+			collapseBtn.Click += delegate
+			{
+				foreach (FlowPanel categoryPanel in _categoryPanels)
+				{
+					categoryPanel.Collapsed = true;
+				}
+			};
+			revealBtn.Click += delegate
+			{
+				foreach (FlowPanel categoryPanel2 in _categoryPanels)
+				{
+					categoryPanel2.Collapsed = false;
+				}
+			};
+			obj.Click += delegate
+			{
+				searchBar.Text = "";
+				rarityDrop.SelectedItem = "All Rarities";
+				locationDrop.SelectedItem = "All Locations";
+				holeDrop.SelectedItem = "All Holes";
+				timeDrop.SelectedItem = "All Times";
+				baitDrop.SelectedItem = "All Baits";
+				ApplyFilters();
+			};
+			pushLeaderboardBtn.Click += async delegate
+			{
+				if ((DateTime.Now - _lastSubmitTime).TotalMinutes < 5.0)
+				{
+					double rem = 5.0 - (DateTime.Now - _lastSubmitTime).TotalMinutes;
+					ScreenNotification.ShowNotification($"Please wait {rem:F1} minutes before pushing again.", ScreenNotification.NotificationType.Error);
+				}
+				else
+				{
+					pushLeaderboardBtn.Enabled = false;
+					pushLeaderboardBtn.Text = "Uploading...";
+					await ForceUploadPB();
+					_lastSubmitTime = DateTime.Now;
+					pushLeaderboardBtn.Text = "Push PBs to Leaderboard";
+					pushLeaderboardBtn.Enabled = true;
+				}
+			};
+			Map mapInfo;
+			zoneAnalyzerBtn.Click += async delegate
+			{
+				zoneAnalyzerBtn.Enabled = false;
+				zoneAnalyzerBtn.Text = "Scanning...";
+				try
+				{
+					int currentMapId = GameService.Gw2Mumble.CurrentMap.Id;
+					if (currentMapId != 0)
+					{
+						mapInfo = await Gw2ApiManager.Gw2ApiClient.V2.Maps.GetAsync(currentMapId);
+						Dictionary<string, int> achievementMap = new Dictionary<string, int>
+						{
+							{ "Kryta", 6068 },
+							{ "Shiverpeak", 6179 },
+							{ "Ascalon", 6330 },
+							{ "Maguuma Jungle", 6344 },
+							{ "Ruins of Orr", 6363 },
+							{ "Crystal Desert", 6317 },
+							{ "Elona", 6106 },
+							{ "Ring of Fire", 6489 },
+							{ "Seitung Province", 6336 },
+							{ "New Kaineng City", 6342 },
+							{ "The Echovald Wilds", 6258 },
+							{ "Dragon's End", 6506 },
+							{ "Skywatch Archipelago", 7114 },
+							{ "Amnytas", 7114 },
+							{ "Inner Nayos", 7114 },
+							{ "Lowland Shore", 8168 },
+							{ "Janthir Syntri", 8168 },
+							{ "Mistburned Barrens", 8554 }
+						};
+						string target = achievementMap.Keys.FirstOrDefault((string k) => mapInfo.Name.Contains(k) || (mapInfo.RegionName != null && mapInfo.RegionName.Contains(k))) ?? "All Locations";
+						if (target != "All Locations")
+						{
+							int achId = achievementMap[target];
+							Achievement achDef = await Gw2ApiManager.Gw2ApiClient.V2.Achievements.GetAsync(achId);
+							int subCurrent = 0;
+							int subMax = achDef.Tiers?.LastOrDefault()?.Count ?? achDef.Bits?.Count ?? 0;
+							string subDescription = achDef.Description ?? "No description available.";
+							await ShowAchievementResultsPanel(target, achId, subCurrent, subMax, subDescription);
+						}
+						else
+						{
+							ScreenNotification.ShowNotification("No fishing achievement found for this area.", ScreenNotification.NotificationType.Error);
+						}
+					}
+				}
+				catch (Exception ex)
+				{
+					Logger.Error(ex, "Zone Analyzer failed.");
+					ScreenNotification.ShowNotification("Zone Analyzer failed.", ScreenNotification.NotificationType.Error);
+				}
+				finally
+				{
+					zoneAnalyzerBtn.Enabled = true;
+					zoneAnalyzerBtn.Text = "Zone Analyzer";
+				}
+			};
+			metaProgressBtn.Click += async delegate
+			{
+				metaProgressBtn.Enabled = false;
+				metaProgressBtn.Text = "Loading...";
+				await ShowMetaProgressWindow();
+				metaProgressBtn.Text = "Meta Progress";
+				metaProgressBtn.Enabled = true;
+			};
+			HashSet<string> uniqueHoles = new HashSet<string>();
+			foreach (FishUIEntry entry in _allFishEntries)
+			{
+				if (string.IsNullOrEmpty(entry.Data.FishingHole))
+				{
+					continue;
+				}
+				foreach (string sh in from h in entry.Data.FishingHole.Replace("None, ", "").Split(',')
+					select h.Trim())
+				{
+					uniqueHoles.Add(sh);
+				}
+			}
+			rarityDrop.Items.Add("All Rarities");
+			foreach (string r in _allFishEntries.Select((FishUIEntry x) => x.Data.Rarity).Distinct())
+			{
+				rarityDrop.Items.Add(r);
+			}
+			rarityDrop.SelectedItem = "All Rarities";
+			locationDrop.Items.Add("All Locations");
+			foreach (string i in _allFishEntries.Select((FishUIEntry x) => x.Data.Location).Distinct())
+			{
+				locationDrop.Items.Add(i);
+			}
+			locationDrop.SelectedItem = "All Locations";
+			holeDrop.Items.Add("All Holes");
+			foreach (string h2 in uniqueHoles.OrderBy((string x) => x))
+			{
+				if (h2 != "None")
+				{
+					holeDrop.Items.Add(h2);
+				}
+			}
+			holeDrop.SelectedItem = "All Holes";
+			timeDrop.Items.Add("All Times");
+			timeDrop.Items.Add("Daytime");
+			timeDrop.Items.Add("Nighttime");
+			timeDrop.Items.Add("Dawn/Dusk");
+			timeDrop.Items.Add("Any");
+			timeDrop.SelectedItem = "All Times";
+			baitDrop.Items.Add("All Baits");
+			foreach (string b in _allFishEntries.Select((FishUIEntry x) => x.Data.Bait).Distinct())
+			{
+				baitDrop.Items.Add(b);
+			}
+			baitDrop.SelectedItem = "All Baits";
+			foreach (IGrouping<string, FishData> group in from x in _allFishEntries
+				select x.Data into x
+				where x.Location != "Any"
+				group x by x.Location into x
+				orderby x.Key
+				select x)
+			{
+				FlowPanel p = new FlowPanel
+				{
+					Parent = scroll,
+					Title = group.Key,
+					CanCollapse = true,
+					ShowBorder = true,
+					Width = 550,
+					HeightSizingMode = SizingMode.AutoSize,
+					FlowDirection = ControlFlowDirection.LeftToRight
+				};
+				_categoryPanels.Add(p);
+				foreach (FishData fish in group)
+				{
+					string safeName = fish.Name.Replace(" ", "_").Replace("'", "").Replace("-", "");
+					bool num = _caughtFishIds.Contains(fish.ItemId);
+					string pbWText = "NONE LOGGED";
+					string pbLText = "NONE LOGGED";
+					Microsoft.Xna.Framework.Color tintColor = (num ? Microsoft.Xna.Framework.Color.White : (Microsoft.Xna.Framework.Color.Gray * 0.5f));
+					if (_personalBests.TryGetValue(fish.ItemId, out var rec))
+					{
+						if (rec.BestWeight != null)
+						{
+							pbWText = (rec.BestWeight.IsCheater ? "CHEATER DETECTED" : $"{rec.BestWeight.Weight} lbs");
+						}
+						if (rec.BestLength != null)
+						{
+							pbLText = (rec.BestLength.IsCheater ? "CHEATER DETECTED" : $"{rec.BestLength.Length} in");
+						}
+						if ((rec.BestWeight != null && rec.BestWeight.IsSuperPb) || (rec.BestLength != null && rec.BestLength.IsSuperPb))
+						{
+							tintColor = Microsoft.Xna.Framework.Color.Gold;
+						}
+					}
+					string tooltip = fish.Name + "\nRarity: " + fish.Rarity + "\nLocation: " + fish.Location + "\nHole: " + fish.FishingHole + "\nTime: " + fish.Time + "\nBait: " + fish.Bait;
+					bool isColl = (fish.Rarity != null && fish.Rarity.Equals("Junk", StringComparison.OrdinalIgnoreCase)) || (fish.Location != null && fish.Location.Contains("Collector"));
+					if (!isColl)
+					{
+						tooltip = tooltip + "\n\nPB Weight: " + pbWText + "\nPB Length: " + pbLText;
+					}
+					Image img = new Image
+					{
+						Parent = p,
+						Size = new Point(64, 64),
+						BasicTooltipText = tooltip,
+						Texture = ContentsManager.GetTexture("images/" + safeName + ".png"),
+						Tint = tintColor
+					};
+					img.Click += delegate
+					{
+						byte[] array = new byte[6] { 2, 1, 0, 0, 0, 0 };
+						BitConverter.GetBytes(fish.ItemId).CopyTo(array, 2);
+						string text = "[&" + Convert.ToBase64String(array) + "]";
+						string text2 = text;
+						if (!isColl && _personalBests.TryGetValue(fish.ItemId, out var value))
+						{
+							double num2 = value.BestWeight?.Weight ?? 0.0;
+							double num3 = value.BestLength?.Length ?? 0.0;
+							if (num2 > 0.0 || num3 > 0.0)
+							{
+								text2 = $"{text} my PB weight for this guy is: {num2} lbs and my PB for length is: {num3} in";
+							}
+						}
+						Clipboard.SetText(text2);
+						ScreenNotification.ShowNotification("Copied " + fish.Name + " code!");
+					};
+					FishUIEntry fishUIEntry = _allFishEntries.First((FishUIEntry x) => x.Data.ItemId == fish.ItemId);
+					fishUIEntry.Icon = img;
+					fishUIEntry.CategoryPanel = p;
+				}
+			}
+			new Blish_HUD.Controls.Panel
+			{
+				Parent = scroll,
+				Width = 550,
+				Height = 60
+			};
+			void ApplyFilters()
+			{
+				foreach (FlowPanel cat in _categoryPanels)
+				{
+					bool anyVisible = false;
+					foreach (FishUIEntry entry2 in _allFishEntries.Where((FishUIEntry x) => x.CategoryPanel == cat))
+					{
+						bool match = true;
+						if (!string.IsNullOrEmpty(searchBar.Text) && !entry2.Data.Name.ToLower().Contains(searchBar.Text.ToLower()))
+						{
+							match = false;
+						}
+						if (rarityDrop.SelectedItem != "All Rarities" && entry2.Data.Rarity != rarityDrop.SelectedItem)
+						{
+							match = false;
+						}
+						if (locationDrop.SelectedItem != "All Locations" && entry2.Data.Location != locationDrop.SelectedItem)
+						{
+							match = false;
+						}
+						if (holeDrop.SelectedItem != "All Holes" && !entry2.Data.FishingHole.Contains(holeDrop.SelectedItem))
+						{
+							match = false;
+						}
+						if (timeDrop.SelectedItem != "All Times" && !entry2.Data.Time.Contains((timeDrop.SelectedItem == "Any") ? "Any" : timeDrop.SelectedItem))
+						{
+							match = false;
+						}
+						if (baitDrop.SelectedItem != "All Baits" && !entry2.Data.Bait.Contains(baitDrop.SelectedItem))
+						{
+							match = false;
+						}
+						entry2.Icon.Visible = match;
+						if (match)
+						{
+							anyVisible = true;
+						}
+					}
+					cat.Visible = anyVisible;
+				}
+			}
+		}
+
+		private async Task ShowAchievementResultsPanel(string locationName, int achievementId, int subCurrent, int subMax, string subDescription)
+		{
+			if (_achievementResultsPanel == null)
+			{
+				_achievementResultsPanel = new Blish_HUD.Controls.Panel
+				{
+					Title = locationName + " Progress",
+					Parent = GameService.Graphics.SpriteScreen,
+					Size = new Point(800, 600),
+					Location = new Point(400, 100),
+					ShowBorder = true,
+					BackgroundColor = new Microsoft.Xna.Framework.Color(0, 0, 0, 240),
+					ZIndex = 1001
+				};
+				_achievementResultsPanel.LeftMouseButtonPressed += delegate
+				{
+					if (GameService.Input.Mouse.ActiveControl == _achievementResultsPanel)
+					{
+						_isDraggingAchievement = true;
+						_achievementDragOffset = new Point(GameService.Input.Mouse.PositionRaw.X - _achievementResultsPanel.Location.X, GameService.Input.Mouse.PositionRaw.Y - _achievementResultsPanel.Location.Y);
+					}
+				};
+			}
+			else
+			{
+				_achievementResultsPanel.Title = locationName + " Progress";
+			}
+			if (_achievementLegendPanel == null)
+			{
+				_achievementLegendPanel = new Blish_HUD.Controls.Panel
+				{
+					Parent = GameService.Graphics.SpriteScreen,
+					Size = new Point(800, 60),
+					ShowBorder = true,
+					BackgroundColor = new Microsoft.Xna.Framework.Color(0, 0, 0, 240),
+					ZIndex = 1002
+				};
+			}
+			_achievementResultsPanel.Visible = true;
+			_achievementLegendPanel.Visible = true;
+			_achievementResultsPanel.ClearChildren();
+			_achievementLegendPanel.ClearChildren();
+			_achievementLegendPanel.Location = new Point(_achievementResultsPanel.Location.X, _achievementResultsPanel.Location.Y + _achievementResultsPanel.Height + 2);
+			int lx = 5;
+			string[] array = new string[7] { "Legendary", "Ascended", "Exotic", "Rare", "Masterwork", "Fine", "Basic" };
+			foreach (string rName in array)
+			{
+				Microsoft.Xna.Framework.Color rColor = GetRarityColor(rName);
+				new Blish_HUD.Controls.Label
+				{
+					Text = "■",
+					Parent = _achievementLegendPanel,
+					Location = new Point(lx, 10),
+					TextColor = rColor,
+					Font = GameService.Content.DefaultFont14,
+					AutoSizeWidth = true
+				};
+				new Blish_HUD.Controls.Label
+				{
+					Text = rName,
+					Parent = _achievementLegendPanel,
+					Location = new Point(lx + 15, 10),
+					TextColor = rColor,
+					Font = GameService.Content.DefaultFont12,
+					AutoSizeWidth = true
+				};
+				lx += rName.Length * 7 + 20;
+			}
+			StandardButton standardButton = new StandardButton();
+			standardButton.Text = "Close";
+			standardButton.Parent = _achievementResultsPanel;
+			standardButton.Location = new Point(690, 10);
+			standardButton.Width = 90;
+			standardButton.Click += delegate
+			{
+				_achievementResultsPanel.Visible = false;
+				_achievementLegendPanel.Visible = false;
+			};
+			Blish_HUD.Controls.Panel progressHeader = new Blish_HUD.Controls.Panel
+			{
+				Parent = _achievementResultsPanel,
+				Location = new Point(10, 45),
+				Size = new Point(780, 35)
+			};
+			FlowPanel listContainer = new FlowPanel
+			{
+				Parent = _achievementResultsPanel,
+				Location = new Point(10, 115),
+				Size = new Point(780, 470),
+				CanScroll = true,
+				FlowDirection = ControlFlowDirection.SingleTopToBottom,
+				ControlPadding = new Vector2(0f, 2f)
+			};
+			try
+			{
+				Achievement achievementDef = await Gw2ApiManager.Gw2ApiClient.V2.Achievements.GetAsync(achievementId);
+				IReadOnlyList<int> completedBits = (await Gw2ApiManager.Gw2ApiClient.V2.Account.Achievements.GetAsync()).FirstOrDefault((AccountAchievement a) => a.Id == achievementId)?.Bits ?? new List<int>();
+				int totalBits = achievementDef.Bits?.Count ?? 0;
+				int missingCount = totalBits - completedBits.Count;
+				new Blish_HUD.Controls.Label
+				{
+					Text = locationName.ToUpper() + ":",
+					Parent = progressHeader,
+					Location = new Point(0, 5),
+					Font = GameService.Content.DefaultFont18,
+					AutoSizeWidth = true,
+					TextColor = Microsoft.Xna.Framework.Color.Gold
+				};
+				new Blish_HUD.Controls.Label
+				{
+					Text = $"MISSING: {missingCount} / {totalBits}",
+					Parent = progressHeader,
+					Location = new Point(310, 7),
+					Font = GameService.Content.DefaultFont14,
+					AutoSizeWidth = true,
+					TextColor = Microsoft.Xna.Framework.Color.Cyan
+				};
+				if (missingCount == 0 && totalBits > 0)
+				{
+					new Blish_HUD.Controls.Label
+					{
+						Text = "✓ ACHIEVEMENT COMPLETE! GOOD JOB!",
+						Parent = listContainer,
+						Location = new Point(20, 20),
+						Font = GameService.Content.DefaultFont16,
+						TextColor = Microsoft.Xna.Framework.Color.LimeGreen,
+						AutoSizeWidth = true
+					};
+					return;
+				}
+				Blish_HUD.Controls.Panel columnHeader = new Blish_HUD.Controls.Panel
+				{
+					Parent = _achievementResultsPanel,
+					Location = new Point(10, 85),
+					Size = new Point(780, 30),
+					BackgroundColor = Microsoft.Xna.Framework.Color.Black * 0.3f
+				};
+				new Blish_HUD.Controls.Label
+				{
+					Text = "NAME",
+					Parent = columnHeader,
+					Location = new Point(60, 5),
+					Width = 170,
+					TextColor = Microsoft.Xna.Framework.Color.Cyan,
+					Font = GameService.Content.DefaultFont16
+				};
+				new Blish_HUD.Controls.Label
+				{
+					Text = "BAIT",
+					Parent = columnHeader,
+					Location = new Point(240, 5),
+					Width = 130,
+					TextColor = Microsoft.Xna.Framework.Color.Cyan,
+					Font = GameService.Content.DefaultFont16
+				};
+				new Blish_HUD.Controls.Label
+				{
+					Text = "TIME",
+					Parent = columnHeader,
+					Location = new Point(380, 5),
+					Width = 150,
+					TextColor = Microsoft.Xna.Framework.Color.Cyan,
+					Font = GameService.Content.DefaultFont16
+				};
+				new Blish_HUD.Controls.Label
+				{
+					Text = "HOLE",
+					Parent = columnHeader,
+					Location = new Point(540, 5),
+					Width = 230,
+					TextColor = Microsoft.Xna.Framework.Color.Cyan,
+					Font = GameService.Content.DefaultFont16
+				};
+				new Image
+				{
+					Texture = ContentService.Textures.Pixel,
+					Parent = listContainer,
+					Width = 760,
+					Height = 2,
+					Tint = Microsoft.Xna.Framework.Color.Gray * 0.5f
+				};
+				if (achievementDef.Bits != null)
+				{
+					for (int i = 0; i < achievementDef.Bits!.Count; i++)
+					{
+						if (completedBits.Contains(i))
+						{
+							continue;
+						}
+						AchievementBit bit = achievementDef.Bits![i];
+						PropertyInfo idProp = bit.GetType().GetProperty("Id");
+						if (!(idProp == null))
+						{
+							int fishItemId = (int)idProp.GetValue(bit);
+							FishData dbFish = _allFishEntries.FirstOrDefault((FishUIEntry x) => x.Data.ItemId == fishItemId)?.Data;
+							Blish_HUD.Controls.Panel row = new Blish_HUD.Controls.Panel
+							{
+								Parent = listContainer,
+								Width = 760,
+								Height = 55,
+								BackgroundColor = Microsoft.Xna.Framework.Color.Black * 0.2f,
+								ShowBorder = true
+							};
+							if (dbFish != null)
+							{
+								string safeName = dbFish.Name.Replace(" ", "_").Replace("'", "").Replace("-", "");
+								new Image
+								{
+									Texture = ContentsManager.GetTexture("images/" + safeName + ".png"),
+									Parent = row,
+									Location = new Point(10, 7),
+									Size = new Point(40, 40)
+								};
+								new Image
+								{
+									Texture = ContentService.Textures.Pixel,
+									Parent = row,
+									Location = new Point(55, 5),
+									Width = 1,
+									Height = 45,
+									Tint = Microsoft.Xna.Framework.Color.White * 0.1f
+								};
+								new Blish_HUD.Controls.Label
+								{
+									Text = dbFish.Name,
+									Parent = row,
+									Location = new Point(60, 5),
+									Size = new Point(170, 45),
+									WrapText = true,
+									VerticalAlignment = VerticalAlignment.Middle,
+									TextColor = GetRarityColor(dbFish.Rarity),
+									Font = GameService.Content.DefaultFont14
+								};
+								new Image
+								{
+									Texture = ContentService.Textures.Pixel,
+									Parent = row,
+									Location = new Point(235, 5),
+									Width = 1,
+									Height = 45,
+									Tint = Microsoft.Xna.Framework.Color.White * 0.1f
+								};
+								new Blish_HUD.Controls.Label
+								{
+									Text = dbFish.Bait,
+									Parent = row,
+									Location = new Point(240, 5),
+									Size = new Point(130, 45),
+									WrapText = true,
+									VerticalAlignment = VerticalAlignment.Middle,
+									TextColor = Microsoft.Xna.Framework.Color.LightGray,
+									Font = GameService.Content.DefaultFont12
+								};
+								new Image
+								{
+									Texture = ContentService.Textures.Pixel,
+									Parent = row,
+									Location = new Point(375, 5),
+									Width = 1,
+									Height = 45,
+									Tint = Microsoft.Xna.Framework.Color.White * 0.1f
+								};
+								new Blish_HUD.Controls.Label
+								{
+									Text = dbFish.Time,
+									Parent = row,
+									Location = new Point(380, 5),
+									Size = new Point(150, 45),
+									WrapText = true,
+									VerticalAlignment = VerticalAlignment.Middle,
+									TextColor = Microsoft.Xna.Framework.Color.White,
+									Font = GameService.Content.DefaultFont12
+								};
+								new Image
+								{
+									Texture = ContentService.Textures.Pixel,
+									Parent = row,
+									Location = new Point(535, 5),
+									Width = 1,
+									Height = 45,
+									Tint = Microsoft.Xna.Framework.Color.White * 0.1f
+								};
+								new Blish_HUD.Controls.Label
+								{
+									Text = dbFish.FishingHole,
+									Parent = row,
+									Location = new Point(540, 5),
+									Size = new Point(210, 45),
+									WrapText = true,
+									VerticalAlignment = VerticalAlignment.Middle,
+									TextColor = Microsoft.Xna.Framework.Color.LightGray,
+									Font = GameService.Content.DefaultFont12
+								};
+							}
+							else
+							{
+								new Blish_HUD.Controls.Label
+								{
+									Text = "?",
+									Parent = row,
+									Location = new Point(20, 15),
+									Font = GameService.Content.DefaultFont18,
+									TextColor = Microsoft.Xna.Framework.Color.Red
+								};
+								new Blish_HUD.Controls.Label
+								{
+									Text = $"API ID: {fishItemId} (MISSING FROM JSON)",
+									Parent = row,
+									Location = new Point(60, 17),
+									Font = GameService.Content.DefaultFont14,
+									TextColor = Microsoft.Xna.Framework.Color.White,
+									AutoSizeWidth = true
+								};
+							}
+							new Image
+							{
+								Texture = ContentService.Textures.Pixel,
+								Parent = listContainer,
+								Width = 760,
+								Height = 1,
+								Tint = Microsoft.Xna.Framework.Color.White * 0.15f
+							};
+						}
+					}
+				}
+				new Blish_HUD.Controls.Panel
+				{
+					Parent = listContainer,
+					Width = 760,
+					Height = 60
+				};
+			}
+			catch (Exception ex)
+			{
+				Logger.Error(ex, "Achievement Detail Panel failed.");
+			}
+		}
+
+		private Microsoft.Xna.Framework.Color GetRarityColor(string rarity)
+		{
+			return rarity switch
+			{
+				"Legendary" => Microsoft.Xna.Framework.Color.DarkOrange, 
+				"Ascended" => Microsoft.Xna.Framework.Color.Violet, 
+				"Exotic" => Microsoft.Xna.Framework.Color.Orange, 
+				"Rare" => Microsoft.Xna.Framework.Color.Yellow, 
+				"Masterwork" => Microsoft.Xna.Framework.Color.LimeGreen, 
+				"Fine" => Microsoft.Xna.Framework.Color.DeepSkyBlue, 
+				_ => Microsoft.Xna.Framework.Color.White, 
+			};
+		}
+
+		private async Task ShowAchievementAnalysis(string locationName, int achievementId)
+		{
+			_fishLogPanel.Visible = false;
+			_achievementPanel.Visible = true;
+			_achievementPanel.ClearChildren();
+			Blish_HUD.Controls.Panel headerPanel = new Blish_HUD.Controls.Panel
+			{
+				Parent = _achievementPanel,
+				Size = new Point(580, 50),
+				Location = new Point(10, 0),
+				BackgroundColor = Microsoft.Xna.Framework.Color.Black * 0.5f
+			};
+			StandardButton standardButton = new StandardButton();
+			standardButton.Parent = headerPanel;
+			standardButton.Text = "<- BACK";
+			standardButton.Location = new Point(5, 10);
+			standardButton.Width = 75;
+			standardButton.Click += delegate
+			{
+				_achievementPanel.Visible = false;
+				_fishLogPanel.Visible = true;
+			};
+			new Blish_HUD.Controls.Label
+			{
+				Text = locationName.ToUpper() + " ACHIEVEMENT PROGRESS",
+				Parent = headerPanel,
+				Location = new Point(90, 12),
+				Font = GameService.Content.DefaultFont18,
+				AutoSizeWidth = true,
+				TextColor = Microsoft.Xna.Framework.Color.Gold
+			};
+			Blish_HUD.Controls.Panel columnHeader = new Blish_HUD.Controls.Panel
+			{
+				Parent = _achievementPanel,
+				Location = new Point(10, 55),
+				Size = new Point(580, 30),
+				BackgroundColor = Microsoft.Xna.Framework.Color.Black * 0.3f
+			};
+			new Blish_HUD.Controls.Label
+			{
+				Text = "ICON",
+				Parent = columnHeader,
+				Location = new Point(10, 5),
+				Font = GameService.Content.DefaultFont12,
+				TextColor = Microsoft.Xna.Framework.Color.LightGray
+			};
+			new Blish_HUD.Controls.Label
+			{
+				Text = "FISH NAME",
+				Parent = columnHeader,
+				Location = new Point(65, 5),
+				Font = GameService.Content.DefaultFont12,
+				TextColor = Microsoft.Xna.Framework.Color.LightGray
+			};
+			new Blish_HUD.Controls.Label
+			{
+				Text = "BAIT",
+				Parent = columnHeader,
+				Location = new Point(230, 5),
+				Font = GameService.Content.DefaultFont12,
+				TextColor = Microsoft.Xna.Framework.Color.LightGray
+			};
+			new Blish_HUD.Controls.Label
+			{
+				Text = "TIME",
+				Parent = columnHeader,
+				Location = new Point(370, 5),
+				Font = GameService.Content.DefaultFont12,
+				TextColor = Microsoft.Xna.Framework.Color.LightGray
+			};
+			new Blish_HUD.Controls.Label
+			{
+				Text = "LOCATION",
+				Parent = columnHeader,
+				Location = new Point(480, 5),
+				Font = GameService.Content.DefaultFont12,
+				TextColor = Microsoft.Xna.Framework.Color.LightGray
+			};
+			FlowPanel list = new FlowPanel
+			{
+				Parent = _achievementPanel,
+				Location = new Point(10, 90),
+				Size = new Point(580, 400),
+				CanScroll = true,
+				FlowDirection = ControlFlowDirection.SingleTopToBottom,
+				ControlPadding = new Vector2(0f, 2f)
+			};
+			try
+			{
+				Achievement achievementDef = await Gw2ApiManager.Gw2ApiClient.V2.Achievements.GetAsync(achievementId);
+				IReadOnlyList<int> bits = (await Gw2ApiManager.Gw2ApiClient.V2.Account.Achievements.GetAsync()).FirstOrDefault((AccountAchievement a) => a.Id == achievementId)?.Bits ?? new List<int>();
+				for (int i = 0; i < achievementDef.Bits!.Count; i++)
+				{
+					if (bits.Contains(i))
+					{
+						continue;
+					}
+					AchievementBit achievementBit = achievementDef.Bits![i];
+					AchievementItemBit itemBit = achievementBit as AchievementItemBit;
+					if (itemBit != null)
+					{
+						FishData dbFish = _allFishEntries.FirstOrDefault((FishUIEntry x) => x.Data.ItemId == itemBit.Id)?.Data;
+						if (dbFish != null)
+						{
+							Blish_HUD.Controls.Panel row = new Blish_HUD.Controls.Panel
+							{
+								Parent = list,
+								Width = 560,
+								Height = 45,
+								BackgroundColor = Microsoft.Xna.Framework.Color.Black * 0.2f,
+								ShowBorder = true
+							};
+							new Image
+							{
+								Parent = row,
+								Size = new Point(36, 36),
+								Location = new Point(5, 4),
+								Texture = ContentsManager.GetTexture("images/" + dbFish.Name.Replace(" ", "_") + ".png")
+							};
+							new Blish_HUD.Controls.Label
+							{
+								Text = dbFish.Name,
+								Parent = row,
+								Location = new Point(65, 12),
+								AutoSizeWidth = true,
+								TextColor = GetRarityColor(dbFish.Rarity),
+								Font = GameService.Content.DefaultFont14
+							};
+							new Blish_HUD.Controls.Label
+							{
+								Text = dbFish.Bait,
+								Parent = row,
+								Location = new Point(230, 12),
+								AutoSizeWidth = true,
+								TextColor = Microsoft.Xna.Framework.Color.Cyan
+							};
+							new Blish_HUD.Controls.Label
+							{
+								Text = dbFish.Time,
+								Parent = row,
+								Location = new Point(370, 12),
+								AutoSizeWidth = true,
+								TextColor = Microsoft.Xna.Framework.Color.Yellow
+							};
+							new Blish_HUD.Controls.Label
+							{
+								Text = dbFish.Location,
+								Parent = row,
+								Location = new Point(480, 12),
+								AutoSizeWidth = true,
+								TextColor = Microsoft.Xna.Framework.Color.LightGray,
+								Font = GameService.Content.DefaultFont12
+							};
+						}
+					}
+				}
+				if (list.Children.Count == 0)
+				{
+					new Blish_HUD.Controls.Label
+					{
+						Text = "✔ Area Fully Logged!",
+						Parent = list,
+						AutoSizeWidth = true,
+						TextColor = Microsoft.Xna.Framework.Color.LimeGreen,
+						Padding = new Thickness(10f, 50f, 0f, 0f)
+					};
+				}
+			}
+			catch
+			{
+				new Blish_HUD.Controls.Label
+				{
+					Text = "API Link Failed - Verify Key Permissions",
+					Parent = list,
+					AutoSizeWidth = true,
+					TextColor = Microsoft.Xna.Framework.Color.Red
+				};
+			}
 		}
 
 		private void BuildCasualUI(Blish_HUD.Controls.Panel parent)
@@ -1776,473 +3079,63 @@ namespace Gorthax.Gilledwars
 			}
 		}
 
-		private void BuildFishLogGrid(Blish_HUD.Controls.Panel parent)
+		private void RefreshFishLogUI()
 		{
-			if (parent == null)
+			foreach (FishUIEntry allFishEntry in _allFishEntries)
 			{
-				return;
-			}
-			Blish_HUD.Controls.Panel filterPanel = new Blish_HUD.Controls.Panel
-			{
-				Parent = parent,
-				Location = new Point(10, 0),
-				Size = new Point(580, 110)
-			};
-			Blish_HUD.Controls.TextBox searchBar = new Blish_HUD.Controls.TextBox
-			{
-				Parent = filterPanel,
-				Location = new Point(0, 0),
-				Width = 115,
-				PlaceholderText = "Search..."
-			};
-			Dropdown rarityDrop = new Dropdown
-			{
-				Parent = filterPanel,
-				Location = new Point(120, 0),
-				Width = 125
-			};
-			Dropdown locationDrop = new Dropdown
-			{
-				Parent = filterPanel,
-				Location = new Point(250, 0),
-				Width = 150
-			};
-			Dropdown holeDrop = new Dropdown
-			{
-				Parent = filterPanel,
-				Location = new Point(405, 0),
-				Width = 165
-			};
-			Dropdown timeDrop = new Dropdown
-			{
-				Parent = filterPanel,
-				Location = new Point(0, 35),
-				Width = 115
-			};
-			Dropdown baitDrop = new Dropdown
-			{
-				Parent = filterPanel,
-				Location = new Point(120, 35),
-				Width = 125
-			};
-			StandardButton collapseBtn = new StandardButton
-			{
-				Text = "Collapse",
-				Parent = filterPanel,
-				Location = new Point(250, 35),
-				Width = 75
-			};
-			StandardButton revealBtn = new StandardButton
-			{
-				Text = "Reveal",
-				Parent = filterPanel,
-				Location = new Point(330, 35),
-				Width = 70
-			};
-			StandardButton obj = new StandardButton
-			{
-				Text = "Reset Filters",
-				Parent = filterPanel,
-				Location = new Point(0, 70),
-				Width = 100,
-				BasicTooltipText = "Clear all active filters."
-			};
-			StandardButton pushLeaderboardBtn = new StandardButton
-			{
-				Text = "Push PBs to Leaderboard",
-				Parent = filterPanel,
-				Location = new Point(120, 70),
-				Width = 200,
-				BasicTooltipText = "Submit your valid DRF-tracked catches to the global leaderboards!"
-			};
-			new Blish_HUD.Controls.Label
-			{
-				Text = "www.gilledwars.com",
-				Parent = filterPanel,
-				Location = new Point(330, 75),
-				AutoSizeWidth = true,
-				TextColor = Microsoft.Xna.Framework.Color.LightGray,
-				Font = GameService.Content.DefaultFont14
-			};
-			pushLeaderboardBtn.Click += async delegate
-			{
-				if (_isCheater)
+				FishData fish = allFishEntry.Data;
+				Image img = allFishEntry.Icon;
+				if (img == null)
 				{
-					ScreenNotification.ShowNotification("Submission Rejected: Tampered Data Detected", ScreenNotification.NotificationType.Error);
+					continue;
 				}
-				else if ((DateTime.Now - _lastSubmitTime).TotalMinutes < 5.0)
+				bool num = _caughtFishIds.Contains(fish.ItemId) || _personalBests.ContainsKey(fish.ItemId);
+				string pbWText = "NONE LOGGED";
+				string pbLText = "NONE LOGGED";
+				Microsoft.Xna.Framework.Color tint = (num ? Microsoft.Xna.Framework.Color.White : (Microsoft.Xna.Framework.Color.Gray * 0.5f));
+				if (_personalBests.TryGetValue(fish.ItemId, out var rec))
 				{
-					ScreenNotification.ShowNotification("Button on Cool down. Please wait a few minutes.", ScreenNotification.NotificationType.Warning);
-				}
-				else
-				{
-					pushLeaderboardBtn.Enabled = false;
-					pushLeaderboardBtn.Text = "Pushing...";
-					try
+					if (rec.BestWeight != null)
 					{
-						if (Gw2ApiManager.HasPermissions(new TokenPermission[1] { TokenPermission.Account }))
+						if (rec.BestWeight.IsCheater)
 						{
-							_ = (await Gw2ApiManager.Gw2ApiClient.V2.Account.GetAsync()).Name;
+							pbWText = "CHEATER DETECTED";
 						}
-					}
-					catch
-					{
-						Logger.Warn("Could not fetch Account Name for Leaderboard.");
-					}
-					List<object> eligibleCatches = new List<object>();
-					_ = GameService.Gw2Mumble.PlayerCharacter.Name;
-					List<SubRecord> submittedWeights = new List<SubRecord>();
-					List<SubRecord> submittedLengths = new List<SubRecord>();
-					foreach (KeyValuePair<int, PersonalBestRecord> kvp in _personalBests)
-					{
-						int fId = kvp.Key;
-						PersonalBestRecord rec2 = kvp.Value;
-						FishData dbFish = _allFishEntries.FirstOrDefault((FishUIEntry x) => x.Data.ItemId == fId)?.Data;
-						string fName = ((dbFish != null) ? dbFish.Name : "Unknown");
-						string fLoc = ((dbFish != null) ? dbFish.Location : "Unknown");
-						if (rec2.BestWeight != null && rec2.BestWeight.CaughtWithDrf && !rec2.BestWeight.IsCheater && !rec2.BestWeight.IsSubmitted)
+						else if (rec.BestWeight.IsSuperPb)
 						{
-							eligibleCatches.Add(new
-							{
-								accountName = _localAccountName,
-								itemId = fId,
-								name = fName,
-								weight = rec2.BestWeight.Weight,
-								length = rec2.BestWeight.Length,
-								signature = rec2.BestWeight.Signature,
-								isSuper = rec2.BestWeight.IsSuperPb,
-								type = "weight",
-								characterName = (rec2.BestWeight.CharacterName ?? "Unknown"),
-								location = fLoc
-							});
-							submittedWeights.Add(rec2.BestWeight);
-						}
-						if (rec2.BestLength != null && rec2.BestLength.CaughtWithDrf && !rec2.BestLength.IsCheater && !rec2.BestLength.IsSubmitted)
-						{
-							eligibleCatches.Add(new
-							{
-								accountName = _localAccountName,
-								itemId = fId,
-								name = fName,
-								weight = rec2.BestLength.Weight,
-								length = rec2.BestLength.Length,
-								signature = rec2.BestLength.Signature,
-								isSuper = rec2.BestLength.IsSuperPb,
-								type = "length",
-								characterName = (rec2.BestLength.CharacterName ?? "Unknown"),
-								location = fLoc
-							});
-							submittedLengths.Add(rec2.BestLength);
-						}
-					}
-					if (eligibleCatches.Count == 0)
-					{
-						ScreenNotification.ShowNotification("No new PB recorded.", ScreenNotification.NotificationType.Warning);
-						pushLeaderboardBtn.Enabled = true;
-						pushLeaderboardBtn.Text = "Push PBs to Leaderboard";
-					}
-					else
-					{
-						_lastSubmitTime = DateTime.Now;
-						var payload = new
-						{
-							catches = eligibleCatches
-						};
-						try
-						{
-							StringContent content = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
-							if ((await _httpClient.PostAsync("https://api.gilledwars.com/submit-leaderboard", (HttpContent)(object)content)).get_IsSuccessStatusCode())
-							{
-								foreach (SubRecord item in submittedWeights)
-								{
-									item.IsSubmitted = true;
-								}
-								foreach (SubRecord item2 in submittedLengths)
-								{
-									item2.IsSubmitted = true;
-								}
-								SavePersonalBests();
-								_cachedLeaderboardData = null;
-								_lastLeaderboardFetchTime = DateTime.MinValue;
-								ScreenNotification.ShowNotification("PB submitted to the Leaderboards, good luck!");
-							}
-							else
-							{
-								ScreenNotification.ShowNotification("Server Error: Leaderboard update failed.", ScreenNotification.NotificationType.Error);
-							}
-						}
-						catch (Exception ex2)
-						{
-							Logger.Error(ex2, "Failed to submit to leaderboards.");
-							ScreenNotification.ShowNotification("Network Error!", ScreenNotification.NotificationType.Error);
-						}
-						pushLeaderboardBtn.Enabled = true;
-						pushLeaderboardBtn.Text = "Push PBs to Leaderboard";
-					}
-				}
-			};
-			FlowPanel scroll = new FlowPanel
-			{
-				Parent = parent,
-				Location = new Point(10, 135),
-				Size = new Point(580, parent.Height - 140),
-				CanScroll = true,
-				FlowDirection = ControlFlowDirection.SingleTopToBottom
-			};
-			searchBar.TextChanged += delegate
-			{
-				ApplyFilters();
-			};
-			rarityDrop.ValueChanged += delegate
-			{
-				ApplyFilters();
-			};
-			locationDrop.ValueChanged += delegate
-			{
-				ApplyFilters();
-			};
-			holeDrop.ValueChanged += delegate
-			{
-				ApplyFilters();
-			};
-			timeDrop.ValueChanged += delegate
-			{
-				ApplyFilters();
-			};
-			baitDrop.ValueChanged += delegate
-			{
-				ApplyFilters();
-			};
-			collapseBtn.Click += delegate
-			{
-				foreach (FlowPanel categoryPanel in _categoryPanels)
-				{
-					categoryPanel.Collapsed = true;
-				}
-			};
-			revealBtn.Click += delegate
-			{
-				foreach (FlowPanel categoryPanel2 in _categoryPanels)
-				{
-					categoryPanel2.Collapsed = false;
-				}
-			};
-			obj.Click += delegate
-			{
-				searchBar.Text = "";
-				rarityDrop.SelectedItem = "All Rarities";
-				locationDrop.SelectedItem = "All Locations";
-				holeDrop.SelectedItem = "All Holes";
-				timeDrop.SelectedItem = "All Times";
-				baitDrop.SelectedItem = "All Baits";
-				ApplyFilters();
-			};
-			try
-			{
-				HashSet<string> uniqueHoles = new HashSet<string>();
-				foreach (FishUIEntry allFishEntry in _allFishEntries)
-				{
-					FishData f = allFishEntry.Data;
-					if (string.IsNullOrEmpty(f.FishingHole))
-					{
-						f.FishingHole = "Unknown";
-					}
-					f.FishingHole = f.FishingHole.Replace("None, ", "");
-					if (f.FishingHole == "None")
-					{
-						f.FishingHole = "Open Water";
-					}
-					foreach (string sh in from h in f.FishingHole.Split(',')
-						select h.Trim())
-					{
-						if (!string.IsNullOrEmpty(sh))
-						{
-							uniqueHoles.Add(sh);
-						}
-					}
-				}
-				rarityDrop.Items.Add("All Rarities");
-				foreach (string r in _allFishEntries.Select((FishUIEntry x) => x.Data.Rarity).Distinct())
-				{
-					rarityDrop.Items.Add(r);
-				}
-				rarityDrop.SelectedItem = "All Rarities";
-				locationDrop.Items.Add("All Locations");
-				foreach (string i in _allFishEntries.Select((FishUIEntry x) => x.Data.Location).Distinct())
-				{
-					locationDrop.Items.Add(i);
-				}
-				locationDrop.SelectedItem = "All Locations";
-				holeDrop.Items.Add("All Holes");
-				foreach (string h2 in uniqueHoles.OrderBy((string x) => x))
-				{
-					holeDrop.Items.Add(h2);
-				}
-				holeDrop.SelectedItem = "All Holes";
-				timeDrop.Items.Add("All Times");
-				timeDrop.Items.Add("Daytime");
-				timeDrop.Items.Add("Nighttime");
-				timeDrop.Items.Add("Dawn/Dusk");
-				timeDrop.Items.Add("Any");
-				timeDrop.SelectedItem = "All Times";
-				baitDrop.Items.Add("All Baits");
-				foreach (string b in _allFishEntries.Select((FishUIEntry x) => x.Data.Bait).Distinct())
-				{
-					baitDrop.Items.Add(b);
-				}
-				baitDrop.SelectedItem = "All Baits";
-				foreach (IGrouping<string, FishData> group in from x in _allFishEntries
-					select x.Data into x
-					group x by x.Location into x
-					orderby x.Key
-					select x)
-				{
-					FlowPanel p = new FlowPanel
-					{
-						Parent = scroll,
-						Title = group.Key,
-						CanCollapse = true,
-						ShowBorder = true,
-						Width = 550,
-						HeightSizingMode = SizingMode.AutoSize,
-						FlowDirection = ControlFlowDirection.LeftToRight
-					};
-					_categoryPanels.Add(p);
-					foreach (FishData fish in group)
-					{
-						string safeName = fish.Name.Replace(" ", "_").Replace("'", "").Replace("-", "");
-						bool num = _caughtFishIds.Contains(fish.ItemId);
-						string pbWText = "NONE LOGGED";
-						string pbLText = "NONE LOGGED";
-						Microsoft.Xna.Framework.Color tintColor = (num ? Microsoft.Xna.Framework.Color.White : (Microsoft.Xna.Framework.Color.Gray * 0.5f));
-						if (_personalBests.ContainsKey(fish.ItemId))
-						{
-							PersonalBestRecord rec = _personalBests[fish.ItemId];
-							if (rec.BestWeight != null)
-							{
-								if (rec.BestWeight.IsCheater)
-								{
-									pbWText = "CHEATER DETECTED";
-								}
-								else if (rec.BestWeight.IsSuperPb)
-								{
-									pbWText = $"[SUPER] {rec.BestWeight.Weight} lbs | {rec.BestWeight.Length} in";
-									tintColor = Microsoft.Xna.Framework.Color.Gold;
-								}
-								else
-								{
-									pbWText = $"{rec.BestWeight.Weight} lbs | {rec.BestWeight.Length} in";
-								}
-							}
-							if (rec.BestLength != null)
-							{
-								if (rec.BestLength.IsCheater)
-								{
-									pbLText = "CHEATER DETECTED";
-								}
-								else if (rec.BestLength.IsSuperPb)
-								{
-									pbLText = $"[SUPER] {rec.BestLength.Length} in | {rec.BestLength.Weight} lbs";
-									tintColor = Microsoft.Xna.Framework.Color.Gold;
-								}
-								else
-								{
-									pbLText = $"{rec.BestLength.Length} in | {rec.BestLength.Weight} lbs";
-								}
-							}
-						}
-						Image image = new Image();
-						image.Parent = p;
-						image.Size = new Point(64, 64);
-						image.BasicTooltipText = fish.Name + "\nRarity: " + fish.Rarity + "\nLocation: " + fish.Location + "\nHole: " + fish.FishingHole + "\nTime: " + fish.Time + "\nBait: " + fish.Bait + "\n\nPB Weight: " + pbWText + "\nPB Length: " + pbLText;
-						image.Texture = ContentsManager.GetTexture("images/" + safeName + ".png");
-						image.Tint = tintColor;
-						Image img = image;
-						img.Click += delegate
-						{
-							byte[] array = new byte[6] { 2, 1, 0, 0, 0, 0 };
-							BitConverter.GetBytes(fish.ItemId).CopyTo(array, 2);
-							string text = "[&" + Convert.ToBase64String(array) + "]";
-							string text2 = text;
-							if (_personalBests.TryGetValue(fish.ItemId, out var value))
-							{
-								double num2 = value.BestWeight?.Weight ?? 0.0;
-								double num3 = value.BestLength?.Length ?? 0.0;
-								if (num2 > 0.0 || num3 > 0.0)
-								{
-									text2 = $"{text} My best weight is {num2} lbs and my best length is {num3} in!";
-								}
-							}
-							CopyToClipboard(text2);
-							ScreenNotification.ShowNotification("Copied " + fish.Name + " PB to clipboard!");
-						};
-						FishUIEntry fishUIEntry = _allFishEntries.First((FishUIEntry x) => x.Data.ItemId == fish.ItemId);
-						fishUIEntry.Icon = img;
-						fishUIEntry.CategoryPanel = p;
-					}
-				}
-			}
-			catch (Exception ex)
-			{
-				Logger.Error(ex, "UI Build Fail");
-			}
-			void ApplyFilters()
-			{
-				foreach (FlowPanel cat in _categoryPanels)
-				{
-					bool anyVisible = false;
-					foreach (FishUIEntry entry in _allFishEntries.Where((FishUIEntry x) => x.CategoryPanel == cat))
-					{
-						bool match = true;
-						if (!string.IsNullOrEmpty(searchBar.Text) && !entry.Data.Name.ToLower().Contains(searchBar.Text.ToLower()))
-						{
-							match = false;
-						}
-						if (rarityDrop.SelectedItem != "All Rarities" && entry.Data.Rarity != rarityDrop.SelectedItem)
-						{
-							match = false;
-						}
-						if (locationDrop.SelectedItem != "All Locations" && entry.Data.Location != locationDrop.SelectedItem)
-						{
-							match = false;
-						}
-						if (holeDrop.SelectedItem != "All Holes" && !entry.Data.FishingHole.Contains(holeDrop.SelectedItem))
-						{
-							match = false;
-						}
-						if (timeDrop.SelectedItem != "All Times" && !entry.Data.Time.Contains((timeDrop.SelectedItem == "Any") ? "Any" : timeDrop.SelectedItem))
-						{
-							match = false;
-						}
-						if (baitDrop.SelectedItem != "All Baits" && !entry.Data.Bait.Contains(baitDrop.SelectedItem))
-						{
-							match = false;
-						}
-						if (match)
-						{
-							anyVisible = true;
-							entry.Icon.Parent = null;
-							entry.Icon.Parent = cat;
-							entry.Icon.Visible = true;
+							pbWText = $"[SUPER] {rec.BestWeight.Weight} lbs";
+							tint = Microsoft.Xna.Framework.Color.Gold;
 						}
 						else
 						{
-							entry.Icon.Parent = null;
-							entry.Icon.Visible = false;
+							pbWText = $"{rec.BestWeight.Weight} lbs";
 						}
 					}
-					if (anyVisible)
+					if (rec.BestLength != null)
 					{
-						cat.Parent = null;
-						cat.Parent = scroll;
-						cat.Visible = true;
-					}
-					else
-					{
-						cat.Parent = null;
-						cat.Visible = false;
+						if (rec.BestLength.IsCheater)
+						{
+							pbLText = "CHEATER DETECTED";
+						}
+						else if (rec.BestLength.IsSuperPb)
+						{
+							pbLText = $"[SUPER] {rec.BestLength.Length} in";
+							tint = Microsoft.Xna.Framework.Color.Gold;
+						}
+						else
+						{
+							pbLText = $"{rec.BestLength.Length} in";
+						}
 					}
 				}
+				img.Tint = tint;
+				bool isCollector = (fish.Rarity != null && fish.Rarity.Equals("Junk", StringComparison.OrdinalIgnoreCase)) || (fish.Location != null && fish.Location.Contains("Collector"));
+				string tooltip = fish.Name + "\nRarity: " + fish.Rarity + "\nLocation: " + fish.Location + "\nHole: " + fish.FishingHole + "\nTime: " + fish.Time + "\nBait: " + fish.Bait;
+				if (!isCollector)
+				{
+					tooltip = tooltip + "\n\nPB Weight: " + pbWText + "\nPB Length: " + pbLText;
+				}
+				img.BasicTooltipText = tooltip;
 			}
 		}
 
@@ -2956,60 +3849,6 @@ namespace Gorthax.Gilledwars
 			}
 		}
 
-		private void RefreshFishLogUI()
-		{
-			foreach (FishUIEntry allFishEntry in _allFishEntries)
-			{
-				FishData fish = allFishEntry.Data;
-				Image img = allFishEntry.Icon;
-				if (img == null)
-				{
-					continue;
-				}
-				bool num = _caughtFishIds.Contains(fish.ItemId) || _personalBests.ContainsKey(fish.ItemId);
-				string pbWText = "NONE LOGGED";
-				string pbLText = "NONE LOGGED";
-				Microsoft.Xna.Framework.Color tint = (num ? Microsoft.Xna.Framework.Color.White : (Microsoft.Xna.Framework.Color.Gray * 0.5f));
-				if (_personalBests.TryGetValue(fish.ItemId, out var rec))
-				{
-					if (rec.BestWeight != null)
-					{
-						if (rec.BestWeight.IsCheater)
-						{
-							pbWText = "CHEATER DETECTED";
-						}
-						else if (rec.BestWeight.IsSuperPb)
-						{
-							pbWText = $"[SUPER] {rec.BestWeight.Weight} lbs | {rec.BestWeight.Length} in";
-							tint = Microsoft.Xna.Framework.Color.Gold;
-						}
-						else
-						{
-							pbWText = $"{rec.BestWeight.Weight} lbs | {rec.BestWeight.Length} in";
-						}
-					}
-					if (rec.BestLength != null)
-					{
-						if (rec.BestLength.IsCheater)
-						{
-							pbLText = "CHEATER DETECTED";
-						}
-						else if (rec.BestLength.IsSuperPb)
-						{
-							pbLText = $"[SUPER] {rec.BestLength.Length} in | {rec.BestLength.Weight} lbs";
-							tint = Microsoft.Xna.Framework.Color.Gold;
-						}
-						else
-						{
-							pbLText = $"{rec.BestLength.Length} in | {rec.BestLength.Weight} lbs";
-						}
-					}
-				}
-				img.Tint = tint;
-				img.BasicTooltipText = fish.Name + "\nRarity: " + fish.Rarity + "\nLocation: " + fish.Location + "\nHole: " + fish.FishingHole + "\nTime: " + fish.Time + "\nBait: " + fish.Bait + "\n\nPB Weight: " + pbWText + "\nPB Length: " + pbLText;
-			}
-		}
-
 		private async Task CompleteTournamentAsync(string title, string msg)
 		{
 			_isTournamentActive = false;
@@ -3224,6 +4063,22 @@ namespace Gorthax.Gilledwars
 			{
 				_leaderboardWindow.Location = new Point(GameService.Input.Mouse.PositionRaw.X - _leaderboardDragOffset.X, GameService.Input.Mouse.PositionRaw.Y - _leaderboardDragOffset.Y);
 			}
+			if (_isSpeciesSelectionDragging && _speciesSelectionWindow != null)
+			{
+				_speciesSelectionWindow.Location = new Point(GameService.Input.Mouse.PositionRaw.X - _speciesSelectionDragOffset.X, GameService.Input.Mouse.PositionRaw.Y - _speciesSelectionDragOffset.Y);
+			}
+			if (_isDraggingAchievement && _achievementResultsPanel != null)
+			{
+				_achievementResultsPanel.Location = new Point(GameService.Input.Mouse.PositionRaw.X - _achievementDragOffset.X, GameService.Input.Mouse.PositionRaw.Y - _achievementDragOffset.Y);
+				if (_achievementLegendPanel != null)
+				{
+					_achievementLegendPanel.Location = new Point(_achievementResultsPanel.Location.X, _achievementResultsPanel.Location.Y + _achievementResultsPanel.Height + 2);
+				}
+			}
+			if (_isMetaDragging && _metaProgressWindow != null)
+			{
+				_metaProgressWindow.Location = new Point(GameService.Input.Mouse.PositionRaw.X - _metaDragOffset.X, GameService.Input.Mouse.PositionRaw.Y - _metaDragOffset.Y);
+			}
 			if (_isCheater && _cheaterLabel != null)
 			{
 				_cheaterTimer += gt.ElapsedGameTime.TotalSeconds;
@@ -3370,6 +4225,92 @@ namespace Gorthax.Gilledwars
 					_isTourneyWrapUpActive = false;
 					CompleteTournamentAsync("Tournament Ended", "Submitting your catches to the server...");
 				}
+			}
+		}
+
+		private async Task ForceUploadPB()
+		{
+			_ = 1;
+			try
+			{
+				List<KeyValuePair<int, PersonalBestRecord>> unsubmittedKvps = _personalBests.Where((KeyValuePair<int, PersonalBestRecord> kvp) => (kvp.Value.BestWeight != null && !kvp.Value.BestWeight.IsSubmitted) || (kvp.Value.BestLength != null && !kvp.Value.BestLength.IsSubmitted)).ToList();
+				if (!unsubmittedKvps.Any())
+				{
+					ScreenNotification.ShowNotification("No new submissions found.");
+					return;
+				}
+				ScreenNotification.ShowNotification($"Pushing {unsubmittedKvps.Count} unsubmitted PBs to Leaderboard...");
+				foreach (KeyValuePair<int, PersonalBestRecord> kvp2 in unsubmittedKvps)
+				{
+					int itemId = kvp2.Key;
+					PersonalBestRecord record = kvp2.Value;
+					FishData fishInfo = _allFishEntries.FirstOrDefault((FishUIEntry f) => f.Data.ItemId == itemId)?.Data;
+					if (fishInfo == null)
+					{
+						continue;
+					}
+					string safeName = fishInfo.Name.Replace(" ", "_").Replace("'", "").Replace("-", "");
+					string accountName = GameService.Gw2Mumble.PlayerCharacter.Name;
+					if (string.IsNullOrEmpty(accountName))
+					{
+						accountName = "Unknown";
+					}
+					HttpClient client2;
+					if (record.BestWeight != null && !record.BestWeight.IsSubmitted && !record.BestWeight.IsCheater)
+					{
+						StringContent content2 = new StringContent(System.Text.Json.JsonSerializer.Serialize(new
+						{
+							player_name = accountName,
+							fish_name = safeName,
+							weight = record.BestWeight.Weight,
+							length = 0.0,
+							catch_time = DateTime.UtcNow.ToString("o")
+						}), Encoding.UTF8, "application/json");
+						client2 = new HttpClient();
+						try
+						{
+							if ((await client2.PostAsync("https://gilledwars.com/api/submit_catch", (HttpContent)(object)content2)).get_IsSuccessStatusCode())
+							{
+								record.BestWeight.IsSubmitted = true;
+							}
+						}
+						finally
+						{
+							((IDisposable)client2)?.Dispose();
+						}
+					}
+					if (record.BestLength == null || record.BestLength.IsSubmitted || record.BestLength.IsCheater)
+					{
+						continue;
+					}
+					StringContent content = new StringContent(System.Text.Json.JsonSerializer.Serialize(new
+					{
+						player_name = accountName,
+						fish_name = safeName,
+						weight = 0.0,
+						length = record.BestLength.Length,
+						catch_time = DateTime.UtcNow.ToString("o")
+					}), Encoding.UTF8, "application/json");
+					client2 = new HttpClient();
+					try
+					{
+						if ((await client2.PostAsync("https://gilledwars.com/api/submit_catch", (HttpContent)(object)content)).get_IsSuccessStatusCode())
+						{
+							record.BestLength.IsSubmitted = true;
+						}
+					}
+					finally
+					{
+						((IDisposable)client2)?.Dispose();
+					}
+				}
+				SavePersonalBests();
+				ScreenNotification.ShowNotification("Fish submitted to leaderboards, Good Luck!", ScreenNotification.NotificationType.Warning);
+			}
+			catch (Exception ex)
+			{
+				Logger.Error(ex, "Failed to force upload PBs.");
+				ScreenNotification.ShowNotification("Failed to connect to leaderboards.", ScreenNotification.NotificationType.Error);
 			}
 		}
 

@@ -30,5 +30,8 @@
     <Reference Include="MonoGame.Extended">
       <HintPath>..\..\working\MonoGame.Extended.dll</HintPath>
     </Reference>
+    <Reference Include="System.Text.Json">
+      <HintPath>..\..\working\System.Text.Json.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>
