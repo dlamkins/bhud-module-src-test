@@ -221,11 +221,13 @@ namespace Manlaan.MouseCursor
 
 		protected override void Update(GameTime gameTime)
 		{
+			Logger.Debug("==============================================================================");
 			UpdateCursorState(gameTime);
 			UpdateCursorClipping();
 			UpdateCursorFreeze(gameTime);
 			UpdateCursorImg();
 			_lastMouseState = Mouse.GetState();
+			Logger.Debug("======================================END=====================================");
 		}
 
 		private void UpdateCursorState(GameTime gt)
@@ -242,16 +244,30 @@ namespace Manlaan.MouseCursor
 			double cursorVel = (double)(Mouse.GetState().Position.ToVector2() - _lastMouseState.Position.ToVector2()).Length() / gt.ElapsedGameTime.TotalSeconds;
 			_cursorVelChanged = cursorVel - _cursorVel < 1E-09;
 			_cursorVel = cursorVel;
+			Logger.Debug($"_cursorVisChanged         {_cursorVisChanged}");
+			Logger.Debug($"_cursorVis                {_cursorVis}");
+			Logger.Debug($"_camDraggedChanged        {_camDraggedChanged}");
+			Logger.Debug($"_camDragged               {_camDragged}");
+			Logger.Debug($"_inActionCamChanged       {_inActionCamChanged}");
+			Logger.Debug($"_inActionCam              {_inActionCam}");
+			Logger.Debug($"WForms.Cursor.Clip        {Cursor.Clip}");
+			Logger.Debug($"clientToScr               {WinApi.ClientToScreen(GameService.GameIntegration.get_Gw2Instance().get_Gw2WindowHandle())}");
+			Logger.Debug($"clientRect                {WinApi.GetClientRect(GameService.GameIntegration.get_Gw2Instance().get_Gw2WindowHandle())}");
+			Logger.Debug($"clientWindowRect          {GameService.Graphics.get_WindowWidth()};{GameService.Graphics.get_WindowHeight()}");
 		}
 
 		private void UpdateCursorImg()
 		{
 			((Control)_mouseImg).set_Visible(GameService.GameIntegration.get_Gw2Instance().get_Gw2HasFocus() && GameService.GameIntegration.get_Gw2Instance().get_IsInGame() && !_inActionCam);
 			((Control)_mouseImg).set_Visible(((Control)_mouseImg).get_Visible() && ((!GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat() && (_settingMouseCursorShow.get_Value() == ShowMode.Always || (_settingMouseCursorShow.get_Value() == ShowMode.Dragging && _camDragged) || (_settingMouseCursorShow.get_Value() == ShowMode.NotDragging && !_camDragged))) || (GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat() && (_settingMouseCursorShowCombat.get_Value() == ShowMode.Always || (_settingMouseCursorShowCombat.get_Value() == ShowMode.Dragging && _camDragged) || (_settingMouseCursorShowCombat.get_Value() == ShowMode.NotDragging && !_camDragged)))));
+			WinApi.GetClientRect(GameService.GameIntegration.get_Gw2Instance().get_Gw2WindowHandle());
 			if (_cursorVis)
 			{
-				((Control)_mouseImg).set_Location(new Microsoft.Xna.Framework.Point(Clamp(Mouse.GetState().Position.X - _settingMouseCursorSize.get_Value() / 2, -_settingMouseCursorSize.get_Value() / 2, GameService.Graphics.get_WindowWidth() - _settingMouseCursorSize.get_Value() / 2), Clamp(Mouse.GetState().Position.Y - _settingMouseCursorSize.get_Value() / 2, -_settingMouseCursorSize.get_Value() / 2, GameService.Graphics.get_WindowHeight() - _settingMouseCursorSize.get_Value() / 2)));
+				((Control)_mouseImg).set_Location(new Microsoft.Xna.Framework.Point(Clamp(GameService.Input.get_Mouse().get_Position().X - _settingMouseCursorSize.get_Value() / 2, -_settingMouseCursorSize.get_Value() / 2, ((Control)GameService.Graphics.get_SpriteScreen()).get_Size().X - _settingMouseCursorSize.get_Value() / 2), Clamp(GameService.Input.get_Mouse().get_Position().Y - _settingMouseCursorSize.get_Value() / 2, -_settingMouseCursorSize.get_Value() / 2, ((Control)GameService.Graphics.get_SpriteScreen()).get_Size().Y - _settingMouseCursorSize.get_Value() / 2)));
 			}
+			Logger.Debug($"Mouse.GetState().Position  {Mouse.GetState().Position}");
+			Logger.Debug($"Input.Mouse.Position       {GameService.Input.get_Mouse().get_Position()}");
+			Logger.Debug($"_mouseImg.Location         {((Control)_mouseImg).get_Location()}");
 		}
 
 		private void UpdateCursorFreeze(GameTime gameTime)
@@ -259,9 +275,14 @@ namespace Manlaan.MouseCursor
 			_freezeCursor = (((_camDraggedChanged && !_camDragged && !_inActionCam) || (_inActionCamChanged && !_inActionCam)) ? _settingMouseCursorFreezeCursor.get_Value() : _freezeCursor);
 			_freezeStart = (((_camDraggedChanged && !_camDragged && !_inActionCam) || (_inActionCamChanged && !_inActionCam)) ? gameTime.TotalGameTime : _freezeStart);
 			_freezeStartPoint = (((_camDraggedChanged && _camDragged && !_inActionCamChanged) || (_inActionCamChanged && _inActionCam && !_camDraggedChanged)) ? new Microsoft.Xna.Framework.Point(Mouse.GetState().Position.X, Mouse.GetState().Position.Y) : _freezeStartPoint);
+			Logger.Debug($"_freezeCursor              {_freezeCursor}");
+			Logger.Debug($"updateFreezeStartPoint     {(_camDraggedChanged && _camDragged && !_inActionCamChanged) || (_inActionCamChanged && _inActionCam && !_camDraggedChanged)}");
+			Logger.Debug($"_freezeStartPoint          {_freezeStartPoint}");
+			Logger.Debug($"_settingMouseCursorSize    {_settingMouseCursorSize.get_Value()}");
 			if (_freezeCursor)
 			{
-				if (gameTime.TotalGameTime.Subtract(_freezeStart).TotalMilliseconds > (double)_settingMouseCursorFreezeCursorPeriod.get_Value() || !GameService.GameIntegration.get_Gw2Instance().get_IsInGame() || !GameService.GameIntegration.get_Gw2Instance().get_Gw2HasFocus())
+				double frozenFor = gameTime.TotalGameTime.Subtract(_freezeStart).TotalMilliseconds;
+				if (frozenFor > (double)_settingMouseCursorFreezeCursorPeriod.get_Value() || !GameService.GameIntegration.get_Gw2Instance().get_IsInGame() || !GameService.GameIntegration.get_Gw2Instance().get_Gw2HasFocus())
 				{
 					_freezeCursor = false;
 				}
@@ -269,6 +290,9 @@ namespace Manlaan.MouseCursor
 				System.Drawing.Rectangle? clientRect = WinApi.GetClientRect(GameService.GameIntegration.get_Gw2Instance().get_Gw2WindowHandle());
 				Cursor.Position = (_freezeCursor ? Cursor.Clip.Location : Cursor.Position);
 				Cursor.Clip = new System.Drawing.Rectangle(_freezeCursor ? (clientToScr.GetValueOrDefault().X + _freezeStartPoint.X) : (_shouldClip ? clientToScr.GetValueOrDefault().X : 0), _freezeCursor ? (clientToScr.GetValueOrDefault().Y + _freezeStartPoint.Y) : (_shouldClip ? clientToScr.GetValueOrDefault().Y : 0), _freezeCursor ? 1 : (_shouldClip ? clientRect.GetValueOrDefault().Width : 0), _freezeCursor ? 1 : (_shouldClip ? clientRect.GetValueOrDefault().Height : 0));
+				Logger.Debug($"   CurrentFreezeTime       {frozenFor}");
+				Logger.Debug($"   _freezeCursor           {_freezeCursor}");
+				Logger.Debug($"   WForms.Cursor.Clip      {Cursor.Clip}");
 			}
 		}
 

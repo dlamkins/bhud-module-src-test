@@ -7,7 +7,7 @@ using System.Runtime.Versioning;
 [assembly: AssemblyCompany("MouseCursor")]
 [assembly: AssemblyConfiguration("Release")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
-[assembly: AssemblyInformationalVersion("1.0.0+203c37c238d988c45e9ce2d2e78099aa8aa806ec")]
+[assembly: AssemblyInformationalVersion("1.0.0+71519a01b5451de3ff5f92765c1e70ef97ab81c9")]
 [assembly: AssemblyProduct("MouseCursor")]
 [assembly: AssemblyTitle("MouseCursor")]
 [assembly: NeutralResourcesLanguage("en")]
