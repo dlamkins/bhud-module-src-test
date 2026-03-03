@@ -185,6 +185,11 @@ namespace Manlaan.MouseCursor.Views
 			//IL_0aaa: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0aba: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0ac6: Expected O, but got Unknown
+			//IL_0afd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0b02: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0b09: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0b1f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0b28: Expected O, but got Unknown
 			Panel val = new Panel();
 			val.set_CanScroll(false);
 			((Control)val).set_Parent(buildPanel);
@@ -453,6 +458,14 @@ namespace Manlaan.MouseCursor.Views
 				((Control)freezeCursorPeriodSlider).set_Visible(Module._settingMouseCursorFreezeCursor.get_Value());
 			});
 			prevContainer = (Control)(object)freezeCursorPeriodSlider;
+			ViewContainer val24 = new ViewContainer();
+			((Container)val24).set_WidthSizingMode((SizingMode)2);
+			((Control)val24).set_Location(new Point(10, prevContainer.get_Bottom() + 5));
+			((Control)val24).set_Parent((Container)(object)parentPanel);
+			ViewContainer _settingLogDebugContainer = val24;
+			IView settingLogDebugView = SettingView.FromType((SettingEntry)(object)Module._settingMouseCursorLogDebug, ((Control)_settingLogDebugContainer).get_Width());
+			_settingLogDebugContainer.Show(settingLogDebugView);
+			prevContainer = (Control)(object)_settingLogDebugContainer;
 		}
 
 		public SettingsView()
