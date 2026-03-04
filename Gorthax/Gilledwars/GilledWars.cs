@@ -12,7 +12,6 @@ using System.Net.WebSockets;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -4233,79 +4232,86 @@ namespace Gorthax.Gilledwars
 			_ = 1;
 			try
 			{
-				List<KeyValuePair<int, PersonalBestRecord>> unsubmittedKvps = _personalBests.Where((KeyValuePair<int, PersonalBestRecord> kvp) => (kvp.Value.BestWeight != null && !kvp.Value.BestWeight.IsSubmitted) || (kvp.Value.BestLength != null && !kvp.Value.BestLength.IsSubmitted)).ToList();
+				List<KeyValuePair<int, PersonalBestRecord>> unsubmittedKvps = _personalBests.Where((KeyValuePair<int, PersonalBestRecord> kvp) => (kvp.Value.BestWeight != null && !kvp.Value.BestWeight.IsSubmitted && !kvp.Value.BestWeight.IsCheater) || (kvp.Value.BestLength != null && !kvp.Value.BestLength.IsSubmitted && !kvp.Value.BestLength.IsCheater)).ToList();
 				if (!unsubmittedKvps.Any())
 				{
 					ScreenNotification.ShowNotification("No new submissions found.");
 					return;
 				}
 				ScreenNotification.ShowNotification($"Pushing {unsubmittedKvps.Count} unsubmitted PBs to Leaderboard...");
+				string accountName = _localAccountName;
+				List<object> catchesToSubmit = new List<object>();
+				List<SubRecord> recordsToMark = new List<SubRecord>();
 				foreach (KeyValuePair<int, PersonalBestRecord> kvp2 in unsubmittedKvps)
 				{
 					int itemId = kvp2.Key;
 					PersonalBestRecord record = kvp2.Value;
 					FishData fishInfo = _allFishEntries.FirstOrDefault((FishUIEntry f) => f.Data.ItemId == itemId)?.Data;
-					if (fishInfo == null)
+					if (fishInfo != null)
 					{
-						continue;
-					}
-					string safeName = fishInfo.Name.Replace(" ", "_").Replace("'", "").Replace("-", "");
-					string accountName = GameService.Gw2Mumble.PlayerCharacter.Name;
-					if (string.IsNullOrEmpty(accountName))
-					{
-						accountName = "Unknown";
-					}
-					HttpClient client2;
-					if (record.BestWeight != null && !record.BestWeight.IsSubmitted && !record.BestWeight.IsCheater)
-					{
-						StringContent content2 = new StringContent(System.Text.Json.JsonSerializer.Serialize(new
+						if (record.BestWeight != null && !record.BestWeight.IsSubmitted && !record.BestWeight.IsCheater)
 						{
-							player_name = accountName,
-							fish_name = safeName,
-							weight = record.BestWeight.Weight,
-							length = 0.0,
-							catch_time = DateTime.UtcNow.ToString("o")
-						}), Encoding.UTF8, "application/json");
-						client2 = new HttpClient();
-						try
-						{
-							if ((await client2.PostAsync("https://gilledwars.com/api/submit_catch", (HttpContent)(object)content2)).get_IsSuccessStatusCode())
+							catchesToSubmit.Add(new
 							{
-								record.BestWeight.IsSubmitted = true;
-							}
+								itemId = itemId,
+								name = fishInfo.Name,
+								weight = record.BestWeight.Weight,
+								length = record.BestWeight.Length,
+								characterName = record.BestWeight.CharacterName,
+								accountName = accountName,
+								isSuper = record.BestWeight.IsSuperPb,
+								signature = record.BestWeight.Signature,
+								type = "weight",
+								location = fishInfo.Location
+							});
+							recordsToMark.Add(record.BestWeight);
 						}
-						finally
+						if (record.BestLength != null && !record.BestLength.IsSubmitted && !record.BestLength.IsCheater)
 						{
-							((IDisposable)client2)?.Dispose();
+							catchesToSubmit.Add(new
+							{
+								itemId = itemId,
+								name = fishInfo.Name,
+								weight = record.BestLength.Weight,
+								length = record.BestLength.Length,
+								characterName = record.BestLength.CharacterName,
+								accountName = accountName,
+								isSuper = record.BestLength.IsSuperPb,
+								signature = record.BestLength.Signature,
+								type = "length",
+								location = fishInfo.Location
+							});
+							recordsToMark.Add(record.BestLength);
 						}
-					}
-					if (record.BestLength == null || record.BestLength.IsSubmitted || record.BestLength.IsCheater)
-					{
-						continue;
-					}
-					StringContent content = new StringContent(System.Text.Json.JsonSerializer.Serialize(new
-					{
-						player_name = accountName,
-						fish_name = safeName,
-						weight = 0.0,
-						length = record.BestLength.Length,
-						catch_time = DateTime.UtcNow.ToString("o")
-					}), Encoding.UTF8, "application/json");
-					client2 = new HttpClient();
-					try
-					{
-						if ((await client2.PostAsync("https://gilledwars.com/api/submit_catch", (HttpContent)(object)content)).get_IsSuccessStatusCode())
-						{
-							record.BestLength.IsSubmitted = true;
-						}
-					}
-					finally
-					{
-						((IDisposable)client2)?.Dispose();
 					}
 				}
-				SavePersonalBests();
-				ScreenNotification.ShowNotification("Fish submitted to leaderboards, Good Luck!", ScreenNotification.NotificationType.Warning);
+				if (!catchesToSubmit.Any())
+				{
+					return;
+				}
+				StringContent content = new StringContent(JsonConvert.SerializeObject(new
+				{
+					catches = catchesToSubmit
+				}), Encoding.UTF8, "application/json");
+				HttpResponseMessage response = await _httpClient.PostAsync("https://api.gilledwars.com/submit-leaderboard", (HttpContent)(object)content);
+				if (response.get_IsSuccessStatusCode())
+				{
+					Dictionary<string, object> resultObj = JsonConvert.DeserializeObject<Dictionary<string, object>>(await response.get_Content().ReadAsStringAsync());
+					if (resultObj != null && resultObj.ContainsKey("count"))
+					{
+						Convert.ToInt32(resultObj["count"]);
+					}
+					foreach (SubRecord item in recordsToMark)
+					{
+						item.IsSubmitted = true;
+					}
+					SavePersonalBests();
+					ScreenNotification.ShowNotification("Analyzing Your Catches Now! Check The Leaderboard Shortly!", ScreenNotification.NotificationType.Warning);
+				}
+				else
+				{
+					ScreenNotification.ShowNotification("Server rejected the submissions. I wonder why.", ScreenNotification.NotificationType.Error);
+				}
 			}
 			catch (Exception ex)
 			{
