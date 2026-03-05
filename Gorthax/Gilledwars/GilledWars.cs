@@ -4267,36 +4267,36 @@ namespace Gorthax.Gilledwars
 			}
 			if (_timeOfDayPanel != null && _timeOfDayPanel.Visible)
 			{
-				double cycleMinutes = DateTime.UtcNow.TimeOfDay.TotalMinutes % 120.0;
+				double currentCycle = DateTime.UtcNow.TimeOfDay.TotalMinutes % 120.0;
 				string phase = "";
 				double remainingMinutes = 0.0;
 				AsyncTexture2D targetTex = null;
 				Microsoft.Xna.Framework.Color phaseColor = Microsoft.Xna.Framework.Color.White;
-				if (cycleMinutes < 5.0)
+				if (currentCycle >= 25.0 && currentCycle < 30.0)
 				{
 					phase = "Dawn";
-					remainingMinutes = 5.0 - cycleMinutes;
+					remainingMinutes = 30.0 - currentCycle;
 					targetTex = _texDawn;
 					phaseColor = new Microsoft.Xna.Framework.Color(255, 200, 150);
 				}
-				else if (cycleMinutes < 75.0)
+				else if (currentCycle >= 30.0 && currentCycle < 100.0)
 				{
 					phase = "Day";
-					remainingMinutes = 75.0 - cycleMinutes;
+					remainingMinutes = 100.0 - currentCycle;
 					targetTex = _texDay;
 					phaseColor = Microsoft.Xna.Framework.Color.LightSkyBlue;
 				}
-				else if (cycleMinutes < 80.0)
+				else if (currentCycle >= 100.0 && currentCycle < 105.0)
 				{
 					phase = "Dusk";
-					remainingMinutes = 80.0 - cycleMinutes;
+					remainingMinutes = 105.0 - currentCycle;
 					targetTex = _texDusk;
 					phaseColor = Microsoft.Xna.Framework.Color.Orange;
 				}
 				else
 				{
 					phase = "Night";
-					remainingMinutes = 120.0 - cycleMinutes;
+					remainingMinutes = ((!(currentCycle >= 105.0)) ? (25.0 - currentCycle) : (145.0 - currentCycle));
 					targetTex = _texNight;
 					phaseColor = new Microsoft.Xna.Framework.Color(220, 190, 255);
 				}
@@ -4305,8 +4305,26 @@ namespace Gorthax.Gilledwars
 				_todLabel.TextColor = phaseColor;
 				if (_currentTodPhase != phase)
 				{
-					_todIcon.Texture = targetTex;
+					bool num = string.IsNullOrEmpty(_currentTodPhase);
 					_currentTodPhase = phase;
+					if (num)
+					{
+						_todIcon.Texture = targetTex;
+					}
+					else
+					{
+						GameService.Animation.Tweener.Tween(_todIcon, new
+						{
+							Opacity = 0f
+						}, 0.5f).OnComplete(delegate
+						{
+							_todIcon.Texture = targetTex;
+							GameService.Animation.Tweener.Tween(_todIcon, new
+							{
+								Opacity = 1f
+							}, 0.5f);
+						});
+					}
 				}
 			}
 			if (_isCheater && _cheaterLabel != null)
