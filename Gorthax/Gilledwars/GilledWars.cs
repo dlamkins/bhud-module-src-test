@@ -332,6 +332,7 @@ namespace Gorthax.Gilledwars
 				CornerIconType.Hook2 => ContentsManager.GetTexture("images/hook2.png"), 
 				CornerIconType.Lure => ContentsManager.GetTexture("images/lure.png"), 
 				CornerIconType.Net => ContentsManager.GetTexture("images/net.png"), 
+				CornerIconType.FishMaster => ContentsManager.GetTexture("images/fishmaster.png"), 
 				_ => ContentsManager.GetTexture("images/hook.png"), 
 			};
 		}

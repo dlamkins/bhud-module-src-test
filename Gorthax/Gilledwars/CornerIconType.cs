@@ -6,6 +6,7 @@ namespace Gorthax.Gilledwars
 		Hook,
 		Hook2,
 		Lure,
-		Net
+		Net,
+		FishMaster
 	}
 }

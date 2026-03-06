@@ -6,7 +6,7 @@ using System.Runtime.Versioning;
 [assembly: AssemblyCompany("GilledWars")]
 [assembly: AssemblyConfiguration("Release")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
-[assembly: AssemblyInformationalVersion("1.0.0+d7299dac58443c8d1949e2e1aac20c4b8c8a67e4")]
+[assembly: AssemblyInformationalVersion("1.0.0+6b6592a6fcf23a608b083c0cd6088324a015a5fd")]
 [assembly: AssemblyProduct("GilledWars")]
 [assembly: AssemblyTitle("GilledWars")]
 [assembly: AssemblyVersion("1.0.0.0")]
