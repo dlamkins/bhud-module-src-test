@@ -121,6 +121,18 @@ namespace CinemaModule.UI.VideoDisplays
 			}
 		}
 
+		public bool IsWatchPartyViewer
+		{
+			get
+			{
+				return _controlsOverlay.IsWatchPartyViewer;
+			}
+			set
+			{
+				_controlsOverlay.IsWatchPartyViewer = value;
+			}
+		}
+
 		public float CurrentPosition
 		{
 			get

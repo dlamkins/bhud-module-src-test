@@ -37,9 +37,13 @@ namespace CinemaModule.UI.Controls
 
 		private const float SeekPositionTolerance = 0.02f;
 
+		private bool _isWatchPartyViewer;
+
 		private int _volume = 100;
 
 		private float _opacity;
+
+		private bool _suppressQualityEvent;
 
 		public VideoControlsRenderer Renderer { get; }
 
@@ -50,6 +54,18 @@ namespace CinemaModule.UI.Controls
 		public Dropdown QualityDropdown { get; }
 
 		public bool IsPaused { get; set; }
+
+		public bool IsWatchPartyViewer
+		{
+			get
+			{
+				return _isWatchPartyViewer;
+			}
+			set
+			{
+				_isWatchPartyViewer = value;
+			}
+		}
 
 		public int Volume
 		{
@@ -230,7 +246,14 @@ namespace CinemaModule.UI.Controls
 		{
 			if (SeekBar.get_Dragging())
 			{
-				_currentPosition = e.get_Value() / 100f;
+				if (_isWatchPartyViewer)
+				{
+					SeekBar.set_Value(_currentPosition * 100f);
+				}
+				else
+				{
+					_currentPosition = e.get_Value() / 100f;
+				}
 			}
 		}
 
@@ -302,19 +325,25 @@ namespace CinemaModule.UI.Controls
 
 		private void OnQualityDropdownChanged(object sender, ValueChangedEventArgs e)
 		{
-			int selectedIndex = QualityDropdown.get_Items().IndexOf(QualityDropdown.get_SelectedItem());
-			if (selectedIndex >= 0)
+			if (!_suppressQualityEvent)
 			{
-				RaiseQualityChanged(selectedIndex);
+				int selectedIndex = QualityDropdown.get_Items().IndexOf(QualityDropdown.get_SelectedItem());
+				if (selectedIndex >= 0)
+				{
+					RaiseQualityChanged(selectedIndex);
+				}
 			}
 		}
 
 		public void UpdateAvailableQualities(IReadOnlyList<string> qualityNames, int selectedIndex)
 		{
+			Logger.GetLogger<BaseVideoControls>().Debug($"UpdateAvailableQualities: {qualityNames?.Count ?? 0} qualities, selectedIndex={selectedIndex}");
+			_suppressQualityEvent = true;
 			QualityDropdown.get_Items().Clear();
 			if (qualityNames == null || qualityNames.Count == 0)
 			{
 				((Control)QualityDropdown).set_Visible(false);
+				_suppressQualityEvent = false;
 				return;
 			}
 			foreach (string name in qualityNames)
@@ -325,6 +354,7 @@ namespace CinemaModule.UI.Controls
 			{
 				QualityDropdown.set_SelectedItem(QualityDropdown.get_Items()[selectedIndex]);
 			}
+			_suppressQualityEvent = false;
 		}
 
 		protected void StartFadeIn()

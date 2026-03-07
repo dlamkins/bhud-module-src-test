@@ -82,7 +82,7 @@ namespace CinemaModule.Services
 
 		private static async Task<string> ParseMapNameFromResponseAsync(HttpResponseMessage response)
 		{
-			return ((object)JObject.Parse(await response.get_Content().ReadAsStringAsync().ConfigureAwait(continueOnCapturedContext: false)).get_Item("name"))?.ToString();
+			return JObject.Parse(await response.get_Content().ReadAsStringAsync().ConfigureAwait(continueOnCapturedContext: false))["name"]?.ToString();
 		}
 
 		private static string GetFallbackMapName(int mapId)
@@ -131,7 +131,7 @@ namespace CinemaModule.Services
 				{
 					Directory.CreateDirectory(directory);
 				}
-				string json = JsonConvert.SerializeObject((object)_mapNameCache, (Formatting)1);
+				string json = JsonConvert.SerializeObject(_mapNameCache, Formatting.Indented);
 				File.WriteAllText(_cacheFilePath, json);
 			}
 			catch (Exception ex)

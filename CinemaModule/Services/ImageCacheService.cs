@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -17,9 +18,15 @@ namespace CinemaModule.Services
 
 		private const string UrlMetadataExtension = ".url";
 
+		private const int MaxMemoryCacheEntries = 100;
+
 		private readonly HttpClient _httpClient;
 
 		private readonly string _cacheDirectory;
+
+		private readonly Dictionary<string, AsyncTexture2D> _memoryCache = new Dictionary<string, AsyncTexture2D>();
+
+		private readonly List<string> _memoryCacheOrder = new List<string>();
 
 		public ImageCacheService(string cacheDirectory, HttpClient httpClient)
 		{
@@ -37,6 +44,10 @@ namespace CinemaModule.Services
 			{
 				return null;
 			}
+			if (TryGetFromMemoryCache(cacheKey, out var memCached))
+			{
+				return memCached;
+			}
 			string cachePath = GetCachePath(cacheKey);
 			if (cachePath == null)
 			{
@@ -45,9 +56,15 @@ namespace CinemaModule.Services
 			AsyncTexture2D cachedTexture = TryLoadFromCache(cachePath, imageUrl);
 			if (cachedTexture != null)
 			{
+				AddToMemoryCache(cacheKey, cachedTexture);
 				return cachedTexture;
 			}
-			return await DownloadAndCacheAsync(imageUrl, cachePath);
+			AsyncTexture2D downloaded = await DownloadAndCacheAsync(imageUrl, cachePath);
+			if (downloaded != null)
+			{
+				AddToMemoryCache(cacheKey, downloaded);
+			}
+			return downloaded;
 		}
 
 		private string GetCachePath(string cacheKey)
@@ -166,6 +183,36 @@ namespace CinemaModule.Services
 		{
 			char[] invalid = Path.GetInvalidFileNameChars();
 			return string.Join("_", name.ToLowerInvariant().Split(invalid, StringSplitOptions.RemoveEmptyEntries));
+		}
+
+		private bool TryGetFromMemoryCache(string cacheKey, out AsyncTexture2D texture)
+		{
+			if (_memoryCache.TryGetValue(cacheKey, out texture))
+			{
+				if (texture != null && !texture.get_IsDisposed())
+				{
+					return true;
+				}
+				_memoryCache.Remove(cacheKey);
+				_memoryCacheOrder.Remove(cacheKey);
+			}
+			texture = null;
+			return false;
+		}
+
+		private void AddToMemoryCache(string cacheKey, AsyncTexture2D texture)
+		{
+			if (!_memoryCache.ContainsKey(cacheKey))
+			{
+				if (_memoryCacheOrder.Count >= 100)
+				{
+					string oldest = _memoryCacheOrder[0];
+					_memoryCacheOrder.RemoveAt(0);
+					_memoryCache.Remove(oldest);
+				}
+				_memoryCache[cacheKey] = texture;
+				_memoryCacheOrder.Add(cacheKey);
+			}
 		}
 
 		private static AsyncTexture2D CreateTextureFromBytes(byte[] bytes)

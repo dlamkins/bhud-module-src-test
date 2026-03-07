@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -17,15 +16,13 @@ namespace CinemaModule.Services
 
 		private const string DefaultApiBaseUrl = "https://www.gw2opus.com/wp-json/cinemahud/v3";
 
-		private const string ImageCacheSubfolder = "presets";
-
 		private static readonly TimeSpan RequestTimeout = TimeSpan.FromSeconds(10.0);
 
 		private readonly HttpClient _httpClient;
 
 		private readonly string _apiBaseUrl;
 
-		private readonly ImageCacheService _imageCache;
+		private readonly TextureService _textureService;
 
 		private PresetsResponse _cachedPresets;
 
@@ -62,22 +59,21 @@ namespace CinemaModule.Services
 			return null;
 		}
 
-		public PresetService(string cacheDirectory)
-			: this(cacheDirectory, "https://www.gw2opus.com/wp-json/cinemahud/v3")
+		public PresetService(TextureService textureService)
+			: this(textureService, "https://www.gw2opus.com/wp-json/cinemahud/v3")
 		{
 		}
 
-		public PresetService(string cacheDirectory, string apiBaseUrl)
+		public PresetService(TextureService textureService, string apiBaseUrl)
 		{
-			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0023: Expected O, but got Unknown
+			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002a: Expected O, but got Unknown
+			_textureService = textureService;
 			_apiBaseUrl = apiBaseUrl;
 			HttpClient val = new HttpClient();
 			val.set_Timeout(RequestTimeout);
 			_httpClient = val;
-			string imageCacheDir = Path.Combine(cacheDirectory, "presets");
-			_imageCache = new ImageCacheService(imageCacheDir, _httpClient);
 		}
 
 		public async Task LoadPresetsAsync()
@@ -154,14 +150,14 @@ namespace CinemaModule.Services
 		{
 			if (!string.IsNullOrEmpty(category.Icon))
 			{
-				category.IconTexture = await _imageCache.GetImageAsync("loc_cat_" + category.Id + "_icon", category.Icon);
+				category.IconTexture = await _textureService.GetPresetImageAsync("loc_cat_" + category.Id + "_icon", category.Icon);
 			}
 		}
 
 		private async Task LoadImagesForWorldLocationAsync(WorldLocationPresetData preset)
 		{
-			Task<AsyncTexture2D> avatarTask = _imageCache.GetImageAsync(preset.Id + "_avatar", preset.Avatar);
-			Task<AsyncTexture2D> pictureTask = _imageCache.GetImageAsync(preset.Id + "_picture", preset.Picture);
+			Task<AsyncTexture2D> avatarTask = _textureService.GetPresetImageAsync(preset.Id + "_avatar", preset.Avatar);
+			Task<AsyncTexture2D> pictureTask = _textureService.GetPresetImageAsync(preset.Id + "_picture", preset.Picture);
 			await Task.WhenAll<AsyncTexture2D>(avatarTask, pictureTask);
 			preset.AvatarTexture = avatarTask.Result;
 			preset.PictureTexture = pictureTask.Result;
@@ -171,7 +167,7 @@ namespace CinemaModule.Services
 		{
 			if (!string.IsNullOrEmpty(category.Icon))
 			{
-				category.IconTexture = await _imageCache.GetImageAsync("cat_" + category.Id + "_icon", category.Icon);
+				category.IconTexture = await _textureService.GetPresetImageAsync("cat_" + category.Id + "_icon", category.Icon);
 			}
 		}
 
@@ -180,11 +176,11 @@ namespace CinemaModule.Services
 			List<Task> tasks = new List<Task>();
 			if (!string.IsNullOrEmpty(channel.Avatar))
 			{
-				tasks.Add(_imageCache.GetImageAsync("ch_" + channel.Id + "_avatar", channel.Avatar).ContinueWith((Task<AsyncTexture2D> t) => channel.AvatarTexture = t.Result, TaskContinuationOptions.OnlyOnRanToCompletion));
+				tasks.Add(_textureService.GetPresetImageAsync("ch_" + channel.Id + "_avatar", channel.Avatar).ContinueWith((Task<AsyncTexture2D> t) => channel.AvatarTexture = t.Result, TaskContinuationOptions.OnlyOnRanToCompletion));
 			}
 			if (!string.IsNullOrEmpty(channel.StaticImage))
 			{
-				tasks.Add(_imageCache.GetImageAsync("ch_" + channel.Id + "_static", channel.StaticImage).ContinueWith((Task<AsyncTexture2D> t) => channel.StaticImageTexture = t.Result, TaskContinuationOptions.OnlyOnRanToCompletion));
+				tasks.Add(_textureService.GetPresetImageAsync("ch_" + channel.Id + "_static", channel.StaticImage).ContinueWith((Task<AsyncTexture2D> t) => channel.StaticImageTexture = t.Result, TaskContinuationOptions.OnlyOnRanToCompletion));
 			}
 			if (tasks.Count > 0)
 			{
@@ -194,7 +190,6 @@ namespace CinemaModule.Services
 
 		public void Dispose()
 		{
-			_imageCache?.Dispose();
 			HttpClient httpClient = _httpClient;
 			if (httpClient != null)
 			{

@@ -121,6 +121,18 @@ namespace CinemaModule.UI.Controls
 
 		public string GameName { get; set; }
 
+		private bool ShowTimeDisplay
+		{
+			get
+			{
+				if (_isSeekable)
+				{
+					return !IsTwitchStream;
+				}
+				return false;
+			}
+		}
+
 		public event EventHandler TwitchChatClicked;
 
 		public event EventHandler CloseClicked;
@@ -229,11 +241,11 @@ namespace CinemaModule.UI.Controls
 
 		private void UpdateSeekBarBounds(Vector2 bottomRight, Vector2 bottomLeft)
 		{
-			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-			if (_isSeekable && !IsTwitchStream)
+			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
+			if (ShowTimeDisplay)
 			{
 				int bottomY = _volumeIconBounds.Y;
 				int sliderLeft = _panelBounds.X + 80;
@@ -320,15 +332,15 @@ namespace CinemaModule.UI.Controls
 			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
 			Point mousePos = GameService.Input.get_Mouse().get_Position();
 			_isHoveringPanel = ((Rectangle)(ref _panelBounds)).Contains(mousePos);
-			_isHoveringPlayPause = _isHoveringPanel && ((Rectangle)(ref _playPauseBounds)).Contains(mousePos);
+			_isHoveringPlayPause = !base.IsWatchPartyViewer && _isHoveringPanel && ((Rectangle)(ref _playPauseBounds)).Contains(mousePos);
 			_isHoveringVolume = _isHoveringPanel && (((Rectangle)(ref _volumeControlBounds)).Contains(mousePos) || ((Control)base.VolumeTrackBar).get_MouseOver());
 			_isHoveringSettings = _isHoveringPanel && ((Rectangle)(ref _settingsBounds)).Contains(mousePos);
 			_isHoveringTwitchChat = IsTwitchStream && _isHoveringPanel && ((Rectangle)(ref _twitchChatBounds)).Contains(mousePos);
@@ -352,12 +364,12 @@ namespace CinemaModule.UI.Controls
 
 		private void UpdateTooltip()
 		{
-			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
 			if (!_isHoveringPanel)
 			{
 				CurrentTooltip = null;
 			}
-			else if (_isHoveringPlayPause)
+			else if (!base.IsWatchPartyViewer && _isHoveringPlayPause)
 			{
 				CurrentTooltip = (base.IsPaused ? "Play" : "Pause");
 			}
@@ -395,14 +407,14 @@ namespace CinemaModule.UI.Controls
 			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0100: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0116: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0136: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0108: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0146: Unknown result type (might be due to invalid IL or missing references)
 			if (!IsVisible)
 			{
 				return false;
@@ -427,7 +439,7 @@ namespace CinemaModule.UI.Controls
 			{
 				return true;
 			}
-			if (((Rectangle)(ref _playPauseBounds)).Contains(mousePosition))
+			if (!base.IsWatchPartyViewer && ((Rectangle)(ref _playPauseBounds)).Contains(mousePosition))
 			{
 				RaisePlayPauseClicked();
 				return true;
@@ -462,7 +474,7 @@ namespace CinemaModule.UI.Controls
 			{
 				return true;
 			}
-			if (_isSeekable && !IsTwitchStream && ((Rectangle)(ref _seekBarBackgroundBounds)).Contains(mousePosition))
+			if (_isSeekable && !IsTwitchStream && !base.IsWatchPartyViewer && ((Rectangle)(ref _seekBarBackgroundBounds)).Contains(mousePosition))
 			{
 				return true;
 			}
@@ -489,9 +501,9 @@ namespace CinemaModule.UI.Controls
 
 		private void DrawSeekBarControls(SpriteBatch spriteBatch)
 		{
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-			if (_isSeekable && !IsTwitchStream)
+			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+			if (ShowTimeDisplay)
 			{
 				base.Renderer.DrawSeekBarBackground(spriteBatch, _seekBarBackgroundBounds, Opacity);
 				base.Renderer.DrawTimeText(spriteBatch, FormatTimeDisplay(), _timeDisplayBounds, Opacity);
@@ -500,17 +512,20 @@ namespace CinemaModule.UI.Controls
 
 		private void DrawPlayPauseButton(SpriteBatch spriteBatch)
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-			Rectangle drawBounds = _playPauseBounds;
-			if (_isHoveringPlayPause)
+			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+			if (!base.IsWatchPartyViewer)
 			{
-				int scaledSize = (int)((float)_playPauseBounds.Width * 1.15f);
-				int offset = (scaledSize - _playPauseBounds.Width) / 2;
-				((Rectangle)(ref drawBounds))._002Ector(_playPauseBounds.X - offset, _playPauseBounds.Y - offset, scaledSize, scaledSize);
+				Rectangle drawBounds = _playPauseBounds;
+				if (_isHoveringPlayPause)
+				{
+					int scaledSize = (int)((float)_playPauseBounds.Width * 1.15f);
+					int offset = (scaledSize - _playPauseBounds.Width) / 2;
+					((Rectangle)(ref drawBounds))._002Ector(_playPauseBounds.X - offset, _playPauseBounds.Y - offset, scaledSize, scaledSize);
+				}
+				base.Renderer.DrawPlayPauseButton(spriteBatch, drawBounds, base.IsPaused, _isHoveringPlayPause, Opacity);
 			}
-			base.Renderer.DrawPlayPauseButton(spriteBatch, drawBounds, base.IsPaused, _isHoveringPlayPause, Opacity);
 		}
 
 		private void DrawVolumeIcon(SpriteBatch spriteBatch)

@@ -5,7 +5,7 @@ using CinemaModule.UI.Windows.Info;
 
 namespace CinemaModule.Settings
 {
-	public class CinemaSettings
+	public class CinemaSettings : IDisposable
 	{
 		private ThirdPartyNoticesWindow _thirdPartyNoticesWindow;
 

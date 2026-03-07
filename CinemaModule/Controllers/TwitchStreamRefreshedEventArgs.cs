@@ -1,17 +1,12 @@
-using System;
-
 namespace CinemaModule.Controllers
 {
-	public class TwitchStreamRefreshedEventArgs : EventArgs
+	public class TwitchStreamRefreshedEventArgs : StreamRefreshedEventArgs
 	{
-		public string ChannelName { get; }
-
-		public string StreamUrl { get; }
+		public string ChannelName => base.Identifier;
 
 		public TwitchStreamRefreshedEventArgs(string channelName, string streamUrl)
+			: base(channelName, streamUrl)
 		{
-			ChannelName = channelName;
-			StreamUrl = streamUrl;
 		}
 	}
 }

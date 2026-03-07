@@ -1,4 +1,5 @@
 using CinemaModule.Models;
+using CinemaModule.Models.Location;
 using Microsoft.Xna.Framework;
 
 namespace CinemaModule.Settings
@@ -9,6 +10,9 @@ namespace CinemaModule.Settings
 
 
 		public string CurrentTwitchChannel { get; set; } = "";
+
+
+		public string CurrentYouTubeVideo { get; set; } = "";
 
 
 		public StreamSourceType CurrentStreamSourceType { get; set; }
@@ -71,5 +75,9 @@ namespace CinemaModule.Settings
 
 		public string TwitchChatWindowChannel { get; set; } = "";
 
+
+		public bool AutoplayOnStartup { get; set; }
+
+		public bool WatchPartyAutoplayNext { get; set; }
 	}
 }

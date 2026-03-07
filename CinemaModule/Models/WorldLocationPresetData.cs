@@ -1,4 +1,5 @@
 using Blish_HUD.Content;
+using CinemaModule.Models.Location;
 using Newtonsoft.Json;
 
 namespace CinemaModule.Models

@@ -5,6 +5,11 @@ using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Graphics;
+using CinemaModule.Models;
+using CinemaModule.Models.Twitch;
+using CinemaModule.Services.Twitch;
+using CinemaModule.Services.YouTube;
+using CinemaModule.Settings;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -19,6 +24,10 @@ namespace CinemaModule.Services
 		private readonly HttpClient _httpClient;
 
 		private Texture2D _whitePixel;
+
+		private AsyncTexture2D _fallbackTexture;
+
+		private TwitchStreamInfo _cachedTwitchStreamInfo;
 
 		private const string CornerIconTexture = "logo_64.png";
 
@@ -45,6 +54,8 @@ namespace CinemaModule.Services
 		private const string ImportIconTexture = "icon_import.png";
 
 		private const string YoutubeIconTexture = "icon_youtube.png";
+
+		private const string VlcIconTexture = "vlc-icon.png";
 
 		private const string TvSideTexture = "tv_frame_side.png";
 
@@ -130,6 +141,11 @@ namespace CinemaModule.Services
 			return GetTexture("icon_youtube.png");
 		}
 
+		public AsyncTexture2D GetVlcIcon()
+		{
+			return GetTexture("vlc-icon.png");
+		}
+
 		public AsyncTexture2D GetDefaultAvatar()
 		{
 			return GetTexture("logo_64.png");
@@ -162,47 +178,47 @@ namespace CinemaModule.Services
 
 		public AsyncTexture2D GetPlayIcon()
 		{
-			return AsyncTexture2D.FromAssetId(156998);
+			return GetAssetTexture(156998);
 		}
 
 		public AsyncTexture2D GetVolumeNotMutedIcon()
 		{
-			return AsyncTexture2D.FromAssetId(156738);
+			return GetAssetTexture(156738);
 		}
 
 		public AsyncTexture2D GetVolumeMutedIcon()
 		{
-			return AsyncTexture2D.FromAssetId(156739);
+			return GetAssetTexture(156739);
 		}
 
 		public AsyncTexture2D GetSettingsIcon()
 		{
-			return AsyncTexture2D.FromAssetId(155052);
+			return GetAssetTexture(155052);
 		}
 
 		public AsyncTexture2D GetSettingsBackground()
 		{
-			return AsyncTexture2D.FromAssetId(965776);
+			return GetAssetTexture(965776);
 		}
 
 		public AsyncTexture2D GetTwitchChatIcon()
 		{
-			return AsyncTexture2D.FromAssetId(155156);
+			return GetAssetTexture(155156);
 		}
 
 		public AsyncTexture2D GetCloseIcon()
 		{
-			return AsyncTexture2D.FromAssetId(255443);
+			return GetAssetTexture(255443);
 		}
 
 		public AsyncTexture2D GetQualityIcon()
 		{
-			return AsyncTexture2D.FromAssetId(440023);
+			return GetAssetTexture(440023);
 		}
 
 		public AsyncTexture2D GetVolumeBackground()
 		{
-			return AsyncTexture2D.FromAssetId(155208);
+			return GetAssetTexture(155208);
 		}
 
 		public AsyncTexture2D GetSeekBarBackground()
@@ -212,72 +228,196 @@ namespace CinemaModule.Services
 
 		public AsyncTexture2D GetResizeCorner()
 		{
-			return AsyncTexture2D.FromAssetId(156009);
+			return GetAssetTexture(156009);
 		}
 
 		public AsyncTexture2D GetResizeCornerActive()
 		{
-			return AsyncTexture2D.FromAssetId(156010);
+			return GetAssetTexture(156010);
 		}
 
 		public AsyncTexture2D GetLockIcon()
 		{
-			return AsyncTexture2D.FromAssetId(733265);
+			return GetAssetTexture(733265);
 		}
 
 		public AsyncTexture2D GetLockActiveIcon()
 		{
-			return AsyncTexture2D.FromAssetId(733266);
+			return GetAssetTexture(733266);
 		}
 
 		public AsyncTexture2D GetDisplayIcon()
 		{
-			return AsyncTexture2D.FromAssetId(358406);
+			return GetAssetTexture(358406);
 		}
 
 		public AsyncTexture2D GetSourceIcon()
 		{
-			return AsyncTexture2D.FromAssetId(156909);
+			return GetAssetTexture(156909);
 		}
 
 		public AsyncTexture2D GetCopyIcon()
 		{
-			return AsyncTexture2D.FromAssetId(2208347);
+			return GetAssetTexture(2208347);
 		}
 
 		public AsyncTexture2D GetCardBackground()
 		{
-			return AsyncTexture2D.FromAssetId(154960);
+			return GetAssetTexture(154960);
 		}
 
 		public AsyncTexture2D GetWindowTexture()
 		{
-			return AsyncTexture2D.FromAssetId(155997);
+			return GetAssetTexture(155997);
 		}
 
 		public AsyncTexture2D GetSetScreenIcon()
 		{
-			return AsyncTexture2D.FromAssetId(528726);
+			return GetAssetTexture(528726);
 		}
 
 		public AsyncTexture2D GetWaypointIcon()
 		{
-			return AsyncTexture2D.FromAssetId(156628);
+			return GetAssetTexture(156628);
 		}
 
 		public AsyncTexture2D GetInfoIcon()
 		{
-			return AsyncTexture2D.FromAssetId(1508665);
+			return GetAssetTexture(1508665);
 		}
 
 		public AsyncTexture2D GetRefreshIcon()
 		{
-			return AsyncTexture2D.FromAssetId(156749);
+			return GetAssetTexture(156749);
+		}
+
+		public AsyncTexture2D GetWatchPartyIcon()
+		{
+			return GetAssetTexture(156694);
+		}
+
+		public AsyncTexture2D GetArrowUpIcon()
+		{
+			return GetAssetTexture(102617);
+		}
+
+		public AsyncTexture2D GetArrowDownIcon()
+		{
+			return GetAssetTexture(102618);
+		}
+
+		public AsyncTexture2D GetTabbedWindowBackground()
+		{
+			return GetAssetTexture(155985);
+		}
+
+		public AsyncTexture2D GetMenuItemFade()
+		{
+			return GetAssetTexture(156044);
 		}
 
 		public async Task<AsyncTexture2D> GetImageFromUrlAsync(string cacheKey, string imageUrl)
 		{
 			return await _imageCache.GetImageAsync(cacheKey, imageUrl);
+		}
+
+		public async Task<AsyncTexture2D> GetYouTubeThumbnailAsync(string videoIdOrUrl)
+		{
+			if (string.IsNullOrWhiteSpace(videoIdOrUrl))
+			{
+				return null;
+			}
+			string videoId = YouTubeService.ExtractVideoId(videoIdOrUrl) ?? videoIdOrUrl;
+			string thumbnailUrl = "https://img.youtube.com/vi/" + videoId + "/hqdefault.jpg";
+			return await GetImageFromUrlAsync("youtube_thumb_" + videoId, thumbnailUrl);
+		}
+
+		public async Task<AsyncTexture2D> GetTwitchAvatarAsync(string channelName, string avatarUrl)
+		{
+			if (string.IsNullOrWhiteSpace(channelName) || string.IsNullOrWhiteSpace(avatarUrl))
+			{
+				return null;
+			}
+			return await GetImageFromUrlAsync("twitch_avatar_" + channelName, avatarUrl);
+		}
+
+		public async Task<AsyncTexture2D> GetPresetImageAsync(string cacheKey, string imageUrl)
+		{
+			if (string.IsNullOrWhiteSpace(cacheKey) || string.IsNullOrWhiteSpace(imageUrl))
+			{
+				return null;
+			}
+			return await GetImageFromUrlAsync("preset_" + cacheKey, imageUrl);
+		}
+
+		public void UpdateCachedStreamInfo(TwitchStreamInfo streamInfo)
+		{
+			_cachedTwitchStreamInfo = streamInfo;
+		}
+
+		public void ClearCachedStreamInfo()
+		{
+			_cachedTwitchStreamInfo = null;
+		}
+
+		public async Task<Texture2D> LoadOfflineTextureAsync(CinemaUserSettings userSettings, TwitchService twitchService)
+		{
+			if (userSettings.CurrentStreamSourceType == StreamSourceType.TwitchChannel)
+			{
+				return await LoadTwitchAvatarTextureAsync(userSettings, twitchService);
+			}
+			if (userSettings.CurrentStreamSourceType == StreamSourceType.YouTubeVideo)
+			{
+				return await LoadYouTubeThumbnailTextureAsync(userSettings);
+			}
+			return await LoadStaticImageTextureAsync(userSettings);
+		}
+
+		private async Task<Texture2D> LoadTwitchAvatarTextureAsync(CinemaUserSettings userSettings, TwitchService twitchService)
+		{
+			string channelName = userSettings.CurrentTwitchChannel;
+			if (string.IsNullOrEmpty(channelName))
+			{
+				return null;
+			}
+			TwitchStreamInfo twitchStreamInfo = _cachedTwitchStreamInfo;
+			if (twitchStreamInfo == null)
+			{
+				twitchStreamInfo = await twitchService.GetStreamInfoAsync(channelName);
+			}
+			TwitchStreamInfo streamInfo = twitchStreamInfo;
+			if (streamInfo == null || string.IsNullOrEmpty(streamInfo.AvatarUrl))
+			{
+				return null;
+			}
+			AsyncTexture2D obj = await GetTwitchAvatarAsync(channelName, streamInfo.AvatarUrl);
+			return (obj != null) ? obj.get_Texture() : null;
+		}
+
+		private async Task<Texture2D> LoadYouTubeThumbnailTextureAsync(CinemaUserSettings userSettings)
+		{
+			string videoId = userSettings.CurrentYouTubeVideo;
+			if (string.IsNullOrEmpty(videoId))
+			{
+				return null;
+			}
+			AsyncTexture2D obj = await GetYouTubeThumbnailAsync(videoId);
+			return (obj != null) ? obj.get_Texture() : null;
+		}
+
+		private async Task<Texture2D> LoadStaticImageTextureAsync(CinemaUserSettings userSettings)
+		{
+			StreamPresetData preset = userSettings.CurrentStreamPreset;
+			if (preset == null || string.IsNullOrEmpty(preset.StaticImage))
+			{
+				return null;
+			}
+			AsyncTexture2D asyncTexture = await GetImageFromUrlAsync("offline_static_" + preset.Id, preset.StaticImage);
+			if (asyncTexture != null)
+			{
+				preset.StaticImageTexture = asyncTexture;
+			}
+			return (asyncTexture != null) ? asyncTexture.get_Texture() : null;
 		}
 
 		public Texture2D GetWhitePixel()
@@ -330,12 +470,22 @@ namespace CinemaModule.Services
 				((GraphicsResource)whitePixel).Dispose();
 			}
 			_whitePixel = null;
+			_fallbackTexture = null;
 			_imageCache?.Dispose();
 			HttpClient httpClient = _httpClient;
 			if (httpClient != null)
 			{
 				((HttpMessageInvoker)httpClient).Dispose();
 			}
+		}
+
+		private AsyncTexture2D GetFallbackTexture()
+		{
+			if (_fallbackTexture == null || _fallbackTexture.get_IsDisposed())
+			{
+				_fallbackTexture = AsyncTexture2D.op_Implicit(Textures.get_Error());
+			}
+			return _fallbackTexture;
 		}
 
 		private AsyncTexture2D GetTexture(string textureName)
@@ -347,7 +497,20 @@ namespace CinemaModule.Services
 			catch (Exception ex)
 			{
 				Logger.Debug("Failed to load texture '" + textureName + "': " + ex.Message);
-				return null;
+				return GetFallbackTexture();
+			}
+		}
+
+		private AsyncTexture2D GetAssetTexture(int assetId)
+		{
+			try
+			{
+				return AsyncTexture2D.FromAssetId(assetId);
+			}
+			catch (Exception ex)
+			{
+				Logger.Debug($"Failed to load asset texture '{assetId}': {ex.Message}");
+				return GetFallbackTexture();
 			}
 		}
 	}

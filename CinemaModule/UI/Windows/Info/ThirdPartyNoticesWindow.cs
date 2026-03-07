@@ -8,6 +8,8 @@ namespace CinemaModule.UI.Windows.Info
 {
 	public class ThirdPartyNoticesWindow : StandardWindow
 	{
+		private static readonly Logger Logger = Logger.GetLogger<ThirdPartyNoticesWindow>();
+
 		private const string NoticesFileName = "THIRD-PARTY-NOTICES.txt";
 
 		private const int LineHeight = 14;
@@ -80,7 +82,7 @@ namespace CinemaModule.UI.Windows.Info
 				using Stream stream = CinemaModule.Instance.ContentsManager.GetFileStream("THIRD-PARTY-NOTICES.txt");
 				if (stream == null)
 				{
-					Logger.GetLogger<ThirdPartyNoticesWindow>().Warn("THIRD-PARTY-NOTICES.txt stream is null");
+					Logger.Warn("THIRD-PARTY-NOTICES.txt stream is null");
 					return "Third-party-notices file not found.";
 				}
 				using StreamReader reader = new StreamReader(stream);
@@ -88,7 +90,7 @@ namespace CinemaModule.UI.Windows.Info
 			}
 			catch (Exception ex)
 			{
-				Logger.GetLogger<ThirdPartyNoticesWindow>().Warn("Failed to load third-party-notices: " + ex.Message);
+				Logger.Warn("Failed to load third-party-notices: " + ex.Message);
 				return "Third-party-notices could not be loaded.\nError: " + ex.Message;
 			}
 		}

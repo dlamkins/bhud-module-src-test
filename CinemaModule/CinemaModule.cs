@@ -11,13 +11,17 @@ using Blish_HUD.Input;
 using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
-using CinemaHUD.UI.Windows.MainSettings;
+using CinemaModule.Controllers;
+using CinemaModule.Controllers.WatchParty;
 using CinemaModule.Models;
 using CinemaModule.Services;
+using CinemaModule.Services.Twitch;
+using CinemaModule.Services.YouTube;
 using CinemaModule.Settings;
 using CinemaModule.UI.Chat;
 using CinemaModule.UI.VideoDisplays;
 using CinemaModule.UI.Views;
+using CinemaModule.UI.Windows.MainSettings;
 using CinemaModule.VideoPlayer;
 using LibVLCSharp.Shared;
 using Microsoft.Xna.Framework;
@@ -51,6 +55,8 @@ namespace CinemaModule
 
 		private TwitchService _twitchService;
 
+		private YouTubeService _youtubeService;
+
 		private TwitchAuthService _twitchAuthService;
 
 		private TwitchChatService _twitchChatService;
@@ -61,6 +67,8 @@ namespace CinemaModule
 
 		private TextureService _textureService;
 
+		private WatchPartyController _watchPartyController;
+
 		private CornerIcon _cornerIcon;
 
 		private bool _needsVideoPlayerInit;
@@ -70,6 +78,10 @@ namespace CinemaModule
 		private bool _needsWindowDisplayRestore;
 
 		private string _libvlcDir;
+
+		private bool _libvlcInitialized;
+
+		internal const string ModuleVersion = "2.0.0";
 
 		internal SettingsManager SettingsManager => base.ModuleParameters.get_SettingsManager();
 
@@ -105,32 +117,29 @@ namespace CinemaModule
 
 		protected override async Task LoadAsync()
 		{
-			_ = 1;
 			try
 			{
 				_libvlcDir = DirectoriesManager.GetFullDirectoryPath("libvlc");
 				Logger.Info("LibVLC directory: " + _libvlcDir);
 				string cacheDirectory = Path.Combine(DirectoryUtil.get_CachePath(), "cinema");
 				_userSettings = new CinemaUserSettings(cacheDirectory);
-				await new LibVlcService(ContentsManager).ExtractAsync(_libvlcDir);
-				string libvlcBinPath = LibVlcService.GetBinPath(_libvlcDir);
-				if (!Directory.Exists(libvlcBinPath))
+				Task.Run(async delegate
 				{
-					Logger.Error("LibVLC bin path does not exist: " + libvlcBinPath);
-					return;
-				}
-				Core.Initialize(libvlcBinPath);
+					await InitializeLibVlcAsync();
+				});
 				_mapService = new Gw2MapService(cacheDirectory);
-				_twitchService = new TwitchService(cacheDirectory);
+				_twitchService = new TwitchService();
+				_youtubeService = new YouTubeService();
 				_twitchAuthService = new TwitchAuthService();
 				InitializeTwitchAuth();
 				_twitchChatService = new TwitchChatService();
-				_presetService = new PresetService(cacheDirectory);
-				_presetService.PresetImagesLoaded += OnPresetImagesLoaded;
-				await _presetService.LoadPresetsAsync();
 				_textureService = new TextureService(cacheDirectory);
+				_presetService = new PresetService(_textureService);
+				_presetService.PresetImagesLoaded += OnPresetImagesLoaded;
+				_presetService.LoadPresetsAsync();
 				_needsVideoPlayerInit = true;
-				_controller = new CinemaController(_cinemaSettings, _userSettings, _twitchService);
+				_watchPartyController = new WatchPartyController(base.ModuleParameters.get_Gw2ApiManager(), _youtubeService);
+				_controller = new CinemaController(_cinemaSettings, _userSettings, _twitchService, _youtubeService);
 				_controller.ShowSettingsRequested += delegate
 				{
 					CinemaSettingsWindow settingsWindow = _settingsWindow;
@@ -141,6 +150,7 @@ namespace CinemaModule
 				};
 				_controller.ShowChatRequested += OnShowChatRequested;
 				_controller.ToggleChatRequested += OnToggleChatRequested;
+				_controller.RegisterWatchParty(_watchPartyController);
 				CreateCornerIcon();
 				CreateSettingsWindow();
 				CreateVideoDisplays();
@@ -152,11 +162,32 @@ namespace CinemaModule
 			}
 		}
 
+		private async Task InitializeLibVlcAsync()
+		{
+			try
+			{
+				await new LibVlcService(ContentsManager).ExtractAsync(_libvlcDir).ConfigureAwait(continueOnCapturedContext: false);
+				string libvlcBinPath = LibVlcService.GetBinPath(_libvlcDir);
+				if (!Directory.Exists(libvlcBinPath))
+				{
+					Logger.Error("LibVLC bin path does not exist: " + libvlcBinPath);
+					return;
+				}
+				Core.Initialize(libvlcBinPath);
+				_libvlcInitialized = true;
+				Logger.Info("LibVLC initialized successfully");
+			}
+			catch (Exception ex)
+			{
+				Logger.Error(ex, "Failed to initialize LibVLC");
+			}
+		}
+
 		private void InitializeVideoPlayer()
 		{
-			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			if (_videoPlayer == null)
+			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+			if (_videoPlayer == null && _libvlcInitialized)
 			{
 				GraphicsDeviceContext ctx = GameService.Graphics.LendGraphicsDeviceContext();
 				try
@@ -174,74 +205,106 @@ namespace CinemaModule
 
 		protected override void Update(GameTime gameTime)
 		{
-			if (_needsVideoPlayerInit)
+			if (_needsVideoPlayerInit && _libvlcInitialized)
 			{
 				_needsVideoPlayerInit = false;
 				InitializeVideoPlayer();
 			}
-			if (_needsTwitchChatRestore || _needsWindowDisplayRestore)
+			ProcessDeferredRestoration();
+			_controller?.Update();
+		}
+
+		private void ProcessDeferredRestoration()
+		{
+			if ((_needsTwitchChatRestore || _needsWindowDisplayRestore) && IsScreenSizeValid())
 			{
-				int width = ((Control)GameService.Graphics.get_SpriteScreen()).get_Width();
-				int screenHeight = ((Control)GameService.Graphics.get_SpriteScreen()).get_Height();
-				if (width >= 640 && screenHeight >= 480)
+				if (_needsWindowDisplayRestore)
 				{
-					if (_needsWindowDisplayRestore)
-					{
-						_needsWindowDisplayRestore = false;
-						RestoreWindowDisplayPosition();
-					}
-					if (_needsTwitchChatRestore)
-					{
-						_needsTwitchChatRestore = false;
-						RestoreTwitchChatWindow();
-					}
+					_needsWindowDisplayRestore = false;
+					RestoreWindowDisplayPosition();
+				}
+				if (_needsTwitchChatRestore)
+				{
+					_needsTwitchChatRestore = false;
+					RestoreTwitchChatWindow();
 				}
 			}
-			_controller?.Update();
+		}
+
+		private static bool IsScreenSizeValid()
+		{
+			if (((Control)GameService.Graphics.get_SpriteScreen()).get_Width() >= 640)
+			{
+				return ((Control)GameService.Graphics.get_SpriteScreen()).get_Height() >= 480;
+			}
+			return false;
 		}
 
 		protected override void Unload()
 		{
-			_twitchAuthService.AuthStatusChanged -= OnTwitchAuthStatusChanged;
-			_twitchService.ScopeError -= OnTwitchScopeError;
-			_presetService.PresetImagesLoaded -= OnPresetImagesLoaded;
-			_controller.ShowChatRequested -= OnShowChatRequested;
-			_controller.ToggleChatRequested -= OnToggleChatRequested;
-			_controller.ChatChannelChangeRequested -= OnChatChannelChangeRequested;
-			_controller?.Dispose();
-			CornerIcon cornerIcon = _cornerIcon;
-			if (cornerIcon != null)
+			SafeUnsubscribe(delegate
 			{
-				((Control)cornerIcon).Dispose();
-			}
-			CinemaSettingsWindow settingsWindow = _settingsWindow;
-			if (settingsWindow != null)
+				_twitchAuthService.AuthStatusChanged -= OnTwitchAuthStatusChanged;
+			});
+			SafeUnsubscribe(delegate
 			{
-				((Control)settingsWindow).Dispose();
-			}
-			TwitchChatWindow twitchChatWindow = _twitchChatWindow;
-			if (twitchChatWindow != null)
+				_twitchService.ScopeError -= OnTwitchScopeError;
+			});
+			SafeUnsubscribe(delegate
 			{
-				((Control)twitchChatWindow).Dispose();
-			}
-			WindowVideoDisplay windowDisplayPanel = _windowDisplayPanel;
-			if (windowDisplayPanel != null)
+				_presetService.PresetImagesLoaded -= OnPresetImagesLoaded;
+			});
+			SafeUnsubscribe(delegate
 			{
-				((Control)windowDisplayPanel).Dispose();
-			}
-			WorldVideoDisplay worldDisplayPanel = _worldDisplayPanel;
-			if (worldDisplayPanel != null)
+				_controller.ShowChatRequested -= OnShowChatRequested;
+			});
+			SafeUnsubscribe(delegate
 			{
-				((Control)worldDisplayPanel).Dispose();
-			}
-			_videoPlayer?.Dispose();
-			_twitchService?.Dispose();
-			_twitchAuthService?.Dispose();
-			_twitchChatService?.Dispose();
-			_presetService?.Dispose();
-			_textureService?.Dispose();
-			_cinemaSettings?.Dispose();
+				_controller.ToggleChatRequested -= OnToggleChatRequested;
+			});
+			SafeUnsubscribe(delegate
+			{
+				_controller.ChatChannelChangeRequested -= OnChatChannelChangeRequested;
+			});
+			SafeDispose(_controller);
+			SafeDispose((IDisposable)_cornerIcon);
+			SafeDispose((IDisposable)_settingsWindow);
+			SafeDispose((IDisposable)_twitchChatWindow);
+			SafeDispose(_windowDisplayPanel);
+			SafeDispose(_worldDisplayPanel);
+			SafeDispose(_videoPlayer);
+			SafeDispose(_twitchService);
+			SafeDispose(_youtubeService);
+			SafeDispose(_twitchAuthService);
+			SafeDispose(_twitchChatService);
+			SafeDispose(_watchPartyController);
+			SafeDispose(_presetService);
+			SafeDispose(_textureService);
+			SafeDispose(_mapService);
+			SafeDispose(_cinemaSettings);
 			Instance = null;
+		}
+
+		private static void SafeUnsubscribe(Action unsubscribe)
+		{
+			try
+			{
+				unsubscribe();
+			}
+			catch
+			{
+			}
+		}
+
+		private static void SafeDispose(IDisposable disposable)
+		{
+			try
+			{
+				disposable?.Dispose();
+			}
+			catch
+			{
+			}
 		}
 
 		private void CreateCornerIcon()
@@ -279,7 +342,8 @@ namespace CinemaModule
 		private void CreateSettingsWindow()
 		{
 			AsyncTexture2D emblemTexture = _textureService.GetEmblem();
-			_settingsWindow = new CinemaSettingsWindow(_cinemaSettings, _userSettings, _controller, emblemTexture, _mapService, _twitchService, _twitchAuthService, _presetService);
+			AsyncTexture2D windowBackgroundTexture = _textureService.GetTabbedWindowBackground();
+			_settingsWindow = new CinemaSettingsWindow(_cinemaSettings, _userSettings, _controller, emblemTexture, windowBackgroundTexture, _mapService, _twitchService, _twitchAuthService, _presetService, _youtubeService, _watchPartyController);
 		}
 
 		private void InitializeTwitchAuth()
@@ -303,27 +367,33 @@ namespace CinemaModule
 		{
 			if (e.Status == TwitchAuthStatus.Authenticated)
 			{
-				_userSettings.TwitchAccessToken = e.AccessToken;
-				_userSettings.TwitchRefreshToken = e.RefreshToken;
-				_twitchService.SetAuthToken(e.AccessToken, e.UserId);
-				_twitchChatService.SetCredentials(e.Username, e.AccessToken);
+				ApplyTwitchCredentials(e);
 			}
 			else if (e.Status == TwitchAuthStatus.NotAuthenticated)
 			{
-				_userSettings.TwitchAccessToken = null;
-				_userSettings.TwitchRefreshToken = null;
-				_twitchService.SetAuthToken(null);
-				_twitchChatService.SetCredentials(null, null);
+				ClearTwitchCredentials();
 			}
+		}
+
+		private void ApplyTwitchCredentials(TwitchAuthStatusEventArgs e)
+		{
+			_userSettings.TwitchAccessToken = e.AccessToken;
+			_userSettings.TwitchRefreshToken = e.RefreshToken;
+			_twitchService.SetAuthToken(e.AccessToken, e.UserId);
+			_twitchChatService.SetCredentials(e.Username, e.AccessToken);
+		}
+
+		private void ClearTwitchCredentials()
+		{
+			_userSettings.TwitchAccessToken = null;
+			_userSettings.TwitchRefreshToken = null;
+			_twitchService.SetAuthToken(null);
+			_twitchChatService.SetCredentials(null, null);
 		}
 
 		private void OnShowChatRequested(object sender, string channelName)
 		{
-			if (_twitchChatWindow == null)
-			{
-				_twitchChatWindow = new TwitchChatWindow(_twitchChatService, _twitchAuthService, _userSettings);
-				_controller.ChatChannelChangeRequested += OnChatChannelChangeRequested;
-			}
+			EnsureChatWindowCreated();
 			_twitchChatWindow.ConnectToChannel(channelName);
 			if (!((Control)_twitchChatWindow).get_Visible())
 			{
@@ -333,11 +403,7 @@ namespace CinemaModule
 
 		private void OnToggleChatRequested(object sender, string channelName)
 		{
-			if (_twitchChatWindow == null)
-			{
-				_twitchChatWindow = new TwitchChatWindow(_twitchChatService, _twitchAuthService, _userSettings);
-				_controller.ChatChannelChangeRequested += OnChatChannelChangeRequested;
-			}
+			EnsureChatWindowCreated();
 			if (((Control)_twitchChatWindow).get_Visible())
 			{
 				((Control)_twitchChatWindow).Hide();
@@ -347,17 +413,26 @@ namespace CinemaModule
 			((Control)_twitchChatWindow).Show();
 		}
 
+		private void EnsureChatWindowCreated()
+		{
+			if (_twitchChatWindow == null)
+			{
+				_twitchChatWindow = new TwitchChatWindow(_twitchChatService, _twitchAuthService, _userSettings);
+				_controller.ChatChannelChangeRequested += OnChatChannelChangeRequested;
+			}
+		}
+
 		private void OnChatChannelChangeRequested(object sender, string channelName)
 		{
 			if (_twitchChatWindow != null && ((Control)_twitchChatWindow).get_Visible())
 			{
-				if (!string.IsNullOrEmpty(channelName))
+				if (string.IsNullOrEmpty(channelName))
 				{
-					_twitchChatWindow.ConnectToChannel(channelName);
+					_twitchChatWindow.Disconnect();
 				}
 				else
 				{
-					_twitchChatWindow.Disconnect();
+					_twitchChatWindow.ConnectToChannel(channelName);
 				}
 			}
 		}

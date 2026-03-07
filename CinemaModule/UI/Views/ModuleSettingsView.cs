@@ -4,9 +4,9 @@ using Blish_HUD.Graphics.UI;
 using Blish_HUD.Input;
 using Blish_HUD.Settings;
 using Blish_HUD.Settings.UI.Views;
-using CinemaHUD.UI.Windows.SettingsSmall;
-using CinemaModule.Services;
+using CinemaModule.Services.Twitch;
 using CinemaModule.Settings;
+using CinemaModule.UI.Windows.Dialogs;
 using Microsoft.Xna.Framework;
 
 namespace CinemaModule.UI.Views

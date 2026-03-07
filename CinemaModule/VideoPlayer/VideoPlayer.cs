@@ -35,6 +35,8 @@ namespace CinemaModule.VideoPlayer
 
 		private volatile bool _qualitiesNeedRefresh;
 
+		private PlaybackState _lastReportedState;
+
 		public Texture2D VideoTexture => _videoTexture;
 
 		public bool IsPlaying => _mediaPlayer?.IsPlaying ?? false;
@@ -62,6 +64,19 @@ namespace CinemaModule.VideoPlayer
 					return false;
 				}
 				return mediaPlayer.State == VLCState.Ended;
+			}
+		}
+
+		public bool IsBuffering
+		{
+			get
+			{
+				VLCState? state = _mediaPlayer?.State;
+				if (state.GetValueOrDefault() != VLCState.Buffering)
+				{
+					return state.GetValueOrDefault() == VLCState.Opening;
+				}
+				return true;
 			}
 		}
 
@@ -172,35 +187,7 @@ namespace CinemaModule.VideoPlayer
 		{
 			_mediaPlayer.Playing += delegate
 			{
-				OnPlaybackStateChanged(PlaybackState.Playing);
 				_qualitiesNeedRefresh = true;
-			};
-			_mediaPlayer.Paused += delegate
-			{
-				OnPlaybackStateChanged(PlaybackState.Paused);
-			};
-			_mediaPlayer.Stopped += delegate
-			{
-				OnPlaybackStateChanged(PlaybackState.Stopped);
-			};
-			_mediaPlayer.EndReached += delegate
-			{
-				OnPlaybackStateChanged(PlaybackState.Ended);
-			};
-			_mediaPlayer.EncounteredError += delegate
-			{
-				OnPlaybackStateChanged(PlaybackState.Error);
-			};
-			_mediaPlayer.Buffering += delegate(object s, MediaPlayerBufferingEventArgs e)
-			{
-				if (e.Cache < 100f)
-				{
-					OnPlaybackStateChanged(PlaybackState.Buffering);
-				}
-				else
-				{
-					OnPlaybackStateChanged(PlaybackState.Playing);
-				}
 			};
 			_mediaPlayer.ESAdded += delegate(object s, MediaPlayerESAddedEventArgs e)
 			{
@@ -211,7 +198,7 @@ namespace CinemaModule.VideoPlayer
 			};
 		}
 
-		public void Play(string url)
+		public void Play(string url, string audioSlaveUrl = null)
 		{
 			if (string.IsNullOrEmpty(url))
 			{
@@ -225,31 +212,34 @@ namespace CinemaModule.VideoPlayer
 			Stop();
 			_currentUrl = url;
 			using Media media = new Media(_libVLC, uri);
+			if (!string.IsNullOrEmpty(audioSlaveUrl))
+			{
+				media.AddOption(":input-slave=" + audioSlaveUrl);
+			}
 			_mediaPlayer.Play(media);
 		}
 
 		public void Pause()
 		{
-			if (_mediaPlayer.CanPause)
+			if (IsPlaying)
 			{
-				_mediaPlayer.Pause();
+				_mediaPlayer.SetPause(pause: true);
 			}
 		}
 
 		public void Resume()
 		{
-			if (IsPaused)
+			if (!IsPlaying && !IsBuffering)
 			{
-				_mediaPlayer.Play();
-			}
-		}
-
-		public void Replay()
-		{
-			if (!string.IsNullOrEmpty(_currentUrl))
-			{
-				string url = _currentUrl;
-				Play(url);
+				if (IsPaused)
+				{
+					_mediaPlayer.SetPause(pause: false);
+				}
+				else if (IsEnded && !string.IsNullOrEmpty(_currentUrl))
+				{
+					string url = _currentUrl;
+					Play(url);
+				}
 			}
 		}
 
@@ -259,13 +249,9 @@ namespace CinemaModule.VideoPlayer
 			{
 				Pause();
 			}
-			else if (IsPaused)
+			else
 			{
 				Resume();
-			}
-			else if (IsEnded)
-			{
-				Replay();
 			}
 		}
 
@@ -404,6 +390,7 @@ namespace CinemaModule.VideoPlayer
 			{
 				return;
 			}
+			SyncPlaybackState();
 			if (_qualitiesNeedRefresh)
 			{
 				_qualitiesNeedRefresh = false;
@@ -443,8 +430,44 @@ namespace CinemaModule.VideoPlayer
 			}
 		}
 
+		private void SyncPlaybackState()
+		{
+			PlaybackState actualState = GetActualPlaybackState();
+			if (actualState != _lastReportedState)
+			{
+				OnPlaybackStateChanged(actualState);
+			}
+		}
+
+		private PlaybackState GetActualPlaybackState()
+		{
+			if (_mediaPlayer == null)
+			{
+				return PlaybackState.Stopped;
+			}
+			switch (_mediaPlayer.State)
+			{
+			case VLCState.Playing:
+				return PlaybackState.Playing;
+			case VLCState.Paused:
+				return PlaybackState.Paused;
+			case VLCState.Stopped:
+				return PlaybackState.Stopped;
+			case VLCState.Ended:
+				return PlaybackState.Ended;
+			case VLCState.Error:
+				return PlaybackState.Error;
+			case VLCState.Opening:
+			case VLCState.Buffering:
+				return PlaybackState.Buffering;
+			default:
+				return _lastReportedState;
+			}
+		}
+
 		private void OnPlaybackStateChanged(PlaybackState state)
 		{
+			_lastReportedState = state;
 			this.PlaybackStateChanged?.Invoke(this, new PlaybackStateEventArgs(state));
 		}
 

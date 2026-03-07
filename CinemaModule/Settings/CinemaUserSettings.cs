@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using Blish_HUD;
 using CinemaModule.Models;
+using CinemaModule.Models.Location;
 using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
 
@@ -73,6 +74,24 @@ namespace CinemaModule.Settings
 				{
 					_data.CurrentTwitchChannel = normalizedValue;
 					Save();
+				}
+			}
+		}
+
+		public string CurrentYouTubeVideo
+		{
+			get
+			{
+				return _data.CurrentYouTubeVideo;
+			}
+			set
+			{
+				string normalizedValue = value ?? "";
+				if (!(_data.CurrentYouTubeVideo == normalizedValue))
+				{
+					_data.CurrentYouTubeVideo = normalizedValue;
+					Save();
+					this.CurrentYouTubeVideoChanged?.Invoke(this, normalizedValue);
 				}
 			}
 		}
@@ -426,6 +445,36 @@ namespace CinemaModule.Settings
 			}
 		}
 
+		public bool AutoplayOnStartup
+		{
+			get
+			{
+				return _data.AutoplayOnStartup;
+			}
+			set
+			{
+				SetProperty(_data.AutoplayOnStartup, value, delegate(bool v)
+				{
+					_data.AutoplayOnStartup = v;
+				});
+			}
+		}
+
+		public bool WatchPartyAutoplayNext
+		{
+			get
+			{
+				return _data.WatchPartyAutoplayNext;
+			}
+			set
+			{
+				SetProperty(_data.WatchPartyAutoplayNext, value, delegate(bool v)
+				{
+					_data.WatchPartyAutoplayNext = v;
+				});
+			}
+		}
+
 		public event EventHandler<string> StreamUrlChanged;
 
 		public event EventHandler<CinemaDisplayMode> DisplayModeChanged;
@@ -439,6 +488,8 @@ namespace CinemaModule.Settings
 		public event EventHandler<StreamSourceType> CurrentStreamSourceTypeChanged;
 
 		public event EventHandler<StreamPresetData> CurrentStreamPresetChanged;
+
+		public event EventHandler<string> CurrentYouTubeVideoChanged;
 
 		public event EventHandler SavedLocationsChanged;
 
@@ -485,9 +536,9 @@ namespace CinemaModule.Settings
 			return true;
 		}
 
-		public SavedStream AddSavedStream(string name, StreamSourceType sourceType, string value)
+		public SavedStream AddSavedStream(string name, StreamSourceType sourceType, string value, string tabId = null)
 		{
-			SavedStream stream = new SavedStream(name, sourceType, value);
+			SavedStream stream = new SavedStream(name, sourceType, value, tabId);
 			SavedStreams.Streams.Add(stream);
 			Save();
 			RaiseEvent(this.SavedStreamsChanged);
@@ -520,11 +571,75 @@ namespace CinemaModule.Settings
 			return num;
 		}
 
+		public CustomStreamTab AddCustomTab(string name)
+		{
+			CustomStreamTab tab = new CustomStreamTab((name != null && name.Length > 16) ? name.Substring(0, 16) : name);
+			SavedStreams.Tabs.Add(tab);
+			Save();
+			RaiseEvent(this.SavedStreamsChanged);
+			return tab;
+		}
+
+		public void RenameCustomTab(string tabId, string newName)
+		{
+			CustomStreamTab tab = SavedStreams.Tabs.Find((CustomStreamTab t) => t.Id == tabId);
+			if (tab != null)
+			{
+				tab.Name = ((newName != null && newName.Length > 16) ? newName.Substring(0, 16) : newName);
+				Save();
+				RaiseEvent(this.SavedStreamsChanged);
+			}
+		}
+
+		public bool DeleteCustomTab(string tabId)
+		{
+			if (SavedStreams.Tabs.Count <= 1)
+			{
+				return false;
+			}
+			bool num = SavedStreams.Tabs.RemoveAll((CustomStreamTab t) => t.Id == tabId) > 0;
+			if (num)
+			{
+				SavedStreams.Streams.RemoveAll((SavedStream s) => s.TabId == tabId);
+				Save();
+				RaiseEvent(this.SavedStreamsChanged);
+			}
+			return num;
+		}
+
+		public void EnsureDefaultTab()
+		{
+			if (SavedStreams.Tabs.Count != 0)
+			{
+				return;
+			}
+			CustomStreamTab defaultTab = new CustomStreamTab("My Streams");
+			SavedStreams.Tabs.Add(defaultTab);
+			foreach (SavedStream stream in SavedStreams.Streams)
+			{
+				if (string.IsNullOrEmpty(stream.TabId))
+				{
+					stream.TabId = defaultTab.Id;
+				}
+			}
+			Save();
+		}
+
 		public void SelectTwitchChannel(string channelName)
 		{
 			SelectedSavedStreamId = "";
 			CurrentTwitchChannel = channelName;
+			CurrentYouTubeVideo = "";
 			CurrentStreamSourceType = StreamSourceType.TwitchChannel;
+			CurrentStreamPreset = null;
+		}
+
+		public void SelectYouTubeVideo(string videoIdOrUrl)
+		{
+			SelectedSavedStreamId = "";
+			CurrentTwitchChannel = "";
+			CurrentYouTubeVideo = videoIdOrUrl;
+			CurrentStreamSourceType = StreamSourceType.YouTubeVideo;
 			CurrentStreamPreset = null;
 		}
 
@@ -541,13 +656,25 @@ namespace CinemaModule.Settings
 		public void SelectSavedStream(SavedStream stream)
 		{
 			SelectedSavedStreamId = stream.Id;
-			CurrentStreamSourceType = stream.SourceType;
 			CurrentTwitchChannel = ((stream.SourceType == StreamSourceType.TwitchChannel) ? stream.Value : "");
+			CurrentYouTubeVideo = ((stream.SourceType == StreamSourceType.YouTubeVideo) ? stream.Value : "");
+			CurrentStreamSourceType = stream.SourceType;
 			if (stream.SourceType == StreamSourceType.Url)
 			{
 				StreamUrl = stream.Value;
 			}
 			CurrentStreamPreset = null;
+		}
+
+		public void ClearStreamSelection()
+		{
+			_data.SelectedSavedStreamId = "";
+			_data.SelectedUrlChannelId = "";
+			_data.CurrentTwitchChannel = "";
+			_data.CurrentYouTubeVideo = "";
+			_data.StreamUrl = "";
+			_data.CurrentStreamSourceType = StreamSourceType.Url;
+			_currentStreamPreset = null;
 		}
 
 		private bool SetProperty<T>(T currentValue, T newValue, Action<T> setter)
@@ -628,6 +755,7 @@ namespace CinemaModule.Settings
 						_data.WorldPosition = new WorldPosition3D(0f, 0f, 0f, 0);
 					}
 					MigrateTwitchChannelFromSelectedStream();
+					EnsureDefaultTab();
 				}
 				catch (Exception ex)
 				{
@@ -638,6 +766,7 @@ namespace CinemaModule.Settings
 			else
 			{
 				_data = new CinemaUserSettingsData();
+				EnsureDefaultTab();
 			}
 		}
 
@@ -650,7 +779,7 @@ namespace CinemaModule.Settings
 				{
 					Directory.CreateDirectory(directory);
 				}
-				string json = JsonConvert.SerializeObject((object)_data, (Formatting)1);
+				string json = JsonConvert.SerializeObject(_data, Formatting.Indented);
 				File.WriteAllText(_settingsFilePath, json);
 			}
 			catch (Exception ex)

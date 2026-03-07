@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
-using CinemaModule.Models;
-using CinemaModule.Services;
+using CinemaModule.Models.Twitch;
+using CinemaModule.Services.Twitch;
 using Microsoft.Xna.Framework;
 
 namespace CinemaModule.UI.Chat
