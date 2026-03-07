@@ -250,6 +250,10 @@ namespace Gorthax.Gilledwars
 
 		private SettingEntry<int> _bitingLocY;
 
+		private bool _showAllBitingFish;
+
+		private StandardButton _bitingToggleBtn;
+
 		private bool _isTournamentActive;
 
 		private bool _isTourneyWaitingRoom;
@@ -3397,7 +3401,8 @@ namespace Gorthax.Gilledwars
 				_bitingWidgetPanel = new Blish_HUD.Controls.Panel
 				{
 					Parent = GameService.Graphics.SpriteScreen,
-					Size = new Point(320, 160),
+					Width = 320,
+					HeightSizingMode = SizingMode.AutoSize,
 					Location = new Point(_bitingLocX.Value, _bitingLocY.Value),
 					BackgroundColor = new Microsoft.Xna.Framework.Color(13, 27, 42) * 0.9f,
 					ShowBorder = true,
@@ -3420,6 +3425,21 @@ namespace Gorthax.Gilledwars
 					TextColor = new Microsoft.Xna.Framework.Color(201, 168, 76),
 					AutoSizeWidth = true
 				};
+				_bitingToggleBtn = new StandardButton
+				{
+					Text = "Missing",
+					Parent = hBar,
+					Location = new Point(hBar.Width - 95, 2),
+					Width = 65,
+					Height = 26,
+					BasicTooltipText = "Toggle between Missing Fish and All Fish"
+				};
+				_bitingToggleBtn.Click += async delegate
+				{
+					_showAllBitingFish = !_showAllBitingFish;
+					_bitingToggleBtn.Text = (_showAllBitingFish ? "All" : "Missing");
+					await RefreshBitingWidget();
+				};
 				Blish_HUD.Controls.Label label = new Blish_HUD.Controls.Label();
 				label.Text = "X";
 				label.Parent = hBar;
@@ -3433,15 +3453,19 @@ namespace Gorthax.Gilledwars
 				};
 				hBar.LeftMouseButtonPressed += delegate
 				{
-					_isBitingDragging = true;
-					_bitingDragOffset = new Point(GameService.Input.Mouse.Position.X - _bitingWidgetPanel.Location.X, GameService.Input.Mouse.Position.Y - _bitingWidgetPanel.Location.Y);
+					if (GameService.Input.Mouse.ActiveControl == hBar || GameService.Input.Mouse.ActiveControl == _bitingTitleLabel)
+					{
+						_isBitingDragging = true;
+						_bitingDragOffset = new Point(GameService.Input.Mouse.Position.X - _bitingWidgetPanel.Location.X, GameService.Input.Mouse.Position.Y - _bitingWidgetPanel.Location.Y);
+					}
 				};
 				_bitingFishList = new FlowPanel
 				{
 					Parent = _bitingWidgetPanel,
 					Location = new Point(10, 35),
-					Size = new Point(300, 115),
-					CanScroll = true,
+					Width = 300,
+					HeightSizingMode = SizingMode.AutoSize,
+					CanScroll = false,
 					FlowDirection = ControlFlowDirection.LeftToRight,
 					ControlPadding = new Vector2(5f, 5f)
 				};
@@ -3516,7 +3540,8 @@ namespace Gorthax.Gilledwars
 							continue;
 						}
 						int fishItemId = (int)idProp.GetValue(achievementDef.Bits![i]);
-						if (completedBits.Contains(i) || _caughtFishIds.Contains(fishItemId))
+						bool isCaught = completedBits.Contains(i) || _caughtFishIds.Contains(fishItemId);
+						if (!_showAllBitingFish && isCaught)
 						{
 							continue;
 						}
@@ -3548,22 +3573,29 @@ namespace Gorthax.Gilledwars
 							}
 							if (timeMatch)
 							{
-								CreateFishIconWithBorder(dbFish, _bitingFishList, 38);
+								CreateFishIconWithBorder(dbFish, _bitingFishList, 38, !isCaught);
 								matchCount++;
 							}
 						}
 					}
 				}
+				string emptyText = (_showAllBitingFish ? "Nothing biting right now!" : "You caught everything biting right now!");
 				if (matchCount == 0)
 				{
 					new Blish_HUD.Controls.Label
 					{
-						Text = "You caught everything biting right now!",
+						Text = emptyText,
 						Parent = _bitingFishList,
 						AutoSizeWidth = true,
 						TextColor = Microsoft.Xna.Framework.Color.LimeGreen
 					};
 				}
+				new Blish_HUD.Controls.Panel
+				{
+					Parent = _bitingFishList,
+					Width = 290,
+					Height = 5
+				};
 			}
 			catch (Exception ex)
 			{
@@ -4154,6 +4186,7 @@ namespace Gorthax.Gilledwars
 					{
 						Dictionary<string, object> tData = JsonConvert.DeserializeObject<Dictionary<string, object>>(resultString);
 						StopCasualLogging();
+						StopDrfListener();
 						_tourneyRoomCode = roomCode;
 						_tourneyModeUsed = tData["mode"].ToString();
 						_tourneyTargetItemId = Convert.ToInt32(tData["targetId"]);
@@ -4183,7 +4216,13 @@ namespace Gorthax.Gilledwars
 							_waitingRoomLabel.Visible = true;
 							_activeTimerLabel.Visible = false;
 							_activeMeasureBtn.Enabled = false;
-							ScreenNotification.ShowNotification("Entered Waiting Room...");
+							if (_activeSyncTimerLabel != null)
+							{
+								_activeSyncTimerLabel.Text = ((_tourneyModeUsed == "DRF") ? "DRF Paused" : "API Paused");
+								_activeSyncTimerLabel.TextColor = Microsoft.Xna.Framework.Color.LightGray;
+								_activeSyncTimerLabel.Visible = true;
+							}
+							ScreenNotification.ShowNotification("DRF not logging. Will resume on tournament start!", ScreenNotification.NotificationType.Warning);
 						}
 						else
 						{
@@ -4277,7 +4316,7 @@ namespace Gorthax.Gilledwars
 			{
 				Text = "05:00",
 				Parent = _tourneyActivePanel,
-				Location = new Point(100, 20),
+				Location = new Point(190, 85),
 				AutoSizeWidth = true,
 				TextColor = Microsoft.Xna.Framework.Color.Yellow,
 				Visible = false
@@ -4327,7 +4366,8 @@ namespace Gorthax.Gilledwars
 			{
 				Parent = _tourneyActivePanel,
 				Location = new Point(10, 110),
-				Size = new Point(280, 150),
+				Size = new Point(290, 230),
+				CanScroll = true,
 				FlowDirection = ControlFlowDirection.SingleTopToBottom
 			};
 			_activeMeasureBtn.Click += async delegate
@@ -4352,6 +4392,10 @@ namespace Gorthax.Gilledwars
 			};
 			_activeExitBtn.Click += delegate
 			{
+				StopDrfListener();
+				_isTournamentActive = false;
+				_isTourneyWaitingRoom = false;
+				_isSyncTimerActive = false;
 				_lastGeneratedCode = "";
 				_tourneyRoomCode = "";
 				_tourneyCatches.Clear();
@@ -4365,6 +4409,8 @@ namespace Gorthax.Gilledwars
 				_activeTimerLabel.Visible = false;
 				_tourneyActivePanel.Visible = false;
 				_mainWindow.Visible = true;
+				ScreenNotification.ShowNotification("Exited Tournament: Casual Mode Re-Enabled!");
+				StartCasualLogging();
 			};
 		}
 
@@ -4544,6 +4590,8 @@ namespace Gorthax.Gilledwars
 				_activeExitBtn.Visible = true;
 			}
 			ShowTournamentSummary(title, msg, Microsoft.Xna.Framework.Color.Cyan, _tourneyCatches, _tourneyWinFactor);
+			ScreenNotification.ShowNotification("Tournament Complete: Casual Mode Re-Enabled!", ScreenNotification.NotificationType.Warning);
+			StartCasualLogging();
 		}
 
 		private void UpdateActiveTourneyCoolerUI()
@@ -4567,7 +4615,7 @@ namespace Gorthax.Gilledwars
 				Blish_HUD.Controls.Panel row = new Blish_HUD.Controls.Panel
 				{
 					Parent = _activeCoolerList,
-					Size = new Point(280, 42),
+					Size = new Point(270, 65),
 					BackgroundColor = Microsoft.Xna.Framework.Color.Black * 0.4f,
 					ShowBorder = true
 				};
@@ -4579,7 +4627,7 @@ namespace Gorthax.Gilledwars
 					{
 						Texture = ContentsManager.GetTexture("images/" + safeName + ".png"),
 						Parent = row,
-						Location = new Point(5, 5),
+						Location = new Point(5, 16),
 						Size = new Point(32, 32)
 					};
 				}
@@ -4588,8 +4636,9 @@ namespace Gorthax.Gilledwars
 				{
 					Text = (c.Name ?? ""),
 					Parent = row,
-					Location = new Point(45, 4),
+					Location = new Point(45, 8),
 					AutoSizeWidth = true,
+					AutoSizeHeight = true,
 					TextColor = catchColor,
 					Font = GameService.Content.DefaultFont14
 				};
@@ -4597,8 +4646,9 @@ namespace Gorthax.Gilledwars
 				{
 					Text = statText,
 					Parent = row,
-					Location = new Point(45, 22),
+					Location = new Point(45, 34),
 					AutoSizeWidth = true,
+					AutoSizeHeight = true,
 					TextColor = Microsoft.Xna.Framework.Color.LightGray,
 					Font = GameService.Content.DefaultFont12
 				};
@@ -4702,7 +4752,7 @@ namespace Gorthax.Gilledwars
 					Blish_HUD.Controls.Panel row = new Blish_HUD.Controls.Panel
 					{
 						Parent = list,
-						Size = new Point(380, 48),
+						Size = new Point(380, 65),
 						BackgroundColor = darkTealPanel,
 						ShowBorder = true
 					};
@@ -4714,7 +4764,7 @@ namespace Gorthax.Gilledwars
 						{
 							Texture = ContentsManager.GetTexture("images/" + safeName + ".png"),
 							Parent = row,
-							Location = new Point(5, 8),
+							Location = new Point(5, 16),
 							Size = new Point(32, 32)
 						};
 					}
@@ -4723,8 +4773,9 @@ namespace Gorthax.Gilledwars
 					{
 						Text = "[" + c.Rarity + "] " + c.Name,
 						Parent = row,
-						Location = new Point(45, 5),
+						Location = new Point(45, 8),
 						AutoSizeWidth = true,
+						AutoSizeHeight = true,
 						TextColor = Microsoft.Xna.Framework.Color.White,
 						Font = GameService.Content.DefaultFont14
 					};
@@ -4732,8 +4783,9 @@ namespace Gorthax.Gilledwars
 					{
 						Text = statText,
 						Parent = row,
-						Location = new Point(45, 25),
+						Location = new Point(45, 34),
 						AutoSizeWidth = true,
+						AutoSizeHeight = true,
 						TextColor = Microsoft.Xna.Framework.Color.LightGray,
 						Font = GameService.Content.DefaultFont12
 					};
