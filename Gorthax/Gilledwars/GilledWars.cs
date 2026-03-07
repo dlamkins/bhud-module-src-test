@@ -4393,8 +4393,10 @@ namespace Gorthax.Gilledwars
 			_activeExitBtn.Click += delegate
 			{
 				StopDrfListener();
+				StopCasualLogging();
 				_isTournamentActive = false;
 				_isTourneyWaitingRoom = false;
+				_isTourneyWrapUpActive = false;
 				_isSyncTimerActive = false;
 				_lastGeneratedCode = "";
 				_tourneyRoomCode = "";
@@ -4511,6 +4513,7 @@ namespace Gorthax.Gilledwars
 		private async Task CompleteTournamentAsync(string title, string msg)
 		{
 			_isTournamentActive = false;
+			_isTourneyWaitingRoom = false;
 			_isTourneyWrapUpActive = false;
 			if (_activeMeasureBtn != null)
 			{
@@ -4518,6 +4521,7 @@ namespace Gorthax.Gilledwars
 			}
 			_isSyncTimerActive = false;
 			StopDrfListener();
+			StopCasualLogging();
 			List<TournamentCatch> list = ((_tourneyWinFactor == "Length") ? _tourneyCatches.OrderByDescending((TournamentCatch x) => x.Length) : _tourneyCatches.OrderByDescending((TournamentCatch x) => x.Weight)).Take(5).ToList();
 			List<string> parts = new List<string>();
 			string charName = GameService.Gw2Mumble.PlayerCharacter.Name;
