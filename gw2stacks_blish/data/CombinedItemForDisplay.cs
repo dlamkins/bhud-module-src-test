@@ -41,14 +41,14 @@ namespace gw2stacks_blish.data
 		{
 			if (!itemList.Any())
 			{
-				return Magic.get_local_name(get_id()) + "\n" + Magic.get_current_translated_string("No current advice") + "\n" + get_source_string();
+				return Magic.get_local_name(get_id()) + "\n" + Magic.get_current_translated_string("No current advice") + "\n" + base.item.print_prices() + get_source_string();
 			}
 			string combinedAdvice = "";
 			foreach (ItemForDisplay item in itemList)
 			{
 				combinedAdvice = combinedAdvice + item.get_advice() + "\n";
 			}
-			return Magic.get_local_name(get_id()) + "\n" + combinedAdvice + "\n" + get_source_string();
+			return Magic.get_local_name(get_id()) + "\n" + combinedAdvice + base.item.print_prices() + get_source_string();
 		}
 
 		public override string ToString()

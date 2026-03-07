@@ -22,7 +22,7 @@ namespace gw2stacks_blish.data
 
 		public override string print(string name = null)
 		{
-			return Magic.get_local_name(get_id()) + "\n" + Magic.get_current_translated_string(advice) + " (" + Magic.get_local_name(output.itemId) + ")\n" + get_source_string();
+			return Magic.get_local_name(get_id()) + "\n" + Magic.get_current_translated_string(advice) + " (" + Magic.get_local_name(output.itemId) + ")\n" + item.print_prices() + get_source_string();
 		}
 
 		public override string ToString()

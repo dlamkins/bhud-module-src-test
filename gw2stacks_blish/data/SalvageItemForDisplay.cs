@@ -2,14 +2,14 @@ using System.Collections.Generic;
 
 namespace gw2stacks_blish.data
 {
-	internal class GobblerItemForDisplay : ItemForDisplay
+	internal class SalvageItemForDisplay : ItemForDisplay
 	{
-		public int gobblerId;
+		public int salvageKitId;
 
-		public GobblerItemForDisplay(Item item_, List<Source> sources_, string advice_, int gobblerId_)
+		public SalvageItemForDisplay(Item item_, List<Source> sources_, string advice_, int salvageKitId_)
 			: base(item_, sources_, advice_)
 		{
-			gobblerId = gobblerId_;
+			salvageKitId = salvageKitId_;
 		}
 
 		protected override string get_source_string()
@@ -29,12 +29,12 @@ namespace gw2stacks_blish.data
 
 		public override string get_advice(string name = null)
 		{
-			return Magic.get_current_translated_string(advice) + " (" + Magic.get_local_name(gobblerId) + ")";
+			return Magic.get_current_translated_string(advice) + " (" + Magic.get_local_name(salvageKitId) + ")";
 		}
 
 		public override string print(string name = null)
 		{
-			return Magic.get_local_name(get_id()) + "\n" + Magic.get_current_translated_string(advice) + " (" + Magic.get_local_name(gobblerId) + ")\n" + item.print_prices() + get_source_string();
+			return Magic.get_local_name(get_id()) + "\n" + Magic.get_current_translated_string(advice) + " (" + Magic.get_local_name(salvageKitId) + ")\n" + item.print_prices() + get_source_string();
 		}
 
 		public override string ToString()

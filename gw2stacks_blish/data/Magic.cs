@@ -32,6 +32,22 @@ namespace gw2stacks_blish.data
 			sharedStorage
 		}
 
+		public enum SalvageKit
+		{
+			CrudeSalvageKit = 23038,
+			BasicSalvageKit = 23040,
+			CopperSalvageKit = 44602,
+			FineSalvageKit = 23041,
+			JourneySalvageKit = 23042,
+			MasterSalvageKit = 23043,
+			MysticSalvageKit = 23045,
+			SilverSalvageKit = 67027,
+			RuneSalvageKit = 89409,
+			AscendedSalvageTool = 75284,
+			AscendedSalvageKit = 73481,
+			AscendedSalvageKit5 = 79105
+		}
+
 		private static Locale currentLocale = Locale.English;
 
 		public static int ectoId = 19721;
@@ -49,6 +65,8 @@ namespace gw2stacks_blish.data
 		public static Logger log = null;
 
 		public static Translation translation = new Translation();
+
+		public static MagicLists magicLists = new MagicLists();
 
 		public static ItemInfo unknown = new ItemInfo
 		{
@@ -156,51 +174,51 @@ namespace gw2stacks_blish.data
 		{
 			{
 				AdviceType.stackAdvice,
-				"stack advice"
+				"Stack advice"
 			},
 			{
 				AdviceType.vendorAdvice,
-				"vendor advice"
+				"Vendor advice"
 			},
 			{
 				AdviceType.rareSalvageAdvice,
-				"rare salvage advice"
+				"Rare salvage advice"
 			},
 			{
 				AdviceType.craftLuckAdvice,
-				"craftable luck advice"
+				"Craftable luck advice"
 			},
 			{
 				AdviceType.deletableAdvice,
-				"deletable advice"
+				"Deletable advice"
 			},
 			{
 				AdviceType.salvageAdvice,
-				"salvagable  advice"
+				"Salvagable  advice"
 			},
 			{
 				AdviceType.consumableAdvice,
-				"consumable  advice"
+				"Consumable  advice"
 			},
 			{
 				AdviceType.gobblerAdvice,
-				"gobbler  advice"
+				"Gobbler  advice"
 			},
 			{
 				AdviceType.karmaAdvice,
-				"karma consumable  advice"
+				"Karma consumable  advice"
 			},
 			{
 				AdviceType.craftingAdvice,
-				"crafting advice"
+				"Crafting advice"
 			},
 			{
 				AdviceType.lwsAdvice,
-				"living world advice"
+				"Living world advice"
 			},
 			{
 				AdviceType.miscAdvice,
-				"miscellaneous  advice"
+				"Miscellaneous  advice"
 			}
 		};
 
@@ -305,149 +323,11 @@ namespace gw2stacks_blish.data
 			new MiscAdvice(43319, 1000, "Convert to Jorbreaker")
 		};
 
-		public static List<int> karmaIds = new List<int>
-		{
-			86336, 85790, 41740, 38030, 86374, 86181, 36448, 36449, 92714, 95765,
-			36450, 36451, 41738, 36456, 77652, 36457, 36458, 36459, 36460, 70244,
-			69939, 39127, 41373, 36461
-		};
-
 		public static List<int> lws3Id = new List<int> { 79280, 79469, 79899, 80332, 81127, 81706 };
 
 		public static List<int> lws4Id = new List<int> { 86069, 86977, 87645, 88955, 89537, 90783 };
 
 		public static List<int> ibsId = new List<int> { 92272 };
-
-		public static List<int> salvageIds = new List<int>
-		{
-			19721, 21653, 21654, 21655, 21656, 21657, 21658, 21659, 21660, 21661,
-			21662, 21663, 21664, 21665, 21666, 21667, 21668, 21669, 21670, 21671,
-			21672, 21673, 21674, 21675, 21676, 21677, 21678, 21679, 21680, 21681,
-			21682, 21683, 21684, 21685, 21686, 21687, 21688, 21689, 21690, 21691,
-			21692, 21693, 21694, 21695, 21941, 22325, 22326, 22327, 22328, 22329,
-			22330, 22331, 43552, 43553, 43554, 43555, 43556, 45039, 45040, 45041,
-			45042, 45043, 66670, 68378, 68379, 68380, 79079, 79138, 79213, 79423,
-			80681, 96464
-		};
-
-		public static List<int> collectionOnlyIds = new List<int>
-		{
-			67188, 67189, 67193, 67194, 67195, 70429, 70520, 70539, 70550, 70559,
-			70560, 70563, 70616, 70620, 70636, 70653, 70667, 70674, 70690, 70738,
-			70753, 70760, 70775, 70776, 70782, 70812, 70862, 70875, 70879, 70900,
-			70914, 70947, 71009, 71048, 71052, 71054, 71056, 71087, 71099, 71100,
-			71111, 71126, 71147, 71160, 71177, 71196, 71199, 71212, 71214, 71231,
-			71244, 71253, 71270, 71274, 71293, 71304, 71310, 71319, 71373, 71401,
-			71442, 71460, 71465, 71471, 71476, 71527, 71562, 71568, 71572, 71591,
-			71611, 71619, 71626, 71634, 71636, 71646, 71657, 71660, 71672, 71673,
-			71682, 71696, 71707, 71713, 71727, 71733, 71751, 71761, 71778, 71799,
-			71821, 71834, 71869, 71871, 71881, 71883, 71902, 71907, 71913, 71922,
-			71960, 71967, 71976, 71987, 71991, 72001, 72019, 72042, 72054, 72101,
-			72110, 72140, 72141, 72160, 72168, 72174, 72178, 72183, 72218, 72235,
-			72257, 72290, 72298, 72321, 72328, 72329, 72348, 72352, 72394, 72399,
-			72410, 72412, 72440, 72453, 72471, 72474, 72483, 72489, 72491, 72492,
-			72514, 72545, 72555, 72574, 72578, 72592, 72600, 72620, 72621, 72623,
-			72634, 72661, 72668, 72692, 72701, 72737, 72787, 72817, 72855, 72870,
-			72876, 72879, 72883, 72888, 72903, 72906, 72911, 72944, 72972, 72994,
-			73008, 73021, 73025, 73026, 73055, 73066, 73069, 73074, 73089, 73103,
-			73136, 73138, 73164, 73208, 73212, 73250, 73252, 73300, 73338, 73388,
-			73401, 73418, 73426, 73463, 73468, 73500, 73513, 73525, 73540, 73564,
-			73568, 73574, 73588, 73640, 73647, 73650, 73672, 73690, 73727, 73742,
-			73760, 73786, 73799, 73819, 73829, 73833, 73864, 73876, 73924, 73950,
-			73954, 73972, 74011, 74027, 74040, 74082, 74088, 74098, 74099, 74129,
-			74138, 74141, 74149, 74152, 74165, 74175, 74208, 74228, 74250, 74252,
-			74269, 74277, 74281, 74292, 74318, 74336, 74368, 74395, 74422, 74428,
-			74453, 74454, 74461, 74469, 74511, 74514, 74517, 74529, 74533, 74553,
-			74560, 74571, 74579, 74608, 74613, 74641, 74649, 74660, 74663, 74688,
-			74690, 74701, 74710, 74713, 74732, 74733, 74736, 74742, 74756, 74758,
-			74779, 74781, 74792, 74813, 74853, 74857, 74888, 74891, 74917, 74932,
-			74993, 75027, 75036, 75045, 75059, 75070, 75073, 75098, 75118, 75121,
-			75138, 75149, 75150, 75151, 75168, 75197, 75209, 75223, 75257, 75280,
-			75281, 75293, 75300, 75302, 75310, 75319, 75352, 75357, 75366, 75419,
-			75424, 75445, 75459, 75479, 75489, 75494, 75497, 75514, 75526, 75547,
-			75563, 75568, 75571, 75594, 75621, 75634, 75657, 75673, 75674, 75700,
-			75717, 75722, 75751, 75757, 75788, 75806, 75814, 75822, 75834, 75836,
-			75842, 75849, 75863, 75875, 75931, 75936, 75947, 75959, 75960, 75970,
-			75994, 76011, 76013, 76023, 76034, 76050, 76066, 76074, 76088, 76097,
-			76099, 76126, 76154, 76187, 76260, 76268, 76276, 76278, 76308, 76341,
-			76346, 76373, 76382, 76386, 76400, 76413, 76421, 76440, 76452, 76464,
-			76489, 76539, 76540, 76554, 76576, 76596, 76605, 76637, 76647, 76673,
-			76684, 76720, 76724, 76747, 76791, 76808, 76818, 76835, 76838, 76851,
-			76852, 76856, 76869, 76895, 76911, 76945, 76963, 76973, 76995, 76997,
-			77003, 77016, 77019, 77023, 77033, 77047, 77059, 77094, 77126, 77140,
-			77145, 77151, 77154, 77155, 77158, 77184, 77195, 77213, 77224, 77228,
-			77231, 77235, 77290, 77343, 77348, 77398, 77445, 77452, 77467, 77584,
-			77650, 77659, 79731, 80169, 80234, 80313, 80319, 80600, 82153, 82240,
-			82592, 83105, 83125, 83580, 83982, 84165, 84797, 95694, 95735, 95806,
-			96440, 96460, 96584, 96622, 96767, 96859, 96956, 96963, 97090, 97224,
-			97381, 97455, 97585, 97641, 97718, 100277, 100735
-		};
-
-		public static List<int> gaetingSalvage = new List<int>
-		{
-			103800, 103999, 104049, 103970, 103908, 103888, 103844, 104052, 103819, 103954,
-			103835, 104006, 103895, 104046, 103866, 103955, 103818, 104025, 103780, 104015,
-			103897, 103944
-		};
-
-		public static List<int> magnetiteSalvage = new List<int>
-		{
-			63420, 63434, 63435, 63441, 63442, 77271, 77272, 77273, 77280, 77281,
-			77284, 77286, 77288, 77293, 77294, 77295, 77300, 77304, 77306, 77308,
-			77309, 77312, 77313, 77319, 77320, 77322, 77323, 77325, 77327, 77331,
-			77337, 77338, 77340, 77341, 77342, 77344, 77346, 77347, 77358, 77361,
-			77363, 77371, 77376, 77377, 77380, 77382, 77383, 77387, 77390, 77391,
-			77395, 77396, 77406, 77408, 77409, 77410, 77412, 77413, 77420, 77422,
-			77425, 77426, 77427, 77429, 77430, 77434, 77436, 77438, 77440, 77444,
-			77448, 77453, 77454, 77459, 77461, 77464, 77466, 77813, 77827, 77829,
-			77830, 77831, 77836, 77837, 77839, 77841, 77842, 77844, 77847, 77849,
-			77851, 77852, 77853, 77854, 77855, 77864, 77867, 77868, 77873, 77874,
-			77875, 77876, 77882, 77885, 77887, 77889, 77891, 77894, 77895, 77896,
-			77903, 77904, 77905, 77907, 77909, 77910, 77917, 77918, 77920, 77922,
-			77924, 77933, 77936, 77939, 77942, 77943, 77944, 77946, 77949, 77950,
-			77952, 77954, 77958, 77959, 77963, 77964, 77965, 77966, 77970, 77972,
-			77974, 77977, 77979, 77986, 77987, 77988, 77990, 77992, 77993, 77999,
-			78001, 78002, 78795, 78796, 78799, 78800, 78802, 78805, 78808, 78809,
-			78817, 78818, 78819, 78820, 78822, 78823, 78829, 78834, 78835, 78843,
-			78844, 78847, 78848, 78852, 78853, 78855, 78856, 78858, 78860, 78862,
-			78863, 78865, 78869, 78874, 78875, 78876, 78877, 78878, 78880, 78881,
-			78885, 78888, 78892, 78895, 78896, 78901, 78903, 78907, 78911, 78915,
-			78916, 78919, 78923, 78925, 78927, 78931, 78934, 78940, 78941, 78943,
-			78945, 78948, 78949, 78953, 78955, 78963, 78964, 78966, 78967, 78969,
-			78971, 78974, 78977, 78980, 78981, 78984, 78985, 78986, 78987, 78991,
-			78992, 78995, 78997, 79000, 80099, 80123, 80180, 80186, 80188, 80193,
-			80194, 80197, 80199, 80206, 80235, 80243, 80249, 80273, 80278, 80310,
-			80330, 80331, 80333, 80337, 80341, 80414, 80461, 80476, 80482, 80493,
-			80499, 80510, 80527, 80531, 80537, 80559, 80568, 80581, 80605, 80606,
-			80611, 80647, 80659, 80678, 85629, 85635, 85636, 85638, 85641, 85645,
-			85651, 85652, 85654, 85655, 85657, 85660, 85661, 85664, 85669, 85673,
-			85674, 85676, 85677, 85680, 85683, 85688, 85691, 85692, 85693, 85696,
-			85697, 85698, 85702, 85703, 85704, 85705, 85712, 85714, 85716, 85722,
-			85729, 85732, 85735, 85736, 85739, 85741, 85749, 85753, 85761, 85763,
-			85764, 85766, 85768, 85770, 85774, 85777, 85778, 85782, 85789, 85791,
-			85792, 85795, 85803, 85807, 85808, 85814, 85816, 85819, 85822, 85823,
-			85825, 85827, 85829, 85831, 85832, 85835, 85837, 85840, 85843, 85846,
-			85847, 85853, 85858, 85859, 85861, 85867, 85871, 85876, 85879, 85883,
-			85888, 85889, 85891, 85892, 85899, 85903, 85904, 85914, 85916, 85931,
-			85932, 85935, 85938, 85940, 85941, 85944, 85949, 85951, 85952, 85954,
-			85956, 85957, 85962, 85963, 85966, 85969, 85972, 85976, 85980, 85982,
-			85984, 85986, 85988, 85992, 86000, 86004, 86005, 86011, 86013, 86017,
-			86021, 86024, 86029, 86032, 86035, 86037, 86038, 86042, 86044, 86045,
-			86049, 86052, 86056, 86073, 86079, 86080, 86084, 86090, 86100, 86102,
-			86103, 86110, 86112, 86121, 86123, 86124, 86128, 86129, 86135, 86136,
-			86138, 86139, 86141, 86143, 86147, 86152, 86158, 86161, 86164, 86165,
-			86176, 86179, 86185, 86186, 86187, 86194, 86195, 86197, 86198, 86206,
-			86209, 86213, 86215, 86220, 86224, 86227, 86234, 86237, 86240, 86244,
-			86246, 86253, 86255, 86256, 86259, 86262, 86263, 86264, 86268, 86270,
-			86273, 86278, 86288, 86289, 86295, 86301, 86307, 86308, 86311, 86324,
-			86325, 86326, 86333, 86335, 86340, 86344, 86345, 86352, 86361, 86362,
-			86363, 86364, 86365, 86368, 86370, 86373, 86380, 86382, 88473, 88478,
-			88487, 88562, 88564, 88582, 88652, 88677, 88750, 88795, 88799, 88804,
-			88822, 88839, 88849, 88854, 88858, 88862, 88881, 88888, 88915, 88916,
-			88944, 88966, 91142, 91144, 91150, 91156, 91163, 91167, 91168, 91179,
-			91190, 91198, 91199, 91201, 91219, 91223, 91229, 91230, 91238, 91239,
-			91249, 91263, 91264, 91265, 91269, 91271, 103999
-		};
 
 		public static List<int> wizardGobblers = new List<int>
 		{
@@ -514,7 +394,7 @@ namespace gw2stacks_blish.data
 
 		public static bool is_karma_item(int id_)
 		{
-			return karmaIds.Contains(id_);
+			return magicLists.karmaIds.Contains(id_);
 		}
 
 		public static int levenshtein_distance(ReadOnlySpan<char> left_, ReadOnlySpan<char> right_)
@@ -652,51 +532,35 @@ namespace gw2stacks_blish.data
 			{
 				return null;
 			}
-			switch (currentLocale)
+			if (tooltip_ == "" || tooltip_ == " ")
 			{
-			case Locale.English:
-				if (!translation.englishToEnglish.ContainsKey(tooltip_))
-				{
-					return handle_missing_translation(tooltip_, "no english local");
-				}
-				return translation.englishToEnglish[tooltip_];
-			case Locale.Spanish:
-				if (!translation.englishToSpanish.ContainsKey(tooltip_))
-				{
-					return handle_missing_translation(tooltip_, "no spanish local");
-				}
-				return translation.englishToSpanish[tooltip_];
-			case Locale.German:
-				if (!translation.englishToGerman.ContainsKey(tooltip_))
-				{
-					return handle_missing_translation(tooltip_, "no german local");
-				}
-				return translation.englishToGerman[tooltip_];
-			case Locale.French:
-				if (!translation.englishToFrench.ContainsKey(tooltip_))
-				{
-					return handle_missing_translation(tooltip_, "no french local");
-				}
-				return translation.englishToFrench[tooltip_];
-			case Locale.Korean:
-				if (!translation.englishToKorean.ContainsKey(tooltip_))
-				{
-					return handle_missing_translation(tooltip_, "no korean local");
-				}
-				return translation.englishToKorean[tooltip_];
-			case Locale.Chinese:
-				if (!translation.englishToChinese.ContainsKey(tooltip_))
-				{
-					return handle_missing_translation(tooltip_, "no chinese local");
-				}
-				return translation.englishToChinese[tooltip_];
-			default:
-				if (!translation.englishToEnglish.ContainsKey(tooltip_))
-				{
-					return handle_missing_translation(tooltip_, "no english local");
-				}
-				return translation.englishToEnglish[tooltip_];
+				return tooltip_;
 			}
+			int index = translation.english.FindIndex((string item) => item.Contains(tooltip_));
+			if (index == -1)
+			{
+				log.Warn("index of >" + tooltip_ + "< is -1");
+				return currentLocale switch
+				{
+					Locale.English => handle_missing_translation(tooltip_, "no english local"), 
+					Locale.Spanish => handle_missing_translation(tooltip_, "no spanish local"), 
+					Locale.German => handle_missing_translation(tooltip_, "no german local"), 
+					Locale.French => handle_missing_translation(tooltip_, "no french local"), 
+					Locale.Korean => handle_missing_translation(tooltip_, "no korean local"), 
+					Locale.Chinese => handle_missing_translation(tooltip_, "no chinese local"), 
+					_ => handle_missing_translation(tooltip_, "no english local"), 
+				};
+			}
+			return currentLocale switch
+			{
+				Locale.English => translation.english[index], 
+				Locale.Spanish => translation.spanish[index], 
+				Locale.German => translation.german[index], 
+				Locale.French => translation.french[index], 
+				Locale.Korean => translation.korean[index], 
+				Locale.Chinese => translation.chinese[index], 
+				_ => translation.english[index], 
+			};
 		}
 	}
 }

@@ -40,13 +40,13 @@ namespace gw2stacks_blish.data
 
 		public Unlocks unlocks;
 
-		public void reset_state()
+		public void reset_state(int materialStorageSize_)
 		{
 			foreach (KeyValuePair<int, Item> item in items)
 			{
 				item.Value.sources.Clear();
 			}
-			materialStorageSize = 0;
+			materialStorageSize = materialStorageSize_;
 			craftableRecipes = new List<RecipeInfo>();
 			recipeResults = new Dictionary<int, Item>();
 			appraisedItemIds = new List<int>();
@@ -65,7 +65,7 @@ namespace gw2stacks_blish.data
 		{
 			log = log_;
 			items = new Dictionary<int, Item>();
-			reset_state();
+			reset_state(0);
 		}
 
 		public async Task setup(Gw2Api api_)
@@ -93,7 +93,7 @@ namespace gw2stacks_blish.data
 				items.Add(id_, new Item(id_, isCharacterBound_, isAccountBound_));
 			}
 			items[id_].add_source(source_);
-			if (items[id_].isRareForSalvage)
+			if (!items[id_].isAccountBound)
 			{
 				appraisedItemIds.Add(id_);
 			}
@@ -197,7 +197,7 @@ namespace gw2stacks_blish.data
 				add_item(item3.Id, accountBound3, characterBound3, new Source(Convert.ToUInt64(item3.Count), "Material Storage"));
 				maxCount = Math.Max(maxCount, (ulong)item3.Count);
 			}
-			materialStorageSize = Convert.ToInt32(Math.Ceiling(Convert.ToDouble(maxCount / 250uL)) * 250.0);
+			materialStorageSize = Math.Max(Convert.ToInt32(Math.Ceiling(Convert.ToDouble(maxCount / 250uL)) * 250.0), materialStorageSize);
 			foreach (AccountItem item2 in await api_.bank())
 			{
 				if (item2 == null)
@@ -428,7 +428,18 @@ namespace gw2stacks_blish.data
 			{
 				if (item.price < ectoSalvagePrice)
 				{
-					result.Add(new ItemForDisplay(item, null, "Salvage these items"));
+					if (has_item(67027))
+					{
+						result.Add(new SalvageItemForDisplay(item, null, "Salvage these items", 67027));
+					}
+					else if (has_item(23045) || (has_item(19983) && items[19983].total_count() > 3))
+					{
+						result.Add(new SalvageItemForDisplay(item, null, "Salvage these items", 23045));
+					}
+					else
+					{
+						result.Add(new SalvageItemForDisplay(item, null, "Salvage these items", 23043));
+					}
 				}
 				else if (item.isAccountBound)
 				{
@@ -466,20 +477,38 @@ namespace gw2stacks_blish.data
 		public List<ItemForDisplay> get_just_salvage_advice()
 		{
 			List<ItemForDisplay> result = new List<ItemForDisplay>();
-			foreach (Item item2 in items.Values.Where((Item list_item) => (Magic.salvageIds.Contains(list_item.itemId) && list_item.itemId != Magic.ectoId) || (list_item.isDeletable && list_item.isSalvagable)))
+			foreach (Item item2 in items.Values.Where((Item list_item) => (Magic.magicLists.salvageIds.Contains(list_item.itemId) && list_item.itemId != Magic.ectoId) || (list_item.isDeletable && list_item.isSalvagable)))
 			{
-				result.Add(new ItemForDisplay(item2, null, "Salvage these items"));
+				if (item2.rarity == ItemRarity.Basic || item2.rarity == ItemRarity.Fine || (item2.rarity == ItemRarity.Rare && !item2.isRareForSalvage))
+				{
+					if (has_item(44602))
+					{
+						result.Add(new SalvageItemForDisplay(item2, null, "Salvage these items", 44602));
+					}
+					else
+					{
+						result.Add(new SalvageItemForDisplay(item2, null, "Salvage these items", 23040));
+					}
+				}
+				else if ((item2.rarity == ItemRarity.Masterwork || item2.rarity == ItemRarity.Exotic) && has_item(89409))
+				{
+					result.Add(new SalvageItemForDisplay(item2, null, "Salvage these items", 89409));
+				}
+				else
+				{
+					result.Add(new SalvageItemForDisplay(item2, null, "Salvage these items", 67027));
+				}
 			}
 			foreach (Item item in items.Values.Where((Item entry) => entry.rarity == ItemRarity.Ascended && (entry.type == ItemType.Armor || entry.type == ItemType.Weapon || entry.type == ItemType.Back || entry.type == ItemType.Trinket)))
 			{
-				if (Magic.gaetingSalvage.Contains(item.itemId))
+				if (Magic.magicLists.gaetingSalvage.Contains(item.itemId))
 				{
-					result.Add(new ItemForDisplay(item, null, "Salvage these items for gaeting crystals"));
+					result.Add(new SalvageItemForDisplay(item, null, "Salvage these items for gaeting crystals", 73481));
 					continue;
 				}
-				if (Magic.magnetiteSalvage.Contains(item.itemId))
+				if (Magic.magicLists.magnetiteSalvage.Contains(item.itemId))
 				{
-					result.Add(new ItemForDisplay(item, null, "Salvage these items for magnetite shards"));
+					result.Add(new SalvageItemForDisplay(item, null, "Salvage these items for magnetite shards", 73481));
 					continue;
 				}
 				switch (item.type)
@@ -493,19 +522,19 @@ namespace gw2stacks_blish.data
 						case ItemWeightType.Heavy:
 							if (legendaryArmory.heavyArmor[item.armorType])
 							{
-								result.Add(new ItemForDisplay(item, null, "Salvage these items for research notes"));
+								result.Add(new SalvageItemForDisplay(item, null, "Salvage these items", 73481));
 							}
 							break;
 						case ItemWeightType.Medium:
 							if (legendaryArmory.mediumArmor[item.armorType])
 							{
-								result.Add(new ItemForDisplay(item, null, "Salvage these items for research notes"));
+								result.Add(new SalvageItemForDisplay(item, null, "Salvage these items", 73481));
 							}
 							break;
 						case ItemWeightType.Light:
 							if (legendaryArmory.lightArmor[item.armorType])
 							{
-								result.Add(new ItemForDisplay(item, null, "Salvage these items for research notes"));
+								result.Add(new SalvageItemForDisplay(item, null, "Salvage these items", 73481));
 							}
 							break;
 						}
@@ -523,12 +552,12 @@ namespace gw2stacks_blish.data
 						{
 							if (legendaryArmory.weapons[item.weaponType] >= 1)
 							{
-								result.Add(new ItemForDisplay(item, null, "Salvage these items for research notes"));
+								result.Add(new SalvageItemForDisplay(item, null, "Salvage these items", 73481));
 							}
 						}
 						else if (legendaryArmory.weapons[item.weaponType] >= 2)
 						{
-							result.Add(new ItemForDisplay(item, null, "Salvage these items for research notes"));
+							result.Add(new SalvageItemForDisplay(item, null, "Salvage these items", 73481));
 						}
 					}
 					else
@@ -543,19 +572,19 @@ namespace gw2stacks_blish.data
 					case ItemTrinketType.Accessory:
 						if (legendaryArmory.trinkets >= 2)
 						{
-							result.Add(new ItemForDisplay(item, null, "Salvage these items"));
+							result.Add(new SalvageItemForDisplay(item, null, "Salvage these items", 73481));
 						}
 						break;
 					case ItemTrinketType.Ring:
 						if (legendaryArmory.rings >= 2)
 						{
-							result.Add(new ItemForDisplay(item, null, "Salvage these items"));
+							result.Add(new SalvageItemForDisplay(item, null, "Salvage these items", 73481));
 						}
 						break;
 					case ItemTrinketType.Amulet:
 						if (legendaryArmory.amulet)
 						{
-							result.Add(new ItemForDisplay(item, null, "Salvage these items"));
+							result.Add(new SalvageItemForDisplay(item, null, "Salvage these items", 73481));
 						}
 						break;
 					}
@@ -610,12 +639,12 @@ namespace gw2stacks_blish.data
 			}
 			foreach (CraftingMiscAdvice advice in Magic.craftingMiscAdvices.Values)
 			{
-				foreach (KeyValuePair<int, int> item3 in advice.idCountMapping)
+				foreach (KeyValuePair<int, int> item5 in advice.idCountMapping)
 				{
-					if (has_item(item3.Key) && items[item3.Key].total_count() >= Convert.ToUInt64(item3.Value))
+					if (has_item(item5.Key) && items[item5.Key].total_count() >= Convert.ToUInt64(item5.Value))
 					{
 						Item output = new Item(advice.outputId, isCharacterBound_: false, isAccountBound_: false);
-						result.Add(new MiscCraftingItemForDisplay(items[item3.Key], output, "Craft: "));
+						result.Add(new MiscCraftingItemForDisplay(items[item5.Key], output, "Craft: "));
 					}
 				}
 			}
@@ -660,31 +689,31 @@ namespace gw2stacks_blish.data
 			}
 			Item wizardGobbler = new Item(104963, isCharacterBound_: true, isAccountBound_: true);
 			Item wizardScroll = new Item(104772, isCharacterBound_: true, isAccountBound_: true);
-			foreach (int item2 in Magic.wizardGobblers)
+			foreach (int item4 in Magic.wizardGobblers)
 			{
-				if (has_item(item2))
+				if (has_item(item4))
 				{
 					if (has_item(wizardGobbler.itemId))
 					{
-						result.Add(new MiscCraftingItemForDisplay(items[item2], wizardGobbler, "Delete and use"));
+						result.Add(new MiscCraftingItemForDisplay(items[item4], wizardGobbler, "Delete and use"));
 					}
 					else
 					{
-						result.Add(new MiscCraftingItemForDisplay(items[item2], wizardGobbler, "Delete and aquire"));
+						result.Add(new MiscCraftingItemForDisplay(items[item4], wizardGobbler, "Delete and aquire"));
 					}
 				}
 			}
-			foreach (int item in Magic.wizardScrolls)
+			foreach (int item3 in Magic.wizardScrolls)
 			{
-				if (has_item(item))
+				if (has_item(item3))
 				{
 					if (has_item(wizardScroll.itemId))
 					{
-						result.Add(new MiscCraftingItemForDisplay(items[item], wizardScroll, "Delete and use"));
+						result.Add(new MiscCraftingItemForDisplay(items[item3], wizardScroll, "Delete and use"));
 					}
 					else
 					{
-						result.Add(new MiscCraftingItemForDisplay(items[item], wizardScroll, "Delete and aquire"));
+						result.Add(new MiscCraftingItemForDisplay(items[item3], wizardScroll, "Delete and aquire"));
 					}
 				}
 			}
@@ -692,13 +721,38 @@ namespace gw2stacks_blish.data
 			{
 				result.Add(new ItemForDisplay(id, null, "Sell these items on the TP"));
 			}
+			foreach (Item item2 in items.Values)
+			{
+				if (item2.type == ItemType.Container)
+				{
+					if (!item2.isAccountBound)
+					{
+						result.Add(new ItemForDisplay(item2, null, "Open or sell these containers on the TP"));
+					}
+					else
+					{
+						result.Add(new ItemForDisplay(item2, null, "Open these containers"));
+					}
+				}
+			}
+			foreach (Item item in items.Values.Where((Item list_item) => list_item.type == ItemType.CraftingMaterial && list_item.total_count() > (ulong)materialStorageSize))
+			{
+				if (item.isAccountBound)
+				{
+					result.Add(new ItemForDisplay(item, null, "Sell excess materials to a vendor"));
+				}
+				else
+				{
+					result.Add(new ItemForDisplay(item, null, "Sell excess materials on the TP"));
+				}
+			}
 			return result;
 		}
 
 		public List<ItemForDisplay> get_karma_consumables_advice()
 		{
 			List<ItemForDisplay> result = new List<ItemForDisplay>();
-			foreach (int item in Magic.karmaIds)
+			foreach (int item in Magic.magicLists.karmaIds)
 			{
 				if (has_item(item) && items[item].total_count() != 0)
 				{

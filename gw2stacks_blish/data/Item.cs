@@ -155,7 +155,7 @@ namespace gw2stacks_blish.data
 					isSellable = false;
 				}
 			}
-			if (Magic.collectionOnlyIds.Contains(info_.Id))
+			if (Magic.magicLists.collectionOnlyIds.Contains(info_.Id))
 			{
 				isDeletable = true;
 			}
@@ -232,6 +232,22 @@ namespace gw2stacks_blish.data
 				total += current_Source.count;
 			}
 			return total;
+		}
+
+		public string print_prices()
+		{
+			string payload = "";
+			if (isSellable)
+			{
+				string vendorPrice = "Vendor price: " + VendorValue / 10000 + "g" + VendorValue / 100 % 100 + "s" + VendorValue % 100 + "\n";
+				payload += vendorPrice;
+			}
+			if (!isAccountBound)
+			{
+				string tpPrice = "TP price: " + price / 10000 + "g" + price / 100 % 100 + "s" + price % 100 + "\n";
+				payload += tpPrice;
+			}
+			return payload;
 		}
 
 		public override string ToString()
