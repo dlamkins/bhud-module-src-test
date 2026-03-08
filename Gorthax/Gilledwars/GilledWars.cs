@@ -505,10 +505,10 @@ namespace Gorthax.Gilledwars
 		{
 			try
 			{
-				IReadOnlyList<CommercePrices> source = await Gw2ApiManager.Gw2ApiClient.V2.Commerce.Prices.ManyAsync(new int[3] { 96028, 96792, 95992 });
-				CommercePrices ambergris = source.FirstOrDefault((CommercePrices p) => p.Id == 96028);
-				CommercePrices fillet = source.FirstOrDefault((CommercePrices p) => p.Id == 96792);
-				CommercePrices fineFillet = source.FirstOrDefault((CommercePrices p) => p.Id == 95992);
+				IReadOnlyList<CommercePrices> source = await Gw2ApiManager.Gw2ApiClient.V2.Commerce.Prices.ManyAsync(new int[3] { 96347, 95673, 96762 });
+				CommercePrices ambergris = source.FirstOrDefault((CommercePrices p) => p.Id == 96347);
+				CommercePrices fillet = source.FirstOrDefault((CommercePrices p) => p.Id == 95673);
+				CommercePrices fineFillet = source.FirstOrDefault((CommercePrices p) => p.Id == 96762);
 				if (ambergris != null)
 				{
 					_ambergrisPriceCopper = ambergris.Sells.UnitPrice;
@@ -577,6 +577,15 @@ namespace Gorthax.Gilledwars
 				Location = new Point(5, 0),
 				Font = GameService.Content.DefaultFont14,
 				TextColor = new Microsoft.Xna.Framework.Color(201, 168, 76),
+				AutoSizeWidth = true
+			};
+			new Blish_HUD.Controls.Label
+			{
+				Text = "[WIP]",
+				Parent = hBar,
+				Location = new Point(180, 2),
+				Font = GameService.Content.DefaultFont12,
+				TextColor = Microsoft.Xna.Framework.Color.Orange,
 				AutoSizeWidth = true
 			};
 			hBar.LeftMouseButtonPressed += delegate
@@ -2006,27 +2015,19 @@ namespace Gorthax.Gilledwars
 				}
 				else if (matchingFish.Rarity.Equals("Ascended", StringComparison.OrdinalIgnoreCase))
 				{
-					_sessionTotalCopper += (int)((double)_ambergrisPriceCopper * 0.05);
+					_sessionTotalCopper += _filletPriceCopper;
 				}
 				else if (matchingFish.Rarity.Equals("Exotic", StringComparison.OrdinalIgnoreCase) || matchingFish.Rarity.Equals("Rare", StringComparison.OrdinalIgnoreCase))
 				{
-					_sessionTotalCopper += _filletPriceCopper;
+					_sessionTotalCopper += (int)((double)_filletPriceCopper * 0.2);
 				}
 				else if (matchingFish.Rarity.Equals("Masterwork", StringComparison.OrdinalIgnoreCase))
 				{
 					_sessionTotalCopper += _fineFilletPriceCopper * 2;
 				}
-				else if (matchingFish.Rarity.Equals("Fine", StringComparison.OrdinalIgnoreCase))
+				else if (matchingFish.Rarity.Equals("Fine", StringComparison.OrdinalIgnoreCase) || matchingFish.Rarity.Equals("Basic", StringComparison.OrdinalIgnoreCase))
 				{
 					_sessionTotalCopper += _fineFilletPriceCopper;
-				}
-				else if (matchingFish.Rarity.Equals("Basic", StringComparison.OrdinalIgnoreCase))
-				{
-					_sessionTotalCopper += 10;
-				}
-				else if (matchingFish.Rarity.Equals("Junk", StringComparison.OrdinalIgnoreCase))
-				{
-					_sessionTotalCopper++;
 				}
 			}
 			bool num = (matchingFish.Rarity != null && matchingFish.Rarity.Equals("Junk", StringComparison.OrdinalIgnoreCase)) || (matchingFish.Location != null && matchingFish.Location.Contains("Trash Collector"));
@@ -2040,33 +2041,6 @@ namespace Gorthax.Gilledwars
 			{
 				ScreenNotification.ShowNotification(_treasureMessages[_rnd.Next(_treasureMessages.Length)], ScreenNotification.NotificationType.Warning);
 				return;
-			}
-			if (_isCasualLoggingActive && _sessionStartTime != DateTime.MinValue)
-			{
-				if (matchingFish.Rarity.Equals("Legendary", StringComparison.OrdinalIgnoreCase))
-				{
-					_sessionTotalCopper += _ambergrisPriceCopper;
-				}
-				else if (matchingFish.Rarity.Equals("Ascended", StringComparison.OrdinalIgnoreCase))
-				{
-					_sessionTotalCopper += (int)((double)_ambergrisPriceCopper * 0.05);
-				}
-				else if (matchingFish.Rarity.Equals("Exotic", StringComparison.OrdinalIgnoreCase) || matchingFish.Rarity.Equals("Rare", StringComparison.OrdinalIgnoreCase))
-				{
-					_sessionTotalCopper += _filletPriceCopper;
-				}
-				else if (matchingFish.Rarity.Equals("Masterwork", StringComparison.OrdinalIgnoreCase))
-				{
-					_sessionTotalCopper += _fineFilletPriceCopper * 2;
-				}
-				else if (matchingFish.Rarity.Equals("Fine", StringComparison.OrdinalIgnoreCase))
-				{
-					_sessionTotalCopper += _fineFilletPriceCopper;
-				}
-				else if (matchingFish.Rarity.Equals("Basic", StringComparison.OrdinalIgnoreCase))
-				{
-					_sessionTotalCopper += 10;
-				}
 			}
 			double minW = ((matchingFish.MinW > 0.0) ? matchingFish.MinW : 1.0);
 			double maxW = ((matchingFish.MaxW > minW) ? matchingFish.MaxW : (minW + 5.0));
