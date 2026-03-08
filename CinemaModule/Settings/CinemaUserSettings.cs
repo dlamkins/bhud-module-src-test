@@ -30,6 +30,20 @@ namespace CinemaModule.Settings
 
 		private StreamPresetData _currentStreamPreset;
 
+		private string _audioUrl;
+
+		public string AudioUrl
+		{
+			get
+			{
+				return _audioUrl;
+			}
+			set
+			{
+				_audioUrl = value;
+			}
+		}
+
 		public StreamPresetData CurrentStreamPreset
 		{
 			get

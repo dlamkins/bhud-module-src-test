@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Blish_HUD;
 using LibVLCSharp.Shared;
 using Microsoft.Xna.Framework.Graphics;
@@ -28,6 +29,10 @@ namespace CinemaModule.VideoPlayer
 		private bool _isDisposed;
 
 		private string _currentUrl;
+
+		private string _currentAudioSlaveUrl;
+
+		private bool _hasAudioSlave;
 
 		private List<VideoQuality> _availableQualities = new List<VideoQuality>();
 
@@ -105,7 +110,16 @@ namespace CinemaModule.VideoPlayer
 			{
 				if (_mediaPlayer != null)
 				{
-					_mediaPlayer.Position = Math.Max(0f, Math.Min(1f, value));
+					float clampedPosition = Math.Max(0f, Math.Min(1f, value));
+					long length = _mediaPlayer.Length;
+					if (length > 0 && _hasAudioSlave)
+					{
+						PerformAudioSlaveSeek(clampedPosition, length);
+					}
+					else
+					{
+						_mediaPlayer.Position = clampedPosition;
+					}
 				}
 			}
 		}
@@ -142,6 +156,26 @@ namespace CinemaModule.VideoPlayer
 
 		public event EventHandler QualitiesChanged;
 
+		private void PerformAudioSlaveSeek(float targetPosition, long length)
+		{
+			bool isPlaying = IsPlaying;
+			long targetTimeMs = (long)(targetPosition * (float)length);
+			_mediaPlayer.SetPause(pause: true);
+			_mediaPlayer.Time = targetTimeMs;
+			if (!isPlaying)
+			{
+				return;
+			}
+			Task.Run(async delegate
+			{
+				await Task.Delay(100);
+				if (!_isDisposed && _mediaPlayer != null)
+				{
+					_mediaPlayer.SetPause(pause: false);
+				}
+			});
+		}
+
 		public VideoPlayer(GraphicsDevice device, VideoPlayerOptions options)
 		{
 			_graphicsDevice = device;
@@ -164,7 +198,10 @@ namespace CinemaModule.VideoPlayer
 				"--adaptive-logic=highest",
 				$"--adaptive-maxwidth={options.MaxWidth}",
 				$"--adaptive-maxheight={options.MaxHeight}",
-				$"--preferred-resolution={options.PreferredResolution}"
+				$"--preferred-resolution={options.PreferredResolution}",
+				"--clock-jitter=0",
+				"--avcodec-skip-frame=0",
+				"--avcodec-skip-idct=0"
 			};
 			if (options.EnableHardwareAcceleration)
 			{
@@ -211,10 +248,13 @@ namespace CinemaModule.VideoPlayer
 			}
 			Stop();
 			_currentUrl = url;
+			_currentAudioSlaveUrl = audioSlaveUrl;
+			_hasAudioSlave = !string.IsNullOrEmpty(audioSlaveUrl);
 			using Media media = new Media(_libVLC, uri);
-			if (!string.IsNullOrEmpty(audioSlaveUrl))
+			if (_hasAudioSlave)
 			{
 				media.AddOption(":input-slave=" + audioSlaveUrl);
+				media.AddOption(":clock-synchro=0");
 			}
 			_mediaPlayer.Play(media);
 		}
@@ -237,8 +277,7 @@ namespace CinemaModule.VideoPlayer
 				}
 				else if (IsEnded && !string.IsNullOrEmpty(_currentUrl))
 				{
-					string url = _currentUrl;
-					Play(url);
+					Play(_currentUrl, _currentAudioSlaveUrl);
 				}
 			}
 		}
@@ -266,6 +305,8 @@ namespace CinemaModule.VideoPlayer
 			}
 			_videoTexture = null;
 			_currentUrl = null;
+			_currentAudioSlaveUrl = null;
+			_hasAudioSlave = false;
 			_availableQualities.Clear();
 			_selectedQualityIndex = -1;
 		}

@@ -34,7 +34,7 @@ namespace CinemaModule.Controllers.WatchParty
 			PrepareForVideoLoad();
 			_reportMemberState(MemberState.Loading);
 			LoadThumbnailAsync(videoId);
-			var (streamUrl, isLiveStream) = await ResolveStreamUrlAsync(videoId, validateLoadingState).ConfigureAwait(continueOnCapturedContext: false);
+			var (streamUrl, audioUrl, isLiveStream) = await ResolveStreamUrlAsync(videoId, validateLoadingState).ConfigureAwait(continueOnCapturedContext: false);
 			if (string.IsNullOrEmpty(streamUrl))
 			{
 				Logger.Warn("Failed to resolve stream URL for " + videoId + " - video may be unavailable or age-restricted");
@@ -44,12 +44,12 @@ namespace CinemaModule.Controllers.WatchParty
 			{
 				return VideoLoadResult.Cancelled();
 			}
-			return VideoLoadResult.Success(streamUrl, isLiveStream);
+			return VideoLoadResult.Success(streamUrl, audioUrl, isLiveStream);
 		}
 
-		public void StartPlayback(string streamUrl, bool isLiveStream)
+		public void StartPlayback(string streamUrl, string audioUrl, bool isLiveStream)
 		{
-			_playbackController.Play(streamUrl);
+			_playbackController.Play(streamUrl, audioUrl);
 			_displayController.UpdateOfflineState(isOffline: false);
 			_displayController.UpdateSeekableState(!isLiveStream, 0L);
 		}
@@ -104,23 +104,23 @@ namespace CinemaModule.Controllers.WatchParty
 			_youtubeService.ClearVideoInfoCache();
 		}
 
-		private async Task<(string Url, bool IsLiveStream)> ResolveStreamUrlAsync(string videoId, Func<string, bool> validateLoadingState)
+		private async Task<(string Url, string AudioUrl, bool IsLiveStream)> ResolveStreamUrlAsync(string videoId, Func<string, bool> validateLoadingState)
 		{
 			YouTubeVideoInfo videoInfo = await _youtubeService.GetVideoInfoAsync(videoId).ConfigureAwait(continueOnCapturedContext: false);
 			if (!validateLoadingState(videoId))
 			{
-				return (null, false);
+				return (null, null, false);
 			}
 			bool isLiveStream = videoInfo?.IsLiveStream ?? false;
-			var (streamUrl, actualIsLiveStream) = await TryResolveStreamUrlAsync(videoId, isLiveStream).ConfigureAwait(continueOnCapturedContext: false);
+			var (streamUrl, audioUrl, actualIsLiveStream) = await TryResolveStreamUrlAsync(videoId, isLiveStream).ConfigureAwait(continueOnCapturedContext: false);
 			if (videoInfo != null)
 			{
 				_displayController.UpdateStreamInfo(videoInfo.Title, null, videoInfo.Author);
 			}
-			return (streamUrl, actualIsLiveStream);
+			return (streamUrl, audioUrl, actualIsLiveStream);
 		}
 
-		private async Task<(string Url, bool IsLiveStream)> TryResolveStreamUrlAsync(string videoId, bool isLiveStream)
+		private async Task<(string Url, string AudioUrl, bool IsLiveStream)> TryResolveStreamUrlAsync(string videoId, bool isLiveStream)
 		{
 			if (isLiveStream)
 			{
@@ -128,19 +128,20 @@ namespace CinemaModule.Controllers.WatchParty
 				string hlsUrl = await _youtubeService.GetLiveStreamUrlAsync(videoId).ConfigureAwait(continueOnCapturedContext: false);
 				if (!string.IsNullOrEmpty(hlsUrl))
 				{
-					return (hlsUrl, true);
+					return (hlsUrl, null, true);
 				}
 				Logger.Warn("Failed to get HLS URL for " + videoId + ", trying regular stream URL");
-				return (await _youtubeService.GetPlayableStreamUrlAsync(videoId).ConfigureAwait(continueOnCapturedContext: false), false);
+				YouTubeStreamUrls regularUrls = await _youtubeService.GetBestQualityStreamUrlsAsync(videoId).ConfigureAwait(continueOnCapturedContext: false);
+				return (regularUrls.VideoUrl, regularUrls.AudioUrl, false);
 			}
-			string streamUrl = await _youtubeService.GetPlayableStreamUrlAsync(videoId).ConfigureAwait(continueOnCapturedContext: false);
-			if (!string.IsNullOrEmpty(streamUrl))
+			YouTubeStreamUrls streamUrls = await _youtubeService.GetBestQualityStreamUrlsAsync(videoId).ConfigureAwait(continueOnCapturedContext: false);
+			if (!string.IsNullOrEmpty(streamUrls.VideoUrl))
 			{
-				return (streamUrl, false);
+				return (streamUrls.VideoUrl, streamUrls.AudioUrl, false);
 			}
 			Logger.Debug("Regular stream URL failed for " + videoId + ", trying livestream URL");
-			string obj = await _youtubeService.GetLiveStreamUrlAsync(videoId).ConfigureAwait(continueOnCapturedContext: false);
-			return (obj, !string.IsNullOrEmpty(obj));
+			string fallbackUrl = await _youtubeService.GetLiveStreamUrlAsync(videoId).ConfigureAwait(continueOnCapturedContext: false);
+			return (fallbackUrl, null, !string.IsNullOrEmpty(fallbackUrl));
 		}
 	}
 }

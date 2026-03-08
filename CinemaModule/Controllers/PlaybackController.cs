@@ -122,6 +122,11 @@ namespace CinemaModule.Controllers
 			_videoPlayer?.Play(url);
 		}
 
+		public void Play(string url, string audioUrl)
+		{
+			_videoPlayer?.Play(url, audioUrl);
+		}
+
 		public void Stop()
 		{
 			_videoPlayer?.Stop();
@@ -176,7 +181,8 @@ namespace CinemaModule.Controllers
 					_twitchService.ClearCachedQualities();
 					_youtubeService.ClearCachedQualities();
 					_videoPlayer.Stop();
-					_videoPlayer.Play(url);
+					_videoPlayer.Play(url, _userSettings.AudioUrl);
+					_userSettings.AudioUrl = null;
 					FetchQualitiesForCurrentSource();
 				}
 			}
@@ -274,14 +280,24 @@ namespace CinemaModule.Controllers
 					youTubeVideoInfo = await _youtubeService.GetVideoInfoAsync(videoId);
 				}
 				videoInfo = youTubeVideoInfo;
-				string text = ((!(videoInfo?.IsLiveStream ?? false)) ? (await _youtubeService.GetPlayableStreamUrlAsync(videoId)) : (await _youtubeService.GetLiveStreamUrlAsync(videoId)));
-				string freshUrl = text;
+				string audioUrl = null;
+				string freshUrl;
+				if (videoInfo?.IsLiveStream ?? false)
+				{
+					freshUrl = await _youtubeService.GetLiveStreamUrlAsync(videoId);
+				}
+				else
+				{
+					YouTubeStreamUrls streamUrls = await _youtubeService.GetBestQualityStreamUrlsAsync(videoId);
+					freshUrl = streamUrls.VideoUrl;
+					audioUrl = streamUrls.AudioUrl;
+				}
 				if (string.IsNullOrEmpty(freshUrl))
 				{
 					Logger.Warn("Failed to get fresh stream URL for video: " + videoId);
 					return;
 				}
-				PlayYouTubeStream(freshUrl, videoId, autoplay);
+				PlayYouTubeStream(freshUrl, audioUrl, videoId, autoplay);
 				this.YouTubeStreamUrlRefreshed?.Invoke(this, new YouTubeStreamRefreshedEventArgs(videoId, freshUrl));
 			}
 			catch (Exception ex)
@@ -292,19 +308,19 @@ namespace CinemaModule.Controllers
 
 		private void PlayTwitchStream(string streamUrl, string channelName, bool autoplay = true)
 		{
-			PlayAndPauseIfNeeded(streamUrl, autoplay);
+			PlayAndPauseIfNeeded(streamUrl, null, autoplay);
 			_twitchService.FetchAndCacheQualitiesAsync(channelName);
 		}
 
-		private void PlayYouTubeStream(string streamUrl, string videoId, bool autoplay = true)
+		private void PlayYouTubeStream(string streamUrl, string audioUrl, string videoId, bool autoplay = true)
 		{
-			PlayAndPauseIfNeeded(streamUrl, autoplay);
+			PlayAndPauseIfNeeded(streamUrl, audioUrl, autoplay);
 			_youtubeService.FetchAndCacheQualitiesAsync(videoId);
 		}
 
-		private void PlayAndPauseIfNeeded(string url, bool autoplay)
+		private void PlayAndPauseIfNeeded(string url, string audioUrl, bool autoplay)
 		{
-			_videoPlayer.Play(url);
+			_videoPlayer.Play(url, audioUrl);
 			if (!autoplay)
 			{
 				_videoPlayer.Pause();

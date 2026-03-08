@@ -7,7 +7,7 @@ namespace CinemaModule.VideoPlayer
 		public bool EnableHardwareAcceleration { get; set; } = true;
 
 
-		public int NetworkCachingMs { get; set; } = 1000;
+		public int NetworkCachingMs { get; set; } = 2000;
 
 
 		public int MaxWidth { get; set; } = 1920;

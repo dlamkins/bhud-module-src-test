@@ -351,7 +351,7 @@ namespace CinemaModule.Controllers.WatchParty
 				{
 					if (result.IsSuccess)
 					{
-						await StartPlaybackAsync(videoId, result.StreamUrl, result.IsLiveStream, state).ConfigureAwait(continueOnCapturedContext: false);
+						await StartPlaybackAsync(videoId, result.StreamUrl, result.AudioUrl, result.IsLiveStream, state).ConfigureAwait(continueOnCapturedContext: false);
 					}
 					else
 					{
@@ -369,14 +369,14 @@ namespace CinemaModule.Controllers.WatchParty
 			}
 		}
 
-		private async Task StartPlaybackAsync(string videoId, string streamUrl, bool isLiveStream, WatchPartyLocalState state)
+		private async Task StartPlaybackAsync(string videoId, string streamUrl, string audioUrl, bool isLiveStream, WatchPartyLocalState state)
 		{
 			if (_isDisposed)
 			{
 				return;
 			}
 			Logger.Debug($"Playing video {videoId} (livestream: {isLiveStream})");
-			_videoLoader.StartPlayback(streamUrl, isLiveStream);
+			_videoLoader.StartPlayback(streamUrl, audioUrl, isLiveStream);
 			_isCurrentVideoLiveStream = isLiveStream;
 			lock (_videoStateLock)
 			{
