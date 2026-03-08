@@ -70,6 +70,8 @@ namespace Gorthax.Gilledwars
 
 		private AsyncTexture2D _texDusk;
 
+		private AsyncTexture2D _texCaughtCheck;
+
 		private AsyncTexture2D _texNight;
 
 		private string _currentTodPhase = "";
@@ -486,6 +488,7 @@ namespace Gorthax.Gilledwars
 			_texDay = ContentsManager.GetTexture("images/tod_day.png");
 			_texDusk = ContentsManager.GetTexture("images/tod_dusk.png");
 			_texNight = ContentsManager.GetTexture("images/tod_night.png");
+			_texCaughtCheck = ContentsManager.GetTexture("images/caught_check.png");
 			BuildTimeOfDayWidget();
 			RefreshFishLogUI();
 			if (_autoStartLogging.Value)
@@ -2527,8 +2530,10 @@ namespace Gorthax.Gilledwars
 							{ "Ascalon", 6330 },
 							{ "Maguuma Jungle", 6344 },
 							{ "Ruins of Orr", 6363 },
-							{ "Crystal Desert", 6317 },
+							{ "Southsun Cove", 6106 },
+							{ "Sandswept Isles", 6106 },
 							{ "Elona", 6106 },
+							{ "Crystal Desert", 6317 },
 							{ "Ring of Fire", 6489 },
 							{ "Seitung Province", 6336 },
 							{ "New Kaineng City", 6342 },
@@ -2539,7 +2544,8 @@ namespace Gorthax.Gilledwars
 							{ "Inner Nayos", 7114 },
 							{ "Lowland Shore", 8168 },
 							{ "Janthir Syntri", 8168 },
-							{ "Mistburned Barrens", 8554 }
+							{ "Mistburned Barrens", 8554 },
+							{ "Castora", 8900 }
 						};
 						string target = achievementMap.Keys.FirstOrDefault((string k) => mapInfo.Name.Contains(k) || (mapInfo.RegionName != null && mapInfo.RegionName.Contains(k))) ?? "All Locations";
 						if (target != "All Locations")
@@ -3184,7 +3190,7 @@ namespace Gorthax.Gilledwars
 			{
 				Parent = parent,
 				Size = new Point(size, size),
-				BackgroundColor = (isMissing ? rarityColor : (rarityColor * 0.3f)),
+				BackgroundColor = rarityColor,
 				BasicTooltipText = tooltip
 			};
 			string safeName = fish.Name.Replace(" ", "_").Replace("'", "").Replace("-", "");
@@ -3194,8 +3200,16 @@ namespace Gorthax.Gilledwars
 				Parent = borderPanel,
 				Size = new Point(size - 4, size - 4),
 				Location = new Point(2, 2),
-				Tint = (isMissing ? Microsoft.Xna.Framework.Color.White : (Microsoft.Xna.Framework.Color.White * 0.3f)),
+				Tint = (isMissing ? Microsoft.Xna.Framework.Color.White : (Microsoft.Xna.Framework.Color.White * 0.4f)),
 				BasicTooltipText = tooltip
+			};
+			new Image
+			{
+				Texture = _texCaughtCheck,
+				Parent = borderPanel,
+				Size = new Point(16, 16),
+				Location = new Point(size - 18, size - 18),
+				Visible = !isMissing
 			};
 			return borderPanel;
 		}
@@ -3474,8 +3488,10 @@ namespace Gorthax.Gilledwars
 				{ "Ascalon", 6330 },
 				{ "Maguuma Jungle", 6344 },
 				{ "Ruins of Orr", 6363 },
-				{ "Crystal Desert", 6317 },
+				{ "Southsun Cove", 6106 },
+				{ "Sandswept Isles", 6106 },
 				{ "Elona", 6106 },
+				{ "Crystal Desert", 6317 },
 				{ "Ring of Fire", 6489 },
 				{ "Seitung Province", 6336 },
 				{ "New Kaineng City", 6342 },
@@ -3486,7 +3502,8 @@ namespace Gorthax.Gilledwars
 				{ "Inner Nayos", 7114 },
 				{ "Lowland Shore", 8168 },
 				{ "Janthir Syntri", 8168 },
-				{ "Mistburned Barrens", 8554 }
+				{ "Mistburned Barrens", 8554 },
+				{ "Castora", 8900 }
 			};
 			try
 			{
