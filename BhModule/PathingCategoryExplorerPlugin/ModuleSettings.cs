@@ -20,7 +20,7 @@ namespace BhModule.PathingCategoryExplorerPlugin
 			_module = module;
 			AddDeselectRecursively = settings.DefineSetting<bool>("AddDeselectRecursively", true, (Func<string>)(() => "Add Deselect Recursively"), (Func<string>)(() => ""));
 			AddSelectRecursively = settings.DefineSetting<bool>("AddSelectRecursively", true, (Func<string>)(() => "Add Select Recursively"), (Func<string>)(() => ""));
-			AddDeselectAllOthers = settings.DefineSetting<bool>("AddDeselectAllOthers", true, (Func<string>)(() => "Add Deselect All Othres"), (Func<string>)(() => ""));
+			AddDeselectAllOthers = settings.DefineSetting<bool>("AddDeselectAllOthers", true, (Func<string>)(() => "Add Select The Path Exclusively"), (Func<string>)(() => ""));
 			FixNodeExpansionBug = settings.DefineSetting<bool>("FixNodeExpansionBug", true, (Func<string>)(() => "Fix Node Expansion Bug"), (Func<string>)(() => "Fix crash when checking a node after parent re-expansion."));
 		}
 

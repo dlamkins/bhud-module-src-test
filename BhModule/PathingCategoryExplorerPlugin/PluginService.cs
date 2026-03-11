@@ -27,11 +27,11 @@ namespace BhModule.PathingCategoryExplorerPlugin
 
 		private Action<Control> _showAllCategories;
 
-		private Func<Control, bool> _checkParentConfirmationVisible;
-
 		private Action<Control> _deselectAdjacentNodes;
 
 		private Action<Container> _disposeContainer;
+
+		private bool _freezeConfirmation;
 
 		private ModuleSettings Settings => PathingCategoryExplorerPluginModule.Instance.Settings;
 
@@ -69,8 +69,8 @@ namespace BhModule.PathingCategoryExplorerPlugin
 
 		private void BuildActions()
 		{
-			//IL_0149: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0153: Expected O, but got Unknown
+			//IL_016c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0176: Expected O, but got Unknown
 			Type type = Assembly.GetAssembly(((object)_pathingModuleManager.get_ModuleInstance()).GetType()).GetType("BhModule.Community.Pathing.UI.Controls.TreeNodes.PathingCategoryNode");
 			Type baseType = type.BaseType;
 			ParameterExpression parameterExpression = Expression.Parameter(typeof(Control));
@@ -83,7 +83,19 @@ namespace BhModule.PathingCategoryExplorerPlugin
 			});
 			BinaryExpression right = Expression.NotEqual(Expression.Property(unaryExpression, "Checked"), parameterExpression2);
 			ConditionalExpression body = Expression.IfThen(Expression.And(Expression.TypeIs(parameterExpression, baseType), right), ifTrue);
-			_setPathingNodeChecked = Expression.Lambda<Action<Control, bool>>(body, new ParameterExpression[2] { parameterExpression, parameterExpression2 }).Compile();
+			Action<Control, bool> setPathingNodeChecked = Expression.Lambda<Action<Control, bool>>(body, new ParameterExpression[2] { parameterExpression, parameterExpression2 }).Compile();
+			_setPathingNodeChecked = delegate(Control ctrl, bool val)
+			{
+				if (val)
+				{
+					_freezeConfirmation = true;
+				}
+				setPathingNodeChecked(ctrl, val);
+				if (_freezeConfirmation)
+				{
+					_freezeConfirmation = false;
+				}
+			};
 			MemberExpression ifTrue2 = Expression.Property(unaryExpression, "Checkable");
 			ConditionalExpression body2 = Expression.Condition(Expression.TypeIs(parameterExpression, baseType), ifTrue2, Expression.Constant(false));
 			_getPathingNodeCheckable = Expression.Lambda<Func<Control, bool>>(body2, new ParameterExpression[1] { parameterExpression }).Compile();
@@ -94,13 +106,9 @@ namespace BhModule.PathingCategoryExplorerPlugin
 			});
 			ConditionalExpression body3 = Expression.IfThen(Expression.TypeIs(parameterExpression, type), ifTrue3);
 			_showAllCategories = Expression.Lambda<Action<Control>>(body3, new ParameterExpression[1] { parameterExpression }).Compile();
-			MemberExpression expression = Expression.Property(parameterExpression, "Parent");
-			MemberExpression memberExpression = Expression.Field(Expression.TypeAs(expression, type), "_confirmationContainer");
-			ConditionalExpression body4 = Expression.Condition(ifTrue: Expression.Property(memberExpression, "Visible"), test: Expression.And(Expression.TypeIs(expression, type), Expression.NotEqual(memberExpression, Expression.Constant(null))), ifFalse: Expression.Constant(false));
-			_checkParentConfirmationVisible = Expression.Lambda<Func<Control, bool>>(body4, new ParameterExpression[1] { parameterExpression }).Compile();
-			MethodCallExpression ifTrue5 = Expression.Call(unaryExpression, baseType.GetMethod("DeselectAdjacentNodesExcept"), unaryExpression);
-			ConditionalExpression body5 = Expression.IfThen(Expression.TypeIs(parameterExpression, baseType), ifTrue5);
-			_deselectAdjacentNodes = Expression.Lambda<Action<Control>>(body5, new ParameterExpression[1] { parameterExpression }).Compile();
+			MethodCallExpression ifTrue4 = Expression.Call(unaryExpression, baseType.GetMethod("DeselectAdjacentNodesExcept"), unaryExpression);
+			ConditionalExpression body4 = Expression.IfThen(Expression.TypeIs(parameterExpression, baseType), ifTrue4);
+			_deselectAdjacentNodes = Expression.Lambda<Action<Control>>(body4, new ParameterExpression[1] { parameterExpression }).Compile();
 			MethodInfo method = typeof(Container).GetMethod("DisposeControl", BindingFlags.Instance | BindingFlags.NonPublic);
 			DynamicMethod dynamicMethod = new DynamicMethod("DisposeContainer", null, new Type[1] { typeof(Container) }, typeof(Container), skipVisibility: true);
 			ILGenerator iLGenerator = dynamicMethod.GetILGenerator();
@@ -171,8 +179,7 @@ namespace BhModule.PathingCategoryExplorerPlugin
 
 		private void ShowConfirmationWindow(Action<object> show, object instance)
 		{
-			Control val = (Control)((instance is Control) ? instance : null);
-			if (val != null && !_checkParentConfirmationVisible(val))
+			if (!_freezeConfirmation)
 			{
 				show(instance);
 			}
@@ -212,7 +219,7 @@ namespace BhModule.PathingCategoryExplorerPlugin
 			}
 			if (Settings.AddDeselectAllOthers.get_Value())
 			{
-				ContextMenuStripItem val3 = new ContextMenuStripItem("Deselect All Others");
+				ContextMenuStripItem val3 = new ContextMenuStripItem("Select The Path Exclusively");
 				((Control)val3).set_Parent((Container)(object)((Control)pathingNode).get_Menu());
 				((Control)val3).add_Click((EventHandler<MouseEventArgs>)delegate
 				{
