@@ -2010,6 +2010,18 @@ namespace Gorthax.Gilledwars
 			{
 				return;
 			}
+			bool num = (matchingFish.Rarity != null && matchingFish.Rarity.Equals("Junk", StringComparison.OrdinalIgnoreCase)) || (matchingFish.Location != null && matchingFish.Location.Contains("Trash Collector"));
+			bool isTreasure = (matchingFish.Name != null && (matchingFish.Name.IndexOf("Treasure", StringComparison.OrdinalIgnoreCase) >= 0 || matchingFish.Name.IndexOf("Chest", StringComparison.OrdinalIgnoreCase) >= 0 || matchingFish.Name.IndexOf("Box", StringComparison.OrdinalIgnoreCase) >= 0 || matchingFish.Name.IndexOf("Runestone", StringComparison.OrdinalIgnoreCase) >= 0 || matchingFish.Name.IndexOf("Cache", StringComparison.OrdinalIgnoreCase) >= 0 || matchingFish.Name.IndexOf("Message", StringComparison.OrdinalIgnoreCase) >= 0)) || (matchingFish.Location != null && matchingFish.Location.Contains("Treasure Collector"));
+			if (num)
+			{
+				ScreenNotification.ShowNotification(_junkMessages[_rnd.Next(_junkMessages.Length)], ScreenNotification.NotificationType.Error);
+				return;
+			}
+			if (isTreasure)
+			{
+				ScreenNotification.ShowNotification(_treasureMessages[_rnd.Next(_treasureMessages.Length)], ScreenNotification.NotificationType.Warning);
+				return;
+			}
 			if (_isCasualLoggingActive && _sessionStartTime != DateTime.MinValue)
 			{
 				if (matchingFish.Rarity.Equals("Legendary", StringComparison.OrdinalIgnoreCase))
@@ -2030,20 +2042,15 @@ namespace Gorthax.Gilledwars
 				}
 				else if (matchingFish.Rarity.Equals("Fine", StringComparison.OrdinalIgnoreCase) || matchingFish.Rarity.Equals("Basic", StringComparison.OrdinalIgnoreCase))
 				{
-					_sessionTotalCopper += _fineFilletPriceCopper;
+					if (matchingFish.Name.IndexOf("Crab", StringComparison.OrdinalIgnoreCase) >= 0 || matchingFish.Name.IndexOf("Crawfish", StringComparison.OrdinalIgnoreCase) >= 0 || matchingFish.Name.IndexOf("Prawn", StringComparison.OrdinalIgnoreCase) >= 0 || matchingFish.Name.IndexOf("Shrimp", StringComparison.OrdinalIgnoreCase) >= 0)
+					{
+						_sessionTotalCopper += _fineFilletPriceCopper;
+					}
+					else
+					{
+						_sessionTotalCopper += _fineFilletPriceCopper;
+					}
 				}
-			}
-			bool num = (matchingFish.Rarity != null && matchingFish.Rarity.Equals("Junk", StringComparison.OrdinalIgnoreCase)) || (matchingFish.Location != null && matchingFish.Location.Contains("Trash Collector"));
-			bool isTreasure = (matchingFish.Name != null && (matchingFish.Name.Contains("Treasure") || matchingFish.Name.Contains("Chest"))) || (matchingFish.Location != null && matchingFish.Location.Contains("Treasure Collector"));
-			if (num)
-			{
-				ScreenNotification.ShowNotification(_junkMessages[_rnd.Next(_junkMessages.Length)], ScreenNotification.NotificationType.Error);
-				return;
-			}
-			if (isTreasure)
-			{
-				ScreenNotification.ShowNotification(_treasureMessages[_rnd.Next(_treasureMessages.Length)], ScreenNotification.NotificationType.Warning);
-				return;
 			}
 			double minW = ((matchingFish.MinW > 0.0) ? matchingFish.MinW : 1.0);
 			double maxW = ((matchingFish.MaxW > minW) ? matchingFish.MaxW : (minW + 5.0));
@@ -2160,6 +2167,10 @@ namespace Gorthax.Gilledwars
 			else
 			{
 				ScreenNotification.ShowNotification($"Caught: {catchRecord.Name} ({catchRecord.Weight} lbs, {catchRecord.Length} in){pbAlert}", notifType);
+			}
+			if (_bitingWidgetPanel != null && _bitingWidgetPanel.Visible)
+			{
+				RefreshBitingWidget();
 			}
 		}
 
