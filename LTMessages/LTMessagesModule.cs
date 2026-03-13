@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -124,6 +125,14 @@ namespace LTMessages
 			public IntPtr dwExtraInfo;
 		}
 
+		private static class NativeMethods
+		{
+			public const int ASFW_ANY = -1;
+
+			[DllImport("user32.dll")]
+			public static extern bool AllowSetForegroundWindow(int dwProcessId);
+		}
+
 		private static readonly Logger Logger = Logger.GetLogger<LTMessagesModule>();
 
 		private SettingEntry<ChatFocus> _chatFocus;
@@ -157,6 +166,10 @@ namespace LTMessages
 		private FlowPanel _messageFlowPanel;
 
 		private Panel _editorWindow;
+
+		private Panel _editorTabContent;
+
+		private Panel _aboutTabContent;
 
 		private FlowPanel _editorFlowPanel;
 
@@ -378,6 +391,32 @@ namespace LTMessages
 					{
 						await Task.Delay(100);
 						openHelpButton.set_Value(false);
+					});
+				}
+			});
+			SettingEntry<bool> openDocsButton = settings.DefineSetting<bool>("OpenDocsButton", false, (Func<string>)(() => "Documentation"), (Func<string>)(() => "Open the full LT Messages documentation at senzall.com/ltmessages"));
+			openDocsButton.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)delegate(object s, ValueChangedEventArgs<bool> e)
+			{
+				if (e.get_NewValue() && !e.get_PreviousValue())
+				{
+					OpenUrl("https://senzall.com/ltmessages");
+					Task.Run(async delegate
+					{
+						await Task.Delay(100);
+						openDocsButton.set_Value(false);
+					});
+				}
+			});
+			SettingEntry<bool> openKoFiButton = settings.DefineSetting<bool>("OpenKoFiButton", false, (Func<string>)(() => "Support on Ko-fi ☕"), (Func<string>)(() => "If LT Messages has been useful, a coffee is always appreciated!"));
+			openKoFiButton.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)delegate(object s, ValueChangedEventArgs<bool> e)
+			{
+				if (e.get_NewValue() && !e.get_PreviousValue())
+				{
+					OpenUrl("https://ko-fi.com/senzall");
+					Task.Run(async delegate
+					{
+						await Task.Delay(100);
+						openKoFiButton.set_Value(false);
 					});
 				}
 			});
@@ -1226,70 +1265,146 @@ namespace LTMessages
 			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
 			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0092: Expected O, but got Unknown
 			//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fe: Expected O, but got Unknown
-			//IL_014f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c5: Expected O, but got Unknown
+			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0111: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0115: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0134: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0140: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0147: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0153: Expected O, but got Unknown
 			//IL_0154: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0159: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0167: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0178: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0195: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01eb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0172: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0183: Expected O, but got Unknown
+			//IL_01d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ec: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01f3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01fa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0204: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0221: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0226: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0231: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01fd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0232: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0239: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0240: Unknown result type (might be due to invalid IL or missing references)
-			//IL_024a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0267: Unknown result type (might be due to invalid IL or missing references)
-			//IL_026c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0277: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0243: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0260: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0265: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0270: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0278: Unknown result type (might be due to invalid IL or missing references)
 			//IL_027f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0287: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0291: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0289: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b6: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02be: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02d8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02f6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02fb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0302: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0309: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0310: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ed: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02f2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02fd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0305: Unknown result type (might be due to invalid IL or missing references)
+			//IL_030d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0317: Unknown result type (might be due to invalid IL or missing references)
-			//IL_031c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0326: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0331: Unknown result type (might be due to invalid IL or missing references)
-			//IL_033b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0347: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0352: Unknown result type (might be due to invalid IL or missing references)
-			//IL_035c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0367: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0376: Expected O, but got Unknown
+			//IL_0335: Unknown result type (might be due to invalid IL or missing references)
+			//IL_033a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0341: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0348: Unknown result type (might be due to invalid IL or missing references)
+			//IL_034f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0356: Unknown result type (might be due to invalid IL or missing references)
+			//IL_035b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0365: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0370: Unknown result type (might be due to invalid IL or missing references)
+			//IL_037a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0386: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0391: Unknown result type (might be due to invalid IL or missing references)
+			//IL_039b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03b5: Expected O, but got Unknown
+			//IL_03b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03c9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03fd: Expected O, but got Unknown
+			//IL_03fd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0402: Unknown result type (might be due to invalid IL or missing references)
+			//IL_040d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_041d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0424: Unknown result type (might be due to invalid IL or missing references)
+			//IL_042b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0430: Unknown result type (might be due to invalid IL or missing references)
+			//IL_043a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_044f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0459: Unknown result type (might be due to invalid IL or missing references)
+			//IL_046b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0470: Unknown result type (might be due to invalid IL or missing references)
+			//IL_047b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_048b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0492: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0499: Unknown result type (might be due to invalid IL or missing references)
+			//IL_049e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04ba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04cf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04df: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04f6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04fd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0502: Unknown result type (might be due to invalid IL or missing references)
+			//IL_050c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0521: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0536: Unknown result type (might be due to invalid IL or missing references)
+			//IL_053b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0546: Unknown result type (might be due to invalid IL or missing references)
+			//IL_054d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0554: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0559: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0563: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0575: Unknown result type (might be due to invalid IL or missing references)
+			//IL_058a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_058f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_059a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05e9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05f4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05ff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0607: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0611: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0641: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0646: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0651: Unknown result type (might be due to invalid IL or missing references)
+			//IL_065c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0664: Unknown result type (might be due to invalid IL or missing references)
+			//IL_066e: Unknown result type (might be due to invalid IL or missing references)
 			Panel val = new Panel();
 			((Control)val).set_Size(new Point(500, 400));
 			((Control)val).set_ZIndex(10000);
@@ -1298,20 +1413,39 @@ namespace LTMessages
 			val.set_ShowBorder(true);
 			val.set_CanScroll(false);
 			_editorWindow = val;
-			Label val2 = new Label();
-			val2.set_Text("LT Messages Editor");
-			val2.set_Font(GameService.Content.get_DefaultFont18());
-			val2.set_AutoSizeHeight(true);
-			val2.set_AutoSizeWidth(true);
-			((Control)val2).set_Location(new Point(10, 10));
-			val2.set_TextColor(new Color(220, 200, 150, 255));
-			val2.set_ShowShadow(true);
+			StandardButton val2 = new StandardButton();
+			val2.set_Text("\ud83d\udcdd Editor");
+			((Control)val2).set_Width(82);
+			((Control)val2).set_Location(new Point(10, 8));
 			((Control)val2).set_Parent((Container)(object)_editorWindow);
-			Dropdown val3 = new Dropdown();
-			((Control)val3).set_Location(new Point(10, 40));
-			((Control)val3).set_Width(150);
+			StandardButton editorTabButton = val2;
+			StandardButton val3 = new StandardButton();
+			val3.set_Text("ℹ\ufe0f About");
+			((Control)val3).set_Width(75);
+			((Control)val3).set_Location(new Point(100, 8));
 			((Control)val3).set_Parent((Container)(object)_editorWindow);
-			_listSelectorDropdown = val3;
+			StandardButton aboutTabButton = val3;
+			StandardButton val4 = new StandardButton();
+			val4.set_Text("Close");
+			((Control)val4).set_Width(70);
+			((Control)val4).set_Location(new Point(420, 8));
+			((Control)val4).set_Parent((Container)(object)_editorWindow);
+			((Control)val4).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				CloseEditor();
+			});
+			Panel val5 = new Panel();
+			((Control)val5).set_Location(new Point(0, 36));
+			((Control)val5).set_Size(new Point(500, 364));
+			((Control)val5).set_Parent((Container)(object)_editorWindow);
+			val5.set_CanScroll(false);
+			((Control)val5).set_Visible(true);
+			_editorTabContent = val5;
+			Dropdown val6 = new Dropdown();
+			((Control)val6).set_Location(new Point(10, 4));
+			((Control)val6).set_Width(150);
+			((Control)val6).set_Parent((Container)(object)_editorTabContent);
+			_listSelectorDropdown = val6;
 			for (int i = 0; i < 6; i++)
 			{
 				_listSelectorDropdown.get_Items().Add(GetListDisplayName(i));
@@ -1343,114 +1477,185 @@ namespace LTMessages
 					}
 				}
 			});
-			StandardButton val4 = new StandardButton();
-			val4.set_Text("Defaults");
-			((Control)val4).set_Width(70);
-			((Control)val4).set_Location(new Point(170, 8));
-			((Control)val4).set_Parent((Container)(object)_editorWindow);
-			((Control)val4).add_Click((EventHandler<MouseEventArgs>)delegate
+			StandardButton val7 = new StandardButton();
+			val7.set_Text("Defaults");
+			((Control)val7).set_Width(70);
+			((Control)val7).set_Location(new Point(170, 2));
+			((Control)val7).set_Parent((Container)(object)_editorTabContent);
+			((Control)val7).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				RestoreDefaultMessages();
 			});
-			StandardButton val5 = new StandardButton();
-			val5.set_Text("Reset All");
-			((Control)val5).set_Width(70);
-			((Control)val5).set_Location(new Point(250, 8));
-			((Control)val5).set_Parent((Container)(object)_editorWindow);
-			((Control)val5).add_Click((EventHandler<MouseEventArgs>)delegate
+			StandardButton val8 = new StandardButton();
+			val8.set_Text("Reset All");
+			((Control)val8).set_Width(70);
+			((Control)val8).set_Location(new Point(248, 2));
+			((Control)val8).set_Parent((Container)(object)_editorTabContent);
+			((Control)val8).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				ResetAllListsToDefaults();
 			});
-			StandardButton val6 = new StandardButton();
-			val6.set_Text("Add");
-			((Control)val6).set_Width(70);
-			((Control)val6).set_Location(new Point(340, 8));
-			((Control)val6).set_Parent((Container)(object)_editorWindow);
-			((Control)val6).add_Click((EventHandler<MouseEventArgs>)delegate
+			StandardButton val9 = new StandardButton();
+			val9.set_Text("Add");
+			((Control)val9).set_Width(70);
+			((Control)val9).set_Location(new Point(326, 2));
+			((Control)val9).set_Parent((Container)(object)_editorTabContent);
+			((Control)val9).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				ShowEditDialog(-1, null);
 			});
-			StandardButton val7 = new StandardButton();
-			val7.set_Text("Close");
-			((Control)val7).set_Width(70);
-			((Control)val7).set_Location(new Point(420, 8));
-			((Control)val7).set_Parent((Container)(object)_editorWindow);
-			((Control)val7).add_Click((EventHandler<MouseEventArgs>)delegate
-			{
-				CloseEditor();
-			});
-			StandardButton val8 = new StandardButton();
-			val8.set_Text("Rename");
-			((Control)val8).set_Width(70);
-			((Control)val8).set_Location(new Point(170, 40));
-			((Control)val8).set_Parent((Container)(object)_editorWindow);
-			((Control)val8).add_Click((EventHandler<MouseEventArgs>)delegate
+			StandardButton val10 = new StandardButton();
+			val10.set_Text("Rename");
+			((Control)val10).set_Width(70);
+			((Control)val10).set_Location(new Point(170, 32));
+			((Control)val10).set_Parent((Container)(object)_editorTabContent);
+			((Control)val10).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				ShowRenameListDialog();
 			});
-			StandardButton val9 = new StandardButton();
-			val9.set_Text("Help");
-			((Control)val9).set_Width(70);
-			((Control)val9).set_Location(new Point(420, 40));
-			((Control)val9).set_Parent((Container)(object)_editorWindow);
-			((Control)val9).add_Click((EventHandler<MouseEventArgs>)delegate
+			StandardButton val11 = new StandardButton();
+			val11.set_Text("Help");
+			((Control)val11).set_Width(70);
+			((Control)val11).set_Location(new Point(416, 32));
+			((Control)val11).set_Parent((Container)(object)_editorTabContent);
+			((Control)val11).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				ShowHelpDialog();
 			});
-			FlowPanel val10 = new FlowPanel();
-			val10.set_FlowDirection((ControlFlowDirection)3);
-			((Container)val10).set_WidthSizingMode((SizingMode)2);
-			((Container)val10).set_HeightSizingMode((SizingMode)2);
-			((Panel)val10).set_CanScroll(true);
-			((Control)val10).set_Location(new Point(10, 70));
-			((Control)val10).set_Size(new Point(480, 315));
-			((Control)val10).set_Parent((Container)(object)_editorWindow);
-			val10.set_OuterControlPadding(new Vector2(5f, 5f));
-			val10.set_ControlPadding(new Vector2(0f, 3f));
-			_editorFlowPanel = val10;
+			FlowPanel val12 = new FlowPanel();
+			val12.set_FlowDirection((ControlFlowDirection)3);
+			((Container)val12).set_WidthSizingMode((SizingMode)2);
+			((Container)val12).set_HeightSizingMode((SizingMode)2);
+			((Panel)val12).set_CanScroll(true);
+			((Control)val12).set_Location(new Point(10, 65));
+			((Control)val12).set_Size(new Point(480, 315));
+			((Control)val12).set_Parent((Container)(object)_editorTabContent);
+			val12.set_OuterControlPadding(new Vector2(5f, 5f));
+			val12.set_ControlPadding(new Vector2(0f, 3f));
+			_editorFlowPanel = val12;
+			Panel val13 = new Panel();
+			((Control)val13).set_Location(new Point(0, 36));
+			((Control)val13).set_Size(new Point(500, 240));
+			((Control)val13).set_Parent((Container)(object)_editorWindow);
+			val13.set_CanScroll(false);
+			((Control)val13).set_Visible(false);
+			_aboutTabContent = val13;
+			Label val14 = new Label();
+			val14.set_Text("LT Messages");
+			val14.set_Font(GameService.Content.get_DefaultFont18());
+			val14.set_AutoSizeHeight(true);
+			val14.set_AutoSizeWidth(true);
+			((Control)val14).set_Location(new Point(15, 10));
+			val14.set_TextColor(new Color(220, 200, 150, 255));
+			val14.set_ShowShadow(true);
+			((Control)val14).set_Parent((Container)(object)_aboutTabContent);
+			Label val15 = new Label();
+			val15.set_Text("v1.0.1  ·  Built by Senzall  ·  MIT Licence");
+			val15.set_Font(GameService.Content.get_DefaultFont14());
+			val15.set_AutoSizeHeight(true);
+			val15.set_AutoSizeWidth(true);
+			((Control)val15).set_Location(new Point(15, 42));
+			val15.set_TextColor(new Color(150, 140, 120, 200));
+			((Control)val15).set_Parent((Container)(object)_aboutTabContent);
+			Label val16 = new Label();
+			val16.set_Text("No gems, no paywall — tools built by a fellow player.");
+			val16.set_Font(GameService.Content.get_DefaultFont14());
+			val16.set_AutoSizeHeight(true);
+			val16.set_AutoSizeWidth(true);
+			((Control)val16).set_Location(new Point(15, 64));
+			val16.set_TextColor(new Color(180, 170, 150, 180));
+			((Control)val16).set_Parent((Container)(object)_aboutTabContent);
+			Label val17 = new Label();
+			val17.set_Text("Links open in your browser:");
+			val17.set_AutoSizeHeight(true);
+			val17.set_AutoSizeWidth(true);
+			((Control)val17).set_Location(new Point(15, 88));
+			val17.set_TextColor(new Color(140, 130, 110, 180));
+			((Control)val17).set_Parent((Container)(object)_aboutTabContent);
+			StandardButton val18 = new StandardButton();
+			val18.set_Text("\ud83d\udcd6 Documentation");
+			((Control)val18).set_Width(160);
+			((Control)val18).set_Location(new Point(15, 108));
+			((Control)val18).set_Parent((Container)(object)_aboutTabContent);
+			((Control)val18).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				OpenUrl("https://senzall.com/ltmessages");
+			});
+			StandardButton val19 = new StandardButton();
+			val19.set_Text("\ud83c\udf10 senzall.com");
+			((Control)val19).set_Width(140);
+			((Control)val19).set_Location(new Point(185, 108));
+			((Control)val19).set_Parent((Container)(object)_aboutTabContent);
+			((Control)val19).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				OpenUrl("https://senzall.com");
+			});
+			StandardButton val20 = new StandardButton();
+			val20.set_Text("☕  Support on Ko-fi");
+			((Control)val20).set_Width(200);
+			((Control)val20).set_Location(new Point(15, 142));
+			((Control)val20).set_Parent((Container)(object)_aboutTabContent);
+			((Control)val20).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				OpenUrl("https://ko-fi.com/senzall");
+			});
+			((Control)editorTabButton).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				((Control)_editorTabContent).set_Visible(true);
+				((Control)_aboutTabContent).set_Visible(false);
+				RefreshEditorUI();
+			});
+			((Control)aboutTabButton).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+				((Control)_editorTabContent).set_Visible(false);
+				((Control)_aboutTabContent).set_Visible(true);
+				((Control)_editorWindow).set_Size(new Point(500, 276));
+			});
 		}
 
 		private void RefreshEditorUI()
 		{
-			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f3: Expected O, but got Unknown
-			//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0114: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0122: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0141: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0162: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0167: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0100: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0116: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012b: Expected O, but got Unknown
+			//IL_012b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0130: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0157: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0164: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0179: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0183: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0192: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0202: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0207: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0212: Unknown result type (might be due to invalid IL or missing references)
-			//IL_021a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0222: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022c: Unknown result type (might be due to invalid IL or missing references)
-			if (_editorFlowPanel == null)
+			//IL_019a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01df: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01fb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0206: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0216: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0220: Unknown result type (might be due to invalid IL or missing references)
+			//IL_023a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_023f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_024a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0252: Unknown result type (might be due to invalid IL or missing references)
+			//IL_025a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0264: Unknown result type (might be due to invalid IL or missing references)
+			if (_editorFlowPanel == null || (_editorTabContent != null && !((Control)_editorTabContent).get_Visible()))
 			{
 				return;
 			}
@@ -1463,8 +1668,12 @@ namespace LTMessages
 			int minFlowPanelHeight = 3 * (itemHeight + itemPadding) + outerPadding;
 			flowPanelHeight = Math.Max(flowPanelHeight, minFlowPanelHeight);
 			((Control)_editorFlowPanel).set_Size(new Point(480, flowPanelHeight));
-			int editorHeight = 70 + flowPanelHeight + 20;
-			((Control)_editorWindow).set_Size(new Point(500, editorHeight));
+			int tabContentHeight = 65 + flowPanelHeight + 15;
+			if (_editorTabContent != null)
+			{
+				((Control)_editorTabContent).set_Size(new Point(500, tabContentHeight));
+			}
+			((Control)_editorWindow).set_Size(new Point(500, 36 + tabContentHeight));
 			for (int i = 0; i < _messages.Count; i++)
 			{
 				MessageEntry message = _messages[i];
@@ -2179,7 +2388,7 @@ namespace LTMessages
 			val4.set_CanScroll(true);
 			val4.set_ShowBorder(false);
 			Panel contentPanel = val4;
-			string helpText = "QUICK START\r\n• Left-click [LT] icon to see your messages\r\n• Click a message to send it\r\n• Right-click [LT] icon to open this editor\r\n\r\nMODULE SETTINGS\r\nAll operational settings are found in:\r\nBlish HUD → Manage Modules → LT Messages\r\n\r\nCHAT SETTINGS\r\n\r\nChat Focus - How to open chat:\r\n• Shift+Enter: Opens squad chat directly\r\n• Enter: Opens last used chat (map, say, etc.)\r\n\r\nChat Action - What to do with message:\r\n• Send: Automatically types and sends\r\n• Paste Only: Copies to clipboard (Ctrl+V to paste)\r\n\r\nChat Command - Which channel to send to:\r\n• Default: Uses your current active channel\r\n• /squad: Squad broadcast\r\n• /map: Map chat\r\n• /party: Party chat\r\n• /guild: Guild chat\r\n• /say: Local say\r\n• /1 through /5: Whisper to party members\r\n• /g1 through /g6: Guild channels 1-6\r\n• And more!\r\n\r\nCOMMON CONFIGURATIONS\r\n\r\nFor Squad Broadcast:\r\n• Chat Focus: Shift+Enter\r\n• Chat Action: Send\r\n• Chat Command: Default (or /squad)\r\n\r\nFor Map Chat:\r\n• Chat Focus: Enter\r\n• Chat Action: Send\r\n• Chat Command: /map\r\n\r\nFor Manual Control (Clipboard):\r\n• Chat Action: Paste Only\r\n• (Chat Focus and Command don't matter)\r\n\r\nMESSAGE LISTS\r\n\r\n• Use 6 different lists for different events\r\n• Click dropdown to switch lists\r\n• Click \"Rename\" to give lists custom names\r\n  (e.g., \"WvW\", \"Metas\", \"HP Trains\")\r\n\r\nEDITING MESSAGES\r\n\r\n• Add: Create new message\r\n• Edit: Modify existing message (click in list)\r\n• Delete: Remove message (click Delete on message)\r\n• Save: Saves to file automatically\r\n• Defaults: Restore 30 default commander messages\r\n\r\nTYPING DELAY\r\n\r\n• Adjust if messages don't send reliably\r\n• Lower = faster typing (5-40ms recommended)\r\n• Higher = more reliable on slow systems\r\n• Default: 40ms works for most people\r\n\r\nTROUBLESHOOTING\r\n\r\nMessages not sending?\r\n• Check that LT Mode is enabled\r\n• Set Chat Action to \"Send\"\r\n• Try higher Typing Delay\r\n• Verify Chat Command is correct\r\n\r\nNeed more help?\r\n• GitHub: github.com/senzal/LTMessages\r\n• Blish Discord: discord.gg/FYKN3qh\r\n\r\n---\r\n\r\nTHANK YOU!\r\n\r\nThanks to the amazing Guild Wars 2 community\r\nand the Blish HUD community for using and\r\ncreating incredible plugins that make our\r\ngaming experience even better!\r\n\r\nYour support, feedback, and contributions\r\nhelp make tools like this possible.\r\n\r\nHappy commanding! ♥\r\n\r\n---\r\n\r\nFor full documentation, visit the wiki:\r\nhttps://github.com/senzal/LTMessages/wiki";
+			string helpText = "QUICK START\r\n• Left-click [LT] icon to see your messages\r\n• Click a message to send it\r\n• Right-click [LT] icon to open this editor\r\n\r\nMODULE SETTINGS\r\nAll operational settings are found in:\r\nBlish HUD → Manage Modules → LT Messages\r\n\r\nCHAT SETTINGS\r\n\r\nChat Focus - How to open chat:\r\n• Shift+Enter: Opens squad chat directly\r\n• Enter: Opens last used chat (map, say, etc.)\r\n\r\nChat Action - What to do with message:\r\n• Send: Automatically types and sends\r\n• Paste Only: Copies to clipboard (Ctrl+V to paste)\r\n\r\nChat Command - Which channel to send to:\r\n• Default: Uses your current active channel\r\n• /squad: Squad broadcast\r\n• /map: Map chat\r\n• /party: Party chat\r\n• /guild: Guild chat\r\n• /say: Local say\r\n• /1 through /5: Whisper to party members\r\n• /g1 through /g6: Guild channels 1-6\r\n• And more!\r\n\r\nCOMMON CONFIGURATIONS\r\n\r\nFor Squad Broadcast:\r\n• Chat Focus: Shift+Enter\r\n• Chat Action: Send\r\n• Chat Command: Default (or /squad)\r\n\r\nFor Map Chat:\r\n• Chat Focus: Enter\r\n• Chat Action: Send\r\n• Chat Command: /map\r\n\r\nFor Manual Control (Clipboard):\r\n• Chat Action: Paste Only\r\n• (Chat Focus and Command don't matter)\r\n\r\nMESSAGE LISTS\r\n\r\n• Use 6 different lists for different events\r\n• Click dropdown to switch lists\r\n• Click \"Rename\" to give lists custom names\r\n  (e.g., \"WvW\", \"Metas\", \"HP Trains\")\r\n\r\nEDITING MESSAGES\r\n\r\n• Add: Create new message\r\n• Edit: Modify existing message (click in list)\r\n• Delete: Remove message (click Delete on message)\r\n• Save: Saves to file automatically\r\n• Defaults: Restore 30 default commander messages\r\n\r\nTYPING DELAY\r\n\r\n• Adjust if messages don't send reliably\r\n• Lower = faster typing (5-40ms recommended)\r\n• Higher = more reliable on slow systems\r\n• Default: 40ms works for most people\r\n\r\nTROUBLESHOOTING\r\n\r\nMessages not sending?\r\n• Check that LT Mode is enabled\r\n• Set Chat Action to \"Send\"\r\n• Try higher Typing Delay\r\n• Verify Chat Command is correct\r\n\r\nNeed more help?\r\n• Docs: senzall.com/ltmessages\r\n• GitHub: github.com/senzal/LTMessages\r\n• Blish Discord: discord.gg/FYKN3qh\r\n\r\n---\r\n\r\nTHANK YOU!\r\n\r\nThanks to the amazing Guild Wars 2 community\r\nand the Blish HUD community for using and\r\ncreating incredible plugins that make our\r\ngaming experience even better!\r\n\r\nIf LT Messages has been useful, you can\r\nsupport development on Ko-fi:\r\nko-fi.com/senzall ☕\r\n\r\nHappy commanding! ♥";
 			Label val5 = new Label();
 			val5.set_Text(helpText);
 			((Control)val5).set_Location(new Point(5, 5));
@@ -2586,6 +2795,23 @@ namespace LTMessages
 					ScreenNotification.ShowNotification("LT Messages: Failed to send - " + ex.Message, (NotificationType)2, (Texture2D)null, 4);
 				}
 			});
+		}
+
+		private static void OpenUrl(string url)
+		{
+			try
+			{
+				NativeMethods.AllowSetForegroundWindow(-1);
+				Process.Start(new ProcessStartInfo
+				{
+					FileName = url,
+					UseShellExecute = true
+				});
+			}
+			catch (Exception ex)
+			{
+				Logger.Warn(ex, "Failed to open URL: " + url);
+			}
 		}
 	}
 }
