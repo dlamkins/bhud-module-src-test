@@ -135,19 +135,18 @@ namespace flakysalt.CharacterKeybinds.Presenter
 
 		protected override void UpdateView()
 		{
-			//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0115: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011a: Unknown result type (might be due to invalid IL or missing references)
 			try
 			{
 				base.get_View()?.ClearKeybindEntries();
-				string keybindsFolder = base.get_Model().GetKeybindsFolder();
-				base.get_View()?.SetDefaultKeybindOptions(CharacterKeybindFileUtil.GetKeybindFiles(keybindsFolder), base.get_Model().GetDefaultKeybind());
+				base.get_View()?.SetDefaultKeybindOptions(CharacterKeybindFileUtil.GetKeybindFiles(base.get_Model().GetKeybindsFolder()), base.get_Model().GetDefaultKeybind());
 				foreach (Keymap keymap in base.get_Model().GetKeymaps())
 				{
 					Character character = base.get_Model().GetCharacter(keymap.CharacterName);
-					if (keymap.CharacterName != null && character == null)
+					if ((!string.IsNullOrEmpty(keymap.CharacterName) && character == null) || (!string.IsNullOrEmpty(keymap.KeymapName) && !CharacterKeybindFileUtil.KeybindFileExists(base.get_Model().GetKeybindsFolder(), keymap.KeymapName)))
 					{
 						continue;
 					}
@@ -170,7 +169,7 @@ namespace flakysalt.CharacterKeybinds.Presenter
 					KeybindFlowContainer container = base.get_View()?.AddKeybind();
 					if (container != null)
 					{
-						base.get_View()?.SetKeybindOptions(container, base.get_Model().GetCharacterNames(), base.get_Model().GetProfessionSpecializations(keymap.CharacterName), CharacterKeybindFileUtil.GetKeybindFiles(keybindsFolder));
+						base.get_View()?.SetKeybindOptions(container, base.get_Model().GetCharacterNames(), base.get_Model().GetProfessionSpecializations(keymap.CharacterName), CharacterKeybindFileUtil.GetKeybindFiles(base.get_Model().GetKeybindsFolder()));
 						base.get_View()?.SetKeybindValues(container, keymap, iconAssetId);
 						base.get_View()?.AttachListeners(container, OnApplyKeymap, OnKeymapChange, OnKeymapRemoved);
 					}
