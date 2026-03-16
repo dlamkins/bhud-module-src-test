@@ -33,19 +33,32 @@ namespace BhModule.PathingCategoryExplorerPlugin
 
 		private bool _freezeConfirmation;
 
+		private bool _error;
+
+		private Logger Logger => PathingCategoryExplorerPluginModule.Logger;
+
 		private ModuleSettings Settings => PathingCategoryExplorerPluginModule.Instance.Settings;
 
 		private bool DependenciesMet => PathingCategoryExplorerPluginModule.InstanceManager.get_DependenciesMet();
 
 		public void Upadate()
 		{
-			if (DependenciesMet && _pathingModuleManager == null)
+			if (DependenciesMet && !_error && _pathingModuleManager == null)
 			{
-				GetPathingModuleManager();
-				BuildActions();
-				HookCategoryContextMenu();
-				HookConfirmationWindow();
-				HookTreeNodeBaseDispose();
+				try
+				{
+					GetPathingModuleManager();
+					BuildActions();
+					HookCategoryContextMenu();
+					HookConfirmationWindow();
+					HookTreeNodeBaseDispose();
+				}
+				catch (Exception ex)
+				{
+					_error = true;
+					OnPathingUnload(this, EventArgs.Empty);
+					LogError(ex);
+				}
 			}
 		}
 
@@ -172,7 +185,7 @@ namespace BhModule.PathingCategoryExplorerPlugin
 			Container val = (Container)((instance is Container) ? instance : null);
 			if (val != null)
 			{
-				_disposeContainer(val);
+				_disposeContainer?.Invoke(val);
 			}
 			dispose(instance);
 		}
@@ -183,6 +196,11 @@ namespace BhModule.PathingCategoryExplorerPlugin
 			{
 				show(instance);
 			}
+		}
+
+		private void LogError(Exception ex)
+		{
+			Logger.Error(ex.Message + "\n" + ex.StackTrace);
 		}
 
 		private void BuildContextMenu(Action<object> BuildDeselectAdjacentNodes, object instance)
@@ -205,7 +223,14 @@ namespace BhModule.PathingCategoryExplorerPlugin
 				((Control)val).set_Parent((Container)(object)((Control)pathingNode).get_Menu());
 				((Control)val).add_Click((EventHandler<MouseEventArgs>)delegate
 				{
-					SelectRecursively(pathingNode, checkedValue: true);
+					try
+					{
+						SelectRecursively(pathingNode, checkedValue: true);
+					}
+					catch (Exception ex3)
+					{
+						LogError(ex3);
+					}
 				});
 			}
 			if (Settings.AddDeselectRecursively.get_Value())
@@ -214,19 +239,34 @@ namespace BhModule.PathingCategoryExplorerPlugin
 				((Control)val2).set_Parent((Container)(object)((Control)pathingNode).get_Menu());
 				((Control)val2).add_Click((EventHandler<MouseEventArgs>)delegate
 				{
-					SelectRecursively(pathingNode, checkedValue: false);
+					try
+					{
+						SelectRecursively(pathingNode, checkedValue: false);
+					}
+					catch (Exception ex2)
+					{
+						LogError(ex2);
+					}
 				});
 			}
-			if (Settings.AddDeselectAllOthers.get_Value())
+			if (!Settings.AddDeselectAllOthers.get_Value())
 			{
-				ContextMenuStripItem val3 = new ContextMenuStripItem("Select The Path Exclusively");
-				((Control)val3).set_Parent((Container)(object)((Control)pathingNode).get_Menu());
-				((Control)val3).add_Click((EventHandler<MouseEventArgs>)delegate
+				return;
+			}
+			ContextMenuStripItem val3 = new ContextMenuStripItem("Select The Path Exclusively");
+			((Control)val3).set_Parent((Container)(object)((Control)pathingNode).get_Menu());
+			((Control)val3).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				try
 				{
 					ActiveAllParentsAndSelf(pathingNode);
 					DeselectAllOthers(pathingNode);
-				});
-			}
+				}
+				catch (Exception ex)
+				{
+					LogError(ex);
+				}
+			});
 		}
 
 		private void SelectRecursively(Container pathingNode, bool checkedValue)
@@ -270,7 +310,7 @@ namespace BhModule.PathingCategoryExplorerPlugin
 
 		private void DeselectAllOthers(Container pathingNode)
 		{
-			_deselectAdjacentNodes((Control)(object)pathingNode);
+			_deselectAdjacentNodes?.Invoke((Control)(object)pathingNode);
 			if (!(((object)((Control)pathingNode).get_Parent()).GetType() != ((object)pathingNode).GetType()))
 			{
 				DeselectAllOthers(((Control)pathingNode).get_Parent());
