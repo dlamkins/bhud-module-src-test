@@ -1,0 +1,209 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="EndSubmitBtn"><value>End &amp; Submit</value></data>
+  <data name="ProfitTotalDefault"><value>Total: 0g 0s 0c</value></data>
+  <data name="SettingWidgetIconSize"><value>Widget Icon Size</value></data>
+  <data name="ZoneAnalyzerTooltip"><value>Analyze map for missing achievement fish!</value></data>
+  <data name="ApiErrorKeyOrChar"><value>API Error: Invalid Key or Character Data!</value></data>
+  <data name="SnapshotSaved"><value>API: Snapshot saved! Tracking {0} items in bags.</value></data>
+  <data name="TourneyEndedTitle"><value>Tournament Ended</value></data>
+  <data name="SettingCornerIcon"><value>Corner Icon</value></data>
+  <data name="MetaProgressTooltip"><value>Track Cod Swimming progress!</value></data>
+  <data name="TournamentOverWeighing"><value>Tournament over! Weighing all your fish, please wait...</value></data>
+  <data name="PasteCodePlaceholder"><value>Paste Backup End Code...</value></data>
+  <data name="ReCopyCodeBtn"><value>Re-Copy Code</value></data>
+  <data name="SearchSpeciesPlaceholder"><value>Search species...</value></data>
+  <data name="BaitLabel"><value>Bait</value></data>
+  <data name="CloseBtnText"><value>Close</value></data>
+  <data name="NoAchievFound"><value>No fishing achievement found for this area.</value></data>
+  <data name="NoFishingZone"><value>No Fishing Zone Found</value></data>
+  <data name="CheaterDetected"><value>CHEATER DETECTED</value></data>
+  <data name="PbWeightLabel"><value>PB Weight</value></data>
+  <data name="BackupCopied"><value>Backup Code Re-copied!</value></data>
+  <data name="ProfitTrackerTooltip"><value>Show or hide the live Gold per Hour widget.</value></data>
+  <data name="ResetFiltersBtnText"><value>Reset Filters</value></data>
+  <data name="CornerIconTooltip"><value>Gilled Wars</value></data>
+  <data name="SpeciesLabel"><value>Species</value></data>
+  <data name="BitingNowLoading"><value>Biting Now: Loading...</value></data>
+  <data name="JoinRoomBtn"><value>Join Room</value></data>
+  <data name="CasualLoggingStopped"><value>Casual Logging Stopped.</value></data>
+  <data name="TourneyBegin"><value>Tournament Has Begun!</value></data>
+  <data name="RecentCatchesText"><value>Recent Catches (Last 20)</value></data>
+  <data name="StartingIn"><value>Starting in...</value></data>
+  <data name="SettingTextLayout"><value>Text Layout</value></data>
+  <data name="ReCopyCodeTooltip"><value>Manual backup.</value></data>
+  <data name="Measuring"><value>Measuring...</value></data>
+  <data name="FishLogTooltip"><value>Fish Log</value></data>
+  <data name="SettingLockTimeOfDay"><value>Lock Time of Day Widget</value></data>
+  <data name="TourneyCatchAlert"><value>Tourney Catch: {0} ({1} lbs, {2} in){3}</value></data>
+  <data name="ServerRejected"><value>Server rejected the submissions. I wonder why.</value></data>
+  <data name="PushPbTooltip"><value>Submit PBs to global leaderboards!</value></data>
+  <data name="Scanning"><value>Scanning...</value></data>
+  <data name="TimeColumnHeader"><value>TIME</value></data>
+  <data name="GphDefault"><value>GpH: 0g 0s 0c</value></data>
+  <data name="DrfPaused"><value>DRF Paused</value></data>
+  <data name="ExpandingMainView"><value>Expanding to Main View</value></data>
+  <data name="AutoSyncSuccess"><value>Auto-Sync: PBs successfully uploaded to Leaderboard!</value></data>
+  <data name="Top5CatchesLabel"><value>Top 5 Catches:</value></data>
+  <data name="SettingShowTimeOfDay"><value>Show Time of Day</value></data>
+  <data name="MetaProgressBtnText"><value>Meta Progress</value></data>
+  <data name="UploadingText"><value>Uploading...</value></data>
+  <data name="PushPbBtnText"><value>Push PB to LB</value></data>
+  <data name="SettingShowTimeOfDayDesc"><value>Displays a widget showing current Tyrian time.</value></data>
+  <data name="ApiPaused"><value>API Paused</value></data>
+  <data name="LeaderboardRefreshed"><value>Leaderboard Refreshed!</value></data>
+  <data name="InvalidRoomCode"><value>Invalid Code Format! Use GW-XXXXX</value></data>
+  <data name="SubmitCooldown"><value>Please wait {0} minutes before pushing again.</value></data>
+  <data name="TreasureMessages"><value>Woah, Shiny! You caught some actual treasure!|A sunken chest! Hope it's not full of more boots.|Treasure! You're gonna be rich... probably.|You reeled in the jackpot! Nice catch!|Move over, Blackbeard! Sunken loot acquired.</value></data>
+  <data name="AllLabel"><value>All</value></data>
+  <data name="NoCatchesYet"><value>No catches logged for this species yet.</value></data>
+  <data name="DrfFailed"><value>DRF Connection Failed! Check Token.</value></data>
+  <data name="UseDrfCheckboxText"><value>Use DRF (Real-Time)</value></data>
+  <data name="TargetAllSpecies"><value>Target: All Species</value></data>
+  <data name="CreateRoomBtn"><value>Create Room</value></data>
+  <data name="TourneyResultsInitial"><value>Results submitted to server.</value></data>
+  <data name="TourneyNetworkError"><value>Network Error. Backup code copied to clipboard.</value></data>
+  <data name="SettingUILanguageDesc"><value>Language for the Gilled Wars interface. 'auto' follows your BlishHUD language.</value></data>
+  <data name="ServerError"><value>Server Error: Waiting for website API...</value></data>
+  <data name="SettingAutoStartLoggingDesc"><value>Automatically starts Casual Logging when you load into the game.</value></data>
+  <data name="Joining"><value>Joining...</value></data>
+  <data name="RefreshBtn"><value>Refresh</value></data>
+  <data name="TourneyModeTooltip"><value>Tournament Mode</value></data>
+  <data name="DrfActive"><value>DRF Active</value></data>
+  <data name="RecentCatchesCompact"><value>Recent Catches</value></data>
+  <data name="LeaderboardTitle"><value>Global Leaderboards</value></data>
+  <data name="StartDelayLabel"><value>Start Delay</value></data>
+  <data name="OpenWebsiteTooltip"><value>Open GilledWars.com</value></data>
+  <data name="ExitedTournament"><value>Exited Tournament: Casual Mode Re-Enabled!</value></data>
+  <data name="ToggleGridView"><value>Toggle Grid/List View</value></data>
+  <data name="FishLabel"><value>Fish:</value></data>
+  <data name="SettingToggleUIDesc"><value>Open/Close UI</value></data>
+  <data name="ManualVerifyTitle"><value>Manual Verification &amp; Info</value></data>
+  <data name="MetaTrackerTitle"><value>Meta Achievement Tracker</value></data>
+  <data name="CollapseBtnText"><value>Collapse</value></data>
+  <data name="BitingNowTitle"><value>Biting Now</value></data>
+  <data name="ApiErrorBags"><value>API Error: Could not read bags.</value></data>
+  <data name="ApiErrorRoom"><value>API Error: Could not create room.</value></data>
+  <data name="WeightDropdown"><value>Weight</value></data>
+  <data name="Creating"><value>Creating...</value></data>
+  <data name="CasualFishingLabel"><value>Casual Fishing</value></data>
+  <data name="DrfConnected"><value>DRF Connected! Tracking in real-time.</value></data>
+  <data name="WhatsBitingBtnText"><value>Whats Biting Widget</value></data>
+  <data name="TourneyComplete"><value>Tournament Complete: Casual Mode Re-Enabled!</value></data>
+  <data name="SettingUILanguage"><value>UI Language</value></data>
+  <data name="LeaderboardTooltip"><value>In-Game Top 10 Leaderboard</value></data>
+  <data name="TourneyPostedDiscord"><value>Results successfully auto-posted to host's Discord!</value></data>
+  <data name="RoomNotFound"><value>Room Not Found or Expired!</value></data>
+  <data name="Ready"><value>Ready!</value></data>
+  <data name="CornerIconSubtitle"><value>Gilled Wars - www.gilledwars.com</value></data>
+  <data name="LengthDropdown"><value>Length</value></data>
+  <data name="MaximizeUI"><value>Maximize UI</value></data>
+  <data name="SettingAutoOpenBitingDesc"><value>Automatically opens the 'Currently Biting' widget on load based on your map.</value></data>
+  <data name="SearchFishPlaceholder"><value>Search fish...</value></data>
+  <data name="Top5Catches"><value>Top 5 Catches:</value></data>
+  <data name="SettingDiscordWebhook"><value>Discord Webhook (Host Only)</value></data>
+  <data name="DrfResumeWait"><value>DRF not logging. Will resume on tournament start!</value></data>
+  <data name="SettingDrfToken"><value>DRF Token</value></data>
+  <data name="PushingPBs"><value>Pushing {0} unsubmitted PBs to Leaderboard...</value></data>
+  <data name="CasualFishingTooltip"><value>Casual Fishing</value></data>
+  <data name="NameColumnHeader"><value>NAME</value></data>
+  <data name="BitingApiSyncing"><value>Biting Now: API Syncing...</value></data>
+  <data name="FailedConnectLB"><value>Failed to connect to leaderboards.</value></data>
+  <data name="StartLoggingBtnText"><value>Start Logging</value></data>
+  <data name="JunkMessages"><value>You caught... trash! The oceans are healing.|A soggy boot! A true angler's prize.|Just some literal garbage. Better luck next cast!|You reeled in a tangled mess. Peak gameplay.|Is it a legendary fish?! No... it's just debris.</value></data>
+  <data name="SettingLockTimeOfDayDesc"><value>Prevents the widget from being dragged accidentally.</value></data>
+  <data name="HostTournamentBtnText"><value>Host Tournament</value></data>
+  <data name="TourneyStarted"><value>Tournament Fishing Started!</value></data>
+  <data name="ApiErrorKey"><value>API Error: Paste Custom API Key in Module Settings!</value></data>
+  <data name="ProfitTrackerBtnText"><value>Profit Tracker</value></data>
+  <data name="SettingWidgetIconSizeDesc"><value>Changes the size of the Time of Day icon.</value></data>
+  <data name="SettingCustomApiKeyDesc"><value>Paste an API key with 'inventories', 'characters', and 'progression' permissions here.</value></data>
+  <data name="LoadingData"><value>Loading data...</value></data>
+  <data name="SettingDiscordWebhookDesc"><value>Paste a Discord channel Webhook URL to automatically post your tournament results!</value></data>
+  <data name="UiToggled"><value>Gilled Wars UI Toggled!</value></data>
+  <data name="TournamentOver"><value>Tournament over! Weighing all your fish, please wait...</value></data>
+  <data name="StopLoggingBtnText"><value>Stop Logging</value></data>
+  <data name="CloseLodgeTooltip"><value>Close Lodge</value></data>
+  <data name="SettingAutoStartLogging"><value>Auto-Start Logging</value></data>
+  <data name="WinFactorLabel"><value>Win Factor</value></data>
+  <data name="CaughtAlert"><value>Caught: {0} ({1} lbs, {2} in){3}</value></data>
+  <data name="LoadingTop10"><value>Loading Top 10...</value></data>
+  <data name="TargetPrefix"><value>Target: </value></data>
+  <data name="SettingCornerIconDesc"><value>Choose the icon displayed in the top-left menu.</value></data>
+  <data name="RefreshCooldown"><value>Refresh is on cooldown! Wait {0}m.</value></data>
+  <data name="ExitTourneyTooltip"><value>Close and return to UI.</value></data>
+  <data name="SettingCustomApiKey"><value>Custom API Key</value></data>
+  <data name="WhatsBitingTooltip"><value>Shows missing fish for your current map and time of day.</value></data>
+  <data name="AnglerLabel"><value>Angler</value></data>
+  <data name="MeasureFishBtnText"><value>Measure Fish</value></data>
+  <data name="DurationLabel"><value>Duration (Mins)</value></data>
+  <data name="VerifyCodeBtn"><value>Verify Code</value></data>
+  <data name="NoNewSubmissions"><value>No new submissions found.</value></data>
+  <data name="NoneLogged"><value>NONE LOGGED</value></data>
+  <data name="PbLengthLabel"><value>PB Length</value></data>
+  <data name="JoinTournamentBtnText"><value>Join Tournament</value></data>
+  <data name="HoleColumnHeader"><value>HOLE</value></data>
+  <data name="SortLabel"><value>Sort:</value></data>
+  <data name="SettingShowProfit"><value>Show Live Profit Widget</value></data>
+  <data name="Loading"><value>Loading...</value></data>
+  <data name="ResultsSubmitted"><value>Results Submitted to Server!</value></data>
+  <data name="RankLabel"><value>Rank</value></data>
+  <data name="SettingDrfTokenDesc"><value>Paste your drf.rs token here for Real-Time tracking.</value></data>
+  <data name="SettingShowProfitDesc"><value>Displays an estimated session profit and GpH tracker.</value></data>
+  <data name="TourneyApiFailed"><value>API submission failed. Please copy backup code manually.</value></data>
+  <data name="NoRecordsFound"><value>No records found.</value></data>
+  <data name="FetchingAchievements"><value>Fetching all achievement data...</value></data>
+  <data name="PbClipText"><value>{0} my PB weight for this guy is: {1} lbs and my PB for length is: {2} in</value></data>
+  <data name="TargetSpeciesLabel"><value>Target Species</value></data>
+  <data name="SettingToggleUI"><value>Toggle UI</value></data>
+  <data name="AllSpeciesFilterBtn"><value>All Species</value></data>
+  <data name="CompactModeBtnText"><value>Compact Mode</value></data>
+  <data name="SettingTextLayoutDesc"><value>Where should the time text be relative to the icon?</value></data>
+  <data name="FishMeasuredCount"><value>Current Fish Measured! Scanned {0} items. Found {1} new.</value></data>
+  <data name="BaitColumnHeader"><value>BAIT</value></data>
+  <data name="SettingAutoOpenBiting"><value>Auto-Open Biting Widget</value></data>
+  <data name="HostSetupTitle"><value>Host Setup Configuration</value></data>
+  <data name="TrackingModeLabel"><value>Tracking Mode</value></data>
+  <data name="UseDrfTooltip"><value>Requires drf.rs Addon</value></data>
+  <data name="ToggleBitingTooltip"><value>Toggle between Missing Fish and All Fish</value></data>
+  <data name="TourneyEndedManualTitle"><value>Tournament Ended Manually</value></data>
+  <data name="EnterRoomCodeLabel"><value>Enter Host's Room Code:</value></data>
+  <data name="NetworkError"><value>Network Error!</value></data>
+  <data name="TrackingModesInfo"><value>TRACKING MODES EXPLAINED: • API (5-Min Wait): Uses official GW2 servers. • DRF (Real-Time): Uses drf.rs memory reader.</value></data>
+  <data name="ExitTourneyBtn"><value>Exit Tourney</value></data>
+  <data name="JoinRoomTitle"><value>Join an Active Room</value></data>
+  <data name="MissingLabel"><value>Missing</value></data>
+  <data name="RoomCreated"><value>Room {0} created &amp; copied!</value></data>
+  <data name="RevealBtnText"><value>Reveal</value></data>
+  <data name="FishCodeCopied"><value>Copied {0} code!</value></data>
+  <data name="DrfErrorToken"><value>DRF Error: Token is missing!</value></data>
+  <data name="TourneySubmitting"><value>Submitting your catches to the server...</value></data>
+  <data name="ZoneAnalyzerBtnText"><value>Zone Analyzer</value></data>
+  </root>

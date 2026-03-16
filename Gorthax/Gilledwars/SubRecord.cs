@@ -17,5 +17,7 @@ namespace Gorthax.Gilledwars
 		public string CharacterName { get; set; }
 
 		public bool IsSubmitted { get; set; }
+
+		public string EnglishFishName { get; set; }
 	}
 }

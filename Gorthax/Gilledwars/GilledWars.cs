@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -22,7 +23,9 @@ using Blish_HUD.Input;
 using Blish_HUD.Modules;
 using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
+using GilledWars;
 using Gw2Sharp;
+using Gw2Sharp.WebApi;
 using Gw2Sharp.WebApi.V2;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
@@ -37,6 +40,8 @@ namespace Gorthax.Gilledwars
 	public class GilledWars : Blish_HUD.Modules.Module
 	{
 		private static readonly Logger Logger = Logger.GetLogger<GilledWars>();
+
+		private const string AllSpeciesKey = "__ALL_SPECIES__";
 
 		private SettingEntry<CornerIconType> _cornerIconChoice;
 
@@ -202,13 +207,13 @@ namespace Gorthax.Gilledwars
 
 		private StandardButton _speciesFilterBtn;
 
-		private string _currentlySelectedSpecies = "All Species";
+		private string _currentlySelectedSpecies = "__ALL_SPECIES__";
 
 		private Blish_HUD.Controls.TextBox _speciesSearchBox;
 
-		private static readonly string[] _junkMessages = new string[5] { "You caught... trash! The oceans are healing.", "A soggy boot! A true angler's prize.", "Just some literal garbage. Better luck next cast!", "You reeled in a tangled mess. Peak gameplay.", "Is it a legendary fish?! No... it's just debris." };
+		private string[] _junkMessages;
 
-		private static readonly string[] _treasureMessages = new string[5] { "Woah, Shiny! You caught some actual treasure!", "A sunken chest! Hope it's not full of more boots.", "Treasure! You're gonna be rich... probably.", "You reeled in the jackpot! Nice catch!", "Move over, Blackbeard! Sunken loot acquired." };
+		private string[] _treasureMessages;
 
 		private Blish_HUD.Controls.Panel _achievementPanel;
 
@@ -237,6 +242,8 @@ namespace Gorthax.Gilledwars
 		private SettingEntry<bool> _autoStartBitingWidget;
 
 		private Blish_HUD.Controls.Panel _bitingWidgetPanel;
+
+		private SettingEntry<string> _selectedLanguage;
 
 		private FlowPanel _bitingFishList;
 
@@ -390,6 +397,7 @@ namespace Gorthax.Gilledwars
 			_todTextLayout = settings.DefineSetting("TodTextLayout", TodTextLayout.Right, () => "Text Layout", () => "Where should the time text be relative to the icon?");
 			_todLocX = settings.DefineSetting("TodLocX", 100);
 			_todLocY = settings.DefineSetting("TodLocY", 100);
+			_selectedLanguage = settings.DefineSetting("SelectedLanguage", "auto", () => "UI Language", () => "Language used for the Gilled Wars interface. 'auto' follows your BlishHUD language setting.");
 		}
 
 		private AsyncTexture2D GetCornerIconTexture(CornerIconType type)
@@ -437,17 +445,86 @@ namespace Gorthax.Gilledwars
 			_isTodDragging = false;
 		}
 
+		private string DetectLanguage()
+		{
+			if (_selectedLanguage.Value != "auto" && !string.IsNullOrEmpty(_selectedLanguage.Value))
+			{
+				return _selectedLanguage.Value;
+			}
+			return GameService.Overlay.UserLocale.Value switch
+			{
+				Locale.French => "fr", 
+				Locale.German => "de", 
+				Locale.Spanish => "es", 
+				_ => "en", 
+			};
+		}
+
+		private void ApplyLanguage(string langCode)
+		{
+			_selectedLanguage.Value = langCode;
+			CultureInfo culture = new CultureInfo(langCode);
+			Thread.CurrentThread.CurrentUICulture = culture;
+			Thread.CurrentThread.CurrentCulture = culture;
+			strings.Culture = culture;
+			_junkMessages = strings.JunkMessages.Split('|');
+			_treasureMessages = strings.TreasureMessages.Split('|');
+			if (_mainWindow != null)
+			{
+				_mainWindow.Dispose();
+				_mainWindow = null;
+			}
+			if (_casualCompactPanel != null)
+			{
+				_casualCompactPanel.Dispose();
+				_casualCompactPanel = null;
+			}
+			BuildMainWindow();
+			BuildCasualCompactPanel();
+			if (_profitWidgetPanel != null)
+			{
+				_profitWidgetPanel.Dispose();
+				_profitWidgetPanel = null;
+			}
+			BuildProfitWidget();
+			if (_timeOfDayPanel != null)
+			{
+				_timeOfDayPanel.Dispose();
+				_timeOfDayPanel = null;
+			}
+			BuildTimeOfDayWidget();
+			if (_bitingWidgetPanel != null)
+			{
+				bool visible = _bitingWidgetPanel.Visible;
+				_bitingWidgetPanel.Dispose();
+				_bitingWidgetPanel = null;
+				if (visible)
+				{
+					ToggleBitingWidget(forceOpen: true);
+				}
+			}
+		}
+
 		protected override void OnModuleLoaded(EventArgs e)
 		{
+			CultureInfo culture = new CultureInfo(DetectLanguage());
+			Thread.CurrentThread.CurrentUICulture = culture;
+			Thread.CurrentThread.CurrentCulture = culture;
+			strings.Culture = culture;
+			_junkMessages = strings.JunkMessages.Split('|');
+			_treasureMessages = strings.TreasureMessages.Split('|');
+			Logger.Info("[GilledWars] Culture: " + culture.Name + " | Test: " + strings.StartLoggingBtnText);
+			Logger.Info("Gw2ApiClient Full Type: " + Gw2ApiManager.Gw2ApiClient.GetType().FullName);
 			LoadFishDatabase();
 			InitializeAccountAndLoadAsync();
+			LocalizeFishNamesAsync();
 			BuildMainWindow();
 			BuildCasualCompactPanel();
 			GameService.Input.Mouse.LeftMouseButtonReleased += OnMouseLeftButtonReleased;
 			_cornerIcon = new CornerIcon
 			{
 				Icon = GetCornerIconTexture(_cornerIconChoice.Value),
-				BasicTooltipText = "Gilled Wars",
+				BasicTooltipText = strings.CornerIconTooltip,
 				Priority = 5
 			};
 			_cornerIconChoice.SettingChanged += delegate(object s, ValueChangedEventArgs<CornerIconType> ev)
@@ -463,7 +540,7 @@ namespace Gorthax.Gilledwars
 					{
 						_mainWindow.Visible = true;
 					}
-					ScreenNotification.ShowNotification("Expanding to Main View");
+					ScreenNotification.ShowNotification(strings.ExpandingMainView);
 				}
 				else if (_mainWindow != null)
 				{
@@ -575,7 +652,7 @@ namespace Gorthax.Gilledwars
 			};
 			new Blish_HUD.Controls.Label
 			{
-				Text = "Estimated Session Profit",
+				Text = strings.ProfitTrackerBtnText,
 				Parent = hBar,
 				Location = new Point(5, 0),
 				Font = GameService.Content.DefaultFont14,
@@ -598,7 +675,7 @@ namespace Gorthax.Gilledwars
 			};
 			_profitTotalLabel = new Blish_HUD.Controls.Label
 			{
-				Text = "Total: 0g 0s 0c",
+				Text = strings.ProfitTotalDefault,
 				Parent = _profitWidgetPanel,
 				Location = new Point(10, 25),
 				Font = GameService.Content.DefaultFont14,
@@ -607,7 +684,7 @@ namespace Gorthax.Gilledwars
 			};
 			_gphLabel = new Blish_HUD.Controls.Label
 			{
-				Text = "GpH: 0g 0s 0c",
+				Text = strings.GphDefault,
 				Parent = _profitWidgetPanel,
 				Location = new Point(10, 45),
 				Font = GameService.Content.DefaultFont12,
@@ -703,7 +780,7 @@ namespace Gorthax.Gilledwars
 				TextColor = Microsoft.Xna.Framework.Color.White,
 				ShowShadow = true,
 				StrokeText = true,
-				Text = "Loading..."
+				Text = strings.Loading
 			};
 			UpdateTodLayout();
 			_todWidgetSize.SettingChanged += delegate
@@ -757,7 +834,7 @@ namespace Gorthax.Gilledwars
 			};
 			_lbDynamicTitleLabel = new Blish_HUD.Controls.Label
 			{
-				Text = "Global Leaderboards",
+				Text = strings.LeaderboardTitle,
 				Parent = headerBar,
 				Location = new Point(10, 5),
 				Font = GameService.Content.DefaultFont16,
@@ -796,7 +873,7 @@ namespace Gorthax.Gilledwars
 			};
 			new Blish_HUD.Controls.Label
 			{
-				Text = "Sort:",
+				Text = strings.SortLabel,
 				Parent = _leaderboardWindow,
 				Location = new Point(10, 45),
 				AutoSizeWidth = true
@@ -807,23 +884,23 @@ namespace Gorthax.Gilledwars
 				Location = new Point(50, 40),
 				Width = 90
 			};
-			_lbSortDropdown.Items.Add("Weight");
-			_lbSortDropdown.Items.Add("Length");
-			_lbSortDropdown.SelectedItem = "Weight";
+			_lbSortDropdown.Items.Add(strings.WeightDropdown);
+			_lbSortDropdown.Items.Add(strings.LengthDropdown);
+			_lbSortDropdown.SelectedItem = strings.WeightDropdown;
 			_lbSortDropdown.ValueChanged += async delegate
 			{
 				await RefreshLeaderboardData();
 			};
 			new Blish_HUD.Controls.Label
 			{
-				Text = "Fish:",
+				Text = strings.FishLabel,
 				Parent = _leaderboardWindow,
 				Location = new Point(150, 45),
 				AutoSizeWidth = true
 			};
 			_speciesFilterBtn = new StandardButton
 			{
-				Text = "All Species",
+				Text = strings.AllSpeciesFilterBtn,
 				Parent = _leaderboardWindow,
 				Location = new Point(190, 40),
 				Width = 140
@@ -834,7 +911,7 @@ namespace Gorthax.Gilledwars
 			};
 			StandardButton refreshBtn = new StandardButton
 			{
-				Text = "Refresh",
+				Text = strings.RefreshBtn,
 				Parent = _leaderboardWindow,
 				Location = new Point(350, 40),
 				Width = 90
@@ -845,7 +922,7 @@ namespace Gorthax.Gilledwars
 				if (elapsedMinutes < 5.0 && _cachedLeaderboardData != null)
 				{
 					int remaining = 5 - (int)elapsedMinutes;
-					ScreenNotification.ShowNotification($"Refresh is on cooldown! Wait {remaining}m.", ScreenNotification.NotificationType.Warning);
+					ScreenNotification.ShowNotification(string.Format(strings.RefreshCooldown, remaining), ScreenNotification.NotificationType.Warning);
 				}
 				else
 				{
@@ -854,7 +931,7 @@ namespace Gorthax.Gilledwars
 					_lastLeaderboardFetchTime = DateTime.MinValue;
 					await RefreshLeaderboardData();
 					refreshBtn.Enabled = true;
-					ScreenNotification.ShowNotification("Leaderboard Refreshed!");
+					ScreenNotification.ShowNotification(strings.LeaderboardRefreshed);
 				}
 			};
 			_lbListPanel = new FlowPanel
@@ -878,53 +955,53 @@ namespace Gorthax.Gilledwars
 			_lbListPanel.ClearChildren();
 			new Blish_HUD.Controls.Label
 			{
-				Text = "Loading data...",
+				Text = strings.LoadingData,
 				Parent = _lbListPanel,
 				AutoSizeWidth = true,
 				TextColor = Microsoft.Xna.Framework.Color.Yellow
 			};
 			try
 			{
-				string sortMode = _lbSortDropdown.SelectedItem.ToLower();
+				string sortMode = ((_lbSortDropdown.SelectedItem == strings.LengthDropdown) ? "length" : "weight");
 				string selectedSpecies = _currentlySelectedSpecies;
 				if (_cachedLeaderboardData != null && !((DateTime.Now - _lastLeaderboardFetchTime).TotalMinutes >= 10.0))
 				{
-					goto IL_0205;
+					goto IL_0218;
 				}
 				HttpResponseMessage response = await _httpClient.GetAsync("https://api.gilledwars.com/get-leaderboard");
 				if (response.get_IsSuccessStatusCode())
 				{
 					_cachedLeaderboardData = JsonConvert.DeserializeObject<List<LeaderboardEntry>>(await response.get_Content().ReadAsStringAsync());
 					_lastLeaderboardFetchTime = DateTime.Now;
-					goto IL_0205;
+					goto IL_0218;
 				}
 				_lbListPanel.ClearChildren();
 				new Blish_HUD.Controls.Label
 				{
-					Text = "Server Error: Waiting for website API...",
+					Text = strings.ServerError,
 					Parent = _lbListPanel,
 					TextColor = Microsoft.Xna.Framework.Color.Red,
 					AutoSizeWidth = true
 				};
 				goto end_IL_006d;
-				IL_0205:
+				IL_0218:
 				_lbListPanel.ClearChildren();
 				if (_lbDynamicTitleLabel != null)
 				{
-					_lbDynamicTitleLabel.Text = ((selectedSpecies == "All Species") ? ("Global Top 10 (" + sortMode.ToUpper() + ")") : ("Top 10 " + selectedSpecies));
+					_lbDynamicTitleLabel.Text = ((selectedSpecies == "__ALL_SPECIES__") ? ("Global Top 10 (" + sortMode.ToUpper() + ")") : ("Top 10 " + selectedSpecies));
 				}
 				if (_cachedLeaderboardData == null || _cachedLeaderboardData.Count == 0)
 				{
 					new Blish_HUD.Controls.Label
 					{
-						Text = "No records found.",
+						Text = strings.NoRecordsFound,
 						Parent = _lbListPanel,
 						AutoSizeWidth = true
 					};
 					return;
 				}
 				IEnumerable<LeaderboardEntry> filteredRecords = _cachedLeaderboardData.Where((LeaderboardEntry r) => r.RecordType == sortMode);
-				if (selectedSpecies != "All Species")
+				if (selectedSpecies != "__ALL_SPECIES__")
 				{
 					filteredRecords = filteredRecords.Where((LeaderboardEntry r) => r.FishName.Equals(selectedSpecies, StringComparison.OrdinalIgnoreCase));
 				}
@@ -933,7 +1010,7 @@ namespace Gorthax.Gilledwars
 				{
 					new Blish_HUD.Controls.Label
 					{
-						Text = "No catches logged for this species yet.",
+						Text = strings.NoCatchesYet,
 						Parent = _lbListPanel,
 						AutoSizeWidth = true,
 						TextColor = Microsoft.Xna.Framework.Color.LightGray
@@ -948,7 +1025,7 @@ namespace Gorthax.Gilledwars
 				};
 				new Blish_HUD.Controls.Label
 				{
-					Text = "Rank",
+					Text = strings.RankLabel,
 					Parent = headerRow,
 					Location = new Point(5, 5),
 					Width = 45,
@@ -957,7 +1034,7 @@ namespace Gorthax.Gilledwars
 				};
 				new Blish_HUD.Controls.Label
 				{
-					Text = "Angler",
+					Text = strings.AnglerLabel,
 					Parent = headerRow,
 					Location = new Point(65, 5),
 					Width = 160,
@@ -966,7 +1043,7 @@ namespace Gorthax.Gilledwars
 				};
 				new Blish_HUD.Controls.Label
 				{
-					Text = "Species",
+					Text = strings.SpeciesLabel,
 					Parent = headerRow,
 					Location = new Point(235, 5),
 					Width = 110,
@@ -1127,7 +1204,7 @@ namespace Gorthax.Gilledwars
 				_lbListPanel.ClearChildren();
 				new Blish_HUD.Controls.Label
 				{
-					Text = "Network Error!",
+					Text = strings.NetworkError,
 					Parent = _lbListPanel,
 					TextColor = Microsoft.Xna.Framework.Color.Red,
 					AutoSizeWidth = true
@@ -1168,7 +1245,7 @@ namespace Gorthax.Gilledwars
 			};
 			new Blish_HUD.Controls.Label
 			{
-				Text = "Fetching all achievement data...",
+				Text = strings.FetchingAchievements,
 				Parent = scroll,
 				Font = GameService.Content.DefaultFont14,
 				TextColor = Microsoft.Xna.Framework.Color.Yellow,
@@ -1206,7 +1283,7 @@ namespace Gorthax.Gilledwars
 				};
 				new Blish_HUD.Controls.Label
 				{
-					Text = "Meta Achievement Tracker",
+					Text = strings.MetaTrackerTitle,
 					Parent = hBar,
 					Location = new Point(10, 5),
 					Font = GameService.Content.DefaultFont16,
@@ -1357,7 +1434,7 @@ namespace Gorthax.Gilledwars
 				StandardButton btn = new StandardButton
 				{
 					Parent = gridPanel,
-					Text = "Loading...",
+					Text = strings.Loading,
 					Width = 150,
 					Height = 35
 				};
@@ -1408,7 +1485,7 @@ namespace Gorthax.Gilledwars
 				Parent = _speciesSelectionWindow,
 				Location = new Point(10, 10),
 				Width = 240,
-				PlaceholderText = "Search species..."
+				PlaceholderText = strings.SearchSpeciesPlaceholder
 			};
 			FlowPanel scroll = new FlowPanel
 			{
@@ -1422,13 +1499,13 @@ namespace Gorthax.Gilledwars
 			{
 				scroll.ClearChildren();
 				StandardButton standardButton = new StandardButton();
-				standardButton.Text = "All Species";
+				standardButton.Text = strings.AllSpeciesFilterBtn;
 				standardButton.Parent = scroll;
 				standardButton.Width = 230;
 				standardButton.Click += async delegate
 				{
-					_currentlySelectedSpecies = "All Species";
-					_speciesFilterBtn.Text = "All Species";
+					_currentlySelectedSpecies = "__ALL_SPECIES__";
+					_speciesFilterBtn.Text = strings.AllSpeciesFilterBtn;
 					_speciesSelectionWindow.Visible = false;
 					await RefreshLeaderboardData();
 				};
@@ -1540,9 +1617,16 @@ namespace Gorthax.Gilledwars
 			return BitConverter.Int64BitsToDouble(BitConverter.DoubleToInt64Bits(value) ^ (((long)(seed.GetHashCode() ^ index) << 32) | (uint)(seed.GetHashCode() ^ index)));
 		}
 
-		private string GenerateSignature(double weight, double length, string name, bool isSuperPb, string salt)
+		private string GenerateSignature(double weight, double length, int itemId, bool isSuperPb, string salt)
 		{
-			string raw = $"{salt}|{weight:F2}|{length:F2}|{name}|{isSuperPb}";
+			string raw = string.Format(CultureInfo.InvariantCulture, "{0}|{1:F2}|{2:F2}|{3}|{4}", salt, weight, length, itemId, isSuperPb);
+			using SHA256 sha256 = SHA256.Create();
+			return Convert.ToBase64String(sha256.ComputeHash(Encoding.UTF8.GetBytes(raw))).Substring(0, 12);
+		}
+
+		private string GenerateSignatureLegacy(double weight, double length, string name, bool isSuperPb, string salt)
+		{
+			string raw = string.Format(CultureInfo.InvariantCulture, "{0}|{1:F2}|{2:F2}|{3}|{4}", salt, weight, length, name, isSuperPb);
 			using SHA256 sha256 = SHA256.Create();
 			return Convert.ToBase64String(sha256.ComputeHash(Encoding.UTF8.GetBytes(raw))).Substring(0, 12);
 		}
@@ -1671,41 +1755,75 @@ namespace Gorthax.Gilledwars
 			RefreshFishLogUI();
 		}
 
+		private string GetPbFileName()
+		{
+			if (!(_localAccountName == "UnknownAccount"))
+			{
+				return "personal_bests_" + _localAccountName + ".json";
+			}
+			return "personal_bests.json";
+		}
+
 		private void LoadPersonalBests()
 		{
-			string fileName = ((_localAccountName == "UnknownAccount") ? "personal_bests.json" : ("personal_bests_" + _localAccountName + ".json"));
-			string path = Path.Combine(ModuleDirectory, fileName);
+			string path = Path.Combine(ModuleDirectory, GetPbFileName());
 			_isCheater = false;
+			_personalBests = new Dictionary<int, PersonalBestRecord>();
 			if (!System.IO.File.Exists(path))
 			{
 				return;
 			}
 			try
 			{
-				Dictionary<int, PersonalBestRecord>? obj = JsonConvert.DeserializeObject<Dictionary<int, PersonalBestRecord>>(System.IO.File.ReadAllText(path)) ?? new Dictionary<int, PersonalBestRecord>();
-				_personalBests = new Dictionary<int, PersonalBestRecord>();
+				string json = System.IO.File.ReadAllText(path);
 				string seed = GetGlobalSeed();
-				foreach (KeyValuePair<int, PersonalBestRecord> kvp in obj!)
+				PersonalBestFile pbFile = null;
+				try
 				{
-					int itemId = kvp.Key;
-					PersonalBestRecord rec = kvp.Value;
-					ValidateRecord(rec.BestWeight);
-					ValidateRecord(rec.BestLength);
-					_personalBests[itemId] = rec;
-					_caughtFishIds.Add(itemId);
-					void ValidateRecord(SubRecord sub)
-					{
-						if (sub != null)
-						{
-							string cName = sub.CharacterName ?? "Unknown";
-							string expected = GenerateSignature(sub.Weight, sub.Length, _allFishEntries.FirstOrDefault((FishUIEntry x) => x.Data.ItemId == itemId)?.Data.Name ?? "Unknown", sub.IsSuperPb, seed + cName + _localAccountName);
-							if (sub.Signature != expected)
-							{
-								sub.IsCheater = (_isCheater = true);
-							}
-						}
-					}
+					pbFile = JsonConvert.DeserializeObject<PersonalBestFile>(json);
 				}
+				catch
+				{
+				}
+				if (pbFile != null && pbFile.Version >= 2 && pbFile.Records != null)
+				{
+					Logger.Info("[GilledWars] Loading PB file version 2");
+					foreach (KeyValuePair<int, PersonalBestRecord> kvp2 in pbFile.Records)
+					{
+						int itemId = kvp2.Key;
+						PersonalBestRecord rec2 = kvp2.Value;
+						ValidateSubRecord(rec2.BestWeight, itemId, seed);
+						ValidateSubRecord(rec2.BestLength, itemId, seed);
+						_personalBests[itemId] = rec2;
+						_caughtFishIds.Add(itemId);
+					}
+					return;
+				}
+				Logger.Info("[GilledWars] Migrating PB file from version 1 to version 2");
+				Dictionary<int, PersonalBestRecord> legacy = null;
+				try
+				{
+					legacy = JsonConvert.DeserializeObject<Dictionary<int, PersonalBestRecord>>(json);
+				}
+				catch
+				{
+				}
+				if (legacy == null)
+				{
+					return;
+				}
+				foreach (KeyValuePair<int, PersonalBestRecord> kvp in legacy)
+				{
+					int itemId2 = kvp.Key;
+					PersonalBestRecord rec = kvp.Value;
+					string englishName = _allFishEntries.FirstOrDefault((FishUIEntry x) => x.Data.ItemId == itemId2)?.Data.Name ?? "Unknown";
+					MigrateSubRecord(rec.BestWeight, itemId2, englishName, seed);
+					MigrateSubRecord(rec.BestLength, itemId2, englishName, seed);
+					_personalBests[itemId2] = rec;
+					_caughtFishIds.Add(itemId2);
+				}
+				SavePersonalBests();
+				Logger.Info("[GilledWars] PB migration complete — saved as version 2");
 			}
 			catch (Exception ex)
 			{
@@ -1713,13 +1831,60 @@ namespace Gorthax.Gilledwars
 			}
 		}
 
+		private void ValidateSubRecord(SubRecord sub, int itemId, string seed)
+		{
+			if (sub != null)
+			{
+				string cName = sub.CharacterName ?? "Unknown";
+				string expected = GenerateSignature(sub.Weight, sub.Length, itemId, sub.IsSuperPb, seed + cName + _localAccountName);
+				if (sub.Signature != expected)
+				{
+					Logger.Warn($"[GilledWars] CHEAT CHECK FAIL itemId={itemId} stored={sub.Signature} expected={expected} weight={sub.Weight} len={sub.Length} char={cName} account={_localAccountName} super={sub.IsSuperPb} seed={seed}");
+					sub.IsCheater = (_isCheater = true);
+				}
+				else
+				{
+					Logger.Info($"[GilledWars] CHEAT CHECK OK itemId={itemId}");
+				}
+			}
+		}
+
+		private void MigrateSubRecord(SubRecord sub, int itemId, string englishName, string seed)
+		{
+			if (sub == null)
+			{
+				return;
+			}
+			string cName = sub.CharacterName ?? "Unknown";
+			string expectedNew = GenerateSignature(sub.Weight, sub.Length, itemId, sub.IsSuperPb, seed + cName + _localAccountName);
+			if (!(sub.Signature == expectedNew))
+			{
+				string expectedOld = GenerateSignatureLegacy(sub.Weight, sub.Length, englishName, sub.IsSuperPb, seed + cName + _localAccountName);
+				if (sub.Signature == expectedOld)
+				{
+					sub.Signature = expectedNew;
+					sub.EnglishFishName = englishName;
+					Logger.Info($"[GilledWars] Migrated record for {englishName} (itemId {itemId})");
+				}
+				else
+				{
+					Logger.Warn($"[GilledWars] Migration: invalid signature for {englishName} (itemId {itemId}) — marking as cheater");
+					sub.IsCheater = (_isCheater = true);
+				}
+			}
+		}
+
 		private void SavePersonalBests()
 		{
-			string fileName = ((_localAccountName == "UnknownAccount") ? "personal_bests.json" : ("personal_bests_" + _localAccountName + ".json"));
-			string path = Path.Combine(ModuleDirectory, fileName);
+			string path = Path.Combine(ModuleDirectory, GetPbFileName());
 			try
 			{
-				System.IO.File.WriteAllText(path, JsonConvert.SerializeObject(_personalBests));
+				PersonalBestFile pbFile = new PersonalBestFile
+				{
+					Version = 2,
+					Records = _personalBests
+				};
+				System.IO.File.WriteAllText(path, JsonConvert.SerializeObject(pbFile, Formatting.Indented));
 			}
 			catch (Exception ex)
 			{
@@ -1782,7 +1947,7 @@ namespace Gorthax.Gilledwars
 			Dictionary<int, int> currentInventory = await GetActiveCharacterBags();
 			if (currentInventory == null)
 			{
-				ScreenNotification.ShowNotification("API Error: Could not read bags.", ScreenNotification.NotificationType.Error);
+				ScreenNotification.ShowNotification(strings.ApiErrorBags, ScreenNotification.NotificationType.Error);
 				return;
 			}
 			int newCatches = 0;
@@ -1805,25 +1970,25 @@ namespace Gorthax.Gilledwars
 				}
 			}
 			_startInventory = currentInventory;
-			ScreenNotification.ShowNotification($"Current Fish Measured! Scanned {currentInventory.Values.Sum()} items. Found {newCatches} new.");
+			ScreenNotification.ShowNotification(string.Format(strings.FishMeasuredCount, currentInventory.Values.Sum(), newCatches));
 		}
 
 		private async Task TakeInventorySnapshot()
 		{
 			if (string.IsNullOrWhiteSpace(_customApiKey.Value))
 			{
-				ScreenNotification.ShowNotification("API Error: Paste Custom API Key in Module Settings!", ScreenNotification.NotificationType.Error);
+				ScreenNotification.ShowNotification(strings.ApiErrorKey, ScreenNotification.NotificationType.Error);
 				return;
 			}
 			Dictionary<int, int> inv = await GetActiveCharacterBags();
 			if (inv != null)
 			{
 				_startInventory = inv;
-				ScreenNotification.ShowNotification($"API: Snapshot saved! Tracking {inv.Values.Sum()} items in bags.");
+				ScreenNotification.ShowNotification(string.Format(strings.SnapshotSaved, inv.Values.Sum()));
 			}
 			else
 			{
-				ScreenNotification.ShowNotification("API Error: Invalid Key or Character Data!", ScreenNotification.NotificationType.Error);
+				ScreenNotification.ShowNotification(strings.ApiErrorKeyOrChar, ScreenNotification.NotificationType.Error);
 			}
 		}
 
@@ -1831,7 +1996,7 @@ namespace Gorthax.Gilledwars
 		{
 			if (string.IsNullOrWhiteSpace(_drfToken.Value))
 			{
-				ScreenNotification.ShowNotification("DRF Error: Token is missing!", ScreenNotification.NotificationType.Error);
+				ScreenNotification.ShowNotification(strings.DrfErrorToken, ScreenNotification.NotificationType.Error);
 				return;
 			}
 			try
@@ -1844,13 +2009,13 @@ namespace Gorthax.Gilledwars
 				await _drfSocket.ConnectAsync(new Uri(drfUrl), _drfCts.Token);
 				ArraySegment<byte> authBuffer = new ArraySegment<byte>(Encoding.UTF8.GetBytes("Bearer " + _drfToken.Value));
 				await _drfSocket.SendAsync(authBuffer, WebSocketMessageType.Text, endOfMessage: true, _drfCts.Token);
-				ScreenNotification.ShowNotification("DRF Connected! Tracking in real-time.", ScreenNotification.NotificationType.Warning);
+				ScreenNotification.ShowNotification(strings.DrfConnected, ScreenNotification.NotificationType.Warning);
 				_drfReceiveTask = Task.Run((Func<Task>)ReceiveDrfMessages, _drfCts.Token);
 			}
 			catch (Exception ex)
 			{
 				Logger.Error(ex, "Failed to connect to DRF WebSocket.");
-				ScreenNotification.ShowNotification("DRF Connection Failed! Check Token.", ScreenNotification.NotificationType.Error);
+				ScreenNotification.ShowNotification(strings.DrfFailed, ScreenNotification.NotificationType.Error);
 			}
 		}
 
@@ -1951,7 +2116,7 @@ namespace Gorthax.Gilledwars
 				_isSyncTimerActive = false;
 				if (_casualLogToggleBtn != null)
 				{
-					_casualLogToggleBtn.Text = "Start Logging";
+					_casualLogToggleBtn.Text = strings.StartLoggingBtnText;
 				}
 				if (_casualMeasureBtn != null)
 				{
@@ -2068,8 +2233,8 @@ namespace Gorthax.Gilledwars
 				length = Math.Round(maxL * bonusMult, 2);
 			}
 			string charName = GameService.Gw2Mumble.PlayerCharacter.Name ?? "Unknown";
-			string globalSig = GenerateSignature(weight, length, matchingFish.Name, isSuperPb, GetGlobalSeed() + charName + _localAccountName);
-			string tSig = (_isTournamentActive ? GenerateSignature(weight, length, matchingFish.Name, isSuperPb, _tourneyRoomCode) : "");
+			string globalSig = GenerateSignature(weight, length, itemId, isSuperPb, GetGlobalSeed() + charName + _localAccountName);
+			string tSig = (_isTournamentActive ? GenerateSignature(weight, length, itemId, isSuperPb, _tourneyRoomCode) : "");
 			bool isNewPbWeight = false;
 			bool isNewPbLength = false;
 			if (!_personalBests.ContainsKey(itemId))
@@ -2157,16 +2322,16 @@ namespace Gorthax.Gilledwars
 				{
 					_tourneyCatches.Add(catchRecord);
 					UpdateActiveTourneyCoolerUI();
-					ScreenNotification.ShowNotification($"Tourney Catch: {catchRecord.Name} ({catchRecord.Weight} lbs, {catchRecord.Length} in){pbAlert}", notifType);
+					ScreenNotification.ShowNotification(string.Format(strings.TourneyCatchAlert, catchRecord.Name, catchRecord.Weight, catchRecord.Length, pbAlert), notifType);
 				}
 				else
 				{
-					ScreenNotification.ShowNotification($"Caught: {catchRecord.Name} ({catchRecord.Weight} lbs, {catchRecord.Length} in){pbAlert}", notifType);
+					ScreenNotification.ShowNotification(string.Format(strings.CaughtAlert, catchRecord.Name, catchRecord.Weight, catchRecord.Length, pbAlert), notifType);
 				}
 			}
 			else
 			{
-				ScreenNotification.ShowNotification($"Caught: {catchRecord.Name} ({catchRecord.Weight} lbs, {catchRecord.Length} in){pbAlert}", notifType);
+				ScreenNotification.ShowNotification(string.Format(strings.CaughtAlert, catchRecord.Name, catchRecord.Weight, catchRecord.Length, pbAlert), notifType);
 			}
 			if (_bitingWidgetPanel != null && _bitingWidgetPanel.Visible)
 			{
@@ -2199,7 +2364,7 @@ namespace Gorthax.Gilledwars
 			};
 			Blish_HUD.Controls.Label titleLabel = new Blish_HUD.Controls.Label
 			{
-				Text = "Gilled Wars - www.gilledwars.com",
+				Text = strings.CornerIconSubtitle,
 				Parent = headerBar,
 				Location = new Point(10, 5),
 				Font = GameService.Content.DefaultFont16,
@@ -2214,7 +2379,81 @@ namespace Gorthax.Gilledwars
 				Font = GameService.Content.DefaultFont16,
 				TextColor = Microsoft.Xna.Framework.Color.Red,
 				AutoSizeWidth = true,
-				BasicTooltipText = "Close Lodge"
+				BasicTooltipText = strings.CloseLodgeTooltip
+			};
+			Image flagEN = new Image
+			{
+				Texture = ContentsManager.GetTexture("flags/gb.png"),
+				Parent = headerBar,
+				Size = new Point(26, 18),
+				Location = new Point(headerBar.Width - 135, 6),
+				BasicTooltipText = "English (click again to reset to BlishHUD language)"
+			};
+			Image flagFR = new Image
+			{
+				Texture = ContentsManager.GetTexture("flags/fr.png"),
+				Parent = headerBar,
+				Size = new Point(26, 18),
+				Location = new Point(headerBar.Width - 107, 6),
+				BasicTooltipText = "Français (click again to reset to BlishHUD language)"
+			};
+			Image flagDE = new Image
+			{
+				Texture = ContentsManager.GetTexture("flags/de.png"),
+				Parent = headerBar,
+				Size = new Point(26, 18),
+				Location = new Point(headerBar.Width - 79, 6),
+				BasicTooltipText = "Deutsch (click again to reset to BlishHUD language)"
+			};
+			Image flagES = new Image
+			{
+				Texture = ContentsManager.GetTexture("flags/es.png"),
+				Parent = headerBar,
+				Size = new Point(26, 18),
+				Location = new Point(headerBar.Width - 51, 6),
+				BasicTooltipText = "Español (click again to reset to BlishHUD language)"
+			};
+			Action updateFlagOpacity = delegate
+			{
+				string text5 = DetectLanguage();
+				_ = _selectedLanguage.Value;
+				flagEN.Opacity = ((text5 == "en") ? 1f : 0.3f);
+				flagFR.Opacity = ((text5 == "fr") ? 1f : 0.3f);
+				flagDE.Opacity = ((text5 == "de") ? 1f : 0.3f);
+				flagES.Opacity = ((text5 == "es") ? 1f : 0.3f);
+			};
+			updateFlagOpacity();
+			flagEN.Click += delegate
+			{
+				string text4 = ((_selectedLanguage.Value == "en") ? "auto" : "en");
+				ApplyLanguage((text4 == "auto") ? DetectLanguage() : text4);
+				_selectedLanguage.Value = text4;
+				updateFlagOpacity();
+				ScreenNotification.ShowNotification((text4 == "auto") ? "Language reset to BlishHUD default." : "Language: English — reopen UI to apply.");
+			};
+			flagFR.Click += delegate
+			{
+				string text3 = ((_selectedLanguage.Value == "fr") ? "auto" : "fr");
+				ApplyLanguage((text3 == "auto") ? DetectLanguage() : text3);
+				_selectedLanguage.Value = text3;
+				updateFlagOpacity();
+				ScreenNotification.ShowNotification((text3 == "auto") ? "Langue réinitialisée." : "Langue: Français — rouvrir l'UI pour appliquer.");
+			};
+			flagDE.Click += delegate
+			{
+				string text2 = ((_selectedLanguage.Value == "de") ? "auto" : "de");
+				ApplyLanguage((text2 == "auto") ? DetectLanguage() : text2);
+				_selectedLanguage.Value = text2;
+				updateFlagOpacity();
+				ScreenNotification.ShowNotification((text2 == "auto") ? "Sprache zurückgesetzt." : "Sprache: Deutsch — UI neu öffnen.");
+			};
+			flagES.Click += delegate
+			{
+				string text = ((_selectedLanguage.Value == "es") ? "auto" : "es");
+				ApplyLanguage((text == "auto") ? DetectLanguage() : text);
+				_selectedLanguage.Value = text;
+				updateFlagOpacity();
+				ScreenNotification.ShowNotification((text == "auto") ? "Idioma restablecido." : "Idioma: Español — reabrir UI para aplicar.");
 			};
 			xCloseBtn.Click += delegate
 			{
@@ -2281,7 +2520,7 @@ namespace Gorthax.Gilledwars
 			{
 				Parent = navPanel,
 				Size = new Point(32, 32),
-				BasicTooltipText = "Casual Fishing"
+				BasicTooltipText = strings.CasualFishingTooltip
 			};
 			Image obj = new Image
 			{
@@ -2302,7 +2541,7 @@ namespace Gorthax.Gilledwars
 			image.Texture = ContentsManager.GetTexture("images/tournamentico.png");
 			image.Parent = navPanel;
 			image.Size = new Point(32, 32);
-			image.BasicTooltipText = "Tournament Mode";
+			image.BasicTooltipText = strings.TourneyModeTooltip;
 			image.Click += delegate
 			{
 				ShowPanel(_tournamentPanel);
@@ -2311,7 +2550,7 @@ namespace Gorthax.Gilledwars
 			image2.Texture = ContentsManager.GetTexture("images/fishlogico.png");
 			image2.Parent = navPanel;
 			image2.Size = new Point(32, 32);
-			image2.BasicTooltipText = "Fish Log";
+			image2.BasicTooltipText = strings.FishLogTooltip;
 			image2.Click += delegate
 			{
 				ShowPanel(_fishLogPanel);
@@ -2320,17 +2559,17 @@ namespace Gorthax.Gilledwars
 			image3.Texture = ContentsManager.GetTexture("images/leaderboardico.png");
 			image3.Parent = navPanel;
 			image3.Size = new Point(32, 32);
-			image3.BasicTooltipText = "In-Game Top 10 Leaderboard";
+			image3.BasicTooltipText = strings.LeaderboardTooltip;
 			image3.Click += delegate
 			{
-				ScreenNotification.ShowNotification("Loading Top 10...");
+				ScreenNotification.ShowNotification(strings.LoadingTop10);
 				ShowLeaderboardWindow();
 			};
 			Image image4 = new Image();
 			image4.Texture = ContentsManager.GetTexture("images/websiteico.png");
 			image4.Parent = navPanel;
 			image4.Size = new Point(32, 32);
-			image4.BasicTooltipText = "Open GilledWars.com";
+			image4.BasicTooltipText = strings.OpenWebsiteTooltip;
 			image4.Click += delegate
 			{
 				Process.Start(new ProcessStartInfo
@@ -2362,6 +2601,7 @@ namespace Gorthax.Gilledwars
 			{
 				return;
 			}
+			_categoryPanels.Clear();
 			Blish_HUD.Controls.Panel filterPanel = new Blish_HUD.Controls.Panel
 			{
 				Parent = parent,
@@ -2373,7 +2613,7 @@ namespace Gorthax.Gilledwars
 				Parent = filterPanel,
 				Location = new Point(0, 0),
 				Width = 140,
-				PlaceholderText = "Search fish..."
+				PlaceholderText = strings.SearchFishPlaceholder
 			};
 			Dropdown rarityDrop = new Dropdown
 			{
@@ -2407,48 +2647,48 @@ namespace Gorthax.Gilledwars
 			};
 			StandardButton collapseBtn = new StandardButton
 			{
-				Text = "Collapse",
+				Text = strings.CollapseBtnText,
 				Parent = filterPanel,
 				Location = new Point(240, 35),
-				Width = 80
+				Width = 100
 			};
 			StandardButton revealBtn = new StandardButton
 			{
-				Text = "Reveal",
+				Text = strings.RevealBtnText,
 				Parent = filterPanel,
-				Location = new Point(330, 35),
-				Width = 80
+				Location = new Point(350, 35),
+				Width = 100
 			};
 			StandardButton obj = new StandardButton
 			{
-				Text = "Reset Filters",
+				Text = strings.ResetFiltersBtnText,
 				Parent = filterPanel,
-				Location = new Point(420, 35),
-				Width = 100
+				Location = new Point(460, 35),
+				Width = 130
 			};
 			StandardButton pushLeaderboardBtn = new StandardButton
 			{
-				Text = "Push PB to LB",
+				Text = strings.PushPbBtnText,
 				Parent = filterPanel,
 				Location = new Point(0, 70),
-				Width = 120,
-				BasicTooltipText = "Submit PBs to global leaderboards!"
+				Width = 150,
+				BasicTooltipText = strings.PushPbTooltip
 			};
 			StandardButton zoneAnalyzerBtn = new StandardButton
 			{
-				Text = "Zone Analyzer",
+				Text = strings.ZoneAnalyzerBtnText,
 				Parent = filterPanel,
-				Location = new Point(130, 70),
-				Width = 120,
-				BasicTooltipText = "Analyze map for missing achievement fish!"
+				Location = new Point(160, 70),
+				Width = 150,
+				BasicTooltipText = strings.ZoneAnalyzerTooltip
 			};
 			StandardButton metaProgressBtn = new StandardButton
 			{
-				Text = "Meta Progress",
+				Text = strings.MetaProgressBtnText,
 				Parent = filterPanel,
-				Location = new Point(260, 70),
-				Width = 120,
-				BasicTooltipText = "Track Cod Swimming progress!"
+				Location = new Point(320, 70),
+				Width = 150,
+				BasicTooltipText = strings.MetaProgressTooltip
 			};
 			FlowPanel scroll = new FlowPanel
 			{
@@ -2510,16 +2750,15 @@ namespace Gorthax.Gilledwars
 			{
 				if ((DateTime.Now - _lastSubmitTime).TotalMinutes < 5.0)
 				{
-					double rem = 5.0 - (DateTime.Now - _lastSubmitTime).TotalMinutes;
-					ScreenNotification.ShowNotification($"Please wait {rem:F1} minutes before pushing again.", ScreenNotification.NotificationType.Error);
+					ScreenNotification.ShowNotification(string.Format(arg0: (5.0 - (DateTime.Now - _lastSubmitTime).TotalMinutes).ToString("F1"), format: strings.SubmitCooldown), ScreenNotification.NotificationType.Error);
 				}
 				else
 				{
 					pushLeaderboardBtn.Enabled = false;
-					pushLeaderboardBtn.Text = "Uploading...";
+					pushLeaderboardBtn.Text = strings.UploadingText;
 					await ForceUploadPB();
 					_lastSubmitTime = DateTime.Now;
-					pushLeaderboardBtn.Text = "Push PBs";
+					pushLeaderboardBtn.Text = strings.PushPbBtnText;
 					pushLeaderboardBtn.Enabled = true;
 				}
 			};
@@ -2527,7 +2766,7 @@ namespace Gorthax.Gilledwars
 			zoneAnalyzerBtn.Click += async delegate
 			{
 				zoneAnalyzerBtn.Enabled = false;
-				zoneAnalyzerBtn.Text = "Scanning...";
+				zoneAnalyzerBtn.Text = strings.Scanning;
 				try
 				{
 					int currentMapId = GameService.Gw2Mumble.CurrentMap.Id;
@@ -2570,7 +2809,7 @@ namespace Gorthax.Gilledwars
 						}
 						else
 						{
-							ScreenNotification.ShowNotification("No fishing achievement found for this area.", ScreenNotification.NotificationType.Error);
+							ScreenNotification.ShowNotification(strings.NoAchievFound, ScreenNotification.NotificationType.Error);
 						}
 					}
 				}
@@ -2581,15 +2820,15 @@ namespace Gorthax.Gilledwars
 				finally
 				{
 					zoneAnalyzerBtn.Enabled = true;
-					zoneAnalyzerBtn.Text = "Zone Analyzer";
+					zoneAnalyzerBtn.Text = strings.ZoneAnalyzerBtnText;
 				}
 			};
 			metaProgressBtn.Click += async delegate
 			{
 				metaProgressBtn.Enabled = false;
-				metaProgressBtn.Text = "Loading...";
+				metaProgressBtn.Text = strings.Loading;
 				await ShowMetaProgressWindow();
-				metaProgressBtn.Text = "Meta Progress";
+				metaProgressBtn.Text = strings.MetaProgressBtnText;
 				metaProgressBtn.Enabled = true;
 			};
 			HashSet<string> uniqueHoles = new HashSet<string>();
@@ -2663,18 +2902,18 @@ namespace Gorthax.Gilledwars
 				{
 					string safeName = fish.Name.Replace(" ", "_").Replace("'", "").Replace("-", "");
 					bool num = _caughtFishIds.Contains(fish.ItemId);
-					string pbWText = "NONE LOGGED";
-					string pbLText = "NONE LOGGED";
+					string pbWText = strings.NoneLogged;
+					string pbLText = strings.NoneLogged;
 					Microsoft.Xna.Framework.Color tintColor = (num ? Microsoft.Xna.Framework.Color.White : (Microsoft.Xna.Framework.Color.Black * 0.4f));
 					if (_personalBests.TryGetValue(fish.ItemId, out var rec))
 					{
 						if (rec.BestWeight != null)
 						{
-							pbWText = (rec.BestWeight.IsCheater ? "CHEATER DETECTED" : $"{rec.BestWeight.Weight} lbs");
+							pbWText = (rec.BestWeight.IsCheater ? strings.CheaterDetected : $"{rec.BestWeight.Weight} lbs");
 						}
 						if (rec.BestLength != null)
 						{
-							pbLText = (rec.BestLength.IsCheater ? "CHEATER DETECTED" : $"{rec.BestLength.Length} in");
+							pbLText = (rec.BestLength.IsCheater ? strings.CheaterDetected : $"{rec.BestLength.Length} in");
 						}
 						if ((rec.BestWeight != null && rec.BestWeight.IsSuperPb) || (rec.BestLength != null && rec.BestLength.IsSuperPb))
 						{
@@ -2707,11 +2946,11 @@ namespace Gorthax.Gilledwars
 							double num3 = value.BestLength?.Length ?? 0.0;
 							if (num2 > 0.0 || num3 > 0.0)
 							{
-								text2 = $"{text} my PB weight for this guy is: {num2} lbs and my PB for length is: {num3} in";
+								text2 = string.Format(strings.PbClipText, text, num2, num3);
 							}
 						}
 						Clipboard.SetText(text2);
-						ScreenNotification.ShowNotification("Copied " + fish.Name + " code!");
+						ScreenNotification.ShowNotification(string.Format(strings.FishCodeCopied, fish.Name));
 					};
 					FishUIEntry fishUIEntry = _allFishEntries.First((FishUIEntry x) => x.Data.ItemId == fish.ItemId);
 					fishUIEntry.Icon = img;
@@ -2726,55 +2965,58 @@ namespace Gorthax.Gilledwars
 			};
 			void ApplyFilters()
 			{
-				bool hasFilter = !string.IsNullOrEmpty(searchBar.Text) || rarityDrop.SelectedItem != "All Rarities" || locationDrop.SelectedItem != "All Locations" || holeDrop.SelectedItem != "All Holes" || timeDrop.SelectedItem != "All Times" || baitDrop.SelectedItem != "All Baits";
-				foreach (FlowPanel cat in _categoryPanels)
+				if (rarityDrop.SelectedItem != null && locationDrop.SelectedItem != null && holeDrop.SelectedItem != null && timeDrop.SelectedItem != null && baitDrop.SelectedItem != null)
 				{
-					bool anyVisible = false;
-					foreach (FishUIEntry entry2 in _allFishEntries.Where((FishUIEntry x) => x.CategoryPanel == cat))
+					bool hasFilter = !string.IsNullOrEmpty(searchBar.Text) || rarityDrop.SelectedItem != "All Rarities" || locationDrop.SelectedItem != "All Locations" || holeDrop.SelectedItem != "All Holes" || timeDrop.SelectedItem != "All Times" || baitDrop.SelectedItem != "All Baits";
+					foreach (FlowPanel cat in _categoryPanels)
 					{
-						bool match = true;
-						if (!string.IsNullOrEmpty(searchBar.Text) && !entry2.Data.Name.ToLower().Contains(searchBar.Text.ToLower()))
+						bool anyVisible = false;
+						foreach (FishUIEntry entry2 in _allFishEntries.Where((FishUIEntry x) => x.CategoryPanel == cat))
 						{
-							match = false;
+							bool match = true;
+							if (!string.IsNullOrEmpty(searchBar.Text) && !entry2.Data.Name.ToLower().Contains(searchBar.Text.ToLower()))
+							{
+								match = false;
+							}
+							if (rarityDrop.SelectedItem != null && rarityDrop.SelectedItem != "All Rarities" && entry2.Data.Rarity != rarityDrop.SelectedItem)
+							{
+								match = false;
+							}
+							if (locationDrop.SelectedItem != null && locationDrop.SelectedItem != "All Locations" && entry2.Data.Location != locationDrop.SelectedItem)
+							{
+								match = false;
+							}
+							if (holeDrop.SelectedItem != null && holeDrop.SelectedItem != "All Holes" && !entry2.Data.FishingHole.Contains(holeDrop.SelectedItem))
+							{
+								match = false;
+							}
+							if (timeDrop.SelectedItem != null && timeDrop.SelectedItem != "All Times" && !entry2.Data.Time.Contains((timeDrop.SelectedItem == "Any") ? "Any" : timeDrop.SelectedItem))
+							{
+								match = false;
+							}
+							if (baitDrop.SelectedItem != null && baitDrop.SelectedItem != "All Baits" && !entry2.Data.Bait.Contains(baitDrop.SelectedItem))
+							{
+								match = false;
+							}
+							entry2.Icon.Visible = match;
+							if (match)
+							{
+								anyVisible = true;
+							}
 						}
-						if (rarityDrop.SelectedItem != "All Rarities" && entry2.Data.Rarity != rarityDrop.SelectedItem)
+						cat.Visible = anyVisible;
+						if (hasFilter && anyVisible)
 						{
-							match = false;
+							cat.Collapsed = false;
 						}
-						if (locationDrop.SelectedItem != "All Locations" && entry2.Data.Location != locationDrop.SelectedItem)
+						else if (!hasFilter)
 						{
-							match = false;
-						}
-						if (holeDrop.SelectedItem != "All Holes" && !entry2.Data.FishingHole.Contains(holeDrop.SelectedItem))
-						{
-							match = false;
-						}
-						if (timeDrop.SelectedItem != "All Times" && !entry2.Data.Time.Contains((timeDrop.SelectedItem == "Any") ? "Any" : timeDrop.SelectedItem))
-						{
-							match = false;
-						}
-						if (baitDrop.SelectedItem != "All Baits" && !entry2.Data.Bait.Contains(baitDrop.SelectedItem))
-						{
-							match = false;
-						}
-						entry2.Icon.Visible = match;
-						if (match)
-						{
-							anyVisible = true;
+							cat.Collapsed = false;
 						}
 					}
-					cat.Visible = anyVisible;
-					if (hasFilter && anyVisible)
-					{
-						cat.Collapsed = false;
-					}
-					else if (!hasFilter)
-					{
-						cat.Collapsed = false;
-					}
+					scroll.Invalidate();
+					scroll.VerticalScrollOffset = 0;
 				}
-				scroll.Invalidate();
-				scroll.VerticalScrollOffset = 0;
 			}
 		}
 
@@ -2907,7 +3149,7 @@ namespace Gorthax.Gilledwars
 				standardButton.Location = new Point(hBar.Width - 75, 2);
 				standardButton.Width = 40;
 				standardButton.Height = 26;
-				standardButton.BasicTooltipText = "Toggle Grid/List View";
+				standardButton.BasicTooltipText = strings.ToggleGridView;
 				standardButton.Click += async delegate
 				{
 					_isAnalyzerMinified = !_isAnalyzerMinified;
@@ -3054,7 +3296,7 @@ namespace Gorthax.Gilledwars
 						};
 						new Blish_HUD.Controls.Label
 						{
-							Text = "NAME",
+							Text = strings.NameColumnHeader,
 							Parent = columnHeader,
 							Location = new Point(60, 5),
 							Width = 170,
@@ -3063,7 +3305,7 @@ namespace Gorthax.Gilledwars
 						};
 						new Blish_HUD.Controls.Label
 						{
-							Text = "BAIT",
+							Text = strings.BaitColumnHeader,
 							Parent = columnHeader,
 							Location = new Point(240, 5),
 							Width = 130,
@@ -3072,7 +3314,7 @@ namespace Gorthax.Gilledwars
 						};
 						new Blish_HUD.Controls.Label
 						{
-							Text = "TIME",
+							Text = strings.TimeColumnHeader,
 							Parent = columnHeader,
 							Location = new Point(380, 5),
 							Width = 150,
@@ -3081,7 +3323,7 @@ namespace Gorthax.Gilledwars
 						};
 						new Blish_HUD.Controls.Label
 						{
-							Text = "HOLE",
+							Text = strings.HoleColumnHeader,
 							Parent = columnHeader,
 							Location = new Point(540, 5),
 							Width = 230,
@@ -3230,14 +3472,14 @@ namespace Gorthax.Gilledwars
 			Microsoft.Xna.Framework.Color agedGoldText = new Microsoft.Xna.Framework.Color(201, 168, 76);
 			_casualLogToggleBtn = new StandardButton
 			{
-				Text = "Start Logging",
+				Text = strings.StartLoggingBtnText,
 				Parent = parent,
 				Location = new Point(10, 10),
 				Width = 120
 			};
 			_casualMeasureBtn = new StandardButton
 			{
-				Text = "Measure Fish",
+				Text = strings.MeasureFishBtnText,
 				Parent = parent,
 				Location = new Point(140, 10),
 				Width = 120,
@@ -3245,35 +3487,35 @@ namespace Gorthax.Gilledwars
 			};
 			_useDrfCheckbox = new Checkbox
 			{
-				Text = "Use DRF (Real-Time)",
+				Text = strings.UseDrfCheckboxText,
 				Parent = parent,
 				Location = new Point(275, 15),
-				BasicTooltipText = "Requires drf.rs Addon",
+				BasicTooltipText = strings.UseDrfTooltip,
 				Checked = !string.IsNullOrWhiteSpace(_drfToken.Value)
 			};
 			StandardButton obj = new StandardButton
 			{
-				Text = "Compact Mode",
+				Text = strings.CompactModeBtnText,
 				Parent = parent,
 				Location = new Point(440, 10),
 				Width = 120
 			};
 			StandardButton standardButton = new StandardButton();
-			standardButton.Text = "Whats Biting Widget";
+			standardButton.Text = strings.WhatsBitingBtnText;
 			standardButton.Parent = parent;
 			standardButton.Location = new Point(440, 45);
 			standardButton.Width = 140;
-			standardButton.BasicTooltipText = "Shows missing fish for your current map and time of day.";
+			standardButton.BasicTooltipText = strings.WhatsBitingTooltip;
 			standardButton.Click += delegate
 			{
 				ToggleBitingWidget();
 			};
 			StandardButton standardButton2 = new StandardButton();
-			standardButton2.Text = "Profit Tracker";
+			standardButton2.Text = strings.ProfitTrackerBtnText;
 			standardButton2.Parent = parent;
 			standardButton2.Location = new Point(310, 45);
 			standardButton2.Width = 120;
-			standardButton2.BasicTooltipText = "Show or hide the live Gold per Hour widget.";
+			standardButton2.BasicTooltipText = strings.ProfitTrackerTooltip;
 			standardButton2.Click += delegate
 			{
 				_showProfitWidget.Value = !_showProfitWidget.Value;
@@ -3289,7 +3531,7 @@ namespace Gorthax.Gilledwars
 			};
 			new Blish_HUD.Controls.Label
 			{
-				Text = "Recent Catches (Last 20)",
+				Text = strings.RecentCatchesText,
 				Parent = parent,
 				Location = new Point(10, 60),
 				AutoSizeWidth = true,
@@ -3320,7 +3562,7 @@ namespace Gorthax.Gilledwars
 				{
 					StopCasualLogging();
 					_mainWindow.Visible = true;
-					ScreenNotification.ShowNotification("Casual Logging Stopped.");
+					ScreenNotification.ShowNotification(strings.CasualLoggingStopped);
 				}
 				else
 				{
@@ -3330,7 +3572,7 @@ namespace Gorthax.Gilledwars
 			_casualMeasureBtn.Click += async delegate
 			{
 				_casualMeasureBtn.Enabled = false;
-				_casualSyncTimerLabel.Text = "Measuring...";
+				_casualSyncTimerLabel.Text = "strings.Measuring";
 				await CheckApiForNewCatches();
 				_nextSyncTime = DateTime.Now.AddMinutes(5.0);
 				_isSyncTimerActive = true;
@@ -3347,7 +3589,7 @@ namespace Gorthax.Gilledwars
 			_isCasualLoggingActive = true;
 			if (_casualLogToggleBtn != null)
 			{
-				_casualLogToggleBtn.Text = "Stop Logging";
+				_casualLogToggleBtn.Text = strings.StopLoggingBtnText;
 			}
 			if (_useDrfCheckbox != null)
 			{
@@ -3377,7 +3619,7 @@ namespace Gorthax.Gilledwars
 				}
 				if (_casualSyncTimerLabel != null)
 				{
-					_casualSyncTimerLabel.Text = "DRF Active";
+					_casualSyncTimerLabel.Text = strings.DrfActive;
 					_casualSyncTimerLabel.TextColor = Microsoft.Xna.Framework.Color.LimeGreen;
 					_casualSyncTimerLabel.Visible = true;
 				}
@@ -3417,7 +3659,7 @@ namespace Gorthax.Gilledwars
 				};
 				_bitingTitleLabel = new Blish_HUD.Controls.Label
 				{
-					Text = "Biting Now: Loading...",
+					Text = strings.BitingNowLoading,
 					Parent = hBar,
 					Location = new Point(10, 5),
 					Font = GameService.Content.DefaultFont14,
@@ -3426,17 +3668,17 @@ namespace Gorthax.Gilledwars
 				};
 				_bitingToggleBtn = new StandardButton
 				{
-					Text = "Missing",
+					Text = strings.MissingLabel,
 					Parent = hBar,
 					Location = new Point(hBar.Width - 95, 2),
 					Width = 65,
 					Height = 26,
-					BasicTooltipText = "Toggle between Missing Fish and All Fish"
+					BasicTooltipText = strings.ToggleBitingTooltip
 				};
 				_bitingToggleBtn.Click += async delegate
 				{
 					_showAllBitingFish = !_showAllBitingFish;
-					_bitingToggleBtn.Text = (_showAllBitingFish ? "All" : "Missing");
+					_bitingToggleBtn.Text = (_showAllBitingFish ? strings.AllLabel : strings.MissingLabel);
 					await RefreshBitingWidget();
 				};
 				Blish_HUD.Controls.Label label = new Blish_HUD.Controls.Label();
@@ -3522,11 +3764,11 @@ namespace Gorthax.Gilledwars
 				string target = achievementMap.Keys.FirstOrDefault((string k) => mapInfo.Name.Contains(k) || (mapInfo.RegionName != null && mapInfo.RegionName.Contains(k)));
 				if (target == null)
 				{
-					_bitingTitleLabel.Text = "No Fishing Zone Found";
+					_bitingTitleLabel.Text = strings.NoFishingZone;
 					_bitingFishList.ClearChildren();
 					return;
 				}
-				_bitingTitleLabel.Text = "Biting Now: " + target + " (" + currentPhase + ")";
+				_bitingTitleLabel.Text = strings.BitingNowTitle + ": " + target + " (" + currentPhase + ")";
 				int achId = achievementMap[target];
 				Achievement achievementDef = await Gw2ApiManager.Gw2ApiClient.V2.Achievements.GetAsync(achId);
 				IReadOnlyList<int> completedBits = (await Gw2ApiManager.Gw2ApiClient.V2.Account.Achievements.GetAsync()).FirstOrDefault((AccountAchievement a) => a.Id == achId)?.Bits ?? new List<int>();
@@ -3602,7 +3844,7 @@ namespace Gorthax.Gilledwars
 			catch (Exception ex)
 			{
 				Logger.Warn(ex, "Biting Widget failed on load. Retrying...");
-				_bitingTitleLabel.Text = "Biting Now: API Syncing...";
+				_bitingTitleLabel.Text = strings.BitingApiSyncing;
 				await Task.Delay(2000);
 				_lastBitingMapId = 0;
 			}
@@ -3686,8 +3928,8 @@ namespace Gorthax.Gilledwars
 					continue;
 				}
 				bool num = _caughtFishIds.Contains(fish.ItemId) || _personalBests.ContainsKey(fish.ItemId);
-				string pbWText = "NONE LOGGED";
-				string pbLText = "NONE LOGGED";
+				string pbWText = strings.NoneLogged;
+				string pbLText = strings.NoneLogged;
 				Microsoft.Xna.Framework.Color tint = (num ? Microsoft.Xna.Framework.Color.White : (Microsoft.Xna.Framework.Color.Gray * 0.5f));
 				if (_personalBests.TryGetValue(fish.ItemId, out var rec))
 				{
@@ -3695,7 +3937,7 @@ namespace Gorthax.Gilledwars
 					{
 						if (rec.BestWeight.IsCheater)
 						{
-							pbWText = "CHEATER DETECTED";
+							pbWText = strings.CheaterDetected;
 						}
 						else if (rec.BestWeight.IsSuperPb)
 						{
@@ -3711,7 +3953,7 @@ namespace Gorthax.Gilledwars
 					{
 						if (rec.BestLength.IsCheater)
 						{
-							pbLText = "CHEATER DETECTED";
+							pbLText = strings.CheaterDetected;
 						}
 						else if (rec.BestLength.IsSuperPb)
 						{
@@ -3726,10 +3968,10 @@ namespace Gorthax.Gilledwars
 				}
 				img.Tint = tint;
 				bool isCollector = (fish.Rarity != null && fish.Rarity.Equals("Junk", StringComparison.OrdinalIgnoreCase)) || (fish.Location != null && fish.Location.Contains("Collector"));
-				string tooltip = fish.Name + "\nRarity: " + fish.Rarity + "\nLocation: " + fish.Location + "\nHole: " + fish.FishingHole + "\nTime: " + fish.Time + "\nBait: " + fish.Bait;
+				string tooltip = fish.Name + "\n" + strings.BaitLabel + ": " + fish.Bait + "\n" + fish.Rarity + "\n" + fish.Location + "\n" + fish.Time;
 				if (!isCollector)
 				{
-					tooltip = tooltip + "\n\nPB Weight: " + pbWText + "\nPB Length: " + pbLText;
+					tooltip = tooltip + "\n\n" + strings.PbWeightLabel + ": " + pbWText + "\n" + strings.PbLengthLabel + ": " + pbLText;
 				}
 				img.BasicTooltipText = tooltip;
 			}
@@ -3760,7 +4002,7 @@ namespace Gorthax.Gilledwars
 				}
 			};
 			StandardButton standardButton = new StandardButton();
-			standardButton.Text = "Close";
+			standardButton.Text = strings.CloseBtnText;
 			standardButton.Parent = _targetSelectionWindow;
 			standardButton.Location = new Point(125, 430);
 			standardButton.Width = 150;
@@ -3776,13 +4018,13 @@ namespace Gorthax.Gilledwars
 				FlowDirection = ControlFlowDirection.SingleTopToBottom
 			};
 			StandardButton standardButton2 = new StandardButton();
-			standardButton2.Text = "All Species";
+			standardButton2.Text = strings.AllSpeciesFilterBtn;
 			standardButton2.Parent = scroll;
 			standardButton2.Width = 350;
 			standardButton2.Click += delegate
 			{
 				_tourneyTargetItemId = 0;
-				targetBtn.Text = "Target: All Species";
+				targetBtn.Text = strings.TargetAllSpecies;
 				_targetSelectionWindow.Dispose();
 			};
 			foreach (IGrouping<string, FishUIEntry> g in from x in _allFishEntries
@@ -3810,7 +4052,7 @@ namespace Gorthax.Gilledwars
 					standardButton3.Click += delegate
 					{
 						_tourneyTargetItemId = fish.Data.ItemId;
-						targetBtn.Text = "Target: " + fish.Data.Name;
+						targetBtn.Text = strings.TargetPrefix + fish.Data.Name;
 						_targetSelectionWindow.Dispose();
 					};
 				}
@@ -3829,14 +4071,14 @@ namespace Gorthax.Gilledwars
 			};
 			StandardButton hostModeBtn = new StandardButton
 			{
-				Text = "Host Tournament",
+				Text = strings.HostTournamentBtnText,
 				Parent = topNav,
 				Location = new Point(10, 0),
 				Width = 150
 			};
 			StandardButton obj = new StandardButton
 			{
-				Text = "Join Tournament",
+				Text = strings.JoinTournamentBtnText,
 				Parent = topNav,
 				Location = new Point(170, 0),
 				Width = 150
@@ -3875,7 +4117,7 @@ namespace Gorthax.Gilledwars
 			};
 			new Blish_HUD.Controls.Label
 			{
-				Text = "Host Setup Configuration",
+				Text = strings.HostSetupTitle,
 				Parent = hostSettingsBg,
 				Location = new Point(10, 5),
 				AutoSizeWidth = true,
@@ -3884,7 +4126,7 @@ namespace Gorthax.Gilledwars
 			};
 			new Blish_HUD.Controls.Label
 			{
-				Text = "Start Delay",
+				Text = strings.StartDelayLabel,
 				Parent = hostSettingsBg,
 				Location = new Point(10, 35),
 				AutoSizeWidth = true,
@@ -3902,7 +4144,7 @@ namespace Gorthax.Gilledwars
 			hostStartDelayDrop.Items.Add("10 Minutes");
 			new Blish_HUD.Controls.Label
 			{
-				Text = "Duration (Mins)",
+				Text = strings.DurationLabel,
 				Parent = hostSettingsBg,
 				Location = new Point(160, 35),
 				AutoSizeWidth = true,
@@ -3917,7 +4159,7 @@ namespace Gorthax.Gilledwars
 			};
 			new Blish_HUD.Controls.Label
 			{
-				Text = "Tracking Mode",
+				Text = strings.TrackingModeLabel,
 				Parent = hostSettingsBg,
 				Location = new Point(280, 35),
 				AutoSizeWidth = true,
@@ -3934,7 +4176,7 @@ namespace Gorthax.Gilledwars
 			hostTrackingModeDrop.SelectedItem = "DRF (Real-Time)";
 			new Blish_HUD.Controls.Label
 			{
-				Text = "Target Species",
+				Text = strings.TargetSpeciesLabel,
 				Parent = hostSettingsBg,
 				Location = new Point(10, 95),
 				AutoSizeWidth = true,
@@ -3942,7 +4184,7 @@ namespace Gorthax.Gilledwars
 			};
 			StandardButton targetSpeciesBtn = new StandardButton
 			{
-				Text = "Target: All Species",
+				Text = strings.TargetAllSpecies,
 				Parent = hostSettingsBg,
 				Location = new Point(10, 115),
 				Width = 200
@@ -3953,7 +4195,7 @@ namespace Gorthax.Gilledwars
 			};
 			new Blish_HUD.Controls.Label
 			{
-				Text = "Win Factor",
+				Text = strings.WinFactorLabel,
 				Parent = hostSettingsBg,
 				Location = new Point(230, 95),
 				AutoSizeWidth = true,
@@ -3965,11 +4207,12 @@ namespace Gorthax.Gilledwars
 				Location = new Point(230, 115),
 				Width = 130
 			};
-			_hostWinFactorDrop.Items.Add("Weight");
-			_hostWinFactorDrop.Items.Add("Length");
+			_hostWinFactorDrop.Items.Add(strings.WeightDropdown);
+			_hostWinFactorDrop.Items.Add(strings.LengthDropdown);
+			_hostWinFactorDrop.SelectedItem = strings.WeightDropdown;
 			StandardButton genKeyBtn = new StandardButton
 			{
-				Text = "Create Room",
+				Text = strings.CreateRoomBtn,
 				Parent = hostSettingsBg,
 				Location = new Point(380, 110),
 				Width = 150,
@@ -3985,7 +4228,7 @@ namespace Gorthax.Gilledwars
 			};
 			new Blish_HUD.Controls.Label
 			{
-				Text = "Manual Verification & Info",
+				Text = strings.ManualVerifyTitle,
 				Parent = backupBg,
 				Location = new Point(10, 5),
 				AutoSizeWidth = true,
@@ -3996,11 +4239,11 @@ namespace Gorthax.Gilledwars
 				Parent = backupBg,
 				Location = new Point(10, 30),
 				Width = 250,
-				PlaceholderText = "Paste Backup End Code..."
+				PlaceholderText = strings.PasteCodePlaceholder
 			};
 			StandardButton obj2 = new StandardButton
 			{
-				Text = "Verify Code",
+				Text = strings.VerifyCodeBtn,
 				Parent = backupBg,
 				Location = new Point(270, 30),
 				Width = 120
@@ -4013,7 +4256,7 @@ namespace Gorthax.Gilledwars
 				Height = 150,
 				WrapText = true,
 				TextColor = Microsoft.Xna.Framework.Color.LightGray,
-				Text = "TRACKING MODES EXPLAINED:\n\n• API (5-Min Wait): Uses official GW2 servers. Highly secure, no extra downloads needed. Catch detection delayed by ArenaNet's cache.\n\n• DRF (Real-Time): Uses the drf.rs memory reader. Instant catch detection! Participants MUST install the 3rd-party DRF .dll to use this mode."
+				Text = strings.TrackingModesInfo
 			};
 			Blish_HUD.Controls.Panel partSettingsBg = new Blish_HUD.Controls.Panel
 			{
@@ -4025,7 +4268,7 @@ namespace Gorthax.Gilledwars
 			};
 			new Blish_HUD.Controls.Label
 			{
-				Text = "Join an Active Room",
+				Text = strings.JoinRoomTitle,
 				Parent = partSettingsBg,
 				Location = new Point(10, 5),
 				AutoSizeWidth = true,
@@ -4034,7 +4277,7 @@ namespace Gorthax.Gilledwars
 			};
 			new Blish_HUD.Controls.Label
 			{
-				Text = "Enter Host's Room Code:",
+				Text = strings.EnterRoomCodeLabel,
 				Parent = partSettingsBg,
 				Location = new Point(10, 40),
 				AutoSizeWidth = true,
@@ -4049,7 +4292,7 @@ namespace Gorthax.Gilledwars
 			};
 			StandardButton joinBtn = new StandardButton
 			{
-				Text = "Join Room",
+				Text = strings.JoinRoomBtn,
 				Parent = partSettingsBg,
 				Location = new Point(200, 65),
 				Width = 150,
@@ -4058,7 +4301,7 @@ namespace Gorthax.Gilledwars
 			genKeyBtn.Click += async delegate
 			{
 				genKeyBtn.Enabled = false;
-				genKeyBtn.Text = "Creating...";
+				genKeyBtn.Text = strings.Creating;
 				string charName = GameService.Gw2Mumble.PlayerCharacter.Name;
 				if (string.IsNullOrEmpty(charName))
 				{
@@ -4078,6 +4321,7 @@ namespace Gorthax.Gilledwars
 					delayMins = 10;
 				}
 				string mode = (hostTrackingModeDrop.SelectedItem.Contains("API") ? "API" : "DRF");
+				string apiWinFactor = ((_hostWinFactorDrop.SelectedItem == strings.LengthDropdown) ? "Length" : "Weight");
 				var payload = new
 				{
 					hostName = charName,
@@ -4085,7 +4329,7 @@ namespace Gorthax.Gilledwars
 					durationMins = int.Parse(hostTimerMin.Text),
 					mode = mode,
 					targetId = _tourneyTargetItemId,
-					winFactor = _hostWinFactorDrop.SelectedItem,
+					winFactor = apiWinFactor,
 					webhookUrl = _discordWebhookUrl.Value
 				};
 				try
@@ -4100,12 +4344,12 @@ namespace Gorthax.Gilledwars
 						{
 							string code = resultObj["roomCode"];
 							CopyToClipboard(code);
-							ScreenNotification.ShowNotification("Room " + code + " created & copied!");
+							ScreenNotification.ShowNotification(string.Format(strings.RoomCreated, code));
 						}
 					}
 					else
 					{
-						ScreenNotification.ShowNotification("API Error: Could not create room.", ScreenNotification.NotificationType.Error);
+						ScreenNotification.ShowNotification("strings.ApiErrorRoom", ScreenNotification.NotificationType.Error);
 					}
 				}
 				catch (Exception ex2)
@@ -4114,7 +4358,7 @@ namespace Gorthax.Gilledwars
 					ScreenNotification.ShowNotification("Network Error: Could not connect to API.", ScreenNotification.NotificationType.Error);
 				}
 				genKeyBtn.Enabled = true;
-				genKeyBtn.Text = "Create Room";
+				genKeyBtn.Text = strings.CreateRoomBtn;
 			};
 			obj2.Click += delegate
 			{
@@ -4171,15 +4415,15 @@ namespace Gorthax.Gilledwars
 			joinBtn.Click += async delegate
 			{
 				joinBtn.Enabled = false;
-				joinBtn.Text = "Joining...";
+				joinBtn.Text = strings.Joining;
 				try
 				{
 					string roomCode = partSessionKey.Text.Trim().ToUpper();
 					if (!roomCode.StartsWith("GW-") || roomCode.Length != 8)
 					{
-						ScreenNotification.ShowNotification("Invalid Code Format! Use GW-XXXXX", ScreenNotification.NotificationType.Error);
+						ScreenNotification.ShowNotification(strings.InvalidRoomCode, ScreenNotification.NotificationType.Error);
 						joinBtn.Enabled = true;
-						joinBtn.Text = "Join Room";
+						joinBtn.Text = strings.JoinRoomBtn;
 						return;
 					}
 					HttpResponseMessage response = await _httpClient.GetAsync("https://api.gilledwars.com/join/" + roomCode);
@@ -4198,7 +4442,7 @@ namespace Gorthax.Gilledwars
 						_tourneyStartTimeUtc = DateTimeOffset.FromUnixTimeMilliseconds(startTimeMs).UtcDateTime;
 						_tourneyEndTimeUtc = _tourneyStartTimeUtc.AddMinutes(durMins);
 						_tourneyCatches.Clear();
-						string targetName = "All Species";
+						string targetName = strings.AllSpeciesFilterBtn;
 						if (_tourneyTargetItemId != 0)
 						{
 							FishUIEntry targetFish = _allFishEntries.FirstOrDefault((FishUIEntry x) => x.Data.ItemId == _tourneyTargetItemId);
@@ -4220,11 +4464,11 @@ namespace Gorthax.Gilledwars
 							_activeMeasureBtn.Enabled = false;
 							if (_activeSyncTimerLabel != null)
 							{
-								_activeSyncTimerLabel.Text = ((_tourneyModeUsed == "DRF") ? "DRF Paused" : "API Paused");
+								_activeSyncTimerLabel.Text = ((_tourneyModeUsed == "DRF") ? strings.DrfPaused : strings.ApiPaused);
 								_activeSyncTimerLabel.TextColor = Microsoft.Xna.Framework.Color.LightGray;
 								_activeSyncTimerLabel.Visible = true;
 							}
-							ScreenNotification.ShowNotification("DRF not logging. Will resume on tournament start!", ScreenNotification.NotificationType.Warning);
+							ScreenNotification.ShowNotification(strings.DrfResumeWait, ScreenNotification.NotificationType.Warning);
 						}
 						else
 						{
@@ -4233,23 +4477,23 @@ namespace Gorthax.Gilledwars
 							_waitingRoomLabel.Visible = false;
 							_activeTimerLabel.Visible = true;
 							StartTrackingMode();
-							ScreenNotification.ShowNotification("Tournament Fishing Started!");
+							ScreenNotification.ShowNotification(strings.TourneyStarted);
 						}
 						_mainWindow.Visible = false;
 						_tourneyActivePanel.Visible = true;
 					}
 					else
 					{
-						ScreenNotification.ShowNotification("Room Not Found or Expired!", ScreenNotification.NotificationType.Error);
+						ScreenNotification.ShowNotification(strings.RoomNotFound, ScreenNotification.NotificationType.Error);
 					}
 				}
 				catch (Exception ex)
 				{
 					Logger.Error(ex, "API Join Failed");
-					ScreenNotification.ShowNotification("Network Error!", ScreenNotification.NotificationType.Error);
+					ScreenNotification.ShowNotification(strings.NetworkError, ScreenNotification.NotificationType.Error);
 				}
 				joinBtn.Enabled = true;
-				joinBtn.Text = "Join Room";
+				joinBtn.Text = strings.JoinRoomBtn;
 			};
 		}
 
@@ -4306,7 +4550,7 @@ namespace Gorthax.Gilledwars
 			};
 			_waitingRoomLabel = new Blish_HUD.Controls.Label
 			{
-				Text = "Starting in...",
+				Text = strings.StartingIn,
 				Parent = _tourneyActivePanel,
 				Location = new Point(10, 10),
 				Font = GameService.Content.DefaultFont18,
@@ -4325,7 +4569,7 @@ namespace Gorthax.Gilledwars
 			};
 			_activeMeasureBtn = new StandardButton
 			{
-				Text = "Measure Fish",
+				Text = strings.MeasureFishBtnText,
 				Parent = _tourneyActivePanel,
 				Location = new Point(180, 10),
 				Width = 110,
@@ -4333,32 +4577,32 @@ namespace Gorthax.Gilledwars
 			};
 			_activeEndBtn = new StandardButton
 			{
-				Text = "End & Submit",
+				Text = strings.EndSubmitBtn,
 				Parent = _tourneyActivePanel,
 				Location = new Point(10, 50),
 				Width = 120
 			};
 			_activeRecopyBtn = new StandardButton
 			{
-				Text = "Re-Copy Code",
+				Text = strings.ReCopyCodeBtn,
 				Parent = _tourneyActivePanel,
 				Location = new Point(10, 50),
 				Width = 120,
 				Visible = false,
-				BasicTooltipText = "Manual backup."
+				BasicTooltipText = strings.ReCopyCodeTooltip
 			};
 			_activeExitBtn = new StandardButton
 			{
-				Text = "Exit Tourney",
+				Text = strings.ExitTourneyBtn,
 				Parent = _tourneyActivePanel,
 				Location = new Point(140, 50),
 				Width = 120,
 				Visible = false,
-				BasicTooltipText = "Close and return to UI."
+				BasicTooltipText = strings.ExitTourneyTooltip
 			};
 			new Blish_HUD.Controls.Label
 			{
-				Text = "Top 5 Catches:",
+				Text = strings.Top5CatchesLabel,
 				Parent = _tourneyActivePanel,
 				Location = new Point(10, 85),
 				AutoSizeWidth = true,
@@ -4375,21 +4619,21 @@ namespace Gorthax.Gilledwars
 			_activeMeasureBtn.Click += async delegate
 			{
 				_activeMeasureBtn.Enabled = false;
-				_activeSyncTimerLabel.Text = "Measuring...";
+				_activeSyncTimerLabel.Text = strings.Measuring;
 				await CheckApiForNewCatches();
 				_nextSyncTime = DateTime.Now.AddMinutes(5.0);
 				_isSyncTimerActive = true;
 			};
 			_activeEndBtn.Click += async delegate
 			{
-				await CompleteTournamentAsync("Tournament Ended Manually", "Results submitted to server.");
+				await CompleteTournamentAsync(strings.TourneyEndedManualTitle, strings.TourneyResultsInitial);
 			};
 			_activeRecopyBtn.Click += delegate
 			{
 				if (!string.IsNullOrEmpty(_lastGeneratedCode))
 				{
 					CopyToClipboard(_lastGeneratedCode);
-					ScreenNotification.ShowNotification("Backup Code Re-copied!");
+					ScreenNotification.ShowNotification(strings.BackupCopied);
 				}
 			};
 			_activeExitBtn.Click += delegate
@@ -4413,7 +4657,7 @@ namespace Gorthax.Gilledwars
 				_activeTimerLabel.Visible = false;
 				_tourneyActivePanel.Visible = false;
 				_mainWindow.Visible = true;
-				ScreenNotification.ShowNotification("Exited Tournament: Casual Mode Re-Enabled!");
+				ScreenNotification.ShowNotification(strings.ExitedTournament);
 				StartCasualLogging();
 			};
 		}
@@ -4441,7 +4685,7 @@ namespace Gorthax.Gilledwars
 			};
 			new Blish_HUD.Controls.Label
 			{
-				Text = "Casual Fishing",
+				Text = strings.CasualFishingLabel,
 				Parent = headerBar,
 				Location = new Point(10, 5),
 				Font = GameService.Content.DefaultFont16,
@@ -4455,7 +4699,7 @@ namespace Gorthax.Gilledwars
 			};
 			new Blish_HUD.Controls.Label
 			{
-				Text = "Recent Catches",
+				Text = strings.RecentCatchesCompact,
 				Parent = _casualCompactPanel,
 				Location = new Point(10, 40),
 				AutoSizeWidth = true,
@@ -4471,7 +4715,7 @@ namespace Gorthax.Gilledwars
 			};
 			_compactMaxBtn = new StandardButton
 			{
-				Text = "Maximize UI",
+				Text = strings.MaximizeUI,
 				Parent = _casualCompactPanel,
 				Location = new Point(100, 200),
 				Width = 120
@@ -4564,19 +4808,19 @@ namespace Gorthax.Gilledwars
 				}), Encoding.UTF8, "application/json");
 				if ((await _httpClient.PostAsync("https://api.gilledwars.com/submit/" + _tourneyRoomCode, (HttpContent)(object)content)).get_IsSuccessStatusCode())
 				{
-					msg = "Results successfully auto-posted to host's Discord!";
-					ScreenNotification.ShowNotification("Results Submitted to Server!");
+					msg = strings.TourneyPostedDiscord;
+					ScreenNotification.ShowNotification(strings.ResultsSubmitted);
 				}
 				else
 				{
-					msg = "API submission failed. Please copy backup code manually.";
+					msg = strings.TourneyApiFailed;
 					CopyToClipboard(_lastGeneratedCode);
 				}
 			}
 			catch (Exception ex)
 			{
 				Logger.Error(ex, "Failed to submit results.");
-				msg = "Network Error. Backup code copied to clipboard.";
+				msg = strings.TourneyNetworkError;
 				CopyToClipboard(_lastGeneratedCode);
 			}
 			if (_activeEndBtn != null)
@@ -4596,7 +4840,7 @@ namespace Gorthax.Gilledwars
 				_activeExitBtn.Visible = true;
 			}
 			ShowTournamentSummary(title, msg, Microsoft.Xna.Framework.Color.Cyan, _tourneyCatches, _tourneyWinFactor);
-			ScreenNotification.ShowNotification("Tournament Complete: Casual Mode Re-Enabled!", ScreenNotification.NotificationType.Warning);
+			ScreenNotification.ShowNotification(strings.TourneyComplete, ScreenNotification.NotificationType.Warning);
 			StartCasualLogging();
 		}
 
@@ -4798,7 +5042,7 @@ namespace Gorthax.Gilledwars
 				}
 			}
 			StandardButton standardButton = new StandardButton();
-			standardButton.Text = "Close";
+			standardButton.Text = strings.CloseBtnText;
 			standardButton.Parent = _currentSummaryWindow;
 			standardButton.Location = new Point(150, 435);
 			standardButton.Width = 150;
@@ -4998,12 +5242,12 @@ namespace Gorthax.Gilledwars
 					}
 					if (_casualSyncTimerLabel != null && _casualSyncTimerLabel.Visible)
 					{
-						_casualSyncTimerLabel.Text = "Ready!";
+						_casualSyncTimerLabel.Text = strings.Ready;
 						_casualSyncTimerLabel.TextColor = Microsoft.Xna.Framework.Color.LimeGreen;
 					}
 					if (_activeSyncTimerLabel != null && _activeSyncTimerLabel.Visible)
 					{
-						_activeSyncTimerLabel.Text = "Ready!";
+						_activeSyncTimerLabel.Text = "strings.Ready";
 						_activeSyncTimerLabel.TextColor = Microsoft.Xna.Framework.Color.LimeGreen;
 					}
 				}
@@ -5038,7 +5282,7 @@ namespace Gorthax.Gilledwars
 						_activeTimerLabel.Visible = true;
 					}
 					StartTrackingMode();
-					ScreenNotification.ShowNotification("Tournament Has Begun!", ScreenNotification.NotificationType.Warning);
+					ScreenNotification.ShowNotification("strings.TourneyBegin", ScreenNotification.NotificationType.Warning);
 				}
 				else if (_waitingRoomLabel != null)
 				{
@@ -5062,7 +5306,7 @@ namespace Gorthax.Gilledwars
 					}
 					if (_tourneyModeUsed == "API")
 					{
-						ScreenNotification.ShowNotification("Tournament over! Weighing all your fish, please wait...", ScreenNotification.NotificationType.Warning, null, 10);
+						ScreenNotification.ShowNotification(strings.TournamentOverWeighing, ScreenNotification.NotificationType.Warning, null, 10);
 						CheckApiForNewCatches();
 						_isTourneyWrapUpActive = true;
 						_tourneyWrapUpEndTime = DateTime.Now.AddSeconds(30.0);
@@ -5070,7 +5314,7 @@ namespace Gorthax.Gilledwars
 					}
 					else
 					{
-						CompleteTournamentAsync("Tournament Ended", "Submitting your catches to the server...");
+						CompleteTournamentAsync(strings.TourneyEndedTitle, strings.TourneySubmitting);
 					}
 				}
 				else if (_activeTimerLabel != null)
@@ -5089,7 +5333,7 @@ namespace Gorthax.Gilledwars
 				if (remWrap.TotalSeconds <= 0.0)
 				{
 					_isTourneyWrapUpActive = false;
-					CompleteTournamentAsync("Tournament Ended", "Submitting your catches to the server...");
+					CompleteTournamentAsync(strings.TourneyEndedTitle, strings.TourneySubmitting);
 				}
 			}
 		}
@@ -5103,7 +5347,7 @@ namespace Gorthax.Gilledwars
 				{
 					if (!isAuto)
 					{
-						ScreenNotification.ShowNotification("No new submissions found.");
+						ScreenNotification.ShowNotification(strings.NoNewSubmissions);
 					}
 					return;
 				}
@@ -5174,16 +5418,16 @@ namespace Gorthax.Gilledwars
 					SavePersonalBests();
 					if (!isAuto)
 					{
-						ScreenNotification.ShowNotification("Analyzing Your Catches Now! Check The Leaderboard Shortly!", ScreenNotification.NotificationType.Warning);
+						ScreenNotification.ShowNotification(strings.SubmitCooldown.Replace("{0}", "5"), ScreenNotification.NotificationType.Warning);
 					}
 					else
 					{
-						ScreenNotification.ShowNotification("Auto-Sync: PBs successfully uploaded to Leaderboard!");
+						ScreenNotification.ShowNotification(strings.AutoSyncSuccess);
 					}
 				}
 				else if (!isAuto)
 				{
-					ScreenNotification.ShowNotification("Server rejected the submissions. I wonder why.", ScreenNotification.NotificationType.Error);
+					ScreenNotification.ShowNotification(strings.ServerRejected, ScreenNotification.NotificationType.Error);
 				}
 			}
 			catch (Exception ex)
@@ -5202,7 +5446,29 @@ namespace Gorthax.Gilledwars
 			{
 				_mainWindow.Visible = !_mainWindow.Visible;
 			}
-			ScreenNotification.ShowNotification("Gilled Wars UI Toggled!");
+			ScreenNotification.ShowNotification(strings.UiToggled);
+		}
+
+		private async Task LocalizeFishNamesAsync()
+		{
+			try
+			{
+				List<int> allItemIds = _allFishEntries.Select((FishUIEntry x) => x.Data.ItemId).Distinct().ToList();
+				foreach (Item item in await Gw2ApiManager.Gw2ApiClient.V2.Items.ManyAsync(allItemIds))
+				{
+					FishUIEntry fishEntry = _allFishEntries.FirstOrDefault((FishUIEntry x) => x.Data.ItemId == item.Id);
+					if (fishEntry != null)
+					{
+						fishEntry.Data.Name = item.Name;
+					}
+				}
+				RefreshFishLogUI();
+				Logger.Info("strings.FishLocalizedSuccess");
+			}
+			catch (Exception ex)
+			{
+				Logger.Warn(ex, "strings.FishLocalizedFail");
+			}
 		}
 
 		protected override void Unload()
