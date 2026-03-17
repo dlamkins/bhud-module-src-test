@@ -192,6 +192,7 @@ namespace GW2StoryTimes.UI
 				_missionNameLabel.Text = mission.Name;
 				TimeEstimate estimate = (((GW2StoryTimesModule.Instance?.SettingPreferredCategory?.Value).GetValueOrDefault() != SubmissionCategory.Speed) ? mission.Times?.Full : mission.Times?.Speed);
 				_estimateLabel.Text = ((estimate != null && estimate.FormattedEstimate != null) ? ("~" + estimate.FormattedEstimate) : "");
+				_estimateLabel.BasicTooltipText = ((estimate != null && estimate.FormattedRange != null) ? ("Range: " + estimate.FormattedRange) : null);
 			}
 		}
 
@@ -310,21 +311,22 @@ namespace GW2StoryTimes.UI
 			double estimateMins = estimate.AvgMins.Value;
 			double elapsedMins = timer.Elapsed.TotalMinutes;
 			double ratio = elapsedMins / estimateMins;
-			if (ratio < 0.75)
+			if (ratio >= 0.9 && ratio <= 1.1)
 			{
 				_timerLabel.TextColor = ColorOnPace;
-				_statusLabel.Text = "On pace (est. ~" + estimate.FormattedEstimate + ")";
+				_statusLabel.Text = "On target (est. ~" + estimate.FormattedEstimate + ")";
 			}
-			else if (ratio < 1.0)
+			else if (ratio >= 0.75 && ratio <= 1.25)
 			{
 				_timerLabel.TextColor = ColorApproaching;
-				_statusLabel.Text = "Approaching estimate (~" + estimate.FormattedEstimate + ")";
+				string direction2 = ((ratio < 1.0) ? "ahead of" : "behind");
+				_statusLabel.Text = "Slightly " + direction2 + " estimate (~" + estimate.FormattedEstimate + ")";
 			}
 			else
 			{
 				_timerLabel.TextColor = ColorOvertime;
-				double overBy = elapsedMins - estimateMins;
-				_statusLabel.Text = $"Over estimate by ~{overBy:F0} min";
+				string direction = ((ratio < 1.0) ? $"{estimateMins - elapsedMins:F0} min ahead" : $"{elapsedMins - estimateMins:F0} min behind");
+				_statusLabel.Text = "Well outside estimate (" + direction + ")";
 			}
 		}
 
@@ -343,8 +345,14 @@ namespace GW2StoryTimes.UI
 			TimerService timer = module?.TimerService;
 			if (mission != null && timer != null)
 			{
+				_submitButton.Enabled = false;
 				module.ShowFeedbackPrompt(mission, timer.Elapsed);
 			}
+		}
+
+		internal void ReenableSubmit()
+		{
+			_submitButton.Enabled = true;
 		}
 	}
 }

@@ -186,7 +186,9 @@ namespace GW2StoryTimes.UI
 				{
 					return;
 				}
-				_detailHeader.Text = season.Name;
+				double totalMins = seasonSummary.TotalFullMins;
+				string totalFormatted = ((totalMins > 0.0) ? (" — " + FormatMins(totalMins) + " total") : "");
+				_detailHeader.Text = season.Name + totalFormatted;
 				string playerRace = GetPlayerRace();
 				bool isFiltering = season.Stories.Any((Story s) => s.Races != null && s.Races.Count > 0) && playerRace != null;
 				if (isFiltering)
@@ -226,6 +228,8 @@ namespace GW2StoryTimes.UI
 						TimeEstimate estimate = mission.Times?.Full;
 						string timeText = estimate?.FormattedEstimate ?? "—";
 						string submissionHint = ((estimate != null && estimate.HasCommunityData) ? $" ({estimate.Submissions} reports)" : "");
+						string rangeText = estimate?.FormattedRange;
+						string tooltip = ((rangeText != null) ? $"Range: {rangeText} ({estimate.Submissions} reports)" : null);
 						Panel missionRow = new Panel
 						{
 							Width = 310,
@@ -251,6 +255,7 @@ namespace GW2StoryTimes.UI
 							AutoSizeWidth = true,
 							HorizontalAlignment = HorizontalAlignment.Right,
 							Location = new Point(200, 4),
+							BasicTooltipText = tooltip,
 							Parent = missionRow
 						};
 						Mission capturedMission = mission;

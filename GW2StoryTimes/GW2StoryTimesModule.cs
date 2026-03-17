@@ -156,12 +156,45 @@ namespace GW2StoryTimes
 
 		internal void ShowFeedbackPrompt(Mission mission, TimeSpan elapsed)
 		{
+			SettingEntry<bool> settingShowFeedbackPrompt = SettingShowFeedbackPrompt;
+			if (settingShowFeedbackPrompt != null && !settingShowFeedbackPrompt.Value)
+			{
+				SubmissionCategory cat = SettingPreferredCategory?.Value ?? SubmissionCategory.Full;
+				string catStr = ((cat == SubmissionCategory.Speed) ? "speed" : "full");
+				Task.Run(() => SubmitDirectly(mission, elapsed, catStr));
+				return;
+			}
 			_feedbackPrompt?.Dispose();
-			TimeEstimate estimate = (((SettingPreferredCategory?.Value ?? SubmissionCategory.Full) != SubmissionCategory.Speed) ? mission.Times?.Full : mission.Times?.Speed);
-			_feedbackPrompt = new FeedbackPrompt(mission, elapsed, estimate)
+			SubmissionCategory category = SettingPreferredCategory?.Value ?? SubmissionCategory.Full;
+			TimeEstimate estimate = ((category != SubmissionCategory.Speed) ? mission.Times?.Full : mission.Times?.Speed);
+			_feedbackPrompt = new FeedbackPrompt(mission, elapsed, estimate, category)
 			{
 				Parent = GameService.Graphics.SpriteScreen
 			};
+			_feedbackPrompt.Disposed += delegate
+			{
+				_widget?.ReenableSubmit();
+			};
+		}
+
+		private async Task SubmitDirectly(Mission mission, TimeSpan elapsed, string category)
+		{
+			StoryTimesApiClient apiClient = ApiClient;
+			if (apiClient == null)
+			{
+				_widget?.ReenableSubmit();
+				return;
+			}
+			StoryTimesApiClient.SubmitResult result = await apiClient.SubmitTimeAsync(mission.Id, category, elapsed.TotalMinutes);
+			if (result.Success)
+			{
+				ScreenNotification.ShowNotification("Story Times: Time submitted for " + mission.Name + "!");
+			}
+			else
+			{
+				ScreenNotification.ShowNotification("Story Times: " + result.Error, ScreenNotification.NotificationType.Warning);
+			}
+			_widget?.ReenableSubmit();
 		}
 	}
 }

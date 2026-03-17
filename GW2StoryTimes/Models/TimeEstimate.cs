@@ -43,5 +43,32 @@ namespace GW2StoryTimes.Models
 				return $"~{hours}h {remaining}m";
 			}
 		}
+
+		public string FormattedRange
+		{
+			get
+			{
+				if (!MinMins.HasValue || !MaxMins.HasValue || !HasCommunityData)
+				{
+					return null;
+				}
+				return FormatShort(MinMins.Value) + "–" + FormatShort(MaxMins.Value);
+			}
+		}
+
+		private static string FormatShort(double mins)
+		{
+			if (mins < 60.0)
+			{
+				return $"{mins:F0}m";
+			}
+			int h = (int)(mins / 60.0);
+			int i = (int)(mins % 60.0);
+			if (i <= 0)
+			{
+				return $"{h}h";
+			}
+			return $"{h}h{i}m";
+		}
 	}
 }

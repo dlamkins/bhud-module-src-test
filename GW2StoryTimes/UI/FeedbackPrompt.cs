@@ -18,13 +18,16 @@ namespace GW2StoryTimes.UI
 
 		private readonly TimeEstimate _estimate;
 
+		private readonly SubmissionCategory _preferredCategory;
+
 		private bool _isSubmitting;
 
-		public FeedbackPrompt(Mission mission, TimeSpan elapsed, TimeEstimate estimate)
+		public FeedbackPrompt(Mission mission, TimeSpan elapsed, TimeEstimate estimate, SubmissionCategory preferredCategory)
 		{
 			_mission = mission;
 			_elapsed = elapsed;
 			_estimate = estimate;
+			_preferredCategory = preferredCategory;
 			base.Width = 420;
 			base.Height = 180;
 			base.ShowBorder = true;
@@ -90,25 +93,26 @@ namespace GW2StoryTimes.UI
 				Location = new Point(20, 65),
 				Parent = this
 			};
+			bool preferFull = _preferredCategory == SubmissionCategory.Full;
 			StandardButton standardButton = new StandardButton();
-			standardButton.Text = "Submit as Full Experience";
-			standardButton.Width = 200;
-			standardButton.Height = 30;
-			standardButton.Location = new Point(20, 100);
+			standardButton.Text = (preferFull ? "Submit as Full Experience" : "Submit as Speedrun");
+			standardButton.Width = 220;
+			standardButton.Height = 32;
+			standardButton.Location = new Point(20, 98);
 			standardButton.Parent = this;
 			standardButton.Click += delegate
 			{
-				Task.Run(() => Submit("full"));
+				Task.Run(() => Submit(preferFull ? "full" : "speed"));
 			};
 			StandardButton standardButton2 = new StandardButton();
-			standardButton2.Text = "Submit as Speedrun";
-			standardButton2.Width = 160;
-			standardButton2.Height = 30;
-			standardButton2.Location = new Point(230, 100);
+			standardButton2.Text = (preferFull ? "Submit as Speedrun" : "Submit as Full Experience");
+			standardButton2.Width = 150;
+			standardButton2.Height = 28;
+			standardButton2.Location = new Point(248, 100);
 			standardButton2.Parent = this;
 			standardButton2.Click += delegate
 			{
-				Task.Run(() => Submit("speed"));
+				Task.Run(() => Submit(preferFull ? "speed" : "full"));
 			};
 			StandardButton standardButton3 = new StandardButton();
 			standardButton3.Text = "Dismiss";
@@ -133,13 +137,14 @@ namespace GW2StoryTimes.UI
 			StoryTimesApiClient apiClient = GW2StoryTimesModule.Instance?.ApiClient;
 			if (apiClient != null)
 			{
-				if (await apiClient.SubmitTimeAsync(_mission.Id, category, durationMins))
+				StoryTimesApiClient.SubmitResult result = await apiClient.SubmitTimeAsync(_mission.Id, category, durationMins);
+				if (result.Success)
 				{
 					ScreenNotification.ShowNotification("Story Times: Time submitted for " + _mission.Name + "!");
 				}
 				else
 				{
-					ScreenNotification.ShowNotification("Story Times: Submission failed. Try again later.", ScreenNotification.NotificationType.Warning);
+					ScreenNotification.ShowNotification("Story Times: " + result.Error, ScreenNotification.NotificationType.Warning);
 				}
 				Dispose();
 			}
