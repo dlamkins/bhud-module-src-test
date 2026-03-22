@@ -97,10 +97,10 @@ namespace DecorBlishhudModule.Sections.LeftSideTasks
 				{
 					textureXImage.set_Texture(AsyncTexture2D.op_Implicit(textureX));
 				});
-				((Control)_decorationImage).add_Click((EventHandler<MouseEventArgs>)async delegate
+				((Control)_decorationImage).add_Click((EventHandler<MouseEventArgs>)async delegate(object s, MouseEventArgs e)
 				{
 					await Task.Delay(100);
-					if ((DateTime.Now - _lastImageShownTime).TotalMilliseconds > 200.0)
+					if (e.get_IsDoubleClick())
 					{
 						((Control)_decorationImage).set_Visible(false);
 						((Control)bigImagePanel).set_Visible(false);

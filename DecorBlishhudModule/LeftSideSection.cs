@@ -43,10 +43,6 @@ namespace DecorBlishhudModule
 
 		private static Label _loadingLabel2 = null;
 
-		private static DateTime _lastClickTime = DateTime.MinValue;
-
-		private const int DoubleClickThresholdMs = 300;
-
 		private static readonly Dictionary<string, SemaphoreSlim> _fileSemaphores = new Dictionary<string, SemaphoreSlim>();
 
 		private static readonly object _semaphoreLock = new object();
@@ -325,10 +321,9 @@ namespace DecorBlishhudModule
 						lastSelectedTab = decorWindow2.SelectedTabGroup2;
 					};
 					DecorModule decorModule;
-					((Control)decorationIconImage).add_Click((EventHandler<MouseEventArgs>)async delegate
+					((Control)decorationIconImage).add_Click((EventHandler<MouseEventArgs>)async delegate(object s, MouseEventArgs e)
 					{
-						DateTime now = DateTime.UtcNow;
-						if ((now - _lastClickTime).TotalMilliseconds <= 300.0)
+						if (e.get_IsDoubleClick())
 						{
 							string pageName = decoration.Name;
 							if (isHomestead)
@@ -341,71 +336,66 @@ namespace DecorBlishhudModule
 								FileName = url,
 								UseShellExecute = true
 							});
-							_lastClickTime = DateTime.MinValue;
 						}
-						else
+						else if (!isOperationRunning)
 						{
-							_lastClickTime = now;
-							if (!isOperationRunning)
+							bool loaded = DecorModule.DecorModuleInstance.Loaded;
+							if (lastClickedIconPanel != null && ((Control)lastClickedIconPanel).get_BackgroundColor() == new Color(254, 254, 176))
 							{
-								bool loaded = DecorModule.DecorModuleInstance.Loaded;
-								if (lastClickedIconPanel != null && ((Control)lastClickedIconPanel).get_BackgroundColor() == new Color(254, 254, 176))
-								{
-									((Control)lastClickedIconPanel).set_BackgroundColor(Color.get_Black());
-									((Control)decorationIconImage).set_Opacity(1f);
-								}
-								((Control)borderPanel).set_BackgroundColor(new Color(254, 254, 176));
+								((Control)lastClickedIconPanel).set_BackgroundColor(Color.get_Black());
 								((Control)decorationIconImage).set_Opacity(1f);
-								lastClickedIconPanel = borderPanel;
-								LoadingSpinner val12 = new LoadingSpinner();
-								((Control)val12).set_Parent((Container)(object)decorWindow2);
-								((Control)val12).set_Size(new Point(32, 32));
-								((Control)val12).set_Location(new Point(727, 320));
-								_loaderSpinner = val12;
-								Label val13 = new Label();
-								((Control)val13).set_Parent((Container)(object)decorWindow2);
-								val13.set_Text("Loading...");
-								val13.set_Font(GameService.Content.get_DefaultFont16());
-								((Control)val13).set_Location(new Point(762, 325));
-								val13.set_HorizontalAlignment((HorizontalAlignment)1);
-								val13.set_AutoSizeWidth(true);
-								_loadingLabel = val13;
-								_loadingLabel2 = new Label();
-								if (!loaded)
+							}
+							((Control)borderPanel).set_BackgroundColor(new Color(254, 254, 176));
+							((Control)decorationIconImage).set_Opacity(1f);
+							lastClickedIconPanel = borderPanel;
+							LoadingSpinner val12 = new LoadingSpinner();
+							((Control)val12).set_Parent((Container)(object)decorWindow2);
+							((Control)val12).set_Size(new Point(32, 32));
+							((Control)val12).set_Location(new Point(727, 320));
+							_loaderSpinner = val12;
+							Label val13 = new Label();
+							((Control)val13).set_Parent((Container)(object)decorWindow2);
+							val13.set_Text("Loading...");
+							val13.set_Font(GameService.Content.get_DefaultFont16());
+							((Control)val13).set_Location(new Point(762, 325));
+							val13.set_HorizontalAlignment((HorizontalAlignment)1);
+							val13.set_AutoSizeWidth(true);
+							_loadingLabel = val13;
+							_loadingLabel2 = new Label();
+							if (!loaded)
+							{
+								Label val14 = new Label();
+								((Control)val14).set_Parent((Container)(object)decorWindow2);
+								val14.set_Text("The image may take longer as the full data is fetched.");
+								val14.set_Font(GameService.Content.get_DefaultFont16());
+								((Control)val14).set_Location(new Point(620, 350));
+								val14.set_HorizontalAlignment((HorizontalAlignment)1);
+								val14.set_AutoSizeWidth(true);
+								_loadingLabel2 = val14;
+							}
+							isOperationRunning = true;
+							try
+							{
+								decorModule = DecorModule.DecorModuleInstance;
+								((Control)decorModule.DecorationImage).set_Tooltip(tooltip);
+								await Task.Run(async delegate
 								{
-									Label val14 = new Label();
-									((Control)val14).set_Parent((Container)(object)decorWindow2);
-									val14.set_Text("The image may take longer as the full data is fetched.");
-									val14.set_Font(GameService.Content.get_DefaultFont16());
-									((Control)val14).set_Location(new Point(620, 350));
-									val14.set_HorizontalAlignment((HorizontalAlignment)1);
-									val14.set_AutoSizeWidth(true);
-									_loadingLabel2 = val14;
-								}
-								isOperationRunning = true;
-								try
-								{
-									decorModule = DecorModule.DecorModuleInstance;
-									((Control)decorModule.DecorationImage).set_Tooltip(tooltip);
-									await Task.Run(async delegate
+									try
 									{
-										try
-										{
-											await RightSideSection.UpdateDecorationImageAsync(decoration, (Container)(object)decorModule.DecorWindow, decorModule.DecorationImage);
-										}
-										catch (Exception ex2)
-										{
-											Console.WriteLine("Error occurred during decoration image update: " + ex2.Message);
-										}
-									});
-								}
-								finally
-								{
-									isOperationRunning = false;
-									((Control)_loaderSpinner).Dispose();
-									((Control)_loadingLabel).Dispose();
-									((Control)_loadingLabel2).Dispose();
-								}
+										await RightSideSection.UpdateDecorationImageAsync(decoration, (Container)(object)decorModule.DecorWindow, decorModule.DecorationImage);
+									}
+									catch (Exception ex2)
+									{
+										Console.WriteLine("Error occurred during decoration image update: " + ex2.Message);
+									}
+								});
+							}
+							finally
+							{
+								isOperationRunning = false;
+								((Control)_loaderSpinner).Dispose();
+								((Control)_loadingLabel).Dispose();
+								((Control)_loadingLabel2).Dispose();
 							}
 						}
 					});
@@ -468,10 +458,9 @@ namespace DecorBlishhudModule
 				((Control)val6).set_BasicTooltipText(decoration.Name);
 				((Control)val6).set_Tooltip(tooltip);
 				Image decorationImage = val6;
-				((Control)mainContainer).add_Click((EventHandler<MouseEventArgs>)delegate
+				((Control)mainContainer).add_Click((EventHandler<MouseEventArgs>)delegate(object s, MouseEventArgs e)
 				{
-					DateTime utcNow = DateTime.UtcNow;
-					if ((utcNow - _lastClickTime).TotalMilliseconds <= 300.0)
+					if (e.get_IsDoubleClick())
 					{
 						string text = decoration.Name;
 						if (isHomestead)
@@ -484,11 +473,6 @@ namespace DecorBlishhudModule
 							FileName = fileName,
 							UseShellExecute = true
 						});
-						_lastClickTime = DateTime.MinValue;
-					}
-					else
-					{
-						_lastClickTime = utcNow;
 					}
 				});
 				((Control)mainContainer).add_MouseEntered((EventHandler<MouseEventArgs>)delegate
