@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -41,6 +42,10 @@ namespace DecorBlishhudModule
 		private static Label _loadingLabel = null;
 
 		private static Label _loadingLabel2 = null;
+
+		private static DateTime _lastClickTime = DateTime.MinValue;
+
+		private const int DoubleClickThresholdMs = 300;
 
 		private static readonly Dictionary<string, SemaphoreSlim> _fileSemaphores = new Dictionary<string, SemaphoreSlim>();
 
@@ -111,7 +116,7 @@ namespace DecorBlishhudModule
 				val.set_ControlPadding(new Vector2(4f, 4f));
 				val.set_OuterControlPadding(new Vector2(6f, 4f));
 				FlowPanel categoryFlowPanel = val;
-				await Task.WhenAll(decorations.Select((Decoration decoration) => CreateDecorationIconsImagesAsync(decoration, categoryFlowPanel, _isIconView)));
+				await Task.WhenAll(decorations.Select((Decoration decoration) => CreateDecorationIconsImagesAsync(decoration, categoryFlowPanel, _isIconView, isHomestead: true)));
 			}));
 			await OrderDecorations.OrderDecorationsAsync(homesteadDecorationsFlowPanel, _isIconView);
 		}
@@ -151,7 +156,7 @@ namespace DecorBlishhudModule
 				val.set_ControlPadding(new Vector2(4f, 4f));
 				val.set_OuterControlPadding(new Vector2(6f, 4f));
 				FlowPanel categoryFlowPanel = val;
-				await Task.WhenAll(decorations.Select((Decoration decoration) => CreateDecorationIconsImagesAsync(decoration, categoryFlowPanel, _isIconView)));
+				await Task.WhenAll(decorations.Select((Decoration decoration) => CreateDecorationIconsImagesAsync(decoration, categoryFlowPanel, _isIconView, isHomestead: false)));
 			}));
 			await OrderDecorations.OrderDecorationsAsync(guildHallDecorationsFlowPanel, _isIconView);
 		}
@@ -191,7 +196,7 @@ namespace DecorBlishhudModule
 				val.set_ControlPadding(new Vector2(8f, 10f));
 				val.set_OuterControlPadding(new Vector2(10f, 10f));
 				FlowPanel categoryFlowPanel = val;
-				await Task.WhenAll(decorations.Select((Decoration decoration) => CreateDecorationIconsImagesAsync(decoration, categoryFlowPanel, _isIconView)));
+				await Task.WhenAll(decorations.Select((Decoration decoration) => CreateDecorationIconsImagesAsync(decoration, categoryFlowPanel, _isIconView, isHomestead: true)));
 			}));
 			await OrderDecorations.OrderDecorationsAsync(homesteadDecorationsFlowPanel, _isIconView);
 		}
@@ -231,12 +236,12 @@ namespace DecorBlishhudModule
 				val.set_ControlPadding(new Vector2(8f, 10f));
 				val.set_OuterControlPadding(new Vector2(10f, 10f));
 				FlowPanel categoryFlowPanel = val;
-				await Task.WhenAll(decorations.Select((Decoration decoration) => CreateDecorationIconsImagesAsync(decoration, categoryFlowPanel, _isIconView)));
+				await Task.WhenAll(decorations.Select((Decoration decoration) => CreateDecorationIconsImagesAsync(decoration, categoryFlowPanel, _isIconView, isHomestead: false)));
 			}));
 			await OrderDecorations.OrderDecorationsAsync(guildHallDecorationsFlowPanel, _isIconView);
 		}
 
-		public static async Task CreateDecorationIconsImagesAsync(Decoration decoration, FlowPanel categoryFlowPanel, bool _isIconView)
+		public static async Task CreateDecorationIconsImagesAsync(Decoration decoration, FlowPanel categoryFlowPanel, bool _isIconView, bool isHomestead)
 		{
 			try
 			{
@@ -322,65 +327,85 @@ namespace DecorBlishhudModule
 					DecorModule decorModule;
 					((Control)decorationIconImage).add_Click((EventHandler<MouseEventArgs>)async delegate
 					{
-						if (!isOperationRunning)
+						DateTime now = DateTime.UtcNow;
+						if ((now - _lastClickTime).TotalMilliseconds <= 300.0)
 						{
-							bool loaded = DecorModule.DecorModuleInstance.Loaded;
-							if (lastClickedIconPanel != null && ((Control)lastClickedIconPanel).get_BackgroundColor() == new Color(254, 254, 176))
+							string pageName = decoration.Name;
+							if (isHomestead)
 							{
-								((Control)lastClickedIconPanel).set_BackgroundColor(Color.get_Black());
-								((Control)decorationIconImage).set_Opacity(1f);
+								pageName += " (Handiwork)";
 							}
-							((Control)borderPanel).set_BackgroundColor(new Color(254, 254, 176));
-							((Control)decorationIconImage).set_Opacity(1f);
-							lastClickedIconPanel = borderPanel;
-							LoadingSpinner val12 = new LoadingSpinner();
-							((Control)val12).set_Parent((Container)(object)decorWindow2);
-							((Control)val12).set_Size(new Point(32, 32));
-							((Control)val12).set_Location(new Point(727, 320));
-							_loaderSpinner = val12;
-							Label val13 = new Label();
-							((Control)val13).set_Parent((Container)(object)decorWindow2);
-							val13.set_Text("Loading...");
-							val13.set_Font(GameService.Content.get_DefaultFont16());
-							((Control)val13).set_Location(new Point(762, 325));
-							val13.set_HorizontalAlignment((HorizontalAlignment)1);
-							val13.set_AutoSizeWidth(true);
-							_loadingLabel = val13;
-							_loadingLabel2 = new Label();
-							if (!loaded)
+							string url = "https://wiki.guildwars2.com/wiki/" + Uri.EscapeDataString(pageName);
+							Process.Start(new ProcessStartInfo
 							{
-								Label val14 = new Label();
-								((Control)val14).set_Parent((Container)(object)decorWindow2);
-								val14.set_Text("The image may take longer as the full data is fetched.");
-								val14.set_Font(GameService.Content.get_DefaultFont16());
-								((Control)val14).set_Location(new Point(620, 350));
-								val14.set_HorizontalAlignment((HorizontalAlignment)1);
-								val14.set_AutoSizeWidth(true);
-								_loadingLabel2 = val14;
-							}
-							isOperationRunning = true;
-							try
+								FileName = url,
+								UseShellExecute = true
+							});
+							_lastClickTime = DateTime.MinValue;
+						}
+						else
+						{
+							_lastClickTime = now;
+							if (!isOperationRunning)
 							{
-								decorModule = DecorModule.DecorModuleInstance;
-								((Control)decorModule.DecorationImage).set_Tooltip(tooltip);
-								await Task.Run(async delegate
+								bool loaded = DecorModule.DecorModuleInstance.Loaded;
+								if (lastClickedIconPanel != null && ((Control)lastClickedIconPanel).get_BackgroundColor() == new Color(254, 254, 176))
 								{
-									try
+									((Control)lastClickedIconPanel).set_BackgroundColor(Color.get_Black());
+									((Control)decorationIconImage).set_Opacity(1f);
+								}
+								((Control)borderPanel).set_BackgroundColor(new Color(254, 254, 176));
+								((Control)decorationIconImage).set_Opacity(1f);
+								lastClickedIconPanel = borderPanel;
+								LoadingSpinner val12 = new LoadingSpinner();
+								((Control)val12).set_Parent((Container)(object)decorWindow2);
+								((Control)val12).set_Size(new Point(32, 32));
+								((Control)val12).set_Location(new Point(727, 320));
+								_loaderSpinner = val12;
+								Label val13 = new Label();
+								((Control)val13).set_Parent((Container)(object)decorWindow2);
+								val13.set_Text("Loading...");
+								val13.set_Font(GameService.Content.get_DefaultFont16());
+								((Control)val13).set_Location(new Point(762, 325));
+								val13.set_HorizontalAlignment((HorizontalAlignment)1);
+								val13.set_AutoSizeWidth(true);
+								_loadingLabel = val13;
+								_loadingLabel2 = new Label();
+								if (!loaded)
+								{
+									Label val14 = new Label();
+									((Control)val14).set_Parent((Container)(object)decorWindow2);
+									val14.set_Text("The image may take longer as the full data is fetched.");
+									val14.set_Font(GameService.Content.get_DefaultFont16());
+									((Control)val14).set_Location(new Point(620, 350));
+									val14.set_HorizontalAlignment((HorizontalAlignment)1);
+									val14.set_AutoSizeWidth(true);
+									_loadingLabel2 = val14;
+								}
+								isOperationRunning = true;
+								try
+								{
+									decorModule = DecorModule.DecorModuleInstance;
+									((Control)decorModule.DecorationImage).set_Tooltip(tooltip);
+									await Task.Run(async delegate
 									{
-										await RightSideSection.UpdateDecorationImageAsync(decoration, (Container)(object)decorModule.DecorWindow, decorModule.DecorationImage);
-									}
-									catch (Exception ex2)
-									{
-										Console.WriteLine("Error occurred during decoration image update: " + ex2.Message);
-									}
-								});
-							}
-							finally
-							{
-								isOperationRunning = false;
-								((Control)_loaderSpinner).Dispose();
-								((Control)_loadingLabel).Dispose();
-								((Control)_loadingLabel2).Dispose();
+										try
+										{
+											await RightSideSection.UpdateDecorationImageAsync(decoration, (Container)(object)decorModule.DecorWindow, decorModule.DecorationImage);
+										}
+										catch (Exception ex2)
+										{
+											Console.WriteLine("Error occurred during decoration image update: " + ex2.Message);
+										}
+									});
+								}
+								finally
+								{
+									isOperationRunning = false;
+									((Control)_loaderSpinner).Dispose();
+									((Control)_loadingLabel).Dispose();
+									((Control)_loadingLabel2).Dispose();
+								}
 							}
 						}
 					});
@@ -443,6 +468,29 @@ namespace DecorBlishhudModule
 				((Control)val6).set_BasicTooltipText(decoration.Name);
 				((Control)val6).set_Tooltip(tooltip);
 				Image decorationImage = val6;
+				((Control)mainContainer).add_Click((EventHandler<MouseEventArgs>)delegate
+				{
+					DateTime utcNow = DateTime.UtcNow;
+					if ((utcNow - _lastClickTime).TotalMilliseconds <= 300.0)
+					{
+						string text = decoration.Name;
+						if (isHomestead)
+						{
+							text += " (Handiwork)";
+						}
+						string fileName = "https://wiki.guildwars2.com/wiki/" + Uri.EscapeDataString(text);
+						Process.Start(new ProcessStartInfo
+						{
+							FileName = fileName,
+							UseShellExecute = true
+						});
+						_lastClickTime = DateTime.MinValue;
+					}
+					else
+					{
+						_lastClickTime = utcNow;
+					}
+				});
 				((Control)mainContainer).add_MouseEntered((EventHandler<MouseEventArgs>)delegate
 				{
 					//IL_001b: Unknown result type (might be due to invalid IL or missing references)
