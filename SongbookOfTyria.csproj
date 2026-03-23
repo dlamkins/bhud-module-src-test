@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>SongbookOfTyria</AssemblyName>
+    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+    <TargetFramework>net48</TargetFramework>
+  </PropertyGroup>
+  <PropertyGroup>
+    <LangVersion>Preview</LangVersion>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemGroup />
+  <ItemGroup>
+    <Reference Include="Blish HUD" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="MonoGame.Framework" />
+    <Reference Include="System.Core" />
+    <Reference Include="MonoGame.Extended" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="Newtonsoft.Json" />
+    <Reference Include="NAudio.WinMM">
+      <HintPath>..\..\working\NAudio.WinMM.dll</HintPath>
+    </Reference>
+    <Reference Include="NAudio">
+      <HintPath>..\..\working\NAudio.dll</HintPath>
+    </Reference>
+    <Reference Include="NAudio.Core">
+      <HintPath>..\..\working\NAudio.Core.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>
