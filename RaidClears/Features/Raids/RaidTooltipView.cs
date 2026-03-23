@@ -329,8 +329,8 @@ namespace RaidClears.Features.Raids
 			//IL_0350: Unknown result type (might be due to invalid IL or missing references)
 			//IL_03c5: Unknown result type (might be due to invalid IL or missing references)
 			//IL_03da: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0429: Unknown result type (might be due to invalid IL or missing references)
-			//IL_043e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_042e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0443: Unknown result type (might be due to invalid IL or missing references)
 			if (e.NewValue == null)
 			{
 				return;
@@ -417,12 +417,12 @@ namespace RaidClears.Features.Raids
 						}
 						else
 						{
-							_mentorLabel.set_Text(string.Format(Strings.Tooltip_MentorProgress, 0, "?"));
+							_mentorLabel.set_Text(string.Format(Strings.Tooltip_MentorProgress, 0, 1000));
 							((Control)_mentorLabel).set_Location(((Control)_mentorIcon).get_Visible() ? new Point(((Control)_mentorIcon).get_Right() + 5, yOffset) : new Point(xOffset + 5, yOffset));
 							((Control)_mentorLabel).set_Visible(true);
 						}
 						yOffset += 25;
-						goto IL_04d5;
+						goto IL_04da;
 					}
 				}
 				((Control)_mentorIcon).set_Visible(false);
@@ -439,8 +439,8 @@ namespace RaidClears.Features.Raids
 				((Control)_mentorIcon).set_Visible(false);
 				((Control)_mentorLabel).set_Visible(false);
 			}
-			goto IL_04d5;
-			IL_04d5:
+			goto IL_04da;
+			IL_04da:
 			((Control)this).Invalidate();
 		}
 

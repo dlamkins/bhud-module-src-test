@@ -25,6 +25,9 @@ namespace RaidClears.Features.Shared.Models
 		[JsonProperty("mentor_achievement_id", NullValueHandling = NullValueHandling.Ignore)]
 		public int? MentorAchievementId { get; set; }
 
+		[JsonProperty("mentor_achievement_max", NullValueHandling = NullValueHandling.Ignore)]
+		public int? MentorAchievementMax { get; set; }
+
 		[JsonProperty("daily_bounty_achievement_id", NullValueHandling = NullValueHandling.Ignore)]
 		public int? DailyBountyAchievementId { get; set; }
 

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,25 +19,9 @@ namespace RaidClears.Features.Raids.Services
 {
 	public class MentorAchievementProgressService
 	{
-		private sealed class AchievementDefinitionDto
-		{
-			[JsonProperty("id")]
-			public int Id { get; set; }
-
-			[JsonProperty("tiers")]
-			public List<AchievementTierDto> Tiers { get; set; } = new List<AchievementTierDto>();
-
-		}
-
-		private sealed class AchievementTierDto
-		{
-			[JsonProperty("count")]
-			public int Count { get; set; }
-		}
-
 		private const string CacheFilename = "mentor_achievement_progress.json";
 
-		private const string DefinitionCacheFilename = "mentor_achievement_definitions.json";
+		public const int DefaultMentorAchievementMax = 1000;
 
 		private static readonly List<TokenPermission> NecessaryPermissions = new List<TokenPermission>
 		{
@@ -50,7 +33,7 @@ namespace RaidClears.Features.Raids.Services
 
 		private Dictionary<int, MentorAchievementProgressEntry> _progress = new Dictionary<int, MentorAchievementProgressEntry>();
 
-		private readonly Dictionary<int, int> _definitionMax = new Dictionary<int, int>();
+		private readonly Dictionary<int, int> _mentorAchievementMax = new Dictionary<int, int>();
 
 		private readonly RaidData _raidData;
 
@@ -70,11 +53,12 @@ namespace RaidClears.Features.Raids.Services
 		public MentorAchievementProgressService(RaidData raidData)
 		{
 			_raidData = raidData ?? throw new ArgumentNullException("raidData");
+			LoadMentorAchievementMax();
 		}
 
-		public IReadOnlyCollection<int> GetMentorAchievementIds()
+		private void LoadMentorAchievementMax()
 		{
-			HashSet<int> ids = new HashSet<int>();
+			_mentorAchievementMax.Clear();
 			foreach (ExpansionRaid expansion in _raidData.Expansions)
 			{
 				foreach (RaidWing wing in expansion.Wings)
@@ -83,17 +67,26 @@ namespace RaidClears.Features.Raids.Services
 					{
 						if (encounter.MentorAchievementId.HasValue)
 						{
-							ids.Add(encounter.MentorAchievementId.Value);
+							int id = encounter.MentorAchievementId.Value;
+							int max = encounter.MentorAchievementMax.GetValueOrDefault(1000);
+							if (max <= 0)
+							{
+								max = 1000;
+							}
+							_mentorAchievementMax[id] = max;
 						}
 					}
 				}
 			}
-			return ids;
+		}
+
+		public IReadOnlyCollection<int> GetMentorAchievementIds()
+		{
+			return _mentorAchievementMax.Keys.ToList();
 		}
 
 		public void LoadCache()
 		{
-			LoadDefinitionCache();
 			string path = GetCacheFilePath();
 			if (!File.Exists(path))
 			{
@@ -107,12 +100,12 @@ namespace RaidClears.Features.Raids.Services
 				{
 					return;
 				}
-				IReadOnlyCollection<int> mentorIds = GetMentorAchievementIds();
 				Dictionary<int, MentorAchievementProgressEntry> dict = new Dictionary<int, MentorAchievementProgressEntry>();
 				foreach (MentorAchievementProgressEntry entry in cache.Achievements)
 				{
-					if (mentorIds.Contains(entry.Id))
+					if (_mentorAchievementMax.TryGetValue(entry.Id, out var max))
 					{
+						entry.Max = max;
 						dict[entry.Id] = entry;
 					}
 				}
@@ -147,10 +140,6 @@ namespace RaidClears.Features.Raids.Services
 			}
 			try
 			{
-				await Task.Run(delegate
-				{
-					EnsureDefinitions(mentorIds);
-				});
 				List<AccountAchievement> obj = ((IEnumerable<AccountAchievement>)(await ((IBlobClient<IApiV2ObjectList<AccountAchievement>>)(object)gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
 					.get_Achievements()).GetAsync(default(CancellationToken))))?.ToList() ?? new List<AccountAchievement>();
 				Dictionary<int, MentorAchievementProgressEntry> newProgress = new Dictionary<int, MentorAchievementProgressEntry>();
@@ -159,12 +148,12 @@ namespace RaidClears.Features.Raids.Services
 					if (mentorIds.Contains(ach.get_Id()))
 					{
 						int defMax;
-						int maxFromDef = (_definitionMax.TryGetValue(ach.get_Id(), out defMax) ? defMax : ach.get_Max());
+						int maxFromStatic = ((_mentorAchievementMax.TryGetValue(ach.get_Id(), out defMax) && defMax > 0) ? defMax : ach.get_Max());
 						newProgress[ach.get_Id()] = new MentorAchievementProgressEntry
 						{
 							Id = ach.get_Id(),
 							Current = ach.get_Current(),
-							Max = maxFromDef,
+							Max = maxFromStatic,
 							Done = ach.get_Done()
 						};
 					}
@@ -208,93 +197,6 @@ namespace RaidClears.Features.Raids.Services
 			{
 				logger.Warn(ex, "Failed to fetch mentor achievement progress from API");
 			}
-		}
-
-		private void LoadDefinitionCache()
-		{
-			string path = GetDefinitionCacheFilePath();
-			if (!File.Exists(path))
-			{
-				return;
-			}
-			try
-			{
-				using StreamReader reader = new StreamReader(path, Encoding.UTF8);
-				MentorAchievementDefinitionCache cache = JsonConvert.DeserializeObject<MentorAchievementDefinitionCache>(reader.ReadToEnd());
-				if (cache?.Achievements == null || cache.Achievements.Count == 0)
-				{
-					return;
-				}
-				_definitionMax.Clear();
-				foreach (MentorAchievementDefinitionEntry entry in cache.Achievements)
-				{
-					_definitionMax[entry.Id] = entry.Max;
-				}
-			}
-			catch (Exception ex)
-			{
-				Logger.GetLogger<Module>().Warn(ex, "Failed to load mentor achievement definition cache");
-			}
-		}
-
-		private void EnsureDefinitions(IReadOnlyCollection<int> mentorIds)
-		{
-			List<int> missing = mentorIds.Where((int id) => !_definitionMax.ContainsKey(id)).ToList();
-			if (missing.Count == 0)
-			{
-				return;
-			}
-			try
-			{
-				using WebClient webClient = new WebClient();
-				string url = "https://api.guildwars2.com/v2/achievements?ids=" + string.Join(",", missing);
-				foreach (AchievementDefinitionDto def in (JsonConvert.DeserializeObject<List<AchievementDefinitionDto>>(webClient.DownloadString(url)) ?? new List<AchievementDefinitionDto>())!)
-				{
-					if (def.Tiers != null && def.Tiers.Count != 0)
-					{
-						int max = def.Tiers.Max((AchievementTierDto t) => t.Count);
-						_definitionMax[def.Id] = max;
-					}
-				}
-				SaveDefinitionCache();
-			}
-			catch (Exception ex)
-			{
-				Logger.GetLogger<Module>().Warn(ex, "Failed to download mentor achievement definitions");
-			}
-		}
-
-		private void SaveDefinitionCache()
-		{
-			try
-			{
-				MentorAchievementDefinitionCache cache = new MentorAchievementDefinitionCache
-				{
-					UpdatedUtc = DateTime.UtcNow.ToString("o"),
-					Achievements = _definitionMax.Select((KeyValuePair<int, int> kv) => new MentorAchievementDefinitionEntry
-					{
-						Id = kv.Key,
-						Max = kv.Value
-					}).ToList()
-				};
-				string definitionCacheFilePath = GetDefinitionCacheFilePath();
-				string dir = Path.GetDirectoryName(definitionCacheFilePath);
-				if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
-				{
-					Directory.CreateDirectory(dir);
-				}
-				using StreamWriter writer = new StreamWriter(definitionCacheFilePath, append: false, Encoding.UTF8);
-				writer.Write(JsonConvert.SerializeObject(cache, Formatting.Indented));
-			}
-			catch (Exception ex)
-			{
-				Logger.GetLogger<Module>().Warn(ex, "Failed to save mentor achievement definition cache");
-			}
-		}
-
-		private string GetDefinitionCacheFilePath()
-		{
-			return Path.Combine(Service.DirectoriesManager.GetFullDirectoryPath(Module.DIRECTORY_PATH), "mentor_achievement_definitions.json");
 		}
 
 		private static bool ProgressEquals(Dictionary<int, MentorAchievementProgressEntry> a, Dictionary<int, MentorAchievementProgressEntry> b)
