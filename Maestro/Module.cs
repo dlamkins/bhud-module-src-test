@@ -74,6 +74,10 @@ namespace Maestro
 
 		internal Gw2ApiManager Gw2ApiManager => base.ModuleParameters.get_Gw2ApiManager();
 
+		internal KeyboardService KeyboardService => _keyboardService;
+
+		internal SongPlayer SongPlayer => _songPlayer;
+
 		[ImportingConstructor]
 		public Module([Import("ModuleParameters")] ModuleParameters moduleParameters)
 			: this(moduleParameters)
@@ -215,13 +219,21 @@ namespace Maestro
 				((Control)_maestroCreatorWindow).Hide();
 				return;
 			}
-			_maestroWindow?.SetCreateButtonEnabled(enabled: false);
+			MaestroWindow maestroWindow = _maestroWindow;
+			if (maestroWindow != null)
+			{
+				((Control)maestroWindow).Hide();
+			}
 			((Control)_maestroCreatorWindow).Show();
 		}
 
 		private void OnCreatorWindowClosed(object sender, EventArgs e)
 		{
-			_maestroWindow?.SetCreateButtonEnabled(enabled: true);
+			MaestroWindow maestroWindow = _maestroWindow;
+			if (maestroWindow != null)
+			{
+				((Control)maestroWindow).Show();
+			}
 		}
 
 		private void OnEditRequested(object sender, Song song)
@@ -235,7 +247,11 @@ namespace Maestro
 			}
 			_editingOriginalSong = song;
 			_maestroCreatorWindow.LoadSong(song);
-			_maestroWindow?.SetCreateButtonEnabled(enabled: false);
+			MaestroWindow maestroWindow = _maestroWindow;
+			if (maestroWindow != null)
+			{
+				((Control)maestroWindow).Hide();
+			}
 			((Control)_maestroCreatorWindow).Show();
 		}
 

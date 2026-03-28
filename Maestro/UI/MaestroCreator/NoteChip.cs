@@ -3,17 +3,16 @@ using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace Maestro.UI.MaestroCreator
 {
-	public class NoteChip : Panel
+	public class NoteChip : BaseChip
 	{
-		private static class Layout
+		public static class Layout
 		{
-			public const int Height = 24;
+			public const int Height = 26;
 
-			public const int FixedWidth = 118;
+			public const int FixedWidth = 114;
 
 			public const int CloseButtonSize = 16;
 
@@ -22,37 +21,13 @@ namespace Maestro.UI.MaestroCreator
 			public const int CloseButtonMargin = 2;
 		}
 
-		private const int BORDER_THICKNESS = 2;
-
 		private readonly Label _noteLabel;
 
 		private readonly Label _closeButton;
 
-		private bool _isSelected;
-
 		public string NoteString { get; }
 
-		public int Index { get; set; }
-
-		public bool IsSelected
-		{
-			get
-			{
-				return _isSelected;
-			}
-			set
-			{
-				_isSelected = value;
-				UpdateVisualState();
-			}
-		}
-
-		public event EventHandler RemoveClicked;
-
-		public event EventHandler<MouseEventArgs> ChipClicked;
-
 		public NoteChip(string noteString, int index)
-			: this()
 		{
 			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
@@ -86,11 +61,11 @@ namespace Maestro.UI.MaestroCreator
 			//IL_0137: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0143: Expected O, but got Unknown
 			NoteString = noteString;
-			Index = index;
+			base.Index = index;
 			Color baseColor = GetNoteColor(noteString);
-			((Control)this).set_Size(new Point(118, 24));
+			((Control)this).set_Size(new Point(114, 26));
 			((Control)this).set_BackgroundColor(baseColor);
-			int maxTextWidth = 92;
+			int maxTextWidth = 88;
 			int maxChars = maxTextWidth / 7;
 			string displayText = noteString;
 			bool needsTooltip = false;
@@ -103,8 +78,8 @@ namespace Maestro.UI.MaestroCreator
 			((Control)val).set_Parent((Container)(object)this);
 			val.set_Text(displayText);
 			((Control)val).set_Location(new Point(4, 2));
-			((Control)val).set_Size(new Point(maxTextWidth, 20));
-			val.set_Font(GameService.Content.get_DefaultFont12());
+			((Control)val).set_Size(new Point(maxTextWidth, 22));
+			val.set_Font(GameService.Content.get_DefaultFont14());
 			val.set_TextColor(MaestroTheme.CreamWhite);
 			val.set_HorizontalAlignment((HorizontalAlignment)0);
 			val.set_VerticalAlignment((VerticalAlignment)1);
@@ -113,8 +88,8 @@ namespace Maestro.UI.MaestroCreator
 			Label val2 = new Label();
 			((Control)val2).set_Parent((Container)(object)this);
 			val2.set_Text("×");
-			((Control)val2).set_Location(new Point(100, 2));
-			((Control)val2).set_Size(new Point(16, 20));
+			((Control)val2).set_Location(new Point(96, 2));
+			((Control)val2).set_Size(new Point(16, 22));
 			val2.set_Font(GameService.Content.get_DefaultFont14());
 			val2.set_TextColor(MaestroTheme.MutedCream);
 			val2.set_HorizontalAlignment((HorizontalAlignment)1);
@@ -132,7 +107,7 @@ namespace Maestro.UI.MaestroCreator
 			});
 			((Control)_closeButton).add_LeftMouseButtonReleased((EventHandler<MouseEventArgs>)delegate
 			{
-				this.RemoveClicked?.Invoke(this, EventArgs.Empty);
+				FireRemoveClicked();
 			});
 			((Control)this).add_MouseEntered((EventHandler<MouseEventArgs>)delegate
 			{
@@ -150,68 +125,36 @@ namespace Maestro.UI.MaestroCreator
 		protected override void OnClick(MouseEventArgs e)
 		{
 			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			if (((Control)this).get_RelativeMousePosition().X < 100)
+			if (((Control)this).get_RelativeMousePosition().X < 96)
 			{
-				this.ChipClicked?.Invoke(this, e);
+				FireChipClicked(e);
 			}
 			((Panel)this).OnClick(e);
-		}
-
-		private void UpdateVisualState()
-		{
-			((Control)this).Invalidate();
 		}
 
 		private static Color GetNoteColor(string noteString)
 		{
 			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
 			if (noteString.StartsWith("R"))
 			{
 				return MaestroTheme.ChipRest;
 			}
-			if (noteString.Contains("-"))
+			bool num = noteString.Contains("#");
+			Color baseColor = (noteString.Contains("-") ? MaestroTheme.ChipLowerOctave : ((!noteString.Contains("+")) ? MaestroTheme.ChipMiddleOctave : MaestroTheme.ChipUpperOctave));
+			if (!num)
 			{
-				return MaestroTheme.ChipLowerOctave;
+				return baseColor;
 			}
-			if (noteString.Contains("+"))
-			{
-				return MaestroTheme.ChipUpperOctave;
-			}
-			return MaestroTheme.ChipMiddleOctave;
-		}
-
-		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
-		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-			((Panel)this).PaintBeforeChildren(spriteBatch, bounds);
-			if (_isSelected)
-			{
-				Color borderColor = MaestroTheme.AmberGold;
-				Texture2D pixel = Textures.get_Pixel();
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, pixel, new Rectangle(0, 0, bounds.Width, 2), borderColor);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, pixel, new Rectangle(0, bounds.Height - 2, bounds.Width, 2), borderColor);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, pixel, new Rectangle(0, 0, 2, bounds.Height), borderColor);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, pixel, new Rectangle(bounds.Width - 2, 0, 2, bounds.Height), borderColor);
-			}
+			return MaestroTheme.Darken(baseColor, 0.7f);
 		}
 
 		protected override void DisposeControl()

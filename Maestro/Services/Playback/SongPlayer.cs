@@ -29,6 +29,12 @@ namespace Maestro.Services.Playback
 
 		private int _seekTargetOctave;
 
+		private int _lastWaitDuration;
+
+		private bool _lastKeyUpWasNote;
+
+		private Keys _lastKeyUpKey;
+
 		private static bool Gw2HasFocus => GameService.GameIntegration.get_Gw2Instance().get_Gw2HasFocus();
 
 		private static bool IsGw2TextInputFocused => GameService.Gw2Mumble.get_UI().get_IsTextInputFocused();
@@ -245,6 +251,7 @@ namespace Maestro.Services.Playback
 						continue;
 					}
 					SongCommand command = CurrentSong.Commands[CurrentCommandIndex];
+					DetectPhantomNoteRisk(command);
 					ExecuteCommand(command);
 					if (command.Type == CommandType.Wait && command.Duration > 0)
 					{
@@ -265,6 +272,43 @@ namespace Maestro.Services.Playback
 			catch (Exception ex)
 			{
 				Logger.Warn(ex, "Error during playback - song stopped");
+			}
+		}
+
+		private void DetectPhantomNoteRisk(SongCommand command)
+		{
+			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002e: Invalid comparison between Unknown and I4
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0038: Invalid comparison between Unknown and I4
+			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004d: Invalid comparison between Unknown and I4
+			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0085: Invalid comparison between Unknown and I4
+			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008f: Invalid comparison between Unknown and I4
+			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
+			if (command.Type == CommandType.Wait)
+			{
+				_lastWaitDuration = command.Duration;
+				_lastKeyUpWasNote = false;
+			}
+			else if (command.Type == CommandType.KeyUp)
+			{
+				bool isOctaveKey = (int)command.Key == 105 || (int)command.Key == 96;
+				_lastKeyUpWasNote = !isOctaveKey && (int)command.Key != 164;
+				_lastKeyUpKey = command.Key;
+			}
+			else if (command.Type == CommandType.KeyDown && _lastKeyUpWasNote)
+			{
+				if (((int)command.Key == 105 || (int)command.Key == 96) && _lastWaitDuration >= 500)
+				{
+					Logger.Debug($"[PHANTOM-RISK] Long note ({_lastWaitDuration}ms) " + $"KeyUp({_lastKeyUpKey}) followed by octave change ({command.Key}) " + $"at command {CurrentCommandIndex}");
+				}
+				_lastKeyUpWasNote = false;
 			}
 		}
 

@@ -101,6 +101,12 @@ namespace Maestro.UI
 			return new Color((int)((Color)(ref color)).get_R(), (int)((Color)(ref color)).get_G(), (int)((Color)(ref color)).get_B(), alpha);
 		}
 
+		public static Color Darken(Color color, float amount)
+		{
+			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+			return new Color((int)((float)(int)((Color)(ref color)).get_R() * amount), (int)((float)(int)((Color)(ref color)).get_G() * amount), (int)((float)(int)((Color)(ref color)).get_B() * amount), (int)((Color)(ref color)).get_A());
+		}
+
 		public static Texture2D CreateWindowBackground(int windowWidth, int windowHeight)
 		{
 			//IL_000e: Unknown result type (might be due to invalid IL or missing references)

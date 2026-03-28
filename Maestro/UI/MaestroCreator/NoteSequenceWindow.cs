@@ -8,11 +8,15 @@ namespace Maestro.UI.MaestroCreator
 {
 	public class NoteSequenceWindow : StandardWindow
 	{
-		private static class Layout
+		public static class Layout
 		{
 			public const int DefaultWidth = 700;
 
 			public const int DefaultHeight = 450;
+
+			public const int MinWidth = 500;
+
+			public const int MinHeight = 350;
 
 			public const int MaxWidth = 1200;
 
@@ -50,12 +54,17 @@ namespace Maestro.UI.MaestroCreator
 			_panel = panel;
 			((Control)_panel).set_Parent((Container)(object)this);
 			((Control)_panel).set_Location(new Point(0, 2));
-			_panel.SetExpanded(expanded: true);
 			UpdatePanelSize();
 		}
 
 		public override void RecalculateLayout()
 		{
+			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+			if (((Control)this).get_Width() < 500 || ((Control)this).get_Height() < 350)
+			{
+				((Control)this).set_Size(new Point(Math.Max(((Control)this).get_Width(), 500), Math.Max(((Control)this).get_Height(), 350)));
+				return;
+			}
 			((WindowBase2)this).RecalculateLayout();
 			UpdatePanelSize();
 		}
@@ -67,7 +76,7 @@ namespace Maestro.UI.MaestroCreator
 			if (_panel != null)
 			{
 				int contentWidth = ((Container)this).get_ContentRegion().Width;
-				int contentHeight = ((Container)this).get_ContentRegion().Height - 2;
+				int contentHeight = ((Container)this).get_ContentRegion().Height - 2 - 5;
 				if (contentWidth > 0 && contentHeight > 0)
 				{
 					_panel.ResizeTo(contentWidth, contentHeight);
@@ -81,7 +90,6 @@ namespace Maestro.UI.MaestroCreator
 			if (panel != null)
 			{
 				((Control)panel).set_Parent((Container)null);
-				panel.SetExpanded(expanded: false);
 				_panel = null;
 			}
 			return panel;

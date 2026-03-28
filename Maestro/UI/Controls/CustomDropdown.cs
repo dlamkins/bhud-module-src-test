@@ -95,10 +95,20 @@ namespace Maestro.UI.Controls
 			protected override void OnClick(MouseEventArgs e)
 			{
 				//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0071: Expected O, but got Unknown
 				int index = GetItemIndexAt(((Control)this).get_RelativeMousePosition().Y);
 				if (index >= 0 && index < _owner._items.Count)
 				{
-					_owner.SelectedIndex = index;
+					if (index == _owner._selectedIndex)
+					{
+						string val = _owner._items[index].DisplayText;
+						_owner.ValueChanged?.Invoke(_owner, new ValueChangedEventArgs(val, val));
+					}
+					else
+					{
+						_owner.SelectedIndex = index;
+					}
 					((Control)this).Dispose();
 				}
 				((Control)this).OnClick(e);
@@ -174,6 +184,7 @@ namespace Maestro.UI.Controls
 			{
 				if (_owner != null)
 				{
+					_owner._panelJustClosed = ((Control)_owner)._mouseOver;
 					_owner._panel = null;
 				}
 				Control.get_Input().get_Mouse().remove_LeftMouseButtonPressed((EventHandler<MouseEventArgs>)OnMouseButtonPressed);
@@ -202,7 +213,7 @@ namespace Maestro.UI.Controls
 
 		private DropdownPanel _panel;
 
-		private bool _hadPanel;
+		private bool _panelJustClosed;
 
 		private readonly List<DropdownItem> _items = new List<DropdownItem>();
 
@@ -279,25 +290,37 @@ namespace Maestro.UI.Controls
 			_selectedIndex = -1;
 		}
 
+		public DropdownItem ItemAt(int index)
+		{
+			if (index < 0 || index >= _items.Count)
+			{
+				return null;
+			}
+			return _items[index];
+		}
+
 		protected override void OnClick(MouseEventArgs e)
 		{
 			((Control)this).OnClick(e);
 			if (((Control)this).get_Enabled())
 			{
-				if (_panel == null && !_hadPanel)
+				if (_panel != null)
 				{
-					_panel = new DropdownPanel(this);
+					((Control)_panel).Dispose();
+				}
+				else if (_panelJustClosed)
+				{
+					_panelJustClosed = false;
 				}
 				else
 				{
-					_hadPanel = false;
+					_panel = new DropdownPanel(this);
 				}
 			}
 		}
 
 		public void HidePanel()
 		{
-			_hadPanel = base._mouseOver;
 			DropdownPanel panel = _panel;
 			if (panel != null)
 			{

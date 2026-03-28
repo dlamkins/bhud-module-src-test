@@ -8,6 +8,7 @@ using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Maestro.Models;
 using Maestro.Services.Data;
+using Maestro.Services.Playback;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -19,15 +20,13 @@ namespace Maestro.UI.MaestroCreator
 		{
 			public const int WindowWidth = 420;
 
-			public const int WindowHeight = 560;
+			public const int WindowHeight = 360;
 
 			public const int ContentWidth = 390;
 
-			public const int ContentHeight = 530;
+			public const int ContentHeight = 350;
 
 			public const int RowHeight = 28;
-
-			public const int NoteSequenceHeight = 195;
 
 			public const int ChordBarHeight = 30;
 
@@ -49,8 +48,6 @@ namespace Maestro.UI.MaestroCreator
 
 			public const int ActionButtonWidth = 80;
 
-			public const int PreviewButtonWidth = 95;
-
 			public const int ActionButtonSpacing = 10;
 
 			public const int ChordPreviewMaxLength = 38;
@@ -69,8 +66,6 @@ namespace Maestro.UI.MaestroCreator
 		private readonly DurationSelector _durationSelector;
 
 		private readonly NoteSequencePanel _noteSequencePanel;
-
-		private readonly StandardButton _previewButton;
 
 		private readonly StandardButton _saveButton;
 
@@ -94,7 +89,9 @@ namespace Maestro.UI.MaestroCreator
 
 		private NoteSequenceWindow _noteSequenceWindow;
 
-		private Panel _noteSequencePlaceholder;
+		private readonly SongPlayer _creatorPlayer;
+
+		private bool _isPreviewActive;
 
 		private readonly Panel _confirmationOverlay;
 
@@ -114,7 +111,7 @@ namespace Maestro.UI.MaestroCreator
 
 		private static Texture2D GetBackground()
 		{
-			return _backgroundTexture ?? (_backgroundTexture = MaestroTheme.CreateWindowBackground(420, 560));
+			return _backgroundTexture ?? (_backgroundTexture = MaestroTheme.CreateWindowBackground(420, 360));
 		}
 
 		public void SetInstrument(InstrumentType instrument)
@@ -132,6 +129,10 @@ namespace Maestro.UI.MaestroCreator
 			((TextInputBase)_titleInput).set_Text(song.Name ?? string.Empty);
 			((TextInputBase)_artistInput).set_Text(song.Artist ?? string.Empty);
 			((TextInputBase)_transcriberInput).set_Text(song.Transcriber ?? string.Empty);
+			if (song.Bpm.HasValue)
+			{
+				_durationSelector.Bpm = song.Bpm.Value;
+			}
 			_noteSequencePanel.Clear();
 			foreach (string note in song.Notes)
 			{
@@ -142,6 +143,7 @@ namespace Maestro.UI.MaestroCreator
 		public override void Show()
 		{
 			((WindowBase2)this).Show();
+			OpenNotesWindow();
 			_pianoKeyboard.Configure(_instrument);
 			if (_editingSong != null)
 			{
@@ -155,6 +157,44 @@ namespace Maestro.UI.MaestroCreator
 				_confirmationLabel.set_Text($"Equip your {_instrument} and click Ready");
 				((Control)_confirmationOverlay).set_Visible(true);
 				_pianoKeyboard.SetOctaveButtonsEnabled(enabled: false);
+			}
+		}
+
+		private void OpenNotesWindow()
+		{
+			if (_noteSequenceWindow == null)
+			{
+				((Control)_noteSequencePanel).set_Parent((Container)null);
+				_noteSequenceWindow = new NoteSequenceWindow(_noteSequencePanel);
+				_noteSequenceWindow.PanelReturned += OnNoteSequenceWindowClosed;
+				((Control)_noteSequenceWindow).Show();
+			}
+		}
+
+		private void CloseNotesWindow()
+		{
+			if (_noteSequenceWindow != null)
+			{
+				_noteSequenceWindow.DetachPanel();
+				_noteSequenceWindow.PanelReturned -= OnNoteSequenceWindowClosed;
+				((Control)_noteSequenceWindow).Hide();
+				((Control)_noteSequenceWindow).Dispose();
+				_noteSequenceWindow = null;
+			}
+		}
+
+		private void OnNoteSequenceWindowClosed(object sender, EventArgs e)
+		{
+			NoteSequencePanel obj = _noteSequenceWindow?.DetachPanel();
+			NoteSequenceWindow noteSequenceWindow = _noteSequenceWindow;
+			if (noteSequenceWindow != null)
+			{
+				((Control)noteSequenceWindow).Dispose();
+			}
+			_noteSequenceWindow = null;
+			if (obj != null && ((Control)this).get_Visible())
+			{
+				OpenNotesWindow();
 			}
 		}
 
@@ -189,7 +229,7 @@ namespace Maestro.UI.MaestroCreator
 		}
 
 		public MaestroCreatorWindow()
-			: this(GetBackground(), new Rectangle(0, 0, 420, 560), new Rectangle(15, 20, 390, 530))
+			: this(GetBackground(), new Rectangle(0, 0, 420, 360), new Rectangle(15, 20, 390, 350))
 		{
 			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
@@ -247,87 +287,57 @@ namespace Maestro.UI.MaestroCreator
 			//IL_02e9: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02f0: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0300: Expected O, but got Unknown
-			//IL_0336: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03c0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03cc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03d9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03e4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03ee: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03ef: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03f9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0400: Unknown result type (might be due to invalid IL or missing references)
-			//IL_040c: Expected O, but got Unknown
-			//IL_040c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0411: Unknown result type (might be due to invalid IL or missing references)
-			//IL_041d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0428: Unknown result type (might be due to invalid IL or missing references)
-			//IL_042c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0436: Unknown result type (might be due to invalid IL or missing references)
-			//IL_043e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0448: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0458: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0459: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0482: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0487: Unknown result type (might be due to invalid IL or missing references)
-			//IL_048e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0499: Unknown result type (might be due to invalid IL or missing references)
-			//IL_049c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04a6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04ab: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04ba: Expected O, but got Unknown
-			//IL_04d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04d7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04e9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04f2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04fc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0501: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0510: Expected O, but got Unknown
-			//IL_0528: Unknown result type (might be due to invalid IL or missing references)
-			//IL_052d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0534: Unknown result type (might be due to invalid IL or missing references)
-			//IL_053f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_054b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0555: Unknown result type (might be due to invalid IL or missing references)
-			//IL_055a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0569: Expected O, but got Unknown
-			//IL_0581: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0586: Unknown result type (might be due to invalid IL or missing references)
-			//IL_058d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0591: Unknown result type (might be due to invalid IL or missing references)
+			//IL_032d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0332: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0339: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0344: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0347: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0351: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0356: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0365: Expected O, but got Unknown
+			//IL_037d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0382: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0389: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0394: Unknown result type (might be due to invalid IL or missing references)
+			//IL_039d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03bb: Expected O, but got Unknown
+			//IL_049e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04ae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04cd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04d6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04e8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04f4: Expected O, but got Unknown
+			//IL_04f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0506: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0511: Unknown result type (might be due to invalid IL or missing references)
+			//IL_051d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0527: Unknown result type (might be due to invalid IL or missing references)
+			//IL_052f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0539: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0549: Unknown result type (might be due to invalid IL or missing references)
+			//IL_054a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0554: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0560: Expected O, but got Unknown
+			//IL_0561: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0566: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0572: Unknown result type (might be due to invalid IL or missing references)
+			//IL_057d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_058c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0596: Unknown result type (might be due to invalid IL or missing references)
 			//IL_059b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05a6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05b0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05b9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05c3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05d7: Expected O, but got Unknown
-			//IL_05d8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05dd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05e9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05f4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0600: Unknown result type (might be due to invalid IL or missing references)
-			//IL_060a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0612: Unknown result type (might be due to invalid IL or missing references)
-			//IL_061c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_062c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_062d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0637: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0643: Expected O, but got Unknown
-			//IL_0644: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0649: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0655: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0660: Unknown result type (might be due to invalid IL or missing references)
-			//IL_066f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0679: Unknown result type (might be due to invalid IL or missing references)
-			//IL_067e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_068d: Expected O, but got Unknown
+			//IL_05aa: Expected O, but got Unknown
 			((WindowBase2)this).set_Title("Maestro Creator");
 			((WindowBase2)this).set_Emblem(Module.Instance.ContentsManager.GetTexture("creator-emblem.png"));
 			((WindowBase2)this).set_SavesPosition(true);
-			((WindowBase2)this).set_Id("MaestroCreatorWindow_v1");
+			((WindowBase2)this).set_Id("MaestroCreatorWindow_v2");
 			((WindowBase2)this).set_CanResize(false);
 			((Control)this).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			int currentY = 2;
@@ -368,9 +378,9 @@ namespace Maestro.UI.MaestroCreator
 			currentY += 37;
 			StandardButton val4 = new StandardButton();
 			((Control)val4).set_Parent((Container)(object)this);
-			val4.set_Text("Chord: OFF");
+			val4.set_Text("Chord");
 			((Control)val4).set_Location(new Point(0, currentY));
-			((Control)val4).set_Size(new Point(80, 26));
+			((Control)val4).set_Size(new Point(65, 26));
 			((Control)val4).set_BasicTooltipText("Toggle chord mode to add multiple notes at once");
 			_chordModeButton = val4;
 			((Control)_chordModeButton).add_Click((EventHandler<MouseEventArgs>)OnChordModeToggle);
@@ -392,80 +402,55 @@ namespace Maestro.UI.MaestroCreator
 			((Control)val6).set_BasicTooltipText("Add the current chord to the sequence");
 			_addChordButton = val6;
 			((Control)_addChordButton).add_Click((EventHandler<MouseEventArgs>)OnAddChordClicked);
-			currentY += 37;
-			NoteSequencePanel noteSequencePanel = new NoteSequencePanel(390, 195);
-			((Control)noteSequencePanel).set_Parent((Container)(object)this);
-			((Control)noteSequencePanel).set_Location(new Point(0, currentY));
-			((Panel)noteSequencePanel).set_ShowBorder(true);
-			_noteSequencePanel = noteSequencePanel;
+			currentY += 44;
+			int totalButtonsWidth = 170;
+			int buttonsStartX = (390 - totalButtonsWidth) / 2;
+			StandardButton val7 = new StandardButton();
+			((Control)val7).set_Parent((Container)(object)this);
+			val7.set_Text("Save");
+			((Control)val7).set_Location(new Point(buttonsStartX, currentY));
+			((Control)val7).set_Size(new Point(80, 26));
+			_saveButton = val7;
+			((Control)_saveButton).add_Click((EventHandler<MouseEventArgs>)OnSaveClicked);
+			StandardButton val8 = new StandardButton();
+			((Control)val8).set_Parent((Container)(object)this);
+			val8.set_Text("Cancel");
+			((Control)val8).set_Location(new Point(buttonsStartX + 80 + 10, currentY));
+			((Control)val8).set_Size(new Point(80, 26));
+			_cancelButton = val8;
+			((Control)_cancelButton).add_Click((EventHandler<MouseEventArgs>)OnCancelClicked);
+			_creatorPlayer = new SongPlayer(Module.Instance.KeyboardService);
+			_noteSequencePanel = new NoteSequencePanel(670, 400);
+			_noteSequencePanel.PreviewAllRequested += OnPreviewClicked;
 			_noteSequencePanel.PreviewSelectionRequested += OnPreviewSelectionClicked;
+			_noteSequencePanel.PauseRequested += OnPauseClicked;
+			_noteSequencePanel.StopRequested += OnStopClicked;
 			_noteSequencePanel.InsertModeChanged += OnNoteSequenceStateChanged;
 			_noteSequencePanel.ReplaceModeChanged += OnNoteSequenceStateChanged;
 			_noteSequencePanel.SelectionChanged += OnNoteSequenceStateChanged;
-			_noteSequencePanel.ExpandRequested += OnExpandRequested;
-			Panel val7 = new Panel();
-			((Control)val7).set_Parent((Container)(object)this);
-			((Control)val7).set_Location(new Point(0, currentY));
-			((Control)val7).set_Size(new Point(390, 195));
-			((Control)val7).set_BackgroundColor(MaestroTheme.DarkCharcoal);
-			val7.set_ShowBorder(true);
-			((Control)val7).set_Visible(false);
-			_noteSequencePlaceholder = val7;
-			Label val8 = new Label();
-			((Control)val8).set_Parent((Container)(object)_noteSequencePlaceholder);
-			val8.set_Text("Notes are being edited in a separate window");
-			((Control)val8).set_Location(new Point(0, 87));
-			((Control)val8).set_Size(new Point(390, 20));
-			val8.set_Font(GameService.Content.get_DefaultFont12());
-			val8.set_TextColor(MaestroTheme.MutedCream);
-			val8.set_HorizontalAlignment((HorizontalAlignment)1);
-			currentY += 209;
-			int totalButtonsWidth = 275;
-			int buttonsStartX = (390 - totalButtonsWidth) / 2;
-			StandardButton val9 = new StandardButton();
+			Panel val9 = new Panel();
 			((Control)val9).set_Parent((Container)(object)this);
-			val9.set_Text("Preview All");
-			((Control)val9).set_Location(new Point(buttonsStartX, currentY));
-			((Control)val9).set_Size(new Point(95, 26));
-			_previewButton = val9;
-			((Control)_previewButton).add_Click((EventHandler<MouseEventArgs>)OnPreviewClicked);
-			StandardButton val10 = new StandardButton();
-			((Control)val10).set_Parent((Container)(object)this);
-			val10.set_Text("Save");
-			((Control)val10).set_Location(new Point(buttonsStartX + 95 + 10, currentY));
-			((Control)val10).set_Size(new Point(80, 26));
-			_saveButton = val10;
-			((Control)_saveButton).add_Click((EventHandler<MouseEventArgs>)OnSaveClicked);
+			((Control)val9).set_Location(new Point(0, 37));
+			((Control)val9).set_Size(new Point(390, PianoKeyboard.Layout.TotalHeight));
+			((Control)val9).set_BackgroundColor(new Color(0, 0, 0, 200));
+			((Control)val9).set_ZIndex(100);
+			((Control)val9).set_Visible(false);
+			_confirmationOverlay = val9;
+			Label val10 = new Label();
+			((Control)val10).set_Parent((Container)(object)_confirmationOverlay);
+			val10.set_Text("Equip your instrument and click Ready");
+			((Control)val10).set_Location(new Point(0, PianoKeyboard.Layout.TotalHeight / 2 - 30));
+			((Control)val10).set_Size(new Point(390, 30));
+			val10.set_Font(GameService.Content.get_DefaultFont16());
+			val10.set_TextColor(MaestroTheme.CreamWhite);
+			val10.set_HorizontalAlignment((HorizontalAlignment)1);
+			_confirmationLabel = val10;
 			StandardButton val11 = new StandardButton();
-			((Control)val11).set_Parent((Container)(object)this);
-			val11.set_Text("Cancel");
-			((Control)val11).set_Location(new Point(buttonsStartX + 95 + 80 + 20, currentY));
-			((Control)val11).set_Size(new Point(80, 26));
-			_cancelButton = val11;
-			((Control)_cancelButton).add_Click((EventHandler<MouseEventArgs>)OnCancelClicked);
-			Panel val12 = new Panel();
-			((Control)val12).set_Parent((Container)(object)this);
-			((Control)val12).set_Location(new Point(0, 37));
-			((Control)val12).set_Size(new Point(390, PianoKeyboard.Layout.TotalHeight));
-			((Control)val12).set_BackgroundColor(new Color(0, 0, 0, 200));
-			((Control)val12).set_ZIndex(100);
-			((Control)val12).set_Visible(false);
-			_confirmationOverlay = val12;
-			Label val13 = new Label();
-			((Control)val13).set_Parent((Container)(object)_confirmationOverlay);
-			val13.set_Text("Equip your instrument and click Ready");
-			((Control)val13).set_Location(new Point(0, PianoKeyboard.Layout.TotalHeight / 2 - 30));
-			((Control)val13).set_Size(new Point(390, 30));
-			val13.set_Font(GameService.Content.get_DefaultFont16());
-			val13.set_TextColor(MaestroTheme.CreamWhite);
-			val13.set_HorizontalAlignment((HorizontalAlignment)1);
-			_confirmationLabel = val13;
-			StandardButton val14 = new StandardButton();
-			((Control)val14).set_Parent((Container)(object)_confirmationOverlay);
-			val14.set_Text("Ready");
-			((Control)val14).set_Location(new Point(145, PianoKeyboard.Layout.TotalHeight / 2 + 5));
-			((Control)val14).set_Size(new Point(100, 30));
-			_readyButton = val14;
+			((Control)val11).set_Parent((Container)(object)_confirmationOverlay);
+			val11.set_Text("Ready");
+			((Control)val11).set_Location(new Point(145, PianoKeyboard.Layout.TotalHeight / 2 + 5));
+			((Control)val11).set_Size(new Point(100, 30));
+			_readyButton = val11;
 			((Control)_readyButton).add_Click((EventHandler<MouseEventArgs>)OnReadyClicked);
 		}
 
@@ -491,8 +476,10 @@ namespace Maestro.UI.MaestroCreator
 
 		private void OnChordModeToggle(object sender, MouseEventArgs e)
 		{
+			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
 			_isChordMode = !_isChordMode;
-			_chordModeButton.set_Text(_isChordMode ? "Chord: ON" : "Chord: OFF");
+			((Control)_chordModeButton).set_BackgroundColor(_isChordMode ? MaestroTheme.AmberGold : Color.get_Transparent());
 			if (!_isChordMode && _pendingChordNotes.Count > 0)
 			{
 				_pendingChordNotes.Clear();
@@ -520,7 +507,12 @@ namespace Maestro.UI.MaestroCreator
 				PlayNoteSound(noteEvent);
 			}
 			string chordString = string.Join(" ", _pendingChordNotes);
-			if (_noteSequencePanel.IsInsertMode && _noteSequencePanel.HasSelection)
+			if (_noteSequencePanel.IsReplaceMode)
+			{
+				_noteSequencePanel.ReplaceAt(_noteSequencePanel.ReplaceTargetIndex, chordString);
+				_noteSequencePanel.ExitReplaceMode();
+			}
+			else if (_noteSequencePanel.IsInsertMode && _noteSequencePanel.HasSelection)
 			{
 				int insertIndex = _noteSequencePanel.GetLastSelectedIndex() + 1;
 				_noteSequencePanel.InsertAt(insertIndex, chordString);
@@ -558,53 +550,6 @@ namespace Maestro.UI.MaestroCreator
 		private void OnNoteSequenceStateChanged(object sender, EventArgs e)
 		{
 			UpdateStatusLabel();
-		}
-
-		private void OnExpandRequested(object sender, EventArgs e)
-		{
-			if (_noteSequenceWindow != null)
-			{
-				CollapseNoteSequence();
-			}
-			else
-			{
-				ExpandNoteSequence();
-			}
-		}
-
-		private void ExpandNoteSequence()
-		{
-			((Control)_noteSequencePanel).set_Parent((Container)null);
-			((Control)_noteSequencePlaceholder).set_Visible(true);
-			_noteSequenceWindow = new NoteSequenceWindow(_noteSequencePanel);
-			_noteSequenceWindow.PanelReturned += OnNoteSequenceWindowClosed;
-			((Control)_noteSequenceWindow).Show();
-		}
-
-		private void CollapseNoteSequence()
-		{
-			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-			if (_noteSequenceWindow != null)
-			{
-				NoteSequencePanel panel = _noteSequenceWindow.DetachPanel();
-				_noteSequenceWindow.PanelReturned -= OnNoteSequenceWindowClosed;
-				((Control)_noteSequenceWindow).Hide();
-				((Control)_noteSequenceWindow).Dispose();
-				_noteSequenceWindow = null;
-				if (panel != null)
-				{
-					panel.ResizeTo(390, 195);
-					((Control)panel).set_Parent((Container)(object)this);
-					((Control)panel).set_Location(((Control)_noteSequencePlaceholder).get_Location());
-					((Panel)panel).set_ShowBorder(true);
-				}
-				((Control)_noteSequencePlaceholder).set_Visible(false);
-			}
-		}
-
-		private void OnNoteSequenceWindowClosed(object sender, EventArgs e)
-		{
-			CollapseNoteSequence();
 		}
 
 		private void UpdateStatusLabel()
@@ -699,7 +644,7 @@ namespace Maestro.UI.MaestroCreator
 			return sb.ToString();
 		}
 
-		private void OnPreviewClicked(object sender, MouseEventArgs e)
+		private void OnPreviewClicked(object sender, EventArgs e)
 		{
 			if (_pendingChordNotes.Count > 0)
 			{
@@ -710,41 +655,91 @@ namespace Maestro.UI.MaestroCreator
 				ScreenNotification.ShowNotification("Add some notes first!", (NotificationType)1, (Texture2D)null, 4);
 				return;
 			}
-			Song song = BuildSong("Preview", "Preview", "");
-			if (song != null)
+			List<string> notes = _noteSequencePanel.Notes.ToList();
+			NoteParser.ParseResult parseResult = NoteParser.ParseWithMapping(notes);
+			Song song = new Song
 			{
-				Module.Instance.PreviewSong(song);
-			}
+				Name = "Preview",
+				Artist = "Preview",
+				Instrument = _instrument,
+				IsCreated = true
+			};
+			song.Notes.AddRange(notes);
+			song.Commands.AddRange(parseResult.Commands);
+			Module.Instance.SongPlayer.Stop();
+			_creatorPlayer.Play(song);
+			StartPreviewHighlight(parseResult.CommandToNoteLineIndex, null);
 		}
 
 		private void OnPreviewSelectionClicked(object sender, EventArgs e)
 		{
 			IReadOnlyList<string> selectedNotes = _noteSequencePanel.GetSelectedNotes();
-			if (selectedNotes.Count == 0)
+			if (selectedNotes.Count != 0)
 			{
-				return;
-			}
-			try
-			{
-				Song song = new Song
+				try
 				{
-					Name = "Preview",
-					Artist = "Preview",
-					Instrument = _instrument,
-					IsCreated = true
-				};
-				foreach (string note in selectedNotes)
-				{
-					song.Notes.Add(note);
+					IReadOnlyList<int> selectedIndices = _noteSequencePanel.GetSelectedIndices();
+					NoteParser.ParseResult parseResult = NoteParser.ParseWithMapping(selectedNotes.ToList());
+					Song song = new Song
+					{
+						Name = "Preview",
+						Artist = "Preview",
+						Instrument = _instrument,
+						IsCreated = true
+					};
+					song.Notes.AddRange(selectedNotes);
+					song.Commands.AddRange(parseResult.Commands);
+					Module.Instance.SongPlayer.Stop();
+					_creatorPlayer.Play(song);
+					StartPreviewHighlight(parseResult.CommandToNoteLineIndex, selectedIndices.ToArray());
 				}
-				List<SongCommand> commands = NoteParser.Parse(song.Notes);
-				song.Commands.AddRange(commands);
-				Module.Instance.PreviewSong(song);
+				catch (Exception ex)
+				{
+					ScreenNotification.ShowNotification("Error previewing selection: " + ex.Message, (NotificationType)2, (Texture2D)null, 4);
+				}
 			}
-			catch (Exception ex)
+		}
+
+		private void StartPreviewHighlight(int[] mapping, int[] noteIndices)
+		{
+			if (_isPreviewActive)
 			{
-				ScreenNotification.ShowNotification("Error previewing selection: " + ex.Message, (NotificationType)2, (Texture2D)null, 4);
+				StopPreviewHighlight();
 			}
+			_isPreviewActive = true;
+			_noteSequencePanel.StartPlaybackHighlight(_creatorPlayer, mapping, noteIndices);
+			_noteSequencePanel.SetControlsEnabled(enabled: false);
+			_creatorPlayer.OnStopped += OnPreviewEnded;
+			_creatorPlayer.OnCompleted += OnPreviewEnded;
+		}
+
+		private void StopPreviewHighlight()
+		{
+			_creatorPlayer.OnStopped -= OnPreviewEnded;
+			_creatorPlayer.OnCompleted -= OnPreviewEnded;
+			_isPreviewActive = false;
+			_noteSequencePanel.StopPlaybackHighlight();
+			_noteSequencePanel.SetControlsEnabled(enabled: true);
+		}
+
+		private void OnPauseClicked(object sender, EventArgs e)
+		{
+			SongPlayer player = _creatorPlayer;
+			if (player.IsPlaying)
+			{
+				player.TogglePause();
+				_noteSequencePanel.SetPlaybackPaused(player.IsPaused);
+			}
+		}
+
+		private void OnStopClicked(object sender, EventArgs e)
+		{
+			_creatorPlayer.Stop();
+		}
+
+		private void OnPreviewEnded(object sender, EventArgs e)
+		{
+			StopPreviewHighlight();
 		}
 
 		private void OnSaveClicked(object sender, MouseEventArgs e)
@@ -787,7 +782,12 @@ namespace Maestro.UI.MaestroCreator
 
 		public override void Hide()
 		{
-			CollapseNoteSequence();
+			if (_isPreviewActive)
+			{
+				StopPreviewHighlight();
+			}
+			_creatorPlayer.Stop();
+			CloseNotesWindow();
 			((WindowBase2)this).Hide();
 			this.WindowClosed?.Invoke(this, EventArgs.Empty);
 		}
@@ -842,7 +842,8 @@ namespace Maestro.UI.MaestroCreator
 					Artist = artist,
 					Transcriber = transcriber,
 					Instrument = _instrument,
-					IsCreated = true
+					IsCreated = true,
+					Bpm = _durationSelector.Bpm
 				};
 				foreach (string note in _noteSequencePanel.Notes)
 				{
@@ -861,6 +862,7 @@ namespace Maestro.UI.MaestroCreator
 
 		private void ClearInputs()
 		{
+			//IL_0092: Unknown result type (might be due to invalid IL or missing references)
 			_editingSong = null;
 			((TextInputBase)_titleInput).set_Text(string.Empty);
 			((TextInputBase)_artistInput).set_Text(string.Empty);
@@ -873,21 +875,23 @@ namespace Maestro.UI.MaestroCreator
 			_pendingChordNotes.Clear();
 			_pendingChordEvents.Clear();
 			_isChordMode = false;
-			_chordModeButton.set_Text("Chord: OFF");
+			((Control)_chordModeButton).set_BackgroundColor(Color.get_Transparent());
 			UpdateChordPreview();
 		}
 
 		protected override void DisposeControl()
 		{
-			CollapseNoteSequence();
+			_creatorPlayer.Stop();
+			CloseNotesWindow();
 			_noteSequencePanel.PreviewSelectionRequested -= OnPreviewSelectionClicked;
 			_noteSequencePanel.InsertModeChanged -= OnNoteSequenceStateChanged;
 			_noteSequencePanel.ReplaceModeChanged -= OnNoteSequenceStateChanged;
 			_noteSequencePanel.SelectionChanged -= OnNoteSequenceStateChanged;
-			_noteSequencePanel.ExpandRequested -= OnExpandRequested;
 			_pianoKeyboard.NotePressed -= OnNotePressed;
 			_pianoKeyboard.OctaveChanged -= OnOctaveChanged;
-			((Control)_previewButton).remove_Click((EventHandler<MouseEventArgs>)OnPreviewClicked);
+			_noteSequencePanel.PreviewAllRequested -= OnPreviewClicked;
+			_noteSequencePanel.PauseRequested -= OnPauseClicked;
+			_noteSequencePanel.StopRequested -= OnStopClicked;
 			((Control)_saveButton).remove_Click((EventHandler<MouseEventArgs>)OnSaveClicked);
 			((Control)_cancelButton).remove_Click((EventHandler<MouseEventArgs>)OnCancelClicked);
 			((Control)_chordModeButton).remove_Click((EventHandler<MouseEventArgs>)OnChordModeToggle);
@@ -923,11 +927,6 @@ namespace Maestro.UI.MaestroCreator
 			{
 				((Control)noteSequencePanel).Dispose();
 			}
-			StandardButton previewButton = _previewButton;
-			if (previewButton != null)
-			{
-				((Control)previewButton).Dispose();
-			}
 			StandardButton saveButton = _saveButton;
 			if (saveButton != null)
 			{
@@ -957,11 +956,6 @@ namespace Maestro.UI.MaestroCreator
 			if (readyButton != null)
 			{
 				((Control)readyButton).Dispose();
-			}
-			Panel noteSequencePlaceholder = _noteSequencePlaceholder;
-			if (noteSequencePlaceholder != null)
-			{
-				((Control)noteSequencePlaceholder).Dispose();
 			}
 			Label confirmationLabel = _confirmationLabel;
 			if (confirmationLabel != null)

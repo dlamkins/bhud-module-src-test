@@ -22,6 +22,13 @@ namespace Maestro.Services.Data
 			public bool IsRest { get; set; }
 		}
 
+		public class ParseResult
+		{
+			public List<SongCommand> Commands { get; set; }
+
+			public int[] CommandToNoteLineIndex { get; set; }
+		}
+
 		private static readonly Regex NotePattern = new Regex("([A-GR])(\\^|#)?([+-])?:(\\d+)", RegexOptions.Compiled);
 
 		public static long CalculateDurationMs(List<string> noteLines)
@@ -44,25 +51,30 @@ namespace Maestro.Services.Data
 			return total;
 		}
 
-		public static List<SongCommand> Parse(List<string> noteLines)
+		public static ParseResult ParseWithMapping(List<string> noteLines)
 		{
-			//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00da: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0130: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0110: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f9: Unknown result type (might be due to invalid IL or missing references)
 			List<SongCommand> commands = new List<SongCommand>();
+			List<int> mapping = new List<int>();
 			int currentOctave = 0;
+			int noteLineIndex = 0;
 			foreach (string noteLine in noteLines)
 			{
 				List<ParsedNote> notes = ParseNotesFromLine(noteLine);
 				if (notes.Count == 0)
 				{
+					noteLineIndex++;
 					continue;
 				}
 				if (notes.Any((ParsedNote n) => n.IsRest))
 				{
 					commands.Add(SongCommand.WaitCmd(notes.Max((ParsedNote n) => n.DurationMs)));
+					mapping.Add(noteLineIndex);
+					noteLineIndex++;
 					continue;
 				}
 				foreach (ParsedNote note2 in notes)
@@ -76,28 +88,46 @@ namespace Maestro.Services.Data
 						for (int i = 0; i < absSteps; i++)
 						{
 							commands.Add(SongCommand.KeyDownCmd(octaveKey));
+							mapping.Add(noteLineIndex);
 							commands.Add(SongCommand.KeyUpCmd(octaveKey));
+							mapping.Add(noteLineIndex);
 							commands.Add(SongCommand.WaitCmd(delay));
+							mapping.Add(noteLineIndex);
 						}
 						currentOctave = note2.TargetOctave;
 					}
 					if (note2.NeedsAlt)
 					{
 						commands.Add(SongCommand.KeyDownCmd((Keys)164));
+						mapping.Add(noteLineIndex);
 					}
 					commands.Add(SongCommand.KeyDownCmd(note2.Key));
+					mapping.Add(noteLineIndex);
 				}
 				commands.Add(SongCommand.WaitCmd(notes.Max((ParsedNote n) => n.DurationMs)));
+				mapping.Add(noteLineIndex);
 				foreach (ParsedNote note in notes.AsEnumerable().Reverse())
 				{
 					commands.Add(SongCommand.KeyUpCmd(note.Key));
+					mapping.Add(noteLineIndex);
 					if (note.NeedsAlt)
 					{
 						commands.Add(SongCommand.KeyUpCmd((Keys)164));
+						mapping.Add(noteLineIndex);
 					}
 				}
+				noteLineIndex++;
 			}
-			return commands;
+			return new ParseResult
+			{
+				Commands = commands,
+				CommandToNoteLineIndex = mapping.ToArray()
+			};
+		}
+
+		public static List<SongCommand> Parse(List<string> noteLines)
+		{
+			return ParseWithMapping(noteLines).Commands;
 		}
 
 		public static SeekData ComputeSeekData(List<SongCommand> commands)
