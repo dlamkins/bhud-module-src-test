@@ -183,24 +183,24 @@ namespace FarmingTracker
 		{
 			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001b: Expected O, but got Unknown
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003e: Expected O, but got Unknown
+			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0096: Expected O, but got Unknown
+			//IL_0059: Expected O, but got Unknown
+			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0069: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
 			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
@@ -217,26 +217,26 @@ namespace FarmingTracker
 			//IL_0100: Unknown result type (might be due to invalid IL or missing references)
 			//IL_011e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0136: Expected O, but got Unknown
-			Panel val = new Panel();
-			((Container)val).set_WidthSizingMode((SizingMode)1);
+			FlowPanel val = new FlowPanel();
+			((Panel)val).set_Title("Favorites");
+			val.set_FlowDirection((ControlFlowDirection)0);
+			((Panel)val).set_Icon(services.TextureService.FavoriteTexture);
+			((Panel)val).set_CanCollapse(true);
 			((Container)val).set_HeightSizingMode((SizingMode)1);
 			((Control)val).set_Parent(parent);
-			Panel currenciesFilterIconPanel = val;
-			FlowPanel val2 = new FlowPanel();
-			((Panel)val2).set_Title("Currencies");
-			val2.set_FlowDirection((ControlFlowDirection)0);
-			((Panel)val2).set_Icon(services.TextureService.MerchantTexture);
-			((Panel)val2).set_CanCollapse(true);
+			FlowPanel favoriteStatsFlowPanel = val;
+			Panel val2 = new Panel();
+			((Container)val2).set_WidthSizingMode((SizingMode)1);
 			((Container)val2).set_HeightSizingMode((SizingMode)1);
-			((Control)val2).set_Parent((Container)(object)currenciesFilterIconPanel);
+			((Control)val2).set_Parent(parent);
+			Panel currenciesFilterIconPanel = val2;
 			FlowPanel val3 = new FlowPanel();
-			((Panel)val3).set_Title("Favorite Items");
+			((Panel)val3).set_Title("Currencies");
 			val3.set_FlowDirection((ControlFlowDirection)0);
-			((Panel)val3).set_Icon(services.TextureService.FavoriteTexture);
+			((Panel)val3).set_Icon(services.TextureService.MerchantTexture);
 			((Panel)val3).set_CanCollapse(true);
 			((Container)val3).set_HeightSizingMode((SizingMode)1);
-			((Control)val3).set_Parent(parent);
-			FlowPanel favoriteItemsFlowPanel = val3;
+			((Control)val3).set_Parent((Container)(object)currenciesFilterIconPanel);
 			Panel val4 = new Panel();
 			((Container)val4).set_WidthSizingMode((SizingMode)1);
 			((Container)val4).set_HeightSizingMode((SizingMode)1);
@@ -252,9 +252,9 @@ namespace FarmingTracker
 			FlowPanel itemsFlowPanel = val5;
 			ClickThroughImage currencyFilterIcon = new ClickThroughImage(services.TextureService.FilterTabIconTexture, new Point(380, 3), (Container)(object)currenciesFilterIconPanel);
 			ClickThroughImage itemsFilterIcon = new ClickThroughImage(services.TextureService.FilterTabIconTexture, new Point(380, 3), (Container)(object)itemsFilterIconPanel);
-			StatsPanels statsPanels = new StatsPanels(val2, favoriteItemsFlowPanel, itemsFlowPanel, currencyFilterIcon, itemsFilterIcon);
+			StatsPanels statsPanels = new StatsPanels(val3, favoriteStatsFlowPanel, itemsFlowPanel, currencyFilterIcon, itemsFilterIcon);
 			new HintLabel((Container?)(object)statsPanels.CurrenciesFlowPanel, "  Loading...");
-			new HintLabel((Container?)(object)statsPanels.FavoriteItemsFlowPanel, "  Loading...");
+			new HintLabel((Container?)(object)statsPanels.FavoriteStatsFlowPanel, "  Loading...");
 			new HintLabel((Container?)(object)statsPanels.ItemsFlowPanel, "  Loading...");
 			return statsPanels;
 		}

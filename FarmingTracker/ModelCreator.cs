@@ -1,55 +1,27 @@
-using System.Collections.Generic;
-
 namespace FarmingTracker
 {
 	public class ModelCreator
 	{
 		public static Model CreateModel(FileModel fileModel)
 		{
-			Model model = new Model
+			Model model = new Model();
+			foreach (FileStat fileStat in fileModel.FileStats)
 			{
-				IgnoredItemApiIds = new SafeList<int>(fileModel.IgnoredItemApiIds),
-				FavoriteItemApiIds = new SafeList<int>(fileModel.FavoriteItemApiIds),
-				CustomStatProfits = new SafeList<CustomStatProfit>(fileModel.CustomStatProfits)
-			};
-			AddStatsToModel(model.Stats.CurrencyById, fileModel.FileCurrencies, StatType.Currency);
-			AddStatsToModel(model.Stats.ItemById, fileModel.FileItems, StatType.Item);
-			foreach (CustomStatProfit customStatProfit in fileModel.CustomStatProfits)
-			{
-				AddStatToModelIfMissing((customStatProfit.StatType == StatType.Item) ? model.Stats.ItemById : model.Stats.CurrencyById, customStatProfit.ApiId, customStatProfit.StatType);
+				AddStatToModel(fileStat, model.Stats);
 			}
-			foreach (int ignoredItemApiId in fileModel.IgnoredItemApiIds)
-			{
-				AddStatToModelIfMissing(model.Stats.ItemById, ignoredItemApiId, StatType.Item);
-			}
-			model.Stats.UpdateStatsSnapshot();
 			return model;
 		}
 
-		private static void AddStatsToModel(Dictionary<int, Stat> statById, List<FileStat> fileStats, StatType statType)
+		private static void AddStatToModel(FileStat fileStat, Stats stats)
 		{
-			foreach (FileStat fileStat in fileStats)
-			{
-				statById[fileStat.ApiId] = new Stat
-				{
-					ApiId = fileStat.ApiId,
-					StatType = statType,
-					Signed_Count = fileStat.Count
-				};
-			}
-		}
-
-		private static void AddStatToModelIfMissing(Dictionary<int, Stat> statById, int statId, StatType statType)
-		{
-			if (!statById.ContainsKey(statId))
-			{
-				statById[statId] = new Stat
-				{
-					ApiId = statId,
-					StatType = statType,
-					Signed_Count = 0L
-				};
-			}
+			Stat stat2 = new Stat();
+			stat2.ApiId = fileStat.ApiId;
+			stat2.StatType = fileStat.StatType;
+			stat2.Signed_Count.Value = fileStat.Signed_Count;
+			stat2.StatVisibility = fileStat.StatVisibility;
+			stat2.Profit.Unsigned_Custom_ProfitInCopper = fileStat.Unsigned_CustomProfitInCopper;
+			Stat stat = stat2;
+			stats.AddStat(stat);
 		}
 	}
 }

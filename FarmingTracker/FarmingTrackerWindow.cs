@@ -71,7 +71,7 @@ namespace FarmingTracker
 			((TabbedWindow2)this).get_Tabs().Add(new Tab(AsyncTexture2D.op_Implicit(services2.TextureService.FilterTabIconTexture), (Func<IView>)(() => (IView)(object)new FilterTabView(services2)), "Filter", (int?)null));
 			((TabbedWindow2)this).get_Tabs().Add(new Tab(AsyncTexture2D.op_Implicit(services2.TextureService.SortTabIconTexture), (Func<IView>)(() => (IView)(object)new SortTabView(services2)), "Sort Items", (int?)null));
 			((TabbedWindow2)this).get_Tabs().Add(_customStatProfitTab);
-			((TabbedWindow2)this).get_Tabs().Add(new Tab(AsyncTexture2D.op_Implicit(services2.TextureService.IgnoredItemsTabIconTexture), (Func<IView>)(() => (IView)(object)new IgnoredItemsTabView(model2, services2)), "Ignored Items", (int?)null));
+			((TabbedWindow2)this).get_Tabs().Add(new Tab(AsyncTexture2D.op_Implicit(services2.TextureService.IgnoredStatsTabIconTexture), (Func<IView>)(() => (IView)(object)new IgnoredStatsTabView(model2, services2)), "Ignored Items and Currencies", (int?)null));
 			((TabbedWindow2)this).get_Tabs().Add(_settingsTab);
 		}
 

@@ -7,8 +7,6 @@ namespace FarmingTracker
 {
 	public class ProfitTooltip : DisposableTooltip
 	{
-		public CoinsPanel ProfitPerHourPanel { get; }
-
 		public ProfitTooltip(Services services)
 		{
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
@@ -25,11 +23,6 @@ namespace FarmingTracker
 			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
 			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
 			FlowPanel val = new FlowPanel();
 			val.set_FlowDirection((ControlFlowDirection)3);
 			val.set_ControlPadding(new Vector2(0f, 10f));
@@ -45,13 +38,6 @@ namespace FarmingTracker
 			((Control)val2).set_Width(420);
 			val2.set_AutoSizeHeight(true);
 			((Control)val2).set_Parent((Container)(object)rootFlowPanel);
-			ProfitPerHourPanel = new CoinsPanel(null, font, services.TextureService, (Container)(object)rootFlowPanel);
-			Label val3 = new Label();
-			val3.set_Text(" Profit per hour");
-			val3.set_Font(font);
-			val3.set_AutoSizeHeight(true);
-			val3.set_AutoSizeWidth(true);
-			((Control)val3).set_Parent((Container)(object)ProfitPerHourPanel);
 		}
 	}
 }

@@ -43,7 +43,7 @@ namespace FarmingTracker
 			_updateIntervalMs = 5000.0;
 		}
 
-		public void TriggerUpdateStats()
+		public void TriggerInstantUpdateStats()
 		{
 			_statsHaveToBeUpdated = true;
 			_runningTimeMs = _updateIntervalMs;

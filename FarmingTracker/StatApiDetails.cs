@@ -3,7 +3,7 @@ using Gw2Sharp.WebApi.V2.Models;
 
 namespace FarmingTracker
 {
-	public class ApiStatDetails
+	public class StatApiDetails
 	{
 		public string Name { get; set; } = string.Empty;
 
@@ -29,17 +29,20 @@ namespace FarmingTracker
 		public string WikiSearchTerm { get; set; } = string.Empty;
 
 
+		public string ChatLink { get; set; } = string.Empty;
+
+
 		public bool HasWikiSearchTerm => !string.IsNullOrWhiteSpace(WikiSearchTerm);
 
-		public ApiStatDetailsState State { get; set; }
+		public StatApiDetailsState State { get; set; }
 
 		public bool IsCustomCoinStat
 		{
 			get
 			{
-				if (State != ApiStatDetailsState.GoldCoinCustomStat && State != ApiStatDetailsState.SilveCoinCustomStat)
+				if (State != StatApiDetailsState.GoldCoinCustomStat && State != StatApiDetailsState.SilveCoinCustomStat)
 				{
-					return State == ApiStatDetailsState.CopperCoinCustomStat;
+					return State == StatApiDetailsState.CopperCoinCustomStat;
 				}
 				return true;
 			}

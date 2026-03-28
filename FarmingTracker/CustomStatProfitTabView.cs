@@ -60,44 +60,23 @@ namespace FarmingTracker
 				collapsibleHelp.UpdateSize(e.get_CurrentRegion().Width - 30);
 			});
 			HintLabel hintLabel = new HintLabel((Container?)(object)_rootFlowPanel, "");
-			List<CustomStatProfit> customStatProfits = _model.CustomStatProfits.ToListSafe();
-			if (customStatProfits.IsEmpty())
+			IEnumerable<Stat> statsWithCustomProfit = from s in _model.Stats.GetStats()
+				where s.Profit.HasCustomProfit
+				select s;
+			if (statsWithCustomProfit.IsEmpty())
 			{
 				ShowNoCustomStatProfitsExistHintIfNecessary(hintLabel, _model);
 				return;
 			}
-			StatsSnapshot statsSnapshot = _model.Stats.StatsSnapshot;
-			List<Stat> currencies = statsSnapshot.CurrencyById.Values.Where((Stat c) => !c.IsCoin).ToList();
-			IEnumerable<Stat> items = statsSnapshot.ItemById.Values;
-			bool num = currencies.Any((Stat i) => i.Details.State == ApiStatDetailsState.MissingBecauseApiNotCalledYet);
-			bool itemApiDataMissing = items.Any((Stat i) => i.Details.State == ApiStatDetailsState.MissingBecauseApiNotCalledYet);
-			if (num || itemApiDataMissing)
+			if (statsWithCustomProfit.Any((Stat i) => i.Details.State == StatApiDetailsState.MissingBecauseApiNotCalledYet))
 			{
 				ShowLoadingHint(hintLabel);
 				return;
 			}
 			FlowPanel statsFlowPanel = CreateStatsFlowPanel(buildPanel, (Container)(object)_rootFlowPanel);
-			foreach (CustomStatProfit customStatProfit in customStatProfits)
+			foreach (Stat item in statsWithCustomProfit)
 			{
-				IEnumerable<Stat> source;
-				if (customStatProfit.StatType != 0)
-				{
-					IEnumerable<Stat> enumerable = currencies;
-					source = enumerable;
-				}
-				else
-				{
-					source = items;
-				}
-				Stat stat = source.SingleOrDefault((Stat s) => customStatProfit.BelongsToStat(s));
-				if (stat == null)
-				{
-					Module.Logger.Error($"Missing stat in model for customStatprofit id: {customStatProfit.ApiId}");
-				}
-				else
-				{
-					new CustomStatProfitRowPanel(customStatProfit, stat, hintLabel, _model, _services, (Container)(object)statsFlowPanel);
-				}
+				new CustomStatProfitRowPanel(item, hintLabel, _model, _services, (Container)(object)statsFlowPanel);
 			}
 		}
 
@@ -126,7 +105,9 @@ namespace FarmingTracker
 
 		public static void ShowNoCustomStatProfitsExistHintIfNecessary(HintLabel hintLabel, Model model)
 		{
-			if (!model.CustomStatProfits.AnySafe())
+			if (!(from s in model.Stats.GetStats()
+				where s.Profit.HasCustomProfit
+				select s).Any())
 			{
 				((Label)hintLabel).set_Text("  No custom profits are set.\n  You can set custom profits by right clicking an item/currency in the 'Summary' tab.");
 			}

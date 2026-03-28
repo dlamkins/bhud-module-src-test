@@ -2,7 +2,7 @@ namespace FarmingTracker
 {
 	public enum StatType
 	{
-		Item,
-		Currency
+		Currency,
+		Item
 	}
 }

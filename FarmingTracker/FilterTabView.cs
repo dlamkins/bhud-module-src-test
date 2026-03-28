@@ -71,7 +71,7 @@ namespace FarmingTracker
 			((Container)val).set_HeightSizingMode((SizingMode)2);
 			((Control)val).set_Parent(buildPanel);
 			_rootFlowPanel = val;
-			CollapsibleHelp collapsibleHelp = new CollapsibleHelp("- Checked = visible.\n- Unchecked = hidden by filter.\n- Items hidden by filters are still included in the profit calculation and are still shown in the 'Favorite Items' panel.\n- A filter, e.g. rarity filter, will not be applied if all its checkboxes are unchecked. In this case no items will be hidden by the filter.\n- filter icon on filter panel header:\nTRANSPARENT: filter wont hide stats.\nOPAQUE: filter will hide stats.\n- expand/collapse panels: for a better overview expand/collapse the filter panels by using the expand/collapse-all-buttons or by clicking on the filter panel headers.", buildPanel.get_ContentRegion().Width - 30, (Container)(object)_rootFlowPanel);
+			CollapsibleHelp collapsibleHelp = new CollapsibleHelp("- Checked = visible.\n- Unchecked = hidden by filter.\n- Items hidden by filters are still included in the profit calculation and are still shown in the 'Favorites' panel.\n- A filter, e.g. rarity filter, will not be applied if all its checkboxes are unchecked. In this case no items will be hidden by the filter.\n- filter icon on filter panel header:\nTRANSPARENT: filter wont hide stats.\nOPAQUE: filter will hide stats.\n- expand/collapse panels: for a better overview expand/collapse the filter panels by using the expand/collapse-all-buttons or by clicking on the filter panel headers.", buildPanel.get_ContentRegion().Width - 30, (Container)(object)_rootFlowPanel);
 			buildPanel.add_ContentResized((EventHandler<RegionChangedEventArgs>)delegate(object s, RegionChangedEventArgs e)
 			{
 				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
@@ -113,7 +113,7 @@ namespace FarmingTracker
 			filterPanels.Add(CreateFilterSettingPanel("Rarity (items)", Constants.ALL_ITEM_RARITIES, _services.SettingService.RarityStatsFilterSetting, _services, (Container)(object)_rootFlowPanel));
 			filterPanels.Add(CreateFilterSettingPanel("Type (items)", Constants.ALL_ITEM_TYPES, _services.SettingService.TypeStatsFilterSetting, _services, (Container)(object)_rootFlowPanel));
 			filterPanels.Add(CreateFilterSettingPanel("Flag (items)", Constants.ALL_ITEM_FLAGS, _services.SettingService.FlagStatsFilterSetting, _services, (Container)(object)_rootFlowPanel, "Some items match several of these options. These items are only hidden\nif all matching options are unselected."));
-			filterPanels.Add(CreateFilterSettingPanel("Currencies", Constants.ALL_CURRENCIES, _services.SettingService.CurrencyFilterSetting, _services, (Container)(object)_rootFlowPanel));
+			filterPanels.Add(CreateFilterSettingPanel("Currencies", Constants.ALL_CURRENCIES, _services.SettingService.CurrencyFilterSetting, _services, (Container)(object)_rootFlowPanel, "Coin will never be hidden."));
 			filterPanels.Add(CreateFilterSettingPanel("GW2 API (items & currencies)", Constants.ALL_KNOWN_BY_API, _services.SettingService.KnownByApiFilterSetting, _services, (Container)(object)_rootFlowPanel, "Coin will never be hidden. Some items like the lvl-80-boost or\ncertain reknown heart items are not known by the GW2 API."));
 		}
 

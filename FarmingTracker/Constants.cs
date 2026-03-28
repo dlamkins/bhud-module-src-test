@@ -15,7 +15,7 @@ namespace FarmingTracker
 
 			public const string SORT = "Sort Items";
 
-			public const string IGNORED = "Ignored Items";
+			public const string IGNORED = "Ignored Items and Currencies";
 
 			public const string CUSTOM_STAT_PROFIT = "Custom Profit";
 
@@ -38,7 +38,7 @@ namespace FarmingTracker
 
 		public const string GW2_API_ERROR_HINT = "GW2 API error";
 
-		public const string FAVORITE_ITEMS_PANEL_TITLE = "Favorite Items";
+		public const string FAVORITES_PANEL_TITLE = "Favorites";
 
 		public const string ITEMS_PANEL_TITLE = "Items";
 

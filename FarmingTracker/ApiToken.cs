@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Modules.Managers;
 using Gw2Sharp.WebApi.V2.Models;
@@ -46,7 +47,7 @@ namespace FarmingTracker
 			return ApiTokenState switch
 			{
 				ApiTokenState.hasNotLoggedIntoCharacterSinceStartingGw2 => "Error: You have to log into a character once after starting Guild Wars 2.\nOtherwise the module gets no GW2 API access from blish.", 
-				ApiTokenState.ApiTokenMissing => "Error: GW2 Api key missing. Please add an api key with these permissions: " + string.Join(", ", RequiredPermissions) + ".\nIf that does not fix the issue try disabling the module and then enabling it again.", 
+				ApiTokenState.ApiTokenMissing => "Error: GW2 Api key missing. Please add an api key with these permissions: " + string.Join(", ", RequiredPermissions) + ".\nIf that does not fix the issue try disabling the module and then enabling it again. If that does not help either, restart blish.", 
 				ApiTokenState.RequiredPermissionsMissing => "Error: GW2 Api key is missing these permissions: " + string.Join(", ", MissingPermissions) + ".\nPlease add a new api key with all required permissions.", 
 				_ => $"This should not happen. ApiTokenState: {ApiTokenState}", 
 			};
@@ -80,15 +81,14 @@ namespace FarmingTracker
 			return ApiTokenState.CanAccessApi;
 		}
 
+		[IteratorStateMachine(typeof(_003CGetMissingPermissions_003Ed__17))]
 		private static IEnumerable<TokenPermission> GetMissingPermissions(IReadOnlyList<TokenPermission> requiredPermissions, Gw2ApiManager gw2ApiManager)
 		{
-			foreach (TokenPermission requiredPermission in requiredPermissions)
+			return new _003CGetMissingPermissions_003Ed__17(-2)
 			{
-				if (!gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)new List<TokenPermission> { requiredPermission }))
-				{
-					yield return requiredPermission;
-				}
-			}
+				_003C_003E3__requiredPermissions = requiredPermissions,
+				_003C_003E3__gw2ApiManager = gw2ApiManager
+			};
 		}
 	}
 }

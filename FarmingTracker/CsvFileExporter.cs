@@ -34,9 +34,11 @@ namespace FarmingTracker
 
 		private static string CreateCsvFileText(Model model)
 		{
-			StatsSnapshot statsSnapshot = model.Stats.StatsSnapshot;
-			List<Stat> items = statsSnapshot.ItemById.Values.Where((Stat s) => s.Signed_Count != 0).ToList();
-			List<Stat> currencies = statsSnapshot.CurrencyById.Values.Where((Stat s) => s.Signed_Count != 0).ToList();
+			List<Stat> source = (from s in model.Stats.GetStats()
+				where s.Signed_Count.Value != 0
+				select s).ToList();
+			List<Stat> items = source.Where((Stat s) => s.IsItem).ToList();
+			List<Stat> currencies = source.Where((Stat s) => s.IsCurrency).ToList();
 			int linesCount = Math.Max(items.Count, currencies.Count);
 			string csvFileText = "item_id,item_name,item_amount,currency_id,currency_amount\n";
 			for (int i = 0; i < linesCount; i++)

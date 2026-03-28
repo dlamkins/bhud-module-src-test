@@ -25,6 +25,10 @@ namespace FarmingTracker
 		TradingPostProfitAll_Ascending,
 		TradingPostProfitAll_Descending,
 		TradingPostProfitPerItem_Ascending,
-		TradingPostProfitPerItem_Descending
+		TradingPostProfitPerItem_Descending,
+		CustomProfitAll_Ascending,
+		CustomProfitAll_Descending,
+		CustomProfitPerItem_Ascending,
+		CustomProfitPerItem_Descending
 	}
 }

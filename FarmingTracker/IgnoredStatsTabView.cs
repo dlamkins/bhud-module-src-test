@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework;
 
 namespace FarmingTracker
 {
-	public class IgnoredItemsTabView : View
+	public class IgnoredStatsTabView : View
 	{
 		private readonly Model _model;
 
@@ -17,9 +17,9 @@ namespace FarmingTracker
 
 		private FlowPanel? _rootFlowPanel;
 
-		private const string IGNORED_ITEMS_PANEL_TITLE = "Ignored Items";
+		private const string IGNORED_STATS_PANEL_TITLE = "Ignored items and currencies";
 
-		public IgnoredItemsTabView(Model model, Services services)
+		public IgnoredStatsTabView(Model model, Services services)
 			: this()
 		{
 			_model = model;
@@ -81,7 +81,7 @@ namespace FarmingTracker
 			((Container)val).set_HeightSizingMode((SizingMode)2);
 			((Control)val).set_Parent(buildPanel);
 			_rootFlowPanel = val;
-			CollapsibleHelp collapsibleHelp = new CollapsibleHelp("IGNORE ITEM:\nIn the 'Summary' tab right click on an item icon in the 'Items' panel to ignore it.\n\nUNIGNORE ITEM:\nleft click on an item here to unignore it.\n\nWHY IGNORE?\nAn ignored item will appear here. It is hidden in the 'Summary' tab and does not contribute to profit calculations. That can be usefull to prevent that none-legendary equipment that you swap manually is tracked accidently.", buildPanel.get_ContentRegion().Width - 30, (Container)(object)_rootFlowPanel);
+			CollapsibleHelp collapsibleHelp = new CollapsibleHelp("IGNORE ITEM / CURRENCY:\nIn the 'Summary' tab right click on an item / currency icon to ignore it.\n\nUNIGNORE ITEM / CURRENCY:\nleft click on an item or currency here to unignore it.\n\nWHY IGNORE?\nAn ignored item / currency will appear here. It is hidden in the 'Summary' tab and does not contribute to profit calculations. That can be usefull to prevent that none-legendary equipment that you swap manually is tracked accidently.", buildPanel.get_ContentRegion().Width - 30, (Container)(object)_rootFlowPanel);
 			buildPanel.add_ContentResized((EventHandler<RegionChangedEventArgs>)delegate(object s, RegionChangedEventArgs e)
 			{
 				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
@@ -89,101 +89,119 @@ namespace FarmingTracker
 			});
 			AutoSizeContainer flowPanelWithButtonContainer = new AutoSizeContainer((Container)(object)_rootFlowPanel);
 			FlowPanel val2 = new FlowPanel();
-			((Panel)val2).set_Title("Ignored Items");
+			((Panel)val2).set_Title("Ignored items and currencies");
 			val2.set_FlowDirection((ControlFlowDirection)3);
-			((Panel)val2).set_Icon(AsyncTexture2D.op_Implicit(_services.TextureService.IgnoredItemsPanelIconTexture));
+			((Panel)val2).set_Icon(AsyncTexture2D.op_Implicit(_services.TextureService.IgnoredStatsPanelIconTexture));
 			((Control)val2).set_Width(buildPanel.get_ContentRegion().Width - 30);
 			((Container)val2).set_HeightSizingMode((SizingMode)1);
 			((Control)val2).set_Parent((Container)(object)flowPanelWithButtonContainer);
-			FlowPanel ignoredItemsWrapperFlowPanel = val2;
+			FlowPanel ignoredStatsWrapperFlowPanel = val2;
 			StandardButton val3 = new StandardButton();
-			val3.set_Text("Unignore all items");
+			val3.set_Text("Unignore all");
 			((Control)val3).set_Enabled(false);
 			((Control)val3).set_Width(150);
 			((Control)val3).set_Top(5);
 			((Control)val3).set_Right(buildPanel.get_ContentRegion().Width - 30);
 			((Control)val3).set_Parent((Container)(object)flowPanelWithButtonContainer);
 			StandardButton unignoreAllButton = val3;
-			HintLabel hintLabel = new HintLabel((Container?)(object)ignoredItemsWrapperFlowPanel, "");
+			HintLabel hintLabel = new HintLabel((Container?)(object)ignoredStatsWrapperFlowPanel, "");
 			FlowPanel val4 = new FlowPanel();
 			val4.set_FlowDirection((ControlFlowDirection)0);
 			((Container)val4).set_HeightSizingMode((SizingMode)1);
 			((Container)val4).set_WidthSizingMode((SizingMode)2);
-			((Control)val4).set_Parent((Container)(object)ignoredItemsWrapperFlowPanel);
-			FlowPanel ignoredItemsFlowPanel = val4;
+			((Control)val4).set_Parent((Container)(object)ignoredStatsWrapperFlowPanel);
+			FlowPanel ignoredStatsFlowPanel = val4;
 			buildPanel.add_ContentResized((EventHandler<RegionChangedEventArgs>)delegate(object s, RegionChangedEventArgs e)
 			{
 				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-				((Control)ignoredItemsWrapperFlowPanel).set_Width(e.get_CurrentRegion().Width - 30);
+				((Control)ignoredStatsWrapperFlowPanel).set_Width(e.get_CurrentRegion().Width - 30);
 				((Control)unignoreAllButton).set_Right(e.get_CurrentRegion().Width - 30);
 			});
-			List<Stat> ignoredItems = (from i in _model.IgnoredItemApiIds.ToListSafe()
-				select _model.Stats.StatsSnapshot.ItemById[i]).ToList();
-			if (ignoredItems.IsEmpty())
+			IEnumerable<Stat> ignoredStats = from s in _model.Stats.GetStats()
+				where s.StatVisibility == StatVisibility.Ignored
+				select s;
+			if (ignoredStats.IsEmpty())
 			{
-				ShowNoItemsAreIgnoredHintIfNecessary(hintLabel, _model);
+				ShowNoStatsAreIgnoredHintIfNecessary(hintLabel, _model);
 				return;
 			}
-			if (ignoredItems.Any((Stat i) => i.Details.State == ApiStatDetailsState.MissingBecauseApiNotCalledYet))
+			if (ignoredStats.Any((Stat i) => i.Details.State == StatApiDetailsState.MissingBecauseApiNotCalledYet))
 			{
 				ShowLoadingHint(hintLabel);
 				return;
 			}
-			((Label)hintLabel).set_Text("  Left click an item to unignore it.");
-			foreach (Stat item in ignoredItems)
+			((Label)hintLabel).set_Text("Left click an item or currency to unignore it.");
+			foreach (Stat item in ignoredStats)
 			{
-				ShowIgnoredItem(item, _model, _services, hintLabel, (Container)(object)ignoredItemsFlowPanel);
+				ShowIgnoredStat(item, _model, _services, hintLabel, (Container)(object)ignoredStatsFlowPanel);
 			}
 			((Control)unignoreAllButton).set_Enabled(true);
 			((Control)unignoreAllButton).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				foreach (Control item2 in ((Container)ignoredItemsFlowPanel).get_Children().ToList())
+				foreach (Control item2 in ((Container)ignoredStatsFlowPanel).get_Children().ToList())
 				{
 					item2.Dispose();
 				}
-				_model.IgnoredItemApiIds.ClearSafe();
+				foreach (Stat current in ignoredStats)
+				{
+					if (current.StatVisibility == StatVisibility.Ignored)
+					{
+						current.StatVisibility = StatVisibility.Regular;
+					}
+				}
 				_services.UpdateLoop.TriggerUpdateUi();
 				_services.UpdateLoop.TriggerSaveModel();
-				ShowNoItemsAreIgnoredHintIfNecessary(hintLabel, _model);
+				ShowNoStatsAreIgnoredHintIfNecessary(hintLabel, _model);
 			});
 		}
 
-		private static void ShowIgnoredItem(Stat ignoredItem, Model model, Services services, HintLabel hintLabel, Container parent)
+		private static void ShowIgnoredStat(Stat ignoredStat, Model model, Services services, HintLabel hintLabel, Container parent)
 		{
-			Stat ignoredItem2 = ignoredItem;
+			Stat ignoredStat2 = ignoredStat;
 			Model model2 = model;
 			Services services2 = services;
 			HintLabel hintLabel2 = hintLabel;
-			StatContainer statContainer2 = new StatContainer(ignoredItem2, PanelType.IgnoredItems, model2.IgnoredItemApiIds, model2.FavoriteItemApiIds, model2.CustomStatProfits, services2);
+			StatContainer statContainer2 = new StatContainer(ignoredStat2, PanelType.IgnoredStats, model2, services2);
 			((Control)statContainer2).set_Parent(parent);
 			StatContainer statContainer = statContainer2;
 			((Control)statContainer).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				UnignoreItem(ignoredItem2, model2, services2);
+				UnignoreStat(ignoredStat2, model2, services2);
 				((Control)statContainer).Dispose();
-				ShowNoItemsAreIgnoredHintIfNecessary(hintLabel2, model2);
+				ShowNoStatsAreIgnoredHintIfNecessary(hintLabel2, model2);
 			});
 		}
 
-		private static void UnignoreItem(Stat item, Model model, Services services)
+		private static void UnignoreStat(Stat stat, Model model, Services services)
 		{
-			model.IgnoredItemApiIds.RemoveSafe(item.ApiId);
+			Stat stat2 = stat;
+			Stat matchingFavoriteStat = (from s in model.Stats.GetStats()
+				where s.StatVisibility == StatVisibility.Ignored
+				select s).FirstOrDefault((Stat i) => i.StatType == stat2.StatType && i.ApiId == stat2.ApiId);
+			if (matchingFavoriteStat == null)
+			{
+				Module.Logger.Error("Failed to remove ignored stat because ignored stat did not exist. That should not be possible.");
+				return;
+			}
+			matchingFavoriteStat.StatVisibility = StatVisibility.Regular;
 			services.UpdateLoop.TriggerUpdateUi();
 			services.UpdateLoop.TriggerSaveModel();
 		}
 
-		private static void ShowNoItemsAreIgnoredHintIfNecessary(HintLabel hintLabel, Model model)
+		private static void ShowNoStatsAreIgnoredHintIfNecessary(HintLabel hintLabel, Model model)
 		{
-			if (!model.IgnoredItemApiIds.AnySafe())
+			if (!(from s in model.Stats.GetStats()
+				where s.StatVisibility == StatVisibility.Ignored
+				select s).Any())
 			{
-				((Label)hintLabel).set_Text("  No items are ignored.\n  You can ignore an item by right clicking it in the 'Summary' tab.");
+				((Label)hintLabel).set_Text("Nothing is ignored.\nYou can ignore an item or currency by right clicking it in the 'Summary' tab.");
 			}
 		}
 
 		private static void ShowLoadingHint(HintLabel hintLabel)
 		{
-			((Label)hintLabel).set_Text("  This tab will not refresh automatically.\n  Go to 'Summary' tab and wait until the 'Updating...' hint disappears.\n  Then come back here and your ignored items will be displayed.");
+			((Label)hintLabel).set_Text("This tab will not refresh automatically.\nGo to 'Summary' tab and wait until the 'Updating...' hint disappears.\nThen come back here and your ignored items and currencies will be displayed.");
 		}
 	}
 }

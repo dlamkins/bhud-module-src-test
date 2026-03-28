@@ -5,27 +5,22 @@ namespace FarmingTracker
 {
 	public class DrfResultAdder
 	{
-		public static void UpdateCountsOrAddNewStats(List<DrfMessage> drfMessages, Dictionary<int, Stat> itemById, Dictionary<int, Stat> currencyById)
+		public static void UpdateCountsOrAddNewStats(List<DrfMessage> drfMessages, Stats stats)
 		{
-			InternalUpdateCountsOrAddNewStats(drfMessages.SelectMany((DrfMessage d) => d.Payload.Drop.Items), StatType.Item, itemById);
-			InternalUpdateCountsOrAddNewStats(drfMessages.SelectMany((DrfMessage d) => d.Payload.Drop.Currencies), StatType.Currency, currencyById);
+			InternalUpdateCountsOrAddNewStats(drfMessages.SelectMany((DrfMessage d) => d.Payload.Drop.Items), StatType.Item, stats);
+			InternalUpdateCountsOrAddNewStats(drfMessages.SelectMany((DrfMessage d) => d.Payload.Drop.Currencies), StatType.Currency, stats);
 		}
 
-		private static void InternalUpdateCountsOrAddNewStats(IEnumerable<KeyValuePair<int, long>> statIdAndCounts, StatType statType, Dictionary<int, Stat> statById)
+		private static void InternalUpdateCountsOrAddNewStats(IEnumerable<KeyValuePair<int, long>> statIdAndCounts, StatType statType, Stats stats)
 		{
 			foreach (KeyValuePair<int, long> statIdAndCount in statIdAndCounts)
 			{
-				if (statById.TryGetValue(statIdAndCount.Key, out var stat))
-				{
-					stat.Signed_Count += statIdAndCount.Value;
-					continue;
-				}
-				statById[statIdAndCount.Key] = new Stat
-				{
-					ApiId = statIdAndCount.Key,
-					StatType = statType,
-					Signed_Count = statIdAndCount.Value
-				};
+				Stat stat2 = new Stat();
+				stat2.ApiId = statIdAndCount.Key;
+				stat2.StatType = statType;
+				stat2.Signed_Count.Value = statIdAndCount.Value;
+				Stat stat = stat2;
+				stats.UpdateCountOrAddNewStat(stat);
 			}
 		}
 	}

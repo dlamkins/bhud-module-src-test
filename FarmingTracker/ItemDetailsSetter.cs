@@ -13,11 +13,12 @@ namespace FarmingTracker
 	{
 		private const string GW2_API_DOES_NOT_KNOW_IDS = "all ids provided are invalid";
 
-		public static async Task SetItemDetailsFromApi(Dictionary<int, Stat> itemById, Gw2ApiManager gw2ApiManager)
+		public static async Task SetItemDetailsFromApi(Stats stats, Gw2ApiManager gw2ApiManager)
 		{
-			List<int> itemIdsWithoutDetails = (from i in itemById.Values
-				where i.Details.State == ApiStatDetailsState.MissingBecauseApiNotCalledYet
-				select i.ApiId).ToList();
+			List<int> itemIdsWithoutDetails = (from s in stats.GetStats()
+				where s.IsItem
+				where s.Details.State == StatApiDetailsState.MissingBecauseApiNotCalledYet
+				select s.ApiId).ToList();
 			if (!itemIdsWithoutDetails.Any())
 			{
 				return;
@@ -64,7 +65,7 @@ namespace FarmingTracker
 			}
 			foreach (CommercePrices apiPrice in apiPrices)
 			{
-				Stat stat = itemById[apiPrice.get_Id()];
+				Stat stat = stats.GetStat(apiPrice.get_Id(), StatType.Item);
 				stat.Details.Unsigned_SellsUnitPriceInCopper = apiPrice.get_Sells().get_UnitPrice();
 				stat.Details.Unsigned_BuysUnitPriceInCopper = apiPrice.get_Buys().get_UnitPrice();
 			}
@@ -74,7 +75,7 @@ namespace FarmingTracker
 			}
 			foreach (Item apiItem in apiItems)
 			{
-				Stat stat2 = itemById[apiItem.get_Id()];
+				Stat stat2 = stats.GetStat(apiItem.get_Id(), StatType.Item);
 				stat2.Details.Name = apiItem.get_Name();
 				stat2.Details.Description = apiItem.get_Description() ?? "";
 				stat2.Details.IconAssetId = TextureService.GetIconAssetId(apiItem.get_Icon());
@@ -82,10 +83,13 @@ namespace FarmingTracker
 				stat2.Details.ItemFlags = apiItem.get_Flags();
 				stat2.Details.Type = ApiEnum<ItemType>.op_Implicit(apiItem.get_Type());
 				stat2.Details.WikiSearchTerm = apiItem.get_ChatLink();
+				stat2.Details.ChatLink = apiItem.get_ChatLink();
 				stat2.Details.Unsigned_VendorValueInCopper = apiItem.get_VendorValue();
-				stat2.Details.State = ApiStatDetailsState.SetByApi;
+				stat2.Details.State = StatApiDetailsState.SetByApi;
 			}
-			List<Stat> itemsUnknownByApi = itemById.Values.Where((Stat i) => i.Details.State == ApiStatDetailsState.MissingBecauseApiNotCalledYet).ToList();
+			List<Stat> itemsUnknownByApi = (from i in stats.GetStats()
+				where i.Details.State == StatApiDetailsState.MissingBecauseApiNotCalledYet
+				select i).ToList();
 			if (!itemsUnknownByApi.Any())
 			{
 				return;
@@ -96,7 +100,7 @@ namespace FarmingTracker
 			}
 			foreach (Stat item in itemsUnknownByApi)
 			{
-				item.Details.State = ApiStatDetailsState.MissingBecauseUnknownByApi;
+				item.Details.State = StatApiDetailsState.MissingBecauseUnknownByApi;
 			}
 		}
 

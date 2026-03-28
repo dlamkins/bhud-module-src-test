@@ -35,9 +35,12 @@ namespace FarmingTracker
 			return currencyDetailsById;
 		}
 
-		public static void SetCurrencyDetailsFromCache(Dictionary<int, Stat> currencyById, Dictionary<int, CurrencyDetails> currencyDetailsByIdCache)
+		public static void SetCurrencyDetailsFromCache(Stats stats, Dictionary<int, CurrencyDetails> currencyDetailsByIdCache)
 		{
-			List<Stat> currenciesWithoutDetails = currencyById.Values.Where((Stat c) => c.Details.State == ApiStatDetailsState.MissingBecauseApiNotCalledYet).ToList();
+			List<Stat> currenciesWithoutDetails = (from s in stats.GetStats()
+				where s.IsCurrency
+				where s.Details.State == StatApiDetailsState.MissingBecauseApiNotCalledYet
+				select s).ToList();
 			if (!currenciesWithoutDetails.Any())
 			{
 				return;
@@ -55,12 +58,12 @@ namespace FarmingTracker
 					currencyWithoutDetails.Details.Description = currencyDetails.Description;
 					currencyWithoutDetails.Details.IconAssetId = currencyDetails.IconAssetId;
 					currencyWithoutDetails.Details.WikiSearchTerm = currencyDetails.Name;
-					currencyWithoutDetails.Details.State = ApiStatDetailsState.SetByApi;
+					currencyWithoutDetails.Details.State = StatApiDetailsState.SetByApi;
 				}
 				else
 				{
 					missingInApiCurrencyIds.Add(currencyWithoutDetails.ApiId);
-					currencyWithoutDetails.Details.State = ApiStatDetailsState.MissingBecauseUnknownByApi;
+					currencyWithoutDetails.Details.State = StatApiDetailsState.MissingBecauseUnknownByApi;
 				}
 			}
 			if (missingInApiCurrencyIds.Any() && DebugMode.DebugLoggingRequired)

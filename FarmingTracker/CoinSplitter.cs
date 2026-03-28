@@ -5,54 +5,50 @@ namespace FarmingTracker
 {
 	public class CoinSplitter
 	{
-		public const int GOLD_FAKE_API_ID = -3;
+		public const int GOLD_FAKE_API_ID = -3000;
 
-		public const int SILVER_FAKE_API_ID = -2;
+		public const int SILVER_FAKE_API_ID = -2000;
 
-		public const int COPPER_FAKE_API_ID = -1;
+		public const int COPPER_FAKE_API_ID = -1000;
 
-		public static List<Stat> ReplaceCoinWithGoldSilverCopperStats(List<Stat> currencies)
+		public static List<Stat> ReplaceCoinWithGoldSilverCopperStats(List<Stat> stats)
 		{
-			Stat coinStat = currencies.SingleOrDefault((Stat c) => c.IsCoin);
+			Stat coinStat = stats.SingleOrDefault((Stat c) => c.IsCoin);
 			if (coinStat == null)
 			{
-				return currencies;
+				return stats;
 			}
 			string localizedCoinName = coinStat.Details.Name;
-			Coin coin = new Coin(coinStat.Signed_Count);
-			if (coin.HasToDisplayGold)
+			Coin coin = new Coin(coinStat.Signed_Count.Value);
+			if (coin.HasToDisplayCopper)
 			{
-				Stat goldStat = CreateCoinStat("Gold", coin.Sign * coin.Unsigned_Gold, -3, ApiStatDetailsState.GoldCoinCustomStat, localizedCoinName);
-				currencies.Add(goldStat);
+				Stat copperStat = CreateCoinStat("Copper", coin.Sign * coin.Unsigned_Copper, -1000, StatApiDetailsState.CopperCoinCustomStat, localizedCoinName);
+				stats.Insert(0, copperStat);
 			}
 			if (coin.HasToDisplaySilver)
 			{
-				Stat silverStat = CreateCoinStat("Silver", coin.Sign * coin.Unsigned_Silver, -2, ApiStatDetailsState.SilveCoinCustomStat, localizedCoinName);
-				currencies.Add(silverStat);
+				Stat silverStat = CreateCoinStat("Silver", coin.Sign * coin.Unsigned_Silver, -2000, StatApiDetailsState.SilveCoinCustomStat, localizedCoinName);
+				stats.Insert(0, silverStat);
 			}
-			if (coin.HasToDisplayCopper)
+			if (coin.HasToDisplayGold)
 			{
-				Stat copperStat = CreateCoinStat("Copper", coin.Sign * coin.Unsigned_Copper, -1, ApiStatDetailsState.CopperCoinCustomStat, localizedCoinName);
-				currencies.Add(copperStat);
+				Stat goldStat = CreateCoinStat("Gold", coin.Sign * coin.Unsigned_Gold, -3000, StatApiDetailsState.GoldCoinCustomStat, localizedCoinName);
+				stats.Insert(0, goldStat);
 			}
-			currencies.Remove(coinStat);
-			return currencies;
+			stats.Remove(coinStat);
+			return stats;
 		}
 
-		private static Stat CreateCoinStat(string name, long signed_count, int apiId, ApiStatDetailsState apiStatDetailsState, string localizedCoinName)
+		private static Stat CreateCoinStat(string name, long signed_count, int apiId, StatApiDetailsState statApiDetailsState, string localizedCoinName)
 		{
-			return new Stat
-			{
-				ApiId = apiId,
-				StatType = StatType.Currency,
-				Signed_Count = signed_count,
-				Details = 
-				{
-					Name = name,
-					WikiSearchTerm = localizedCoinName,
-					State = apiStatDetailsState
-				}
-			};
+			Stat stat = new Stat();
+			stat.ApiId = apiId;
+			stat.StatType = StatType.Currency;
+			stat.Signed_Count.Value = signed_count;
+			stat.Details.Name = name;
+			stat.Details.WikiSearchTerm = localizedCoinName;
+			stat.Details.State = statApiDetailsState;
+			return stat;
 		}
 	}
 }

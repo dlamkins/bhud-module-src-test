@@ -1,34 +1,83 @@
 using System.Collections.Generic;
-using Newtonsoft.Json;
+using System.Linq;
 
 namespace FarmingTracker
 {
 	public class Stats
 	{
-		public Dictionary<int, Stat> CurrencyById { get; } = new Dictionary<int, Stat>();
+		private readonly Dictionary<int, Stat> _statById = new Dictionary<int, Stat>();
 
+		private readonly object _statsLock = new object();
 
-		public Dictionary<int, Stat> ItemById { get; } = new Dictionary<int, Stat>();
-
-
-		public StatsSnapshot StatsSnapshot { get; set; } = new StatsSnapshot();
-
-
-		public void UpdateStatsSnapshot()
+		public Stat GetStat(int apiId, StatType statType)
 		{
-			StatsSnapshot statsSnapshot = JsonConvert.DeserializeObject<StatsSnapshot>(JsonConvert.SerializeObject((object)new StatsSnapshot
+			int key = CreateKey(apiId, statType);
+			lock (_statsLock)
 			{
-				ItemById = ItemById,
-				CurrencyById = CurrencyById
-			}));
-			if (statsSnapshot == null)
-			{
-				Module.Logger.Error("Failed to copy statsSnapshot.");
+				return _statById[key];
 			}
-			else
+		}
+
+		public List<Stat> GetStats()
+		{
+			lock (_statsLock)
 			{
-				StatsSnapshot = statsSnapshot;
+				return _statById.Values.ToList();
 			}
+		}
+
+		public void ResetCounts()
+		{
+			foreach (Stat stat in GetStats())
+			{
+				stat.Signed_Count.Value = 0L;
+			}
+		}
+
+		public void AddStat(Stat stat)
+		{
+			int key = CreateKey(stat);
+			lock (_statsLock)
+			{
+				if (_statById.ContainsKey(key))
+				{
+					Module.Logger.Error("Cannot add stat to model because a stat with that key already exists");
+				}
+				else
+				{
+					_statById[key] = stat;
+				}
+			}
+		}
+
+		public void UpdateCountOrAddNewStat(Stat newStat)
+		{
+			int key = CreateKey(newStat);
+			lock (_statsLock)
+			{
+				if (_statById.TryGetValue(key, out var stat))
+				{
+					stat.Signed_Count.Add(newStat.Signed_Count);
+				}
+				else
+				{
+					_statById[key] = newStat;
+				}
+			}
+		}
+
+		private static int CreateKey(Stat stat)
+		{
+			return CreateKey(stat.ApiId, stat.StatType);
+		}
+
+		private static int CreateKey(int apiId, StatType statType)
+		{
+			if (statType != 0)
+			{
+				return apiId;
+			}
+			return -apiId;
 		}
 	}
 }

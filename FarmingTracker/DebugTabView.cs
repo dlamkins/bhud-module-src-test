@@ -104,19 +104,23 @@ namespace FarmingTracker
 
 		private static DrfMessage ConvertToDrfMessage(Model model)
 		{
-			StatsSnapshot statsSnapshot = model.Stats.StatsSnapshot;
-			List<Stat> items = statsSnapshot.ItemById.Values.ToList();
-			List<Stat> currencies = statsSnapshot.CurrencyById.Values.ToList();
+			List<Stat> stats = model.Stats.GetStats();
 			DrfMessage drfMessage = new DrfMessage();
 			drfMessage.Kind = "data";
 			drfMessage.Payload.Character = "1";
-			foreach (Stat item in items.Where((Stat s) => s.Signed_Count != 0))
+			foreach (Stat item in from s in stats
+				where s.IsItem
+				where s.Signed_Count.Value != 0
+				select s)
 			{
-				drfMessage.Payload.Drop.Items.Add(item.ApiId, item.Signed_Count);
+				drfMessage.Payload.Drop.Items.Add(item.ApiId, item.Signed_Count.Value);
 			}
-			foreach (Stat currency in currencies.Where((Stat s) => s.Signed_Count != 0).Take(10))
+			foreach (Stat currency in (from s in stats
+				where s.IsCurrency
+				where s.Signed_Count.Value != 0
+				select s).Take(10))
 			{
-				drfMessage.Payload.Drop.Currencies.Add(currency.ApiId, currency.Signed_Count);
+				drfMessage.Payload.Drop.Currencies.Add(currency.ApiId, currency.Signed_Count.Value);
 			}
 			return drfMessage;
 		}

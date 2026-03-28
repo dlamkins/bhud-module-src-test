@@ -7,46 +7,31 @@ namespace FarmingTracker
 {
 	public class StatProfitSetter
 	{
-		public static void SetProfits(Dictionary<int, Stat> itemById)
+		public static void SetProfits(Stats Stats)
 		{
-			foreach (Stat item in itemById.Values)
+			foreach (Stat stat in Stats.GetStats())
 			{
-				item.Profits = CreateProfits(item.Signed_Count, item.Details);
+				SetProfit(stat.Profit, stat.Details);
 			}
 		}
 
-		private static Profits CreateProfits(long signed_count, ApiStatDetails details)
+		private static void SetProfit(Profit profit, StatApiDetails details)
 		{
-			long unsigned_tpSellProfitInCopper = details.Unsigned_SellsUnitPriceInCopper * 85 / 100;
-			long unsigned_tpBuyProfitInCopper = details.Unsigned_BuysUnitPriceInCopper * 85 / 100;
-			bool canBeSoldOnTp = unsigned_tpSellProfitInCopper > 0 || unsigned_tpBuyProfitInCopper > 0;
 			bool canBeSoldToVendor = details.Unsigned_VendorValueInCopper != 0L && !((IEnumerable<ApiEnum<ItemFlag>>)details.ItemFlags).Any((ApiEnum<ItemFlag> f) => f == ApiEnum<ItemFlag>.op_Implicit((ItemFlag)11));
-			long unsigned_vendorProfitInCopper = (canBeSoldToVendor ? details.Unsigned_VendorValueInCopper : 0);
-			return new Profits
-			{
-				Each = CreateProfit(unsigned_vendorProfitInCopper, unsigned_tpSellProfitInCopper, unsigned_tpBuyProfitInCopper),
-				All = CreateProfit(signed_count * unsigned_vendorProfitInCopper, signed_count * unsigned_tpSellProfitInCopper, signed_count * unsigned_tpBuyProfitInCopper),
-				CanBeSoldOnTp = canBeSoldOnTp,
-				CanBeSoldToVendor = canBeSoldToVendor,
-				CanNotBeSold = (!canBeSoldToVendor && !canBeSoldOnTp)
-			};
-		}
-
-		private static Profit CreateProfit(long unsigned_vendorProfitInCopper, long unsigned_tpSellProfitInCopper, long unsigned_tpBuyProfitInCopper)
-		{
-			unsigned_vendorProfitInCopper = Math.Abs(unsigned_vendorProfitInCopper);
-			unsigned_tpSellProfitInCopper = Math.Abs(unsigned_tpSellProfitInCopper);
-			unsigned_tpBuyProfitInCopper = Math.Abs(unsigned_tpBuyProfitInCopper);
-			long unsigned_maxTpProfitInCopper = Math.Max(unsigned_tpSellProfitInCopper, unsigned_tpBuyProfitInCopper);
-			long unsigned_maxProfitInCopper = Math.Max(unsigned_vendorProfitInCopper, unsigned_maxTpProfitInCopper);
-			return new Profit
-			{
-				Unsigned_VendorProfitInCopper = unsigned_vendorProfitInCopper,
-				Unsigned_TpSellProfitInCopper = unsigned_tpSellProfitInCopper,
-				Unsigned_TpBuyProfitInCopper = unsigned_tpBuyProfitInCopper,
-				Unsigned_MaxTpProfitInCopper = unsigned_maxTpProfitInCopper,
-				Unsigned_MaxProfitInCopper = unsigned_maxProfitInCopper
-			};
+			long unsigned_vendor_ProfitInCopper = (canBeSoldToVendor ? details.Unsigned_VendorValueInCopper : 0);
+			long unsigned_tpSell_ProfitInCopper = details.Unsigned_SellsUnitPriceInCopper * 85 / 100;
+			long unsigned_tpBuy_ProfitInCopper = details.Unsigned_BuysUnitPriceInCopper * 85 / 100;
+			bool canBeSoldOnTp = unsigned_tpSell_ProfitInCopper > 0 || unsigned_tpBuy_ProfitInCopper > 0;
+			long unsigned_maxTp_ProfitInCopper = Math.Max(unsigned_tpSell_ProfitInCopper, unsigned_tpBuy_ProfitInCopper);
+			long unsigned_maxTpAndVendor_ProfitInCopper = Math.Max(unsigned_vendor_ProfitInCopper, unsigned_maxTp_ProfitInCopper);
+			profit.CanBeSoldOnTp = canBeSoldOnTp;
+			profit.CanBeSoldToVendor = canBeSoldToVendor;
+			profit.CanNotBeSold = !canBeSoldToVendor && !canBeSoldOnTp;
+			profit.Unsigned_Vendor_ProfitInCopper.Value = unsigned_vendor_ProfitInCopper;
+			profit.Unsigned_TpSell_ProfitInCopper.Value = unsigned_tpSell_ProfitInCopper;
+			profit.Unsigned_TpBuy_ProfitInCopper.Value = unsigned_tpBuy_ProfitInCopper;
+			profit.Unsigned_MaxTp_ProfitInCopper.Value = unsigned_maxTp_ProfitInCopper;
+			profit.Unsigned_MaxTpAndVendor_ProfitInCopper.Value = unsigned_maxTpAndVendor_ProfitInCopper;
 		}
 	}
 }

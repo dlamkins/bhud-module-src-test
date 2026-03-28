@@ -8,7 +8,7 @@ namespace FarmingTracker
 {
 	public class StatTooltip : DisposableTooltip
 	{
-		public StatTooltip(Stat stat, long? unsigned_customStatProfitInCopper, AsyncTexture2D statIconTexture, PanelType panelType, Services services)
+		public StatTooltip(Stat stat, AsyncTexture2D statIconTexture, PanelType panelType, Services services)
 		{
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
@@ -25,12 +25,12 @@ namespace FarmingTracker
 			BitmapFont font = services.FontService.Fonts[(FontSize)16];
 			switch (stat.Details.State)
 			{
-			case ApiStatDetailsState.SetByApi:
+			case StatApiDetailsState.SetByApi:
 				AddTitle(stat, statIconTexture, (Container)(object)rootFlowPanel);
 				AddDescription(stat, font, (Container)(object)rootFlowPanel);
-				if (panelType != PanelType.IgnoredItems)
+				if (panelType != PanelType.IgnoredStats)
 				{
-					StatTooltipService.AddProfitTable(stat, unsigned_customStatProfitInCopper, font, services, (Container)(object)rootFlowPanel);
+					StatTooltipService.AddProfitTable(stat, font, services, (Container)(object)rootFlowPanel);
 					StatTooltipService.AddText("\nRight click for more options.", font, (Container)(object)rootFlowPanel);
 				}
 				else
@@ -38,14 +38,14 @@ namespace FarmingTracker
 					StatTooltipService.AddText("\nLeft click to unignore this item.", font, (Container)(object)rootFlowPanel);
 				}
 				break;
-			case ApiStatDetailsState.GoldCoinCustomStat:
-			case ApiStatDetailsState.SilveCoinCustomStat:
-			case ApiStatDetailsState.CopperCoinCustomStat:
+			case StatApiDetailsState.GoldCoinCustomStat:
+			case StatApiDetailsState.SilveCoinCustomStat:
+			case StatApiDetailsState.CopperCoinCustomStat:
 				StatTooltipService.AddText($"{stat.Signed_Count}\nChanges in 'raw gold'.\nIn other words coins spent or gained.", font, (Container)(object)rootFlowPanel);
 				break;
-			case ApiStatDetailsState.MissingBecauseUnknownByApi:
+			case StatApiDetailsState.MissingBecauseUnknownByApi:
 				StatTooltipService.AddText($"Unknown item/currency (ID: {stat.ApiId})\n" + "GW2 API has no information about it.\nThis issue typically occurs for items related to renown hearts.", font, (Container)(object)rootFlowPanel);
-				if (panelType == PanelType.SummaryRegularItems)
+				if (panelType == PanelType.SummaryItems)
 				{
 					StatTooltipService.AddText("\nRight click to search its ID in the wiki in your default browser.", font, (Container)(object)rootFlowPanel);
 				}
@@ -54,7 +54,7 @@ namespace FarmingTracker
 					StatTooltipService.AddText("\nLeft click to unignore this item.", font, (Container)(object)rootFlowPanel);
 				}
 				break;
-			case ApiStatDetailsState.MissingBecauseApiNotCalledYet:
+			case StatApiDetailsState.MissingBecauseApiNotCalledYet:
 			{
 				string errorMessage = $"Module error: API was not called for stat. Stats like that should not be displayed (id: {stat.ApiId}).";
 				Module.Logger.Error(errorMessage);
@@ -62,7 +62,7 @@ namespace FarmingTracker
 				break;
 			}
 			default:
-				Module.Logger.Error(Helper.CreateSwitchCaseNotFoundMessage(stat.Details.State, "ApiStatDetailsState", "use error tooltip"));
+				Module.Logger.Error(Helper.CreateSwitchCaseNotFoundMessage(stat.Details.State, "StatApiDetailsState", "use error tooltip"));
 				StatTooltipService.AddText("Module error: unexpected state", font, (Container)(object)rootFlowPanel);
 				break;
 			}
@@ -85,13 +85,13 @@ namespace FarmingTracker
 			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a3: Expected O, but got Unknown
+			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0082: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009e: Expected O, but got Unknown
 			Panel val = new Panel();
 			((Container)val).set_HeightSizingMode((SizingMode)1);
 			((Container)val).set_WidthSizingMode((SizingMode)1);

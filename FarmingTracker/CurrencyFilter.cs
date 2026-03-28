@@ -2,9 +2,6 @@ namespace FarmingTracker
 {
 	public enum CurrencyFilter
 	{
-		GoldCoin = -3,
-		SilverCoin = -2,
-		CopperCoin = -1,
 		Karma = 2,
 		Laurel = 3,
 		Gem = 4,

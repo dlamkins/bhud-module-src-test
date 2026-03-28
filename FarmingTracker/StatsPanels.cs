@@ -8,16 +8,16 @@ namespace FarmingTracker
 
 		public FlowPanel ItemsFlowPanel { get; }
 
-		public FlowPanel FavoriteItemsFlowPanel { get; }
+		public FlowPanel FavoriteStatsFlowPanel { get; }
 
 		public ClickThroughImage CurrencyFilterIcon { get; }
 
 		public ClickThroughImage ItemsFilterIcon { get; }
 
-		public StatsPanels(FlowPanel currenciesFlowPanel, FlowPanel favoriteItemsFlowPanel, FlowPanel itemsFlowPanel, ClickThroughImage currencyFilterIcon, ClickThroughImage itemsFilterIcon)
+		public StatsPanels(FlowPanel currenciesFlowPanel, FlowPanel favoriteStatsFlowPanel, FlowPanel itemsFlowPanel, ClickThroughImage currencyFilterIcon, ClickThroughImage itemsFilterIcon)
 		{
 			CurrenciesFlowPanel = currenciesFlowPanel;
-			FavoriteItemsFlowPanel = favoriteItemsFlowPanel;
+			FavoriteStatsFlowPanel = favoriteStatsFlowPanel;
 			ItemsFlowPanel = itemsFlowPanel;
 			CurrencyFilterIcon = currencyFilterIcon;
 			ItemsFilterIcon = itemsFilterIcon;

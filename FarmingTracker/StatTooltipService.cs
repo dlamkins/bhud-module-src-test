@@ -26,15 +26,16 @@ namespace FarmingTracker
 			((Control)val).set_Parent(parent);
 		}
 
-		public static void AddProfitTable(Stat stat, long? unsigned_customStatProfitInCopper, BitmapFont font, Services services, Container parent)
+		public static void AddProfitTable(Stat stat, BitmapFont font, Services services, Container parent)
 		{
-			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0049: Expected O, but got Unknown
-			if (!stat.Profits.CanNotBeSold || unsigned_customStatProfitInCopper.HasValue)
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0053: Expected O, but got Unknown
+			long? unsigned_CustomProfitInCopper_copy = stat.Profit.Unsigned_Custom_ProfitInCopper;
+			if (!stat.Profit.CanNotBeSold || unsigned_CustomProfitInCopper_copy.HasValue)
 			{
 				if (!stat.IsSingleItem)
 				{
@@ -46,17 +47,17 @@ namespace FarmingTracker
 				((Container)val).set_WidthSizingMode((SizingMode)1);
 				((Control)val).set_Parent(parent);
 				FlowPanel profitColumnsFlowPanel = val;
-				AddTitleColumn(stat, unsigned_customStatProfitInCopper.HasValue, font, services, (Container)(object)profitColumnsFlowPanel);
+				AddTitleColumn(stat, unsigned_CustomProfitInCopper_copy.HasValue, font, services, (Container)(object)profitColumnsFlowPanel);
 				if (stat.IsSingleItem)
 				{
-					AddProfitColumn("", stat.Profits.Each, stat.CountSign * unsigned_customStatProfitInCopper, stat, font, services, (Container)(object)profitColumnsFlowPanel);
+					AddProfitColumn("", stat.CountSign, stat.Profit, font, services, (Container)(object)profitColumnsFlowPanel);
 				}
 				else
 				{
-					AddProfitColumn("all", stat.Profits.All, stat.Signed_Count * unsigned_customStatProfitInCopper, stat, font, services, (Container)(object)profitColumnsFlowPanel);
-					AddProfitColumn("each", stat.Profits.Each, stat.CountSign * unsigned_customStatProfitInCopper, stat, font, services, (Container)(object)profitColumnsFlowPanel);
+					AddProfitColumn("all", stat.Signed_Count.Value, stat.Profit, font, services, (Container)(object)profitColumnsFlowPanel);
+					AddProfitColumn("each", stat.CountSign, stat.Profit, font, services, (Container)(object)profitColumnsFlowPanel);
 				}
-				if (stat.Profits.CanBeSoldOnTp)
+				if (stat.Profit.CanBeSoldOnTp)
 				{
 					AddText("\n(15% trading post fee is already deducted from TP sell/buy)", font, parent);
 				}
@@ -88,12 +89,12 @@ namespace FarmingTracker
 			val2.set_AutoSizeWidth(true);
 			((Control)val2).set_Height(22);
 			((Control)val2).set_Parent((Container)(object)titleColumnFlowPanel);
-			if (stat.Profits.CanBeSoldOnTp)
+			if (stat.Profit.CanBeSoldOnTp)
 			{
 				new IconLabel("TP Sell", services.TextureService.TradingPostTexture, 22, font, (Container)(object)titleColumnFlowPanel);
 				new IconLabel("TP Buy", services.TextureService.TradingPostTexture, 22, font, (Container)(object)titleColumnFlowPanel);
 			}
-			if (stat.Profits.CanBeSoldToVendor)
+			if (stat.Profit.CanBeSoldToVendor)
 			{
 				new IconLabel("Vendor", services.TextureService.MerchantTexture, 22, font, (Container)(object)titleColumnFlowPanel);
 			}
@@ -103,7 +104,7 @@ namespace FarmingTracker
 			}
 		}
 
-		private static void AddProfitColumn(string columnHeaderText, Profit profit, long? signed_customStatProfitInCopper, Stat stat, BitmapFont font, Services services, Container parent)
+		private static void AddProfitColumn(string columnHeaderText, long profitFaktor, Profit profit, BitmapFont font, Services services, Container parent)
 		{
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
@@ -114,10 +115,10 @@ namespace FarmingTracker
 			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0059: Expected O, but got Unknown
+			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0058: Expected O, but got Unknown
 			FlowPanel val = new FlowPanel();
 			val.set_FlowDirection((ControlFlowDirection)3);
 			((Container)val).set_HeightSizingMode((SizingMode)1);
@@ -133,32 +134,32 @@ namespace FarmingTracker
 			Label headerLabel = val2;
 			List<CoinsPanel> profitPanels = new List<CoinsPanel>();
 			List<FixedWidthContainer> containers = new List<FixedWidthContainer>();
-			if (stat.Profits.CanBeSoldOnTp)
+			if (profit.CanBeSoldOnTp)
 			{
 				FixedWidthContainer tpSellProfitContainer = new FixedWidthContainer((Container)(object)columnFlowPanel);
 				CoinsPanel tpSellProfitPanel = new CoinsPanel(null, font, services.TextureService, (Container)(object)tpSellProfitContainer, 22);
-				tpSellProfitPanel.SetCoins(stat.CountSign * profit.Unsigned_TpSellProfitInCopper);
+				tpSellProfitPanel.SetCoins(profitFaktor * profit.Unsigned_TpSell_ProfitInCopper.Value);
 				profitPanels.Add(tpSellProfitPanel);
 				containers.Add(tpSellProfitContainer);
 				FixedWidthContainer tpBuyProfitContainer = new FixedWidthContainer((Container)(object)columnFlowPanel);
 				CoinsPanel tpBuyProfitPanel = new CoinsPanel(null, font, services.TextureService, (Container)(object)tpBuyProfitContainer, 22);
-				tpBuyProfitPanel.SetCoins(stat.CountSign * profit.Unsigned_TpBuyProfitInCopper);
+				tpBuyProfitPanel.SetCoins(profitFaktor * profit.Unsigned_TpBuy_ProfitInCopper.Value);
 				profitPanels.Add(tpBuyProfitPanel);
 				containers.Add(tpBuyProfitContainer);
 			}
-			if (stat.Profits.CanBeSoldToVendor)
+			if (profit.CanBeSoldToVendor)
 			{
 				FixedWidthContainer vendorProfitContainer2 = new FixedWidthContainer((Container)(object)columnFlowPanel);
 				CoinsPanel vendorProfitPanel2 = new CoinsPanel(null, font, services.TextureService, (Container)(object)vendorProfitContainer2, 22);
-				vendorProfitPanel2.SetCoins(stat.CountSign * profit.Unsigned_VendorProfitInCopper);
+				vendorProfitPanel2.SetCoins(profitFaktor * profit.Unsigned_Vendor_ProfitInCopper.Value);
 				profitPanels.Add(vendorProfitPanel2);
 				containers.Add(vendorProfitContainer2);
 			}
-			if (signed_customStatProfitInCopper.HasValue)
+			if (profit.Unsigned_Custom_ProfitInCopper.HasValue)
 			{
 				FixedWidthContainer vendorProfitContainer = new FixedWidthContainer((Container)(object)columnFlowPanel);
 				CoinsPanel vendorProfitPanel = new CoinsPanel(null, font, services.TextureService, (Container)(object)vendorProfitContainer, 22);
-				vendorProfitPanel.SetCoins(signed_customStatProfitInCopper.Value);
+				vendorProfitPanel.SetCoins(profitFaktor * profit.Unsigned_Custom_ProfitInCopper.Value);
 				profitPanels.Add(vendorProfitPanel);
 				containers.Add(vendorProfitContainer);
 			}

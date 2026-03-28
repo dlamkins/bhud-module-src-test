@@ -58,7 +58,7 @@ namespace FarmingTracker
 			});
 			AutomaticResetService automaticResetService = (_automaticResetService = new AutomaticResetService(services));
 			_timeSinceModuleStartStopwatch.Restart();
-			services.UpdateLoop.TriggerUpdateStats();
+			services.UpdateLoop.TriggerInstantUpdateStats();
 		}
 
 		public void Dispose()
@@ -89,7 +89,7 @@ namespace FarmingTracker
 		{
 			((Control)_controls.StatsPanels.CurrenciesFlowPanel).set_Width(width);
 			((Control)_controls.StatsPanels.ItemsFlowPanel).set_Width(width);
-			((Control)_controls.StatsPanels.FavoriteItemsFlowPanel).set_Width(width);
+			((Control)_controls.StatsPanels.FavoriteStatsFlowPanel).set_Width(width);
 			_controls.StatsPanels.ItemsFilterIcon.SetLeft(width);
 			_controls.StatsPanels.CurrencyFilterIcon.SetLeft(width);
 			_controls.SearchPanel.UpdateSize(width);
@@ -104,11 +104,10 @@ namespace FarmingTracker
 				_isUiUpdateTaskRunning = true;
 				Task.Run(delegate
 				{
-					StatsSnapshot statsSnapshot = _model.Stats.StatsSnapshot;
-					_services.ProfitCalculator.CalculateProfits(statsSnapshot, _model.CustomStatProfits, _model.IgnoredItemApiIds, _services.FarmingDuration.Elapsed);
+					_services.ProfitCalculator.CalculateProfits(_model, _services.FarmingDuration.Elapsed);
 					_controls.ProfitPanels.ShowProfits(_services.ProfitCalculator.Signed_ProfitInCopper, _services.ProfitCalculator.Signed_ProfitPerHourInCopper);
 					_profitWindow.ProfitPanels.ShowProfits(_services.ProfitCalculator.Signed_ProfitInCopper, _services.ProfitCalculator.Signed_ProfitPerHourInCopper);
-					UiUpdater.UpdateStatPanels(_controls.StatsPanels, statsSnapshot, _model, _services);
+					UiUpdater.UpdateStatPanels(_controls.StatsPanels, _model, _services);
 					_isUiUpdateTaskRunning = false;
 				});
 			}
@@ -185,9 +184,7 @@ namespace FarmingTracker
 		{
 			try
 			{
-				StatsService.ResetCounts(_model.Stats.ItemById);
-				StatsService.ResetCounts(_model.Stats.CurrencyById);
-				_model.Stats.UpdateStatsSnapshot();
+				_model.Stats.ResetCounts();
 				_lastStatsUpdateSuccessfull = true;
 				_controls.HintLabel.set_Text(" ");
 			}
@@ -206,8 +203,8 @@ namespace FarmingTracker
 				if (drfMessages.Any() || !_lastStatsUpdateSuccessfull || _services.UpdateLoop.HasToUpdateStats())
 				{
 					_controls.HintLabel.set_Text("Updating... (this may take a few seconds)");
-					await UpdateStatsInModel(drfMessages, _services);
-					_model.Stats.UpdateStatsSnapshot();
+					DrfResultAdder.UpdateCountsOrAddNewStats(drfMessages, _model.Stats);
+					await _statsSetter.SetDetailsAndProfitFromApi(_model.Stats, _services.Gw2ApiManager);
 					_services.UpdateLoop.TriggerUpdateUi();
 					_services.UpdateLoop.TriggerSaveModel();
 					_lastStatsUpdateSuccessfull = true;
@@ -274,12 +271,6 @@ namespace FarmingTracker
 				}
 				_oldApiTokenErrorTooltip = apiTokenErrorMessage;
 			}
-		}
-
-		private async Task UpdateStatsInModel(List<DrfMessage> drfMessages, Services services)
-		{
-			DrfResultAdder.UpdateCountsOrAddNewStats(drfMessages, _model.Stats.ItemById, _model.Stats.CurrencyById);
-			await _statsSetter.SetDetailsAndProfitFromApi(_model.Stats.ItemById, _model.Stats.CurrencyById, services.Gw2ApiManager);
 		}
 	}
 }
