@@ -141,6 +141,7 @@ namespace GW2StoryTimes.UI
 				if (result.Success)
 				{
 					ScreenNotification.ShowNotification("Story Times: Time submitted for " + _mission.Name + "!");
+					GW2StoryTimesModule.Instance?.OnSubmissionCompleted(_mission);
 				}
 				else
 				{

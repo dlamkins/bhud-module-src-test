@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Linq;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Content;
@@ -28,6 +30,8 @@ namespace GW2StoryTimes
 		private StoryTimesWindow _selectorWindow;
 
 		private FeedbackPrompt _feedbackPrompt;
+
+		private NextMissionPrompt _nextMissionPrompt;
 
 		internal static GW2StoryTimesModule Instance { get; private set; }
 
@@ -96,6 +100,7 @@ namespace GW2StoryTimes
 			_widget?.Dispose();
 			_selectorWindow?.Dispose();
 			_feedbackPrompt?.Dispose();
+			_nextMissionPrompt?.Dispose();
 			ApiClient?.Dispose();
 			TimerService?.Dispose();
 			Instance = null;
@@ -189,12 +194,103 @@ namespace GW2StoryTimes
 			if (result.Success)
 			{
 				ScreenNotification.ShowNotification("Story Times: Time submitted for " + mission.Name + "!");
+				OnSubmissionCompleted(mission);
 			}
 			else
 			{
 				ScreenNotification.ShowNotification("Story Times: " + result.Error, ScreenNotification.NotificationType.Warning);
+				_widget?.ReenableSubmit();
 			}
+		}
+
+		internal void OnSubmissionCompleted(Mission submittedMission)
+		{
+			ActiveMission = null;
+			TimerService?.Reset();
 			_widget?.ReenableSubmit();
+			Task.Run(async delegate
+			{
+				try
+				{
+					Mission nextMission = await FindNextMissionAsync(submittedMission);
+					if (nextMission != null)
+					{
+						ShowNextMissionPrompt(nextMission);
+					}
+				}
+				catch (Exception ex)
+				{
+					Logger.Warn("Failed to find next mission: " + ex.Message);
+				}
+			});
+		}
+
+		private async Task<Mission> FindNextMissionAsync(Mission current)
+		{
+			if (current == null || string.IsNullOrEmpty(current.SeasonId))
+			{
+				return null;
+			}
+			Season season = await ApiClient.GetSeasonAsync(current.SeasonId);
+			if (season?.Stories == null)
+			{
+				return null;
+			}
+			string playerRace = GetPlayerRace();
+			List<(Mission, string)> allMissions = new List<(Mission, string)>();
+			foreach (Story story in season.Stories.OrderBy((Story s) => s.Order))
+			{
+				if ((story.Races != null && story.Races.Count > 0 && playerRace != null && !story.Races.Contains(playerRace)) || story.Missions == null)
+				{
+					continue;
+				}
+				foreach (Mission mission in story.Missions.OrderBy((Mission m) => m.Order))
+				{
+					allMissions.Add((mission, story.Name));
+				}
+			}
+			for (int i = 0; i < allMissions.Count - 1; i++)
+			{
+				if (allMissions[i].Item1.Id == current.Id)
+				{
+					Mission next = allMissions[i + 1].Item1;
+					if (string.IsNullOrEmpty(next.SeasonName))
+					{
+						next.SeasonName = season.Name;
+					}
+					if (string.IsNullOrEmpty(next.StoryName))
+					{
+						next.StoryName = allMissions[i + 1].Item2;
+					}
+					if (string.IsNullOrEmpty(next.SeasonId))
+					{
+						next.SeasonId = season.Id;
+					}
+					return next;
+				}
+			}
+			return null;
+		}
+
+		private void ShowNextMissionPrompt(Mission nextMission)
+		{
+			_nextMissionPrompt?.Dispose();
+			_nextMissionPrompt = new NextMissionPrompt(nextMission)
+			{
+				Parent = GameService.Graphics.SpriteScreen
+			};
+		}
+
+		private static string GetPlayerRace()
+		{
+			try
+			{
+				return GameService.Gw2Mumble.PlayerCharacter.Race.ToString();
+			}
+			catch
+			{
+				return null;
+			}
 		}
 	}
 }
