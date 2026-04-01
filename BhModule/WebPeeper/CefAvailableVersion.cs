@@ -7,6 +7,8 @@ namespace BhModule.WebPeeper
 		[Description(" 103.0.90")]
 		v103,
 		[Description(" 144.0.120")]
-		v144
+		v144,
+		[Description(" 146.0.70")]
+		v146
 	}
 }

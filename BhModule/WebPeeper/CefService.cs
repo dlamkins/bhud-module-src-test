@@ -28,6 +28,10 @@ namespace BhModule.WebPeeper
 			{
 				CefAvailableVersion.v144,
 				new CefPkgVersion("144.0.120", "144.0.12")
+			},
+			{
+				CefAvailableVersion.v146,
+				new CefPkgVersion("146.0.70", "146.0.7")
 			}
 		};
 
@@ -41,7 +45,7 @@ namespace BhModule.WebPeeper
 
 		private bool _eventHandlersBound;
 
-		private static readonly CefPkgVersion _suggestionVersion = _versions[CefAvailableVersion.v144];
+		private static readonly CefPkgVersion _suggestionVersion = _versions[CefAvailableVersion.v146];
 
 		public static readonly CefPkgVersion DefaultVersion = _versions[CefAvailableVersion.v103];
 
@@ -272,6 +276,11 @@ namespace BhModule.WebPeeper
 			}
 		}
 
+		public void ShowDevTools()
+		{
+			Browser.ShowDevTools();
+		}
+
 		public Task<Texture2D> GetScreenshot()
 		{
 			return Browser.GetScreenshot().ContinueWith(delegate(Task<byte[]> t)
@@ -396,7 +405,7 @@ namespace BhModule.WebPeeper
 			try
 			{
 				Browser.CefSettingInit(IsDefaultVersion ? _cefFolder : Path.Combine(_cefFolder, "locales"), CefCacheFolder, _cefSharpFolder);
-				Browser.Create(Settings.HomeUrl.get_Value(), Settings.GetFrameRate(), Settings.IsMobileLayout.get_Value()).ContinueWith(delegate(Task<bool> t)
+				Browser.Create(Settings.HomeUrl.get_Value(), Settings.GetFrameRate(), Settings.IsMobileLayout.get_Value(), Settings.SoundVolume.get_Value()).ContinueWith(delegate(Task<bool> t)
 				{
 					if (t.Status == TaskStatus.RanToCompletion)
 					{

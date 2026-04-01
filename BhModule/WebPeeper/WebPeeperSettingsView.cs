@@ -11,11 +11,15 @@ namespace BhModule.WebPeeper
 {
 	internal class WebPeeperSettingsView : View
 	{
+		public static Action UpdateSoundVolumeTitle;
+
 		public static Action UpdateWebWindowOpacityTitle;
 
 		public static Action UpdateIsAutoPauseWebState;
 
-		private FlowPanel _rootflowPanel;
+		public static Action DisposeRootFlowPanel;
+
+		private FlowPanel _rootFlowPanel;
 
 		private readonly SettingCollection _settings;
 
@@ -30,24 +34,26 @@ namespace BhModule.WebPeeper
 
 		protected override void Build(Container buildPanel)
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006b: Expected O, but got Unknown
-			//IL_0119: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0125: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0082: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0098: Expected O, but got Unknown
+			//IL_0176: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0182: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0189: Unknown result type (might be due to invalid IL or missing references)
+			DisposeRootFlowPanel?.Invoke();
+			ModuleSettings settings = WebPeeperModule.Instance.Settings;
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Size(((Control)buildPanel).get_Size());
 			val.set_FlowDirection((ControlFlowDirection)3);
@@ -57,59 +63,59 @@ namespace BhModule.WebPeeper
 			((Container)val).set_HeightSizingMode((SizingMode)1);
 			((Container)val).set_AutoSizePadding(new Point(0, 15));
 			((Control)val).set_Parent(buildPanel);
-			_rootflowPanel = val;
+			_rootFlowPanel = val;
+			DisposeRootFlowPanel = delegate
+			{
+				DisposeRootFlowPanel = null;
+				((Control)_rootFlowPanel).Dispose();
+			};
 			foreach (SettingEntry item in ((IEnumerable<SettingEntry>)_settings).Where((SettingEntry s) => s.get_SessionDefined() && !_hiddenSettings.Contains(s.get_EntryKey())))
 			{
 				IView val2 = null;
-				if (item.get_EntryKey() == "WebBgColor")
+				if (((object)item).Equals((object)settings.WebBgColor))
 				{
-					SettingEntry<string> val3 = item as SettingEntry<string>;
-					if (val3 != null)
-					{
-						val2 = (IView)(object)new HexColorSettingView(val3, ((Control)_rootflowPanel).get_Width());
-						goto IL_00f7;
-					}
+					val2 = (IView)(object)new HexColorSettingView(settings.WebBgColor, ((Control)_rootFlowPanel).get_Width());
 				}
-				if (item.get_EntryKey() == "CefVersion")
+				else if (((object)item).Equals((object)settings.CefVersion))
 				{
-					SettingEntry<CefAvailableVersion> val4 = item as SettingEntry<CefAvailableVersion>;
-					if (val4 != null)
-					{
-						val2 = (IView)(object)new CefVersionSettingView(val4, ((Control)_rootflowPanel).get_Width());
-					}
+					val2 = (IView)(object)new CefVersionSettingView(settings.CefVersion, ((Control)_rootFlowPanel).get_Width());
 				}
-				goto IL_00f7;
-				IL_01de:
-				_003F val5;
-				((ViewContainer)val5).Show(val2);
-				continue;
-				IL_00f7:
-				if (val2 == null && (val2 = SettingView.FromType(item, ((Control)_rootflowPanel).get_Width())) == null)
+				if (val2 == null && (val2 = SettingView.FromType(item, ((Control)_rootFlowPanel).get_Width())) == null)
 				{
 					continue;
 				}
-				val5 = new ViewContainer();
-				((Container)val5).set_WidthSizingMode((SizingMode)2);
-				((Container)val5).set_HeightSizingMode((SizingMode)1);
-				((Control)val5).set_Parent((Container)(object)_rootflowPanel);
-				SettingEntry<float> settingFloat = item as SettingEntry<float>;
-				if (settingFloat != null)
+				ViewContainer val3 = new ViewContainer();
+				((Container)val3).set_WidthSizingMode((SizingMode)2);
+				((Container)val3).set_HeightSizingMode((SizingMode)1);
+				((Control)val3).set_Parent((Container)(object)_rootFlowPanel);
+				if (((object)item).Equals((object)settings.WebWindowOpacity))
 				{
 					FloatSettingView settingViewFloat = (FloatSettingView)(object)((val2 is FloatSettingView) ? val2 : null);
-					if (settingViewFloat != null && ((SettingEntry)settingFloat).get_EntryKey() == "WebWindowOpacity")
+					if (settingViewFloat != null)
 					{
 						UpdateWebWindowOpacityTitle = delegate
 						{
-							((SettingView<float>)(object)settingViewFloat).set_DisplayName(((SettingEntry)settingFloat).get_GetDisplayNameFunc()());
+							((SettingView<float>)(object)settingViewFloat).set_DisplayName(((SettingEntry)settings.WebWindowOpacity).get_GetDisplayNameFunc()());
 						};
-						goto IL_01de;
+						goto IL_0283;
 					}
 				}
-				SettingEntry<bool> val6 = item as SettingEntry<bool>;
-				if (val6 != null)
+				if (((object)item).Equals((object)settings.SoundVolume))
+				{
+					FloatSettingView settingViewFloat2 = (FloatSettingView)(object)((val2 is FloatSettingView) ? val2 : null);
+					if (settingViewFloat2 != null)
+					{
+						UpdateSoundVolumeTitle = delegate
+						{
+							((SettingView<float>)(object)settingViewFloat2).set_DisplayName(((SettingEntry)settings.SoundVolume).get_GetDisplayNameFunc()());
+						};
+						goto IL_0283;
+					}
+				}
+				if (((object)item).Equals((object)settings.IsAutoPauseWeb))
 				{
 					BoolSettingView settingViewBool = (BoolSettingView)(object)((val2 is BoolSettingView) ? val2 : null);
-					if (settingViewBool != null && ((SettingEntry)val6).get_EntryKey() == "IsAutoPauseWeb")
+					if (settingViewBool != null)
 					{
 						UpdateIsAutoPauseWebState = delegate
 						{
@@ -117,7 +123,9 @@ namespace BhModule.WebPeeper
 						};
 					}
 				}
-				goto IL_01de;
+				goto IL_0283;
+				IL_0283:
+				val3.Show(val2);
 			}
 		}
 	}
