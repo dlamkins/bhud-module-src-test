@@ -116,40 +116,6 @@ namespace SongbookOfTyria.Services
 			}
 		}
 
-		public async Task<MusicTab> GetTabBySlugAsync(string slug, bool includeSongs = true)
-		{
-			string url = "https://gw2opus.com/wp-json/blishhud/v1/albums/" + slug + "?include_songs=" + includeSongs.ToString().ToLower();
-			try
-			{
-				HttpRequestMessage request = CreateRequest(HttpMethod.get_Get(), url);
-				try
-				{
-					HttpResponseMessage httpResponse = await _httpClient.SendAsync(request).ConfigureAwait(continueOnCapturedContext: false);
-					if (!httpResponse.get_IsSuccessStatusCode())
-					{
-						Logger.Warn("GetTabBySlugAsync: HTTP request failed with status code {StatusCode}", new object[1] { httpResponse.get_StatusCode() });
-						return null;
-					}
-					return JsonConvert.DeserializeObject<MusicTab>(await httpResponse.get_Content().ReadAsStringAsync().ConfigureAwait(continueOnCapturedContext: false));
-				}
-				finally
-				{
-					((IDisposable)request)?.Dispose();
-				}
-			}
-			catch (HttpRequestException val)
-			{
-				HttpRequestException ex2 = val;
-				Logger.Warn((Exception)(object)ex2, "GetTabBySlugAsync: HTTP request failed");
-				return null;
-			}
-			catch (Exception ex)
-			{
-				Logger.Warn(ex, "GetTabBySlugAsync: Failed to fetch tab {Slug}", new object[1] { slug });
-				return null;
-			}
-		}
-
 		public async Task<MusicTab> GetTabByUrlAsync(string apiUrl, bool includeSongs = true)
 		{
 			if (string.IsNullOrEmpty(apiUrl))

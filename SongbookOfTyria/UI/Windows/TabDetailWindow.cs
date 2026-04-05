@@ -1,12 +1,18 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Microsoft.Xna.Framework;
 using SongbookOfTyria.Models;
 using SongbookOfTyria.Services;
+using SongbookOfTyria.Settings;
 using SongbookOfTyria.UI.Controls;
 using SongbookOfTyria.UI.Controls.Notation;
 
@@ -54,8 +60,6 @@ namespace SongbookOfTyria.UI.Windows
 
 		private const float ScrollSpeedMultiplier = 0.21f;
 
-		private const int WindowBackgroundAssetId = 155985;
-
 		private const string TabDetailWindowIdPrefix = "SongbookOfTyria_TabDetail_";
 
 		private const int AudioSectionExpandedHeight = 105;
@@ -80,6 +84,14 @@ namespace SongbookOfTyria.UI.Windows
 
 		private readonly UserSettingsService _userSettingsService;
 
+		private readonly MidiPlaybackService _midiPlaybackService;
+
+		private readonly MidiFileParser _midiFileParser;
+
+		private readonly ModuleSettings _moduleSettings;
+
+		private PracticeFeedbackService _practiceFeedbackService;
+
 		private FlowPanel _leftPanel;
 
 		private FlowPanel _rightPanel;
@@ -88,17 +100,27 @@ namespace SongbookOfTyria.UI.Windows
 
 		private ViewOptionsPanel _controlsSection;
 
+		private Dropdown _modeDropdown;
+
 		private FlowPanel _audioSection;
+
+		private PracticeModePanel _practiceModePanel;
 
 		private PianoKeybindsPanel _pianoKeybindsSection;
 
-		private FlowPanel _notationSection;
+		private Panel _notationSection;
+
+		private Panel _notationHeaderPanel;
 
 		private Panel _notationContentPanel;
+
+		private TrackSelectionPanel _trackSelectionPanel;
 
 		private PianoKeybinds _pianoKeybinds;
 
 		private NotationFontSize _currentFontSize = NotationFontSize.Size20;
+
+		private TabViewMode _currentMode;
 
 		private bool _detailsCollapsed;
 
@@ -112,27 +134,53 @@ namespace SongbookOfTyria.UI.Windows
 
 		private float _scrollSpeed = 30f;
 
+		private bool _hitDetectionEnabled;
+
 		private float _accumulatedScrollOffset;
 
 		private Scrollbar _cachedScrollbar;
 
 		private NotationRenderer _notationRenderer;
 
-		public TabDetailWindow(MusicTab musicTab, TextureService textureService, AudioService audioService, UserSettingsService userSettingsService)
+		private List<ActiveNoteInfo> _pendingActiveNotes;
+
+		private volatile bool _activeNotesDirty;
+
+		private readonly Dictionary<int, DateTime> _noteHighlightStartTimes = new Dictionary<int, DateTime>();
+
+		private const double HighlightMaxDurationMs = 500.0;
+
+		private Dictionary<int, NoteFeedbackType> _pendingFeedback;
+
+		private volatile bool _feedbackDirty;
+
+		private volatile bool _markersDirty;
+
+		public TabDetailWindow(MusicTab musicTab, TextureService textureService, AudioService audioService, UserSettingsService userSettingsService, ModuleSettings moduleSettings, MidiPlaybackService midiPlaybackService = null, string cacheDirectory = null)
 			: this(AsyncTexture2D.FromAssetId(155985), new Rectangle(45, 25, 900, 700), new Rectangle(40, 25, 890, 650))
 		{
-			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
 			_musicTab = musicTab;
 			_textureService = textureService;
 			_audioService = audioService;
 			_userSettingsService = userSettingsService;
+			_moduleSettings = moduleSettings;
+			_midiPlaybackService = midiPlaybackService;
+			if (cacheDirectory != null)
+			{
+				_midiFileParser = new MidiFileParser(cacheDirectory);
+			}
 			((WindowBase2)this).set_Emblem(AsyncTexture2D.op_Implicit(_textureService.GetEmblem()));
 			RestoreSavedState();
 			InitializeWindow();
 			BuildLeftPanel();
 			BuildRightPanel();
 			ForceLayoutRefresh();
+			if (_musicTab.HasPracticeMode && _midiPlaybackService != null)
+			{
+				InitializePracticeModeAsync();
+			}
 		}
 
 		private void ForceLayoutRefresh()
@@ -153,6 +201,7 @@ namespace SongbookOfTyria.UI.Windows
 			_viewOptionsCollapsed = _userSettingsService?.GetGlobalViewOptionsCollapsed() ?? false;
 			_audioPlayerCollapsed = _userSettingsService?.GetGlobalAudioPlayerCollapsed() ?? false;
 			_pianoKeybindsCollapsed = _userSettingsService?.GetGlobalPianoKeybindsCollapsed() ?? false;
+			_hitDetectionEnabled = false;
 			_pianoKeybinds = _userSettingsService?.GetPianoKeybinds() ?? new PianoKeybinds();
 			TabWindowState savedState = _userSettingsService?.GetTabWindowState(_musicTab.Id);
 			if (savedState != null)
@@ -160,18 +209,23 @@ namespace SongbookOfTyria.UI.Windows
 				_currentFontSize = savedState.FontSize;
 				_autoScrollEnabled = savedState.AutoScrollEnabled;
 				_scrollSpeed = savedState.ScrollSpeed;
+				if (savedState.IsPracticeMode && _musicTab.HasPracticeMode)
+				{
+					_currentMode = TabViewMode.Practice;
+				}
 			}
 		}
 
 		private void SaveWindowState()
 		{
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
 			TabWindowState windowState = new TabWindowState
 			{
 				FontSize = _currentFontSize,
 				AutoScrollEnabled = _autoScrollEnabled,
-				ScrollSpeed = _scrollSpeed
+				ScrollSpeed = _scrollSpeed,
+				IsPracticeMode = (_currentMode == TabViewMode.Practice)
 			};
 			windowState.SetLocation(((Control)this).get_Location());
 			windowState.SetSize(((Control)this).get_Size());
@@ -209,6 +263,7 @@ namespace SongbookOfTyria.UI.Windows
 		private void OnWindowHidden(object sender, EventArgs e)
 		{
 			_audioService?.Stop();
+			_midiPlaybackService?.Stop();
 			SaveWindowState();
 		}
 
@@ -269,9 +324,120 @@ namespace SongbookOfTyria.UI.Windows
 			((Control)val).set_Parent((Container)(object)this);
 			_rightPanel = val;
 			BuildAudioSection();
+			BuildPracticeModeSection();
 			BuildPianoKeybindsSection();
 			BuildNotationSection();
 			BuildNotationContent();
+			UpdateModeVisibility();
+		}
+
+		private void BuildModeDropdown()
+		{
+			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0043: Expected O, but got Unknown
+			if (_musicTab.HasPracticeMode && _notationHeaderPanel != null)
+			{
+				Dropdown val = new Dropdown();
+				((Control)val).set_Width(110);
+				((Control)val).set_Location(new Point(75, 1));
+				((Control)val).set_Parent((Container)(object)_notationHeaderPanel);
+				_modeDropdown = val;
+				_modeDropdown.get_Items().Add("Normal");
+				_modeDropdown.get_Items().Add("Practice");
+				_modeDropdown.set_SelectedItem((_currentMode == TabViewMode.Normal) ? "Normal" : "Practice");
+				_modeDropdown.add_ValueChanged((EventHandler<ValueChangedEventArgs>)OnModeDropdownChanged);
+			}
+		}
+
+		private void OnModeDropdownChanged(object sender, ValueChangedEventArgs e)
+		{
+			TabViewMode newMode = ((e.get_CurrentValue() == "Practice") ? TabViewMode.Practice : TabViewMode.Normal);
+			if (newMode != _currentMode)
+			{
+				_currentMode = newMode;
+				if (_currentMode == TabViewMode.Normal)
+				{
+					_midiPlaybackService?.Stop();
+				}
+				else
+				{
+					_audioService?.Stop();
+				}
+				_accumulatedScrollOffset = 0f;
+				_cachedScrollbar = null;
+				UpdateModeVisibility();
+				ForceLayoutRefresh();
+			}
+		}
+
+		private void UpdateModeVisibility()
+		{
+			bool isNormalMode = _currentMode == TabViewMode.Normal;
+			bool isPracticeMode = !isNormalMode;
+			SetControlVisible((Control)(object)_audioSection, isNormalMode);
+			SetControlVisible((Control)(object)_practiceModePanel, isPracticeMode);
+			_controlsSection?.SetPracticeModeActive(isPracticeMode);
+			FlowPanel leftPanel = _leftPanel;
+			if (leftPanel != null)
+			{
+				((Control)leftPanel).Invalidate();
+			}
+			if (_practiceFeedbackService != null)
+			{
+				_practiceFeedbackService.IsEnabled = isPracticeMode && _hitDetectionEnabled;
+				if (isNormalMode)
+				{
+					_practiceFeedbackService.ClearFeedback();
+					_notationRenderer?.Control?.ClearNoteFeedback();
+				}
+			}
+			if (_trackSelectionPanel != null)
+			{
+				if (isPracticeMode)
+				{
+					AddTrackSelectionToNotationSection();
+				}
+				else
+				{
+					((Control)_trackSelectionPanel).set_Parent((Container)null);
+					UpdateNotationContentPanelHeight();
+				}
+			}
+			ReorderSectionsForMode(isNormalMode);
+			UpdatePanelSizes();
+		}
+
+		private static void SetControlVisible(Control control, bool visible)
+		{
+			if (control != null)
+			{
+				control.set_Visible(visible);
+			}
+		}
+
+		private void ReorderSectionsForMode(bool isNormalMode)
+		{
+			if (_pianoKeybindsSection != null && _practiceModePanel != null)
+			{
+				((Control)_pianoKeybindsSection).set_Parent((Container)null);
+				((Control)_practiceModePanel).set_Parent((Container)null);
+				((Control)_notationSection).set_Parent((Container)null);
+				if (isNormalMode)
+				{
+					((Control)_practiceModePanel).set_Parent((Container)(object)_rightPanel);
+					((Control)_pianoKeybindsSection).set_Parent((Container)(object)_rightPanel);
+				}
+				else
+				{
+					((Control)_pianoKeybindsSection).set_Parent((Container)(object)_rightPanel);
+					((Control)_practiceModePanel).set_Parent((Container)(object)_rightPanel);
+				}
+				((Control)_notationSection).set_Parent((Container)(object)_rightPanel);
+			}
 		}
 
 		private void BuildAudioSection()
@@ -311,6 +477,150 @@ namespace SongbookOfTyria.UI.Windows
 			}
 		}
 
+		private void BuildPracticeModeSection()
+		{
+			if (_musicTab.HasPracticeMode && _midiPlaybackService != null)
+			{
+				MidiData midiData = _musicTab.MidiData;
+				if (midiData != null && midiData.Tracks?.Count > 0)
+				{
+					CreatePracticeModePanel(_musicTab.MidiData);
+				}
+			}
+		}
+
+		private async Task InitializePracticeModeAsync()
+		{
+			try
+			{
+				MidiData midiData2 = _musicTab.MidiData;
+				if ((midiData2 == null || !(midiData2.Tracks?.Count > 0)) && !string.IsNullOrEmpty(_musicTab.MidiFile) && _midiFileParser != null)
+				{
+					Logger.Debug("Downloading and parsing MIDI file: {0}", new object[1] { _musicTab.MidiFile });
+					MidiData midiData = await _midiFileParser.ParseFromUrlAsync(_musicTab.MidiFile).ConfigureAwait(continueOnCapturedContext: false);
+					if (midiData != null && midiData.Tracks?.Count > 0)
+					{
+						_musicTab.MidiData = midiData;
+						CreatePracticeModePanel(midiData);
+						UpdateModeVisibility();
+						ForceLayoutRefresh();
+					}
+					else
+					{
+						Logger.Warn("MIDI file parsed but contained no tracks");
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Logger.Warn(ex, "Failed to initialize practice mode");
+			}
+		}
+
+		private void CreatePracticeModePanel(MidiData midiData)
+		{
+			PracticeModePanel practiceModePanel = new PracticeModePanel(_midiPlaybackService, midiData, _textureService, ((Control)_rightPanel).get_Width() - 15, _userSettingsService, _musicTab.Id, _musicTab.PracticeSections);
+			((Control)practiceModePanel).set_Parent((Container)(object)_rightPanel);
+			((Control)practiceModePanel).set_Visible(_currentMode == TabViewMode.Practice);
+			_practiceModePanel = practiceModePanel;
+			_midiPlaybackService.ActiveNotesChanged += OnActiveNotesChanged;
+			_practiceModePanel.CollapsedChanged += OnPlaybackCollapsedChanged;
+			_practiceModePanel.MarkersChanged += OnMarkersChanged;
+			_practiceFeedbackService = new PracticeFeedbackService(_midiPlaybackService, _moduleSettings);
+			_practiceFeedbackService.FeedbackChanged += OnPracticeFeedbackChanged;
+			_practiceFeedbackService.IsEnabled = _currentMode == TabViewMode.Practice && _hitDetectionEnabled;
+			int savedTrackIndex = _practiceModePanel.SelectedTrackIndex;
+			if (midiData != null && midiData.Tracks?.Count > 0)
+			{
+				int trackIndex = Math.Min(savedTrackIndex, midiData.Tracks.Count - 1);
+				MidiTrack track = midiData.Tracks.FirstOrDefault((MidiTrack t) => t.Index == trackIndex) ?? midiData.Tracks[0];
+				_practiceFeedbackService.SetActiveTrack(track);
+			}
+			CreateTrackSelectionPanel(midiData);
+			if (_currentMode == TabViewMode.Practice && _trackSelectionPanel != null)
+			{
+				AddTrackSelectionToNotationSection();
+			}
+			if (_notationSection != null)
+			{
+				((Control)_notationSection).set_Parent((Container)null);
+				((Control)_notationSection).set_Parent((Container)(object)_rightPanel);
+			}
+		}
+
+		private void OnPlaybackCollapsedChanged(object sender, bool collapsed)
+		{
+			_userSettingsService?.SaveGlobalPlaybackCollapsed(collapsed);
+		}
+
+		private void CreateTrackSelectionPanel(MidiData midiData)
+		{
+			if (midiData?.Tracks != null && midiData.Tracks.Count != 0)
+			{
+				Panel notationSection = _notationSection;
+				_trackSelectionPanel = new TrackSelectionPanel(midiData, (notationSection != null) ? ((Control)notationSection).get_Width() : (((Control)_rightPanel).get_Width() - 15 - 3));
+				_trackSelectionPanel.TrackChanged += OnTrackSelectionChanged;
+				int savedTrackIndex = _practiceModePanel?.SelectedTrackIndex ?? 0;
+				if (savedTrackIndex > 0 && savedTrackIndex < midiData.Tracks.Count)
+				{
+					_trackSelectionPanel.SelectTrack(savedTrackIndex);
+				}
+			}
+		}
+
+		private void OnActiveNotesChanged(object sender, ActiveNoteEventArgs e)
+		{
+			_pendingActiveNotes = e.ActiveNotes;
+			_activeNotesDirty = true;
+		}
+
+		private void OnMarkersChanged(object sender, EventArgs e)
+		{
+			_markersDirty = true;
+		}
+
+		private void OnPracticeFeedbackChanged(object sender, PracticeFeedbackEventArgs e)
+		{
+			_pendingFeedback = e.NoteFeedback?.ToDictionary((KeyValuePair<int, NoteFeedbackState> kvp) => kvp.Key, (KeyValuePair<int, NoteFeedbackState> kvp) => ConvertFeedbackState(kvp.Value));
+			_feedbackDirty = true;
+		}
+
+		private static NoteFeedbackType ConvertFeedbackState(NoteFeedbackState state)
+		{
+			return state switch
+			{
+				NoteFeedbackState.Correct => NoteFeedbackType.Correct, 
+				NoteFeedbackState.Wrong => NoteFeedbackType.Wrong, 
+				NoteFeedbackState.Missed => NoteFeedbackType.Missed, 
+				_ => NoteFeedbackType.None, 
+			};
+		}
+
+		private void OnTrackSelectionChanged(object sender, int trackIndex)
+		{
+			_practiceModePanel?.SetSelectedTrackIndex(trackIndex);
+			if (_practiceFeedbackService != null && _musicTab.MidiData?.Tracks != null)
+			{
+				MidiTrack track = _musicTab.MidiData.Tracks.FirstOrDefault((MidiTrack t) => t.Index == trackIndex);
+				_practiceFeedbackService.SetActiveTrack(track);
+			}
+			RefreshNotationContent();
+		}
+
+		private int GetPracticeModeSectionHeight()
+		{
+			if (_currentMode != TabViewMode.Practice)
+			{
+				return 0;
+			}
+			PracticeModePanel practiceModePanel = _practiceModePanel;
+			if (practiceModePanel == null)
+			{
+				return 0;
+			}
+			return ((Control)practiceModePanel).get_Height();
+		}
+
 		private void BuildPianoKeybindsSection()
 		{
 			if (_musicTab.Piano)
@@ -346,48 +656,114 @@ namespace SongbookOfTyria.UI.Windows
 			return 0;
 		}
 
+		private int GetTrackSelectionHeight()
+		{
+			return 0;
+		}
+
 		private void BuildNotationSection()
 		{
-			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005c: Expected O, but got Unknown
+			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0082: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0091: Expected O, but got Unknown
-			//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d7: Expected O, but got Unknown
+			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00df: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0105: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0121: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0132: Expected O, but got Unknown
 			int notationWidth = ((Control)_rightPanel).get_Width() - 15;
-			int notationHeight = ((Control)_rightPanel).get_Height() - GetAudioSectionHeight() - GetPianoKeybindsSectionHeight();
-			FlowPanel val = new FlowPanel();
-			((Panel)val).set_ShowBorder(true);
-			((Panel)val).set_Title("Notation");
+			int notationHeight = ((Control)_rightPanel).get_Height() - GetAudioSectionHeight() - GetPracticeModeSectionHeight() - GetPianoKeybindsSectionHeight();
+			Panel val = new Panel();
+			val.set_ShowBorder(true);
 			((Control)val).set_Width(notationWidth);
 			((Control)val).set_Height(notationHeight);
 			((Control)val).set_Parent((Container)(object)_rightPanel);
-			val.set_FlowDirection((ControlFlowDirection)3);
-			val.set_ControlPadding(new Vector2(0f, 0f));
-			val.set_OuterControlPadding(new Vector2(0f, 0f));
 			_notationSection = val;
 			Panel val2 = new Panel();
 			((Control)val2).set_Width(notationWidth - 3);
-			((Control)val2).set_Height(notationHeight - 28);
-			val2.set_CanScroll(true);
-			((Control)val2).set_BackgroundColor(Color.get_Black() * 0.3f);
+			((Control)val2).set_Height(28);
+			((Control)val2).set_Location(new Point(0, 0));
 			((Control)val2).set_Parent((Container)(object)_notationSection);
-			_notationContentPanel = val2;
+			_notationHeaderPanel = val2;
+			Label val3 = new Label();
+			val3.set_Text("Notation");
+			val3.set_Font(GameService.Content.get_DefaultFont16());
+			val3.set_AutoSizeWidth(true);
+			val3.set_AutoSizeHeight(true);
+			((Control)val3).set_Location(new Point(10, 5));
+			((Control)val3).set_Parent((Container)(object)_notationHeaderPanel);
+			BuildModeDropdown();
+			Panel val4 = new Panel();
+			((Control)val4).set_Width(notationWidth - 3);
+			((Control)val4).set_Height(notationHeight - 28);
+			((Control)val4).set_Location(new Point(0, 28));
+			val4.set_CanScroll(true);
+			((Control)val4).set_BackgroundColor(Color.get_Black() * 0.3f);
+			((Control)val4).set_Parent((Container)(object)_notationSection);
+			_notationContentPanel = val4;
+		}
+
+		private void AddTrackSelectionToNotationSection()
+		{
+			if (_trackSelectionPanel != null && _notationHeaderPanel != null)
+			{
+				((Control)_trackSelectionPanel).set_Parent((Container)null);
+				((Control)_trackSelectionPanel).remove_Resized((EventHandler<ResizedEventArgs>)OnTrackSelectionPanelResized);
+				((Container)_trackSelectionPanel).set_HeightSizingMode((SizingMode)0);
+				((Control)_trackSelectionPanel).set_Height(24);
+				((Container)_trackSelectionPanel).set_WidthSizingMode((SizingMode)1);
+				((Control)_trackSelectionPanel).add_Resized((EventHandler<ResizedEventArgs>)OnTrackSelectionPanelResized);
+				((Control)_trackSelectionPanel).set_Parent((Container)(object)_notationHeaderPanel);
+				RepositionTrackSelectionPanel();
+			}
+		}
+
+		private void OnTrackSelectionPanelResized(object sender, ResizedEventArgs e)
+		{
+			RepositionTrackSelectionPanel();
+		}
+
+		private void RepositionTrackSelectionPanel()
+		{
+			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+			if (_trackSelectionPanel != null && _notationHeaderPanel != null)
+			{
+				int rightX = ((Control)_notationHeaderPanel).get_Width() - ((Control)_trackSelectionPanel).get_Width() - 5;
+				((Control)_trackSelectionPanel).set_Location(new Point(Math.Max(80, rightX), 2));
+			}
+		}
+
+		private void UpdateNotationContentPanelHeight()
+		{
+			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+			if (_notationContentPanel != null && _notationSection != null)
+			{
+				((Control)_notationContentPanel).set_Height(((Control)_notationSection).get_Height() - 28);
+				((Control)_notationContentPanel).set_Location(new Point(0, 28));
+			}
 		}
 
 		private void RefreshNotationContent(int? explicitWidth = null, int? explicitHeight = null)
@@ -407,19 +783,26 @@ namespace SongbookOfTyria.UI.Windows
 			_cachedScrollbar = null;
 			ClearNotationPanel();
 			BuildNotationContent(explicitWidth, explicitHeight);
-			((Control)_notationContentPanel).Invalidate();
+			Panel notationContentPanel2 = _notationContentPanel;
+			if (notationContentPanel2 != null)
+			{
+				((Control)notationContentPanel2).Invalidate();
+			}
 			RestoreScrollPosition(savedScrollOffset);
 		}
 
 		private void ClearNotationPanel()
 		{
-			Control[] array = ((Container)_notationContentPanel).get_Children().ToArray();
-			foreach (Control obj in array)
+			if (_notationContentPanel != null)
 			{
-				obj.set_Parent((Container)null);
-				obj.Dispose();
+				Control[] array = ((Container)_notationContentPanel).get_Children().ToArray();
+				foreach (Control obj in array)
+				{
+					obj.set_Parent((Container)null);
+					obj.Dispose();
+				}
+				_notationRenderer = null;
 			}
-			_notationRenderer = null;
 		}
 
 		private void RestoreScrollPosition(float savedScrollOffset)
@@ -486,6 +869,10 @@ namespace SongbookOfTyria.UI.Windows
 
 		private int GetAudioSectionHeight()
 		{
+			if (_currentMode != 0)
+			{
+				return 0;
+			}
 			if (_audioSection != null)
 			{
 				if (!_audioPlayerCollapsed)
@@ -526,13 +913,14 @@ namespace SongbookOfTyria.UI.Windows
 
 		private void BuildControlsSection()
 		{
-			ViewOptionsPanel viewOptionsPanel = new ViewOptionsPanel(GetCurrentLeftPanelContentWidth(), _viewOptionsCollapsed, _currentFontSize, _autoScrollEnabled, _scrollSpeed, _textureService);
+			ViewOptionsPanel viewOptionsPanel = new ViewOptionsPanel(GetCurrentLeftPanelContentWidth(), _viewOptionsCollapsed, _currentFontSize, _autoScrollEnabled, _scrollSpeed, _hitDetectionEnabled, _textureService);
 			((Control)viewOptionsPanel).set_Parent((Container)(object)_leftPanel);
 			((Control)viewOptionsPanel).set_Visible(!_detailsCollapsed);
 			_controlsSection = viewOptionsPanel;
 			_controlsSection.FontSizeChanged += OnFontSizeChanged;
 			_controlsSection.AutoScrollToggled += OnAutoScrollToggled;
 			_controlsSection.ScrollSpeedChanged += OnScrollSpeedChanged;
+			_controlsSection.HitDetectionToggled += OnHitDetectionToggled;
 			_controlsSection.CollapsedChanged += OnControlsSectionCollapsedChanged;
 		}
 
@@ -561,6 +949,22 @@ namespace SongbookOfTyria.UI.Windows
 			_scrollSpeed = speed;
 		}
 
+		private void OnHitDetectionToggled(object sender, bool enabled)
+		{
+			_hitDetectionEnabled = enabled;
+			_userSettingsService?.SaveHitDetectionFeedbackEnabled(enabled);
+			if (_practiceFeedbackService != null)
+			{
+				bool shouldBeEnabled = _currentMode == TabViewMode.Practice && enabled;
+				_practiceFeedbackService.IsEnabled = shouldBeEnabled;
+				if (!shouldBeEnabled)
+				{
+					_practiceFeedbackService.ClearFeedback();
+					_notationRenderer?.Control?.ClearNoteFeedback();
+				}
+			}
+		}
+
 		private void OnControlsSectionCollapsedChanged(object sender, bool isCollapsed)
 		{
 			if (isCollapsed != _viewOptionsCollapsed)
@@ -572,37 +976,60 @@ namespace SongbookOfTyria.UI.Windows
 
 		private void BuildNotationContent(int? explicitWidth = null, int? explicitHeight = null)
 		{
-			string notationText = _musicTab.NotationBlishhud;
-			if (string.IsNullOrEmpty(notationText))
+			if (_notationContentPanel != null)
 			{
-				CreateNoNotationMessage();
+				string notationText = GetActiveNotation();
+				if (string.IsNullOrEmpty(notationText))
+				{
+					CreateNoNotationMessage();
+				}
+				else
+				{
+					RenderNotation(notationText, explicitWidth, explicitHeight);
+				}
 			}
-			else
+		}
+
+		private string GetActiveNotation()
+		{
+			if (_currentMode == TabViewMode.Practice && _trackSelectionPanel != null)
 			{
-				RenderNotation(notationText, explicitWidth, explicitHeight);
+				string trackNotation = _trackSelectionPanel.GetSelectedTrackNotation();
+				if (!string.IsNullOrEmpty(trackNotation))
+				{
+					return ConvertTrackNotationToBlishHud(trackNotation, _musicTab.PracticeSections);
+				}
 			}
+			return _musicTab.NotationBlishhud;
 		}
 
 		private void CreateNoNotationMessage()
 		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-			Label val = new Label();
-			val.set_Text("No notation available for this tab.");
-			val.set_Font(GameService.Content.get_DefaultFont14());
-			val.set_AutoSizeWidth(true);
-			val.set_AutoSizeHeight(true);
-			((Control)val).set_Location(new Point(10, 10));
-			((Control)val).set_Parent((Container)(object)_notationContentPanel);
+			//IL_0009: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+			if (_notationContentPanel != null)
+			{
+				Label val = new Label();
+				val.set_Text("No notation available for this tab.");
+				val.set_Font(GameService.Content.get_DefaultFont14());
+				val.set_AutoSizeWidth(true);
+				val.set_AutoSizeHeight(true);
+				((Control)val).set_Location(new Point(10, 10));
+				((Control)val).set_Parent((Container)(object)_notationContentPanel);
+			}
 		}
 
 		private void RenderNotation(string notation, int? explicitWidth = null, int? explicitHeight = null)
 		{
+			if (_notationContentPanel == null)
+			{
+				return;
+			}
 			int width = explicitWidth ?? ((Control)_notationContentPanel).get_Width();
 			int height = explicitHeight ?? ((Control)_notationContentPanel).get_Height();
 			if (_musicTab.Piano && _pianoKeybinds != null)
@@ -614,6 +1041,10 @@ namespace SongbookOfTyria.UI.Windows
 			if (_notationRenderer.Control != null)
 			{
 				_notationRenderer.Control.SmoothScrolling = _autoScrollEnabled;
+				if (_currentMode == TabViewMode.Practice)
+				{
+					UpdateNotationMarkers();
+				}
 				((Control)_notationContentPanel).Invalidate();
 			}
 		}
@@ -653,10 +1084,14 @@ namespace SongbookOfTyria.UI.Windows
 		private void UpdateSectionSizes(int rightPanelWidth, int rightPanelHeight)
 		{
 			int sectionWidth = rightPanelWidth - 15;
-			int notationSectionHeight = rightPanelHeight - GetAudioSectionHeight() - GetPianoKeybindsSectionHeight();
+			int notationSectionHeight = rightPanelHeight - GetAudioSectionHeight() - GetPracticeModeSectionHeight() - GetPianoKeybindsSectionHeight();
 			if (_audioSection != null)
 			{
 				((Control)_audioSection).set_Width(sectionWidth);
+			}
+			if (_practiceModePanel != null)
+			{
+				((Control)_practiceModePanel).set_Width(sectionWidth);
 			}
 			if (_pianoKeybindsSection != null)
 			{
@@ -667,18 +1102,27 @@ namespace SongbookOfTyria.UI.Windows
 
 		private void UpdateNotationSection(int sectionWidth, int notationSectionHeight)
 		{
-			if (_notationSection != null)
+			if (_notationSection == null)
 			{
-				((Control)_notationSection).set_Width(sectionWidth);
-				((Control)_notationSection).set_Height(notationSectionHeight);
-				if (_notationContentPanel != null)
+				return;
+			}
+			((Control)_notationSection).set_Width(sectionWidth);
+			((Control)_notationSection).set_Height(notationSectionHeight);
+			int notationPanelWidth = sectionWidth - 3;
+			if (_notationHeaderPanel != null)
+			{
+				((Control)_notationHeaderPanel).set_Width(notationPanelWidth);
+			}
+			if (_notationContentPanel != null)
+			{
+				int notationPanelHeight = notationSectionHeight - 28;
+				((Control)_notationContentPanel).set_Width(notationPanelWidth);
+				((Control)_notationContentPanel).set_Height(notationPanelHeight);
+				if (_trackSelectionPanel != null && _currentMode == TabViewMode.Practice)
 				{
-					int notationPanelWidth = sectionWidth - 3;
-					int notationPanelHeight = notationSectionHeight - 28;
-					((Control)_notationContentPanel).set_Width(notationPanelWidth);
-					((Control)_notationContentPanel).set_Height(notationPanelHeight);
-					RefreshNotationContent(notationPanelWidth, notationPanelHeight);
+					RepositionTrackSelectionPanel();
 				}
+				RefreshNotationContent(notationPanelWidth, notationPanelHeight);
 			}
 		}
 
@@ -698,6 +1142,69 @@ namespace SongbookOfTyria.UI.Windows
 			{
 				UpdateAutoScroll(gameTime);
 			}
+			if (_currentMode == TabViewMode.Practice)
+			{
+				_practiceFeedbackService?.Update();
+			}
+			if (_feedbackDirty && _notationRenderer?.Control != null && _currentMode == TabViewMode.Practice)
+			{
+				_feedbackDirty = false;
+				_notationRenderer.Control.SetNoteFeedback(_pendingFeedback);
+			}
+			if (_markersDirty && _notationRenderer?.Control != null && _currentMode == TabViewMode.Practice)
+			{
+				_markersDirty = false;
+				UpdateNotationMarkers();
+			}
+			if (!_activeNotesDirty || _notationRenderer?.Control == null || _currentMode != TabViewMode.Practice)
+			{
+				return;
+			}
+			_activeNotesDirty = false;
+			List<ActiveNoteInfo> notes = _pendingActiveNotes;
+			DateTime now = DateTime.UtcNow;
+			HashSet<int> filteredNoteIndices = new HashSet<int>();
+			if (notes != null)
+			{
+				int selectedTrack = _trackSelectionPanel?.SelectedTrackIndex ?? 0;
+				HashSet<int> currentTrackNotes = new HashSet<int>();
+				foreach (ActiveNoteInfo note in notes)
+				{
+					if (note.TrackIndex == selectedTrack)
+					{
+						currentTrackNotes.Add(note.NoteIndex);
+					}
+				}
+				foreach (int noteIdx in currentTrackNotes)
+				{
+					if (!_noteHighlightStartTimes.TryGetValue(noteIdx, out var startTime))
+					{
+						_noteHighlightStartTimes[noteIdx] = now;
+						startTime = now;
+					}
+					if ((now - startTime).TotalMilliseconds < 500.0)
+					{
+						filteredNoteIndices.Add(noteIdx);
+					}
+				}
+				List<int> expiredKeys = new List<int>();
+				foreach (KeyValuePair<int, DateTime> kvp in _noteHighlightStartTimes)
+				{
+					if (!currentTrackNotes.Contains(kvp.Key))
+					{
+						expiredKeys.Add(kvp.Key);
+					}
+				}
+				foreach (int key in expiredKeys)
+				{
+					_noteHighlightStartTimes.Remove(key);
+				}
+			}
+			else
+			{
+				_noteHighlightStartTimes.Clear();
+			}
+			_notationRenderer.Control.SetHighlightedNoteIndices(filteredNoteIndices);
 		}
 
 		private void SyncAudioSectionCollapseState()
@@ -745,6 +1252,33 @@ namespace SongbookOfTyria.UI.Windows
 			}
 		}
 
+		private void UpdateNotationMarkers()
+		{
+			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
+			if (_notationRenderer?.Control == null || _practiceModePanel == null)
+			{
+				return;
+			}
+			IReadOnlyList<MarkerInfo> markers = _practiceModePanel.GetMarkers();
+			if (markers == null || markers.Count == 0)
+			{
+				_notationRenderer.Control.SetMarkers(null);
+				return;
+			}
+			int selectedTrackIndex = _trackSelectionPanel?.SelectedTrackIndex ?? (-1);
+			List<NotationMarker> notationMarkers = new List<NotationMarker>();
+			foreach (MarkerInfo marker in markers)
+			{
+				int noteIndex = _practiceModePanel.GetNoteIndexForTime(marker.Time, selectedTrackIndex);
+				notationMarkers.Add(new NotationMarker
+				{
+					NoteIndex = noteIndex,
+					Color = marker.Color
+				});
+			}
+			_notationRenderer.Control.SetMarkers(notationMarkers);
+		}
+
 		protected override void DisposeControl()
 		{
 			((Control)this).remove_Resized((EventHandler<ResizedEventArgs>)OnWindowResized);
@@ -758,17 +1292,37 @@ namespace SongbookOfTyria.UI.Windows
 				_controlsSection.FontSizeChanged -= OnFontSizeChanged;
 				_controlsSection.AutoScrollToggled -= OnAutoScrollToggled;
 				_controlsSection.ScrollSpeedChanged -= OnScrollSpeedChanged;
+				_controlsSection.HitDetectionToggled -= OnHitDetectionToggled;
 				_controlsSection.CollapsedChanged -= OnControlsSectionCollapsedChanged;
 			}
 			if (_audioSection != null)
 			{
 				((Control)_audioSection).remove_Resized((EventHandler<ResizedEventArgs>)OnAudioSectionResized);
 			}
+			if (_modeDropdown != null)
+			{
+				_modeDropdown.remove_ValueChanged((EventHandler<ValueChangedEventArgs>)OnModeDropdownChanged);
+			}
 			if (_pianoKeybindsSection != null)
 			{
 				_pianoKeybindsSection.CollapsedChanged -= OnPianoKeybindsSectionCollapsedChanged;
 			}
+			if (_trackSelectionPanel != null)
+			{
+				_trackSelectionPanel.TrackChanged -= OnTrackSelectionChanged;
+				((Control)_trackSelectionPanel).remove_Resized((EventHandler<ResizedEventArgs>)OnTrackSelectionPanelResized);
+			}
+			if (_midiPlaybackService != null)
+			{
+				_midiPlaybackService.ActiveNotesChanged -= OnActiveNotesChanged;
+			}
+			if (_practiceFeedbackService != null)
+			{
+				_practiceFeedbackService.FeedbackChanged -= OnPracticeFeedbackChanged;
+				_practiceFeedbackService.Dispose();
+			}
 			_audioService?.Stop();
+			_midiPlaybackService?.Stop();
 			FlowPanel leftPanel = _leftPanel;
 			if (leftPanel != null)
 			{
@@ -780,6 +1334,171 @@ namespace SongbookOfTyria.UI.Windows
 				((Control)rightPanel).Dispose();
 			}
 			((WindowBase2)this).DisposeControl();
+		}
+
+		private static string ConvertTrackNotationToBlishHud(string trackNotation, PracticeSections practiceSections)
+		{
+			string[] array = trackNotation.Replace("\u200b", "").Split('\n');
+			List<string> contentLines = new List<string>();
+			bool skippedHeader = false;
+			string[] array2 = array;
+			for (int j = 0; j < array2.Length; j++)
+			{
+				string trimmed = array2[j].Trim();
+				if (!skippedHeader && (trimmed.EndsWith(":") || trimmed.Length == 0))
+				{
+					if (trimmed.EndsWith(":"))
+					{
+						skippedHeader = true;
+					}
+					continue;
+				}
+				skippedHeader = true;
+				if (!string.IsNullOrEmpty(trimmed))
+				{
+					contentLines.Add(trimmed);
+				}
+			}
+			string allContent = string.Join(" ", contentLines).Trim();
+			allContent = Regex.Replace(allContent, "\\|\\s*\\|", "|");
+			if (!allContent.StartsWith("|"))
+			{
+				allContent = "|" + allContent;
+			}
+			if (!allContent.EndsWith("|"))
+			{
+				allContent += "|";
+			}
+			List<string> bars = SplitIntoBars(allContent);
+			if (bars.Count == 0)
+			{
+				return string.Empty;
+			}
+			int barsPerRow = ((practiceSections != null && practiceSections.BarsPerRow > 0) ? practiceSections.BarsPerRow : 4);
+			Dictionary<int, string> sectionLookup = BuildSectionLookup(practiceSections);
+			StringBuilder sb = new StringBuilder();
+			int barsInCurrentRow = 0;
+			for (int i = 0; i < bars.Count; i++)
+			{
+				string label;
+				bool num = sectionLookup.TryGetValue(i, out label);
+				bool isLastBar = i == bars.Count - 1;
+				bool nextIsNewSection = !isLastBar && sectionLookup.ContainsKey(i + 1);
+				if (num)
+				{
+					if (i > 0)
+					{
+						sb.AppendLine();
+					}
+					sb.AppendLine(FormatSectionLabel(label));
+					barsInCurrentRow = 0;
+				}
+				else if (barsInCurrentRow == barsPerRow)
+				{
+					sb.AppendLine();
+					barsInCurrentRow = 0;
+				}
+				sb.Append("<c=#6bff6b>|</c>");
+				sb.Append(ColorizeNotationLine(bars[i]));
+				barsInCurrentRow++;
+				bool isEndOfRow = barsInCurrentRow == barsPerRow;
+				if (isLastBar || isEndOfRow || nextIsNewSection)
+				{
+					sb.Append("<c=#6bff6b>|</c>");
+				}
+			}
+			return sb.ToString().TrimEnd();
+		}
+
+		private static List<string> SplitIntoBars(string content)
+		{
+			List<string> bars = new List<string>();
+			string[] parts = content.Split(new char[1] { '|' }, StringSplitOptions.None);
+			for (int i = 0; i < parts.Length; i++)
+			{
+				if (!string.IsNullOrEmpty(parts[i]))
+				{
+					bars.Add(parts[i]);
+				}
+			}
+			return bars;
+		}
+
+		private static Dictionary<int, string> BuildSectionLookup(PracticeSections practiceSections)
+		{
+			Dictionary<int, string> lookup = new Dictionary<int, string>();
+			if (practiceSections?.Sections == null)
+			{
+				return lookup;
+			}
+			foreach (PracticeSection section in practiceSections.Sections)
+			{
+				int barIndex = section.Bar;
+				if (!lookup.ContainsKey(barIndex))
+				{
+					lookup[barIndex] = section.Label;
+				}
+			}
+			return lookup;
+		}
+
+		private static string FormatSectionLabel(string label)
+		{
+			return "<c=#ffffff>" + label + "</c>";
+		}
+
+		private static string ColorizeNotationLine(string line)
+		{
+			StringBuilder sb = new StringBuilder(line.Length * 2);
+			int i = 0;
+			while (i < line.Length)
+			{
+				char c = line[i];
+				switch (c)
+				{
+				case '|':
+					sb.Append("<c=#6bff6b>|</c>");
+					i++;
+					break;
+				case '[':
+				{
+					int end2 = line.IndexOf(']', i);
+					if (end2 > i)
+					{
+						string content2 = line.Substring(i, end2 - i + 1);
+						sb.Append("<c=#6bb5ff>").Append(content2).Append("</c>");
+						i = end2 + 1;
+					}
+					else
+					{
+						sb.Append(c);
+						i++;
+					}
+					break;
+				}
+				case '(':
+				{
+					int end = line.IndexOf(')', i);
+					if (end > i)
+					{
+						string content = line.Substring(i, end - i + 1);
+						sb.Append("<c=#ff6b6b>").Append(content).Append("</c>");
+						i = end + 1;
+					}
+					else
+					{
+						sb.Append(c);
+						i++;
+					}
+					break;
+				}
+				default:
+					sb.Append(c);
+					i++;
+					break;
+				}
+			}
+			return sb.ToString();
 		}
 	}
 }

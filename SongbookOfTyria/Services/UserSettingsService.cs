@@ -94,6 +94,39 @@ namespace SongbookOfTyria.Services
 			SaveState();
 		}
 
+		public bool GetGlobalPlaybackCollapsed()
+		{
+			return _state.GlobalPlaybackCollapsed;
+		}
+
+		public void SaveGlobalPlaybackCollapsed(bool collapsed)
+		{
+			_state.GlobalPlaybackCollapsed = collapsed;
+			SaveState();
+		}
+
+		public bool GetHitDetectionFeedbackEnabled()
+		{
+			return _state.HitDetectionFeedbackEnabled;
+		}
+
+		public void SaveHitDetectionFeedbackEnabled(bool enabled)
+		{
+			_state.HitDetectionFeedbackEnabled = enabled;
+			SaveState();
+		}
+
+		public int GetSelectedMainWindowTabIndex()
+		{
+			return _state.SelectedMainWindowTabIndex;
+		}
+
+		public void SaveSelectedMainWindowTabIndex(int index)
+		{
+			_state.SelectedMainWindowTabIndex = index;
+			SaveState();
+		}
+
 		public PianoKeybinds GetPianoKeybinds()
 		{
 			return _state.PianoKeybinds ?? (_state.PianoKeybinds = new PianoKeybinds());
@@ -102,6 +135,21 @@ namespace SongbookOfTyria.Services
 		public void SavePianoKeybinds(PianoKeybinds keybinds)
 		{
 			_state.PianoKeybinds = keybinds;
+			SaveState();
+		}
+
+		public PracticeModeState GetPracticeModeState(int tabId)
+		{
+			if (_state.PracticeModeStates.TryGetValue(tabId, out var state))
+			{
+				return state;
+			}
+			return null;
+		}
+
+		public void SavePracticeModeState(int tabId, PracticeModeState state)
+		{
+			_state.PracticeModeStates[tabId] = state;
 			SaveState();
 		}
 

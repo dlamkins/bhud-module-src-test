@@ -93,11 +93,19 @@ namespace SongbookOfTyria.UI.Controls
 
 		private Label _speedLabel;
 
+		private Checkbox _hitDetectionCheckbox;
+
+		private FlowPanel _hitDetectionRow;
+
+		private Panel _hitDetectionSpacer;
+
 		private NotationFontSize _currentFontSize;
 
 		private bool _autoScrollEnabled;
 
 		private float _scrollSpeed;
+
+		private bool _hitDetectionEnabled;
 
 		private bool _lastCollapsedState;
 
@@ -152,23 +160,42 @@ namespace SongbookOfTyria.UI.Controls
 			}
 		}
 
+		public bool HitDetectionEnabled
+		{
+			get
+			{
+				return _hitDetectionEnabled;
+			}
+			set
+			{
+				_hitDetectionEnabled = value;
+				if (_hitDetectionCheckbox != null)
+				{
+					_hitDetectionCheckbox.set_Checked(value);
+				}
+			}
+		}
+
 		public event EventHandler<NotationFontSize> FontSizeChanged;
 
 		public event EventHandler<bool> AutoScrollToggled;
 
 		public event EventHandler<float> ScrollSpeedChanged;
 
+		public event EventHandler<bool> HitDetectionToggled;
+
 		public event EventHandler<bool> CollapsedChanged;
 
-		public ViewOptionsPanel(int panelWidth, bool collapsed, NotationFontSize initialFontSize, bool initialAutoScroll, float initialScrollSpeed, TextureService textureService)
+		public ViewOptionsPanel(int panelWidth, bool collapsed, NotationFontSize initialFontSize, bool initialAutoScroll, float initialScrollSpeed, bool initialHitDetection, TextureService textureService)
 			: this()
 		{
-			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0092: Unknown result type (might be due to invalid IL or missing references)
 			_textureService = textureService;
 			_currentFontSize = initialFontSize;
 			_autoScrollEnabled = initialAutoScroll;
 			_scrollSpeed = ((initialScrollSpeed > 0f) ? initialScrollSpeed : 30f);
+			_hitDetectionEnabled = initialHitDetection;
 			_lastCollapsedState = collapsed;
 			((Panel)this).set_ShowBorder(true);
 			((Panel)this).set_Title("View Options");
@@ -268,9 +295,6 @@ namespace SongbookOfTyria.UI.Controls
 			//IL_0323: Unknown result type (might be due to invalid IL or missing references)
 			//IL_032d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_033a: Expected O, but got Unknown
-			//IL_033a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_033f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0346: Unknown result type (might be due to invalid IL or missing references)
 			int contentWidth = panelWidth - 20;
 			FlowPanel val = new FlowPanel();
 			val.set_FlowDirection((ControlFlowDirection)2);
@@ -358,10 +382,6 @@ namespace SongbookOfTyria.UI.Controls
 			((Control)val12).set_Location(new Point(0, 3));
 			((Control)val12).set_Parent((Container)(object)speedLabelContainer);
 			_speedLabel = val12;
-			Panel val13 = new Panel();
-			((Control)val13).set_Width(contentWidth);
-			((Control)val13).set_Height(5);
-			((Control)val13).set_Parent((Container)(object)this);
 		}
 
 		private void OnFontSizeChanged(object sender, ValueChangedEventArgs e)
@@ -385,6 +405,38 @@ namespace SongbookOfTyria.UI.Controls
 			_scrollSpeed = e.get_Value();
 			UpdateSpeedLabel();
 			this.ScrollSpeedChanged?.Invoke(this, _scrollSpeed);
+		}
+
+		private void OnHitDetectionCheckboxChanged(object sender, CheckChangedEvent e)
+		{
+			_hitDetectionEnabled = e.get_Checked();
+			this.HitDetectionToggled?.Invoke(this, _hitDetectionEnabled);
+		}
+
+		public void SetPracticeModeActive(bool isPracticeMode)
+		{
+			if (_hitDetectionRow != null)
+			{
+				((Control)_hitDetectionRow).set_Parent((Container)null);
+			}
+			if (_hitDetectionSpacer != null)
+			{
+				((Control)_hitDetectionSpacer).set_Parent((Container)null);
+			}
+			if (isPracticeMode)
+			{
+				if (_hitDetectionRow != null)
+				{
+					((Control)_hitDetectionRow).set_Visible(true);
+					((Control)_hitDetectionRow).set_Parent((Container)(object)this);
+				}
+				if (_hitDetectionSpacer != null)
+				{
+					((Control)_hitDetectionSpacer).set_Visible(true);
+					((Control)_hitDetectionSpacer).set_Parent((Container)(object)this);
+				}
+			}
+			((Control)this).Invalidate();
 		}
 
 		private void UpdateSpeedLabel()
@@ -418,6 +470,11 @@ namespace SongbookOfTyria.UI.Controls
 			{
 				_speedTrackBar.remove_ValueChanged((EventHandler<ValueEventArgs<float>>)OnSpeedTrackBarChanged);
 			}
+			if (_hitDetectionCheckbox != null)
+			{
+				_hitDetectionCheckbox.remove_CheckedChanged((EventHandler<CheckChangedEvent>)OnHitDetectionCheckboxChanged);
+			}
+			DisposeOrphanedControls();
 			Control[] array = ((Container)this).get_Children().ToArray();
 			foreach (Control obj in array)
 			{
@@ -428,6 +485,9 @@ namespace SongbookOfTyria.UI.Controls
 			_autoScrollButton = null;
 			_speedTrackBar = null;
 			_speedLabel = null;
+			_hitDetectionCheckbox = null;
+			_hitDetectionRow = null;
+			_hitDetectionSpacer = null;
 			BuildContent(((Control)this).get_Width());
 			((Control)this).Invalidate();
 		}
@@ -453,6 +513,20 @@ namespace SongbookOfTyria.UI.Controls
 			}
 		}
 
+		private void DisposeOrphanedControls()
+		{
+			if (_hitDetectionRow != null && ((Control)_hitDetectionRow).get_Parent() == null)
+			{
+				((Control)_hitDetectionRow).Dispose();
+				_hitDetectionRow = null;
+			}
+			if (_hitDetectionSpacer != null && ((Control)_hitDetectionSpacer).get_Parent() == null)
+			{
+				((Control)_hitDetectionSpacer).Dispose();
+				_hitDetectionSpacer = null;
+			}
+		}
+
 		protected override void DisposeControl()
 		{
 			((Control)this).remove_Resized((EventHandler<ResizedEventArgs>)OnResized);
@@ -468,6 +542,11 @@ namespace SongbookOfTyria.UI.Controls
 			{
 				_speedTrackBar.remove_ValueChanged((EventHandler<ValueEventArgs<float>>)OnSpeedTrackBarChanged);
 			}
+			if (_hitDetectionCheckbox != null)
+			{
+				_hitDetectionCheckbox.remove_CheckedChanged((EventHandler<CheckChangedEvent>)OnHitDetectionCheckboxChanged);
+			}
+			DisposeOrphanedControls();
 			((FlowPanel)this).DisposeControl();
 		}
 	}

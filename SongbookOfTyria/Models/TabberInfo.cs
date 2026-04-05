@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 
 namespace SongbookOfTyria.Models
 {
-	public class ArrangerInfo
+	public class TabberInfo
 	{
 		[JsonProperty("username")]
 		public string Username { get; set; }

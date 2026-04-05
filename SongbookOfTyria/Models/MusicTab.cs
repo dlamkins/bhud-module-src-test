@@ -48,7 +48,7 @@ namespace SongbookOfTyria.Models
 		public List<string> TabbedByMember { get; set; }
 
 		[JsonProperty("tabber_info")]
-		public List<ArrangerInfo> ArrangerInfo { get; set; }
+		public List<TabberInfo> TabberInfo { get; set; }
 
 		[JsonProperty("last_updated")]
 		public long LastUpdated { get; set; }
@@ -74,7 +74,30 @@ namespace SongbookOfTyria.Models
 		[JsonProperty("song_mp3")]
 		public string SongMp3 { get; set; }
 
+		[JsonProperty("midi_data")]
+		public MidiData MidiData { get; set; }
+
+		[JsonProperty("practice_sections")]
+		public PracticeSections PracticeSections { get; set; }
+
 		[JsonProperty("is_private")]
 		public bool IsPrivate { get; set; }
+
+		public bool HasPracticeMode
+		{
+			get
+			{
+				if (PracticeMode)
+				{
+					MidiData midiData = MidiData;
+					if (midiData == null || !(midiData.Tracks?.Count > 0))
+					{
+						return !string.IsNullOrEmpty(MidiFile);
+					}
+					return true;
+				}
+				return false;
+			}
+		}
 	}
 }

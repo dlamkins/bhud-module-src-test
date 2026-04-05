@@ -1,8 +1,8 @@
 using Microsoft.Xna.Framework;
 
-namespace SongbookOfTyria.UI.Utilities
+namespace SongbookOfTyria.Utilities
 {
-	public static class ImageSizeCalculator
+	internal static class ImageSizeCalculator
 	{
 		public static Point CalculateAspectRatioSize(int originalWidth, int originalHeight, int maxWidth, int maxHeight)
 		{

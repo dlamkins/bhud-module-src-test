@@ -19,10 +19,19 @@ namespace SongbookOfTyria.Services
 
 		public bool GlobalPianoKeybindsCollapsed { get; set; }
 
+		public bool GlobalPlaybackCollapsed { get; set; }
+
+		public bool HitDetectionFeedbackEnabled { get; set; }
+
+		public int SelectedMainWindowTabIndex { get; set; }
+
 		public PianoKeybinds PianoKeybinds { get; set; } = new PianoKeybinds();
 
 
 		public HashSet<int> Favorites { get; set; } = new HashSet<int>();
+
+
+		public Dictionary<int, PracticeModeState> PracticeModeStates { get; set; } = new Dictionary<int, PracticeModeState>();
 
 	}
 }

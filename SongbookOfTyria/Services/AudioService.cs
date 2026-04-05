@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Blish_HUD;
 using Microsoft.Xna.Framework;
 using NAudio.Wave;
+using SongbookOfTyria.Utilities;
 
 namespace SongbookOfTyria.Services
 {
@@ -16,6 +17,8 @@ namespace SongbookOfTyria.Services
 		private readonly HttpClient _httpClient;
 
 		private readonly string _cacheDirectory;
+
+		private readonly object _lock = new object();
 
 		private WaveOutEvent _waveOut;
 
@@ -35,15 +38,17 @@ namespace SongbookOfTyria.Services
 
 		public bool IsLoaded => _audioReader != null;
 
+		public float Volume => _waveOut?.Volume ?? 0f;
+
 		public event EventHandler<AudioStateChangedEventArgs> StateChanged;
 
 		public event EventHandler<AudioPositionChangedEventArgs> PositionChanged;
 
 		public AudioService(string cacheDirectory)
 		{
-			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0036: Expected O, but got Unknown
+			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0041: Expected O, but got Unknown
 			_cacheDirectory = Path.Combine(cacheDirectory, "audio");
 			HttpClient val = new HttpClient();
 			val.set_Timeout(TimeSpan.FromMinutes(5.0));
@@ -78,6 +83,7 @@ namespace SongbookOfTyria.Services
 			Stop();
 			DisposeCurrentAudio();
 			_loadCts?.Cancel();
+			_loadCts?.Dispose();
 			_loadCts = new CancellationTokenSource();
 			try
 			{
@@ -139,7 +145,7 @@ namespace SongbookOfTyria.Services
 
 		private string GetCacheFileName(string url)
 		{
-			string hash = GetStableHashCode(url).ToString("X8");
+			string hash = HashUtility.GetStableHashCode(url).ToString("X8");
 			string extension = ".mp3";
 			try
 			{
@@ -159,82 +165,84 @@ namespace SongbookOfTyria.Services
 			return "audio_" + hash + extension;
 		}
 
-		private static uint GetStableHashCode(string str)
-		{
-			uint hash = 2166136261u;
-			foreach (char c in str)
-			{
-				hash = (hash ^ c) * 16777619;
-			}
-			return hash;
-		}
-
 		public void Play()
 		{
-			if (_waveOut != null && _audioReader != null)
+			lock (_lock)
 			{
-				try
+				if (_waveOut != null && _audioReader != null)
 				{
-					_waveOut.Play();
-					OnStateChanged(AudioPlaybackState.Playing);
-				}
-				catch (Exception ex)
-				{
-					Logger.Warn(ex, "Failed to play audio");
+					try
+					{
+						_waveOut.Play();
+						OnStateChanged(AudioPlaybackState.Playing);
+					}
+					catch (Exception ex)
+					{
+						Logger.Warn(ex, "Failed to play audio");
+					}
 				}
 			}
 		}
 
 		public void Pause()
 		{
-			if (_waveOut != null)
+			lock (_lock)
 			{
-				try
+				if (_waveOut != null)
 				{
-					_waveOut.Pause();
-					OnStateChanged(AudioPlaybackState.Paused);
-				}
-				catch (Exception ex)
-				{
-					Logger.Warn(ex, "Failed to pause audio");
+					try
+					{
+						_waveOut.Pause();
+						OnStateChanged(AudioPlaybackState.Paused);
+					}
+					catch (Exception ex)
+					{
+						Logger.Warn(ex, "Failed to pause audio");
+					}
 				}
 			}
 		}
 
 		public void Stop()
 		{
-			if (_waveOut == null)
+			lock (_lock)
 			{
-				return;
-			}
-			try
-			{
-				_waveOut.Stop();
-				if (_audioReader != null)
+				if (_waveOut == null)
 				{
-					_audioReader.Position = 0L;
+					return;
 				}
-				OnStateChanged(AudioPlaybackState.Stopped);
-			}
-			catch (Exception ex)
-			{
-				Logger.Warn(ex, "Failed to stop audio");
+				try
+				{
+					_waveOut.Stop();
+					if (_audioReader != null)
+					{
+						_audioReader.Position = 0L;
+					}
+					OnStateChanged(AudioPlaybackState.Stopped);
+				}
+				catch (Exception ex)
+				{
+					Logger.Warn(ex, "Failed to stop audio");
+				}
 			}
 		}
 
 		public void Seek(TimeSpan position)
 		{
-			if (_audioReader != null)
+			lock (_lock)
 			{
-				try
+				if (_audioReader != null)
 				{
-					long clampedTicks = Math.Max(0L, Math.Min(position.Ticks, _audioReader.TotalTime.Ticks));
-					_audioReader.CurrentTime = TimeSpan.FromTicks(clampedTicks);
-					OnPositionChanged();
-				}
-				catch (Exception ex)
-				{
-					Logger.Warn(ex, "Failed to seek audio");
+					try
+					{
+						float clampedSeconds = MathHelper.Clamp((float)position.TotalSeconds, 0f, (float)_audioReader.TotalTime.TotalSeconds);
+						_audioReader.CurrentTime = TimeSpan.FromSeconds(clampedSeconds);
+						OnPositionChanged();
+					}
+					catch (Exception ex)
+					{
+						Logger.Warn(ex, "Failed to seek audio");
+					}
 				}
 			}
 		}
@@ -249,13 +257,11 @@ namespace SongbookOfTyria.Services
 
 		public void UpdatePosition()
 		{
-			if (_audioReader != null)
+			AudioFileReader audioReader = _audioReader;
+			WaveOutEvent output = _waveOut;
+			if (audioReader != null && output != null && output.PlaybackState == NAudio.Wave.PlaybackState.Playing)
 			{
-				WaveOutEvent waveOut = _waveOut;
-				if (waveOut != null && waveOut.PlaybackState == NAudio.Wave.PlaybackState.Playing)
-				{
-					OnPositionChanged();
-				}
+				OnPositionChanged();
 			}
 		}
 

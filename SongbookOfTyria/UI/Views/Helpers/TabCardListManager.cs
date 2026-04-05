@@ -208,17 +208,18 @@ namespace SongbookOfTyria.UI.Views.Helpers
 
 		public void ClearAllCards()
 		{
-			foreach (TabListCard value in _tabCards.Values)
-			{
-				value.CardClicked -= OnCardClicked;
-				value.FavoriteToggled -= OnFavoriteToggled;
-				((Control)value).Dispose();
-			}
+			List<TabListCard> list = _tabCards.Values.ToList();
 			_tabCards.Clear();
 			FlowPanel cardsPanel = _cardsPanel;
 			if (cardsPanel != null)
 			{
 				((Container)cardsPanel).ClearChildren();
+			}
+			foreach (TabListCard item in list)
+			{
+				item.CardClicked -= OnCardClicked;
+				item.FavoriteToggled -= OnFavoriteToggled;
+				((Control)item).Dispose();
 			}
 		}
 

@@ -11,7 +11,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SongbookOfTyria.Models;
 using SongbookOfTyria.Services;
-using SongbookOfTyria.UI.Utilities;
+using SongbookOfTyria.Utilities;
 
 namespace SongbookOfTyria.UI.Controls
 {
@@ -35,9 +35,11 @@ namespace SongbookOfTyria.UI.Controls
 
 		private readonly AsyncTexture2D _practiceModeIconTexture;
 
-		private bool _lastCollapsedState;
+		private EventHandler<ValueChangedEventArgs<Texture2D>> _textureSwappedHandler;
 
-		private bool _isHandlingResize;
+		private AsyncTexture2D _arrangerTexture;
+
+		private bool _lastCollapsedState;
 
 		public event EventHandler<bool> CollapsedChanged;
 
@@ -81,9 +83,9 @@ namespace SongbookOfTyria.UI.Controls
 			}
 			AddDetailRow("Released Date:", _musicTab.ReleaseDate);
 			AddDetailRow("Tabbed by:", GetTabberName());
-			if (_musicTab.ArrangerInfo != null && _musicTab.ArrangerInfo.Count > 0)
+			if (_musicTab.TabberInfo != null && _musicTab.TabberInfo.Count > 0)
 			{
-				AddArrangerPicture(_musicTab.ArrangerInfo[0]);
+				AddArrangerPicture(_musicTab.TabberInfo[0]);
 			}
 			AddViewOnWebsiteButton();
 		}
@@ -131,7 +133,7 @@ namespace SongbookOfTyria.UI.Controls
 			{
 				return _musicTab.TabbedBy;
 			}
-			ArrangerInfo arranger = _musicTab.ArrangerInfo?.FirstOrDefault();
+			TabberInfo arranger = _musicTab.TabberInfo?.FirstOrDefault();
 			if (arranger != null)
 			{
 				string name = ((!string.IsNullOrEmpty(arranger.DisplayName)) ? arranger.DisplayName : arranger.Username);
@@ -153,29 +155,29 @@ namespace SongbookOfTyria.UI.Controls
 			//IL_0009: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0059: Expected O, but got Unknown
-			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005a: Expected O, but got Unknown
+			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
 			if (!string.IsNullOrEmpty(value))
 			{
 				FlowPanel val = new FlowPanel();
 				val.set_FlowDirection((ControlFlowDirection)2);
-				((Control)val).set_Width(240);
+				((Control)val).set_Width(((Control)this).get_Width());
 				((Container)val).set_HeightSizingMode((SizingMode)1);
 				val.set_ControlPadding(new Vector2(5f, 0f));
 				val.set_OuterControlPadding(new Vector2(15f, 0f));
@@ -197,50 +199,51 @@ namespace SongbookOfTyria.UI.Controls
 			}
 		}
 
-		private void AddArrangerPicture(ArrangerInfo arrangerInfo)
+		private void AddArrangerPicture(TabberInfo tabberInfo)
 		{
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0055: Expected O, but got Unknown
-			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0060: Expected O, but got Unknown
 			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0091: Expected O, but got Unknown
-			if (string.IsNullOrEmpty(arrangerInfo.PictureUrl))
+			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a1: Expected O, but got Unknown
+			if (string.IsNullOrEmpty(tabberInfo.PictureUrl))
 			{
 				return;
 			}
-			AsyncTexture2D arrangerTexture = _textureService.GetRemoteTexture(arrangerInfo.PictureUrl);
-			if (arrangerTexture == null)
+			_arrangerTexture = _textureService.GetRemoteTexture(tabberInfo.PictureUrl);
+			if (_arrangerTexture == null)
 			{
 				return;
 			}
 			Panel val = new Panel();
-			((Control)val).set_Width(240);
+			((Control)val).set_Width(((Control)this).get_Width());
 			((Container)val).set_HeightSizingMode((SizingMode)1);
 			((Control)val).set_Parent((Container)(object)this);
 			Panel picturePanel = val;
-			Image val2 = new Image(arrangerTexture);
+			Image val2 = new Image(_arrangerTexture);
 			((Control)val2).set_Size(new Point(220, 220));
 			((Control)val2).set_Location(new Point(10, 10));
 			((Control)val2).set_Parent((Container)(object)picturePanel);
 			Image arrangerImage = val2;
-			if (arrangerTexture.get_HasTexture())
+			if (_arrangerTexture.get_HasTexture())
 			{
-				UpdateArrangerImageSize(arrangerImage, picturePanel, arrangerTexture.get_Texture());
+				UpdateArrangerImageSize(arrangerImage, picturePanel, _arrangerTexture.get_Texture());
 			}
-			arrangerTexture.add_TextureSwapped((EventHandler<ValueChangedEventArgs<Texture2D>>)delegate(object sender, ValueChangedEventArgs<Texture2D> e)
+			_textureSwappedHandler = delegate(object sender, ValueChangedEventArgs<Texture2D> e)
 			{
 				if (e.get_NewValue() != null)
 				{
 					UpdateArrangerImageSize(arrangerImage, picturePanel, e.get_NewValue());
 				}
-			});
+			};
+			_arrangerTexture.add_TextureSwapped(_textureSwappedHandler);
 		}
 
 		private void UpdateArrangerImageSize(Image image, Panel panel, Texture2D texture)
@@ -322,24 +325,7 @@ namespace SongbookOfTyria.UI.Controls
 
 		private void OnResized(object sender, ResizedEventArgs e)
 		{
-			if (_isHandlingResize)
-			{
-				return;
-			}
-			_isHandlingResize = true;
-			try
-			{
-				((Panel)this).set_Title(((Panel)this).get_Collapsed() ? " " : "Details");
-				if (((Panel)this).get_Collapsed() != _lastCollapsedState)
-				{
-					_lastCollapsedState = ((Panel)this).get_Collapsed();
-					this.CollapsedChanged?.Invoke(this, ((Panel)this).get_Collapsed());
-				}
-			}
-			finally
-			{
-				_isHandlingResize = false;
-			}
+			((Panel)this).set_Title(((Panel)this).get_Collapsed() ? " " : "Details");
 		}
 
 		public void RebuildContent()
@@ -367,6 +353,10 @@ namespace SongbookOfTyria.UI.Controls
 		protected override void DisposeControl()
 		{
 			((Control)this).remove_Resized((EventHandler<ResizedEventArgs>)OnResized);
+			if (_arrangerTexture != null && _textureSwappedHandler != null)
+			{
+				_arrangerTexture.remove_TextureSwapped(_textureSwappedHandler);
+			}
 			((FlowPanel)this).DisposeControl();
 		}
 	}

@@ -27,5 +27,14 @@
     <Reference Include="NAudio.Core">
       <HintPath>..\..\working\NAudio.Core.dll</HintPath>
     </Reference>
+    <Reference Include="NAudio.Midi">
+      <HintPath>..\..\working\NAudio.Midi.dll</HintPath>
+    </Reference>
+    <Reference Include="MeltySynth">
+      <HintPath>..\..\working\MeltySynth.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Memory">
+      <HintPath>..\..\working\System.Memory.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>

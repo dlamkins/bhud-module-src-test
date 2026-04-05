@@ -21,6 +21,8 @@ namespace SongbookOfTyria.Services
 		public float ScrollSpeed { get; set; } = 30f;
 
 
+		public bool IsPracticeMode { get; set; }
+
 		public Point GetLocation()
 		{
 			//IL_000c: Unknown result type (might be due to invalid IL or missing references)

@@ -26,17 +26,19 @@ namespace SongbookOfTyria.UI.Views
 
 		private const int LeftPadding = 50;
 
-		private readonly TabsCacheService _tabsCacheService;
+		private readonly TabsService _tabsService;
 
 		private readonly UserSettingsService _userSettingsService;
 
 		private readonly GuildAuthService _guildAuthService;
 
+		private readonly TextureService _textureService;
+
 		private readonly MusicTabFilter _filter;
 
 		private readonly MusicTabSorter _sorter;
 
-		private readonly TabCardListManager _cardManager;
+		private TabCardListManager _cardManager;
 
 		private FlowPanel _filterPanel;
 
@@ -108,10 +110,11 @@ namespace SongbookOfTyria.UI.Views
 
 		public event EventHandler<MusicTab> TabClicked;
 
-		public SongLibraryView(TabsCacheService tabsCacheService, TextureService textureService, UserSettingsService userSettingsService, GuildAuthService guildAuthService)
+		public SongLibraryView(TabsService tabsService, TextureService textureService, UserSettingsService userSettingsService, GuildAuthService guildAuthService)
 			: this()
 		{
-			_tabsCacheService = tabsCacheService;
+			_tabsService = tabsService;
+			_textureService = textureService;
 			_userSettingsService = userSettingsService;
 			_guildAuthService = guildAuthService;
 			_filter = new MusicTabFilter
@@ -119,11 +122,6 @@ namespace SongbookOfTyria.UI.Views
 				UserSettingsService = userSettingsService
 			};
 			_sorter = new MusicTabSorter();
-			_cardManager = new TabCardListManager(textureService, userSettingsService);
-			_cardManager.CardClicked += OnCardClicked;
-			_cardManager.FavoriteToggled += OnFavoriteToggled;
-			_cardManager.RenderingStarted += OnRenderingStarted;
-			_cardManager.RenderingCompleted += OnRenderingCompleted;
 			FilterState savedState = _userSettingsService.GetFilterState();
 			RestoreFilterState(savedState);
 			if (_guildAuthService != null)
@@ -132,8 +130,26 @@ namespace SongbookOfTyria.UI.Views
 			}
 		}
 
+		private void InitializeCardManager()
+		{
+			if (_cardManager != null)
+			{
+				_cardManager.CardClicked -= OnCardClicked;
+				_cardManager.FavoriteToggled -= OnFavoriteToggled;
+				_cardManager.RenderingStarted -= OnRenderingStarted;
+				_cardManager.RenderingCompleted -= OnRenderingCompleted;
+				_cardManager.Dispose();
+			}
+			_cardManager = new TabCardListManager(_textureService, _userSettingsService);
+			_cardManager.CardClicked += OnCardClicked;
+			_cardManager.FavoriteToggled += OnFavoriteToggled;
+			_cardManager.RenderingStarted += OnRenderingStarted;
+			_cardManager.RenderingCompleted += OnRenderingCompleted;
+		}
+
 		protected override void Build(Container buildPanel)
 		{
+			InitializeCardManager();
 			_parentContainer = buildPanel;
 			((Control)_parentContainer).add_Resized((EventHandler<ResizedEventArgs>)OnParentResized);
 			BuildFilterPanel(buildPanel);
@@ -290,44 +306,25 @@ namespace SongbookOfTyria.UI.Views
 		private void RestoreCheckboxStates()
 		{
 			FilterState savedState = _userSettingsService.GetFilterState();
-			if (_beginnerCheckbox != null)
-			{
-				_beginnerCheckbox.set_Checked(savedState.BeginnerOnly);
-			}
-			if (_soloCheckbox != null)
-			{
-				_soloCheckbox.set_Checked(savedState.SoloOnly);
-			}
-			if (_duetCheckbox != null)
-			{
-				_duetCheckbox.set_Checked(savedState.DuetOnly);
-			}
-			if (_bandCheckbox != null)
-			{
-				_bandCheckbox.set_Checked(savedState.BandOnly);
-			}
-			if (_pianoCheckbox != null)
-			{
-				_pianoCheckbox.set_Checked(savedState.PianoOnly);
-			}
-			if (_practiceModeCheckbox != null)
-			{
-				_practiceModeCheckbox.set_Checked(savedState.PracticeModeOnly);
-			}
-			if (_favoritesCheckbox != null)
-			{
-				_favoritesCheckbox.set_Checked(savedState.FavoritesOnly);
-			}
-			if (_publicCheckbox != null)
-			{
-				_publicCheckbox.set_Checked(savedState.PublicOnly);
-			}
-			if (_privateCheckbox != null)
-			{
-				_privateCheckbox.set_Checked(savedState.PrivateOnly);
-			}
+			SetCheckboxState(_beginnerCheckbox, savedState.BeginnerOnly);
+			SetCheckboxState(_soloCheckbox, savedState.SoloOnly);
+			SetCheckboxState(_duetCheckbox, savedState.DuetOnly);
+			SetCheckboxState(_bandCheckbox, savedState.BandOnly);
+			SetCheckboxState(_pianoCheckbox, savedState.PianoOnly);
+			SetCheckboxState(_practiceModeCheckbox, savedState.PracticeModeOnly);
+			SetCheckboxState(_favoritesCheckbox, savedState.FavoritesOnly);
+			SetCheckboxState(_publicCheckbox, savedState.PublicOnly);
+			SetCheckboxState(_privateCheckbox, savedState.PrivateOnly);
 			RestorePanelCollapsedStates(savedState.CollapsedPanels);
 			UpdateSortButtonStates();
+		}
+
+		private static void SetCheckboxState(Checkbox checkbox, bool isChecked)
+		{
+			if (checkbox != null)
+			{
+				checkbox.set_Checked(isChecked);
+			}
 		}
 
 		private void RestorePanelCollapsedStates(Dictionary<string, bool> collapsedPanels)
@@ -429,42 +426,15 @@ namespace SongbookOfTyria.UI.Views
 
 		private void OnResetFiltersClicked(object sender, MouseEventArgs e)
 		{
-			if (_beginnerCheckbox != null)
-			{
-				_beginnerCheckbox.set_Checked(false);
-			}
-			if (_soloCheckbox != null)
-			{
-				_soloCheckbox.set_Checked(false);
-			}
-			if (_duetCheckbox != null)
-			{
-				_duetCheckbox.set_Checked(false);
-			}
-			if (_bandCheckbox != null)
-			{
-				_bandCheckbox.set_Checked(false);
-			}
-			if (_pianoCheckbox != null)
-			{
-				_pianoCheckbox.set_Checked(false);
-			}
-			if (_practiceModeCheckbox != null)
-			{
-				_practiceModeCheckbox.set_Checked(false);
-			}
-			if (_favoritesCheckbox != null)
-			{
-				_favoritesCheckbox.set_Checked(false);
-			}
-			if (_publicCheckbox != null)
-			{
-				_publicCheckbox.set_Checked(false);
-			}
-			if (_privateCheckbox != null)
-			{
-				_privateCheckbox.set_Checked(false);
-			}
+			ResetCheckbox(_beginnerCheckbox);
+			ResetCheckbox(_soloCheckbox);
+			ResetCheckbox(_duetCheckbox);
+			ResetCheckbox(_bandCheckbox);
+			ResetCheckbox(_pianoCheckbox);
+			ResetCheckbox(_practiceModeCheckbox);
+			ResetCheckbox(_favoritesCheckbox);
+			ResetCheckbox(_publicCheckbox);
+			ResetCheckbox(_privateCheckbox);
 			foreach (Checkbox value in _genreCheckboxes.Values)
 			{
 				value.set_Checked(false);
@@ -480,6 +450,14 @@ namespace SongbookOfTyria.UI.Views
 				((TextInputBase)_searchBox).set_Text(string.Empty);
 			}
 			ApplyFiltersAndSort();
+		}
+
+		private static void ResetCheckbox(Checkbox checkbox)
+		{
+			if (checkbox != null)
+			{
+				checkbox.set_Checked(false);
+			}
 		}
 
 		private void BuildTabTypeSection()
@@ -671,14 +649,14 @@ namespace SongbookOfTyria.UI.Views
 
 		private void PopulateGenreCheckboxes()
 		{
-			//IL_0153: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0158: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0188: Expected O, but got Unknown
-			//IL_01c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cd: Unknown result type (might be due to invalid IL or missing references)
-			if (_allTabs == null || _genrePanel == null)
+			//IL_0169: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0191: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019e: Expected O, but got Unknown
+			//IL_01d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e3: Unknown result type (might be due to invalid IL or missing references)
+			if (_allTabs == null || _genrePanel == null || _genreCheckboxes == null)
 			{
 				return;
 			}
@@ -694,12 +672,15 @@ namespace SongbookOfTyria.UI.Views
 				orderby kvp.Value descending, kvp.Key
 				select kvp)
 			{
-				Checkbox val = new Checkbox();
-				val.set_Text($"{genreCount.Key} ({genreCount.Value})");
-				((Control)val).set_Parent((Container)(object)_genrePanel);
-				Checkbox checkbox = val;
-				checkbox.add_CheckedChanged((EventHandler<CheckChangedEvent>)OnGenreCheckboxChanged);
-				_genreCheckboxes[genreCount.Key] = checkbox;
+				if (!string.IsNullOrEmpty(genreCount.Key))
+				{
+					Checkbox val = new Checkbox();
+					val.set_Text($"{genreCount.Key} ({genreCount.Value})");
+					((Control)val).set_Parent((Container)(object)_genrePanel);
+					Checkbox checkbox = val;
+					checkbox.add_CheckedChanged((EventHandler<CheckChangedEvent>)OnGenreCheckboxChanged);
+					_genreCheckboxes[genreCount.Key] = checkbox;
+				}
 			}
 			Panel val2 = new Panel();
 			((Control)val2).set_Width(1);
@@ -723,14 +704,14 @@ namespace SongbookOfTyria.UI.Views
 
 		private void PopulateTabberCheckboxes()
 		{
-			//IL_0248: Unknown result type (might be due to invalid IL or missing references)
-			//IL_024d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0270: Unknown result type (might be due to invalid IL or missing references)
-			//IL_027e: Expected O, but got Unknown
-			//IL_02bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c8: Unknown result type (might be due to invalid IL or missing references)
-			if (_allTabs == null || _tabberPanel == null)
+			//IL_0250: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0255: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0278: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0286: Expected O, but got Unknown
+			//IL_02c4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02c9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d0: Unknown result type (might be due to invalid IL or missing references)
+			if (_allTabs == null || _tabberPanel == null || _tabberCheckboxes == null)
 			{
 				return;
 			}
@@ -816,41 +797,15 @@ namespace SongbookOfTyria.UI.Views
 				return;
 			}
 			List<MusicTab> currentFiltered = _displayedTabs ?? _allTabs;
-			int beginnerCount = currentFiltered.Count((MusicTab t) => t.IsBeginner);
-			int soloCount = currentFiltered.Count((MusicTab t) => t.TabType != null && t.TabType.Contains("Solo"));
-			int duetCount = currentFiltered.Count((MusicTab t) => t.TabType != null && t.TabType.Contains("Duet"));
-			int bandCount = currentFiltered.Count((MusicTab t) => t.TabType != null && t.TabType.Contains("Band"));
-			int pianoCount = currentFiltered.Count((MusicTab t) => t.Piano);
-			int practiceModeCount = currentFiltered.Count((MusicTab t) => t.PracticeMode);
-			int favoritesCount = ((_userSettingsService != null) ? currentFiltered.Count((MusicTab t) => _userSettingsService.IsFavorite(t.Id)) : 0);
-			if (_beginnerCheckbox != null)
-			{
-				_beginnerCheckbox.set_Text($"Beginner Friendly ({beginnerCount})");
-			}
-			if (_soloCheckbox != null)
-			{
-				_soloCheckbox.set_Text($"Solo ({soloCount})");
-			}
-			if (_duetCheckbox != null)
-			{
-				_duetCheckbox.set_Text($"Duet ({duetCount})");
-			}
-			if (_bandCheckbox != null)
-			{
-				_bandCheckbox.set_Text($"Band ({bandCount})");
-			}
-			if (_pianoCheckbox != null)
-			{
-				_pianoCheckbox.set_Text($"Piano ({pianoCount})");
-			}
-			if (_practiceModeCheckbox != null)
-			{
-				_practiceModeCheckbox.set_Text($"Practice Mode ({practiceModeCount})");
-			}
-			if (_favoritesCheckbox != null)
-			{
-				_favoritesCheckbox.set_Text($"Favorites ({favoritesCount})");
-			}
+			UpdateCheckboxText(_beginnerCheckbox, "Beginner Friendly", currentFiltered.Count((MusicTab t) => t.IsBeginner));
+			UpdateCheckboxText(_soloCheckbox, "Solo", currentFiltered.Count((MusicTab t) => t.TabType != null && t.TabType.Contains("Solo")));
+			UpdateCheckboxText(_duetCheckbox, "Duet", currentFiltered.Count((MusicTab t) => t.TabType != null && t.TabType.Contains("Duet")));
+			UpdateCheckboxText(_bandCheckbox, "Band", currentFiltered.Count((MusicTab t) => t.TabType != null && t.TabType.Contains("Band")));
+			UpdateCheckboxText(_pianoCheckbox, "Piano", currentFiltered.Count((MusicTab t) => t.Piano));
+			UpdateCheckboxText(_practiceModeCheckbox, "Practice Mode", currentFiltered.Count((MusicTab t) => t.PracticeMode));
+			UpdateCheckboxText(_favoritesCheckbox, "Favorites", (_userSettingsService != null) ? currentFiltered.Count((MusicTab t) => _userSettingsService.IsFavorite(t.Id)) : 0);
+			UpdateCheckboxText(_publicCheckbox, "Public", currentFiltered.Count((MusicTab t) => !t.IsPrivate));
+			UpdateCheckboxText(_privateCheckbox, "Private", currentFiltered.Count((MusicTab t) => t.IsPrivate));
 			foreach (KeyValuePair<string, Checkbox> kvp2 in _genreCheckboxes)
 			{
 				int genreCount = currentFiltered.Count((MusicTab t) => t.Genre == kvp2.Key);
@@ -861,15 +816,13 @@ namespace SongbookOfTyria.UI.Views
 				int tabberCount = currentFiltered.Count((MusicTab t) => t.TabbedBy == kvp.Key || (t.TabbedByMember != null && t.TabbedByMember.Contains(kvp.Key)));
 				kvp.Value.set_Text($"{kvp.Key} ({tabberCount})");
 			}
-			if (_publicCheckbox != null)
+		}
+
+		private static void UpdateCheckboxText(Checkbox checkbox, string label, int count)
+		{
+			if (checkbox != null)
 			{
-				int publicCount = currentFiltered.Count((MusicTab t) => !t.IsPrivate);
-				_publicCheckbox.set_Text($"Public ({publicCount})");
-			}
-			if (_privateCheckbox != null)
-			{
-				int privateCount = currentFiltered.Count((MusicTab t) => t.IsPrivate);
-				_privateCheckbox.set_Text($"Private ({privateCount})");
+				checkbox.set_Text($"{label} ({count})");
 			}
 		}
 
@@ -1122,7 +1075,7 @@ namespace SongbookOfTyria.UI.Views
 
 		private void RestoreOrLoadTabs()
 		{
-			TabsResponse cachedResponse = _tabsCacheService.GetCachedTabs();
+			TabsResponse cachedResponse = _tabsService.GetCachedTabs();
 			if (cachedResponse?.Tabs != null && cachedResponse.Tabs.Count > 0)
 			{
 				_allTabs = cachedResponse.Tabs;
@@ -1158,38 +1111,31 @@ namespace SongbookOfTyria.UI.Views
 		{
 			_displayedTabs = new List<MusicTab>(_allTabs);
 			ApplyFiltersAndSort();
-			if (_errorLabel != null)
-			{
-				((Control)_errorLabel).set_Visible(false);
-			}
+			SetControlVisible((Control)(object)_errorLabel, visible: false);
 		}
 
 		private void ShowError(string message)
 		{
-			if (_loadingSpinner != null)
-			{
-				((Control)_loadingSpinner).set_Visible(false);
-			}
+			SetControlVisible((Control)(object)_loadingSpinner, visible: false);
 			if (_errorLabel != null)
 			{
 				_errorLabel.set_Text(message);
 				((Control)_errorLabel).set_Visible(true);
 			}
-			if (_cardsPanel != null)
-			{
-				((Control)_cardsPanel).set_Visible(false);
-			}
+			SetControlVisible((Control)(object)_cardsPanel, visible: false);
 		}
 
 		private void ShowLoading()
 		{
-			if (_loadingSpinner != null)
+			SetControlVisible((Control)(object)_loadingSpinner, visible: true);
+			SetControlVisible((Control)(object)_errorLabel, visible: false);
+		}
+
+		private static void SetControlVisible(Control control, bool visible)
+		{
+			if (control != null)
 			{
-				((Control)_loadingSpinner).set_Visible(true);
-			}
-			if (_errorLabel != null)
-			{
-				((Control)_errorLabel).set_Visible(false);
+				control.set_Visible(visible);
 			}
 		}
 
@@ -1309,7 +1255,7 @@ namespace SongbookOfTyria.UI.Views
 				}
 				else
 				{
-					_cardManager.RefreshCards(_displayedTabs);
+					_cardManager?.RefreshCards(_displayedTabs);
 				}
 			}
 		}
@@ -1326,26 +1272,14 @@ namespace SongbookOfTyria.UI.Views
 
 		private void ShowLoadingSpinner()
 		{
-			if (_loadingSpinner != null)
-			{
-				((Control)_loadingSpinner).set_Visible(true);
-			}
-			if (_cardsPanel != null)
-			{
-				((Control)_cardsPanel).set_Visible(false);
-			}
+			SetControlVisible((Control)(object)_loadingSpinner, visible: true);
+			SetControlVisible((Control)(object)_cardsPanel, visible: false);
 		}
 
 		private void HideLoadingSpinner()
 		{
-			if (_loadingSpinner != null)
-			{
-				((Control)_loadingSpinner).set_Visible(false);
-			}
-			if (_cardsPanel != null)
-			{
-				((Control)_cardsPanel).set_Visible(true);
-			}
+			SetControlVisible((Control)(object)_loadingSpinner, visible: false);
+			SetControlVisible((Control)(object)_cardsPanel, visible: true);
 		}
 
 		private void OnFavoriteToggled(object sender, MusicTab tab)
@@ -1412,7 +1346,7 @@ namespace SongbookOfTyria.UI.Views
 				_isLoading = true;
 				_errorMessage = null;
 				PrepareForLoading();
-				TabsResponse tabsResponse = await _tabsCacheService.GetTabsAsync().ConfigureAwait(continueOnCapturedContext: false);
+				TabsResponse tabsResponse = await _tabsService.GetTabsAsync().ConfigureAwait(continueOnCapturedContext: false);
 				_isLoading = false;
 				_hasLoaded = true;
 				if (tabsResponse == null)
@@ -1435,7 +1369,7 @@ namespace SongbookOfTyria.UI.Views
 			{
 				((Control)_errorLabel).set_Visible(false);
 			}
-			_cardManager.ClearAllCards();
+			_cardManager?.ClearAllCards();
 		}
 
 		private void HandleLoadError()
@@ -1476,15 +1410,6 @@ namespace SongbookOfTyria.UI.Views
 		protected override void Unload()
 		{
 			SavePanelCollapsedStates();
-			if (_guildAuthService != null)
-			{
-				_guildAuthService.AuthStatusChanged -= OnAuthStatusChanged;
-			}
-			_cardManager.CardClicked -= OnCardClicked;
-			_cardManager.FavoriteToggled -= OnFavoriteToggled;
-			_cardManager.RenderingStarted -= OnRenderingStarted;
-			_cardManager.RenderingCompleted -= OnRenderingCompleted;
-			_cardManager.Dispose();
 			if (_parentContainer != null)
 			{
 				((Control)_parentContainer).remove_Resized((EventHandler<ResizedEventArgs>)OnParentResized);
@@ -1520,6 +1445,7 @@ namespace SongbookOfTyria.UI.Views
 				value2.remove_CheckedChanged((EventHandler<CheckChangedEvent>)OnTabberCheckboxChanged);
 			}
 			_tabberCheckboxes.Clear();
+			_cardManager?.ClearAllCards();
 			((View<IPresenter>)this).Unload();
 		}
 	}

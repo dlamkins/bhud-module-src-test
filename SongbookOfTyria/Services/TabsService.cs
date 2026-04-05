@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
 using SongbookOfTyria.Models;
@@ -6,11 +7,13 @@ using SongbookOfTyria.Models.Api;
 
 namespace SongbookOfTyria.Services
 {
-	public sealed class TabsCacheService
+	public sealed class TabsService
 	{
-		private static readonly Logger Logger = Logger.GetLogger<TabsCacheService>();
+		private static readonly Logger Logger = Logger.GetLogger<TabsService>();
 
 		private readonly ApiService _apiService;
+
+		private readonly SemaphoreSlim _refreshLock = new SemaphoreSlim(1, 1);
 
 		private TabsResponse _cachedTabsResponse;
 
@@ -28,7 +31,7 @@ namespace SongbookOfTyria.Services
 
 		public event EventHandler<TabsResponse> TabsLoaded;
 
-		public TabsCacheService(ApiService apiService)
+		public TabsService(ApiService apiService)
 		{
 			_apiService = apiService;
 			InitializeAsync();
@@ -41,6 +44,7 @@ namespace SongbookOfTyria.Services
 
 		private async Task PreloadTabsFromApiAsync()
 		{
+			await _refreshLock.WaitAsync().ConfigureAwait(continueOnCapturedContext: false);
 			try
 			{
 				Logger.Info("Preloading tabs from API...");
@@ -55,6 +59,10 @@ namespace SongbookOfTyria.Services
 			catch (Exception ex)
 			{
 				Logger.Warn(ex, "Failed to preload tabs from API");
+			}
+			finally
+			{
+				_refreshLock.Release();
 			}
 		}
 

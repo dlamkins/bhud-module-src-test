@@ -54,7 +54,7 @@ namespace SongbookOfTyria.Services
 
 		private const string PauseIconTexture = "icon_pause.png";
 
-		private const int WindowBackgroundAssetId = 155985;
+		public const int WindowBackgroundAssetId = 155985;
 
 		private const int AboutIconAssetId = 440023;
 
@@ -71,6 +71,8 @@ namespace SongbookOfTyria.Services
 		private const int FavoriteFilledAssetId = 102439;
 
 		private const int FavoriteEmptyAssetId = 102440;
+
+		private const int PracticeModeIconAssetId = 528696;
 
 		public TextureService(ContentsManager contentsManager, string cacheDirectory)
 		{
@@ -163,6 +165,11 @@ namespace SongbookOfTyria.Services
 		public AsyncTexture2D GetFavoriteEmptyIcon()
 		{
 			return GetAssetTexture(102440);
+		}
+
+		public AsyncTexture2D GetPracticeModeIcon()
+		{
+			return GetAssetTexture(528696);
 		}
 
 		private static AsyncTexture2D GetAssetTexture(int assetId)

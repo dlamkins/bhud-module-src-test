@@ -36,7 +36,7 @@ namespace SongbookOfTyria
 
 		private TextureService _textureService;
 
-		private TabsCacheService _tabsCacheService;
+		private TabsService _tabsService;
 
 		private GuildAuthService _guildAuthService;
 
@@ -79,12 +79,12 @@ namespace SongbookOfTyria
 			_textureService = new TextureService(ContentsManager, texturesCacheDirectory);
 			_guildAuthService = new GuildAuthService();
 			_apiService = new ApiService(_guildAuthService);
-			_tabsCacheService = new TabsCacheService(_apiService);
+			_tabsService = new TabsService(_apiService);
 			_userSettingsService = new UserSettingsService(cacheDirectory);
-			_tabsCacheService.TabsLoaded += OnTabsLoaded;
-			_moduleSettings.InitializeServices(_tabsCacheService, _textureService, _guildAuthService);
+			_tabsService.TabsLoaded += OnTabsLoaded;
+			_moduleSettings.InitializeServices(_tabsService, _textureService, _guildAuthService);
 			_guildAuthService.AuthStatusChanged += OnAuthStatusChanged;
-			_mainWindow = new SongbookMainWindow(_tabsCacheService, _textureService, _userSettingsService, _guildAuthService, cacheDirectory);
+			_mainWindow = new SongbookMainWindow(_tabsService, _textureService, _userSettingsService, _guildAuthService, _moduleSettings, cacheDirectory);
 			CreateCornerIcon();
 			_moduleSettings.InitializeGuildAuthAsync();
 		}
@@ -133,8 +133,14 @@ namespace SongbookOfTyria
 
 		private async void OnAuthStatusChanged(object sender, GuildAuthStatusChangedEventArgs e)
 		{
-			_tabsCacheService?.ClearInMemoryCache();
-			await (_mainWindow?.RefreshTabListAsync());
+			if (_tabsService != null)
+			{
+				await _tabsService.RefreshTabsAsync().ConfigureAwait(continueOnCapturedContext: false);
+			}
+			if (_mainWindow != null)
+			{
+				await _mainWindow.RefreshTabListAsync().ConfigureAwait(continueOnCapturedContext: false);
+			}
 		}
 
 		public override IView GetSettingsView()
@@ -151,7 +157,7 @@ namespace SongbookOfTyria
 		{
 			SafeUnsubscribe(delegate
 			{
-				_tabsCacheService.TabsLoaded -= OnTabsLoaded;
+				_tabsService.TabsLoaded -= OnTabsLoaded;
 			});
 			SafeUnsubscribe(delegate
 			{

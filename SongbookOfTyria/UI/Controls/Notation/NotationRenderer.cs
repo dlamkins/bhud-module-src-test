@@ -107,6 +107,23 @@ namespace SongbookOfTyria.UI.Controls.Notation
 
 		public NotationControl Control => _notationControl;
 
+		public static BitmapFont GetFont(int size)
+		{
+			return (BitmapFont)(size switch
+			{
+				16 => _font16, 
+				18 => _font18, 
+				20 => _font20, 
+				22 => _font22, 
+				24 => _font24, 
+				26 => _font26, 
+				28 => _font28, 
+				30 => _font30, 
+				32 => _font32, 
+				_ => _font18, 
+			});
+		}
+
 		public static void InitializeFonts(ContentsManager contentsManager)
 		{
 			try
