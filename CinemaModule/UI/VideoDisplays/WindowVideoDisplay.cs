@@ -377,14 +377,13 @@ namespace CinemaModule.UI.VideoDisplays
 			//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0130: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0131: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0162: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0186: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0112: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0137: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0151: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0164: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0170: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0188: Unknown result type (might be due to invalid IL or missing references)
 			Rectangle panelRect = default(Rectangle);
 			((Rectangle)(ref panelRect))._002Ector(Location.X, Location.Y, Size.X, Size.Y);
 			Point mousePos = GameService.Input.get_Mouse().get_Position();
@@ -396,11 +395,11 @@ namespace CinemaModule.UI.VideoDisplays
 			((Rectangle)(ref videoRect))._002Ector(Location.X + 6, Location.Y + 6, Math.Max(1, Size.X - 12), Math.Max(1, Size.Y - 12));
 			if (IsOffline && OfflineTexture != null && !((GraphicsResource)OfflineTexture).get_IsDisposed())
 			{
-				DrawOfflineTexture(spriteBatch, videoRect);
+				DrawTexturePreservingAspectRatio(spriteBatch, OfflineTexture, videoRect);
 			}
 			else if (_currentTexture != null && !((GraphicsResource)_currentTexture).get_IsDisposed())
 			{
-				spriteBatch.Draw(_currentTexture, videoRect, Color.get_White());
+				DrawTexturePreservingAspectRatio(spriteBatch, _currentTexture, videoRect);
 			}
 			if (!string.IsNullOrEmpty(RadioTrackName))
 			{
@@ -412,23 +411,23 @@ namespace CinemaModule.UI.VideoDisplays
 			_controlsOverlay.Draw(spriteBatch);
 		}
 
-		private void DrawOfflineTexture(SpriteBatch spriteBatch, Rectangle videoRect)
+		private void DrawTexturePreservingAspectRatio(SpriteBatch spriteBatch, Texture2D texture, Rectangle videoRect)
 		{
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-			float textureAspect = (float)OfflineTexture.get_Width() / (float)OfflineTexture.get_Height();
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
+			float textureAspect = (float)texture.get_Width() / (float)texture.get_Height();
 			float targetAspect = (float)videoRect.Width / (float)videoRect.Height;
 			Rectangle destRect = default(Rectangle);
 			if (textureAspect > targetAspect)
@@ -441,7 +440,7 @@ namespace CinemaModule.UI.VideoDisplays
 				int width = (int)((float)videoRect.Height * textureAspect);
 				((Rectangle)(ref destRect))._002Ector(videoRect.X + (videoRect.Width - width) / 2, videoRect.Y, width, videoRect.Height);
 			}
-			spriteBatch.Draw(OfflineTexture, destRect, Color.get_White());
+			spriteBatch.Draw(texture, destRect, Color.get_White());
 		}
 
 		private void DrawBorder(SpriteBatch spriteBatch, Rectangle panelRect, Color baseColor)

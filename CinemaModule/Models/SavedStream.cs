@@ -24,6 +24,19 @@ namespace CinemaModule.Models
 		[JsonProperty("tabId")]
 		public string TabId { get; set; }
 
+		[JsonIgnore]
+		public bool IsYouTubeChannelOrPlaylist
+		{
+			get
+			{
+				if (SourceType != StreamSourceType.YouTubeChannel)
+				{
+					return SourceType == StreamSourceType.YouTubePlaylist;
+				}
+				return true;
+			}
+		}
+
 		[JsonConstructor]
 		public SavedStream()
 		{

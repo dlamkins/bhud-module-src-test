@@ -84,6 +84,23 @@ namespace CinemaModule.UI.Windows.MainSettings
 			return listCard;
 		}
 
+		public ListCard CreatePlaylistVideoCard(FlowPanel parent, StreamListItem item, Action<string, string> onSelect)
+		{
+			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+			List<ListCardButton> buttons = CreatePlaylistVideoButtons(item.PlaylistVideoId);
+			StreamStatus status = new StreamStatus
+			{
+				Subtitle = item.Subtitle,
+				SubtitleColor = item.SubtitleColor
+			};
+			ListCard listCard = CreateCard(parent, item.Key, item.Title, status, buttons, item.AvatarTexture);
+			((Control)listCard).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				onSelect(item.PlaylistVideoId, item.Key);
+			});
+			return listCard;
+		}
+
 		public ListCard CreateCustomCard(FlowPanel parent, string key, SavedStream stream, StreamStatus status, Action onDelete, Action onEdit, Action<SavedStream> onSelect)
 		{
 			List<ListCardButton> buttons = CreateCustomButtons(stream, onDelete, onEdit);
@@ -166,6 +183,20 @@ namespace CinemaModule.UI.Windows.MainSettings
 				buttons.Add(CreateIconButton(_textureService.GetSetScreenIcon(), "Apply in-game screen position", delegate
 				{
 					OnApplyWorldPosition?.Invoke(channel);
+				}));
+			}
+			return buttons;
+		}
+
+		private List<ListCardButton> CreatePlaylistVideoButtons(string videoId)
+		{
+			List<ListCardButton> buttons = new List<ListCardButton>();
+			if (!string.IsNullOrEmpty(videoId))
+			{
+				string youtubeUrl = "https://www.youtube.com/watch?v=" + videoId;
+				buttons.Add(CreateIconButton(_textureService.GetYoutubeIcon(), "Watch on YouTube", delegate
+				{
+					OpenUrl(youtubeUrl);
 				}));
 			}
 			return buttons;

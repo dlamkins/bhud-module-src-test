@@ -4,6 +4,8 @@ namespace CinemaModule.Models
 	{
 		Url,
 		TwitchChannel,
-		YouTubeVideo
+		YouTubeVideo,
+		YouTubeChannel,
+		YouTubePlaylist
 	}
 }

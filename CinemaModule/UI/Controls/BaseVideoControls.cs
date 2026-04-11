@@ -337,7 +337,6 @@ namespace CinemaModule.UI.Controls
 
 		public void UpdateAvailableQualities(IReadOnlyList<string> qualityNames, int selectedIndex)
 		{
-			Logger.GetLogger<BaseVideoControls>().Debug($"UpdateAvailableQualities: {qualityNames?.Count ?? 0} qualities, selectedIndex={selectedIndex}");
 			_suppressQualityEvent = true;
 			QualityDropdown.get_Items().Clear();
 			if (qualityNames == null || qualityNames.Count == 0)

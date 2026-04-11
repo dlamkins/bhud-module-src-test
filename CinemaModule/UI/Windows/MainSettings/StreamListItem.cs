@@ -31,6 +31,12 @@ namespace CinemaModule.UI.Windows.MainSettings
 
 		public int Index { get; set; }
 
+		public bool IsPlaylistVideo { get; set; }
+
+		public string PlaylistTitle { get; set; }
+
+		public string PlaylistVideoId { get; set; }
+
 		public void ApplyStatus(StreamStatus status)
 		{
 			//IL_001a: Unknown result type (might be due to invalid IL or missing references)

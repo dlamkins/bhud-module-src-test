@@ -20,7 +20,9 @@ namespace CinemaModule.UI.Windows.Dialogs
 
 		private const string UrlHelpText = "Supported formats:\n• Video files: MP4, MKV, AVI, WEBM\n• Live streams: M3U8, HLS, RTSP, RTMP\n• Radio/Audio: MP3, AAC, OGG streams\n• Local files: file:///C:/path/to/video.mp4";
 
-		private const string YouTubeHelpText = "Supported formats:\n• Full URL: https://www.youtube.com/watch?v=VIDEO_ID\n• Short URL: https://youtu.be/VIDEO_ID\n• Video ID: VIDEO_ID";
+		private const string YouTubeVideoHelpText = "Supported formats:\n• Full URL: https://www.youtube.com/watch?v=VIDEO_ID\n• Short URL: https://youtu.be/VIDEO_ID\n• Video ID: VIDEO_ID";
+
+		private const string YouTubePlaylistHelpText = "Supported formats:\n• Playlist URL: https://www.youtube.com/playlist?list=PLxxxxxxxx\n• Playlist ID: PLxxxxxxxx\n• Channel ID: UCxxxxxxxx (shows latest uploads)";
 
 		private readonly CinemaUserSettings _settings;
 
@@ -38,9 +40,11 @@ namespace CinemaModule.UI.Windows.Dialogs
 
 		private GlowButton _twitchButton;
 
-		private GlowButton _youtubeButton;
-
 		private GlowButton _urlButton;
+
+		private GlowButton _youtubeVideoButton;
+
+		private GlowButton _youtubePlaylistButton;
 
 		private TextBox _valueTextBox;
 
@@ -145,9 +149,10 @@ namespace CinemaModule.UI.Windows.Dialogs
 			val2.set_ControlPadding(new Vector2(8f, 0f));
 			((Control)val2).set_Parent(parent);
 			FlowPanel buttonPanel = val2;
-			_twitchButton = CreateSourceButton((Container)(object)buttonPanel, _textureService.GetTwitchIcon(), "Twitch", StreamSourceType.TwitchChannel);
-			_youtubeButton = CreateSourceButton((Container)(object)buttonPanel, _textureService.GetYoutubeIcon(), "YouTube", StreamSourceType.YouTubeVideo);
+			_twitchButton = CreateSourceButton((Container)(object)buttonPanel, _textureService.GetTwitchIcon(), "Twitch Channel", StreamSourceType.TwitchChannel);
 			_urlButton = CreateSourceButton((Container)(object)buttonPanel, _textureService.GetVlcIcon(), "URL", StreamSourceType.Url);
+			_youtubeVideoButton = CreateSourceButton((Container)(object)buttonPanel, _textureService.GetYoutubeIcon(), "YouTube Video", StreamSourceType.YouTubeVideo);
+			_youtubePlaylistButton = CreateSourceButton((Container)(object)buttonPanel, _textureService.GetYoutubeIcon(), "YouTube Playlist", StreamSourceType.YouTubePlaylist);
 		}
 
 		private GlowButton CreateSourceButton(Container parent, AsyncTexture2D icon, string tooltip, StreamSourceType sourceType)
@@ -178,8 +183,9 @@ namespace CinemaModule.UI.Windows.Dialogs
 		{
 			_selectedSourceType = sourceType;
 			_twitchButton.set_Checked(sourceType == StreamSourceType.TwitchChannel);
-			_youtubeButton.set_Checked(sourceType == StreamSourceType.YouTubeVideo);
 			_urlButton.set_Checked(sourceType == StreamSourceType.Url);
+			_youtubeVideoButton.set_Checked(sourceType == StreamSourceType.YouTubeVideo);
+			_youtubePlaylistButton.set_Checked(sourceType == StreamSourceType.YouTubePlaylist);
 			OnSourceTypeChanged();
 		}
 
@@ -252,8 +258,8 @@ namespace CinemaModule.UI.Windows.Dialogs
 			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
 			FlowPanel val = new FlowPanel();
-			val.set_FlowDirection((ControlFlowDirection)0);
-			((Container)val).set_WidthSizingMode((SizingMode)2);
+			val.set_FlowDirection((ControlFlowDirection)2);
+			((Container)val).set_WidthSizingMode((SizingMode)1);
 			((Container)val).set_HeightSizingMode((SizingMode)1);
 			val.set_ControlPadding(new Vector2(10f, 0f));
 			((Control)val).set_Parent(parent);
@@ -300,6 +306,11 @@ namespace CinemaModule.UI.Windows.Dialogs
 				_valueLabel.set_Text("YouTube URL or Video ID");
 				((TextInputBase)_valueTextBox).set_PlaceholderText("YouTube URL or video ID");
 				_helpLabel.set_Text("Supported formats:\n• Full URL: https://www.youtube.com/watch?v=VIDEO_ID\n• Short URL: https://youtu.be/VIDEO_ID\n• Video ID: VIDEO_ID");
+				break;
+			case StreamSourceType.YouTubePlaylist:
+				_valueLabel.set_Text("YouTube Playlist");
+				((TextInputBase)_valueTextBox).set_PlaceholderText("Playlist URL or ID");
+				_helpLabel.set_Text("Supported formats:\n• Playlist URL: https://www.youtube.com/playlist?list=PLxxxxxxxx\n• Playlist ID: PLxxxxxxxx\n• Channel ID: UCxxxxxxxx (shows latest uploads)");
 				break;
 			default:
 				_valueLabel.set_Text("URL");

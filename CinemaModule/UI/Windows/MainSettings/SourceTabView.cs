@@ -43,6 +43,8 @@ namespace CinemaModule.UI.Windows.MainSettings
 
 		private const string KeyPrefixCustomTab = "customtab:";
 
+		private const string KeyPrefixPlaylistVideo = "playlist_video:";
+
 		private const string CategoryFollowed = "Followed Channels";
 
 		private readonly CinemaUserSettings _settings;
@@ -94,6 +96,8 @@ namespace CinemaModule.UI.Windows.MainSettings
 		private TextBox _editingTextBox;
 
 		private string _editingTabId;
+
+		private SavedStream _browsingPlaylist;
 
 		public SourceTabView(CinemaUserSettings settings, CinemaController controller, TwitchService twitchService, TwitchAuthService twitchAuthService, PresetService presetService, YouTubeService youtubeService)
 			: this()
@@ -378,6 +382,7 @@ namespace CinemaModule.UI.Windows.MainSettings
 			MenuItem menuItem = (MenuItem)(object)((activatedControl is MenuItem) ? activatedControl : null);
 			if (menuItem != null)
 			{
+				_browsingPlaylist = null;
 				string tabId = GetTabIdFromMenuItem(menuItem);
 				_selectedCategoryId = ((tabId != null) ? ("customtab:" + tabId) : menuItem.get_Text());
 				_settings.LastSelectedSourceCategory = _selectedCategoryId;
@@ -559,21 +564,26 @@ namespace CinemaModule.UI.Windows.MainSettings
 
 		private async Task LoadStreamCategoryAsync(StreamCategory category, CancellationToken token)
 		{
-			List<StreamListItem> items = BuildChannelItems(category);
-			if (items.Count == 0)
+			List<ChannelData> playlistChannels = category.Channels.Where((ChannelData c) => c.HasYouTubePlaylistSource).ToList();
+			List<ChannelData> regularChannels = category.Channels.Where((ChannelData c) => !c.HasYouTubePlaylistSource).ToList();
+			if (regularChannels.Count == 0 && playlistChannels.Count == 0)
 			{
 				ShowEmptyMessage("No channels available");
 				return;
 			}
+			List<StreamListItem> items = BuildChannelItemsFromList(regularChannels);
 			ShowLoadingSpinner();
-			await _statusLoader.FetchUrlStatusesAsync(items, token);
+			Task<List<StreamListItem>> playlistTask = LoadPlaylistChannelVideosAsync(playlistChannels, token);
+			Task statusTask = ((items.Count > 0) ? _statusLoader.FetchUrlStatusesAsync(items, token) : Task.CompletedTask);
+			await Task.WhenAll(playlistTask, statusTask);
 			if (token.IsCancellationRequested)
 			{
 				return;
 			}
+			List<StreamListItem> playlistItems = await playlistTask;
 			ReplaceSpinnerWithContent();
 			BuildCategoryHeader(category);
-			List<StreamListItem> list = (from i in items
+			List<StreamListItem> livestreams = (from i in items
 				where !i.IsOnDemand
 				orderby i.IsOnline descending, i.Index
 				select i).ToList();
@@ -581,12 +591,24 @@ namespace CinemaModule.UI.Windows.MainSettings
 				where i.IsOnDemand
 				orderby i.Index
 				select i).ToList();
-			bool hasBothSections = list.Count > 0 && onDemand.Count > 0;
-			if (hasBothSections)
+			bool hasMultipleSections = ((livestreams.Count > 0) ? 1 : 0) + ((onDemand.Count > 0) ? 1 : 0) + ((playlistItems.Count > 0) ? 1 : 0) > 1;
+			if (hasMultipleSections && livestreams.Count > 0)
 			{
 				BuildSectionHeader("Livestreams");
 			}
-			foreach (StreamListItem item2 in list)
+			foreach (StreamListItem item3 in livestreams)
+			{
+				if (token.IsCancellationRequested)
+				{
+					return;
+				}
+				_cardFactory.CreateChannelCard(_cardsPanel, item3, SelectChannel);
+			}
+			if (hasMultipleSections && onDemand.Count > 0)
+			{
+				BuildSectionHeader("On Demand");
+			}
+			foreach (StreamListItem item2 in onDemand)
 			{
 				if (token.IsCancellationRequested)
 				{
@@ -594,23 +616,126 @@ namespace CinemaModule.UI.Windows.MainSettings
 				}
 				_cardFactory.CreateChannelCard(_cardsPanel, item2, SelectChannel);
 			}
-			if (hasBothSections)
-			{
-				BuildSectionHeader("On Demand");
-			}
-			foreach (StreamListItem item in onDemand)
+			foreach (IGrouping<string, StreamListItem> group in from i in playlistItems
+				group i by i.PlaylistTitle)
 			{
 				if (token.IsCancellationRequested)
 				{
 					return;
 				}
-				_cardFactory.CreateChannelCard(_cardsPanel, item, SelectChannel);
+				BuildSectionHeader(group.Key ?? "Videos");
+				foreach (StreamListItem item in group)
+				{
+					if (token.IsCancellationRequested)
+					{
+						return;
+					}
+					_cardFactory.CreatePlaylistVideoCard(_cardsPanel, item, SelectPlaylistVideo);
+				}
 			}
 			LoadAvatarsAsync(items, token);
+			LoadPlaylistThumbnailsAsync(playlistItems, token);
+		}
+
+		private async Task<List<StreamListItem>> LoadPlaylistChannelVideosAsync(List<ChannelData> playlistChannels, CancellationToken token)
+		{
+			List<StreamListItem> items = new List<StreamListItem>();
+			int globalIndex = 0;
+			foreach (ChannelData channel in playlistChannels)
+			{
+				if (token.IsCancellationRequested)
+				{
+					break;
+				}
+				string source = ((!string.IsNullOrEmpty(channel.YoutubeChannelId)) ? channel.YoutubeChannelId : channel.YoutubePlaylistUrl);
+				if (string.IsNullOrEmpty(source))
+				{
+					continue;
+				}
+				int videoCount = ((channel.YoutubePlaylistCount > 0) ? channel.YoutubePlaylistCount : 10);
+				try
+				{
+					foreach (YouTubePlaylistVideo video in await _youtubeService.GetChannelVideosAsync(source, videoCount))
+					{
+						items.Add(new StreamListItem
+						{
+							Key = "playlist_video:" + video.VideoId,
+							Title = video.Title,
+							Subtitle = FormatDuration(video.Duration),
+							SubtitleColor = Color.get_LightGray(),
+							AvatarTexture = CinemaModule.Instance.TextureService.GetDefaultAvatar(),
+							AvatarUrl = video.ThumbnailUrl,
+							IsOnDemand = true,
+							IsOnline = true,
+							IsPlaylistVideo = true,
+							PlaylistTitle = channel.Title,
+							PlaylistVideoId = video.VideoId,
+							Index = globalIndex++
+						});
+					}
+				}
+				catch (Exception ex)
+				{
+					Logger.Warn(ex, "Failed to load playlist videos for: " + channel.Title);
+				}
+			}
+			return items;
+		}
+
+		private async Task LoadPlaylistThumbnailsAsync(List<StreamListItem> playlistVideos, CancellationToken token)
+		{
+			await Task.WhenAll(from i in playlistVideos
+				where !string.IsNullOrEmpty(i.AvatarUrl)
+				select LoadThumbnailFromUrlAsync(i.Key, i.AvatarUrl, token));
+		}
+
+		private async Task LoadThumbnailFromUrlAsync(string itemKey, string thumbnailUrl, CancellationToken token)
+		{
+			try
+			{
+				AsyncTexture2D texture = await CinemaModule.Instance.TextureService.GetImageFromUrlAsync(itemKey, thumbnailUrl);
+				if (!token.IsCancellationRequested && texture != null && _streamCards.TryGetValue(itemKey, out var card))
+				{
+					card.SetAvatar(texture);
+				}
+			}
+			catch (Exception ex)
+			{
+				Logger.Debug("Failed to load thumbnail: " + ex.Message);
+			}
+		}
+
+		private static string FormatDuration(TimeSpan duration)
+		{
+			if (duration.TotalHours >= 1.0)
+			{
+				return $"{(int)duration.TotalHours}:{duration.Minutes:D2}:{duration.Seconds:D2}";
+			}
+			return $"{duration.Minutes}:{duration.Seconds:D2}";
+		}
+
+		private List<StreamListItem> BuildChannelItemsFromList(IEnumerable<ChannelData> channels)
+		{
+			return channels.Select((ChannelData channel, int index) => new StreamListItem
+			{
+				Key = GetChannelKey(channel.Id),
+				Title = channel.Title,
+				Subtitle = GetChannelSubtitle(channel),
+				ChannelData = channel,
+				TwitchChannel = (channel.IsTwitchChannel ? channel.TwitchName : null),
+				AvatarTexture = (channel.AvatarTexture ?? CinemaModule.Instance.TextureService.GetDefaultAvatar()),
+				IsOnDemand = channel.IsOnDemand,
+				Index = index
+			}).ToList();
 		}
 
 		private async void LoadCustomTabContent(CancellationToken token)
 		{
+			if (_browsingPlaylist != null)
+			{
+				await LoadBrowsingPlaylistContentAsync(token);
+				return;
+			}
 			CustomStreamTab currentTab = GetCurrentCustomTab();
 			if (currentTab == null)
 			{
@@ -636,6 +761,115 @@ namespace CinemaModule.UI.Windows.MainSettings
 			}
 			LoadYouTubeThumbnailsImmediatelyAsync(customStreams, token);
 			FetchAndApplyCustomStatusesAsync(customStreams, token);
+		}
+
+		private async Task LoadBrowsingPlaylistContentAsync(CancellationToken token)
+		{
+			BuildPlaylistBrowsingHeader(_browsingPlaylist.Name);
+			ShowLoadingSpinner();
+			try
+			{
+				List<YouTubePlaylistVideo> videos = await _youtubeService.GetChannelVideosAsync(_browsingPlaylist.Value, 50);
+				if (token.IsCancellationRequested)
+				{
+					return;
+				}
+				ReplaceSpinnerWithContent();
+				if (videos.Count == 0)
+				{
+					ShowEmptyMessage("No videos found in this playlist");
+					return;
+				}
+				int index = 0;
+				foreach (YouTubePlaylistVideo video in videos)
+				{
+					if (token.IsCancellationRequested)
+					{
+						return;
+					}
+					StreamListItem item = new StreamListItem
+					{
+						Key = "playlist_video:" + video.VideoId,
+						Title = video.Title,
+						Subtitle = FormatDuration(video.Duration),
+						SubtitleColor = Color.get_LightGray(),
+						AvatarTexture = CinemaModule.Instance.TextureService.GetDefaultAvatar(),
+						AvatarUrl = video.ThumbnailUrl,
+						IsPlaylistVideo = true,
+						PlaylistVideoId = video.VideoId,
+						Index = index++
+					};
+					_cardFactory.CreatePlaylistVideoCard(_cardsPanel, item, SelectPlaylistVideo);
+				}
+				LoadPlaylistThumbnailsAsync(videos.Select((YouTubePlaylistVideo v, int i) => new StreamListItem
+				{
+					Key = "playlist_video:" + v.VideoId,
+					AvatarUrl = v.ThumbnailUrl
+				}).ToList(), token);
+			}
+			catch (Exception ex)
+			{
+				if (!token.IsCancellationRequested)
+				{
+					Logger.Warn(ex, "Failed to load playlist videos: " + _browsingPlaylist.Name);
+					ReplaceSpinnerWithContent();
+					ShowEmptyMessage("Failed to load playlist videos");
+				}
+			}
+		}
+
+		private void BuildPlaylistBrowsingHeader(string playlistName)
+		{
+			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002e: Expected O, but got Unknown
+			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
+			((Control)_headerSection).set_Height(50);
+			Panel val = new Panel();
+			((Container)val).set_WidthSizingMode((SizingMode)2);
+			((Control)val).set_Height(50);
+			((Control)val).set_Parent((Container)(object)_headerSection);
+			Panel headerPanel = val;
+			StandardButton val2 = new StandardButton();
+			val2.set_Text("← Back");
+			((Control)val2).set_Width(70);
+			((Control)val2).set_Height(30);
+			((Control)val2).set_Left(5);
+			((Control)val2).set_Top(10);
+			((Control)val2).set_Parent((Container)(object)headerPanel);
+			((Control)val2).set_BasicTooltipText("Return to stream list");
+			((Control)val2).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				ExitPlaylistBrowsing();
+			});
+			Label val3 = new Label();
+			val3.set_Text(playlistName);
+			val3.set_AutoSizeHeight(true);
+			val3.set_AutoSizeWidth(true);
+			val3.set_TextColor(Color.get_White());
+			val3.set_Font(GameService.Content.get_DefaultFont16());
+			((Control)val3).set_Left(85);
+			((Control)val3).set_Top(15);
+			((Control)val3).set_Parent((Container)(object)headerPanel);
+			UpdateCardsPanelLayout();
 		}
 
 		private async Task LoadYouTubeThumbnailsImmediatelyAsync(List<SavedStream> streams, CancellationToken token)
@@ -685,19 +919,29 @@ namespace CinemaModule.UI.Windows.MainSettings
 			}).ToList();
 		}
 
-		private List<StreamListItem> BuildChannelItems(StreamCategory category)
+		private static string GetChannelSubtitle(ChannelData channel)
 		{
-			return category.Channels.Select((ChannelData channel, int index) => new StreamListItem
+			if (!string.IsNullOrEmpty(channel.Url))
 			{
-				Key = GetChannelKey(channel.Id),
-				Title = channel.Title,
-				Subtitle = ((string.IsNullOrEmpty(channel.Url) && !channel.IsTwitchChannel) ? "No URL configured" : null),
-				ChannelData = channel,
-				TwitchChannel = (channel.IsTwitchChannel ? channel.TwitchName : null),
-				AvatarTexture = (channel.AvatarTexture ?? CinemaModule.Instance.TextureService.GetDefaultAvatar()),
-				IsOnDemand = channel.IsOnDemand,
-				Index = index
-			}).ToList();
+				return null;
+			}
+			if (channel.IsTwitchChannel)
+			{
+				return null;
+			}
+			if (channel.IsYouTubePlaylist)
+			{
+				return null;
+			}
+			if (!string.IsNullOrEmpty(channel.YoutubeChannelId))
+			{
+				return null;
+			}
+			if (!string.IsNullOrEmpty(channel.YoutubePlaylistUrl))
+			{
+				return null;
+			}
+			return "No URL configured";
 		}
 
 		private void BuildCenteredLoginButton()
@@ -1343,6 +1587,11 @@ namespace CinemaModule.UI.Windows.MainSettings
 
 		private async void SelectSavedStream(SavedStream stream)
 		{
+			if (stream.IsYouTubeChannelOrPlaylist)
+			{
+				BrowsePlaylist(stream);
+				return;
+			}
 			CancelPendingSelection();
 			_selectedStreamKey = GetSavedStreamKey(stream.Id);
 			_controller.SelectSavedStream(stream.Id);
@@ -1357,6 +1606,28 @@ namespace CinemaModule.UI.Windows.MainSettings
 				await TrySetYouTubeStreamUrlAsync(stream.Value, "YouTube video: " + stream.Name, _selectionCts.Token);
 				break;
 			}
+		}
+
+		private void BrowsePlaylist(SavedStream playlist)
+		{
+			_browsingPlaylist = playlist;
+			RefreshContent();
+		}
+
+		private void ExitPlaylistBrowsing()
+		{
+			_browsingPlaylist = null;
+			RefreshContent();
+		}
+
+		private async void SelectPlaylistVideo(string videoId, string key)
+		{
+			CancelPendingSelection();
+			_selectedStreamKey = key;
+			_settings.SelectYouTubeVideo(videoId);
+			_controller.PrepareForStreamChange();
+			UpdateCardSelection();
+			await TrySetYouTubeStreamUrlAsync(videoId, "playlist video: " + videoId, _selectionCts.Token);
 		}
 
 		private void CancelPendingSelection()

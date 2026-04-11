@@ -45,6 +45,15 @@ namespace CinemaModule.Models
 		[JsonProperty("twitchName")]
 		public string TwitchName { get; set; }
 
+		[JsonProperty("youtubePlaylistUrl")]
+		public string YoutubePlaylistUrl { get; set; }
+
+		[JsonProperty("youtubeChannelId")]
+		public string YoutubeChannelId { get; set; }
+
+		[JsonProperty("youtubePlaylistCount")]
+		public int YoutubePlaylistCount { get; set; }
+
 		[JsonProperty("position")]
 		public WorldPosition3D Position { get; set; }
 
@@ -56,6 +65,22 @@ namespace CinemaModule.Models
 
 		[JsonIgnore]
 		public bool IsTwitchChannel => string.Equals(TypeString, "twitch", StringComparison.OrdinalIgnoreCase);
+
+		[JsonIgnore]
+		public bool IsYouTubePlaylist => string.Equals(TypeString, "youtube_playlist", StringComparison.OrdinalIgnoreCase);
+
+		[JsonIgnore]
+		public bool HasYouTubePlaylistSource
+		{
+			get
+			{
+				if (string.IsNullOrEmpty(YoutubeChannelId))
+				{
+					return !string.IsNullOrEmpty(YoutubePlaylistUrl);
+				}
+				return true;
+			}
+		}
 
 		[JsonIgnore]
 		public bool HasWorldPosition

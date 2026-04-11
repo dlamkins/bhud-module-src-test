@@ -8,6 +8,7 @@ using CinemaModule.Models;
 using CinemaModule.Models.Twitch;
 using CinemaModule.Services.Twitch;
 using CinemaModule.Services.YouTube;
+using Microsoft.Xna.Framework;
 
 namespace CinemaModule.UI.Windows.MainSettings
 {
@@ -108,8 +109,9 @@ namespace CinemaModule.UI.Windows.MainSettings
 			Dictionary<string, StreamStatus> statusMap = new Dictionary<string, StreamStatus>();
 			List<SavedStream> twitchStreams = streams.Where((SavedStream s) => s.SourceType == StreamSourceType.TwitchChannel).ToList();
 			List<SavedStream> urlStreams = streams.Where((SavedStream s) => s.SourceType == StreamSourceType.Url).ToList();
-			List<SavedStream> youtubeStreams = streams.Where((SavedStream s) => s.SourceType == StreamSourceType.YouTubeVideo).ToList();
-			await Task.WhenAll(FetchTwitchCustomStatusesAsync(twitchStreams, statusMap, token), FetchUrlCustomStatusesAsync(urlStreams, statusMap, token), FetchYouTubeCustomStatusesAsync(youtubeStreams, statusMap, token));
+			List<SavedStream> youtubeVideoStreams = streams.Where((SavedStream s) => s.SourceType == StreamSourceType.YouTubeVideo).ToList();
+			List<SavedStream> youtubeChannelOrPlaylistStreams = streams.Where((SavedStream s) => s.IsYouTubeChannelOrPlaylist).ToList();
+			await Task.WhenAll(FetchTwitchCustomStatusesAsync(twitchStreams, statusMap, token), FetchUrlCustomStatusesAsync(urlStreams, statusMap, token), FetchYouTubeCustomStatusesAsync(youtubeVideoStreams, statusMap, token), FetchYouTubeChannelPlaylistStatusesAsync(youtubeChannelOrPlaylistStreams, statusMap, token));
 			return statusMap;
 		}
 
@@ -243,6 +245,51 @@ namespace CinemaModule.UI.Windows.MainSettings
 						statusMap[stream.Id] = new StreamStatus
 						{
 							Subtitle = "Unknown"
+						};
+					}
+				}
+			}));
+		}
+
+		private async Task FetchYouTubeChannelPlaylistStatusesAsync(List<SavedStream> streams, Dictionary<string, StreamStatus> statusMap, CancellationToken token)
+		{
+			if (streams.Count == 0)
+			{
+				return;
+			}
+			await Task.WhenAll(((IEnumerable<SavedStream>)streams).Select((Func<SavedStream, Task>)async delegate(SavedStream stream)
+			{
+				try
+				{
+					List<YouTubePlaylistVideo> videos = await _youtubeService.GetChannelVideosAsync(stream.Value, 1);
+					if (!token.IsCancellationRequested)
+					{
+						if (videos.Count > 0)
+						{
+							statusMap[stream.Id] = new StreamStatus
+							{
+								Subtitle = "Click to browse videos",
+								SubtitleColor = Color.get_LightGreen()
+							};
+						}
+						else
+						{
+							statusMap[stream.Id] = new StreamStatus
+							{
+								Subtitle = "No videos found",
+								SubtitleColor = Color.get_Gray()
+							};
+						}
+					}
+				}
+				catch
+				{
+					if (!token.IsCancellationRequested)
+					{
+						statusMap[stream.Id] = new StreamStatus
+						{
+							Subtitle = "Could not load",
+							SubtitleColor = Color.get_Gray()
 						};
 					}
 				}

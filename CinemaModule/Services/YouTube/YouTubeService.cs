@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
 using YoutubeExplode;
+using YoutubeExplode.Channels;
 using YoutubeExplode.Common;
+using YoutubeExplode.Playlists;
 using YoutubeExplode.Videos;
 using YoutubeExplode.Videos.Streams;
 
@@ -370,6 +373,116 @@ namespace CinemaModule.Services.YouTube
 		{
 			_videoInfoCache.Clear();
 			_videoInfoCacheOrder.Clear();
+		}
+
+		public async Task<List<YouTubePlaylistVideo>> GetChannelVideosAsync(string channelIdOrPlaylistUrl, int maxCount)
+		{
+			if (_isDisposed || string.IsNullOrWhiteSpace(channelIdOrPlaylistUrl) || maxCount <= 0)
+			{
+				return new List<YouTubePlaylistVideo>();
+			}
+			try
+			{
+				string input = channelIdOrPlaylistUrl.Trim();
+				if (IsChannelId(input))
+				{
+					return await GetChannelUploadsAsync(input, maxCount).ConfigureAwait(continueOnCapturedContext: false);
+				}
+				if (input.StartsWith("@"))
+				{
+					return await GetChannelUploadsAsync(input, maxCount).ConfigureAwait(continueOnCapturedContext: false);
+				}
+				PlaylistId? playlistId = PlaylistId.TryParse(input);
+				if (playlistId.HasValue)
+				{
+					return await GetPlaylistVideosAsync((string)playlistId.Value, maxCount).ConfigureAwait(continueOnCapturedContext: false);
+				}
+				return await GetChannelUploadsAsync(input, maxCount).ConfigureAwait(continueOnCapturedContext: false);
+			}
+			catch (Exception ex)
+			{
+				Logger.Warn("Failed to get videos for: " + channelIdOrPlaylistUrl + " - " + ex.Message);
+				return new List<YouTubePlaylistVideo>();
+			}
+		}
+
+		private static bool IsChannelId(string input)
+		{
+			if (input.StartsWith("UC") && input.Length == 24)
+			{
+				return !input.Contains("/");
+			}
+			return false;
+		}
+
+		private async Task<List<YouTubePlaylistVideo>> GetChannelUploadsAsync(string channelIdOrHandle, int maxCount)
+		{
+			if (IsChannelId(channelIdOrHandle))
+			{
+				string uploadsPlaylistId = "UU" + channelIdOrHandle.Substring(2);
+				return await GetPlaylistVideosAsync(uploadsPlaylistId, maxCount).ConfigureAwait(continueOnCapturedContext: false);
+			}
+			Channel channel = await ResolveChannelAsync(channelIdOrHandle).ConfigureAwait(continueOnCapturedContext: false);
+			if (channel == null)
+			{
+				return new List<YouTubePlaylistVideo>();
+			}
+			string uploadsId = "UU" + channel.Id.Value.Substring(2);
+			return await GetPlaylistVideosAsync(uploadsId, maxCount).ConfigureAwait(continueOnCapturedContext: false);
+		}
+
+		private async Task<Channel> ResolveChannelAsync(string input)
+		{
+			if (string.IsNullOrWhiteSpace(input))
+			{
+				return null;
+			}
+			string cleanInput = input.Trim();
+			try
+			{
+				if (cleanInput.StartsWith("@"))
+				{
+					return await _youtubeClient.Channels.GetByHandleAsync(cleanInput.Substring(1)).ConfigureAwait(continueOnCapturedContext: false);
+				}
+				ChannelId? channelId = ChannelId.TryParse(cleanInput);
+				if (channelId.HasValue)
+				{
+					return await _youtubeClient.Channels.GetAsync(channelId.Value).ConfigureAwait(continueOnCapturedContext: false);
+				}
+				Match handleMatch = Regex.Match(cleanInput, "youtube\\.com/@([^/?]+)");
+				if (handleMatch.Success)
+				{
+					return await _youtubeClient.Channels.GetByHandleAsync(handleMatch.Groups[1].Value).ConfigureAwait(continueOnCapturedContext: false);
+				}
+				Match userMatch = Regex.Match(cleanInput, "youtube\\.com/user/([^/?]+)");
+				if (userMatch.Success)
+				{
+					return await _youtubeClient.Channels.GetByUserAsync(userMatch.Groups[1].Value).ConfigureAwait(continueOnCapturedContext: false);
+				}
+				Match slugMatch = Regex.Match(cleanInput, "youtube\\.com/c/([^/?]+)");
+				if (slugMatch.Success)
+				{
+					return await _youtubeClient.Channels.GetBySlugAsync(slugMatch.Groups[1].Value).ConfigureAwait(continueOnCapturedContext: false);
+				}
+				return await _youtubeClient.Channels.GetByHandleAsync(cleanInput).ConfigureAwait(continueOnCapturedContext: false);
+			}
+			catch (Exception ex)
+			{
+				Logger.Warn("Could not resolve channel '" + input + "': " + ex.Message);
+				return null;
+			}
+		}
+
+		private async Task<List<YouTubePlaylistVideo>> GetPlaylistVideosAsync(string playlistId, int maxCount)
+		{
+			return (await _youtubeClient.Playlists.GetVideosAsync(playlistId).CollectAsync(maxCount).ConfigureAwait(continueOnCapturedContext: false)).Select((PlaylistVideo video) => new YouTubePlaylistVideo
+			{
+				VideoId = video.Id.Value,
+				Title = (video.Title ?? "Unknown"),
+				Author = (video.Author?.ChannelTitle ?? "Unknown"),
+				ThumbnailUrl = video.Thumbnails?.OrderByDescending((Thumbnail t) => t.Resolution.Area).FirstOrDefault()?.Url,
+				Duration = (video.Duration ?? TimeSpan.Zero)
+			}).ToList();
 		}
 
 		public void Dispose()
