@@ -29,8 +29,6 @@ namespace Maestro.UI.MaestroCreator
 
 		private static Texture2D _backgroundTexture;
 
-		public event EventHandler PanelReturned;
-
 		private static Texture2D GetBackground()
 		{
 			return _backgroundTexture ?? (_backgroundTexture = MaestroTheme.CreateWindowBackground(1200, 800));
@@ -95,10 +93,13 @@ namespace Maestro.UI.MaestroCreator
 			return panel;
 		}
 
-		public override void Hide()
+		public void CloseProgrammatic()
 		{
 			((WindowBase2)this).Hide();
-			this.PanelReturned?.Invoke(this, EventArgs.Empty);
+		}
+
+		public override void Hide()
+		{
 		}
 
 		protected override void DisposeControl()

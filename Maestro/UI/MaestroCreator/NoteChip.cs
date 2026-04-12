@@ -25,46 +25,57 @@ namespace Maestro.UI.MaestroCreator
 
 		private readonly Label _closeButton;
 
+		private readonly Color _chipColor;
+
+		private readonly Color _hoverColor;
+
 		public string NoteString { get; }
 
 		public NoteChip(string noteString, int index)
 		{
-			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e0: Expected O, but got Unknown
-			//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ee: Expected O, but got Unknown
+			//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0106: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0115: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0125: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0126: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0130: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0137: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0143: Expected O, but got Unknown
+			//IL_010a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0114: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0119: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0123: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0133: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0134: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0145: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0151: Expected O, but got Unknown
 			NoteString = noteString;
 			base.Index = index;
-			Color baseColor = GetNoteColor(noteString);
+			_chipColor = GetNoteColor(noteString);
+			_hoverColor = MaestroTheme.Brighten(_chipColor);
+			_currentColor = _chipColor;
 			((Control)this).set_Size(new Point(114, 26));
-			((Control)this).set_BackgroundColor(baseColor);
+			((Control)this).set_BackgroundColor(Color.get_Transparent());
 			int maxTextWidth = 88;
 			int maxChars = maxTextWidth / 7;
 			string displayText = noteString;
@@ -111,14 +122,17 @@ namespace Maestro.UI.MaestroCreator
 			});
 			((Control)this).add_MouseEntered((EventHandler<MouseEventArgs>)delegate
 			{
+				//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-				((Control)this).set_BackgroundColor(MaestroTheme.WithAlpha(baseColor, 255));
+				_currentColor = _hoverColor;
+				((Control)this).Invalidate();
 			});
 			((Control)this).add_MouseLeft((EventHandler<MouseEventArgs>)delegate
 			{
+				//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-				((Control)this).set_BackgroundColor(baseColor);
+				_currentColor = _chipColor;
+				((Control)this).Invalidate();
 			});
 		}
 
@@ -135,26 +149,38 @@ namespace Maestro.UI.MaestroCreator
 		private static Color GetNoteColor(string noteString)
 		{
 			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
 			if (noteString.StartsWith("R"))
 			{
 				return MaestroTheme.ChipRest;
 			}
-			bool num = noteString.Contains("#");
-			Color baseColor = (noteString.Contains("-") ? MaestroTheme.ChipLowerOctave : ((!noteString.Contains("+")) ? MaestroTheme.ChipMiddleOctave : MaestroTheme.ChipUpperOctave));
-			if (!num)
+			bool isSharp = noteString.Contains("#");
+			if (noteString.Contains("-"))
 			{
-				return baseColor;
+				if (!isSharp)
+				{
+					return MaestroTheme.ChipLowerOctave;
+				}
+				return MaestroTheme.ChipLowerOctaveSharp;
 			}
-			return MaestroTheme.Darken(baseColor, 0.7f);
+			if (noteString.Contains("+"))
+			{
+				if (!isSharp)
+				{
+					return MaestroTheme.ChipUpperOctave;
+				}
+				return MaestroTheme.ChipUpperOctaveSharp;
+			}
+			if (!isSharp)
+			{
+				return MaestroTheme.ChipMiddleOctave;
+			}
+			return MaestroTheme.ChipMiddleOctaveSharp;
 		}
 
 		protected override void DisposeControl()

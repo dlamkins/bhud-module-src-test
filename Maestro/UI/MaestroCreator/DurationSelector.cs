@@ -62,6 +62,10 @@ namespace Maestro.UI.MaestroCreator
 
 		private readonly Label _dottedLabel;
 
+		private Color _accentColor = MaestroTheme.AmberGold;
+
+		private Color _accentColorDark = MaestroTheme.DeepAmber;
+
 		public int Bpm
 		{
 			get
@@ -86,6 +90,7 @@ namespace Maestro.UI.MaestroCreator
 			{
 				_selectedNoteType = value;
 				UpdateNoteTypeSelection();
+				UpdateTooltips();
 				this.DurationChanged?.Invoke(this, EventArgs.Empty);
 			}
 		}
@@ -132,83 +137,99 @@ namespace Maestro.UI.MaestroCreator
 			return 20;
 		}
 
+		public void SetAccentColor(InstrumentType instrument)
+		{
+			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+			_accentColor = MaestroTheme.GetInstrumentAccent(instrument);
+			_accentColorDark = MaestroTheme.GetInstrumentAccentDark(instrument);
+			UpdateNoteTypeSelection();
+			UpdateDottedVisual();
+		}
+
 		public DurationSelector(int width)
 			: this()
 		{
-			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d1: Expected O, but got Unknown
-			//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0102: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0142: Expected O, but got Unknown
-			//IL_01ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01da: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ec: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01fb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0200: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0092: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0099: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e7: Expected O, but got Unknown
+			//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0105: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0109: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0113: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0118: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0122: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0132: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0158: Expected O, but got Unknown
+			//IL_01e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0202: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0207: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0211: Unknown result type (might be due to invalid IL or missing references)
-			//IL_021e: Expected O, but got Unknown
+			//IL_0216: Unknown result type (might be due to invalid IL or missing references)
 			//IL_021e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0223: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_023d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0240: Unknown result type (might be due to invalid IL or missing references)
-			//IL_024a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_024f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0259: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0269: Unknown result type (might be due to invalid IL or missing references)
-			//IL_026e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0275: Unknown result type (might be due to invalid IL or missing references)
-			//IL_027f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0286: Unknown result type (might be due to invalid IL or missing references)
-			//IL_028d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0297: Expected O, but got Unknown
-			//IL_0327: Unknown result type (might be due to invalid IL or missing references)
-			//IL_032c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0333: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0336: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0340: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0345: Unknown result type (might be due to invalid IL or missing references)
-			//IL_034f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0350: Unknown result type (might be due to invalid IL or missing references)
-			//IL_035a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_036a: Expected O, but got Unknown
-			//IL_036b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0370: Unknown result type (might be due to invalid IL or missing references)
-			//IL_037c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0228: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0235: Expected O, but got Unknown
+			//IL_0235: Unknown result type (might be due to invalid IL or missing references)
+			//IL_023a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0246: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0254: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0257: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0261: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0266: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0270: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0280: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0285: Unknown result type (might be due to invalid IL or missing references)
+			//IL_028c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0296: Unknown result type (might be due to invalid IL or missing references)
+			//IL_029d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ae: Expected O, but got Unknown
+			//IL_033e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0343: Unknown result type (might be due to invalid IL or missing references)
+			//IL_034a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_034d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0357: Unknown result type (might be due to invalid IL or missing references)
+			//IL_035c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0366: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0367: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0371: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0381: Expected O, but got Unknown
+			//IL_0382: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0387: Unknown result type (might be due to invalid IL or missing references)
-			//IL_038a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0394: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0399: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03b4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03cc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03dc: Expected O, but got Unknown
+			//IL_0393: Unknown result type (might be due to invalid IL or missing references)
+			//IL_039e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03a1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03b0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03ba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03d5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03f3: Expected O, but got Unknown
 			((Control)this).set_Size(new Point(width, 30));
 			((Control)this).set_BackgroundColor(Color.get_Transparent());
 			_noteButtons = (Panel[])(object)new Panel[_noteTypes.Length];
@@ -219,7 +240,7 @@ namespace Maestro.UI.MaestroCreator
 			((Control)val).set_Location(new Point(0, 0));
 			((Control)val).set_Size(new Point(40, 26));
 			val.set_Font(GameService.Content.get_DefaultFont12());
-			val.set_TextColor(MaestroTheme.CreamWhite);
+			val.set_TextColor(MaestroTheme.InputLabelColor);
 			val.set_VerticalAlignment((VerticalAlignment)1);
 			_bpmLabel = val;
 			TextBox val2 = new TextBox();
@@ -242,7 +263,7 @@ namespace Maestro.UI.MaestroCreator
 				((Control)val3).set_Parent((Container)(object)this);
 				((Control)val3).set_Location(new Point(noteX + i * 42, 0));
 				((Control)val3).set_Size(new Point(40, 26));
-				((Control)val3).set_BackgroundColor(isSelected ? MaestroTheme.AmberGold : MaestroTheme.ButtonBackground);
+				((Control)val3).set_BackgroundColor(isSelected ? _accentColor : MaestroTheme.GhostButtonBackground);
 				((Control)val3).set_BasicTooltipText(tooltipText);
 				Panel button = val3;
 				Label val4 = new Label();
@@ -251,7 +272,7 @@ namespace Maestro.UI.MaestroCreator
 				((Control)val4).set_Location(new Point(0, 0));
 				((Control)val4).set_Size(new Point(40, 26));
 				val4.set_Font(GameService.Content.get_DefaultFont12());
-				val4.set_TextColor(isSelected ? MaestroTheme.DarkCharcoal : MaestroTheme.CreamWhite);
+				val4.set_TextColor(isSelected ? MaestroTheme.DarkCharcoal : MaestroTheme.GhostButtonText);
 				val4.set_HorizontalAlignment((HorizontalAlignment)1);
 				val4.set_VerticalAlignment((VerticalAlignment)1);
 				((Control)val4).set_BasicTooltipText(tooltipText);
@@ -261,16 +282,16 @@ namespace Maestro.UI.MaestroCreator
 				((Control)button).add_MouseEntered((EventHandler<MouseEventArgs>)delegate
 				{
 					//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+					//IL_0036: Unknown result type (might be due to invalid IL or missing references)
 					bool flag2 = _noteTypes[capturedIndex] == _selectedNoteType;
-					((Control)button).set_BackgroundColor(flag2 ? MaestroTheme.DeepAmber : MaestroTheme.ButtonBackgroundHover);
+					((Control)button).set_BackgroundColor(flag2 ? _accentColorDark : MaestroTheme.GhostButtonHover);
 				});
 				((Control)button).add_MouseLeft((EventHandler<MouseEventArgs>)delegate
 				{
 					//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+					//IL_0036: Unknown result type (might be due to invalid IL or missing references)
 					bool flag = _noteTypes[capturedIndex] == _selectedNoteType;
-					((Control)button).set_BackgroundColor(flag ? MaestroTheme.AmberGold : MaestroTheme.ButtonBackground);
+					((Control)button).set_BackgroundColor(flag ? _accentColor : MaestroTheme.GhostButtonBackground);
 				});
 				((Control)button).add_LeftMouseButtonReleased((EventHandler<MouseEventArgs>)delegate
 				{
@@ -284,7 +305,7 @@ namespace Maestro.UI.MaestroCreator
 			((Control)val5).set_Parent((Container)(object)this);
 			((Control)val5).set_Location(new Point(dottedX, 0));
 			((Control)val5).set_Size(new Point(42, 26));
-			((Control)val5).set_BackgroundColor(MaestroTheme.ButtonBackground);
+			((Control)val5).set_BackgroundColor(MaestroTheme.GhostButtonBackground);
 			((Control)val5).set_BasicTooltipText("Dotted note (+50% duration)");
 			_dottedButton = val5;
 			Label val6 = new Label();
@@ -293,7 +314,7 @@ namespace Maestro.UI.MaestroCreator
 			((Control)val6).set_Location(new Point(0, 0));
 			((Control)val6).set_Size(new Point(42, 26));
 			val6.set_Font(GameService.Content.get_DefaultFont12());
-			val6.set_TextColor(MaestroTheme.CreamWhite);
+			val6.set_TextColor(MaestroTheme.GhostButtonText);
 			val6.set_HorizontalAlignment((HorizontalAlignment)1);
 			val6.set_VerticalAlignment((VerticalAlignment)1);
 			((Control)val6).set_BasicTooltipText("Dotted note (+50% duration)");
@@ -301,20 +322,21 @@ namespace Maestro.UI.MaestroCreator
 			((Control)_dottedButton).add_MouseEntered((EventHandler<MouseEventArgs>)delegate
 			{
 				//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-				((Control)_dottedButton).set_BackgroundColor(_isDotted ? MaestroTheme.DeepAmber : MaestroTheme.ButtonBackgroundHover);
+				//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+				((Control)_dottedButton).set_BackgroundColor(_isDotted ? _accentColorDark : MaestroTheme.GhostButtonHover);
 			});
 			((Control)_dottedButton).add_MouseLeft((EventHandler<MouseEventArgs>)delegate
 			{
 				//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-				((Control)_dottedButton).set_BackgroundColor(_isDotted ? MaestroTheme.AmberGold : MaestroTheme.ButtonBackground);
+				//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+				((Control)_dottedButton).set_BackgroundColor(_isDotted ? _accentColor : MaestroTheme.GhostButtonBackground);
 			});
 			((Control)_dottedButton).add_LeftMouseButtonReleased((EventHandler<MouseEventArgs>)delegate
 			{
 				IsDotted = !_isDotted;
 			});
 			UpdateNoteTypeSelection();
+			UpdateTooltips();
 		}
 
 		private string GetNoteButtonText(NoteType noteType)
@@ -397,12 +419,12 @@ namespace Maestro.UI.MaestroCreator
 		private void UpdateDottedVisual()
 		{
 			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
 			if (_dottedButton != null)
 			{
-				((Control)_dottedButton).set_BackgroundColor(_isDotted ? MaestroTheme.AmberGold : MaestroTheme.ButtonBackground);
+				((Control)_dottedButton).set_BackgroundColor(_isDotted ? _accentColor : MaestroTheme.GhostButtonBackground);
 				_dottedLabel.set_TextColor(_isDotted ? MaestroTheme.DarkCharcoal : MaestroTheme.CreamWhite);
 				UpdateTooltips();
 			}
@@ -411,14 +433,14 @@ namespace Maestro.UI.MaestroCreator
 		private void UpdateNoteTypeSelection()
 		{
 			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
 			for (int i = 0; i < _noteTypes.Length; i++)
 			{
 				bool isSelected = _noteTypes[i] == _selectedNoteType;
-				((Control)_noteButtons[i]).set_BackgroundColor(isSelected ? MaestroTheme.AmberGold : MaestroTheme.ButtonBackground);
-				_noteLabels[i].set_TextColor(isSelected ? MaestroTheme.DarkCharcoal : MaestroTheme.CreamWhite);
+				((Control)_noteButtons[i]).set_BackgroundColor(isSelected ? _accentColor : MaestroTheme.GhostButtonBackground);
+				_noteLabels[i].set_TextColor(isSelected ? MaestroTheme.DarkCharcoal : MaestroTheme.GhostButtonText);
 			}
 		}
 

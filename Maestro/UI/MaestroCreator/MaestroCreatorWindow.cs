@@ -53,6 +53,8 @@ namespace Maestro.UI.MaestroCreator
 			public const int ChordPreviewMaxLength = 38;
 
 			public const int LabelYOffset = 5;
+
+			public const int MaxChordNotes = 7;
 		}
 
 		private readonly TextBox _titleInput;
@@ -116,9 +118,15 @@ namespace Maestro.UI.MaestroCreator
 
 		public void SetInstrument(InstrumentType instrument)
 		{
+			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
 			_instrument = instrument;
 			((WindowBase2)this).set_Subtitle(instrument.ToString());
 			_pianoKeyboard.Configure(instrument);
+			_durationSelector.SetAccentColor(instrument);
+			if (_isChordMode)
+			{
+				((Control)_chordModeButton).set_BackgroundColor(MaestroTheme.GetInstrumentAccent(instrument));
+			}
 		}
 
 		public void LoadSong(Song song)
@@ -166,7 +174,6 @@ namespace Maestro.UI.MaestroCreator
 			{
 				((Control)_noteSequencePanel).set_Parent((Container)null);
 				_noteSequenceWindow = new NoteSequenceWindow(_noteSequencePanel);
-				_noteSequenceWindow.PanelReturned += OnNoteSequenceWindowClosed;
 				((Control)_noteSequenceWindow).Show();
 			}
 		}
@@ -176,25 +183,9 @@ namespace Maestro.UI.MaestroCreator
 			if (_noteSequenceWindow != null)
 			{
 				_noteSequenceWindow.DetachPanel();
-				_noteSequenceWindow.PanelReturned -= OnNoteSequenceWindowClosed;
-				((Control)_noteSequenceWindow).Hide();
+				_noteSequenceWindow.CloseProgrammatic();
 				((Control)_noteSequenceWindow).Dispose();
 				_noteSequenceWindow = null;
-			}
-		}
-
-		private void OnNoteSequenceWindowClosed(object sender, EventArgs e)
-		{
-			NoteSequencePanel obj = _noteSequenceWindow?.DetachPanel();
-			NoteSequenceWindow noteSequenceWindow = _noteSequenceWindow;
-			if (noteSequenceWindow != null)
-			{
-				((Control)noteSequenceWindow).Dispose();
-			}
-			_noteSequenceWindow = null;
-			if (obj != null && ((Control)this).get_Visible())
-			{
-				OpenNotesWindow();
 			}
 		}
 
@@ -470,16 +461,19 @@ namespace Maestro.UI.MaestroCreator
 			val.set_Text(text);
 			((Control)val).set_Location(new Point(x, y + 5));
 			val.set_AutoSizeWidth(true);
-			val.set_TextColor(MaestroTheme.CreamWhite);
+			val.set_TextColor(MaestroTheme.InputLabelColor);
 			return val;
 		}
 
 		private void OnChordModeToggle(object sender, MouseEventArgs e)
 		{
-			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
 			_isChordMode = !_isChordMode;
-			((Control)_chordModeButton).set_BackgroundColor(_isChordMode ? MaestroTheme.AmberGold : Color.get_Transparent());
+			Color accent = MaestroTheme.GetInstrumentAccent(_instrument);
+			((Control)_chordModeButton).set_BackgroundColor(_isChordMode ? accent : Color.get_Transparent());
 			if (!_isChordMode && _pendingChordNotes.Count > 0)
 			{
 				_pendingChordNotes.Clear();
@@ -527,7 +521,7 @@ namespace Maestro.UI.MaestroCreator
 			UpdateChordPreview();
 		}
 
-		private void UpdateChordPreview()
+		private void UpdateChordPreview(bool showFullMessage = false)
 		{
 			if (_pendingChordNotes.Count == 0)
 			{
@@ -537,7 +531,7 @@ namespace Maestro.UI.MaestroCreator
 				return;
 			}
 			string chordText = string.Join(" ", _pendingChordNotes);
-			string displayText = "Chord: " + chordText;
+			string displayText = (showFullMessage ? $"Chord full ({7}/{7})" : $"Chord ({_pendingChordNotes.Count}/{7}): {chordText}");
 			if (displayText.Length > 38)
 			{
 				displayText = displayText.Substring(0, 35) + "...";
@@ -571,9 +565,16 @@ namespace Maestro.UI.MaestroCreator
 			string noteString = BuildNoteString(e);
 			if (_isChordMode)
 			{
-				_pendingChordNotes.Add(noteString);
-				_pendingChordEvents.Add(e);
-				UpdateChordPreview();
+				if (_pendingChordNotes.Count >= 7)
+				{
+					UpdateChordPreview(showFullMessage: true);
+				}
+				else if (!_pendingChordNotes.Contains(noteString))
+				{
+					_pendingChordNotes.Add(noteString);
+					_pendingChordEvents.Add(e);
+					UpdateChordPreview();
+				}
 			}
 			else if (_noteSequencePanel.IsReplaceMode)
 			{

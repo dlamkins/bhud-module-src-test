@@ -1,5 +1,4 @@
 using System;
-using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Microsoft.Xna.Framework;
@@ -11,7 +10,11 @@ namespace Maestro.UI.MaestroCreator
 	{
 		protected const int BORDER_THICKNESS = 2;
 
+		protected Color _currentColor;
+
 		private bool _isSelected;
+
+		private bool _isPlaying;
 
 		public int Index { get; set; }
 
@@ -24,6 +27,19 @@ namespace Maestro.UI.MaestroCreator
 			set
 			{
 				_isSelected = value;
+				((Control)this).Invalidate();
+			}
+		}
+
+		public bool IsPlaying
+		{
+			get
+			{
+				return _isPlaying;
+			}
+			set
+			{
+				_isPlaying = value;
 				((Control)this).Invalidate();
 			}
 		}
@@ -42,38 +58,26 @@ namespace Maestro.UI.MaestroCreator
 			this.RemoveClicked?.Invoke(this, EventArgs.Empty);
 		}
 
-		protected void DrawBorder(SpriteBatch spriteBatch, Rectangle bounds, Color borderColor)
-		{
-			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-			Texture2D pixel = Textures.get_Pixel();
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, pixel, new Rectangle(0, 0, bounds.Width, 2), borderColor);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, pixel, new Rectangle(0, bounds.Height - 2, bounds.Width, 2), borderColor);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, pixel, new Rectangle(0, 0, 2, bounds.Height), borderColor);
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, pixel, new Rectangle(bounds.Width - 2, 0, 2, bounds.Height), borderColor);
-		}
-
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			((Panel)this).PaintBeforeChildren(spriteBatch, bounds);
-			if (_isSelected)
+			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+			if (_isPlaying || _isSelected)
 			{
-				DrawBorder(spriteBatch, bounds, MaestroTheme.AmberGold);
+				MaestroTheme.DrawRoundedRect(spriteBatch, (Control)(object)this, bounds, MaestroTheme.AmberGold);
+				Rectangle inset = default(Rectangle);
+				((Rectangle)(ref inset))._002Ector(2, 2, bounds.Width - 4, bounds.Height - 4);
+				MaestroTheme.DrawRoundedRect(spriteBatch, (Control)(object)this, inset, _currentColor);
+			}
+			else
+			{
+				MaestroTheme.DrawRoundedRect(spriteBatch, (Control)(object)this, bounds, _currentColor);
 			}
 		}
 
