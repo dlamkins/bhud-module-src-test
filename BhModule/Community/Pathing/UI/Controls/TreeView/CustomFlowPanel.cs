@@ -69,12 +69,18 @@ namespace BhModule.Community.Pathing.UI.Controls.TreeView
 
 		public void UpdateScrollDistance(float target)
 		{
-			//IL_0069: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
 			if (Scrollbar != null && !float.IsNaN(target))
 			{
-				int bottom = ((IEnumerable<Control>)((Container)this).get_Children()).Where((Control c) => c.get_Visible()).Max((Control c) => c.get_Bottom());
-				float distance = target / (float)(bottom + (int)((FlowPanel)this).get_ControlPadding().Y - ((Control)Scrollbar).get_Height());
-				Scrollbar.set_ScrollDistance(Math.Min(distance, 1f));
+				List<Control> visibleChildren = ((IEnumerable<Control>)((Container)this).get_Children()).Where((Control c) => c.get_Visible()).ToList();
+				float scrollRange = (visibleChildren.Any() ? visibleChildren.Max((Control c) => c.get_Bottom()) : 0) + (int)((FlowPanel)this).get_ControlPadding().Y - ((Control)Scrollbar).get_Height();
+				if (scrollRange <= 0f)
+				{
+					Scrollbar.set_ScrollDistance(0f);
+					return;
+				}
+				float distance = target / scrollRange;
+				Scrollbar.set_ScrollDistance(MathHelper.Clamp(distance, 0f, 1f));
 			}
 		}
 
@@ -126,12 +132,15 @@ namespace BhModule.Community.Pathing.UI.Controls.TreeView
 		public void ScrollToChild(Control child, int paddingTop)
 		{
 			int childPosition = ((Container)(object)this).ContainsChildPosition(child);
-			ScrollToChild(childPosition - paddingTop);
+			if (childPosition != -1)
+			{
+				ScrollToChild(Math.Max(0, childPosition - paddingTop));
+			}
 		}
 
 		public void ScrollToChild(int childYPosition)
 		{
-			if (childYPosition == -1)
+			if (childYPosition < 0)
 			{
 				return;
 			}
@@ -146,10 +155,22 @@ namespace BhModule.Community.Pathing.UI.Controls.TreeView
 				scrollbar.set_ScrollDistance(0f);
 				return;
 			}
-			float panelHeight = ((IEnumerable<Control>)((Container)this).get_Children()).Where((Control c) => c.get_Visible()).Max((Control c) => c.get_Bottom());
-			float scrollPosition = (float)childYPosition / (panelHeight - (float)((Control)scrollbar).get_Height());
-			scrollbar.set_ScrollDistance(scrollPosition);
-			SetTargetScrollDistance(scrollPosition);
+			List<Control> visibleChildren = ((IEnumerable<Control>)((Container)this).get_Children()).Where((Control c) => c.get_Visible()).ToList();
+			if (visibleChildren.Any())
+			{
+				float scrollRange = (float)visibleChildren.Max((Control c) => c.get_Bottom()) - (float)((Control)scrollbar).get_Height();
+				if (scrollRange <= 0f)
+				{
+					scrollbar.set_ScrollDistance(0f);
+					SetTargetScrollDistance(0f);
+				}
+				else
+				{
+					float scrollPosition = MathHelper.Clamp((float)childYPosition / scrollRange, 0f, 1f);
+					scrollbar.set_ScrollDistance(scrollPosition);
+					SetTargetScrollDistance(scrollPosition);
+				}
+			}
 		}
 
 		protected override void DisposeControl()

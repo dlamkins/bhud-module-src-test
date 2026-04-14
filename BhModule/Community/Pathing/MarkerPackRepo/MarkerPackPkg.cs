@@ -29,6 +29,8 @@ namespace BhModule.Community.Pathing.MarkerPackRepo
 
 		public DateTime LastUpdate { get; set; }
 
+		public int[] MapIds { get; set; }
+
 		public DateTime CurrentDownloadDate { get; set; }
 
 		public bool IsDownloading { get; set; }
