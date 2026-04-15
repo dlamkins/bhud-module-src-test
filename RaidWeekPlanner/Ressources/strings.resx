@@ -27,7 +27,7 @@
       </xsd:complexType>
     </xsd:element>
   </xsd:schema>
-<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="MainWindow_Label_ClearTrack_Notice"><value>Forging Steel clear is not trackable, per API limitation</value></data>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="MainWindow_Label_ClearTrack_Notice"><value>Per API limitation, Forging Steel clear is not trackable, and if you completed</value></data>
   <data name="NoData"><value>No data, please wait a moment and refresh!</value></data>
   <data name="MainWindow_Button_ToggleTableDrawMode_Areas"><value>Show week</value></data>
   <data name="MainWindow_Button_ToggleTableDrawMode_Tooltip"><value>Toggle between week / areas display</value></data>
@@ -46,6 +46,7 @@
   <data name="Legend_Todo_Label"><value>Not planned</value></data>
   <data name="CornerIcon_Tooltip"><value>RaidWeekPlanner</value></data>
   <data name="Legend_Planned_Tooltip"><value>Planned this week</value></data>
+  <data name="MainWindow_Label_ClearTrack_Notice2"><value>the weekly raid encounter achievement, all encounters will be flagged as done.</value></data>
   <data name="day1"><value>Tueday</value></data>
   <data name="day0"><value>Monday</value></data>
   <data name="day3"><value>Thursday</value></data>

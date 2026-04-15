@@ -159,6 +159,7 @@ namespace RaidWeekPlanner.UI.Views
 			((FlowPanel)flowPanel5).set_ControlPadding(new Vector2(5f));
 			FlowPanel disclaimerContainer = flowPanel5;
 			UiUtils.CreateLabel(() => strings.MainWindow_Label_ClearTrack_Notice, () => "", disclaimerContainer, 1, (HorizontalAlignment)1);
+			UiUtils.CreateLabel(() => strings.MainWindow_Label_ClearTrack_Notice2, () => "", disclaimerContainer, 1, (HorizontalAlignment)1);
 			DrawLegend(legendContainer);
 			DrawTable();
 		}

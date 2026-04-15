@@ -92,6 +92,8 @@ namespace RaidWeekPlanner
 
 		internal static string MainWindow_Label_ClearTrack_Notice => ResourceManager.GetString("MainWindow_Label_ClearTrack_Notice", resourceCulture);
 
+		internal static string MainWindow_Label_ClearTrack_Notice2 => ResourceManager.GetString("MainWindow_Label_ClearTrack_Notice2", resourceCulture);
+
 		internal static string NoData => ResourceManager.GetString("NoData", resourceCulture);
 
 		internal strings()

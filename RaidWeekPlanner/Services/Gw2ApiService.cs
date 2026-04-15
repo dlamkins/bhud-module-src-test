@@ -77,6 +77,10 @@ namespace RaidWeekPlanner.Services
 			{
 				return null;
 			}
+			if (strikeWeeklyClearAchievement.get_Done())
+			{
+				return GetAllStrikes();
+			}
 			return strikeWeeklyClearAchievement.get_Bits().Select(GetStrikeName).ToList();
 		}
 
@@ -99,6 +103,15 @@ namespace RaidWeekPlanner.Services
 				12 => "old_lion_court", 
 				13 => "kela", 
 				_ => string.Empty, 
+			};
+		}
+
+		private List<string> GetAllStrikes()
+		{
+			return new List<string>(14)
+			{
+				"shiverpeaks_pass", "fraenir_of_jormag", "voice_and_claw", "whisper_of_jormag", "boneskinner", "cold_war", "aetherblade_hideout", "xunlai_jade_junkyard", "kaineng_overlook", "harvest_temple",
+				"cosmic_observatory", "temple_of_febe", "old_lion_court", "kela"
 			};
 		}
 	}
