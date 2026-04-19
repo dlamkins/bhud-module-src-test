@@ -1,5 +1,6 @@
 using System;
 using Gw2Sharp.WebApi.V2.Models;
+using Microsoft.Xna.Framework;
 
 namespace FarmingTracker
 {
@@ -23,6 +24,8 @@ namespace FarmingTracker
 
 			public const string DEBUG = "Debug";
 		}
+
+		public static readonly Color RED = new Color(255, 120, 120);
 
 		public const int PANEL_WIDTH = 500;
 

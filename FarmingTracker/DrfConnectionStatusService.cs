@@ -8,8 +8,6 @@ namespace FarmingTracker
 
 		private const string SMILEY_VERTICAL_SPACE = "  ";
 
-		private static readonly Color RED = new Color(255, 120, 120);
-
 		public static Color GetDrfConnectionStatusTextColor(DrfConnectionStatus drfConnectionStatus)
 		{
 			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
@@ -25,10 +23,10 @@ namespace FarmingTracker
 				return Color.get_LightGreen();
 			case DrfConnectionStatus.Disconnected:
 			case DrfConnectionStatus.AuthenticationFailed:
-				return RED;
+				return Constants.RED;
 			default:
 				Module.Logger.Error(Helper.CreateSwitchCaseNotFoundMessage(drfConnectionStatus, "DrfConnectionStatus", "white"));
-				return RED;
+				return Constants.RED;
 			}
 		}
 

@@ -96,10 +96,12 @@ namespace FarmingTracker
 			//IL_02c5: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02ca: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02d5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02f2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02e0: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02fd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0304: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0310: Expected O, but got Unknown
+			//IL_0308: Unknown result type (might be due to invalid IL or missing references)
+			//IL_030f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_031b: Expected O, but got Unknown
 			Services services2 = services;
 			Model model2 = model;
 			base._002Ector();
@@ -169,8 +171,9 @@ namespace FarmingTracker
 			ElapsedFarmingTimeLabel = new ElapsedFarmingTimeLabel(services2, (Container)(object)timeAndHintFlowPanel);
 			Label val9 = new Label();
 			val9.set_Text(" ");
+			val9.set_TextColor(Color.get_Yellow());
 			val9.set_Font(services2.FontService.Fonts[(FontSize)14]);
-			((Control)val9).set_Width(250);
+			((Control)val9).set_Width(350);
 			val9.set_AutoSizeHeight(true);
 			((Control)val9).set_Parent((Container)(object)timeAndHintFlowPanel);
 			HintLabel = val9;

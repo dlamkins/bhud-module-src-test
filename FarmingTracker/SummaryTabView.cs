@@ -98,6 +98,7 @@ namespace FarmingTracker
 
 		public void Update(GameTime gameTime)
 		{
+			//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
 			_services.UpdateLoop.AddToRunningTime(gameTime.get_ElapsedGameTime().TotalMilliseconds);
 			if (!_isUiUpdateTaskRunning && _services.UpdateLoop.HasToUpdateUi())
 			{
@@ -126,6 +127,7 @@ namespace FarmingTracker
 			if (_resetState != 0)
 			{
 				_controls.HintLabel.set_Text("Resetting... (this may take a few seconds)");
+				_controls.HintLabel.set_TextColor(Color.get_Yellow());
 				if (!_statsAccessLocked)
 				{
 					_statsAccessLocked = true;
@@ -182,6 +184,7 @@ namespace FarmingTracker
 
 		private void ResetStats()
 		{
+			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
 			try
 			{
 				_model.Stats.ResetCounts();
@@ -192,6 +195,7 @@ namespace FarmingTracker
 			{
 				Module.Logger.Error(exception, "ResetStats failed.");
 				_controls.HintLabel.set_Text("Module crash. :-(");
+				_controls.HintLabel.set_TextColor(Constants.RED);
 			}
 		}
 
@@ -203,6 +207,7 @@ namespace FarmingTracker
 				if (drfMessages.Any() || !_lastStatsUpdateSuccessfull || _services.UpdateLoop.HasToUpdateStats())
 				{
 					_controls.HintLabel.set_Text("Updating... (this may take a few seconds)");
+					_controls.HintLabel.set_TextColor(Color.get_Yellow());
 					DrfResultAdder.UpdateCountsOrAddNewStats(drfMessages, _model.Stats);
 					await _statsSetter.SetDetailsAndProfitFromApi(_model.Stats, _services.Gw2ApiManager);
 					_services.UpdateLoop.TriggerUpdateUi();
@@ -217,12 +222,14 @@ namespace FarmingTracker
 				_services.UpdateLoop.UseRetryAfterApiFailureUpdateInterval();
 				_lastStatsUpdateSuccessfull = false;
 				_controls.HintLabel.set_Text(string.Format("{0}. Retry every {1}s", "GW2 API error", 5));
+				_controls.HintLabel.set_TextColor(Constants.RED);
 			}
 			catch (Exception exception)
 			{
 				Module.Logger.Error(exception, "UpdateStats failed.");
 				_lastStatsUpdateSuccessfull = false;
 				_controls.HintLabel.set_Text("Module crash. :-(");
+				_controls.HintLabel.set_TextColor(Constants.RED);
 			}
 		}
 
@@ -243,6 +250,8 @@ namespace FarmingTracker
 
 		private void ShowOrHideApiErrorHint(ApiToken apiToken, Label hintLabel, double timeSinceModuleStartInSeconds)
 		{
+			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
 			if (!apiToken.CanAccessApi)
 			{
 				_apiErrorHintVisible = true;
@@ -250,8 +259,16 @@ namespace FarmingTracker
 				bool isGivingBlishSomeTimeToGiveToken = timeSinceModuleStartInSeconds < 20.0;
 				bool loadingHintVisible = apiToken.ApiTokenMissing && isGivingBlishSomeTimeToGiveToken;
 				LogApiTokenErrorOnce(apiTokenErrorMessage, loadingHintVisible);
-				hintLabel.set_Text(loadingHintVisible ? "Loading... (this may take a few seconds)" : $"{apiToken.CreateApiTokenErrorLabelText()} Retry every {2}s");
-				((Control)hintLabel).set_BasicTooltipText(loadingHintVisible ? "" : apiTokenErrorMessage);
+				if (loadingHintVisible)
+				{
+					hintLabel.set_Text("Loading... (this may take a few seconds)");
+					hintLabel.set_TextColor(Color.get_Yellow());
+				}
+				else
+				{
+					hintLabel.set_Text($"{apiToken.CreateApiTokenErrorLabelText()} Retry every {2}s");
+					hintLabel.set_TextColor(Constants.RED);
+				}
 			}
 			else if (_apiErrorHintVisible)
 			{

@@ -92,9 +92,9 @@ namespace FarmingTracker
 				Module.Logger.Warn("ReceiveFailed: " + ExceptionService.GetExceptionSummary(e.Data));
 				await Reconnect();
 			};
-			_drfWebSocketClient.AuthenticationFailed += delegate
+			_drfWebSocketClient.AuthenticationFailed += delegate(object s, GenericEventArgs<string> e)
 			{
-				Module.Logger.Warn("AuthenticationFailed");
+				Module.Logger.Warn("AuthenticationFailed: " + e.Data);
 				SetDrfConnectionStatus(DrfConnectionStatus.AuthenticationFailed);
 			};
 			_drfWebSocketClient.ReceivedUnexpectedBinaryMessage += delegate
@@ -151,22 +151,30 @@ namespace FarmingTracker
 
 		private async void OnDrfTokenSettingChanged(object? sender = null, ValueChangedEventArgs<string>? e = null)
 		{
-			string drfToken = _settingService.DrfTokenSetting.get_Value();
-			if (DrfToken.HasValidFormat(drfToken))
-			{
-				await _drfWebSocketClient.Connect(drfToken);
-			}
-		}
-
-		private async void FireAndForgetConnectToDrf()
-		{
-			_drfWebSocketClient.WebSocketUrl = (_settingService.IsFakeDrfServerUsedSetting.get_Value() ? "ws://localhost:8080" : "wss://drf.rs/ws");
-			await _drfWebSocketClient.Connect(_settingService.DrfTokenSetting.get_Value());
+			FireAndForgetConnectToDrf(tokenIsBeingEdited: true);
 		}
 
 		private void OnIsFakeDrfServerUsedSettingChanged(object sender, ValueChangedEventArgs<bool> e)
 		{
 			FireAndForgetConnectToDrf();
+		}
+
+		private async void FireAndForgetConnectToDrf(bool tokenIsBeingEdited = false)
+		{
+			_drfWebSocketClient.WebSocketUrl = (_settingService.IsFakeDrfServerUsedSetting.get_Value() ? "ws://localhost:8080" : "wss://drf.rs/ws");
+			string drfToken = _settingService.DrfTokenSetting.get_Value();
+			if (!DrfToken.HasValidFormat(drfToken))
+			{
+				if (!tokenIsBeingEdited)
+				{
+					Module.Logger.Warn("Connect() is not performed because DRF token is empty or has invalid format.");
+				}
+				SetDrfConnectionStatus(DrfConnectionStatus.AuthenticationFailed);
+			}
+			else
+			{
+				await _drfWebSocketClient.Connect(drfToken);
+			}
 		}
 	}
 }

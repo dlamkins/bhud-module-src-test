@@ -1,10 +1,13 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Settings;
+using Gw2Sharp.WebApi.V2.Clients;
+using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended.BitmapFonts;
 
@@ -58,6 +61,7 @@ namespace FarmingTracker
 			settingsTabView._rootFlowPanel = val;
 			BitmapFont font = _services.FontService.Fonts[(FontSize)16];
 			CreateDrfConnectionStatusLabel(font, _rootFlowPanel);
+			CreateSupportInfoLabel();
 			await Task.Delay(1);
 			CreateSetupDrfTokenPanel(font, _services, (Container)(object)_rootFlowPanel);
 			SettingsFlowPanel parent = new SettingsFlowPanel((Container)(object)_rootFlowPanel, "Misc");
@@ -93,6 +97,25 @@ namespace FarmingTracker
 			_services.SettingService.CountHoritzontalAlignmentSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<HorizontalAlignment>>)OnSettingChanged<HorizontalAlignment>);
 			_services.SettingService.NegativeCountIconOpacitySetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)OnSettingChanged<int>);
 			_services.SettingService.RarityIconBorderIsVisibleSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnSettingChanged<bool>);
+		}
+
+		private async void CreateSupportInfoLabel()
+		{
+			string text = "Character: " + GameService.Gw2Mumble.get_PlayerCharacter().get_Name();
+			Label val = new Label();
+			val.set_Text(text);
+			val.set_AutoSizeWidth(true);
+			val.set_AutoSizeHeight(true);
+			((Control)val).set_Parent((Container)(object)_rootFlowPanel);
+			Label supportInfoLabel = val;
+			try
+			{
+				Account account = await ((IBlobClient<Account>)(object)_services.Gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()).GetAsync(default(CancellationToken));
+				supportInfoLabel.set_Text(supportInfoLabel.get_Text() + " | Account: " + account.get_Name());
+			}
+			catch
+			{
+			}
 		}
 
 		private void OnSettingChanged<T>(object sender, ValueChangedEventArgs<T> e)
@@ -266,6 +289,7 @@ namespace FarmingTracker
 			//IL_0206: Unknown result type (might be due to invalid IL or missing references)
 			//IL_020d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_021a: Expected O, but got Unknown
+			//IL_0241: Unknown result type (might be due to invalid IL or missing references)
 			AutoSizeContainer setupDrfWrapperContainer = new AutoSizeContainer(parent);
 			FlowPanel val = new FlowPanel();
 			((Panel)val).set_Title(" ");
@@ -325,6 +349,7 @@ namespace FarmingTracker
 				_services.SettingService.DrfTokenSetting.set_Value(((TextInputBase)drfTokenTextBox).get_Text());
 				drfTokenValidationLabel.set_Text(DrfToken.CreateDrfTokenHintText(((TextInputBase)drfTokenTextBox).get_Text()));
 			};
+			((Label)new FixedWidthHintLabel((Container)(object)addDrfTokenFlowPanel, 480, "Do NOT share your DRF Token! Make sure it is not visible in screenshots!")).set_TextColor(Constants.RED);
 			SetupInstructions.CreateSetupInstructions(font, addDrfTokenFlowPanel, _services);
 		}
 

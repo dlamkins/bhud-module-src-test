@@ -19,7 +19,7 @@ namespace FarmingTracker
 			(TokenPermission)8
 		}.AsReadOnly();
 
-		public const string ADD_GW2_API_KEY_ERROR_DISPLAY_TEXT = "Add GW2 API key!";
+		public const string ADD_GW2_API_KEY_ERROR_DISPLAY_TEXT = "Add GW2 API key in BlishHUD Settings!";
 
 		public bool CanAccessApi => ApiTokenState == ApiTokenState.CanAccessApi;
 
@@ -47,7 +47,7 @@ namespace FarmingTracker
 			return ApiTokenState switch
 			{
 				ApiTokenState.hasNotLoggedIntoCharacterSinceStartingGw2 => "Error: You have to log into a character once after starting Guild Wars 2.\nOtherwise the module gets no GW2 API access from blish.", 
-				ApiTokenState.ApiTokenMissing => "Error: GW2 Api key missing. Please add an api key with these permissions: " + string.Join(", ", RequiredPermissions) + ".\nIf that does not fix the issue try disabling the module and then enabling it again. If that does not help either, restart blish.", 
+				ApiTokenState.ApiTokenMissing => "Error: GW2 Api key missing. Please add an api key in the BlishHUD settings with these permissions: " + string.Join(", ", RequiredPermissions) + ".\nIf that does not fix the issue try disabling the module and then enabling it again. If that does not help either, restart blish.", 
 				ApiTokenState.RequiredPermissionsMissing => "Error: GW2 Api key is missing these permissions: " + string.Join(", ", MissingPermissions) + ".\nPlease add a new api key with all required permissions.", 
 				_ => $"This should not happen. ApiTokenState: {ApiTokenState}", 
 			};
@@ -58,7 +58,7 @@ namespace FarmingTracker
 			return ApiTokenState switch
 			{
 				ApiTokenState.hasNotLoggedIntoCharacterSinceStartingGw2 => "Log into character!", 
-				ApiTokenState.ApiTokenMissing => "Add GW2 API key!", 
+				ApiTokenState.ApiTokenMissing => "Add GW2 API key in BlishHUD Settings!", 
 				ApiTokenState.RequiredPermissionsMissing => "Missing GW2 API key permissions!", 
 				_ => $"This should not happen. ApiTokenState: {ApiTokenState}", 
 			};
