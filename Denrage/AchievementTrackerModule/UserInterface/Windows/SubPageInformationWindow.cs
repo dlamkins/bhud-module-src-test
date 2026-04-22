@@ -104,7 +104,7 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Windows
 			//IL_04ba: Unknown result type (might be due to invalid IL or missing references)
 			//IL_04c1: Unknown result type (might be due to invalid IL or missing references)
 			//IL_04ca: Expected O, but got Unknown
-			//IL_0590: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0584: Unknown result type (might be due to invalid IL or missing references)
 			string title = subPageInformation.Title.Substring(0, Math.Min(subPageInformation.Title.Length, 25));
 			if (title != subPageInformation.Title)
 			{
@@ -232,7 +232,7 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Windows
 			IHasInteractiveMap interactiveMap = subPageInformation as IHasInteractiveMap;
 			if (interactiveMap != null && interactiveMap.InteractiveMap != null)
 			{
-				InteractiveMapControl interactiveMapControl = new InteractiveMapControl(interactiveMap.InteractiveMap.IconUrl, interactiveMap.InteractiveMap.LocalTiles, interactiveMap.InteractiveMap.Coordinates, interactiveMap.InteractiveMap.Path, interactiveMap.InteractiveMap.Bounds);
+				InteractiveMapControl interactiveMapControl = new InteractiveMapControl(interactiveMap.InteractiveMap.IconUrl, interactiveMap.InteractiveMap.Coordinates, interactiveMap.InteractiveMap.Path, interactiveMap.InteractiveMap.Bounds);
 				((Control)interactiveMapControl).set_Parent((Container)(object)flowPanel);
 				((Control)interactiveMapControl).set_Width(((Container)flowPanel).get_ContentRegion().Width - 45);
 				((Control)interactiveMapControl).set_Height(400);

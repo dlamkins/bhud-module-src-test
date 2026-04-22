@@ -1,12 +1,9 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Runtime.CompilerServices;
 using Blish_HUD.Controls;
 using Blish_HUD.Modules.Managers;
 using Denrage.AchievementTrackerModule.Interfaces;
-using Denrage.AchievementTrackerModule.Libs.Achievement;
 using HtmlAgilityPack;
-using Microsoft.Xna.Framework;
 
 namespace Denrage.AchievementTrackerModule.Services
 {
@@ -45,229 +42,15 @@ namespace Denrage.AchievementTrackerModule.Services
 			return labelBuilder;
 		}
 
+		[IteratorStateMachine(typeof(_003CCreateParts_003Ed__7))]
 		private IEnumerable<FormattedLabelPartBuilder> CreateParts(HtmlNode childNode, FormattedLabelBuilder labelBuilder)
 		{
-			if (childNode.Name == "#text")
+			return new _003CCreateParts_003Ed__7(-2)
 			{
-				yield return labelBuilder.CreatePart(childNode.InnerText);
-			}
-			else if (childNode.Name == "a")
-			{
-				if (!childNode.GetClasses().Contains("mw-selflink"))
-				{
-					foreach (HtmlNode innerChildNode10 in (IEnumerable<HtmlNode>)childNode.ChildNodes)
-					{
-						foreach (FormattedLabelPartBuilder part3 in CreateParts(innerChildNode10, labelBuilder))
-						{
-							string link = childNode.GetAttributeValue("href", "");
-							bool inSubpages = false;
-							foreach (SubPageInformation subPage in achievementService.Subpages)
-							{
-								if (subPage.Link == "https://wiki.guildwars2.com" + link && !inSubpages)
-								{
-									inSubpages = true;
-									yield return part3.SetLink((Action)delegate
-									{
-										subPageInformationWindowManager.Create(subPage);
-									}).MakeUnderlined();
-								}
-							}
-							if (!inSubpages)
-							{
-								if (link.StartsWith("/"))
-								{
-									link = "https://wiki.guildwars2.com/" + link;
-								}
-								yield return part3.SetHyperLink(link).MakeUnderlined();
-							}
-						}
-					}
-					yield break;
-				}
-				foreach (HtmlNode innerChildNode14 in (IEnumerable<HtmlNode>)childNode.ChildNodes)
-				{
-					foreach (FormattedLabelPartBuilder item3 in CreateParts(innerChildNode14, labelBuilder))
-					{
-						yield return item3;
-					}
-				}
-			}
-			else if (childNode.Name == "span")
-			{
-				if (childNode.GetClasses().Contains("inline-icon"))
-				{
-					HtmlNode imageNode = childNode.ChildNodes.FindFirst("img");
-					if (imageNode != null)
-					{
-						FormattedLabelPartBuilder builder2 = labelBuilder.CreatePart("");
-						builder2.SetPrefixImage(externalImageService.GetImage(imageNode.GetAttributeValue("src", ""))).SetPrefixImageSize(new Point(24, 24));
-						yield return builder2;
-					}
-					yield break;
-				}
-				foreach (HtmlNode innerChildNode13 in (IEnumerable<HtmlNode>)childNode.ChildNodes)
-				{
-					foreach (FormattedLabelPartBuilder item4 in CreateParts(innerChildNode13, labelBuilder))
-					{
-						yield return item4;
-					}
-				}
-			}
-			else if (childNode.Name == "b")
-			{
-				foreach (HtmlNode innerChildNode12 in (IEnumerable<HtmlNode>)childNode.ChildNodes)
-				{
-					foreach (FormattedLabelPartBuilder item5 in CreateParts(innerChildNode12, labelBuilder))
-					{
-						yield return item5;
-					}
-				}
-			}
-			else if (childNode.Name == "i")
-			{
-				foreach (HtmlNode innerChildNode11 in (IEnumerable<HtmlNode>)childNode.ChildNodes)
-				{
-					foreach (FormattedLabelPartBuilder part2 in CreateParts(innerChildNode11, labelBuilder))
-					{
-						yield return part2.MakeItalic();
-					}
-				}
-			}
-			else if (childNode.Name == "sup")
-			{
-				yield return labelBuilder.CreatePart(string.Empty);
-			}
-			else if (childNode.Name == "h3")
-			{
-				foreach (HtmlNode innerChildNode9 in (IEnumerable<HtmlNode>)childNode.ChildNodes)
-				{
-					foreach (FormattedLabelPartBuilder item6 in CreateParts(innerChildNode9, labelBuilder))
-					{
-						yield return item6;
-					}
-				}
-			}
-			else if (childNode.Name == "style" || childNode.Name == "script")
-			{
-				yield return labelBuilder.CreatePart(string.Empty);
-			}
-			else if (childNode.Name == "p")
-			{
-				foreach (HtmlNode innerChildNode8 in (IEnumerable<HtmlNode>)childNode.ChildNodes)
-				{
-					foreach (FormattedLabelPartBuilder item7 in CreateParts(innerChildNode8, labelBuilder))
-					{
-						yield return item7;
-					}
-				}
-			}
-			else if (childNode.Name == "br")
-			{
-				yield return labelBuilder.CreatePart("\n");
-			}
-			else if (childNode.Name == "small")
-			{
-				foreach (HtmlNode innerChildNode7 in (IEnumerable<HtmlNode>)childNode.ChildNodes)
-				{
-					foreach (FormattedLabelPartBuilder item8 in CreateParts(innerChildNode7, labelBuilder))
-					{
-						yield return item8;
-					}
-				}
-			}
-			else if (childNode.Name == "ul")
-			{
-				foreach (HtmlNode item2 in childNode.ChildNodes.Where((HtmlNode x) => x.Name == "li"))
-				{
-					foreach (FormattedLabelPartBuilder item9 in CreateParts(item2, labelBuilder))
-					{
-						yield return item9;
-					}
-				}
-			}
-			else if (childNode.Name == "li")
-			{
-				foreach (HtmlNode innerChildNode6 in (IEnumerable<HtmlNode>)childNode.ChildNodes)
-				{
-					foreach (FormattedLabelPartBuilder item10 in CreateParts(innerChildNode6, labelBuilder))
-					{
-						yield return item10;
-					}
-				}
-			}
-			else if (childNode.Name == "div")
-			{
-				foreach (HtmlNode innerChildNode5 in (IEnumerable<HtmlNode>)childNode.ChildNodes)
-				{
-					foreach (FormattedLabelPartBuilder item11 in CreateParts(innerChildNode5, labelBuilder))
-					{
-						yield return item11;
-					}
-				}
-			}
-			else if (childNode.Name == "code")
-			{
-				yield return labelBuilder.CreatePart(childNode.InnerText);
-			}
-			else if (childNode.Name == "img")
-			{
-				FormattedLabelPartBuilder builder = labelBuilder.CreatePart(string.Empty);
-				yield return builder.SetPrefixImage(externalImageService.GetImage(childNode.GetAttributeValue("src", string.Empty)));
-			}
-			else if (childNode.Name == "s")
-			{
-				foreach (HtmlNode innerChildNode4 in (IEnumerable<HtmlNode>)childNode.ChildNodes)
-				{
-					foreach (FormattedLabelPartBuilder part in CreateParts(innerChildNode4, labelBuilder))
-					{
-						yield return part.MakeStrikeThrough();
-					}
-				}
-			}
-			else if (childNode.Name == "dl")
-			{
-				foreach (HtmlNode innerChildNode3 in (IEnumerable<HtmlNode>)childNode.ChildNodes)
-				{
-					foreach (FormattedLabelPartBuilder item12 in CreateParts(innerChildNode3, labelBuilder))
-					{
-						yield return item12;
-					}
-				}
-			}
-			else if (childNode.Name == "font")
-			{
-				foreach (HtmlNode innerChildNode2 in (IEnumerable<HtmlNode>)childNode.ChildNodes)
-				{
-					foreach (FormattedLabelPartBuilder item13 in CreateParts(innerChildNode2, labelBuilder))
-					{
-						yield return item13;
-					}
-				}
-			}
-			else if (childNode.Name == "big")
-			{
-				foreach (HtmlNode innerChildNode in (IEnumerable<HtmlNode>)childNode.ChildNodes)
-				{
-					foreach (FormattedLabelPartBuilder item14 in CreateParts(innerChildNode, labelBuilder))
-					{
-						yield return item14;
-					}
-				}
-			}
-			else
-			{
-				if (!(childNode.Name == "ol"))
-				{
-					yield break;
-				}
-				foreach (HtmlNode item in childNode.ChildNodes.Where((HtmlNode x) => x.Name == "li"))
-				{
-					foreach (FormattedLabelPartBuilder item15 in CreateParts(item, labelBuilder))
-					{
-						yield return item15;
-					}
-				}
-			}
+				_003C_003E4__this = this,
+				_003C_003E3__childNode = childNode,
+				_003C_003E3__labelBuilder = labelBuilder
+			};
 		}
 	}
 }

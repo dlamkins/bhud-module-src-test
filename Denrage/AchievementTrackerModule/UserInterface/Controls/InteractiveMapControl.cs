@@ -41,8 +41,6 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Controls
 
 		private readonly ((double X, double Y) StartCoordinate, (double X, double Y) EndCoordinate) continentDimensions;
 
-		private readonly string localTiles;
-
 		private readonly (float X, float Y) mapBounds;
 
 		private (int X, int Y) startCoordinate;
@@ -59,12 +57,11 @@ namespace Denrage.AchievementTrackerModule.UserInterface.Controls
 
 		private static AsyncTexture2D flagEnd;
 
-		public InteractiveMapControl(string iconUrl, string localTiles, string inputCoords, string path, string bounds)
+		public InteractiveMapControl(string iconUrl, string inputCoords, string path, string bounds)
 			: this()
 		{
 			((Control)this).set_ClipsBounds(true);
 			this.iconUrl = iconUrl;
-			this.localTiles = localTiles;
 			List<List<double>> coords = ConvertStringToNestedArray(inputCoords);
 			this.path = ConvertStringToNestedArray(path);
 			this.bounds = ConvertStringToNestedArray(bounds);
