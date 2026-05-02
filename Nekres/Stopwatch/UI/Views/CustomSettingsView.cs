@@ -1,9 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
-using Blish_HUD.Input;
 using Blish_HUD.Settings;
 using Blish_HUD.Settings.UI.Views;
 using Microsoft.Xna.Framework;
@@ -35,8 +33,6 @@ namespace Nekres.Stopwatch.UI.Views
 				}
 			}
 		}
-
-		public event EventHandler<EventArgs> PositionButtonClick;
 
 		private void UpdateBoundsLocking(bool locked)
 		{
@@ -79,12 +75,6 @@ namespace Nekres.Stopwatch.UI.Views
 			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00fe: Expected O, but got Unknown
-			//IL_012f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0134: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0140: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0148: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0152: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015d: Unknown result type (might be due to invalid IL or missing references)
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Size(new Point(((Control)buildPanel).get_Width(), ((Control)buildPanel).get_Height()));
 			((Control)val).set_Location(new Point(0, 0));
@@ -114,17 +104,6 @@ namespace Nekres.Stopwatch.UI.Views
 					}
 				}
 			}
-			StandardButton val3 = new StandardButton();
-			((Control)val3).set_Parent((Container)(object)_settingFlowPanel);
-			((Control)val3).set_Size(new Point(160, 46));
-			val3.set_Text("Set Position");
-			((Control)val3).set_BasicTooltipText("Set the position of the timer on the user-interface.");
-			((Control)val3).add_Click((EventHandler<MouseEventArgs>)OnPositionButtonClick);
-		}
-
-		private void OnPositionButtonClick(object sender, MouseEventArgs e)
-		{
-			this.PositionButtonClick?.Invoke(sender, (EventArgs)(object)e);
 		}
 
 		protected override void Unload()

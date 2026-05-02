@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Microsoft.Xna.Framework;
@@ -150,7 +151,13 @@ namespace Nekres.Stopwatch.Core.Controllers
 		{
 			TimeSpan prevValue = StopwatchModule.ModuleInstance.StartTime.get_Value();
 			_inInputPrompt = true;
-			TimeSpanInputPrompt.ShowPrompt(TimeSpanInputPromptCallback, "Enter a start time:", prevValue.Equals(TimeSpan.Zero) ? string.Empty : prevValue.ToString("hh\\:mm\\:ss\\.fff"));
+			string prefill = string.Empty;
+			if (prevValue > TimeSpan.Zero)
+			{
+				string frac = ((prevValue.Milliseconds > 0) ? "\\.fff" : "");
+				prefill = ((Math.Abs(prevValue.Hours) > 0) ? prevValue.ToString("h\\:mm\\:ss" + frac) : ((Math.Abs(prevValue.Minutes) <= 0) ? prevValue.TotalSeconds.ToString("0.###", CultureInfo.InvariantCulture) : prevValue.ToString("m\\:ss" + frac)));
+			}
+			TimeSpanInputPrompt.ShowPrompt(TimeSpanInputPromptCallback, "Enter a start time:", prefill);
 		}
 
 		private void TimeSpanInputPromptCallback(bool confirmed, TimeSpan time)
@@ -163,13 +170,17 @@ namespace Nekres.Stopwatch.Core.Controllers
 			}
 		}
 
+		private void OnSetGoalTimeClicked(object sender, EventArgs e)
+		{
+			StartAt();
+		}
+
 		public void Start(TimeSpan? start = null)
 		{
 			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
 			if (_inInputPrompt || !((Vector3)(ref PlayerPosition)).Equals(Vector3.get_Zero()))
 			{
 				return;
@@ -180,19 +191,21 @@ namespace Nekres.Stopwatch.Core.Controllers
 				Start();
 				return;
 			}
-			StopwatchDisplay display = _display;
-			if (display != null)
+			if (_display != null)
 			{
-				((Control)display).Dispose();
+				_display.Dragged -= OnDisplayMoved;
+				_display.SetGoalTimeClicked -= OnSetGoalTimeClicked;
+				((Control)_display).Dispose();
 			}
 			StopwatchDisplay stopwatchDisplay = new StopwatchDisplay();
 			((Control)stopwatchDisplay).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			((Control)stopwatchDisplay).set_Size(new Point(400, 100));
 			((Control)stopwatchDisplay).set_Location(Position);
 			stopwatchDisplay.Color = FontColor;
 			stopwatchDisplay.FontSize = FontSize;
 			stopwatchDisplay.BackgroundOpacity = BackgroundOpacity;
 			_display = stopwatchDisplay;
+			_display.Dragged += OnDisplayMoved;
+			_display.SetGoalTimeClicked += OnSetGoalTimeClicked;
 			if (start.HasValue)
 			{
 				_startTime = start.Value;
@@ -210,7 +223,8 @@ namespace Nekres.Stopwatch.Core.Controllers
 			if (StopwatchModule.ModuleInstance.StartOnMovementEnabled.get_Value())
 			{
 				PlayerPosition = (GameService.Gw2Mumble.get_CurrentMap().get_IsCompetitiveMode() ? GameService.Gw2Mumble.get_PlayerCamera().get_Position() : GameService.Gw2Mumble.get_PlayerCharacter().get_Position());
-				_display.Text = $"Awaiting movement...\nX:{PlayerPosition.X:F} Y:{PlayerPosition.Y:F} Z:{PlayerPosition.Z:F}";
+				_display.IsStatusText = true;
+				_display.Text = "Waiting...";
 			}
 			else
 			{
@@ -230,12 +244,13 @@ namespace Nekres.Stopwatch.Core.Controllers
 		public void Reset()
 		{
 			RewindSfx.Play(AudioVolume, 0f, 0f);
-			StopwatchDisplay display = _display;
-			if (display != null)
+			if (_display != null)
 			{
-				((Control)display).Dispose();
+				_display.Dragged -= OnDisplayMoved;
+				_display.SetGoalTimeClicked -= OnSetGoalTimeClicked;
+				((Control)_display).Dispose();
+				_display = null;
 			}
-			_display = null;
 			_stopwatch.Reset();
 		}
 
@@ -245,12 +260,13 @@ namespace Nekres.Stopwatch.Core.Controllers
 			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0150: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01fb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0201: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0211: Unknown result type (might be due to invalid IL or missing references)
 			if (!((Vector3)(ref PlayerPosition)).Equals(Vector3.get_Zero()) && !((Vector3)(ref PlayerPosition)).Equals(GameService.Gw2Mumble.get_PlayerCharacter().get_Position()))
 			{
 				PlayerPosition = Vector3.get_Zero();
+				_display.IsStatusText = false;
 				_stopwatch.Start();
 			}
 			if (_display == null || !_stopwatch.IsRunning)
@@ -264,12 +280,17 @@ namespace Nekres.Stopwatch.Core.Controllers
 			}
 			if (_startTime.Equals(TimeSpan.Zero))
 			{
-				_display.Text = _stopwatch.Elapsed.ToString("hh\\:mm\\:ss\\.fff");
+				_display.IsStatusText = false;
+				_display.Text = ((_stopwatch.Elapsed.Hours > 0) ? _stopwatch.Elapsed.ToString("hh\\:mm\\:ss\\.fff") : _stopwatch.Elapsed.ToString("mm\\:ss\\.fff"));
+				_display.Progress = 0f;
 				return;
 			}
 			TimeSpan current = _startTime.Subtract(_stopwatch.Elapsed);
-			_display.Text = ((current.Ticks < 0) ? "-" : "") + current.ToString("hh\\:mm\\:ss\\.fff");
-			_display.Color = Color.Lerp(Color.get_White(), _redShift, (float)_stopwatch.ElapsedMilliseconds / (float)_startTime.TotalMilliseconds);
+			float progress = (float)((double)_stopwatch.ElapsedMilliseconds / _startTime.TotalMilliseconds);
+			_display.IsStatusText = false;
+			_display.Text = ((current.Ticks < 0) ? "-" : "") + ((Math.Abs(current.Hours) > 0) ? current.ToString("hh\\:mm\\:ss\\.fff") : current.ToString("mm\\:ss\\.fff"));
+			_display.Progress = Math.Min(progress, 1f);
+			_display.Color = Color.Lerp(Color.get_White(), _redShift, Math.Min(progress, 1f));
 			if (StopwatchModule.ModuleInstance.BeepSoundDisabledSetting.get_Value())
 			{
 				return;
@@ -289,13 +310,24 @@ namespace Nekres.Stopwatch.Core.Controllers
 			}
 		}
 
+		private void OnDisplayMoved(object sender, EventArgs e)
+		{
+			//IL_0009: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+			StopwatchDisplay display = (StopwatchDisplay)sender;
+			_position = ((Control)display).get_Location();
+			StopwatchModule.ModuleInstance.Position.set_Value(((Control)display).get_Location());
+		}
+
 		public void Dispose()
 		{
 			_stopwatch.Stop();
-			StopwatchDisplay display = _display;
-			if (display != null)
+			if (_display != null)
 			{
-				((Control)display).Dispose();
+				_display.Dragged -= OnDisplayMoved;
+				_display.SetGoalTimeClicked -= OnSetGoalTimeClicked;
+				((Control)_display).Dispose();
 			}
 			SoundEffect[] rewindSfx = _rewindSfx;
 			for (int i = 0; i < rewindSfx.Length; i++)

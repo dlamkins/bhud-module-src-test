@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
@@ -71,6 +72,48 @@ namespace Nekres.Stopwatch.Core.Controls
 			_bgTexture = GameService.Content.get_DatAssetCache().GetTextureFromAssetId(156003);
 		}
 
+		private static bool SafeParseTime(string input, out TimeSpan timeSpan)
+		{
+			timeSpan = TimeSpan.Zero;
+			if (string.IsNullOrWhiteSpace(input))
+			{
+				return true;
+			}
+			input = input.Replace(',', '.');
+			string[] parts = input.Split(':');
+			try
+			{
+				double h;
+				double i;
+				double s;
+				if (parts.Length == 1)
+				{
+					if (double.TryParse(parts[0], NumberStyles.Any, CultureInfo.InvariantCulture, out var s2))
+					{
+						timeSpan = TimeSpan.FromSeconds(s2);
+						return true;
+					}
+				}
+				else if (parts.Length == 2)
+				{
+					if (double.TryParse(parts[0], NumberStyles.Any, CultureInfo.InvariantCulture, out var j) && double.TryParse(parts[1], NumberStyles.Any, CultureInfo.InvariantCulture, out var s3))
+					{
+						timeSpan = TimeSpan.FromMinutes(j).Add(TimeSpan.FromSeconds(s3));
+						return true;
+					}
+				}
+				else if (parts.Length == 3 && double.TryParse(parts[0], NumberStyles.Any, CultureInfo.InvariantCulture, out h) && double.TryParse(parts[1], NumberStyles.Any, CultureInfo.InvariantCulture, out i) && double.TryParse(parts[2], NumberStyles.Any, CultureInfo.InvariantCulture, out s))
+				{
+					timeSpan = TimeSpan.FromHours(h).Add(TimeSpan.FromMinutes(i)).Add(TimeSpan.FromSeconds(s));
+					return true;
+				}
+			}
+			catch
+			{
+			}
+			return false;
+		}
+
 		public static void ShowPrompt(Action<bool, TimeSpan> callback, string text, string defaultValue = "", string confirmButtonText = "Confirm", string cancelButtonText = "Cancel")
 		{
 			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
@@ -96,15 +139,15 @@ namespace Nekres.Stopwatch.Core.Controls
 			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006b: Expected O, but got Unknown
-			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ca: Expected O, but got Unknown
+			//IL_005b: Expected O, but got Unknown
+			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0087: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ba: Expected O, but got Unknown
 			if (_confirmButton == null)
 			{
 				StandardButton val = new StandardButton();
@@ -112,7 +155,7 @@ namespace Nekres.Stopwatch.Core.Controls
 				val.set_Text(_confirmButtonText);
 				((Control)val).set_Size(((Rectangle)(ref _confirmButtonBounds)).get_Size());
 				((Control)val).set_Location(((Rectangle)(ref _confirmButtonBounds)).get_Location());
-				((Control)val).set_Enabled(string.IsNullOrEmpty(_defaultValue) || TimeSpan.TryParse(_defaultValue, out var _));
+				((Control)val).set_Enabled(SafeParseTime(_defaultValue, out var _));
 				_confirmButton = val;
 				((Control)_confirmButton).add_Click((EventHandler<MouseEventArgs>)delegate
 				{
@@ -138,7 +181,9 @@ namespace Nekres.Stopwatch.Core.Controls
 		{
 			GameService.Input.get_Keyboard().remove_KeyPressed((EventHandler<KeyboardEventArgs>)OnKeyPressed);
 			GameService.Content.PlaySoundEffectByName("button-click");
-			_callback(arg1: true, string.IsNullOrEmpty(((TextInputBase)_inputTextBox).get_Text()) ? TimeSpan.Zero : TimeSpan.Parse(((TextInputBase)_inputTextBox).get_Text()));
+			TimeSpan timeSpan = TimeSpan.Zero;
+			SafeParseTime(((TextInputBase)_inputTextBox).get_Text(), out timeSpan);
+			_callback(arg1: true, timeSpan);
 			_singleton = null;
 			((Control)this).Dispose();
 		}
@@ -196,17 +241,17 @@ namespace Nekres.Stopwatch.Core.Controls
 				((Control)val).set_Size(((Rectangle)(ref _inputTextBoxBounds)).get_Size());
 				((Control)val).set_Location(((Rectangle)(ref _inputTextBoxBounds)).get_Location());
 				((TextInputBase)val).set_Font(_font);
-				((TextInputBase)val).set_Focused(true);
+				((TextInputBase)val).set_Focused(false);
 				val.set_HorizontalAlignment((HorizontalAlignment)1);
 				((TextInputBase)val).set_Text(_defaultValue);
-				((TextInputBase)val).set_PlaceholderText("00:00:00.000");
+				((TextInputBase)val).set_PlaceholderText("MM:SS, SS, .fff");
 				((TextInputBase)val).set_CursorIndex(_defaultValue.Length);
 				_inputTextBox = val;
-				((TextInputBase)_inputTextBox).add_TextChanged((EventHandler<EventArgs>)delegate(object o, EventArgs _)
+				((TextInputBase)_inputTextBox).add_TextChanged((EventHandler<EventArgs>)delegate(object o, EventArgs e)
 				{
 					//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 					string text = ((TextInputBase)(TextBox)o).get_Text();
-					((Control)_confirmButton).set_Enabled(string.IsNullOrEmpty(text) || TimeSpan.TryParse(text, out var _));
+					((Control)_confirmButton).set_Enabled(SafeParseTime(text, out var _));
 				});
 			}
 		}
@@ -221,56 +266,58 @@ namespace Nekres.Stopwatch.Core.Controls
 			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0104: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0115: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0121: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0128: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0134: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0164: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0183: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0194: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01dd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0200: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0205: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0224: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0234: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0102: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0107: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0118: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0124: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0132: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0137: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0167: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0186: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0197: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0203: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0208: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0227: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0232: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0237: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0357: Unknown result type (might be due to invalid IL or missing references)
+			//IL_035c: Unknown result type (might be due to invalid IL or missing references)
 			((Container)this).PaintBeforeChildren(spriteBatch, bounds);
 			Size2 textSize = _font.MeasureString(_text);
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), bounds, Color.get_Black() * 0.8f);
 			Point bgTextureSize = default(Point);
-			((Point)(ref bgTextureSize))._002Ector((int)textSize.Width + 12, (int)textSize.Height + 125);
+			((Point)(ref bgTextureSize))._002Ector((int)textSize.Width + 12, (int)textSize.Height + 145);
 			Point bgTexturePos = default(Point);
 			((Point)(ref bgTexturePos))._002Ector((bounds.Width - bgTextureSize.X) / 2, (bounds.Height - bgTextureSize.Y) / 2);
 			Rectangle bgBounds = default(Rectangle);
@@ -284,9 +331,15 @@ namespace Nekres.Stopwatch.Core.Controls
 			int btnMaxWith = Math.Min(100, bgBounds.Width / 2 - 10);
 			_confirmButtonBounds = new Rectangle(((Rectangle)(ref bgBounds)).get_Left() + 5, ((Rectangle)(ref bgBounds)).get_Bottom() - 50, btnMaxWith, 45);
 			_cancelButtonBounds = new Rectangle(((Rectangle)(ref _confirmButtonBounds)).get_Right() + 10, _confirmButtonBounds.Y, btnMaxWith, 45);
-			_inputTextBoxBounds = new Rectangle(_confirmButtonBounds.X, _confirmButtonBounds.Y - 55, bgBounds.Width - 10, 45);
+			_inputTextBoxBounds = new Rectangle(_confirmButtonBounds.X, _confirmButtonBounds.Y - 70, bgBounds.Width - 10, 45);
 			CreateTextInput();
 			CreateButtons();
+			if (_inputTextBox != null && !string.IsNullOrWhiteSpace(((TextInputBase)_inputTextBox).get_Text()) && SafeParseTime(((TextInputBase)_inputTextBox).get_Text(), out var timeSpan))
+			{
+				string ms = ((timeSpan.Milliseconds > 0) ? $" {timeSpan.Milliseconds}ms" : "");
+				string parsedText = ((timeSpan.TotalHours >= 1.0) ? $"{(int)timeSpan.TotalHours}h {timeSpan.Minutes}m {timeSpan.Seconds}s{ms}" : $"{(int)timeSpan.TotalMinutes}m {timeSpan.Seconds}s{ms}");
+				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, parsedText, GameService.Content.get_DefaultFont14(), new Rectangle(_inputTextBoxBounds.X, ((Rectangle)(ref _inputTextBoxBounds)).get_Bottom(), _inputTextBoxBounds.Width, 20), Color.get_LightGray(), false, (HorizontalAlignment)1, (VerticalAlignment)1);
+			}
 		}
 	}
 }

@@ -76,19 +76,19 @@ namespace Stopwatch
 			//IL_010d: Expected O, but got Unknown
 			//IL_011c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0164: Expected O, but got Unknown
-			//IL_0173: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01bb: Expected O, but got Unknown
-			//IL_0276: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0435: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0171: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b9: Expected O, but got Unknown
+			//IL_0274: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0433: Unknown result type (might be due to invalid IL or missing references)
 			SettingCollection hotkeys = settings.AddSubCollection("Control Options", true, false);
 			Toggle = hotkeys.DefineSetting<KeyBinding>("toggleKey", new KeyBinding((ModifierKeys)2, (Keys)220), (Func<string>)(() => "Toggle"), (Func<string>)(() => "Starts or stops the stopwatch."));
 			Start = hotkeys.DefineSetting<KeyBinding>("startKey", new KeyBinding((Keys)0), (Func<string>)(() => "Start"), (Func<string>)(() => "Starts the stopwatch."));
 			Stop = hotkeys.DefineSetting<KeyBinding>("stopKey", new KeyBinding((Keys)0), (Func<string>)(() => "Stop"), (Func<string>)(() => "Stops the stopwatch."));
-			Reset = hotkeys.DefineSetting<KeyBinding>("resetKey", new KeyBinding((ModifierKeys)2, (Keys)27), (Func<string>)(() => "Reset"), (Func<string>)(() => "Rewinds the stopwatch."));
-			SetStartTime = hotkeys.DefineSetting<KeyBinding>("setStartTimeKey", new KeyBinding((ModifierKeys)2, (Keys)9), (Func<string>)(() => "Set Goal Time"), (Func<string>)(() => "Set a goal time and make the stopwatch count down into the negative."));
+			Reset = hotkeys.DefineSetting<KeyBinding>("resetKey", new KeyBinding((ModifierKeys)2, (Keys)82), (Func<string>)(() => "Reset"), (Func<string>)(() => "Rewinds the stopwatch."));
+			SetStartTime = hotkeys.DefineSetting<KeyBinding>("setStartTimeKey", new KeyBinding((Keys)0), (Func<string>)(() => "Set Goal Time"), (Func<string>)(() => "Set a goal time and make the stopwatch count down into the negative."));
 			SettingCollection general = settings.AddSubCollection("General", true, false);
 			StartOnMovementEnabled = general.DefineSetting<bool>("startOnMovement", false, (Func<string>)(() => "Wait for Character Movement"), (Func<string>)(() => "When you activate the stopwatch it will delay its start until the moment you move from where you toggled it.\nIn competitive modes it will wait for camera movement instead."));
-			FontSize = general.DefineSetting<FontSize>("fontSize", (FontSize)36, (Func<string>)(() => "Font Size"), (Func<string>)(() => "Sets the font size of the timer."));
+			FontSize = general.DefineSetting<FontSize>("fontSize", (FontSize)24, (Func<string>)(() => "Font Size"), (Func<string>)(() => "Sets the font size of the timer."));
 			FontColor = general.DefineSetting<Color>("fontColor", Color.get_White(), (Func<string>)(() => "Font Color"), (Func<string>)(() => "Sets the font color of the timer."));
 			BackgroundOpacity = general.DefineSetting<float>("backgroundOpacity", 30f, (Func<string>)(() => "Background Opacity"), (Func<string>)(() => "Sets the transparency of the background."));
 			SettingCollection audio = settings.AddSubCollection("Sound Options", true, false);
