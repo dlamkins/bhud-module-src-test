@@ -46,9 +46,18 @@ namespace RaidClears.Features.Strikes.Services
 				{
 					return;
 				}
-				HashSet<int> completedBits = new HashSet<int>(achievement.get_Bits() ?? Array.Empty<int>());
 				List<string> mapping = strikeData.WeeklyAchievementBitStrikeIds;
 				StrikePersistance persistence = Service.StrikePersistance;
+				if (achievement.get_Done())
+				{
+					foreach (string strikeId2 in mapping)
+					{
+						BossEncounter mission2 = strikeData.GetBossEncounterById(strikeId2);
+						persistence.SaveClear(account, mission2);
+					}
+					return;
+				}
+				HashSet<int> completedBits = new HashSet<int>(achievement.get_Bits() ?? Array.Empty<int>());
 				for (int i = 0; i < mapping.Count; i++)
 				{
 					string strikeId = mapping[i];
