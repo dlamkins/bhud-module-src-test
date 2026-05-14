@@ -28,7 +28,11 @@ namespace RaidWeekPlanner.UI.Views
 
 		private readonly List<StandardButton> _buttons = new List<StandardButton>();
 
+		private StandardButton _refreshButton;
+
 		private StandardButton _toggleTableDrawModeBtn;
+
+		private StandardButton _toggleFutureBtn;
 
 		private List<Area> _areas;
 
@@ -37,6 +41,8 @@ namespace RaidWeekPlanner.UI.Views
 		private List<string> _neverOnTheMenu;
 
 		private List<string> _accountClears;
+
+		private bool _isFuture;
 
 		private TableDrawMode _tableDrawMode;
 
@@ -73,16 +79,16 @@ namespace RaidWeekPlanner.UI.Views
 			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01fc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0201: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0208: Unknown result type (might be due to invalid IL or missing references)
-			//IL_020d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0217: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0223: Expected O, but got Unknown
-			//IL_0248: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0258: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0288: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0298: Unknown result type (might be due to invalid IL or missing references)
+			//IL_027a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_027f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0286: Unknown result type (might be due to invalid IL or missing references)
+			//IL_028b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0295: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a1: Expected O, but got Unknown
+			//IL_02c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0306: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0316: Unknown result type (might be due to invalid IL or missing references)
 			FlowPanel flowPanel = new FlowPanel();
 			((Control)flowPanel).set_Parent((Container)(object)this);
 			((Container)flowPanel).set_WidthSizingMode((SizingMode)2);
@@ -119,9 +125,10 @@ namespace RaidWeekPlanner.UI.Views
 				SetLocalizedTooltip = () => strings.MainWindow_Button_Refresh_Tooltip
 			};
 			((Control)obj).set_Parent((Container)(object)actionContainer);
-			StandardButton button = (StandardButton)(object)obj;
-			buttons.Add((StandardButton)(object)obj);
-			((Control)button).add_Click((EventHandler<MouseEventArgs>)async delegate
+			StandardButton item = (StandardButton)(object)obj;
+			_refreshButton = (StandardButton)(object)obj;
+			buttons.Add(item);
+			((Control)_refreshButton).add_Click((EventHandler<MouseEventArgs>)async delegate
 			{
 				await RefreshData();
 			});
@@ -132,12 +139,26 @@ namespace RaidWeekPlanner.UI.Views
 				SetLocalizedTooltip = () => strings.MainWindow_Button_ToggleTableDrawMode_Tooltip
 			};
 			((Control)obj2).set_Parent((Container)(object)actionContainer);
-			StandardButton item = (StandardButton)(object)obj2;
+			item = (StandardButton)(object)obj2;
 			_toggleTableDrawModeBtn = (StandardButton)(object)obj2;
 			buttons2.Add(item);
 			((Control)_toggleTableDrawModeBtn).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				ToggleTableDrawMode();
+			});
+			List<StandardButton> buttons3 = _buttons;
+			StandardButton obj3 = new StandardButton
+			{
+				SetLocalizedText = () => GetToggleFutureBtnLabel(),
+				SetLocalizedTooltip = () => strings.MainWindow_Button_ToggleFuture_Tooltip
+			};
+			((Control)obj3).set_Parent((Container)(object)actionContainer);
+			item = (StandardButton)(object)obj3;
+			_toggleFutureBtn = (StandardButton)(object)obj3;
+			buttons3.Add(item);
+			((Control)_toggleFutureBtn).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				ToggleFuture();
 			});
 			LoadingSpinner val = new LoadingSpinner();
 			((Control)val).set_Parent((Container)(object)actionContainer);
@@ -184,6 +205,15 @@ namespace RaidWeekPlanner.UI.Views
 				return strings.MainWindow_Button_ToggleTableDrawMode_Areas;
 			}
 			return strings.MainWindow_Button_ToggleTableDrawMode_Week;
+		}
+
+		public string GetToggleFutureBtnLabel()
+		{
+			if (!_isFuture)
+			{
+				return strings.MainWindow_Button_ToggleFuture_Future;
+			}
+			return strings.MainWindow_Button_ToggleFuture_Present;
 		}
 
 		private void DrawLegend(FlowPanel container)
@@ -311,21 +341,26 @@ namespace RaidWeekPlanner.UI.Views
 		private Color GetBackgroundColor(string encounterKey)
 		{
 			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0082: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
+			if (_isFuture)
+			{
+				return Colors.Planned;
+			}
 			if (string.IsNullOrEmpty(encounterKey))
 			{
 				return Colors.Empty;
@@ -384,6 +419,25 @@ namespace RaidWeekPlanner.UI.Views
 			ClearTable();
 			DrawTable();
 			_toggleTableDrawModeBtn.set_Text(GetToggleTableDrawModeBtnLabel());
+		}
+
+		private void ToggleFuture()
+		{
+			_isFuture = !_isFuture;
+			_tableDrawMode = TableDrawMode.Week;
+			ToggleBtnState();
+			_businessService.ToggleDate(_isFuture);
+			_bounties = _businessService.GetEventsForCurrentWeek();
+			ClearTable();
+			DrawTable();
+		}
+
+		private void ToggleBtnState()
+		{
+			_toggleFutureBtn.set_Text(GetToggleFutureBtnLabel());
+			_toggleTableDrawModeBtn.set_Text(GetToggleTableDrawModeBtnLabel());
+			((Control)_toggleTableDrawModeBtn).set_Enabled(!_isFuture);
+			((Control)_refreshButton).set_Enabled(!_isFuture);
 		}
 
 		private void TableContainer_ContentResized(object sender, RegionChangedEventArgs e)

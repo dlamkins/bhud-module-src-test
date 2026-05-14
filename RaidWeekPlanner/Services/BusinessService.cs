@@ -30,6 +30,8 @@ namespace RaidWeekPlanner.Services
 
 		private List<string> _raidClears;
 
+		private DateTime _baseDate = DateTime.UtcNow;
+
 		private string _accountName { get; set; }
 
 		public BusinessService(ContentsManager contentsManager, Gw2ApiService gw2ApiService, Func<LoadingSpinner> getSpinner, CornerIcon cornerIcon, Logger logger)
@@ -100,7 +102,7 @@ namespace RaidWeekPlanner.Services
 
 		public Dictionary<int, List<string>> GetEventsForCurrentWeek()
 		{
-			DateTime monday = GetMonday(DateTime.UtcNow);
+			DateTime monday = GetMonday(_baseDate);
 			Dictionary<int, List<string>> weekEvents = new Dictionary<int, List<string>>();
 			for (int dayOffset = 0; dayOffset < 7; dayOffset++)
 			{
@@ -108,6 +110,18 @@ namespace RaidWeekPlanner.Services
 				weekEvents.Add(dayOffset, GetEventsForDate(currentDay));
 			}
 			return weekEvents;
+		}
+
+		public void ToggleDate(bool exploreFuture)
+		{
+			if (exploreFuture)
+			{
+				_baseDate = DateTime.UtcNow.AddDays(7.0);
+			}
+			else
+			{
+				_baseDate = DateTime.UtcNow;
+			}
 		}
 
 		private async Task<bool> RefreshAccountName()

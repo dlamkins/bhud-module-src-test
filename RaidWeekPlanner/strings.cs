@@ -84,6 +84,12 @@ namespace RaidWeekPlanner
 
 		internal static string MainWindow_Button_Refresh_Tooltip => ResourceManager.GetString("MainWindow_Button_Refresh_Tooltip", resourceCulture);
 
+		internal static string MainWindow_Button_ToggleFuture_Future => ResourceManager.GetString("MainWindow_Button_ToggleFuture_Future", resourceCulture);
+
+		internal static string MainWindow_Button_ToggleFuture_Present => ResourceManager.GetString("MainWindow_Button_ToggleFuture_Present", resourceCulture);
+
+		internal static string MainWindow_Button_ToggleFuture_Tooltip => ResourceManager.GetString("MainWindow_Button_ToggleFuture_Tooltip", resourceCulture);
+
 		internal static string MainWindow_Button_ToggleTableDrawMode_Areas => ResourceManager.GetString("MainWindow_Button_ToggleTableDrawMode_Areas", resourceCulture);
 
 		internal static string MainWindow_Button_ToggleTableDrawMode_Tooltip => ResourceManager.GetString("MainWindow_Button_ToggleTableDrawMode_Tooltip", resourceCulture);
