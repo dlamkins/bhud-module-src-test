@@ -254,7 +254,7 @@ namespace DavidRice.BlishHud.MidiControl
 
 		protected override async Task LoadAsync()
 		{
-			_keySendThread = new KeySendThread();
+			_keySendThread = new KeySendThread(new Action<uint>(SendInputApi.SendKeyTap));
 			_keySendThread.Start();
 			_keySender = new KeySender(_keySendThread);
 			_keySender.NoteProcessed += new Action<MidiNoteEvent, KeySendResult>(OnNoteProcessed);

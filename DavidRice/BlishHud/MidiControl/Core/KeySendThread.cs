@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.Threading;
-using DavidRice.BlishHud.MidiControl.Input;
 
 namespace DavidRice.BlishHud.MidiControl.Core
 {
@@ -17,9 +16,9 @@ namespace DavidRice.BlishHud.MidiControl.Core
 
 		public bool IsAlive => _thread.IsAlive;
 
-		public KeySendThread(Action<uint>? sendTap = null)
+		public KeySendThread(Action<uint> sendTap)
 		{
-			_sendTap = sendTap ?? new Action<uint>(SendInputApi.SendKeyTap);
+			_sendTap = sendTap;
 			_queue = new BlockingCollection<SendAction>();
 			_thread = new Thread(Run)
 			{

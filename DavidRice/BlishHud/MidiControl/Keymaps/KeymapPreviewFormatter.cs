@@ -8,19 +8,20 @@ namespace DavidRice.BlishHud.MidiControl.Keymaps
 	{
 		public static IReadOnlyList<string> FormatLines(Keymap keymap)
 		{
-			if (keymap == null)
+			Keymap keymap2 = keymap;
+			if (keymap2 == null)
 			{
 				throw new ArgumentNullException("keymap");
 			}
-			List<string> list = (from kvp in keymap.Notes
-				select FormatLine(kvp.Key, kvp.Value) into line
+			List<string> list = (from kvp in keymap2.Notes
+				select FormatLine(kvp.Key, kvp.Value, keymap2) into line
 				where line != null
 				select line).Cast<string>().ToList();
 			list.Sort(CompareNoteLines);
 			return list;
 		}
 
-		private static string? FormatLine(string noteName, NoteDefinition definition)
+		private static string? FormatLine(string noteName, NoteDefinition definition, Keymap keymap)
 		{
 			if (definition.ForceInternalOctave.HasValue)
 			{
@@ -32,7 +33,11 @@ namespace DavidRice.BlishHud.MidiControl.Keymaps
 			}
 			if (!definition.Octave.HasValue)
 			{
-				return noteName + " → " + definition.Key + " (oct shift)";
+				if (definition.Key!.Equals(keymap.OctaveDownKey, StringComparison.OrdinalIgnoreCase) || definition.Key!.Equals(keymap.OctaveUpKey, StringComparison.OrdinalIgnoreCase))
+				{
+					return noteName + " → " + definition.Key + " (oct shift)";
+				}
+				return noteName + " → " + definition.Key;
 			}
 			string line = $"{noteName} → {definition.Key} (oct {definition.Octave.Value})";
 			if (definition.AltOctave.HasValue && definition.AltOctaveKey != null)

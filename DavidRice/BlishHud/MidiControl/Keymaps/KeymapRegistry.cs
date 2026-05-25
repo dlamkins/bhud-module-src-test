@@ -12,12 +12,19 @@ namespace DavidRice.BlishHud.MidiControl.Keymaps
 
 		public KeymapRegistry()
 		{
+			Register(GeneralKeymap.Instance);
 			Register(GrandPianoAutoKeymap.Instance);
-			Register(MinstrelAutoKeymap.Instance);
-			Register(MinstrelKeymap.Instance);
-			Register(ChoirBellAutoKeymap.Instance);
+			Register(BassGuitarAutoKeymap.Instance);
 			Register(FluteCAutoKeymap.Instance);
 			Register(FluteEAutoKeymap.Instance);
+			Register(HarpAutoKeymap.Instance);
+			Register(HornCAutoKeymap.Instance);
+			Register(HornEAutoKeymap.Instance);
+			Register(LuteAutoKeymap.Instance);
+			Register(ChoirBellAutoKeymap.Instance);
+			Register(MinstrelKeymap.Instance);
+			Register(MinstrelAutoKeymap.Instance);
+			Register(VerdarachAutoKeymap.Instance);
 		}
 
 		public void Register(Keymap keymap)
