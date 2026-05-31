@@ -5,6 +5,7 @@ using Blish_HUD.Controls.Effects;
 using Blish_HUD.Input;
 using Maestro.Models;
 using Maestro.Services.Community;
+using Maestro.UI.Controls;
 using Microsoft.Xna.Framework;
 
 namespace Maestro.UI.Community
@@ -25,7 +26,7 @@ namespace Maestro.UI.Community
 
 			public const int DetailsY = 40;
 
-			public const int ButtonWidth = 90;
+			public const int ButtonWidth = 40;
 
 			public const int ButtonHeight = 26;
 
@@ -33,7 +34,7 @@ namespace Maestro.UI.Community
 
 			public const int ButtonRightMargin = 15;
 
-			public static int LabelRightMargin => 115;
+			public static int LabelRightMargin => 65;
 		}
 
 		private readonly CommunitySong _song;
@@ -46,7 +47,7 @@ namespace Maestro.UI.Community
 
 		private readonly Label _detailsLabel;
 
-		private readonly StandardButton _actionButton;
+		private readonly IconButton _actionButton;
 
 		private readonly Label _progressLabel;
 
@@ -101,61 +102,56 @@ namespace Maestro.UI.Community
 			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00dd: Expected O, but got Unknown
-			//IL_00de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0105: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0112: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0122: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0123: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0132: Expected O, but got Unknown
-			//IL_0169: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0175: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0181: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0198: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b8: Expected O, but got Unknown
-			//IL_01b9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01da: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f1: Expected O, but got Unknown
-			//IL_0209: Unknown result type (might be due to invalid IL or missing references)
-			//IL_020e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d7: Expected O, but got Unknown
+			//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012c: Expected O, but got Unknown
+			//IL_0163: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0168: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0176: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0185: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0192: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b2: Expected O, but got Unknown
+			//IL_01b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01de: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0215: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0220: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0234: Unknown result type (might be due to invalid IL or missing references)
-			//IL_023c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0244: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0254: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0255: Unknown result type (might be due to invalid IL or missing references)
-			//IL_025f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0266: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0272: Expected O, but got Unknown
-			//IL_0273: Unknown result type (might be due to invalid IL or missing references)
-			//IL_027d: Expected O, but got Unknown
+			//IL_021a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0221: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0236: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0240: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0248: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0250: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0260: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0261: Unknown result type (might be due to invalid IL or missing references)
+			//IL_026b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0272: Unknown result type (might be due to invalid IL or missing references)
+			//IL_027e: Expected O, but got Unknown
+			//IL_027f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0289: Expected O, but got Unknown
 			_song = song;
 			_downloadState = (isDownloaded ? DownloadState.Completed : DownloadState.Idle);
 			((Control)this).set_Size(new Point(width, 70));
 			((Control)this).set_BackgroundColor(MaestroTheme.PanelBackground);
 			_highlightEffect = new ScrollingHighlightEffect((Control)(object)this);
 			((Control)this).set_EffectBehind((ControlEffect)(object)_highlightEffect);
-			Color instrumentColor = GetInstrumentColor(song.InstrumentType);
+			Color instrumentColor = MaestroTheme.GetInstrumentAccent(song.InstrumentType);
 			Panel val = new Panel();
 			((Control)val).set_Parent((Container)(object)this);
 			((Control)val).set_Location(new Point(0, 0));
@@ -164,7 +160,7 @@ namespace Maestro.UI.Community
 			_indicator = val;
 			Label val2 = new Label();
 			((Control)val2).set_Parent((Container)(object)this);
-			val2.set_Text("[" + song.Instrument + "]");
+			val2.set_Text(song.Instrument ?? "");
 			((Control)val2).set_Location(new Point(12, 4));
 			val2.set_Font(GameService.Content.get_DefaultFont12());
 			val2.set_TextColor(instrumentColor);
@@ -190,24 +186,25 @@ namespace Maestro.UI.Community
 			val4.set_Font(GameService.Content.get_DefaultFont12());
 			val4.set_TextColor(MaestroTheme.MutedCream);
 			_detailsLabel = val4;
-			StandardButton val5 = new StandardButton();
-			((Control)val5).set_Parent((Container)(object)this);
-			val5.set_Text("Download");
-			((Control)val5).set_Location(new Point(width - 90 - 15, 18));
-			((Control)val5).set_Width(90);
-			_actionButton = val5;
+			IconButton iconButton = new IconButton(MaestroIcons.Download, MaestroTheme.IconGlyph);
+			((Control)iconButton).set_Parent((Container)(object)this);
+			((Control)iconButton).set_BasicTooltipText("Download");
+			((Control)iconButton).set_Location(new Point(width - 40 - 15, 18));
+			((Control)iconButton).set_Width(40);
+			((Control)iconButton).set_Height(26);
+			_actionButton = iconButton;
 			((Control)_actionButton).add_Click((EventHandler<MouseEventArgs>)OnActionButtonClicked);
-			Label val6 = new Label();
-			((Control)val6).set_Parent((Container)(object)this);
-			val6.set_Text("");
-			((Control)val6).set_Location(new Point(width - 90 - 15, 23));
-			((Control)val6).set_Width(90);
-			((Control)val6).set_Height(26);
-			val6.set_Font(GameService.Content.get_DefaultFont12());
-			val6.set_TextColor(MaestroTheme.CreamWhite);
-			val6.set_HorizontalAlignment((HorizontalAlignment)1);
-			((Control)val6).set_Visible(false);
-			_progressLabel = val6;
+			Label val5 = new Label();
+			((Control)val5).set_Parent((Container)(object)this);
+			val5.set_Text("");
+			((Control)val5).set_Location(new Point(width - 40 - 15, 23));
+			((Control)val5).set_Width(40);
+			((Control)val5).set_Height(26);
+			val5.set_Font(GameService.Content.get_DefaultFont12());
+			val5.set_TextColor(MaestroTheme.CreamWhite);
+			val5.set_HorizontalAlignment((HorizontalAlignment)1);
+			((Control)val5).set_Visible(false);
+			_progressLabel = val5;
 			_contextMenu = new ContextMenuStrip();
 			((Control)_contextMenu.AddMenuItem("Delete Song")).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
@@ -218,7 +215,7 @@ namespace Maestro.UI.Community
 
 		private void OnActionButtonClicked(object sender, MouseEventArgs e)
 		{
-			if (_downloadState == DownloadState.Idle)
+			if (_downloadState == DownloadState.Idle || _downloadState == DownloadState.Failed || _downloadState == DownloadState.Cancelled)
 			{
 				this.DownloadRequested?.Invoke(this, _song);
 			}
@@ -243,7 +240,8 @@ namespace Maestro.UI.Community
 			switch (_downloadState)
 			{
 			case DownloadState.Idle:
-				_actionButton.set_Text("Download");
+				_actionButton.IconTexture = MaestroIcons.Download;
+				((Control)_actionButton).set_BasicTooltipText("Download");
 				((Control)_actionButton).set_Visible(true);
 				((Control)_actionButton).set_Enabled(true);
 				((Control)_progressLabel).set_Visible(false);
@@ -254,41 +252,27 @@ namespace Maestro.UI.Community
 				((Control)_progressLabel).set_Visible(true);
 				break;
 			case DownloadState.Completed:
-				_actionButton.set_Text("Downloaded");
+				_actionButton.IconTexture = MaestroIcons.Check;
+				((Control)_actionButton).set_BasicTooltipText("Downloaded");
 				((Control)_actionButton).set_Visible(true);
 				((Control)_actionButton).set_Enabled(false);
 				((Control)_progressLabel).set_Visible(false);
 				break;
 			case DownloadState.Failed:
-				_actionButton.set_Text("Retry");
+				_actionButton.IconTexture = MaestroIcons.Refresh;
+				((Control)_actionButton).set_BasicTooltipText("Retry");
 				((Control)_actionButton).set_Visible(true);
 				((Control)_actionButton).set_Enabled(true);
 				((Control)_progressLabel).set_Visible(false);
 				break;
 			case DownloadState.Cancelled:
-				_actionButton.set_Text("Download");
+				_actionButton.IconTexture = MaestroIcons.Download;
+				((Control)_actionButton).set_BasicTooltipText("Download");
 				((Control)_actionButton).set_Visible(true);
 				((Control)_actionButton).set_Enabled(true);
 				((Control)_progressLabel).set_Visible(false);
 				break;
 			}
-		}
-
-		private static Color GetInstrumentColor(InstrumentType instrument)
-		{
-			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-			return (Color)(instrument switch
-			{
-				InstrumentType.Piano => MaestroTheme.Piano, 
-				InstrumentType.Harp => MaestroTheme.Harp, 
-				InstrumentType.Lute => MaestroTheme.Lute, 
-				InstrumentType.Bass => MaestroTheme.Bass, 
-				_ => MaestroTheme.AmberGold, 
-			});
 		}
 
 		protected override void DisposeControl()
@@ -313,7 +297,7 @@ namespace Maestro.UI.Community
 			{
 				((Control)detailsLabel).Dispose();
 			}
-			StandardButton actionButton = _actionButton;
+			IconButton actionButton = _actionButton;
 			if (actionButton != null)
 			{
 				((Control)actionButton).Dispose();

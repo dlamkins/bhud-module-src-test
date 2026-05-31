@@ -6,7 +6,7 @@ namespace Maestro.Models
 		{
 			get
 			{
-				if (NameValid && TranscriberValid && InstrumentValid && NotesValid && !IsDuplicate)
+				if (NameValid && TranscriberValid && InstrumentValid && NotesValid && DurationValid && !IsDuplicate)
 				{
 					return !RateLimitExceeded;
 				}
@@ -30,6 +30,10 @@ namespace Maestro.Models
 
 		public string NotesError { get; set; }
 
+		public bool DurationValid { get; set; }
+
+		public string DurationError { get; set; }
+
 		public bool IsDuplicate { get; set; }
 
 		public string DuplicateError { get; set; }
@@ -46,6 +50,7 @@ namespace Maestro.Models
 				TranscriberValid = true,
 				InstrumentValid = true,
 				NotesValid = true,
+				DurationValid = true,
 				IsDuplicate = false,
 				RateLimitExceeded = false
 			};

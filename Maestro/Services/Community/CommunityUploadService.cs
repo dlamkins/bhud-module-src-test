@@ -18,6 +18,8 @@ namespace Maestro.Services.Community
 
 		private const int MIN_NOTE_COUNT = 10;
 
+		private const long MIN_DURATION_MS = 15000L;
+
 		private readonly CommunityApiClient _apiClient;
 
 		private readonly CommunityService _communityService;
@@ -90,6 +92,16 @@ namespace Maestro.Services.Community
 			else
 			{
 				result.NotesValid = true;
+			}
+			long durationMs = song.DurationMs;
+			if (durationMs < 15000)
+			{
+				result.DurationValid = false;
+				result.DurationError = $"Song must be at least {15L}s long (is {(double)durationMs / 1000.0:0.#}s)";
+			}
+			else
+			{
+				result.DurationValid = true;
 			}
 			if (_communityService.HasManifest && string.IsNullOrEmpty(song.CommunityId))
 			{
@@ -195,6 +207,10 @@ namespace Maestro.Services.Community
 			if (!validation.NotesValid)
 			{
 				return validation.NotesError;
+			}
+			if (!validation.DurationValid)
+			{
+				return validation.DurationError;
 			}
 			if (validation.IsDuplicate)
 			{

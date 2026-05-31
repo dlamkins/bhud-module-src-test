@@ -1,6 +1,9 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Blish_HUD;
 using Blish_HUD.Controls;
+using Maestro.Models;
 using Maestro.UI.Controls;
 using Microsoft.Xna.Framework;
 
@@ -55,7 +58,7 @@ namespace Maestro.UI.Main
 			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0054: Expected O, but got Unknown
-			//IL_016d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0142: Unknown result type (might be due to invalid IL or missing references)
 			((Control)this).set_Size(new Point(width, 36));
 			((Control)this).set_BackgroundColor(Color.get_Transparent());
 			TextBox val = new TextBox();
@@ -83,7 +86,7 @@ namespace Maestro.UI.Main
 				DefaultValue = "All"
 			}, new FilterSection
 			{
-				Items = new string[5] { "All", "Piano", "Harp", "Lute", "Bass" },
+				Items = BuildInstrumentFilterItems(),
 				DefaultValue = "All"
 			}, new FilterSection
 			{
@@ -98,6 +101,14 @@ namespace Maestro.UI.Main
 			{
 				this.FilterChanged?.Invoke(this, EventArgs.Empty);
 			};
+		}
+
+		private static string[] BuildInstrumentFilterItems()
+		{
+			List<string> list = new List<string>();
+			list.Add("All");
+			list.AddRange(InstrumentCatalog.Pickable.Select((InstrumentInfo i) => i.DisplayName));
+			return list.ToArray();
 		}
 
 		public void HideFilterPanel()

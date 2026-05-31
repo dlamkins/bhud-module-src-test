@@ -28,6 +28,8 @@ namespace Maestro.UI
 
 		public static readonly Color LightGray = new Color(128, 128, 128);
 
+		public static readonly Color IconGlyph = new Color(57, 50, 38);
+
 		public static readonly Color Playing = new Color(76, 175, 80);
 
 		public static readonly Color Paused = new Color(255, 193, 7);
@@ -35,14 +37,6 @@ namespace Maestro.UI
 		public static readonly Color Error = new Color(244, 67, 54);
 
 		public static readonly Color Disabled = new Color(85, 85, 85);
-
-		public static readonly Color Piano = new Color(126, 200, 227);
-
-		public static readonly Color Harp = new Color(184, 212, 168);
-
-		public static readonly Color Lute = new Color(232, 193, 112);
-
-		public static readonly Color Bass = new Color(212, 132, 140);
 
 		public static readonly Color PanelBackground = new Color(45, 45, 45, 180);
 
@@ -119,14 +113,6 @@ namespace Maestro.UI
 		public const int CornerRadius = 4;
 
 		private static Texture2D _cornerMask;
-
-		public static readonly Color PianoDark = new Color(90, 176, 208);
-
-		public static readonly Color HarpDark = new Color(140, 196, 144);
-
-		public static readonly Color LuteDark = new Color(212, 166, 86);
-
-		public static readonly Color BassDark = new Color(192, 112, 120);
 
 		public static Texture2D GetCornerMask()
 		{
@@ -255,36 +241,14 @@ namespace Maestro.UI
 
 		public static Color GetInstrumentAccent(InstrumentType instrument)
 		{
-			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-			return (Color)(instrument switch
-			{
-				InstrumentType.Piano => Piano, 
-				InstrumentType.Harp => Harp, 
-				InstrumentType.Lute => Lute, 
-				InstrumentType.Bass => Bass, 
-				_ => AmberGold, 
-			});
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			return InstrumentCatalog.Get(instrument).Accent;
 		}
 
 		public static Color GetInstrumentAccentDark(InstrumentType instrument)
 		{
-			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-			return (Color)(instrument switch
-			{
-				InstrumentType.Piano => PianoDark, 
-				InstrumentType.Harp => HarpDark, 
-				InstrumentType.Lute => LuteDark, 
-				InstrumentType.Bass => BassDark, 
-				_ => WarmBronze, 
-			});
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			return InstrumentCatalog.Get(instrument).AccentDark;
 		}
 
 		public static Color AccentTint(Color accent, float opacity)

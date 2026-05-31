@@ -19,7 +19,7 @@ namespace Maestro.UI.Main
 		{
 			public const int WindowWidth = 420;
 
-			public const int WindowHeight = 520;
+			public const int WindowHeight = 536;
 
 			public const int ContentWidth = 390;
 		}
@@ -63,7 +63,7 @@ namespace Maestro.UI.Main
 		public event EventHandler<Song> EditRequested;
 
 		public MaestroWindow(SongPlayer songPlayer, List<Song> songs, FavoriteService favoriteService)
-			: this(GetBackground(), new Rectangle(0, 0, 420, 520), new Rectangle(15, 20, 390, 520))
+			: this(GetBackground(), new Rectangle(0, 0, 420, 536), new Rectangle(15, 20, 390, 536))
 		{
 			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
@@ -158,7 +158,7 @@ namespace Maestro.UI.Main
 
 		private static Texture2D GetBackground()
 		{
-			return _backgroundTexture ?? (_backgroundTexture = MaestroTheme.CreateWindowBackground(420, 520));
+			return _backgroundTexture ?? (_backgroundTexture = MaestroTheme.CreateWindowBackground(420, 536));
 		}
 
 		private void BuildUi()
@@ -182,7 +182,7 @@ namespace Maestro.UI.Main
 			_nowPlayingPanel.StopRequested += OnStopRequested;
 			_nowPlayingPanel.PlayPendingRequested += OnPlayPendingRequested;
 			_nowPlayingPanel.QueueToggleClicked += OnQueueToggleClicked;
-			return currentY + 130 + 7;
+			return currentY + 144 + 7;
 		}
 
 		private int BuildFilterBar(int currentY)
@@ -550,7 +550,7 @@ namespace Maestro.UI.Main
 			{
 				return songs;
 			}
-			if (Enum.TryParse<InstrumentType>(filter, out var instrument))
+			if (InstrumentCatalog.TryFromDisplayName(filter, out var instrument))
 			{
 				return songs.Where((Song s) => s.Instrument == instrument);
 			}

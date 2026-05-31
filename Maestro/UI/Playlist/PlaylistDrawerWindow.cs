@@ -5,6 +5,7 @@ using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Maestro.Models;
 using Maestro.Services;
+using Maestro.UI.Controls;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -16,7 +17,7 @@ namespace Maestro.UI.Playlist
 		{
 			public const int WindowWidth = 250;
 
-			public const int WindowHeight = 400;
+			public const int WindowHeight = 386;
 
 			public const int ContentWidth = 220;
 
@@ -24,9 +25,9 @@ namespace Maestro.UI.Playlist
 
 			public const int ContentPaddingX = 15;
 
-			public const int HeaderHeight = 50;
-
 			public const int ButtonSpacing = 8;
+
+			public const int ButtonWidth = 40;
 
 			public const int ButtonHeight = 30;
 
@@ -35,6 +36,12 @@ namespace Maestro.UI.Playlist
 			public const int OuterPadding = 6;
 
 			public const int DragHandleHalfWidth = 6;
+
+			public const int ListTop = 6;
+
+			public const int FooterButtonY = 329;
+
+			public const int ListHeight = 317;
 		}
 
 		private const float ANIMATION_DURATION = 0.15f;
@@ -49,11 +56,9 @@ namespace Maestro.UI.Playlist
 
 		private readonly int _cardWidth;
 
-		private Panel _header;
-
 		private StandardButton _clearButton;
 
-		private StandardButton _playButton;
+		private IconButton _playButton;
 
 		private FlowPanel _songList;
 
@@ -78,7 +83,7 @@ namespace Maestro.UI.Playlist
 		public event EventHandler PlayQueueRequested;
 
 		public PlaylistDrawerWindow(PlaylistService playlistService)
-			: this(GetBackground(), new Rectangle(0, 0, 250, 400), new Rectangle(15, 20, 220, 365))
+			: this(GetBackground(), new Rectangle(0, 0, 250, 386), new Rectangle(15, 20, 220, 365))
 		{
 			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
@@ -165,71 +170,37 @@ namespace Maestro.UI.Playlist
 
 		private static Texture2D GetBackground()
 		{
-			return _backgroundTexture ?? (_backgroundTexture = MaestroTheme.CreateDrawerBackground(250, 400));
+			return _backgroundTexture ?? (_backgroundTexture = MaestroTheme.CreateDrawerBackground(250, 386));
 		}
 
 		private void BuildContent()
 		{
-			BuildHeader();
-			BuildButtons();
 			BuildSongList();
+			BuildButtons();
 			BuildInstrumentOverlay();
-		}
-
-		private void BuildHeader()
-		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0041: Expected O, but got Unknown
-			Panel val = new Panel();
-			((Control)val).set_Parent((Container)(object)this);
-			((Control)val).set_Location(Point.get_Zero());
-			((Control)val).set_Size(new Point(220, 50));
-			((Control)val).set_BackgroundColor(MaestroTheme.DrawerHeader);
-			val.set_ShowBorder(true);
-			_header = val;
 		}
 
 		private void BuildButtons()
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003b: Expected O, but got Unknown
-			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008e: Expected O, but got Unknown
-			StandardButton val = new StandardButton();
-			((Control)val).set_Parent((Container)(object)this);
-			val.set_Text("Clear");
-			((Control)val).set_Location(new Point(6, 10));
-			((Control)val).set_Width(100);
-			((Control)val).set_Height(30);
-			_clearButton = val;
+			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
+			IconButton iconButton = new IconButton(MaestroIcons.Trash, MaestroTheme.IconGlyph);
+			((Control)iconButton).set_Parent((Container)(object)this);
+			((Control)iconButton).set_BasicTooltipText("Clear queue");
+			((Control)iconButton).set_Location(new Point(66, 329));
+			((Control)iconButton).set_Width(40);
+			((Control)iconButton).set_Height(30);
+			_clearButton = (StandardButton)(object)iconButton;
 			((Control)_clearButton).add_Click((EventHandler<MouseEventArgs>)OnClearClicked);
-			StandardButton val2 = new StandardButton();
-			((Control)val2).set_Parent((Container)(object)this);
-			val2.set_Text("Play queue");
-			((Control)val2).set_Location(new Point(114, 10));
-			((Control)val2).set_Width(100);
-			((Control)val2).set_Height(30);
-			_playButton = val2;
+			IconButton iconButton2 = new IconButton(MaestroIcons.Play, MaestroTheme.IconGlyph);
+			((Control)iconButton2).set_Parent((Container)(object)this);
+			((Control)iconButton2).set_BasicTooltipText("Play queue");
+			((Control)iconButton2).set_Location(new Point(114, 329));
+			((Control)iconButton2).set_Width(40);
+			((Control)iconButton2).set_Height(30);
+			_playButton = iconButton2;
 			((Control)_playButton).add_Click((EventHandler<MouseEventArgs>)OnPlayClicked);
 		}
 
@@ -238,23 +209,23 @@ namespace Maestro.UI.Playlist
 			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007f: Expected O, but got Unknown
+			//IL_007e: Expected O, but got Unknown
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Parent((Container)(object)this);
-			((Control)val).set_Location(new Point(0, 56));
-			((Control)val).set_Size(new Point(220, 309));
+			((Control)val).set_Location(new Point(0, 6));
+			((Control)val).set_Size(new Point(220, 317));
 			val.set_FlowDirection((ControlFlowDirection)3);
 			val.set_ControlPadding(new Vector2(0f, 4f));
 			val.set_OuterControlPadding(new Vector2(6f, 6f));
@@ -269,39 +240,39 @@ namespace Maestro.UI.Playlist
 			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005a: Expected O, but got Unknown
-			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00df: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ee: Expected O, but got Unknown
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0059: Expected O, but got Unknown
+			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ed: Expected O, but got Unknown
 			Panel val = new Panel();
 			((Control)val).set_Parent((Container)(object)this);
-			((Control)val).set_Location(new Point(0, 56));
-			((Control)val).set_Size(new Point(220, 309));
+			((Control)val).set_Location(new Point(0, 6));
+			((Control)val).set_Size(new Point(220, 317));
 			((Control)val).set_BackgroundColor(new Color(20, 25, 35, 240));
 			((Control)val).set_ZIndex(100);
 			((Control)val).set_Visible(false);
 			_instrumentOverlay = val;
 			int labelHeight = 60;
-			int centerY = (309 - labelHeight) / 2;
+			int centerY = (317 - labelHeight) / 2;
 			Label val2 = new Label();
 			((Control)val2).set_Parent((Container)(object)_instrumentOverlay);
 			val2.set_Text("");
@@ -433,7 +404,9 @@ namespace Maestro.UI.Playlist
 
 		private void UpdatePlayButtonText()
 		{
-			_playButton.set_Text((_isPlayingFromQueue && _playlistService.HasItems) ? "Next" : "Play queue");
+			bool isNext = _isPlayingFromQueue && _playlistService.HasItems;
+			_playButton.IconTexture = (isNext ? MaestroIcons.Next : MaestroIcons.Play);
+			((Control)_playButton).set_BasicTooltipText(isNext ? "Next" : "Play queue");
 		}
 
 		private static Point GetDragHandleOffset()
@@ -554,17 +527,12 @@ namespace Maestro.UI.Playlist
 
 		private void DisposeControls()
 		{
-			Panel header = _header;
-			if (header != null)
-			{
-				((Control)header).Dispose();
-			}
 			StandardButton clearButton = _clearButton;
 			if (clearButton != null)
 			{
 				((Control)clearButton).Dispose();
 			}
-			StandardButton playButton = _playButton;
+			IconButton playButton = _playButton;
 			if (playButton != null)
 			{
 				((Control)playButton).Dispose();

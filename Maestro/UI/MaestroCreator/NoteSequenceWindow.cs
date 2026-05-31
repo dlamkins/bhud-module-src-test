@@ -100,6 +100,7 @@ namespace Maestro.UI.MaestroCreator
 
 		public override void Hide()
 		{
+			ScreenNotification.ShowNotification("Close the Creator from its main window instead.", (NotificationType)1, (Texture2D)null, 4);
 		}
 
 		protected override void DisposeControl()

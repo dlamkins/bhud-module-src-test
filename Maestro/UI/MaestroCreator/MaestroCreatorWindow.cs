@@ -20,35 +20,37 @@ namespace Maestro.UI.MaestroCreator
 		{
 			public const int WindowWidth = 420;
 
-			public const int WindowHeight = 360;
+			public const int WindowHeight = 408;
 
 			public const int ContentWidth = 390;
 
-			public const int ContentHeight = 350;
+			public const int ContentLeftInset = 15;
+
+			public const int ContentHeight = 398;
 
 			public const int RowHeight = 28;
 
 			public const int ChordBarHeight = 30;
 
-			public const int TitleInputX = 35;
+			public const int TitleInputX = 45;
 
-			public const int TitleInputWidth = 95;
+			public const int TitleInputWidth = 345;
 
-			public const int ArtistLabelX = 135;
+			public const int ArtistInputX = 48;
 
-			public const int ArtistInputX = 175;
+			public const int ArtistInputWidth = 140;
 
-			public const int ArtistInputWidth = 70;
+			public const int ByLabelX = 200;
 
-			public const int TranscriberLabelX = 250;
+			public const int ByInputX = 228;
 
-			public const int TranscriberInputX = 275;
+			public const int ByInputWidth = 162;
 
-			public const int TranscriberInputWidth = 115;
+			public const int ActionButtonWidth = 90;
 
-			public const int ActionButtonWidth = 80;
+			public const int ActionButtonHeight = 30;
 
-			public const int ActionButtonSpacing = 10;
+			public const int ActionButtonSpacing = 12;
 
 			public const int ChordPreviewMaxLength = 38;
 
@@ -113,14 +115,23 @@ namespace Maestro.UI.MaestroCreator
 
 		private static Texture2D GetBackground()
 		{
-			return _backgroundTexture ?? (_backgroundTexture = MaestroTheme.CreateWindowBackground(420, 360));
+			return _backgroundTexture ?? (_backgroundTexture = MaestroTheme.CreateWindowBackground(420, 408));
+		}
+
+		private static string ShortInstrumentName(InstrumentType instrument)
+		{
+			if (instrument != InstrumentType.Bell && instrument != InstrumentType.BellMagnanimous)
+			{
+				return InstrumentCatalog.Get(instrument).DisplayName;
+			}
+			return "Bell";
 		}
 
 		public void SetInstrument(InstrumentType instrument)
 		{
-			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
 			_instrument = instrument;
-			((WindowBase2)this).set_Subtitle(instrument.ToString());
+			((WindowBase2)this).set_Subtitle(ShortInstrumentName(instrument));
 			_pianoKeyboard.Configure(instrument);
 			_durationSelector.SetAccentColor(instrument);
 			if (_isChordMode)
@@ -162,7 +173,7 @@ namespace Maestro.UI.MaestroCreator
 			else
 			{
 				_isWaitingForConfirmation = true;
-				_confirmationLabel.set_Text($"Equip your {_instrument} and click Ready");
+				_confirmationLabel.set_Text("Equip your " + ShortInstrumentName(_instrument) + " and click Ready");
 				((Control)_confirmationOverlay).set_Visible(true);
 				_pianoKeyboard.SetOctaveButtonsEnabled(enabled: false);
 			}
@@ -196,7 +207,7 @@ namespace Maestro.UI.MaestroCreator
 				_isWaitingForConfirmation = false;
 				((Control)_confirmationOverlay).set_Visible(false);
 				_chordPreviewLabel.set_Text("Resetting octave...");
-				if (_instrument == InstrumentType.Bass)
+				if (InstrumentCatalog.Get(_instrument).MinOctave == 0)
 				{
 					ResetToLowOctave();
 				}
@@ -220,7 +231,7 @@ namespace Maestro.UI.MaestroCreator
 		}
 
 		public MaestroCreatorWindow()
-			: this(GetBackground(), new Rectangle(0, 0, 420, 360), new Rectangle(15, 20, 390, 350))
+			: this(GetBackground(), new Rectangle(0, 0, 420, 408), new Rectangle(15, 20, 390, 398))
 		{
 			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
@@ -229,102 +240,103 @@ namespace Maestro.UI.MaestroCreator
 			//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d6: Expected O, but got Unknown
-			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0106: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011e: Expected O, but got Unknown
-			//IL_0131: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0136: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0144: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0156: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0166: Expected O, but got Unknown
-			//IL_0180: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01fd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d9: Expected O, but got Unknown
+			//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0107: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0112: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0122: Expected O, but got Unknown
+			//IL_0135: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0141: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0148: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0152: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016d: Expected O, but got Unknown
+			//IL_0187: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ff: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0204: Unknown result type (might be due to invalid IL or missing references)
-			//IL_020f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0212: Unknown result type (might be due to invalid IL or missing references)
-			//IL_021c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0221: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_023b: Expected O, but got Unknown
-			//IL_0253: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0258: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0216: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0219: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0223: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0228: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0232: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0242: Expected O, but got Unknown
+			//IL_025a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_025f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_026a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_026e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0278: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0280: Unknown result type (might be due to invalid IL or missing references)
-			//IL_028a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_029a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_029b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b1: Expected O, but got Unknown
-			//IL_02b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0266: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0271: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0275: Unknown result type (might be due to invalid IL or missing references)
+			//IL_027f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0287: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0291: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b8: Expected O, but got Unknown
+			//IL_02b9: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02c5: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02d0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02da: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02df: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02e9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02e1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02e6: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02f0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0300: Expected O, but got Unknown
-			//IL_032d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0332: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02f7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0307: Expected O, but got Unknown
+			//IL_0334: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0339: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0344: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0347: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0351: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0356: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0365: Expected O, but got Unknown
-			//IL_037d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0382: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0340: Unknown result type (might be due to invalid IL or missing references)
+			//IL_034b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_034e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0358: Unknown result type (might be due to invalid IL or missing references)
+			//IL_035d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_036c: Expected O, but got Unknown
+			//IL_0384: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0389: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0394: Unknown result type (might be due to invalid IL or missing references)
-			//IL_039d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03a7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03ac: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03bb: Expected O, but got Unknown
-			//IL_049e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0390: Unknown result type (might be due to invalid IL or missing references)
+			//IL_039b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03a4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03ae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03c2: Expected O, but got Unknown
+			//IL_04a5: Unknown result type (might be due to invalid IL or missing references)
 			//IL_04aa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04b9: Unknown result type (might be due to invalid IL or missing references)
 			//IL_04c3: Unknown result type (might be due to invalid IL or missing references)
 			//IL_04cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04e0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04e8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04f4: Expected O, but got Unknown
+			//IL_04d8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04e2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04eb: Unknown result type (might be due to invalid IL or missing references)
 			//IL_04f5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04fa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0506: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0511: Unknown result type (might be due to invalid IL or missing references)
-			//IL_051d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0527: Unknown result type (might be due to invalid IL or missing references)
-			//IL_052f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0539: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0549: Unknown result type (might be due to invalid IL or missing references)
-			//IL_054a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0554: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0560: Expected O, but got Unknown
-			//IL_0561: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0566: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0572: Unknown result type (might be due to invalid IL or missing references)
-			//IL_057d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_058c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0596: Unknown result type (might be due to invalid IL or missing references)
-			//IL_059b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05aa: Expected O, but got Unknown
+			//IL_04fd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0509: Expected O, but got Unknown
+			//IL_050a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_050f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_051b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0526: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0532: Unknown result type (might be due to invalid IL or missing references)
+			//IL_053c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0544: Unknown result type (might be due to invalid IL or missing references)
+			//IL_054e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_055e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_055f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0569: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0575: Expected O, but got Unknown
+			//IL_0576: Unknown result type (might be due to invalid IL or missing references)
+			//IL_057b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0587: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0592: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05a1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05b0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05bf: Expected O, but got Unknown
 			((WindowBase2)this).set_Title("Maestro Creator");
 			((WindowBase2)this).set_Emblem(Module.Instance.ContentsManager.GetTexture("creator-emblem.png"));
 			((WindowBase2)this).set_SavesPosition(true);
@@ -335,25 +347,26 @@ namespace Maestro.UI.MaestroCreator
 			CreateLabel("Title:", 0, currentY);
 			TextBox val = new TextBox();
 			((Control)val).set_Parent((Container)(object)this);
-			((Control)val).set_Location(new Point(35, currentY));
-			((Control)val).set_Width(95);
+			((Control)val).set_Location(new Point(45, currentY));
+			((Control)val).set_Width(345);
 			((TextInputBase)val).set_PlaceholderText("Song title");
 			_titleInput = val;
-			CreateLabel("Artist:", 135, currentY);
+			currentY += 35;
+			CreateLabel("Artist:", 0, currentY);
 			TextBox val2 = new TextBox();
 			((Control)val2).set_Parent((Container)(object)this);
-			((Control)val2).set_Location(new Point(175, currentY));
-			((Control)val2).set_Width(70);
+			((Control)val2).set_Location(new Point(48, currentY));
+			((Control)val2).set_Width(140);
 			((TextInputBase)val2).set_PlaceholderText("Artist");
 			_artistInput = val2;
-			CreateLabel("By:", 250, currentY);
+			CreateLabel("By:", 200, currentY);
 			TextBox val3 = new TextBox();
 			((Control)val3).set_Parent((Container)(object)this);
-			((Control)val3).set_Location(new Point(275, currentY));
-			((Control)val3).set_Width(115);
+			((Control)val3).set_Location(new Point(228, currentY));
+			((Control)val3).set_Width(162);
 			((TextInputBase)val3).set_PlaceholderText("Your name");
 			_transcriberInput = val3;
-			currentY += 35;
+			currentY += 42;
 			PianoKeyboard pianoKeyboard = new PianoKeyboard(390);
 			((Control)pianoKeyboard).set_Parent((Container)(object)this);
 			((Control)pianoKeyboard).set_Location(new Point(0, currentY));
@@ -394,20 +407,20 @@ namespace Maestro.UI.MaestroCreator
 			_addChordButton = val6;
 			((Control)_addChordButton).add_Click((EventHandler<MouseEventArgs>)OnAddChordClicked);
 			currentY += 44;
-			int totalButtonsWidth = 170;
+			int totalButtonsWidth = 192;
 			int buttonsStartX = (390 - totalButtonsWidth) / 2;
 			StandardButton val7 = new StandardButton();
 			((Control)val7).set_Parent((Container)(object)this);
 			val7.set_Text("Save");
 			((Control)val7).set_Location(new Point(buttonsStartX, currentY));
-			((Control)val7).set_Size(new Point(80, 26));
+			((Control)val7).set_Size(new Point(90, 30));
 			_saveButton = val7;
 			((Control)_saveButton).add_Click((EventHandler<MouseEventArgs>)OnSaveClicked);
 			StandardButton val8 = new StandardButton();
 			((Control)val8).set_Parent((Container)(object)this);
 			val8.set_Text("Cancel");
-			((Control)val8).set_Location(new Point(buttonsStartX + 80 + 10, currentY));
-			((Control)val8).set_Size(new Point(80, 26));
+			((Control)val8).set_Location(new Point(buttonsStartX + 90 + 12, currentY));
+			((Control)val8).set_Size(new Point(90, 30));
 			_cancelButton = val8;
 			((Control)_cancelButton).add_Click((EventHandler<MouseEventArgs>)OnCancelClicked);
 			_creatorPlayer = new SongPlayer(Module.Instance.KeyboardService);
@@ -421,7 +434,7 @@ namespace Maestro.UI.MaestroCreator
 			_noteSequencePanel.SelectionChanged += OnNoteSequenceStateChanged;
 			Panel val9 = new Panel();
 			((Control)val9).set_Parent((Container)(object)this);
-			((Control)val9).set_Location(new Point(0, 37));
+			((Control)val9).set_Location(new Point(0, ((Control)_pianoKeyboard).get_Location().Y));
 			((Control)val9).set_Size(new Point(390, PianoKeyboard.Layout.TotalHeight));
 			((Control)val9).set_BackgroundColor(new Color(0, 0, 0, 200));
 			((Control)val9).set_ZIndex(100);
@@ -624,14 +637,7 @@ namespace Maestro.UI.MaestroCreator
 					sb.Append("#");
 				}
 				int octave = _pianoKeyboard.CurrentOctave;
-				if (_instrument == InstrumentType.Bass)
-				{
-					if (octave > 0)
-					{
-						sb.Append("+");
-					}
-				}
-				else if (octave > 0)
+				if (octave > 0)
 				{
 					sb.Append("+");
 				}

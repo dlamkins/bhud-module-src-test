@@ -18,7 +18,7 @@ namespace Maestro.UI.Community
 		{
 			public const int WindowWidth = 420;
 
-			public const int WindowHeight = 355;
+			public const int WindowHeight = 370;
 
 			public const int ContentWidth = 390;
 
@@ -59,6 +59,8 @@ namespace Maestro.UI.Community
 
 		private Label _notesValidation;
 
+		private Label _durationValidation;
+
 		private Label _duplicateValidation;
 
 		private Label _rateLimitValidation;
@@ -83,11 +85,11 @@ namespace Maestro.UI.Community
 
 		private static Texture2D GetBackground()
 		{
-			return _backgroundTexture ?? (_backgroundTexture = MaestroTheme.CreateWindowBackground(420, 355));
+			return _backgroundTexture ?? (_backgroundTexture = MaestroTheme.CreateWindowBackground(420, 370));
 		}
 
 		public UploadWindow(CommunityUploadService uploadService, List<Song> songs)
-			: this(GetBackground(), new Rectangle(0, 0, 420, 355), new Rectangle(15, 20, 390, 355))
+			: this(GetBackground(), new Rectangle(0, 0, 420, 370), new Rectangle(15, 20, 390, 370))
 		{
 			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
@@ -126,57 +128,57 @@ namespace Maestro.UI.Community
 			//IL_01d4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01db: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01e7: Expected O, but got Unknown
-			//IL_0285: Unknown result type (might be due to invalid IL or missing references)
-			//IL_028a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0291: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0294: Unknown result type (might be due to invalid IL or missing references)
 			//IL_029e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ca: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02d9: Expected O, but got Unknown
-			//IL_02df: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02e4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02eb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ee: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02c2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02e2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02f2: Expected O, but got Unknown
 			//IL_02f8: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02fd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0304: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0307: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0313: Expected O, but got Unknown
-			//IL_0314: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0319: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0311: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0316: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0320: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0323: Unknown result type (might be due to invalid IL or missing references)
+			//IL_032c: Expected O, but got Unknown
 			//IL_032d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0334: Unknown result type (might be due to invalid IL or missing references)
-			//IL_033f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_034b: Expected O, but got Unknown
-			//IL_034c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0351: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0332: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0339: Unknown result type (might be due to invalid IL or missing references)
+			//IL_033c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0346: Unknown result type (might be due to invalid IL or missing references)
+			//IL_034d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0358: Unknown result type (might be due to invalid IL or missing references)
-			//IL_035c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0366: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0364: Expected O, but got Unknown
+			//IL_0365: Unknown result type (might be due to invalid IL or missing references)
+			//IL_036a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0371: Unknown result type (might be due to invalid IL or missing references)
-			//IL_037c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_037d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_038c: Expected O, but got Unknown
-			//IL_0391: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0375: Unknown result type (might be due to invalid IL or missing references)
+			//IL_037f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_038a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0395: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0396: Unknown result type (might be due to invalid IL or missing references)
-			//IL_039d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03a5: Expected O, but got Unknown
+			//IL_03aa: Unknown result type (might be due to invalid IL or missing references)
 			//IL_03af: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03b9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03c1: Unknown result type (might be due to invalid IL or missing references)
 			//IL_03c8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03d4: Expected O, but got Unknown
-			//IL_03ec: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03f1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03f8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0403: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03d2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03e1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03ed: Expected O, but got Unknown
+			//IL_0405: Unknown result type (might be due to invalid IL or missing references)
 			//IL_040a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0414: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0419: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0428: Expected O, but got Unknown
+			//IL_0411: Unknown result type (might be due to invalid IL or missing references)
+			//IL_041c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0423: Unknown result type (might be due to invalid IL or missing references)
+			//IL_042d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0432: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0441: Expected O, but got Unknown
 			int currentY = 2;
 			CreateLabel("Select Song:", 0, currentY);
 			CustomDropdown customDropdown = new CustomDropdown();
@@ -218,7 +220,7 @@ namespace Maestro.UI.Community
 			Panel val2 = new Panel();
 			((Control)val2).set_Parent((Container)(object)this);
 			((Control)val2).set_Location(new Point(0, currentY));
-			((Control)val2).set_Size(new Point(390, 95));
+			((Control)val2).set_Size(new Point(390, 110));
 			val2.set_ShowBorder(true);
 			val2.set_CanScroll(true);
 			_validationPanel = val2;
@@ -227,9 +229,10 @@ namespace Maestro.UI.Community
 			_transcriberValidation = CreateValidationRow(_validationPanel, "Transcriber (min 2 chars)", ref valY);
 			_instrumentValidation = CreateValidationRow(_validationPanel, "Instrument selected", ref valY);
 			_notesValidation = CreateValidationRow(_validationPanel, "At least 10 notes", ref valY);
+			_durationValidation = CreateValidationRow(_validationPanel, "Duration (min 15s)", ref valY);
 			_duplicateValidation = CreateValidationRow(_validationPanel, "Not a duplicate", ref valY);
 			_rateLimitValidation = CreateValidationRow(_validationPanel, "Upload limit OK", ref valY);
-			currentY += 102;
+			currentY += 117;
 			Label val3 = new Label();
 			((Control)val3).set_Parent((Container)(object)this);
 			((Control)val3).set_Location(new Point(0, currentY));
@@ -406,6 +409,7 @@ namespace Maestro.UI.Community
 			UpdateValidationLabel(_transcriberValidation, "Transcriber (min 2 chars)", validation.TranscriberValid, validation.TranscriberError);
 			UpdateValidationLabel(_instrumentValidation, "Instrument selected", validation.InstrumentValid, validation.InstrumentError);
 			UpdateValidationLabel(_notesValidation, "At least 10 notes", validation.NotesValid, validation.NotesError);
+			UpdateValidationLabel(_durationValidation, "Duration (min 15s)", validation.DurationValid, validation.DurationError);
 			UpdateValidationLabel(_duplicateValidation, "Not a duplicate", !validation.IsDuplicate, validation.DuplicateError);
 			UpdateValidationLabel(_rateLimitValidation, "Upload limit OK", !validation.RateLimitExceeded, validation.RateLimitError);
 			((Control)_uploadButton).set_Enabled(validation.IsValid && !_isUploading);

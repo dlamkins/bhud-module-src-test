@@ -333,23 +333,21 @@ namespace Maestro.Services.Playback
 		{
 			IsAdjustingOctave = true;
 			Logger.Debug("Resetting octave...");
-			for (int i = 0; i < 5; i++)
+			for (int j = 0; j < 5; j++)
 			{
 				_keyboardService.KeyDown((Keys)96);
 				_keyboardService.KeyUp((Keys)96);
 				Thread.Sleep(150);
 			}
-			Song currentSong = CurrentSong;
-			if (currentSong == null || currentSong.Instrument != InstrumentType.Bass)
+			int ups = ((CurrentSong == null) ? 1 : (-InstrumentCatalog.Get(CurrentSong.Instrument).MinOctave));
+			for (int i = 0; i < ups; i++)
 			{
 				_keyboardService.KeyDown((Keys)105);
 				_keyboardService.KeyUp((Keys)105);
 				Thread.Sleep(150);
 			}
 			IsAdjustingOctave = false;
-			Logger logger = Logger;
-			Song currentSong2 = CurrentSong;
-			logger.Debug((currentSong2 != null && currentSong2.Instrument == InstrumentType.Bass) ? "Octave reset complete - Bass at Low octave" : "Octave reset complete - now at middle octave");
+			Logger.Debug((ups == 0) ? "Octave reset complete - at lowest octave" : "Octave reset complete - now at middle octave");
 		}
 
 		private void ResetToTargetOctave(int targetOctave)
@@ -362,9 +360,8 @@ namespace Maestro.Services.Playback
 				_keyboardService.KeyUp((Keys)96);
 				Thread.Sleep(150);
 			}
-			Song currentSong = CurrentSong;
-			int upsNeeded = ((currentSong != null && currentSong.Instrument == InstrumentType.Bass) ? targetOctave : (targetOctave + 1));
-			upsNeeded = Math.Max(0, upsNeeded);
+			int minOctave = ((CurrentSong != null) ? InstrumentCatalog.Get(CurrentSong.Instrument).MinOctave : (-1));
+			int upsNeeded = Math.Max(0, targetOctave - minOctave);
 			for (int i = 0; i < upsNeeded; i++)
 			{
 				_keyboardService.KeyDown((Keys)105);

@@ -6,6 +6,8 @@ namespace Maestro.Models
 		Harp,
 		Lute,
 		Bass,
-		Bell
+		Flute,
+		Bell,
+		BellMagnanimous
 	}
 }

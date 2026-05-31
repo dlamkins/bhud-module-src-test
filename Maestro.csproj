@@ -13,19 +13,61 @@
     <RootNamespace />
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Maestro\ref.cancel-icon.png" />
+    <None Remove="Maestro\ref.check-icon.png" />
+    <None Remove="Maestro\ref.clipboard-icon.png" />
     <None Remove="Maestro\ref.community-emblem.png" />
+    <None Remove="Maestro\ref.community-icon.png" />
+    <None Remove="Maestro\ref.create-icon.png" />
     <None Remove="Maestro\ref.creator-emblem.png" />
+    <None Remove="Maestro\ref.download-icon.png" />
     <None Remove="Maestro\ref.icon.png" />
     <None Remove="Maestro\ref.import-emblem.png" />
+    <None Remove="Maestro\ref.import-icon.png" />
     <None Remove="Maestro\ref.maestro-emblem.png" />
+    <None Remove="Maestro\ref.next-icon.png" />
+    <None Remove="Maestro\ref.pause-icon.png" />
+    <None Remove="Maestro\ref.play-icon.png" />
+    <None Remove="Maestro\ref.playall-icon.png" />
+    <None Remove="Maestro\ref.queue-icon.png" />
+    <None Remove="Maestro\ref.refresh-icon.png" />
+    <None Remove="Maestro\ref.save-icon.png" />
+    <None Remove="Maestro\ref.section-icon.png" />
+    <None Remove="Maestro\ref.star-filled.png" />
+    <None Remove="Maestro\ref.star-outline.png" />
+    <None Remove="Maestro\ref.stop-icon.png" />
+    <None Remove="Maestro\ref.trash-icon.png" />
+    <None Remove="Maestro\ref.undo-icon.png" />
     <None Remove="Maestro\ref.upload-emblem.png" />
+    <None Remove="Maestro\ref.upload-icon.png" />
     <None Remove="Maestro\ref.songs.json" />
+    <EmbeddedResource Include="Maestro\ref.cancel-icon.png" />
+    <EmbeddedResource Include="Maestro\ref.check-icon.png" />
+    <EmbeddedResource Include="Maestro\ref.clipboard-icon.png" />
     <EmbeddedResource Include="Maestro\ref.community-emblem.png" />
+    <EmbeddedResource Include="Maestro\ref.community-icon.png" />
+    <EmbeddedResource Include="Maestro\ref.create-icon.png" />
     <EmbeddedResource Include="Maestro\ref.creator-emblem.png" />
+    <EmbeddedResource Include="Maestro\ref.download-icon.png" />
     <EmbeddedResource Include="Maestro\ref.icon.png" />
     <EmbeddedResource Include="Maestro\ref.import-emblem.png" />
+    <EmbeddedResource Include="Maestro\ref.import-icon.png" />
     <EmbeddedResource Include="Maestro\ref.maestro-emblem.png" />
+    <EmbeddedResource Include="Maestro\ref.next-icon.png" />
+    <EmbeddedResource Include="Maestro\ref.pause-icon.png" />
+    <EmbeddedResource Include="Maestro\ref.play-icon.png" />
+    <EmbeddedResource Include="Maestro\ref.playall-icon.png" />
+    <EmbeddedResource Include="Maestro\ref.queue-icon.png" />
+    <EmbeddedResource Include="Maestro\ref.refresh-icon.png" />
+    <EmbeddedResource Include="Maestro\ref.save-icon.png" />
+    <EmbeddedResource Include="Maestro\ref.section-icon.png" />
+    <EmbeddedResource Include="Maestro\ref.star-filled.png" />
+    <EmbeddedResource Include="Maestro\ref.star-outline.png" />
+    <EmbeddedResource Include="Maestro\ref.stop-icon.png" />
+    <EmbeddedResource Include="Maestro\ref.trash-icon.png" />
+    <EmbeddedResource Include="Maestro\ref.undo-icon.png" />
     <EmbeddedResource Include="Maestro\ref.upload-emblem.png" />
+    <EmbeddedResource Include="Maestro\ref.upload-icon.png" />
     <EmbeddedResource Include="Maestro\ref.songs.json" />
   </ItemGroup>
   <ItemGroup>

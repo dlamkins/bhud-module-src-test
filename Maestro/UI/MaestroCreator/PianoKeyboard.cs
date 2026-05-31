@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
@@ -486,33 +487,13 @@ namespace Maestro.UI.MaestroCreator
 
 		public void Configure(InstrumentType instrument)
 		{
-			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
 			_instrument = instrument;
-			switch (instrument)
-			{
-			case InstrumentType.Piano:
-				_sharpsEnabled = true;
-				_minOctave = -1;
-				_maxOctave = 1;
-				break;
-			case InstrumentType.Harp:
-			case InstrumentType.Lute:
-				_sharpsEnabled = false;
-				_minOctave = -1;
-				_maxOctave = 1;
-				break;
-			case InstrumentType.Bass:
-				_sharpsEnabled = false;
-				_minOctave = 0;
-				_maxOctave = 1;
-				break;
-			default:
-				_sharpsEnabled = true;
-				_minOctave = -1;
-				_maxOctave = 1;
-				break;
-			}
+			InstrumentInfo info = InstrumentCatalog.Get(instrument);
+			_sharpsEnabled = info.SharpsEnabled;
+			_minOctave = info.MinOctave;
+			_maxOctave = info.MaxOctave;
 			Panel[] blackKeyPanels = _blackKeyPanels;
 			foreach (Panel key in blackKeyPanels)
 			{
@@ -521,25 +502,22 @@ namespace Maestro.UI.MaestroCreator
 					((Control)key).set_Visible(_sharpsEnabled);
 				}
 			}
-			_currentOctave = ((_instrument == InstrumentType.Bass) ? 0 : 0);
+			_currentOctave = ((0 < _minOctave) ? _minOctave : 0);
 			_accentColor = MaestroTheme.GetInstrumentAccent(instrument);
 			UpdateOctaveDisplay();
 		}
 
 		private void UpdateOctaveDisplay()
 		{
-			//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0101: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0109: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0100: Unknown result type (might be due to invalid IL or missing references)
 			if (_octaveLabel != null)
 			{
-				string octaveName = ((_instrument == InstrumentType.Bass) ? ((_currentOctave == 0) ? "Low" : "High") : (_currentOctave switch
-				{
-					-1 => "Lower (-)", 
-					1 => "Upper (+)", 
-					_ => "Middle", 
-				}));
+				IReadOnlyList<string> labels = InstrumentCatalog.Get(_instrument).OctaveLabels;
+				int index = _currentOctave - _minOctave;
+				string octaveName = ((index >= 0 && index < labels.Count) ? labels[index] : "Middle");
 				_octaveLabel.set_Text("Octave: " + octaveName);
 			}
 			if (_octaveDownButton != null)

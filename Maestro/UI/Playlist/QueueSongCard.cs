@@ -3,6 +3,7 @@ using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Maestro.Models;
+using Maestro.UI.Controls;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.BitmapFonts;
@@ -74,7 +75,7 @@ namespace Maestro.UI.Playlist
 			_song = song;
 			_index = index;
 			base._size = new Point(width, 40);
-			_dragHandleBounds = new Rectangle(12, 12, 12, 16);
+			_dragHandleBounds = new Rectangle(12, 12, 16, 16);
 			_removeButtonBounds = new Rectangle(width - 24 - 22, 8, 24, 24);
 		}
 
@@ -157,42 +158,39 @@ namespace Maestro.UI.Playlist
 			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0144: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0149: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0152: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0157: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0160: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0165: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0190: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0195: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_020c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0211: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0223: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0258: Unknown result type (might be due to invalid IL or missing references)
-			//IL_025d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0129: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0137: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0145: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0175: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0208: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0214: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0284: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0286: Unknown result type (might be due to invalid IL or missing references)
 			float opacity = ((Control)this).get_Opacity();
 			Color bgColor = (((Control)this).get_MouseOver() ? MaestroTheme.PanelHover : MaestroTheme.PanelBackground);
 			((Color)(ref bgColor))._002Ector((int)((Color)(ref bgColor)).get_R(), (int)((Color)(ref bgColor)).get_G(), (int)((Color)(ref bgColor)).get_B(), (int)((float)(int)((Color)(ref bgColor)).get_A() * opacity));
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), bounds, bgColor);
-			Color instrumentColor = GetInstrumentColor(_song.Instrument);
+			Color instrumentColor = MaestroTheme.GetInstrumentAccent(_song.Instrument);
 			((Color)(ref instrumentColor))._002Ector((int)((Color)(ref instrumentColor)).get_R(), (int)((Color)(ref instrumentColor)).get_G(), (int)((Color)(ref instrumentColor)).get_B(), (int)(255f * opacity));
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(0, 0, 3, 40), instrumentColor);
 			Color handleColor = ((_isHoveringDragHandle || _isDragging) ? MaestroTheme.AmberGold : MaestroTheme.MutedCream);
 			((Color)(ref handleColor))._002Ector((int)((Color)(ref handleColor)).get_R(), (int)((Color)(ref handleColor)).get_G(), (int)((Color)(ref handleColor)).get_B(), (int)(255f * opacity));
-			for (int i = 0; i < 3; i++)
-			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(12, 14 + i * 5, 10, 2), handleColor);
-			}
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, MaestroIcons.Queue, _dragHandleBounds, handleColor);
 			int titleWidth = base._size.X - 32 - 24 - 22 - 8;
 			string title = TruncateText(_song.Name, Control.get_Content().get_DefaultFont14(), titleWidth);
 			Color val = MaestroTheme.CreamWhite;
@@ -214,26 +212,9 @@ namespace Maestro.UI.Playlist
 			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, artistTruncated, Control.get_Content().get_DefaultFont12(), new Rectangle(32, 21, titleWidth, 14), artistColor, false, (HorizontalAlignment)0, (VerticalAlignment)1);
 			Color removeColor = (_isHoveringRemove ? MaestroTheme.Error : MaestroTheme.MutedCream);
 			((Color)(ref removeColor))._002Ector((int)((Color)(ref removeColor)).get_R(), (int)((Color)(ref removeColor)).get_G(), (int)((Color)(ref removeColor)).get_B(), (int)(255f * opacity));
-			DrawX(spriteBatch, _removeButtonBounds, removeColor);
-		}
-
-		private void DrawX(SpriteBatch spriteBatch, Rectangle bounds, Color color)
-		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-			int centerX = bounds.X + bounds.Width / 2;
-			int centerY = bounds.Y + bounds.Height / 2;
-			for (int i = -4; i <= 4; i++)
-			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(centerX + i - 1, centerY + i - 1, 2, 2), color);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(centerX - i - 1, centerY + i - 1, 2, 2), color);
-			}
+			Rectangle removeIconRect = default(Rectangle);
+			((Rectangle)(ref removeIconRect))._002Ector(_removeButtonBounds.X + (_removeButtonBounds.Width - 16) / 2, _removeButtonBounds.Y + (_removeButtonBounds.Height - 16) / 2, 16, 16);
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, MaestroIcons.Cancel, removeIconRect, removeColor);
 		}
 
 		private static string TruncateText(string text, BitmapFont font, int maxWidth)
@@ -258,23 +239,6 @@ namespace Maestro.UI.Playlist
 				}
 			}
 			return "...";
-		}
-
-		private static Color GetInstrumentColor(InstrumentType instrument)
-		{
-			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-			return (Color)(instrument switch
-			{
-				InstrumentType.Piano => MaestroTheme.Piano, 
-				InstrumentType.Harp => MaestroTheme.Harp, 
-				InstrumentType.Lute => MaestroTheme.Lute, 
-				InstrumentType.Bass => MaestroTheme.Bass, 
-				_ => MaestroTheme.AmberGold, 
-			});
 		}
 	}
 }

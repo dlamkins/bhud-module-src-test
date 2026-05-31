@@ -1,8 +1,11 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Maestro.Models;
+using Maestro.UI.Controls;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -16,13 +19,7 @@ namespace Maestro.UI.Main
 
 			private const int PADDING_X = 10;
 
-			private static readonly InstrumentType[] Instruments = new InstrumentType[4]
-			{
-				InstrumentType.Piano,
-				InstrumentType.Harp,
-				InstrumentType.Lute,
-				InstrumentType.Bass
-			};
+			private static readonly IReadOnlyList<InstrumentInfo> Instruments = InstrumentCatalog.Pickable.ToList();
 
 			private readonly StatusBar _owner;
 
@@ -31,13 +28,13 @@ namespace Maestro.UI.Main
 			public InstrumentSelectorPanel(StatusBar owner)
 				: this()
 			{
-				//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-				//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+				//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+				//IL_003c: Unknown result type (might be due to invalid IL or missing references)
 				_owner = owner;
-				int height = Instruments.Length * 28 + 8;
-				base._size = new Point(100, height);
+				int height = Instruments.Count * 28 + 8;
+				base._size = new Point(150, height);
 				base._location = GetPanelLocation();
 				base._zIndex = 2147483615;
 				((Control)this).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
@@ -68,15 +65,15 @@ namespace Maestro.UI.Main
 			{
 				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 				int y = ((Control)this).get_RelativeMousePosition().Y - 4;
-				_highlightedIndex = ((y >= 0 && y < Instruments.Length * 28) ? (y / 28) : (-1));
+				_highlightedIndex = ((y >= 0 && y < Instruments.Count * 28) ? (y / 28) : (-1));
 				((Control)this).OnMouseMoved(e);
 			}
 
 			protected override void OnClick(MouseEventArgs e)
 			{
-				if (_highlightedIndex >= 0 && _highlightedIndex < Instruments.Length)
+				if (_highlightedIndex >= 0 && _highlightedIndex < Instruments.Count)
 				{
-					InstrumentType instrument = Instruments[_highlightedIndex];
+					InstrumentType instrument = Instruments[_highlightedIndex].Type;
 					((Control)this).Dispose();
 					_owner.OnInstrumentSelected(instrument);
 				}
@@ -102,15 +99,15 @@ namespace Maestro.UI.Main
 				//IL_0126: Unknown result type (might be due to invalid IL or missing references)
 				//IL_012d: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0132: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0168: Unknown result type (might be due to invalid IL or missing references)
-				//IL_016d: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0162: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0167: Unknown result type (might be due to invalid IL or missing references)
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(Point.get_Zero(), base._size), Color.get_Black());
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(0, 0, base._size.X, 1), MaestroTheme.MediumGray);
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(0, base._size.Y - 1, base._size.X, 1), MaestroTheme.MediumGray);
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(0, 0, 1, base._size.Y), MaestroTheme.MediumGray);
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(base._size.X - 1, 0, 1, base._size.Y), MaestroTheme.MediumGray);
 				int y = 4;
-				for (int i = 0; i < Instruments.Length; i++)
+				for (int i = 0; i < Instruments.Count; i++)
 				{
 					bool num = _highlightedIndex == i;
 					if (num)
@@ -118,7 +115,7 @@ namespace Maestro.UI.Main
 						SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(2, y, base._size.X - 4, 28), new Color(45, 37, 25, 255));
 					}
 					Color textColor = (num ? Colors.Chardonnay : Color.FromNonPremultiplied(239, 240, 239, 255));
-					SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, Instruments[i].ToString(), Control.get_Content().get_DefaultFont14(), new Rectangle(10, y, base._size.X - 20, 28), textColor, false, (HorizontalAlignment)0, (VerticalAlignment)1);
+					SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, Instruments[i].DisplayName, Control.get_Content().get_DefaultFont14(), new Rectangle(10, y, base._size.X - 20, 28), textColor, false, (HorizontalAlignment)0, (VerticalAlignment)1);
 					y += 28;
 				}
 			}
@@ -204,35 +201,18 @@ namespace Maestro.UI.Main
 			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0081: Expected O, but got Unknown
-			//IL_0087: Unknown result type (might be due to invalid IL or missing references)
 			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ca: Expected O, but got Unknown
-			//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0101: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0110: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011f: Expected O, but got Unknown
-			//IL_013c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0141: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0148: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0153: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0156: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0160: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0165: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017f: Expected O, but got Unknown
+			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016d: Unknown result type (might be due to invalid IL or missing references)
 			((Control)this).set_Size(new Point(width, Layout.Height));
 			((Control)this).set_BackgroundColor(Color.get_Transparent());
-			int buttonsWidth = 245;
+			int buttonsWidth = 130;
 			Label val = new Label();
 			((Control)val).set_Parent((Container)(object)this);
 			((Control)val).set_Location(new Point(0, 0));
@@ -242,34 +222,32 @@ namespace Maestro.UI.Main
 			val.set_TextColor(MaestroTheme.LightGray);
 			val.set_HorizontalAlignment((HorizontalAlignment)0);
 			_statusLabel = val;
-			int x = width - 70;
-			StandardButton val2 = new StandardButton();
-			((Control)val2).set_Parent((Container)(object)this);
-			val2.set_Text("Import");
-			((Control)val2).set_Location(new Point(x, 0));
-			((Control)val2).set_Size(new Point(70, 26));
-			((Control)val2).set_BasicTooltipText("Toggle Import");
-			_importButton = val2;
+			int x = width - 40;
+			IconButton iconButton = new IconButton(MaestroIcons.Import, MaestroTheme.IconGlyph);
+			((Control)iconButton).set_Parent((Container)(object)this);
+			((Control)iconButton).set_Location(new Point(x, 0));
+			((Control)iconButton).set_Size(new Point(40, 26));
+			((Control)iconButton).set_BasicTooltipText("Import songs");
+			_importButton = (StandardButton)(object)iconButton;
 			((Control)_importButton).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				this.ImportClicked?.Invoke(this, EventArgs.Empty);
 			});
-			x -= 75;
-			StandardButton val3 = new StandardButton();
-			((Control)val3).set_Parent((Container)(object)this);
-			val3.set_Text("Create");
-			((Control)val3).set_Location(new Point(x, 0));
-			((Control)val3).set_Size(new Point(70, 26));
-			_createButton = val3;
+			x -= 45;
+			IconButton iconButton2 = new IconButton(MaestroIcons.Create, MaestroTheme.IconGlyph);
+			((Control)iconButton2).set_Parent((Container)(object)this);
+			((Control)iconButton2).set_Location(new Point(x, 0));
+			((Control)iconButton2).set_Size(new Point(40, 26));
+			((Control)iconButton2).set_BasicTooltipText("Create a song");
+			_createButton = (StandardButton)(object)iconButton2;
 			((Control)_createButton).add_Click((EventHandler<MouseEventArgs>)OnCreateButtonClick);
-			x -= 100;
-			StandardButton val4 = new StandardButton();
-			((Control)val4).set_Parent((Container)(object)this);
-			val4.set_Text("Community");
-			((Control)val4).set_Location(new Point(x, 0));
-			((Control)val4).set_Size(new Point(95, 26));
-			((Control)val4).set_BasicTooltipText("Browse & upload community songs");
-			_communityButton = val4;
+			x -= 45;
+			IconButton iconButton3 = new IconButton(MaestroIcons.Community, MaestroTheme.IconGlyph);
+			((Control)iconButton3).set_Parent((Container)(object)this);
+			((Control)iconButton3).set_Location(new Point(x, 0));
+			((Control)iconButton3).set_Size(new Point(40, 26));
+			((Control)iconButton3).set_BasicTooltipText("Browse & upload community songs");
+			_communityButton = (StandardButton)(object)iconButton3;
 			((Control)_communityButton).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				this.CommunityClicked?.Invoke(this, EventArgs.Empty);
@@ -297,7 +275,7 @@ namespace Maestro.UI.Main
 		public void SetCreateButtonEnabled(bool enabled)
 		{
 			((Control)_createButton).set_Enabled(enabled);
-			((Control)_createButton).set_BasicTooltipText(enabled ? null : "Close the Creator window first");
+			((Control)_createButton).set_BasicTooltipText(enabled ? "Create a song" : "Close the Creator window first");
 		}
 
 		private void UpdateText()

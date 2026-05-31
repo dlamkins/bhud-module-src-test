@@ -85,9 +85,9 @@ namespace Maestro.Services.Community
 		public IEnumerable<CommunitySong> SearchSongs(string searchTerm, string instrumentFilter)
 		{
 			IEnumerable<CommunitySong> songs = GetAvailableSongs();
-			if (!string.IsNullOrEmpty(instrumentFilter) && instrumentFilter != "All")
+			if (!string.IsNullOrEmpty(instrumentFilter) && instrumentFilter != "All" && InstrumentCatalog.TryFromDisplayName(instrumentFilter, out var instrumentType))
 			{
-				songs = songs.Where((CommunitySong s) => s.Instrument.Equals(instrumentFilter, StringComparison.OrdinalIgnoreCase));
+				songs = songs.Where((CommunitySong s) => s.InstrumentType == instrumentType);
 			}
 			if (!string.IsNullOrEmpty(searchTerm))
 			{

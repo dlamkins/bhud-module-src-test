@@ -13,7 +13,7 @@ namespace Maestro.UI.Main
 	{
 		public static class Layout
 		{
-			public const int Height = 130;
+			public const int Height = 144;
 
 			public const int ButtonY = 18;
 
@@ -35,29 +35,15 @@ namespace Maestro.UI.Main
 
 			public const int LabelWidth = 300;
 
-			public const int SpeedLabelX = 8;
+			public const int SideMargin = 8;
 
-			public const int SpeedLabelY = 62;
+			public const int SpeedLabelY = 52;
 
-			public const int SpeedSliderX = 60;
+			public const int SpeedSliderY = 78;
 
-			public const int SpeedSliderY = 65;
+			public const int SeekLabelY = 100;
 
-			public const int SpeedSliderWidth = 180;
-
-			public const int SpeedValueX = 248;
-
-			public const int SeekElapsedX = 8;
-
-			public const int SeekLabelY = 87;
-
-			public const int SeekSliderX = 42;
-
-			public const int SeekSliderY = 90;
-
-			public const int SeekSliderWidth = 200;
-
-			public const int SeekTotalX = 248;
+			public const int SeekSliderY = 126;
 
 			public const int QueueButtonWidth = 30;
 
@@ -68,7 +54,7 @@ namespace Maestro.UI.Main
 
 		private readonly SongPlayer _songPlayer;
 
-		private readonly StandardButton _pauseButton;
+		private readonly IconButton _pauseButton;
 
 		private readonly StandardButton _stopButton;
 
@@ -100,6 +86,8 @@ namespace Maestro.UI.Main
 
 		private bool _wasPlayingBeforeSeek;
 
+		private int RowWidth => ((Control)this).get_Width() - 16;
+
 		public event EventHandler StopRequested;
 
 		public event EventHandler<Song> PlayPendingRequested;
@@ -111,11 +99,10 @@ namespace Maestro.UI.Main
 		{
 			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
 			_songPlayer = songPlayer;
-			((Control)this).set_Size(new Point(width, 130));
-			((Control)this).set_BackgroundColor(MaestroTheme.WithAlpha(MaestroTheme.SlateGray, 150));
-			((Panel)this).set_ShowBorder(true);
+			((Control)this).set_Size(new Point(width, 144));
+			((Control)this).set_BackgroundColor(Color.get_Transparent());
+			((Panel)this).set_ShowBorder(false);
 			_pauseButton = CreatePauseButton();
 			_stopButton = CreateStopButton();
 			_nowPlayingLabel = CreateNowPlayingLabel();
@@ -187,46 +174,32 @@ namespace Maestro.UI.Main
 			((Panel)this).DisposeControl();
 		}
 
-		private StandardButton CreatePauseButton()
+		private IconButton CreatePauseButton()
 		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0047: Expected O, but got Unknown
-			StandardButton val = new StandardButton();
-			((Control)val).set_Parent((Container)(object)this);
-			val.set_Text("||");
-			((Control)val).set_Location(new Point(8, 18));
-			((Control)val).set_Width(40);
-			((Control)val).set_Enabled(false);
-			((Control)val).add_Click((EventHandler<MouseEventArgs>)OnPauseClicked);
-			return val;
+			IconButton iconButton = new IconButton(MaestroIcons.Pause, MaestroTheme.IconGlyph);
+			((Control)iconButton).set_Parent((Container)(object)this);
+			((Control)iconButton).set_BasicTooltipText("Pause");
+			((Control)iconButton).set_Location(new Point(8, 18));
+			((Control)iconButton).set_Width(40);
+			((Control)iconButton).set_Enabled(false);
+			((Control)iconButton).add_Click((EventHandler<MouseEventArgs>)OnPauseClicked);
+			return iconButton;
 		}
 
 		private StandardButton CreateStopButton()
 		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0048: Expected O, but got Unknown
-			StandardButton val = new StandardButton();
-			((Control)val).set_Parent((Container)(object)this);
-			val.set_Text("X");
-			((Control)val).set_Location(new Point(52, 18));
-			((Control)val).set_Width(40);
-			((Control)val).set_Enabled(false);
-			((Control)val).add_Click((EventHandler<MouseEventArgs>)OnStopClicked);
-			return val;
+			IconButton iconButton = new IconButton(MaestroIcons.Stop, MaestroTheme.IconGlyph);
+			((Control)iconButton).set_Parent((Container)(object)this);
+			((Control)iconButton).set_BasicTooltipText("Stop");
+			((Control)iconButton).set_Location(new Point(52, 18));
+			((Control)iconButton).set_Width(40);
+			((Control)iconButton).set_Enabled(false);
+			((Control)iconButton).add_Click((EventHandler<MouseEventArgs>)OnStopClicked);
+			return (StandardButton)(object)iconButton;
 		}
 
 		private MarqueeLabel CreateNowPlayingLabel()
@@ -296,15 +269,17 @@ namespace Maestro.UI.Main
 			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0048: Expected O, but got Unknown
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0054: Expected O, but got Unknown
 			Label val = new Label();
 			((Control)val).set_Parent((Container)(object)this);
 			val.set_Text("Speed:");
-			((Control)val).set_Location(new Point(8, 62));
-			val.set_AutoSizeWidth(true);
+			((Control)val).set_Location(new Point(8, 52));
+			((Control)val).set_Width(RowWidth);
+			val.set_HorizontalAlignment((HorizontalAlignment)0);
 			val.set_Font(GameService.Content.get_DefaultFont12());
 			val.set_TextColor(MaestroTheme.MutedCream);
 			return val;
@@ -315,8 +290,8 @@ namespace Maestro.UI.Main
 			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
@@ -325,8 +300,8 @@ namespace Maestro.UI.Main
 			//IL_0061: Expected O, but got Unknown
 			TrackBar val = new TrackBar();
 			((Control)val).set_Parent((Container)(object)this);
-			((Control)val).set_Location(new Point(60, 65));
-			((Control)val).set_Width(180);
+			((Control)val).set_Location(new Point(8, 78));
+			((Control)val).set_Width(RowWidth);
 			val.set_MinValue(1f);
 			val.set_MaxValue(20f);
 			val.set_Value(10f);
@@ -341,17 +316,19 @@ namespace Maestro.UI.Main
 			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004c: Expected O, but got Unknown
+			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0054: Expected O, but got Unknown
 			Label val = new Label();
 			((Control)val).set_Parent((Container)(object)this);
 			val.set_Text("1.0x");
-			((Control)val).set_Location(new Point(248, 62));
-			val.set_AutoSizeWidth(true);
+			((Control)val).set_Location(new Point(8, 52));
+			((Control)val).set_Width(RowWidth);
+			val.set_HorizontalAlignment((HorizontalAlignment)2);
 			val.set_Font(GameService.Content.get_DefaultFont12());
 			val.set_TextColor(MaestroTheme.CreamWhite);
 			return val;
@@ -365,15 +342,17 @@ namespace Maestro.UI.Main
 			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0048: Expected O, but got Unknown
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0054: Expected O, but got Unknown
 			Label val = new Label();
 			((Control)val).set_Parent((Container)(object)this);
 			val.set_Text("0:00");
-			((Control)val).set_Location(new Point(8, 87));
-			val.set_AutoSizeWidth(true);
+			((Control)val).set_Location(new Point(8, 100));
+			((Control)val).set_Width(RowWidth);
+			val.set_HorizontalAlignment((HorizontalAlignment)0);
 			val.set_Font(GameService.Content.get_DefaultFont12());
 			val.set_TextColor(MaestroTheme.MutedCream);
 			return val;
@@ -384,8 +363,8 @@ namespace Maestro.UI.Main
 			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
@@ -396,8 +375,8 @@ namespace Maestro.UI.Main
 			//IL_007a: Expected O, but got Unknown
 			TrackBar val = new TrackBar();
 			((Control)val).set_Parent((Container)(object)this);
-			((Control)val).set_Location(new Point(42, 90));
-			((Control)val).set_Width(200);
+			((Control)val).set_Location(new Point(8, 126));
+			((Control)val).set_Width(RowWidth);
 			val.set_MinValue(0f);
 			val.set_MaxValue(1000f);
 			val.set_Value(0f);
@@ -414,17 +393,19 @@ namespace Maestro.UI.Main
 			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004c: Expected O, but got Unknown
+			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0054: Expected O, but got Unknown
 			Label val = new Label();
 			((Control)val).set_Parent((Container)(object)this);
 			val.set_Text("0:00");
-			((Control)val).set_Location(new Point(248, 87));
-			val.set_AutoSizeWidth(true);
+			((Control)val).set_Location(new Point(8, 100));
+			((Control)val).set_Width(RowWidth);
+			val.set_HorizontalAlignment((HorizontalAlignment)2);
 			val.set_Font(GameService.Content.get_DefaultFont12());
 			val.set_TextColor(MaestroTheme.MutedCream);
 			return val;
@@ -432,27 +413,19 @@ namespace Maestro.UI.Main
 
 		private StandardButton CreateQueueButton(int panelWidth)
 		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0056: Expected O, but got Unknown
-			StandardButton val = new StandardButton();
-			((Control)val).set_Parent((Container)(object)this);
-			val.set_Text(">>");
-			((Control)val).set_Location(new Point(panelWidth - 30 - 8, 8));
-			((Control)val).set_Size(new Point(30, 26));
-			((Control)val).set_BasicTooltipText("Toggle Queue");
-			((Control)val).add_Click((EventHandler<MouseEventArgs>)delegate
+			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+			IconButton iconButton = new IconButton(MaestroIcons.Queue, MaestroTheme.IconGlyph);
+			((Control)iconButton).set_Parent((Container)(object)this);
+			((Control)iconButton).set_Location(new Point(panelWidth - 30 - 8, 8));
+			((Control)iconButton).set_Size(new Point(30, 26));
+			((Control)iconButton).set_BasicTooltipText("Toggle Queue");
+			((Control)iconButton).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				this.QueueToggleClicked?.Invoke(this, EventArgs.Empty);
 			});
-			return val;
+			return (StandardButton)(object)iconButton;
 		}
 
 		private void SubscribeToEvents()
@@ -561,7 +534,7 @@ namespace Maestro.UI.Main
 		{
 			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-			_pauseButton.set_Text(">");
+			_pauseButton.IconTexture = MaestroIcons.Play;
 			_nowPlayingLabel.TextColor = MaestroTheme.CreamWhite;
 			_progressLabel.set_Text("Paused" + GetQueueSuffix());
 			_progressLabel.set_TextColor(MaestroTheme.Paused);
@@ -572,7 +545,7 @@ namespace Maestro.UI.Main
 			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-			_pauseButton.set_Text("||");
+			_pauseButton.IconTexture = MaestroIcons.Pause;
 			_nowPlayingLabel.TextColor = MaestroTheme.CreamWhite;
 			if (_songPlayer.IsAdjustingOctave)
 			{
@@ -620,7 +593,7 @@ namespace Maestro.UI.Main
 				_nowPlayingLabel.TextColor = MaestroTheme.MutedCream;
 				_progressLabel.set_Text("");
 			}
-			_pauseButton.set_Text("||");
+			_pauseButton.IconTexture = MaestroIcons.Pause;
 			((Control)_pauseButton).set_Enabled(false);
 			((Control)_stopButton).set_Enabled(false);
 			((Control)_seekSlider).set_Enabled(false);
@@ -640,7 +613,7 @@ namespace Maestro.UI.Main
 			_instrumentLabel.set_Text(_pendingSong?.Instrument.ToString() ?? "");
 			_progressLabel.set_Text("Ready" + GetQueueSuffix());
 			_progressLabel.set_TextColor(MaestroTheme.Paused);
-			_pauseButton.set_Text(">");
+			_pauseButton.IconTexture = MaestroIcons.Play;
 			((Control)_pauseButton).set_Enabled(true);
 			((Control)_stopButton).set_Enabled(false);
 			((Control)_seekSlider).set_Enabled(false);
@@ -653,7 +626,7 @@ namespace Maestro.UI.Main
 			//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
 			if (_songPlayer.IsWaitingForInput)
 			{
-				_pauseButton.set_Text(">");
+				_pauseButton.IconTexture = MaestroIcons.Play;
 				_progressLabel.set_Text("Paused" + GetQueueSuffix());
 				_progressLabel.set_TextColor(MaestroTheme.Paused);
 			}
@@ -664,7 +637,7 @@ namespace Maestro.UI.Main
 			}
 			else
 			{
-				_pauseButton.set_Text("||");
+				_pauseButton.IconTexture = MaestroIcons.Pause;
 				Song song = _songPlayer.CurrentSong;
 				UpdateProgressText(song);
 				_progressLabel.set_TextColor(MaestroTheme.MutedCream);
@@ -741,7 +714,7 @@ namespace Maestro.UI.Main
 
 		private void DisposeControls()
 		{
-			StandardButton pauseButton = _pauseButton;
+			IconButton pauseButton = _pauseButton;
 			if (pauseButton != null)
 			{
 				((Control)pauseButton).Dispose();
