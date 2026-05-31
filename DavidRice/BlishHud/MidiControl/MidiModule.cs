@@ -137,6 +137,10 @@ namespace DavidRice.BlishHud.MidiControl
 
 		public IReadOnlyList<Keymap> AvailableKeymaps => _keymapRegistry.AllKeymaps;
 
+		public int CustomKeymapCount => _keymapRegistry.CustomKeymapCount;
+
+		public IReadOnlyList<string> KeymapLoadErrors => _keymapRegistry.LoadErrors;
+
 		public string SelectedMidiDeviceName => _selectedMidiDeviceName.get_Value();
 
 		public string SelectedKeymapId => _selectedKeymapId.get_Value();
@@ -248,6 +252,8 @@ namespace DavidRice.BlishHud.MidiControl
 		protected override void Initialize()
 		{
 			_keymapRegistry = new KeymapRegistry();
+			string keymapsDir = DirectoriesManager.GetFullDirectoryPath("midi-keymaps");
+			_keymapRegistry.LoadCustomKeymaps(keymapsDir);
 			_midiInputManager = new MidiInputManager(_midiQueue);
 			_recentSendLog.Enqueue("No sends yet.");
 		}
@@ -397,6 +403,10 @@ namespace DavidRice.BlishHud.MidiControl
 						Logger.Error("Corner icon click failed.", new object[1] { ex2 });
 					}
 				});
+				((Control)_cornerIcon).add_RightMouseButtonReleased((EventHandler<MouseEventArgs>)delegate
+				{
+					_sendNotes.set_Value(!_sendNotes.get_Value());
+				});
 			}
 			catch (Exception ex)
 			{
@@ -416,7 +426,7 @@ namespace DavidRice.BlishHud.MidiControl
 				else
 				{
 					_cornerIcon!.set_Icon(AsyncTexture2D.op_Implicit(_sendNotes.get_Value() ? _activeIconTexture : _mutedIconTexture));
-					((Control)_cornerIcon).set_BasicTooltipText(((Module)this).get_Name() + " — " + (_sendNotes.get_Value() ? "Active" : "Muted"));
+					((Control)_cornerIcon).set_BasicTooltipText(((Module)this).get_Name() + " — " + (_sendNotes.get_Value() ? "Active" : "Muted") + "\nRight-click to toggle");
 				}
 			}
 		}
@@ -496,6 +506,24 @@ namespace DavidRice.BlishHud.MidiControl
 		public void SelectKeymap(string id)
 		{
 			_selectedKeymapId.set_Value(id);
+		}
+
+		public void ReloadKeymaps()
+		{
+			string keymapsDir = DirectoriesManager.GetFullDirectoryPath("midi-keymaps");
+			_keymapRegistry.LoadCustomKeymaps(keymapsDir);
+			string currentId = _selectedKeymapId.get_Value();
+			if (_keymapRegistry.FindById(currentId) == null)
+			{
+				Logger.Warn("Selected keymap '" + currentId + "' no longer exists. Falling back to 'minstrel-auto'.");
+				_selectedKeymapId.set_Value("minstrel-auto");
+				if (_keySendThread != null)
+				{
+					_keySender.NoteProcessed -= new Action<MidiNoteEvent, KeySendResult>(OnNoteProcessed);
+					_keySender = new KeySender(_keySendThread);
+					_keySender.NoteProcessed += new Action<MidiNoteEvent, KeySendResult>(OnNoteProcessed);
+				}
+			}
 		}
 
 		private static void SafetyReleaseAllKeys()

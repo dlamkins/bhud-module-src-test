@@ -18,6 +18,7 @@
     <Reference Include="NAudio.Midi">
       <HintPath>..\..\working\NAudio.Midi.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json" />
     <Reference Include="System.Core" />
   </ItemGroup>
 </Project>
