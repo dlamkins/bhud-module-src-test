@@ -5245,7 +5245,7 @@ namespace Gorthax.Gilledwars
 					phaseColor = new Microsoft.Xna.Framework.Color(220, 190, 255);
 				}
 				TimeSpan timeRemaining = TimeSpan.FromMinutes(remainingMinutes);
-				_todLabel.Text = $"{phase}: {timeRemaining.Minutes:D2}:{timeRemaining.Seconds:D2}";
+				_todLabel.Text = ((timeRemaining.TotalMinutes >= 60.0) ? $"{phase}: {(int)timeRemaining.TotalHours}:{timeRemaining.Minutes:D2}:{timeRemaining.Seconds:D2}" : $"{phase}: {timeRemaining.Minutes:D2}:{timeRemaining.Seconds:D2}");
 				_todLabel.TextColor = phaseColor;
 				if (_currentTodPhase != phase)
 				{
