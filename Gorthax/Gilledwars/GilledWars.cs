@@ -1253,7 +1253,7 @@ namespace Gorthax.Gilledwars
 			};
 			try
 			{
-				List<int> metaIds = new List<int> { 6478, 6109, 6284, 6201, 6279, 6111 };
+				List<int> metaIds = new List<int> { 6201, 6478, 6109, 6284, 6279, 6111 };
 				int[] metaMaxes = new int[6] { 5, 10, 15, 20, 25, 30 };
 				int[] base30 = new int[30]
 				{
@@ -1326,7 +1326,7 @@ namespace Gorthax.Gilledwars
 					}
 					AccountAchievement progress = accAchievements.FirstOrDefault((AccountAchievement a) => a.Id == mId);
 					int max = metaMaxes[i];
-					int current = ((mId != 6279) ? realCompletedCollections : (progress?.Current ?? 0));
+					int current = realCompletedCollections;
 					bool isDone = progress?.Done ?? false;
 					if (isDone || current > max)
 					{
@@ -1509,7 +1509,9 @@ namespace Gorthax.Gilledwars
 					_speciesSelectionWindow.Visible = false;
 					await RefreshLeaderboardData();
 				};
-				foreach (string name in from n in _allFishEntries.Select((FishUIEntry x) => x.Data.Name).Distinct()
+				foreach (string name in from n in (from x in _allFishEntries
+						where IsRealFish(x.Data)
+						select x.Data.Name).Distinct()
 					where string.IsNullOrEmpty(filter) || n.ToLower().Contains(filter.ToLower())
 					orderby n
 					select n)
@@ -1785,45 +1787,66 @@ namespace Gorthax.Gilledwars
 				catch
 				{
 				}
+				int loadedVersion = ((pbFile == null || pbFile.Records == null || pbFile.Version < 2) ? 1 : pbFile.Version);
 				if (pbFile != null && pbFile.Version >= 2 && pbFile.Records != null)
 				{
-					Logger.Info("[GilledWars] Loading PB file version 2");
+					Logger.Info($"[GilledWars] Loading PB file version {pbFile.Version}");
 					foreach (KeyValuePair<int, PersonalBestRecord> kvp2 in pbFile.Records)
 					{
 						int itemId = kvp2.Key;
-						PersonalBestRecord rec2 = kvp2.Value;
-						ValidateSubRecord(rec2.BestWeight, itemId, seed);
-						ValidateSubRecord(rec2.BestLength, itemId, seed);
-						_personalBests[itemId] = rec2;
+						PersonalBestRecord rec3 = kvp2.Value;
+						ValidateSubRecord(rec3.BestWeight, itemId, seed);
+						ValidateSubRecord(rec3.BestLength, itemId, seed);
+						_personalBests[itemId] = rec3;
 						_caughtFishIds.Add(itemId);
 					}
+				}
+				else
+				{
+					Logger.Info("[GilledWars] Migrating PB file from version 1 to version 2");
+					Dictionary<int, PersonalBestRecord> legacy = null;
+					try
+					{
+						legacy = JsonConvert.DeserializeObject<Dictionary<int, PersonalBestRecord>>(json);
+					}
+					catch
+					{
+					}
+					if (legacy != null)
+					{
+						foreach (KeyValuePair<int, PersonalBestRecord> kvp in legacy)
+						{
+							int itemId2 = kvp.Key;
+							PersonalBestRecord rec2 = kvp.Value;
+							string englishName = _allFishEntries.FirstOrDefault((FishUIEntry x) => x.Data.ItemId == itemId2)?.Data.Name ?? "Unknown";
+							MigrateSubRecord(rec2.BestWeight, itemId2, englishName, seed);
+							MigrateSubRecord(rec2.BestLength, itemId2, englishName, seed);
+							_personalBests[itemId2] = rec2;
+							_caughtFishIds.Add(itemId2);
+						}
+						Logger.Info("[GilledWars] v1 -> v2 migration complete");
+					}
+				}
+				if (loadedVersion >= 3 || _personalBests.Count <= 0)
+				{
 					return;
 				}
-				Logger.Info("[GilledWars] Migrating PB file from version 1 to version 2");
-				Dictionary<int, PersonalBestRecord> legacy = null;
-				try
+				int reset = 0;
+				foreach (PersonalBestRecord rec in _personalBests.Values)
 				{
-					legacy = JsonConvert.DeserializeObject<Dictionary<int, PersonalBestRecord>>(json);
-				}
-				catch
-				{
-				}
-				if (legacy == null)
-				{
-					return;
-				}
-				foreach (KeyValuePair<int, PersonalBestRecord> kvp in legacy)
-				{
-					int itemId2 = kvp.Key;
-					PersonalBestRecord rec = kvp.Value;
-					string englishName = _allFishEntries.FirstOrDefault((FishUIEntry x) => x.Data.ItemId == itemId2)?.Data.Name ?? "Unknown";
-					MigrateSubRecord(rec.BestWeight, itemId2, englishName, seed);
-					MigrateSubRecord(rec.BestLength, itemId2, englishName, seed);
-					_personalBests[itemId2] = rec;
-					_caughtFishIds.Add(itemId2);
+					if (rec.BestWeight != null && !rec.BestWeight.IsCheater && rec.BestWeight.IsSubmitted)
+					{
+						rec.BestWeight.IsSubmitted = false;
+						reset++;
+					}
+					if (rec.BestLength != null && !rec.BestLength.IsCheater && rec.BestLength.IsSubmitted)
+					{
+						rec.BestLength.IsSubmitted = false;
+						reset++;
+					}
 				}
 				SavePersonalBests();
-				Logger.Info("[GilledWars] PB migration complete — saved as version 2");
+				Logger.Info($"[GilledWars] v3 migration: reset IsSubmitted on {reset} sub-record(s); saved as version 3");
 			}
 			catch (Exception ex)
 			{
@@ -1881,7 +1904,7 @@ namespace Gorthax.Gilledwars
 			{
 				PersonalBestFile pbFile = new PersonalBestFile
 				{
-					Version = 2,
+					Version = 3,
 					Records = _personalBests
 				};
 				System.IO.File.WriteAllText(path, JsonConvert.SerializeObject(pbFile, Formatting.Indented));
@@ -2168,6 +2191,43 @@ namespace Gorthax.Gilledwars
 			}
 		}
 
+		private static bool IsJunkFish(FishData f)
+		{
+			if (f == null)
+			{
+				return false;
+			}
+			if (f.Rarity == null || !f.Rarity.Equals("Junk", StringComparison.OrdinalIgnoreCase))
+			{
+				if (f.Location != null)
+				{
+					return f.Location.Contains("Trash Collector");
+				}
+				return false;
+			}
+			return true;
+		}
+
+		private static bool IsTreasureFish(FishData f)
+		{
+			if (f == null)
+			{
+				return false;
+			}
+			bool num = f.Name != null && (f.Name.IndexOf("Treasure", StringComparison.OrdinalIgnoreCase) >= 0 || f.Name.IndexOf("Chest", StringComparison.OrdinalIgnoreCase) >= 0 || f.Name.IndexOf("Box", StringComparison.OrdinalIgnoreCase) >= 0 || f.Name.IndexOf("Runestone", StringComparison.OrdinalIgnoreCase) >= 0 || f.Name.IndexOf("Cache", StringComparison.OrdinalIgnoreCase) >= 0 || f.Name.IndexOf("Message", StringComparison.OrdinalIgnoreCase) >= 0);
+			bool locHit = f.Location != null && f.Location.Contains("Treasure Collector");
+			return num || locHit;
+		}
+
+		private static bool IsRealFish(FishData f)
+		{
+			if (!IsJunkFish(f))
+			{
+				return !IsTreasureFish(f);
+			}
+			return false;
+		}
+
 		private void ProcessCaughtFish(int itemId)
 		{
 			FishData matchingFish = _allFishEntries.FirstOrDefault((FishUIEntry x) => x.Data.ItemId == itemId)?.Data;
@@ -2175,8 +2235,8 @@ namespace Gorthax.Gilledwars
 			{
 				return;
 			}
-			bool num = (matchingFish.Rarity != null && matchingFish.Rarity.Equals("Junk", StringComparison.OrdinalIgnoreCase)) || (matchingFish.Location != null && matchingFish.Location.Contains("Trash Collector"));
-			bool isTreasure = (matchingFish.Name != null && (matchingFish.Name.IndexOf("Treasure", StringComparison.OrdinalIgnoreCase) >= 0 || matchingFish.Name.IndexOf("Chest", StringComparison.OrdinalIgnoreCase) >= 0 || matchingFish.Name.IndexOf("Box", StringComparison.OrdinalIgnoreCase) >= 0 || matchingFish.Name.IndexOf("Runestone", StringComparison.OrdinalIgnoreCase) >= 0 || matchingFish.Name.IndexOf("Cache", StringComparison.OrdinalIgnoreCase) >= 0 || matchingFish.Name.IndexOf("Message", StringComparison.OrdinalIgnoreCase) >= 0)) || (matchingFish.Location != null && matchingFish.Location.Contains("Treasure Collector"));
+			bool num = IsJunkFish(matchingFish);
+			bool isTreasure = IsTreasureFish(matchingFish);
 			if (num)
 			{
 				ScreenNotification.ShowNotification(_junkMessages[_rnd.Next(_junkMessages.Length)], ScreenNotification.NotificationType.Error);
@@ -3155,8 +3215,19 @@ namespace Gorthax.Gilledwars
 					_isAnalyzerMinified = !_isAnalyzerMinified;
 					await ShowAchievementResultsPanel(locationName, achievementId, subCurrent, subMax, subDescription);
 				};
-				IReadOnlyList<int> completedBits = source.FirstOrDefault((AccountAchievement a) => a.Id == achievementId)?.Bits ?? new List<int>();
+				AccountAchievement progress = source.FirstOrDefault((AccountAchievement a) => a.Id == achievementId);
 				int totalBits = achievementDef.Bits?.Count ?? 0;
+				object obj;
+				if (progress == null || !progress.Done)
+				{
+					obj = progress?.Bits ?? new List<int>();
+				}
+				else
+				{
+					IReadOnlyList<int> readOnlyList = Enumerable.Range(0, totalBits).ToList();
+					obj = readOnlyList;
+				}
+				IReadOnlyList<int> completedBits = (IReadOnlyList<int>)obj;
 				List<int> trueMissingBits = new List<int>();
 				if (achievementDef.Bits != null)
 				{
@@ -3771,7 +3842,19 @@ namespace Gorthax.Gilledwars
 				_bitingTitleLabel.Text = strings.BitingNowTitle + ": " + target + " (" + currentPhase + ")";
 				int achId = achievementMap[target];
 				Achievement achievementDef = await Gw2ApiManager.Gw2ApiClient.V2.Achievements.GetAsync(achId);
-				IReadOnlyList<int> completedBits = (await Gw2ApiManager.Gw2ApiClient.V2.Account.Achievements.GetAsync()).FirstOrDefault((AccountAchievement a) => a.Id == achId)?.Bits ?? new List<int>();
+				AccountAchievement progress = (await Gw2ApiManager.Gw2ApiClient.V2.Account.Achievements.GetAsync()).FirstOrDefault((AccountAchievement a) => a.Id == achId);
+				int totalBitsForBiting = achievementDef.Bits?.Count ?? 0;
+				object obj;
+				if (progress == null || !progress.Done)
+				{
+					obj = progress?.Bits ?? new List<int>();
+				}
+				else
+				{
+					IReadOnlyList<int> readOnlyList = Enumerable.Range(0, totalBitsForBiting).ToList();
+					obj = readOnlyList;
+				}
+				IReadOnlyList<int> completedBits = (IReadOnlyList<int>)obj;
 				_bitingFishList.ClearChildren();
 				int matchCount = 0;
 				if (achievementDef.Bits != null)
@@ -5340,6 +5423,7 @@ namespace Gorthax.Gilledwars
 
 		private async Task ForceUploadPB(bool isAuto = false)
 		{
+			_ = 1;
 			try
 			{
 				List<KeyValuePair<int, PersonalBestRecord>> unsubmittedKvps = _personalBests.Where((KeyValuePair<int, PersonalBestRecord> kvp) => (kvp.Value.BestWeight != null && !kvp.Value.BestWeight.IsSubmitted && !kvp.Value.BestWeight.IsCheater) || (kvp.Value.BestLength != null && !kvp.Value.BestLength.IsSubmitted && !kvp.Value.BestLength.IsCheater)).ToList();
@@ -5357,7 +5441,7 @@ namespace Gorthax.Gilledwars
 				}
 				string accountName = _localAccountName;
 				List<object> catchesToSubmit = new List<object>();
-				List<SubRecord> recordsToMark = new List<SubRecord>();
+				Dictionary<string, SubRecord> recordsByKey = new Dictionary<string, SubRecord>();
 				foreach (KeyValuePair<int, PersonalBestRecord> kvp2 in unsubmittedKvps)
 				{
 					int itemId = kvp2.Key;
@@ -5365,12 +5449,14 @@ namespace Gorthax.Gilledwars
 					FishData fishInfo = _allFishEntries.FirstOrDefault((FishUIEntry f) => f.Data.ItemId == itemId)?.Data;
 					if (fishInfo != null)
 					{
+						string englishWeightName = record.BestWeight?.EnglishFishName ?? fishInfo.Name;
+						string englishLengthName = record.BestLength?.EnglishFishName ?? fishInfo.Name;
 						if (record.BestWeight != null && !record.BestWeight.IsSubmitted && !record.BestWeight.IsCheater)
 						{
 							catchesToSubmit.Add(new
 							{
 								itemId = itemId,
-								name = fishInfo.Name,
+								name = englishWeightName,
 								weight = record.BestWeight.Weight,
 								length = record.BestWeight.Length,
 								characterName = record.BestWeight.CharacterName,
@@ -5380,14 +5466,14 @@ namespace Gorthax.Gilledwars
 								type = "weight",
 								location = fishInfo.Location
 							});
-							recordsToMark.Add(record.BestWeight);
+							recordsByKey[$"{itemId}|weight"] = record.BestWeight;
 						}
 						if (record.BestLength != null && !record.BestLength.IsSubmitted && !record.BestLength.IsCheater)
 						{
 							catchesToSubmit.Add(new
 							{
 								itemId = itemId,
-								name = fishInfo.Name,
+								name = englishLengthName,
 								weight = record.BestLength.Weight,
 								length = record.BestLength.Length,
 								characterName = record.BestLength.CharacterName,
@@ -5397,7 +5483,7 @@ namespace Gorthax.Gilledwars
 								type = "length",
 								location = fishInfo.Location
 							});
-							recordsToMark.Add(record.BestLength);
+							recordsByKey[$"{itemId}|length"] = record.BestLength;
 						}
 					}
 				}
@@ -5409,14 +5495,48 @@ namespace Gorthax.Gilledwars
 				{
 					catches = catchesToSubmit
 				}), Encoding.UTF8, "application/json");
-				if ((await _httpClient.PostAsync("https://api.gilledwars.com/submit-leaderboard", (HttpContent)(object)content)).get_IsSuccessStatusCode())
+				HttpResponseMessage response = await _httpClient.PostAsync("https://api.gilledwars.com/submit-leaderboard", (HttpContent)(object)content);
+				if (response.get_IsSuccessStatusCode())
 				{
-					foreach (SubRecord item in recordsToMark)
+					string respBody = await response.get_Content().ReadAsStringAsync();
+					int markedCount = 0;
+					try
 					{
-						item.IsSubmitted = true;
+						SubmitResponse resp = JsonConvert.DeserializeObject<SubmitResponse>(respBody);
+						if (resp?.Accepted != null && resp.Accepted.Count > 0)
+						{
+							foreach (AcceptedKey key in resp.Accepted)
+							{
+								string lookup = $"{key.ItemId}|{key.Type}";
+								if (recordsByKey.TryGetValue(lookup, out var sub))
+								{
+									sub.IsSubmitted = true;
+									markedCount++;
+								}
+							}
+						}
+						else if (resp != null && resp.Count == recordsByKey.Count)
+						{
+							foreach (SubRecord value in recordsByKey.Values)
+							{
+								value.IsSubmitted = true;
+								markedCount++;
+							}
+						}
+					}
+					catch (Exception parseEx)
+					{
+						Logger.Warn(parseEx, "Failed to parse /submit-leaderboard response body.");
 					}
 					SavePersonalBests();
-					if (!isAuto)
+					if (markedCount == 0)
+					{
+						if (!isAuto)
+						{
+							ScreenNotification.ShowNotification(strings.ServerRejected, ScreenNotification.NotificationType.Error);
+						}
+					}
+					else if (!isAuto)
 					{
 						ScreenNotification.ShowNotification(strings.SubmitCooldown.Replace("{0}", "5"), ScreenNotification.NotificationType.Warning);
 					}
