@@ -271,6 +271,21 @@ namespace CinemaModule.Settings
 			}
 		}
 
+		public bool WindowInForeground
+		{
+			get
+			{
+				return _data.WindowInForeground;
+			}
+			set
+			{
+				SetPropertyWithEvent(_data.WindowInForeground, value, delegate(bool v)
+				{
+					_data.WindowInForeground = v;
+				}, this.WindowInForegroundChanged);
+			}
+		}
+
 		public SavedLocationCollection SavedLocations => _data.SavedLocations;
 
 		public SavedStreamCollection SavedStreams => _data.SavedStreams;
@@ -508,6 +523,8 @@ namespace CinemaModule.Settings
 		public event EventHandler SavedLocationsChanged;
 
 		public event EventHandler SavedStreamsChanged;
+
+		public event EventHandler<bool> WindowInForegroundChanged;
 
 		public CinemaUserSettings(string settingsDirectory)
 		{

@@ -368,9 +368,8 @@ namespace CinemaModule.VideoPlayer
 					this.QualitiesChanged?.Invoke(this, EventArgs.Empty);
 				}
 			}
-			catch (Exception ex)
+			catch
 			{
-				Logger.Debug(ex, "Failed to refresh available qualities - will retry");
 			}
 		}
 
@@ -421,7 +420,7 @@ namespace CinemaModule.VideoPlayer
 			}
 			catch (Exception ex)
 			{
-				Logger.Debug(ex, $"Failed to set quality to track ID {trackId}");
+				Logger.Warn(ex, $"Failed to set quality to track ID {trackId}");
 			}
 		}
 

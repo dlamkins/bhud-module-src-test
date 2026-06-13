@@ -25,6 +25,8 @@ namespace CinemaModule.UI.Views
 
 		private readonly CinemaUserSettings _userSettings;
 
+		private readonly CinemaSettings _cinemaSettings;
+
 		private readonly TwitchAuthService _twitchAuthService;
 
 		private readonly Action _showThirdPartyNoticesAction;
@@ -35,13 +37,18 @@ namespace CinemaModule.UI.Views
 
 		private StandardButton _thirdPartyNoticesButton;
 
+		private Checkbox _foregroundCheckbox;
+
+		private Checkbox _keybindsEnabledCheckbox;
+
 		private TwitchAuthWindow _twitchAuthWindow;
 
-		public ModuleSettingsView(SettingCollection settings, CinemaUserSettings userSettings, TwitchAuthService twitchAuthService, Action showThirdPartyNoticesAction)
+		public ModuleSettingsView(SettingCollection settings, CinemaUserSettings userSettings, CinemaSettings cinemaSettings, TwitchAuthService twitchAuthService, Action showThirdPartyNoticesAction)
 			: this()
 		{
 			_settings = settings;
 			_userSettings = userSettings;
+			_cinemaSettings = cinemaSettings;
 			_twitchAuthService = twitchAuthService;
 			_showThirdPartyNoticesAction = showThirdPartyNoticesAction;
 		}
@@ -73,6 +80,7 @@ namespace CinemaModule.UI.Views
 			((Control)val).set_Parent(buildPanel);
 			_settingsPanel = val;
 			BuildSettingsEntries();
+			BuildExtraSettings();
 			BuildButtons();
 			_twitchAuthService.AuthStatusChanged += OnTwitchAuthStatusChanged;
 		}
@@ -97,6 +105,68 @@ namespace CinemaModule.UI.Views
 						val.Show(settingView);
 					}
 				}
+			}
+		}
+
+		private void BuildExtraSettings()
+		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003e: Expected O, but got Unknown
+			Checkbox val = new Checkbox();
+			val.set_Text("Window Display in Foreground");
+			((Control)val).set_BasicTooltipText("When enabled, the on-screen window renders on top of all other overlay elements");
+			val.set_Checked(_userSettings.WindowInForeground);
+			((Control)val).set_Parent((Container)(object)_settingsPanel);
+			_foregroundCheckbox = val;
+			_foregroundCheckbox.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
+			{
+				_userSettings.WindowInForeground = _foregroundCheckbox.get_Checked();
+			});
+			BuildKeybindSection();
+		}
+
+		private void BuildKeybindSection()
+		{
+			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0043: Expected O, but got Unknown
+			Checkbox val = new Checkbox();
+			val.set_Text("Enable Keybinds");
+			((Control)val).set_BasicTooltipText("Master toggle — enables or disables all CinemaHUD keybinds");
+			val.set_Checked(_cinemaSettings.KeybindsEnabled.get_Value());
+			((Control)val).set_Parent((Container)(object)_settingsPanel);
+			_keybindsEnabledCheckbox = val;
+			_keybindsEnabledCheckbox.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
+			{
+				_cinemaSettings.KeybindsEnabled.set_Value(_keybindsEnabledCheckbox.get_Checked());
+			});
+			AddKeybindRow(_cinemaSettings.KeybindPlayPause);
+			AddKeybindRow(_cinemaSettings.KeybindLockWindow);
+			AddKeybindRow(_cinemaSettings.KeybindMuteToggle);
+			AddKeybindRow(_cinemaSettings.KeybindToggleEnabled);
+		}
+
+		private void AddKeybindRow(SettingEntry<KeyBinding> keybindSetting)
+		{
+			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			IView settingView = SettingView.FromType((SettingEntry)(object)keybindSetting, ((Control)_settingsPanel).get_Width());
+			if (settingView != null)
+			{
+				ViewContainer val = new ViewContainer();
+				((Container)val).set_WidthSizingMode((SizingMode)2);
+				((Container)val).set_HeightSizingMode((SizingMode)1);
+				((Control)val).set_Parent((Container)(object)_settingsPanel);
+				val.Show(settingView);
 			}
 		}
 

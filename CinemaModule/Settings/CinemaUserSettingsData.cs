@@ -48,6 +48,8 @@ namespace CinemaModule.Settings
 
 		public bool WindowLocked { get; set; }
 
+		public bool WindowInForeground { get; set; }
+
 		public SavedLocationCollection SavedLocations { get; set; } = new SavedLocationCollection();
 
 

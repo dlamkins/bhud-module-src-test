@@ -738,9 +738,8 @@ namespace CinemaModule.UI.Windows.MainSettings
 					ClipboardUtil.get_WindowsClipboardService().SetTextAsync(waypoint);
 					ScreenNotification.ShowNotification("Waypoint copied!", (NotificationType)0, (Texture2D)null, 4);
 				}
-				catch (Exception ex)
+				catch
 				{
-					Logger.Debug("Failed to copy waypoint to clipboard: " + ex.Message);
 				}
 			}
 		}
@@ -773,24 +772,18 @@ namespace CinemaModule.UI.Windows.MainSettings
 		{
 			try
 			{
-				if (!Clipboard.ContainsText())
+				if (Clipboard.ContainsText())
 				{
-					Logger.Debug("Clipboard does not contain text for import");
-					return;
+					SavedLocationExport importData = JsonConvert.DeserializeObject<SavedLocationExport>(Clipboard.GetText());
+					if (importData?.Position != null)
+					{
+						string name = (string.IsNullOrWhiteSpace(importData.Name) ? "Imported Location" : importData.Name);
+						_settings.AddSavedLocation(name, importData.Position, importData.ScreenWidth);
+					}
 				}
-				SavedLocationExport importData = JsonConvert.DeserializeObject<SavedLocationExport>(Clipboard.GetText());
-				if (importData?.Position == null)
-				{
-					Logger.Debug("Invalid location data in clipboard");
-					return;
-				}
-				string name = (string.IsNullOrWhiteSpace(importData.Name) ? "Imported Location" : importData.Name);
-				_settings.AddSavedLocation(name, importData.Position, importData.ScreenWidth);
-				Logger.Debug("Imported location '" + name + "' from clipboard");
 			}
-			catch (Exception ex)
+			catch
 			{
-				Logger.Debug("Failed to import location from clipboard: " + ex.Message);
 			}
 		}
 
@@ -809,11 +802,9 @@ namespace CinemaModule.UI.Windows.MainSettings
 					Position = position,
 					ScreenWidth = screenWidth
 				}, Formatting.Indented));
-				Logger.Debug("Exported location '" + name + "' to clipboard");
 			}
-			catch (Exception ex)
+			catch
 			{
-				Logger.Debug("Failed to export location to clipboard: " + ex.Message);
 			}
 		}
 

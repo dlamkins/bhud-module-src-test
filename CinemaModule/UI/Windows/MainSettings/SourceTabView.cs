@@ -699,9 +699,8 @@ namespace CinemaModule.UI.Windows.MainSettings
 					card.SetAvatar(texture);
 				}
 			}
-			catch (Exception ex)
+			catch
 			{
-				Logger.Debug("Failed to load thumbnail: " + ex.Message);
 			}
 		}
 
@@ -1488,9 +1487,8 @@ namespace CinemaModule.UI.Windows.MainSettings
 					card.SetAvatar(avatarTexture);
 				}
 			}
-			catch (Exception ex)
+			catch
 			{
-				Logger.Debug("Failed to load avatar for " + cacheKey + ": " + ex.Message);
 			}
 		}
 
@@ -1504,9 +1502,8 @@ namespace CinemaModule.UI.Windows.MainSettings
 					card.SetAvatar(texture);
 				}
 			}
-			catch (Exception ex)
+			catch
 			{
-				Logger.Debug("Failed to load YouTube thumbnail for " + videoIdOrUrl + ": " + ex.Message);
 			}
 		}
 
@@ -1750,9 +1747,8 @@ namespace CinemaModule.UI.Windows.MainSettings
 					ClipboardUtil.get_WindowsClipboardService().SetTextAsync(waypoint);
 					ScreenNotification.ShowNotification("Waypoint copied!", (NotificationType)0, (Texture2D)null, 4);
 				}
-				catch (Exception ex)
+				catch
 				{
-					Logger.Debug("Failed to copy waypoint to clipboard: " + ex.Message);
 				}
 			}
 		}

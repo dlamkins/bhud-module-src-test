@@ -99,7 +99,7 @@ namespace CinemaModule.UI.Windows.MainSettings
 			{
 				if (!token.IsCancellationRequested)
 				{
-					Logger.Debug("Failed to fetch Twitch statuses for channel items: " + ex.Message);
+					Logger.Warn("Failed to fetch Twitch statuses for channel items: " + ex.Message);
 				}
 			}
 		}
@@ -136,11 +136,10 @@ namespace CinemaModule.UI.Windows.MainSettings
 					item.ApplyStatus(GetUrlStatus(result.IsAvailable.GetValueOrDefault(), item.IsOnDemand));
 				}
 			}
-			catch (Exception ex)
+			catch
 			{
 				if (!token.IsCancellationRequested)
 				{
-					Logger.Debug("Failed to check URL status: " + ex.Message);
 					item.ApplyStatus(StreamStatus.Offline());
 				}
 			}
@@ -185,12 +184,8 @@ namespace CinemaModule.UI.Windows.MainSettings
 					statusMap[stream.Id] = CreateTwitchStatus(infos, stream.Value);
 				}
 			}
-			catch (Exception ex)
+			catch
 			{
-				if (!token.IsCancellationRequested)
-				{
-					Logger.Debug("Failed to fetch Twitch statuses for custom streams: " + ex.Message);
-				}
 			}
 		}
 
@@ -210,11 +205,10 @@ namespace CinemaModule.UI.Windows.MainSettings
 						statusMap[stream.Id] = ((info != null) ? StreamStatus.YouTubeAvailable(info.Title) : StreamStatus.YouTubeInvalid());
 					}
 				}
-				catch (Exception ex)
+				catch
 				{
 					if (!token.IsCancellationRequested)
 					{
-						Logger.Debug("Failed to check YouTube status for " + stream.Name + ": " + ex.Message);
 						statusMap[stream.Id] = StreamStatus.YouTubeInvalid();
 					}
 				}
@@ -237,11 +231,10 @@ namespace CinemaModule.UI.Windows.MainSettings
 						statusMap[stream.Id] = GetUrlStatus(result.IsAvailable.GetValueOrDefault(), isOnDemand: false);
 					}
 				}
-				catch (Exception ex)
+				catch
 				{
 					if (!token.IsCancellationRequested)
 					{
-						Logger.Debug("Failed to check URL status for " + stream.Name + ": " + ex.Message);
 						statusMap[stream.Id] = new StreamStatus
 						{
 							Subtitle = "Unknown"

@@ -41,6 +41,10 @@ namespace CinemaModule.UI.VideoDisplays
 
 		private const int TopMargin = 35;
 
+		private const int ZIndexBackground = -9001;
+
+		private const int ZIndexForeground = 9001;
+
 		private Texture2D _currentTexture;
 
 		private WindowVideoControls _controlsOverlay;
@@ -327,6 +331,11 @@ namespace CinemaModule.UI.VideoDisplays
 				this.LockToggled?.Invoke(this, locked);
 			};
 			GameService.Input.get_Mouse().add_LeftMouseButtonReleased((EventHandler<MouseEventArgs>)OnGlobalMouseRelease);
+		}
+
+		public void ApplyZIndex(bool inForeground)
+		{
+			((Control)this).set_ZIndex(inForeground ? 9001 : (-9001));
 		}
 
 		public void UpdateTexture(Texture2D texture)

@@ -44,7 +44,6 @@ namespace CinemaModule.VideoPlayer
 				_bufferPtr = newPtr;
 				_textureBuffer = null;
 				_isAllocated = true;
-				Logger.Debug($"Buffer allocated: {size} bytes, ptr={newPtr}");
 			}
 		}
 

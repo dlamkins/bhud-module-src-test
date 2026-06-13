@@ -43,6 +43,8 @@ namespace CinemaModule.Controllers
 
 		private WatchPartyPlaybackHandler _watchPartyPlaybackHandler;
 
+		private int _preMuteVolume;
+
 		private bool _isDisposed;
 
 		private bool IsTwitchStream => _userSettings.CurrentStreamSourceType == StreamSourceType.TwitchChannel;
@@ -59,6 +61,7 @@ namespace CinemaModule.Controllers
 		{
 			_moduleSettings = coreSettings;
 			_userSettings = userSettings;
+			_preMuteVolume = userSettings.Volume;
 			_twitchService = twitchService;
 			_youtubeService = youtubeService;
 			_radioMetadataService = new RadioMetadataService();
@@ -90,9 +93,40 @@ namespace CinemaModule.Controllers
 			_playbackController.StartInitialPlaybackIfEnabled();
 		}
 
+		public void TogglePause()
+		{
+			_playbackController.TogglePause();
+		}
+
+		public void ToggleLockWindow()
+		{
+			bool newLocked = !_userSettings.WindowLocked;
+			_userSettings.WindowLocked = newLocked;
+			_displayController.UpdateWindowLockState(newLocked);
+		}
+
+		public void ToggleMute()
+		{
+			if (_userSettings.Volume > 0)
+			{
+				_preMuteVolume = _userSettings.Volume;
+				_userSettings.Volume = 0;
+			}
+			else
+			{
+				_userSettings.Volume = _preMuteVolume;
+			}
+		}
+
+		public void ToggleModuleEnabled()
+		{
+			_moduleSettings.EnabledSetting.set_Value(!_moduleSettings.EnabledSetting.get_Value());
+		}
+
 		public void RegisterDisplays(WindowVideoDisplay windowDisplay, WorldVideoDisplay worldDisplay)
 		{
 			_displayController.RegisterDisplays(windowDisplay, worldDisplay);
+			_displayController.UpdateWindowZIndex(_userSettings.WindowInForeground);
 			_displayController.UpdateTwitchStreamState(IsTwitchStream);
 			_displayController.UpdateDisplayVisibility();
 			_twitchHandler.InitializeStreamInfo();
@@ -249,6 +283,7 @@ namespace CinemaModule.Controllers
 			_userSettings.VolumeChanged += OnVolumeChanged;
 			_userSettings.CurrentStreamSourceTypeChanged += OnCurrentStreamSourceTypeChanged;
 			_userSettings.CurrentStreamPresetChanged += OnCurrentStreamPresetChanged;
+			_userSettings.WindowInForegroundChanged += OnWindowInForegroundChanged;
 		}
 
 		private void UnsubscribeFromSettingsEvents()
@@ -261,6 +296,7 @@ namespace CinemaModule.Controllers
 			_userSettings.VolumeChanged -= OnVolumeChanged;
 			_userSettings.CurrentStreamSourceTypeChanged -= OnCurrentStreamSourceTypeChanged;
 			_userSettings.CurrentStreamPresetChanged -= OnCurrentStreamPresetChanged;
+			_userSettings.WindowInForegroundChanged -= OnWindowInForegroundChanged;
 		}
 
 		private void OnEnabledChanged(object sender, ValueChangedEventArgs<bool> e)
@@ -334,6 +370,11 @@ namespace CinemaModule.Controllers
 			{
 				LoadOfflineTextureAsync();
 			}
+		}
+
+		private void OnWindowInForegroundChanged(object sender, bool inForeground)
+		{
+			_displayController.UpdateWindowZIndex(inForeground);
 		}
 
 		private void OnWorldDisplayInRangeChanged(object sender, bool isInRange)

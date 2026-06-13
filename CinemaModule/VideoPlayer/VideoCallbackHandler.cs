@@ -29,7 +29,6 @@ namespace CinemaModule.VideoPlayer
 			if (bufferPtr == IntPtr.Zero)
 			{
 				_lockFailed = true;
-				Logger.Debug("LockCallback: Buffer not ready (BufferPtr is zero)");
 				return IntPtr.Zero;
 			}
 			_lockFailed = false;

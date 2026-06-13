@@ -71,6 +71,8 @@ namespace CinemaModule
 
 		private CornerIcon _cornerIcon;
 
+		private KeybindHandler _keybindHandler;
+
 		private bool _needsVideoPlayerInit;
 
 		private bool _needsTwitchChatRestore;
@@ -109,7 +111,7 @@ namespace CinemaModule
 
 		public override IView GetSettingsView()
 		{
-			return (IView)(object)new ModuleSettingsView(SettingsManager.get_ModuleSettings(), _userSettings, _twitchAuthService, delegate
+			return (IView)(object)new ModuleSettingsView(SettingsManager.get_ModuleSettings(), _userSettings, _cinemaSettings, _twitchAuthService, delegate
 			{
 				_cinemaSettings?.ShowThirdPartyNotices();
 			});
@@ -151,6 +153,19 @@ namespace CinemaModule
 				_controller.ShowChatRequested += OnShowChatRequested;
 				_controller.ToggleChatRequested += OnToggleChatRequested;
 				_controller.RegisterWatchParty(_watchPartyController);
+				_keybindHandler = new KeybindHandler(_cinemaSettings, delegate
+				{
+					_controller.TogglePause();
+				}, delegate
+				{
+					_controller.ToggleLockWindow();
+				}, delegate
+				{
+					_controller.ToggleMute();
+				}, delegate
+				{
+					_controller.ToggleModuleEnabled();
+				});
 				CreateCornerIcon();
 				CreateSettingsWindow();
 				CreateVideoDisplays();
@@ -267,6 +282,7 @@ namespace CinemaModule
 				_controller.ChatChannelChangeRequested -= OnChatChannelChangeRequested;
 			});
 			SafeDispose(_controller);
+			SafeDispose(_keybindHandler);
 			SafeDispose((IDisposable)_cornerIcon);
 			SafeDispose((IDisposable)_settingsWindow);
 			SafeDispose((IDisposable)_twitchChatWindow);
