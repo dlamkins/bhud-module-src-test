@@ -61,6 +61,24 @@ namespace MysticCrafting.Module.Repositories
 				Id = 82345678,
 				RewardItemId = 104777,
 				Name = "Unknown Nightmares: Experiments in the Shadows"
+			},
+			new Achievement
+			{
+				Id = 92345678,
+				RewardItemId = 109363,
+				Name = "Mists Research: Strife Unending"
+			},
+			new Achievement
+			{
+				Id = 102345678,
+				RewardItemId = 109361,
+				Name = "Castora: Forge Guard's Armor Collection"
+			},
+			new Achievement
+			{
+				Id = 112345678,
+				RewardItemId = 109141,
+				Name = "Eternity's Garden: Eternity's Garden Mastery"
 			}
 		};
 

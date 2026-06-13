@@ -1,4 +1,7 @@
-﻿#1.5.9 Bug fixes
+﻿#1.5.10 Data update to add all the new items
+- Sorry for the long wait everyone! <3 Atzie
+
+#1.5.9 Bug fixes
 - Fixed an issue with Gifts related to Endless Summer ring not displaying Mystic Forge recipes
 - Fixed an issue with item category filters returning no results
 - Increased the limit of Legendary rings from 1 to 2
