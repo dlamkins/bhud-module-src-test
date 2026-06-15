@@ -18,6 +18,8 @@
     <Reference Include="Gw2Sharp">
       <HintPath>..\..\working\Gw2Sharp.dll</HintPath>
     </Reference>
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="MonoGame.Framework">
       <HintPath>..\..\working\MonoGame.Framework.dll</HintPath>
     </Reference>
