@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
+using Gw2BuildTemplates;
 using Gw2Sharp.Models;
 using Gw2Sharp.WebApi;
 using Kenedia.Modules.BuildsManager.DataModels.Professions;
@@ -33,6 +35,16 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 		private readonly Kenedia.Modules.Core.Controls.Dropdown _sortBehavior;
 
 		private double _lastShown;
+
+		private Template? _pendingFocusedTemplate;
+
+		private bool _pendingRename;
+
+		private int _pendingFocusDelayFrames;
+
+		private int _pendingFocusFramesRemaining;
+
+		private static readonly BindingFlags s_instanceFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
 		public List<TemplateSelectable> TemplateSelectables { get; } = new List<TemplateSelectable>();
 
@@ -146,41 +158,54 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 		{
 			Task.Run(async delegate
 			{
-				string code = await ClipboardUtil.WindowsClipboardService.GetTextAsync();
-				code = code.Trim();
+				string code = null;
+				try
+				{
+					code = await ClipboardUtil.WindowsClipboardService.GetTextAsync();
+				}
+				catch (Exception ex)
+				{
+					BaseModule<BuildsManager, MainWindow, Kenedia.Modules.BuildsManager.Services.Settings, Paths, Kenedia.Modules.BuildsManager.Services.StaticHosting>.Logger.Warn(ex, "Failed to read clipboard while creating a template.");
+				}
+				string trimmedCode = (string.IsNullOrWhiteSpace(code) ? null : code.Trim());
+				bool hasClipboardCode = !string.IsNullOrEmpty(trimmedCode);
+				BuildTemplate build;
+				bool hasValidBuildCode = hasClipboardCode && Gw2BuildCodec.TryDecode(trimmedCode, out build);
 				GameService.Graphics.QueueMainThreadRender(delegate
 				{
 					string name = (string.IsNullOrEmpty(Search.Text) ? strings.NewTemplate : Search.Text);
-					Template t = CreateTemplate(Templates.GetNewName(name));
-					if (!string.IsNullOrEmpty(code))
+					Template template = CreateTemplate(name);
+					if (hasValidBuildCode)
 					{
 						try
 						{
-							BaseModule<BuildsManager, MainWindow, Kenedia.Modules.BuildsManager.Services.Settings, Paths, Kenedia.Modules.BuildsManager.Services.StaticHosting>.Logger.Debug("Load template from clipboard code: " + code);
-							t.LoadFromCode(code);
+							BaseModule<BuildsManager, MainWindow, Kenedia.Modules.BuildsManager.Services.Settings, Paths, Kenedia.Modules.BuildsManager.Services.StaticHosting>.Logger.Debug("Load template from clipboard code: " + trimmedCode);
+							template.LoadFromCode(trimmedCode);
 						}
-						catch (Exception)
+						catch (Exception exception)
 						{
+							BaseModule<BuildsManager, MainWindow, Kenedia.Modules.BuildsManager.Services.Settings, Paths, Kenedia.Modules.BuildsManager.Services.StaticHosting>.Logger.Warn(exception, "Failed to load clipboard build code '" + trimmedCode + "'.");
+							ScreenNotification.ShowNotification("Clipboard build code could not be loaded. Created blank template instead.");
 						}
 					}
-					TemplateSelectable templateSelectable = null;
-					SelectionPanel?.SetTemplateAnchor(templateSelectable = TemplateSelectables.FirstOrDefault((TemplateSelectable e) => e.Template == t));
-					templateSelectable?.ToggleEditMode(enable: true);
 					if (Settings.SetFilterOnTemplateCreate.Value)
 					{
-						Search.Text = t.Name;
+						Search.Text = template.Name;
+						Search.ForceFilter();
 					}
 					else if (Settings.ResetFilterOnTemplateCreate.Value)
 					{
 						Search.Text = null;
+						Search.ForceFilter();
 					}
+					QueueFocusTemplate(template, rename: true);
 				});
 			});
 		}
 
 		private void Templates_TemplateChanged(object sender, PropertyChangedEventArgs e)
 		{
-			FilterTemplates();
+			RefreshTemplateSelection(sender as Template);
 		}
 
 		private TemplateSortBehavior GetSortBehaviorFromString(string s)
@@ -237,6 +262,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 					template.Visible = filterQueriesMatches && specMatches && (nameMatches || lastModifiedMatch);
 				}
 				SortTemplates();
+				SelectionContent.Invalidate();
 				TemplateSelectable current = TemplateSelectables.FirstOrDefault((TemplateSelectable x) => x.Template == TemplatePresenter.Template);
 				if ((((!(current?.Visible)) ?? true) && Settings.RequireVisibleTemplate.Value) || current?.Template == Template.Empty)
 				{
@@ -258,8 +284,13 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 				SelectionContent.SortChildren(delegate(TemplateSelectable a, TemplateSelectable b)
 				{
 					int num = a.Template.Profession.CompareTo(b.Template.Profession);
-					int num2 = a.Template.Name.CompareTo(b.Template.Name);
-					return (num != 0) ? num : num2;
+					int num2 = a.Template.EliteSpecializationId.CompareTo(b.Template.EliteSpecializationId);
+					int num3 = a.Template.Name.CompareTo(b.Template.Name);
+					if (num != 0)
+					{
+						return num;
+					}
+					return (num2 == 0) ? num3 : num2;
 				});
 				break;
 			case TemplateSortBehavior.ByName:
@@ -268,9 +299,9 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 			case TemplateSortBehavior.ByModified:
 				SelectionContent.SortChildren(delegate(TemplateSelectable a, TemplateSelectable b)
 				{
-					int num3 = a.Template.LastModified.CompareTo(b.Template.LastModified);
-					int num4 = a.Template.Name.CompareTo(b.Template.Name);
-					return (num3 != 0) ? num3 : num4;
+					int num4 = a.Template.LastModified.CompareTo(b.Template.LastModified);
+					int num5 = a.Template.Name.CompareTo(b.Template.Name);
+					return (num4 != 0) ? num4 : num5;
 				});
 				break;
 			}
@@ -330,21 +361,22 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 				{
 					Parent = SelectionContent,
 					Template = template,
-					Width = SelectionContent.Width - 35,
-					OnNameChangedAction = new Action(FilterTemplates)
+					Width = SelectionContent.Width - 35
+				};
+				t.OnNameChangedAction = delegate
+				{
+					RefreshTemplateSelection(t.Template);
 				};
 				template.ProfessionChanged += new ValueChangedEventHandler<ProfessionType>(ProfessionChanged);
 				t.OnClickAction = delegate
 				{
 					SelectionPanel?.SetTemplateAnchor(t);
 				};
+				TemplateSelectables.Add(t);
 				if (!firstLoad)
 				{
-					SelectionPanel?.SetTemplateAnchor(t);
-					TemplatePresenter.SetTemplate(t.Template);
-					t.ToggleEditMode(enable: true);
+					QueueFocusTemplate(t.Template, rename: true);
 				}
-				TemplateSelectables.Add(t);
 			}
 			if (firstLoad)
 			{
@@ -362,40 +394,193 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 
 		public Template CreateTemplate(string name)
 		{
-			for (int i = 0; i < int.MaxValue; i++)
+			string uniqueName = Templates.GetNewName(name);
+			Template template = TemplateFactory.CreateTemplate(uniqueName);
+			Templates.Add(template);
+			return template;
+		}
+
+		private void QueueFocusTemplate(Template template, bool rename)
+		{
+			if (template != null)
 			{
-				string newName = ((i == 0) ? name : $"{name} #{i}");
-				if (Templates.Where((Template e) => e.Name == newName)?.FirstOrDefault() != null)
+				_pendingFocusedTemplate = template;
+				_pendingRename = rename;
+				_pendingFocusDelayFrames = 2;
+				_pendingFocusFramesRemaining = 30;
+			}
+		}
+
+		private void RefreshTemplateSelection(Template? template)
+		{
+			FilterTemplates();
+			if (template != null && template == TemplatePresenter.Template)
+			{
+				QueueFocusTemplate(template, rename: false);
+			}
+		}
+
+		private void FocusTemplate(Template template, bool rename)
+		{
+			Template template2 = template;
+			if (template2 == null)
+			{
+				return;
+			}
+			TemplateSelectable selectable = TemplateSelectables.FirstOrDefault((TemplateSelectable e) => e.Template == template2);
+			if (selectable != null)
+			{
+				TemplatePresenter.SetTemplate(template2);
+				SelectionPanel?.SetTemplateAnchor(selectable);
+				BringTemplateIntoView(selectable);
+				if (rename)
 				{
-					continue;
+					selectable.ToggleEditMode(enable: true);
 				}
-				TemplateSelectable ts = null;
-				Template t;
-				Templates.Add(t = TemplateFactory.CreateTemplate(name));
-				SelectionPanel?.SetTemplateAnchor(ts = TemplateSelectables.FirstOrDefault((TemplateSelectable e) => e.Template == t));
-				ts?.ToggleEditMode(enable: false);
-				TemplatePresenter.SetTemplate(t);
-				t.ProfessionChanged += new ValueChangedEventHandler<ProfessionType>(ProfessionChanged);
-				if (ts != null)
+			}
+		}
+
+		private Kenedia.Modules.Core.Controls.Scrollbar? GetSelectionScrollbar()
+		{
+			object obj = base.Parent?.Children?.OfType<Kenedia.Modules.Core.Controls.Scrollbar>().FirstOrDefault((Kenedia.Modules.Core.Controls.Scrollbar s) => s.AssociatedContainer == SelectionContent);
+			if (obj == null)
+			{
+				Blish_HUD.Controls.Container parent = SelectionContent.Parent;
+				if (parent == null)
 				{
-					ts.DisposeAction = delegate
-					{
-						t.ProfessionChanged -= new ValueChangedEventHandler<ProfessionType>(ProfessionChanged);
-					};
+					return null;
 				}
-				return t;
+				ControlCollection<Control> children = parent.Children;
+				if (children == null)
+				{
+					return null;
+				}
+				obj = children.OfType<Kenedia.Modules.Core.Controls.Scrollbar>().FirstOrDefault((Kenedia.Modules.Core.Controls.Scrollbar s) => s.AssociatedContainer == SelectionContent);
+			}
+			return (Kenedia.Modules.Core.Controls.Scrollbar?)obj;
+		}
+
+		private object? GetNativeSelectionScrollbar()
+		{
+			Type type = SelectionContent.GetType();
+			while ((object)type != null)
+			{
+				object scrollbar = type.GetField("_panelScrollbar", s_instanceFlags)?.GetValue(SelectionContent);
+				if (scrollbar != null)
+				{
+					return scrollbar;
+				}
+				type = type.BaseType;
 			}
 			return null;
 		}
 
+		private void SetSelectionScrollState(int targetOffset, int maxOffset)
+		{
+			targetOffset = Math.Max(0, Math.Min(targetOffset, maxOffset));
+			SelectionContent.VerticalScrollOffset = targetOffset;
+			float scrollDistance = ((maxOffset == 0) ? 0f : Math.Max(0f, Math.Min((float)targetOffset / (float)maxOffset, 1f)));
+			Kenedia.Modules.Core.Controls.Scrollbar customScrollbar = GetSelectionScrollbar();
+			if (customScrollbar != null)
+			{
+				customScrollbar.ScrollDistance = scrollDistance;
+			}
+			object nativeScrollbar = GetNativeSelectionScrollbar();
+			if (nativeScrollbar != null)
+			{
+				Type type = nativeScrollbar.GetType();
+				type.GetProperty("ScrollDistance", s_instanceFlags)?.SetValue(nativeScrollbar, scrollDistance);
+				type.GetProperty("TargetScrollDistance", s_instanceFlags)?.SetValue(nativeScrollbar, scrollDistance);
+			}
+		}
+
+		private bool TryGetTemplateBounds(TemplateSelectable selectable, out int top, out int bottom, out int contentHeight)
+		{
+			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
+			top = 0;
+			bottom = 0;
+			contentHeight = SelectionContent.ContentRegion.Height;
+			if (selectable == null || !selectable.Visible)
+			{
+				return false;
+			}
+			int y = SelectionContent.ContentPadding.Top;
+			int spacing = (int)SelectionContent.ControlPadding.Y;
+			foreach (TemplateSelectable child in SelectionContent.Children.OfType<TemplateSelectable>())
+			{
+				if (child.Visible)
+				{
+					if (child == selectable)
+					{
+						top = y;
+						bottom = y + child.Height;
+					}
+					y += child.Height + spacing;
+				}
+			}
+			contentHeight = Math.Max(y + SelectionContent.ContentPadding.Bottom - spacing, SelectionContent.ContentRegion.Height);
+			return bottom > top;
+		}
+
+		private void BringTemplateIntoView(TemplateSelectable selectable)
+		{
+			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0082: Unknown result type (might be due to invalid IL or missing references)
+			if (!TryGetTemplateBounds(selectable, out var childTop, out var childBottom, out var contentHeight))
+			{
+				return;
+			}
+			int maxOffset = Math.Max(contentHeight - SelectionContent.ContentRegion.Height, 0);
+			if (maxOffset == 0)
+			{
+				SetSelectionScrollState(0, 0);
+				return;
+			}
+			int margin = 10;
+			int viewportTop;
+			int num = (viewportTop = SelectionContent.VerticalScrollOffset);
+			int viewportBottom = num + SelectionContent.ContentRegion.Height;
+			int targetOffset = num;
+			if (childTop < viewportTop + margin)
+			{
+				targetOffset = Math.Max(childTop - margin, 0);
+			}
+			else if (childBottom > viewportBottom - margin)
+			{
+				targetOffset = Math.Max(childBottom - SelectionContent.ContentRegion.Height + margin, 0);
+			}
+			targetOffset = Math.Max(0, Math.Min(targetOffset, maxOffset));
+			SetSelectionScrollState(targetOffset, maxOffset);
+		}
+
+		private bool IsTemplateInView(TemplateSelectable selectable)
+		{
+			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+			if (!TryGetTemplateBounds(selectable, out var childTop, out var childBottom, out var _))
+			{
+				return false;
+			}
+			int margin = 10;
+			int viewportTop = SelectionContent.VerticalScrollOffset;
+			int viewportBottom = viewportTop + SelectionContent.ContentRegion.Height;
+			if (childTop >= viewportTop + margin)
+			{
+				return childBottom <= viewportBottom - margin;
+			}
+			return false;
+		}
+
 		private void SpecializationChanged(object sender, DictionaryItemChangedEventArgs<SpecializationSlotType, Specialization> e)
 		{
-			FilterTemplates();
+			RefreshTemplateSelection(sender as Template);
 		}
 
 		private void ProfessionChanged(object sender, Kenedia.Modules.Core.Models.ValueChangedEventArgs<ProfessionType> e)
 		{
-			FilterTemplates();
+			RefreshTemplateSelection(sender as Template);
 		}
 
 		public TemplateSelectable? GetFirstTemplateSelectable()
@@ -449,6 +634,34 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 			if (!_sortBehavior.Enabled)
 			{
 				_sortBehavior.Enabled = _sortBehavior.Enabled || Common.Now - _lastShown >= 5.0;
+			}
+			if (_pendingFocusedTemplate == null)
+			{
+				return;
+			}
+			Template pendingTemplate = _pendingFocusedTemplate;
+			bool pendingRename = _pendingRename;
+			if (_pendingFocusDelayFrames > 0)
+			{
+				_pendingFocusDelayFrames--;
+				return;
+			}
+			TemplateSelectable selectable = TemplateSelectables.FirstOrDefault((TemplateSelectable e) => e.Template == pendingTemplate);
+			if (selectable != null && selectable.Visible && selectable.Parent == SelectionContent && selectable.Height > 0)
+			{
+				FocusTemplate(pendingTemplate, pendingRename);
+				_pendingRename = false;
+				_pendingFocusFramesRemaining--;
+				if (IsTemplateInView(selectable) || _pendingFocusFramesRemaining <= 0)
+				{
+					_pendingFocusedTemplate = null;
+					_pendingRename = false;
+				}
+			}
+			else if (_pendingFocusFramesRemaining <= 0)
+			{
+				_pendingFocusedTemplate = null;
+				_pendingRename = false;
 			}
 		}
 

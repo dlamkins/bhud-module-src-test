@@ -58,15 +58,34 @@ namespace Kenedia.Modules.BuildsManager.Models
 			if (template != null)
 			{
 				_templates.Add(template);
-				template.LastModifiedChanged += new ValueChangedEventHandler<string>(Template_LastModifiedChanged);
-				template.NameChanged += new ValueChangedEventHandler<string>(Template_NameChanged);
-				template.ProfessionChanged += new ValueChangedEventHandler<ProfessionType>(Template_ProfessionChanged);
+				AttachTemplate(template);
 			}
+		}
+
+		private void AttachTemplate(Template template)
+		{
+			template.LastModifiedChanged += new ValueChangedEventHandler<string>(Template_LastModifiedChanged);
+			template.NameChanged += new ValueChangedEventHandler<string>(Template_NameChanged);
+			template.ProfessionChanged += new ValueChangedEventHandler<ProfessionType>(Template_ProfessionChanged);
+			template.EliteSpecializationChanged += new SpecializationChangedEventHandler(Template_EliteSpecializationChanged);
+		}
+
+		private void DetachTemplate(Template template)
+		{
+			template.LastModifiedChanged -= new ValueChangedEventHandler<string>(Template_LastModifiedChanged);
+			template.NameChanged -= new ValueChangedEventHandler<string>(Template_NameChanged);
+			template.ProfessionChanged -= new ValueChangedEventHandler<ProfessionType>(Template_ProfessionChanged);
+			template.EliteSpecializationChanged -= new SpecializationChangedEventHandler(Template_EliteSpecializationChanged);
 		}
 
 		private void Template_ProfessionChanged(object sender, Kenedia.Modules.Core.Models.ValueChangedEventArgs<ProfessionType> e)
 		{
 			this.TemplateChanged?.Invoke(sender, new PropertyChangedEventArgs("Profession"));
+		}
+
+		private void Template_EliteSpecializationChanged(object sender, SpecializationChangedEventArgs e)
+		{
+			this.TemplateChanged?.Invoke(sender, new PropertyChangedEventArgs("EliteSpecialization"));
 		}
 
 		private void Template_NameChanged(object sender, Kenedia.Modules.Core.Models.ValueChangedEventArgs<string> e)
@@ -85,14 +104,16 @@ namespace Kenedia.Modules.BuildsManager.Models
 			{
 				return false;
 			}
-			template.LastModifiedChanged -= new ValueChangedEventHandler<string>(Template_LastModifiedChanged);
-			template.NameChanged -= new ValueChangedEventHandler<string>(Template_NameChanged);
-			template.ProfessionChanged -= new ValueChangedEventHandler<ProfessionType>(Template_ProfessionChanged);
+			DetachTemplate(template);
 			return _templates.Remove(template);
 		}
 
 		public void Clear()
 		{
+			foreach (Template template in _templates)
+			{
+				DetachTemplate(template);
+			}
 			_templates.Clear();
 		}
 
@@ -134,7 +155,7 @@ namespace Kenedia.Modules.BuildsManager.Models
 			try
 			{
 				string[] templateFiles = Directory.GetFiles(Paths.TemplatesPath);
-				_templates.Clear();
+				Clear();
 				JsonSerializerSettings settings = new JsonSerializerSettings();
 				settings.get_Converters().Add((JsonConverter)(object)TemplateConverter);
 				Logger.Info($"Loading {templateFiles.Length} Templates ...");
@@ -145,10 +166,13 @@ namespace Kenedia.Modules.BuildsManager.Models
 					Template template = JsonConvert.DeserializeObject<Template>(await reader.ReadToEndAsync(), settings);
 					template.SaveRequested = false;
 					_templates.Add(template);
+					AttachTemplate(template);
 				}
 				if (_templates.Count == 0)
 				{
-					_templates.Add(TemplateFactory.CreateTemplate());
+					Template template2 = TemplateFactory.CreateTemplate();
+					_templates.Add(template2);
+					AttachTemplate(template2);
 				}
 				time.Stop();
 				Logger.Info($"Time to load {templateFiles.Length} templates {time.ElapsedMilliseconds}ms. {_templates.Count} out of {templateFiles.Length} templates got loaded.");

@@ -147,6 +147,8 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selectables
 
 		public bool PassSelected { get; set; }
 
+		protected virtual int AnchorZIndexOffset => 1000;
+
 		public Selector()
 		{
 			//IL_0003: Unknown result type (might be due to invalid IL or missing references)
@@ -404,6 +406,10 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selectables
 			base.UpdateContainer(gameTime);
 			if (base.Visible)
 			{
+				if (base.Parent == Control.Graphics.SpriteScreen && Anchor != null)
+				{
+					ZIndex = GetAnchorRootZIndex(Anchor) + AnchorZIndexOffset;
+				}
 				SetCapture();
 				MoveToAnchor();
 			}
@@ -440,6 +446,20 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selectables
 				absoluteBounds = Anchor.AbsoluteBounds;
 				base.Location = new Point(num, ((Rectangle)(ref absoluteBounds)).get_Top() + AnchorOffset.Y);
 			}
+		}
+
+		public static int GetAnchorRootZIndex(Control anchor)
+		{
+			if (anchor == null)
+			{
+				return 0;
+			}
+			Control current = anchor;
+			while (current.Parent != null && current.Parent != Control.Graphics.SpriteScreen)
+			{
+				current = current.Parent;
+			}
+			return current.ZIndex;
 		}
 
 		protected override void DisposeControl()

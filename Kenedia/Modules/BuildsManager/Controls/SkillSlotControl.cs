@@ -346,7 +346,7 @@ namespace Kenedia.Modules.BuildsManager.Controls
 			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
 			SkillSelector.Anchor = this;
 			SkillSelector.AnchorOffset = new Point(-2, 10);
-			SkillSelector.ZIndex = ZIndex + 100;
+			SkillSelector.ZIndex = Selector<Kenedia.Modules.BuildsManager.DataModels.Professions.Skill>.GetAnchorRootZIndex(this) + 1000;
 			SkillSelector.SelectedItem = Skill;
 			SkillSlotType slot = SkillSlot;
 			SkillSelector.Label = strings.ResourceManager.GetString(Regex.Replace((slot & ~(SkillSlotType.Active | SkillSlotType.Inactive | SkillSlotType.Terrestrial | SkillSlotType.Aquatic)).ToString().Trim() ?? "", "[_0-9]", "") + "Skills");

@@ -415,20 +415,30 @@ namespace Kenedia.Modules.Core.Controls
 
 		public override void RecalculateLayout()
 		{
-			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0133: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0143: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0148: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0183: Unknown result type (might be due to invalid IL or missing references)
 			double scrollbarPercent = _scrollbarPercent;
+			int previousVerticalOffset = _associatedContainer?.VerticalScrollOffset ?? 0;
 			RecalculateScrollbarSize();
 			if (scrollbarPercent != _scrollbarPercent && _associatedContainer != null)
 			{
-				ScrollDistance = 0f;
-				TargetScrollDistance = 0f;
+				int maxOffset = Math.Max(_containerLowestContent - _associatedContainer.ContentRegion.Height, 0);
+				if (maxOffset != 0)
+				{
+					float preservedDistance = (TargetScrollDistance = (ScrollDistance = (float)Math.Min(previousVerticalOffset, maxOffset) / (float)maxOffset));
+				}
+				else
+				{
+					ScrollDistance = 0f;
+					TargetScrollDistance = 0f;
+				}
 			}
 			_upArrowBounds = new Rectangle(base.Width / 2 - s_textureUpArrow.get_Width() / 2, 0, s_textureUpArrow.get_Width(), s_textureUpArrow.get_Height());
 			_downArrowBounds = new Rectangle(base.Width / 2 - s_textureDownArrow.get_Width() / 2, base.Height - s_textureDownArrow.get_Height(), s_textureDownArrow.get_Width(), s_textureDownArrow.get_Height());

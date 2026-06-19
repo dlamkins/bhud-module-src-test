@@ -1,6 +1,5 @@
 using System;
 using System.ComponentModel.Composition;
-using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,7 +12,6 @@ using Blish_HUD.Settings;
 using Gw2Sharp.WebApi;
 using Kenedia.Modules.BuildsManager.Controls.Selection;
 using Kenedia.Modules.BuildsManager.Controls.Tabs;
-using Kenedia.Modules.BuildsManager.DataModels.Stats;
 using Kenedia.Modules.BuildsManager.Models;
 using Kenedia.Modules.BuildsManager.Services;
 using Kenedia.Modules.BuildsManager.Utility;
@@ -26,7 +24,6 @@ using Kenedia.Modules.Core.Structs;
 using Kenedia.Modules.Core.Utility;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
-using Newtonsoft.Json;
 
 namespace Kenedia.Modules.BuildsManager
 {
@@ -202,12 +199,7 @@ namespace Kenedia.Modules.BuildsManager
 			BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug("ReloadKey_Activated: " + base.Name);
 			_cancellationTokenSource?.Cancel();
 			_cancellationTokenSource = new CancellationTokenSource();
-			string json = JsonConvert.SerializeObject((object)new StaticStats
-			{
-				TextureMapInfo = Stat.StatTextureMap,
-				ImageUrl = "https://img.gw2skills.net/editor/UI/profile-icons-44x44.v3.png"
-			});
-			File.WriteAllText("C:\\Users\\lasse\\Downloads\\Stats.json", json);
+			await GW2API.UpdateMappedIds();
 		}
 
 		protected override void LoadGUI()
