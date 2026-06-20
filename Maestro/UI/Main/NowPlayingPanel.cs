@@ -76,7 +76,7 @@ namespace Maestro.UI.Main
 
 		private readonly Label _totalLabel;
 
-		private readonly StandardButton _queueButton;
+		private readonly IconButton _queueButton;
 
 		private bool _isPlayingFromQueue;
 
@@ -122,6 +122,11 @@ namespace Maestro.UI.Main
 		{
 			_isPlayingFromQueue = isPlaying;
 			UpdatePlaybackState();
+		}
+
+		public void SetQueueActive(bool active)
+		{
+			_queueButton.Selected = active;
 		}
 
 		public void SetPendingSong(Song song)
@@ -411,7 +416,7 @@ namespace Maestro.UI.Main
 			return val;
 		}
 
-		private StandardButton CreateQueueButton(int panelWidth)
+		private IconButton CreateQueueButton(int panelWidth)
 		{
 			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
@@ -425,7 +430,7 @@ namespace Maestro.UI.Main
 			{
 				this.QueueToggleClicked?.Invoke(this, EventArgs.Empty);
 			});
-			return (StandardButton)(object)iconButton;
+			return iconButton;
 		}
 
 		private void SubscribeToEvents()
@@ -769,7 +774,7 @@ namespace Maestro.UI.Main
 			{
 				((Control)totalLabel).Dispose();
 			}
-			StandardButton queueButton = _queueButton;
+			IconButton queueButton = _queueButton;
 			if (queueButton != null)
 			{
 				((Control)queueButton).Dispose();

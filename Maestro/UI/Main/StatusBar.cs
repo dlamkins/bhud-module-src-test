@@ -139,11 +139,11 @@ namespace Maestro.UI.Main
 
 		private readonly Label _statusLabel;
 
-		private readonly StandardButton _communityButton;
+		private readonly IconButton _communityButton;
 
 		private readonly StandardButton _createButton;
 
-		private readonly StandardButton _importButton;
+		private readonly IconButton _importButton;
 
 		private InstrumentSelectorPanel _instrumentPanel;
 
@@ -228,7 +228,7 @@ namespace Maestro.UI.Main
 			((Control)iconButton).set_Location(new Point(x, 0));
 			((Control)iconButton).set_Size(new Point(40, 26));
 			((Control)iconButton).set_BasicTooltipText("Import songs");
-			_importButton = (StandardButton)(object)iconButton;
+			_importButton = iconButton;
 			((Control)_importButton).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				this.ImportClicked?.Invoke(this, EventArgs.Empty);
@@ -247,7 +247,7 @@ namespace Maestro.UI.Main
 			((Control)iconButton3).set_Location(new Point(x, 0));
 			((Control)iconButton3).set_Size(new Point(40, 26));
 			((Control)iconButton3).set_BasicTooltipText("Browse & upload community songs");
-			_communityButton = (StandardButton)(object)iconButton3;
+			_communityButton = iconButton3;
 			((Control)_communityButton).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				this.CommunityClicked?.Invoke(this, EventArgs.Empty);
@@ -278,6 +278,16 @@ namespace Maestro.UI.Main
 			((Control)_createButton).set_BasicTooltipText(enabled ? "Create a song" : "Close the Creator window first");
 		}
 
+		public void SetImportActive(bool active)
+		{
+			_importButton.Selected = active;
+		}
+
+		public void SetCommunityActive(bool active)
+		{
+			_communityButton.Selected = active;
+		}
+
 		private void UpdateText()
 		{
 			_statusLabel.set_Text((_visibleCount == _totalCount) ? $"  {_totalCount} songs" : $"  {_visibleCount} of {_totalCount} songs");
@@ -295,7 +305,7 @@ namespace Maestro.UI.Main
 			{
 				((Control)statusLabel).Dispose();
 			}
-			StandardButton communityButton = _communityButton;
+			IconButton communityButton = _communityButton;
 			if (communityButton != null)
 			{
 				((Control)communityButton).Dispose();
@@ -305,7 +315,7 @@ namespace Maestro.UI.Main
 			{
 				((Control)createButton).Dispose();
 			}
-			StandardButton importButton = _importButton;
+			IconButton importButton = _importButton;
 			if (importButton != null)
 			{
 				((Control)importButton).Dispose();

@@ -31,7 +31,7 @@ namespace Maestro.UI.MaestroCreator
 
 		private static Texture2D GetBackground()
 		{
-			return _backgroundTexture ?? (_backgroundTexture = MaestroTheme.CreateWindowBackground(1200, 800));
+			return _backgroundTexture ?? (_backgroundTexture = MaestroTheme.CreateCreatorBackground(1200, 800));
 		}
 
 		public NoteSequenceWindow(NoteSequencePanel panel)

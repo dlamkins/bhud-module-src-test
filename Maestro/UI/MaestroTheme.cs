@@ -30,6 +30,10 @@ namespace Maestro.UI
 
 		public static readonly Color IconGlyph = new Color(57, 50, 38);
 
+		public static readonly Color ToggleActiveFill = new Color(46, 34, 28);
+
+		public static readonly Color ToggleActiveGlyph = CreamWhite;
+
 		public static readonly Color Playing = new Color(76, 175, 80);
 
 		public static readonly Color Paused = new Color(255, 193, 7);
@@ -43,12 +47,6 @@ namespace Maestro.UI
 		public static readonly Color PanelHover = new Color(64, 64, 64, 200);
 
 		public static readonly Color PanelSelected = new Color(51, 51, 51, 220);
-
-		public static readonly Color DrawerHeader = new Color(38, 42, 48);
-
-		public static readonly Color DrawerAccent = new Color(85, 95, 110);
-
-		public static readonly Color DrawerBackground = new Color(25, 28, 32);
 
 		public static readonly Color PianoWhiteKey = new Color(250, 250, 245);
 
@@ -104,7 +102,25 @@ namespace Maestro.UI
 
 		public const int WindowContentTopPadding = 20;
 
-		private static readonly Color WindowBackground = new Color(30, 24, 40, 255);
+		private static readonly Color BgMainTop = new Color(28, 20, 34, 255);
+
+		private static readonly Color BgMainBottom = new Color(42, 32, 28, 255);
+
+		private static readonly Color BgImportTop = new Color(22, 21, 36, 255);
+
+		private static readonly Color BgImportBottom = new Color(34, 32, 52, 255);
+
+		private static readonly Color BgCreatorTop = new Color(30, 23, 30, 255);
+
+		private static readonly Color BgCreatorBottom = new Color(44, 34, 24, 255);
+
+		private static readonly Color BgCommunityTop = new Color(19, 26, 28, 255);
+
+		private static readonly Color BgCommunityBottom = new Color(28, 40, 38, 255);
+
+		private static readonly Color BgDrawerTop = new Color(26, 20, 25, 255);
+
+		private static readonly Color BgDrawerBottom = new Color(38, 27, 33, 255);
 
 		private const int BACKGROUND_X_OFFSET = 1;
 
@@ -257,14 +273,18 @@ namespace Maestro.UI
 			return new Color((int)((Color)(ref accent)).get_R(), (int)((Color)(ref accent)).get_G(), (int)((Color)(ref accent)).get_B(), (int)(255f * opacity));
 		}
 
-		public static Texture2D CreateWindowBackground(int windowWidth, int windowHeight)
+		public static Texture2D CreateVerticalGradient(int windowWidth, int windowHeight, Color top, Color bottom)
 		{
 			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0023: Expected O, but got Unknown
-			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
 			int width = windowWidth - 1;
 			int height = windowHeight - 13;
 			GraphicsDeviceContext context = GameService.Graphics.LendGraphicsDeviceContext();
@@ -272,9 +292,14 @@ namespace Maestro.UI
 			{
 				Texture2D texture = new Texture2D(((GraphicsDeviceContext)(ref context)).get_GraphicsDevice(), width, height);
 				Color[] data = (Color[])(object)new Color[width * height];
-				for (int i = 0; i < data.Length; i++)
+				for (int y = 0; y < height; y++)
 				{
-					data[i] = WindowBackground;
+					float t = ((height > 1) ? ((float)y / (float)(height - 1)) : 0f);
+					Color row = Color.Lerp(top, bottom, t);
+					for (int x = 0; x < width; x++)
+					{
+						data[y * width + x] = row;
+					}
 				}
 				texture.SetData<Color>(data);
 				return texture;
@@ -285,32 +310,39 @@ namespace Maestro.UI
 			}
 		}
 
+		public static Texture2D CreateWindowBackground(int windowWidth, int windowHeight)
+		{
+			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+			return CreateVerticalGradient(windowWidth, windowHeight, BgMainTop, BgMainBottom);
+		}
+
+		public static Texture2D CreateImportBackground(int windowWidth, int windowHeight)
+		{
+			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+			return CreateVerticalGradient(windowWidth, windowHeight, BgImportTop, BgImportBottom);
+		}
+
+		public static Texture2D CreateCreatorBackground(int windowWidth, int windowHeight)
+		{
+			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+			return CreateVerticalGradient(windowWidth, windowHeight, BgCreatorTop, BgCreatorBottom);
+		}
+
+		public static Texture2D CreateCommunityBackground(int windowWidth, int windowHeight)
+		{
+			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+			return CreateVerticalGradient(windowWidth, windowHeight, BgCommunityTop, BgCommunityBottom);
+		}
+
 		public static Texture2D CreateDrawerBackground(int windowWidth, int windowHeight)
 		{
-			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0023: Expected O, but got Unknown
-			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-			int width = windowWidth - 1;
-			int height = windowHeight - 13;
-			GraphicsDeviceContext context = GameService.Graphics.LendGraphicsDeviceContext();
-			try
-			{
-				Texture2D texture = new Texture2D(((GraphicsDeviceContext)(ref context)).get_GraphicsDevice(), width, height);
-				Color[] data = (Color[])(object)new Color[width * height];
-				for (int i = 0; i < data.Length; i++)
-				{
-					data[i] = DrawerBackground;
-				}
-				texture.SetData<Color>(data);
-				return texture;
-			}
-			finally
-			{
-				((GraphicsDeviceContext)(ref context)).Dispose();
-			}
+			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+			return CreateVerticalGradient(windowWidth, windowHeight, BgDrawerTop, BgDrawerBottom);
 		}
 	}
 }

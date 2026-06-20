@@ -1,9 +1,11 @@
 using System;
 using Blish_HUD;
 using Blish_HUD.Controls;
+using Blish_HUD.Controls.Resources;
 using Blish_HUD.Input;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended.TextureAtlases;
 
 namespace Maestro.UI.Controls
 {
@@ -227,6 +229,10 @@ namespace Maestro.UI.Controls
 
 		private static readonly Texture2D TextureInputBox = Control.get_Content().GetTexture("input-box");
 
+		private static readonly TextureRegion2D DdArrow = Control.TextureAtlasControl.GetRegion("inputboxes/dd-arrow");
+
+		private static readonly TextureRegion2D DdArrowActive = Control.TextureAtlasControl.GetRegion("inputboxes/dd-arrow-active");
+
 		private FilterPanel _panel;
 
 		private bool _hadPanel;
@@ -353,35 +359,14 @@ namespace Maestro.UI.Controls
 			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0114: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0127: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0141: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0146: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0179: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0186: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0104: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0148: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0163: Unknown result type (might be due to invalid IL or missing references)
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, TextureInputBox, RectangleExtension.Subtract(new Rectangle(Point.get_Zero(), base._size), new Rectangle(0, 0, 5, 0)), (Rectangle?)new Rectangle(0, 0, Math.Min(TextureInputBox.get_Width() - 5, ((Control)this).get_Width() - 5), TextureInputBox.get_Height()));
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, TextureInputBox, new Rectangle(base._size.X - 5, 0, 5, base._size.Y), (Rectangle?)new Rectangle(TextureInputBox.get_Width() - 5, 0, 5, TextureInputBox.get_Height()));
-			Color arrowColor = ((((Control)this).get_Enabled() && ((Control)this).get_MouseOver()) ? Colors.Chardonnay : MaestroTheme.MutedCream);
-			int arrowX = base._size.X - 18;
-			int arrowY = base._size.Y / 2 - 2;
-			if (PanelOpen)
-			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(arrowX + 2, arrowY, 4, 2), arrowColor);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(arrowX, arrowY + 2, 8, 2), arrowColor);
-			}
-			else
-			{
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(arrowX, arrowY, 8, 2), arrowColor);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(arrowX + 2, arrowY + 2, 4, 2), arrowColor);
-			}
+			TextureRegion2D arrow = (((((Control)this).get_Enabled() && ((Control)this).get_MouseOver()) || PanelOpen) ? DdArrowActive : DdArrow);
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, arrow, new Rectangle(base._size.X - arrow.get_Width() - 5, base._size.Y / 2 - arrow.get_Height() / 2, arrow.get_Width(), arrow.get_Height()));
 			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, DisplayText, Control.get_Content().get_DefaultFont14(), new Rectangle(5, 0, base._size.X - 25, base._size.Y), ((Control)this).get_Enabled() ? Color.FromNonPremultiplied(239, 240, 239, 255) : StandardColors.get_DisabledText(), false, (HorizontalAlignment)0, (VerticalAlignment)1);
 		}
 	}

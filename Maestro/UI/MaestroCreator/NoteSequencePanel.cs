@@ -95,7 +95,7 @@ namespace Maestro.UI.MaestroCreator
 
 		private readonly StandardButton _undoButton;
 
-		private readonly StandardButton _clearButton;
+		private readonly IconButton _clearButton;
 
 		private readonly Panel _headerPanel;
 
@@ -346,7 +346,7 @@ namespace Maestro.UI.MaestroCreator
 			((Control)iconButton).set_BasicTooltipText("Clear all notes");
 			((Control)iconButton).set_Location(new Point(clearX, 6));
 			((Control)iconButton).set_Size(new Point(55, 26));
-			_clearButton = (StandardButton)(object)iconButton;
+			_clearButton = iconButton;
 			((Control)_clearButton).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				if (!_clearConfirmExpiresAt.HasValue)
@@ -831,9 +831,7 @@ namespace Maestro.UI.MaestroCreator
 
 		private void UpdateInsertVisual()
 		{
-			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			_insertButton.Tint = (_isInsertMode ? MaestroTheme.AmberGold : MaestroTheme.IconGlyph);
+			_insertButton.Selected = _isInsertMode;
 		}
 
 		public void CopySelected()
@@ -936,6 +934,7 @@ namespace Maestro.UI.MaestroCreator
 		private void PrimeClearConfirm()
 		{
 			_clearConfirmExpiresAt = DateTime.UtcNow.AddSeconds(3.0);
+			_clearButton.Selected = true;
 			((Control)_clearButton).set_BasicTooltipText("Click again to clear all notes");
 		}
 
@@ -944,6 +943,7 @@ namespace Maestro.UI.MaestroCreator
 			if (_clearConfirmExpiresAt.HasValue)
 			{
 				_clearConfirmExpiresAt = null;
+				_clearButton.Selected = false;
 				((Control)_clearButton).set_BasicTooltipText("Clear all notes");
 			}
 		}
@@ -1682,7 +1682,7 @@ namespace Maestro.UI.MaestroCreator
 			{
 				((Control)undoButton).Dispose();
 			}
-			StandardButton clearButton = _clearButton;
+			IconButton clearButton = _clearButton;
 			if (clearButton != null)
 			{
 				((Control)clearButton).Dispose();

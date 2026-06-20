@@ -13,6 +13,8 @@ namespace Maestro.UI.Controls
 
 		private Texture2D _iconTexture;
 
+		private bool _selected;
+
 		public Color Tint
 		{
 			get
@@ -50,6 +52,22 @@ namespace Maestro.UI.Controls
 			}
 		}
 
+		public bool Selected
+		{
+			get
+			{
+				return _selected;
+			}
+			set
+			{
+				if (_selected != value)
+				{
+					_selected = value;
+					((Control)this).Invalidate();
+				}
+			}
+		}
+
 		public IconButton(Texture2D icon, Color tint)
 			: this()
 		{
@@ -62,14 +80,26 @@ namespace Maestro.UI.Controls
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
 			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
 			((StandardButton)this).Paint(spriteBatch, bounds);
 			if (_iconTexture != null)
 			{
+				if (_selected)
+				{
+					Rectangle fill = default(Rectangle);
+					((Rectangle)(ref fill))._002Ector(3, 3, ((Control)this)._size.X - 6, ((Control)this)._size.Y - 6);
+					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), fill, MaestroTheme.ToggleActiveFill);
+				}
+				Color glyphColor = (_selected ? MaestroTheme.ToggleActiveGlyph : _tint);
 				Rectangle iconBounds = default(Rectangle);
 				((Rectangle)(ref iconBounds))._002Ector(((Control)this)._size.X / 2 - 8, ((Control)this)._size.Y / 2 - 8, 16, 16);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _iconTexture, iconBounds, _tint);
+				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _iconTexture, iconBounds, glyphColor);
 			}
 		}
 	}

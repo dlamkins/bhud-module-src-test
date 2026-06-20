@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Controls;
@@ -52,7 +53,11 @@ namespace Maestro.UI.Import
 
 		private readonly StandardButton _cancelButton;
 
+		private readonly Label _formatLink;
+
 		private List<string> _parsedNotes;
+
+		private bool _skipOctaveReset;
 
 		private static Texture2D _backgroundTexture;
 
@@ -60,7 +65,7 @@ namespace Maestro.UI.Import
 
 		private static Texture2D GetBackground()
 		{
-			return _backgroundTexture ?? (_backgroundTexture = MaestroTheme.CreateWindowBackground(420, 272));
+			return _backgroundTexture ?? (_backgroundTexture = MaestroTheme.CreateImportBackground(420, 272));
 		}
 
 		public ImportWindow()
@@ -111,8 +116,19 @@ namespace Maestro.UI.Import
 			//IL_02e4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02e9: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02f8: Expected O, but got Unknown
+			//IL_0310: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0315: Unknown result type (might be due to invalid IL or missing references)
+			//IL_031c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0327: Unknown result type (might be due to invalid IL or missing references)
+			//IL_032c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0336: Unknown result type (might be due to invalid IL or missing references)
+			//IL_033d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_034d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_034e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0358: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0368: Expected O, but got Unknown
 			((WindowBase2)this).set_Title("Import Song");
-			((WindowBase2)this).set_Subtitle("AHK v1 Format");
+			((WindowBase2)this).set_Subtitle("AHK or Maestro");
 			((WindowBase2)this).set_Emblem(Module.Instance.ContentsManager.GetTexture("import-emblem.png"));
 			((WindowBase2)this).set_SavesPosition(true);
 			((WindowBase2)this).set_Id("ImportWindow_v1");
@@ -121,7 +137,7 @@ namespace Maestro.UI.Import
 			int currentY = 2;
 			StandardButton val = new StandardButton();
 			((Control)val).set_Parent((Container)(object)this);
-			val.set_Text("Paste AHK Script");
+			val.set_Text("Paste Song");
 			((Control)val).set_Location(new Point(0, currentY));
 			((Control)val).set_Size(new Point(390, 36));
 			_pasteButton = val;
@@ -134,7 +150,7 @@ namespace Maestro.UI.Import
 			((Control)val2).set_Height(18);
 			val2.set_HorizontalAlignment((HorizontalAlignment)1);
 			val2.set_Font(GameService.Content.get_DefaultFont12());
-			val2.set_Text("Paste your AHK v1 script to begin");
+			val2.set_Text("Paste an AHK script or Maestro song");
 			val2.set_TextColor(MaestroTheme.HintTextColor);
 			_statusChip = val2;
 			currentY += 25;
@@ -180,6 +196,27 @@ namespace Maestro.UI.Import
 			((Control)val5).set_Size(new Point(90, 26));
 			_cancelButton = val5;
 			((Control)_cancelButton).add_Click((EventHandler<MouseEventArgs>)OnCancelClicked);
+			Label val6 = new Label();
+			((Control)val6).set_Parent((Container)(object)this);
+			val6.set_Text("Maestro format guide");
+			((Control)val6).set_Location(new Point(0, currentY + 6));
+			val6.set_AutoSizeWidth(true);
+			val6.set_Font(GameService.Content.get_DefaultFont12());
+			val6.set_TextColor(MaestroTheme.AmberGold);
+			((Control)val6).set_BasicTooltipText("Open the Maestro song format guide in your browser");
+			_formatLink = val6;
+			((Control)_formatLink).add_Click((EventHandler<MouseEventArgs>)OnFormatLinkClicked);
+		}
+
+		private void OnFormatLinkClicked(object sender, MouseEventArgs e)
+		{
+			try
+			{
+				Process.Start("https://blishhud.com/modules/?module=Aex.Maestro#profile");
+			}
+			catch
+			{
+			}
 		}
 
 		private Label CreateLabel(string text, int x, int y)
@@ -232,16 +269,39 @@ namespace Maestro.UI.Import
 				}
 				else
 				{
-					ParseScript(task.Result);
+					ParseClipboard(task.Result);
 				}
 			});
 		}
 
+		private void ParseClipboard(string text)
+		{
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+			string trimmed = text.TrimStart();
+			if (trimmed.StartsWith("["))
+			{
+				_parsedNotes = null;
+				((WindowBase2)this).set_Subtitle("Maestro format");
+				SetStatus("Paste a single song, not a list", MaestroTheme.Error);
+				UpdateImportEnabled();
+			}
+			else if (trimmed.StartsWith("{"))
+			{
+				ParseJson(text);
+			}
+			else
+			{
+				ParseScript(text);
+			}
+		}
+
 		private void ParseScript(string script)
 		{
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
+			((WindowBase2)this).set_Subtitle("AHK v1 Format");
+			_skipOctaveReset = false;
 			try
 			{
 				_parsedNotes = AhkParser.ParseToCompact(script);
@@ -260,6 +320,54 @@ namespace Maestro.UI.Import
 				_parsedNotes = null;
 				SetStatus("Could not parse clipboard content", MaestroTheme.Error);
 			}
+			UpdateImportEnabled();
+		}
+
+		private void FailParse(string message)
+		{
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			_parsedNotes = null;
+			_skipOctaveReset = false;
+			SetStatus(message, MaestroTheme.Error);
+			UpdateImportEnabled();
+		}
+
+		private void ParseJson(string json)
+		{
+			//IL_012d: Unknown result type (might be due to invalid IL or missing references)
+			((WindowBase2)this).set_Subtitle("Maestro format");
+			Song song;
+			try
+			{
+				song = SongSerializer.DeserializeJsonContent(json);
+			}
+			catch
+			{
+				FailParse("Could not read Maestro song");
+				return;
+			}
+			if (song?.Notes == null || song.Notes.Count == 0)
+			{
+				FailParse("No notes found");
+				return;
+			}
+			long durationMs = NoteParser.CalculateDurationMs(song.Notes);
+			if (durationMs <= 0)
+			{
+				FailParse("Notes are not in a valid format");
+				return;
+			}
+			_parsedNotes = song.Notes;
+			_skipOctaveReset = song.SkipOctaveReset;
+			if (!string.IsNullOrWhiteSpace(song.Name))
+			{
+				((TextInputBase)_titleInput).set_Text(song.Name);
+			}
+			((TextInputBase)_artistInput).set_Text(string.IsNullOrWhiteSpace(song.Artist) ? string.Empty : song.Artist);
+			((TextInputBase)_transcriberInput).set_Text(string.IsNullOrWhiteSpace(song.Transcriber) ? string.Empty : song.Transcriber);
+			_instrumentDropdown.set_SelectedItem(InstrumentCatalog.Get(song.Instrument).DisplayName);
+			TimeSpan duration = TimeSpan.FromMilliseconds(durationMs);
+			SetStatus($"✓ {_parsedNotes.Count} notes · {duration:m\\:ss}", MaestroTheme.Playing);
 			UpdateImportEnabled();
 		}
 
@@ -304,7 +412,7 @@ namespace Maestro.UI.Import
 			}
 			if (_parsedNotes == null || _parsedNotes.Count == 0)
 			{
-				ScreenNotification.ShowNotification("Please paste a valid AHK script", (NotificationType)2, (Texture2D)null, 4);
+				ScreenNotification.ShowNotification("Please paste a valid song", (NotificationType)2, (Texture2D)null, 4);
 				return false;
 			}
 			return true;
@@ -319,6 +427,7 @@ namespace Maestro.UI.Import
 				Artist = (string.IsNullOrWhiteSpace(((TextInputBase)_artistInput).get_Text()) ? "Unknown" : ((TextInputBase)_artistInput).get_Text().Trim()),
 				Transcriber = (string.IsNullOrWhiteSpace(((TextInputBase)_transcriberInput).get_Text()) ? null : ((TextInputBase)_transcriberInput).get_Text().Trim()),
 				Instrument = instrument,
+				SkipOctaveReset = _skipOctaveReset,
 				IsUserImported = true
 			};
 			song.Notes.AddRange(_parsedNotes);
@@ -330,13 +439,15 @@ namespace Maestro.UI.Import
 
 		private void ClearInputs()
 		{
-			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
 			((TextInputBase)_titleInput).set_Text(string.Empty);
 			((TextInputBase)_artistInput).set_Text(string.Empty);
 			((TextInputBase)_transcriberInput).set_Text(string.Empty);
 			_instrumentDropdown.set_SelectedItem("Harp");
 			_parsedNotes = null;
-			SetStatus("Paste your AHK v1 script to begin", MaestroTheme.HintTextColor);
+			_skipOctaveReset = false;
+			((WindowBase2)this).set_Subtitle("AHK or Maestro");
+			SetStatus("Paste an AHK script or Maestro song", MaestroTheme.HintTextColor);
 			UpdateImportEnabled();
 		}
 
@@ -345,6 +456,7 @@ namespace Maestro.UI.Import
 			((Control)_importButton).remove_Click((EventHandler<MouseEventArgs>)OnImportClicked);
 			((Control)_cancelButton).remove_Click((EventHandler<MouseEventArgs>)OnCancelClicked);
 			((Control)_pasteButton).remove_Click((EventHandler<MouseEventArgs>)OnPasteClicked);
+			((Control)_formatLink).remove_Click((EventHandler<MouseEventArgs>)OnFormatLinkClicked);
 			TextBox titleInput = _titleInput;
 			if (titleInput != null)
 			{
@@ -384,6 +496,11 @@ namespace Maestro.UI.Import
 			if (cancelButton != null)
 			{
 				((Control)cancelButton).Dispose();
+			}
+			Label formatLink = _formatLink;
+			if (formatLink != null)
+			{
+				((Control)formatLink).Dispose();
 			}
 			((WindowBase2)this).DisposeControl();
 		}

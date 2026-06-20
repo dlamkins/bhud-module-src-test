@@ -74,6 +74,8 @@ namespace Maestro
 
 		internal Gw2ApiManager Gw2ApiManager => base.ModuleParameters.get_Gw2ApiManager();
 
+		internal ModuleSettings Settings => _moduleSettings;
+
 		internal KeyboardService KeyboardService => _keyboardService;
 
 		internal SongPlayer SongPlayer => _songPlayer;
@@ -175,6 +177,14 @@ namespace Maestro
 			{
 				_importWindow = new ImportWindow();
 				_importWindow.SongImported += OnSongImported;
+				((Control)_importWindow).add_Shown((EventHandler<EventArgs>)delegate
+				{
+					_maestroWindow?.SetImportActive(active: true);
+				});
+				((Control)_importWindow).add_Hidden((EventHandler<EventArgs>)delegate
+				{
+					_maestroWindow?.SetImportActive(active: false);
+				});
 			}
 			if (((Control)_importWindow).get_Visible())
 			{
@@ -194,6 +204,14 @@ namespace Maestro
 				_communityWindow.SongDownloaded += OnCommunitySongDownloaded;
 				_communityWindow.SongDeleteRequested += OnCommunitySongDeleteRequested;
 				_communityWindow.UploadRequested += OnUploadRequested;
+				((Control)_communityWindow).add_Shown((EventHandler<EventArgs>)delegate
+				{
+					_maestroWindow?.SetCommunityActive(active: true);
+				});
+				((Control)_communityWindow).add_Hidden((EventHandler<EventArgs>)delegate
+				{
+					_maestroWindow?.SetCommunityActive(active: false);
+				});
 			}
 			if (((Control)_communityWindow).get_Visible())
 			{
@@ -339,6 +357,14 @@ namespace Maestro
 			{
 				_uploadWindow = new UploadWindow(_uploadService, _songs);
 				_uploadWindow.UploadCompleted += OnUploadCompleted;
+				((Control)_uploadWindow).add_Shown((EventHandler<EventArgs>)delegate
+				{
+					_communityWindow?.SetUploadActive(active: true);
+				});
+				((Control)_uploadWindow).add_Hidden((EventHandler<EventArgs>)delegate
+				{
+					_communityWindow?.SetUploadActive(active: false);
+				});
 			}
 			if (((Control)_uploadWindow).get_Visible())
 			{

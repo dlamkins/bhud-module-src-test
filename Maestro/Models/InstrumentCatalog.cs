@@ -22,29 +22,29 @@ namespace Maestro.Models
 		static InstrumentCatalog()
 		{
 			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0107: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0146: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0157: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0196: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0131: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c8: Unknown result type (might be due to invalid IL or missing references)
 			ThreeOctaveLabels = new string[3] { "Lower (-)", "Middle", "Upper (+)" };
 			_all = new List<InstrumentInfo>
 			{
-				new InstrumentInfo(InstrumentType.Piano, "Piano", new Color(126, 200, 227), new Color(90, 176, 208), sharpsEnabled: true, -1, 1, ThreeOctaveLabels),
-				new InstrumentInfo(InstrumentType.Harp, "Harp", new Color(184, 212, 168), new Color(140, 196, 144), sharpsEnabled: false, -1, 1, ThreeOctaveLabels),
-				new InstrumentInfo(InstrumentType.Lute, "Lute", new Color(232, 193, 112), new Color(212, 166, 86), sharpsEnabled: false, -1, 1, ThreeOctaveLabels),
-				new InstrumentInfo(InstrumentType.Bass, "Bass", new Color(212, 132, 140), new Color(192, 112, 120), sharpsEnabled: false, 0, 1, new string[2] { "Low", "High" }),
-				new InstrumentInfo(InstrumentType.Flute, "Flute", new Color(175, 160, 220), new Color(135, 118, 190), sharpsEnabled: false, -1, 0, new string[2] { "Low", "Middle" }),
-				new InstrumentInfo(InstrumentType.Bell, "Bell (3 octaves)", new Color(150, 196, 190), new Color(108, 156, 150), sharpsEnabled: false, -1, 1, ThreeOctaveLabels),
-				new InstrumentInfo(InstrumentType.BellMagnanimous, "Bell (2 octaves)", new Color(176, 208, 200), new Color(130, 176, 168), sharpsEnabled: false, 0, 1, new string[2] { "Middle", "High" })
+				new InstrumentInfo(InstrumentType.Piano, "Piano", new Color(79, 155, 224), new Color(53, 122, 192), sharpsEnabled: true, -1, 1, ThreeOctaveLabels),
+				new InstrumentInfo(InstrumentType.Harp, "Harp", new Color(107, 194, 136), new Color(62, 154, 99), sharpsEnabled: false, -1, 1, ThreeOctaveLabels),
+				new InstrumentInfo(InstrumentType.Lute, "Lute", new Color(227, 165, 58), new Color(190, 132, 32), sharpsEnabled: false, -1, 1, ThreeOctaveLabels),
+				new InstrumentInfo(InstrumentType.Bass, "Bass", new Color(224, 106, 124), new Color(184, 72, 94), sharpsEnabled: false, 0, 1, new string[2] { "Low", "High" }),
+				new InstrumentInfo(InstrumentType.Flute, "Flute", new Color(165, 121, 224), new Color(126, 84, 190), sharpsEnabled: false, -1, 0, new string[2] { "Low", "Middle" }),
+				new InstrumentInfo(InstrumentType.Bell, "Bell (3 octaves)", new Color(63, 194, 178), new Color(42, 148, 136), sharpsEnabled: false, -1, 1, ThreeOctaveLabels),
+				new InstrumentInfo(InstrumentType.BellMagnanimous, "Bell (2 octaves)", new Color(116, 214, 190), new Color(73, 174, 151), sharpsEnabled: false, 0, 1, new string[2] { "Middle", "High" })
 			};
 			_byType = _all.ToDictionary((InstrumentInfo i) => i.Type);
 			_pickable = _all.Where((InstrumentInfo i) => i.ListedInPickers).ToList().AsReadOnly();

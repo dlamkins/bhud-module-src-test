@@ -49,7 +49,7 @@ namespace Maestro.UI.Community
 
 		private StandardButton _refreshButton;
 
-		private StandardButton _uploadButton;
+		private IconButton _uploadButton;
 
 		private LoadingSpinner _loadingSpinner;
 
@@ -61,7 +61,7 @@ namespace Maestro.UI.Community
 
 		private static Texture2D GetBackground()
 		{
-			return _backgroundTexture ?? (_backgroundTexture = MaestroTheme.CreateWindowBackground(420, 570));
+			return _backgroundTexture ?? (_backgroundTexture = MaestroTheme.CreateCommunityBackground(420, 570));
 		}
 
 		public CommunityWindow(CommunityService communityService)
@@ -208,7 +208,7 @@ namespace Maestro.UI.Community
 			((Control)iconButton).set_Location(new Point(uploadX, currentY));
 			((Control)iconButton).set_Width(uploadWidth);
 			((Control)iconButton).set_Height(26);
-			_uploadButton = (StandardButton)(object)iconButton;
+			_uploadButton = iconButton;
 			((Control)_uploadButton).add_Click((EventHandler<MouseEventArgs>)OnUploadClicked);
 			IconButton iconButton2 = new IconButton(MaestroIcons.Refresh, MaestroTheme.IconGlyph);
 			((Control)iconButton2).set_Parent((Container)(object)this);
@@ -366,6 +366,11 @@ namespace Maestro.UI.Community
 			}
 		}
 
+		public void SetUploadActive(bool active)
+		{
+			_uploadButton.Selected = active;
+		}
+
 		private void UpdateStatusLabel()
 		{
 			int total = _communityService.GetAvailableSongs().Count();
@@ -411,7 +416,7 @@ namespace Maestro.UI.Community
 			{
 				((Control)refreshButton).Dispose();
 			}
-			StandardButton uploadButton = _uploadButton;
+			IconButton uploadButton = _uploadButton;
 			if (uploadButton != null)
 			{
 				((Control)uploadButton).Dispose();

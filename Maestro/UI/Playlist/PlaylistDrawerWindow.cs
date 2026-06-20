@@ -5,6 +5,7 @@ using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Maestro.Models;
 using Maestro.Services;
+using Maestro.Settings;
 using Maestro.UI.Controls;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -60,6 +61,10 @@ namespace Maestro.UI.Playlist
 
 		private IconButton _playButton;
 
+		private IconButton _shuffleButton;
+
+		private IconButton _repeatButton;
+
 		private FlowPanel _songList;
 
 		private QueueSongCard _draggingCard;
@@ -96,6 +101,7 @@ namespace Maestro.UI.Playlist
 			((WindowBase2)this).set_Id("MaestroQueueDrawer_v5");
 			BuildContent();
 			SubscribeToEvents();
+			InitFromSettings();
 			RefreshCards();
 		}
 
@@ -182,25 +188,49 @@ namespace Maestro.UI.Playlist
 
 		private void BuildButtons()
 		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-			IconButton iconButton = new IconButton(MaestroIcons.Trash, MaestroTheme.IconGlyph);
+			//IL_0009: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0135: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0158: Unknown result type (might be due to invalid IL or missing references)
+			int x = 18;
+			IconButton iconButton = new IconButton(MaestroIcons.Shuffle, MaestroTheme.IconGlyph);
 			((Control)iconButton).set_Parent((Container)(object)this);
-			((Control)iconButton).set_BasicTooltipText("Clear queue");
-			((Control)iconButton).set_Location(new Point(66, 329));
+			((Control)iconButton).set_BasicTooltipText("Shuffle: Off");
+			((Control)iconButton).set_Location(new Point(x, 329));
 			((Control)iconButton).set_Width(40);
 			((Control)iconButton).set_Height(30);
-			_clearButton = (StandardButton)(object)iconButton;
-			((Control)_clearButton).add_Click((EventHandler<MouseEventArgs>)OnClearClicked);
-			IconButton iconButton2 = new IconButton(MaestroIcons.Play, MaestroTheme.IconGlyph);
+			_shuffleButton = iconButton;
+			((Control)_shuffleButton).add_Click((EventHandler<MouseEventArgs>)OnShuffleClicked);
+			x += 48;
+			IconButton iconButton2 = new IconButton(MaestroIcons.Repeat, MaestroTheme.IconGlyph);
 			((Control)iconButton2).set_Parent((Container)(object)this);
-			((Control)iconButton2).set_BasicTooltipText("Play queue");
-			((Control)iconButton2).set_Location(new Point(114, 329));
+			((Control)iconButton2).set_BasicTooltipText("Repeat: Off");
+			((Control)iconButton2).set_Location(new Point(x, 329));
 			((Control)iconButton2).set_Width(40);
 			((Control)iconButton2).set_Height(30);
-			_playButton = iconButton2;
+			_repeatButton = iconButton2;
+			((Control)_repeatButton).add_Click((EventHandler<MouseEventArgs>)OnRepeatClicked);
+			x += 48;
+			IconButton iconButton3 = new IconButton(MaestroIcons.Trash, MaestroTheme.IconGlyph);
+			((Control)iconButton3).set_Parent((Container)(object)this);
+			((Control)iconButton3).set_BasicTooltipText("Clear queue");
+			((Control)iconButton3).set_Location(new Point(x, 329));
+			((Control)iconButton3).set_Width(40);
+			((Control)iconButton3).set_Height(30);
+			_clearButton = (StandardButton)(object)iconButton3;
+			((Control)_clearButton).add_Click((EventHandler<MouseEventArgs>)OnClearClicked);
+			x += 48;
+			IconButton iconButton4 = new IconButton(MaestroIcons.Play, MaestroTheme.IconGlyph);
+			((Control)iconButton4).set_Parent((Container)(object)this);
+			((Control)iconButton4).set_BasicTooltipText("Play queue");
+			((Control)iconButton4).set_Location(new Point(x, 329));
+			((Control)iconButton4).set_Width(40);
+			((Control)iconButton4).set_Height(30);
+			_playButton = iconButton4;
 			((Control)_playButton).add_Click((EventHandler<MouseEventArgs>)OnPlayClicked);
 		}
 
@@ -291,6 +321,7 @@ namespace Maestro.UI.Playlist
 		private void SubscribeToEvents()
 		{
 			_playlistService.QueueChanged += OnQueueChanged;
+			_playlistService.CurrentChanged += OnCurrentChanged;
 			Control.get_Input().get_Mouse().add_LeftMouseButtonReleased((EventHandler<MouseEventArgs>)OnGlobalMouseReleased);
 			Control.get_Input().get_Mouse().add_MouseMoved((EventHandler<MouseEventArgs>)OnGlobalMouseMoved);
 		}
@@ -308,6 +339,70 @@ namespace Maestro.UI.Playlist
 		private void OnPlayClicked(object sender, MouseEventArgs e)
 		{
 			this.PlayQueueRequested?.Invoke(this, EventArgs.Empty);
+		}
+
+		private void InitFromSettings()
+		{
+			ModuleSettings settings = Module.Instance.Settings;
+			_playlistService.Repeat = settings.Repeat.get_Value();
+			_playlistService.Shuffle = settings.ShuffleEnabled.get_Value();
+			UpdateRepeatVisual();
+			UpdateShuffleVisual();
+		}
+
+		private void OnShuffleClicked(object sender, MouseEventArgs e)
+		{
+			_playlistService.Shuffle = !_playlistService.Shuffle;
+			Module.Instance.Settings.ShuffleEnabled.set_Value(_playlistService.Shuffle);
+			UpdateShuffleVisual();
+		}
+
+		private void OnRepeatClicked(object sender, MouseEventArgs e)
+		{
+			RepeatMode next = ((_playlistService.Repeat == RepeatMode.Off) ? RepeatMode.All : ((_playlistService.Repeat == RepeatMode.All) ? RepeatMode.One : RepeatMode.Off));
+			_playlistService.Repeat = next;
+			Module.Instance.Settings.Repeat.set_Value(next);
+			UpdateRepeatVisual();
+		}
+
+		private void UpdateShuffleVisual()
+		{
+			bool on = _playlistService.Shuffle;
+			_shuffleButton.Selected = on;
+			((Control)_shuffleButton).set_BasicTooltipText(on ? "Shuffle On" : "Shuffle Off");
+		}
+
+		private void UpdateRepeatVisual()
+		{
+			switch (_playlistService.Repeat)
+			{
+			case RepeatMode.All:
+				_repeatButton.Selected = true;
+				((Control)_repeatButton).set_BasicTooltipText("Repeat all songs");
+				break;
+			case RepeatMode.One:
+				_repeatButton.Selected = true;
+				((Control)_repeatButton).set_BasicTooltipText("Repeat current song");
+				break;
+			default:
+				_repeatButton.Selected = false;
+				((Control)_repeatButton).set_BasicTooltipText("Repeat off");
+				break;
+			}
+		}
+
+		private void OnCurrentChanged(object sender, EventArgs e)
+		{
+			UpdateCurrentHighlight();
+		}
+
+		private void UpdateCurrentHighlight()
+		{
+			int currentIndex = _playlistService.CurrentIndex;
+			for (int i = 0; i < _cards.Count; i++)
+			{
+				_cards[i].IsCurrent = i == currentIndex;
+			}
 		}
 
 		private void OnCardRemoveRequested(object sender, EventArgs e)
@@ -364,6 +459,7 @@ namespace Maestro.UI.Playlist
 		{
 			ClearCards();
 			CreateCards();
+			UpdateCurrentHighlight();
 			UpdateButtonStates();
 		}
 
@@ -498,8 +594,11 @@ namespace Maestro.UI.Playlist
 		private void UnsubscribeFromEvents()
 		{
 			_playlistService.QueueChanged -= OnQueueChanged;
+			_playlistService.CurrentChanged -= OnCurrentChanged;
 			((Control)_clearButton).remove_Click((EventHandler<MouseEventArgs>)OnClearClicked);
 			((Control)_playButton).remove_Click((EventHandler<MouseEventArgs>)OnPlayClicked);
+			((Control)_shuffleButton).remove_Click((EventHandler<MouseEventArgs>)OnShuffleClicked);
+			((Control)_repeatButton).remove_Click((EventHandler<MouseEventArgs>)OnRepeatClicked);
 			Control.get_Input().get_Mouse().remove_LeftMouseButtonReleased((EventHandler<MouseEventArgs>)OnGlobalMouseReleased);
 			Control.get_Input().get_Mouse().remove_MouseMoved((EventHandler<MouseEventArgs>)OnGlobalMouseMoved);
 		}
@@ -527,6 +626,16 @@ namespace Maestro.UI.Playlist
 
 		private void DisposeControls()
 		{
+			IconButton shuffleButton = _shuffleButton;
+			if (shuffleButton != null)
+			{
+				((Control)shuffleButton).Dispose();
+			}
+			IconButton repeatButton = _repeatButton;
+			if (repeatButton != null)
+			{
+				((Control)repeatButton).Dispose();
+			}
 			StandardButton clearButton = _clearButton;
 			if (clearButton != null)
 			{
