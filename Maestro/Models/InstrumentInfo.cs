@@ -20,11 +20,13 @@ namespace Maestro.Models
 
 		public int MaxOctave { get; }
 
+		public bool IsPercussion { get; }
+
 		public IReadOnlyList<string> OctaveLabels { get; }
 
 		public bool ListedInPickers { get; }
 
-		public InstrumentInfo(InstrumentType type, string displayName, Color accent, Color accentDark, bool sharpsEnabled, int minOctave, int maxOctave, string[] octaveLabels, bool listedInPickers = true)
+		public InstrumentInfo(InstrumentType type, string displayName, Color accent, Color accentDark, bool sharpsEnabled, int minOctave, int maxOctave, string[] octaveLabels, bool listedInPickers = true, bool isPercussion = false)
 		{
 			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
@@ -39,6 +41,7 @@ namespace Maestro.Models
 			MaxOctave = maxOctave;
 			OctaveLabels = Array.AsReadOnly(octaveLabels);
 			ListedInPickers = listedInPickers;
+			IsPercussion = isPercussion;
 		}
 	}
 }

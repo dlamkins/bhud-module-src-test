@@ -59,7 +59,7 @@ namespace Maestro.Models
 				{
 					return Commands.Where((SongCommand c) => c.Type == CommandType.Wait).Sum((SongCommand c) => c.Duration);
 				}
-				return NoteParser.CalculateDurationMs(Notes);
+				return SongCompiler.CalculateDurationMs(Notes, Instrument);
 			}
 		}
 

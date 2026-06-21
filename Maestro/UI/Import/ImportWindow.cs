@@ -65,7 +65,7 @@ namespace Maestro.UI.Import
 
 		private static Texture2D GetBackground()
 		{
-			return _backgroundTexture ?? (_backgroundTexture = MaestroTheme.CreateImportBackground(420, 272));
+			return _backgroundTexture ?? (_backgroundTexture = MaestroTheme.CreateWindowBackground(420, 272));
 		}
 
 		public ImportWindow()
@@ -334,7 +334,7 @@ namespace Maestro.UI.Import
 
 		private void ParseJson(string json)
 		{
-			//IL_012d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0133: Unknown result type (might be due to invalid IL or missing references)
 			((WindowBase2)this).set_Subtitle("Maestro format");
 			Song song;
 			try
@@ -351,7 +351,7 @@ namespace Maestro.UI.Import
 				FailParse("No notes found");
 				return;
 			}
-			long durationMs = NoteParser.CalculateDurationMs(song.Notes);
+			long durationMs = SongCompiler.CalculateDurationMs(song.Notes, song.Instrument);
 			if (durationMs <= 0)
 			{
 				FailParse("Notes are not in a valid format");
@@ -431,7 +431,7 @@ namespace Maestro.UI.Import
 				IsUserImported = true
 			};
 			song.Notes.AddRange(_parsedNotes);
-			List<SongCommand> commands = NoteParser.Parse(_parsedNotes);
+			List<SongCommand> commands = SongCompiler.Parse(_parsedNotes, instrument);
 			song.Commands.AddRange(commands);
 			ScreenNotification.ShowNotification($"Imported \"{song.Name}\" ({_parsedNotes.Count} notes)", (NotificationType)0, (Texture2D)null, 4);
 			return song;

@@ -2,6 +2,7 @@ using System;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
+using Maestro.Models;
 using Microsoft.Xna.Framework;
 
 namespace Maestro.UI.MaestroCreator
@@ -42,33 +43,33 @@ namespace Maestro.UI.MaestroCreator
 			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ee: Expected O, but got Unknown
-			//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0106: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0114: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0119: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0123: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0133: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0134: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0145: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0151: Expected O, but got Unknown
+			//IL_0102: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0115: Expected O, but got Unknown
+			//IL_0116: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0122: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0131: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0140: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0165: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0178: Expected O, but got Unknown
 			NoteString = noteString;
 			base.Index = index;
 			_chipColor = GetNoteColor(noteString);
@@ -78,11 +79,16 @@ namespace Maestro.UI.MaestroCreator
 			((Control)this).set_BackgroundColor(Color.get_Transparent());
 			int maxTextWidth = 88;
 			int maxChars = maxTextWidth / 7;
-			string displayText = noteString;
-			bool needsTooltip = false;
-			if (noteString.Length > maxChars)
+			string fullText = noteString;
+			if (TryParseDrum(noteString, out var drumInfo, out var drumDuration))
 			{
-				displayText = noteString.Substring(0, maxChars - 2) + "..";
+				fullText = drumInfo.DisplayName + ":" + drumDuration;
+			}
+			string displayText = fullText;
+			bool needsTooltip = false;
+			if (fullText.Length > maxChars)
+			{
+				displayText = fullText.Substring(0, maxChars - 2) + "..";
 				needsTooltip = true;
 			}
 			Label val = new Label();
@@ -94,7 +100,7 @@ namespace Maestro.UI.MaestroCreator
 			val.set_TextColor(MaestroTheme.CreamWhite);
 			val.set_HorizontalAlignment((HorizontalAlignment)0);
 			val.set_VerticalAlignment((VerticalAlignment)1);
-			((Control)val).set_BasicTooltipText(needsTooltip ? noteString : null);
+			((Control)val).set_BasicTooltipText(needsTooltip ? fullText : null);
 			_noteLabel = val;
 			Label val2 = new Label();
 			((Control)val2).set_Parent((Container)(object)this);
@@ -146,18 +152,37 @@ namespace Maestro.UI.MaestroCreator
 			((Panel)this).OnClick(e);
 		}
 
+		private static bool TryParseDrum(string noteString, out DrumSoundInfo info, out string durationPart)
+		{
+			info = null;
+			durationPart = null;
+			int colon = noteString.IndexOf(':');
+			if (colon <= 0)
+			{
+				return false;
+			}
+			string code = noteString.Substring(0, colon);
+			durationPart = noteString.Substring(colon + 1);
+			return DrumMapping.TryFromCode(code, out info);
+		}
+
 		private static Color GetNoteColor(string noteString)
 		{
 			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0069: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
 			if (noteString.StartsWith("R"))
 			{
 				return MaestroTheme.ChipRest;
+			}
+			if (TryParseDrum(noteString, out var drum, out var _))
+			{
+				return MaestroTheme.GetDrumGroupColor(drum.Group);
 			}
 			bool isSharp = noteString.Contains("#");
 			if (noteString.Contains("-"))

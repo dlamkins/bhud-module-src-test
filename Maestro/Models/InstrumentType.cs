@@ -8,6 +8,7 @@ namespace Maestro.Models
 		Bass,
 		Flute,
 		Bell,
-		BellMagnanimous
+		BellMagnanimous,
+		DrumSet
 	}
 }

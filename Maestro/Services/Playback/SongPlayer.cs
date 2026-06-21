@@ -122,7 +122,7 @@ namespace Maestro.Services.Playback
 			_cancellationTokenSource = new CancellationTokenSource();
 			if (song.SeekData == null && song.Commands.Count > 0)
 			{
-				song.SeekData = NoteParser.ComputeSeekData(song.Commands);
+				song.SeekData = SongCompiler.ComputeSeekData(song.Commands, song.Instrument);
 			}
 			_keyboardService.StartDebugLog(song.DisplayName);
 			_playbackTask = Task.Run(() => PlaybackLoop(_cancellationTokenSource.Token));
@@ -223,7 +223,7 @@ namespace Maestro.Services.Playback
 			_ = 1;
 			try
 			{
-				if (!CurrentSong.SkipOctaveReset)
+				if (!CurrentSong.SkipOctaveReset && !InstrumentCatalog.Get(CurrentSong.Instrument).IsPercussion)
 				{
 					ResetToMiddleOctave();
 				}
@@ -247,7 +247,10 @@ namespace Maestro.Services.Playback
 						_seekRequested = false;
 						CurrentCommandIndex = _seekTargetIndex;
 						_keyboardService.ReleaseAllKeys();
-						ResetToTargetOctave(_seekTargetOctave);
+						if (!InstrumentCatalog.Get(CurrentSong.Instrument).IsPercussion)
+						{
+							ResetToTargetOctave(_seekTargetOctave);
+						}
 						continue;
 					}
 					SongCommand command = CurrentSong.Commands[CurrentCommandIndex];

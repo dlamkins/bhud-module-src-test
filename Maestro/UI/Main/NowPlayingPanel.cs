@@ -517,7 +517,7 @@ namespace Maestro.UI.Main
 			Song song = _songPlayer.CurrentSong;
 			_nowPlayingLabel.Text = song?.DisplayName ?? "Unknown";
 			((Control)_nowPlayingLabel).set_Location(new Point(100, 8));
-			_instrumentLabel.set_Text(song?.Instrument.ToString() ?? "");
+			_instrumentLabel.set_Text((song != null) ? song.Instrument.DisplayName() : "");
 			if (_songPlayer.IsPaused)
 			{
 				UpdatePausedState();
@@ -611,11 +611,11 @@ namespace Maestro.UI.Main
 		{
 			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
 			_nowPlayingLabel.Text = _pendingSong?.DisplayName ?? "Unknown";
 			((Control)_nowPlayingLabel).set_Location(new Point(100, 8));
 			_nowPlayingLabel.TextColor = MaestroTheme.CreamWhite;
-			_instrumentLabel.set_Text(_pendingSong?.Instrument.ToString() ?? "");
+			_instrumentLabel.set_Text((_pendingSong != null) ? _pendingSong.Instrument.DisplayName() : "");
 			_progressLabel.set_Text("Ready" + GetQueueSuffix());
 			_progressLabel.set_TextColor(MaestroTheme.Paused);
 			_pauseButton.IconTexture = MaestroIcons.Play;

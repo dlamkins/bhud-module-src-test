@@ -90,6 +90,8 @@ namespace Maestro.UI
 
 		public static readonly Color ChipUpperOctaveSharp = new Color(100, 42, 48);
 
+		public static readonly Color DrumPadBase = new Color(34, 30, 40);
+
 		public const int ActionButtonWidth = 90;
 
 		public const int ActionButtonHeight = 26;
@@ -105,10 +107,6 @@ namespace Maestro.UI
 		private static readonly Color BgMainTop = new Color(28, 20, 34, 255);
 
 		private static readonly Color BgMainBottom = new Color(42, 32, 28, 255);
-
-		private static readonly Color BgImportTop = new Color(22, 21, 36, 255);
-
-		private static readonly Color BgImportBottom = new Color(34, 32, 52, 255);
 
 		private static readonly Color BgCreatorTop = new Color(30, 23, 30, 255);
 
@@ -129,6 +127,35 @@ namespace Maestro.UI
 		public const int CornerRadius = 4;
 
 		private static Texture2D _cornerMask;
+
+		public static Color GetDrumGroupColor(DrumGroup group)
+		{
+			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+			return (Color)(group switch
+			{
+				DrumGroup.Cymbals => ChipLowerOctave, 
+				DrumGroup.Toms => ChipUpperOctave, 
+				_ => ChipMiddleOctave, 
+			});
+		}
+
+		public static Color DrumPadResting(DrumGroup group)
+		{
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			return Color.Lerp(DrumPadBase, GetDrumGroupColor(group), 0.4f);
+		}
+
+		public static Color DrumPadHover(DrumGroup group)
+		{
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			return Color.Lerp(DrumPadBase, GetDrumGroupColor(group), 0.62f);
+		}
 
 		public static Texture2D GetCornerMask()
 		{
@@ -315,13 +342,6 @@ namespace Maestro.UI
 			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 			return CreateVerticalGradient(windowWidth, windowHeight, BgMainTop, BgMainBottom);
-		}
-
-		public static Texture2D CreateImportBackground(int windowWidth, int windowHeight)
-		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-			return CreateVerticalGradient(windowWidth, windowHeight, BgImportTop, BgImportBottom);
 		}
 
 		public static Texture2D CreateCreatorBackground(int windowWidth, int windowHeight)

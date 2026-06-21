@@ -146,7 +146,7 @@ namespace Maestro.Services.Data
 				List<string> notes = song.Notes;
 				if (notes != null && notes.Count > 0)
 				{
-					List<SongCommand> commands = NoteParser.Parse(song.Notes);
+					List<SongCommand> commands = SongCompiler.Parse(song.Notes, song.Instrument);
 					song.Commands.AddRange(commands);
 				}
 			}

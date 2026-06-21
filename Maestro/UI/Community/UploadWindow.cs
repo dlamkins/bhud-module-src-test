@@ -411,7 +411,7 @@ namespace Maestro.UI.Community
 				_nameLabel.set_Text(_selectedSong.Name ?? "-");
 				_artistLabel.set_Text(_selectedSong.Artist ?? "-");
 				_transcriberLabel.set_Text(_selectedSong.Transcriber ?? "(not set)");
-				_instrumentLabel.set_Text(_selectedSong.Instrument.ToString());
+				_instrumentLabel.set_Text(_selectedSong.Instrument.DisplayName());
 				_noteCountLabel.set_Text(GetNoteCount(_selectedSong).ToString());
 			}
 		}

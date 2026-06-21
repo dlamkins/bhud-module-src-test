@@ -23,18 +23,20 @@ namespace Maestro.Models
 		{
 			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0131: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0135: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0143: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0180: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0191: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0208: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0216: Unknown result type (might be due to invalid IL or missing references)
 			ThreeOctaveLabels = new string[3] { "Lower (-)", "Middle", "Upper (+)" };
 			_all = new List<InstrumentInfo>
 			{
@@ -44,7 +46,8 @@ namespace Maestro.Models
 				new InstrumentInfo(InstrumentType.Bass, "Bass", new Color(224, 106, 124), new Color(184, 72, 94), sharpsEnabled: false, 0, 1, new string[2] { "Low", "High" }),
 				new InstrumentInfo(InstrumentType.Flute, "Flute", new Color(165, 121, 224), new Color(126, 84, 190), sharpsEnabled: false, -1, 0, new string[2] { "Low", "Middle" }),
 				new InstrumentInfo(InstrumentType.Bell, "Bell (3 octaves)", new Color(63, 194, 178), new Color(42, 148, 136), sharpsEnabled: false, -1, 1, ThreeOctaveLabels),
-				new InstrumentInfo(InstrumentType.BellMagnanimous, "Bell (2 octaves)", new Color(116, 214, 190), new Color(73, 174, 151), sharpsEnabled: false, 0, 1, new string[2] { "Middle", "High" })
+				new InstrumentInfo(InstrumentType.BellMagnanimous, "Bell (2 octaves)", new Color(116, 214, 190), new Color(73, 174, 151), sharpsEnabled: false, 0, 1, new string[2] { "Middle", "High" }),
+				new InstrumentInfo(InstrumentType.DrumSet, "Drum Set", new Color(198, 110, 64), new Color(160, 82, 45), sharpsEnabled: false, 0, 0, new string[1] { "Kit" }, listedInPickers: true, isPercussion: true)
 			};
 			_byType = _all.ToDictionary((InstrumentInfo i) => i.Type);
 			_pickable = _all.Where((InstrumentInfo i) => i.ListedInPickers).ToList().AsReadOnly();

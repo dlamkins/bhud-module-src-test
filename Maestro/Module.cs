@@ -328,6 +328,13 @@ namespace Maestro
 			_keyboardService?.PlayNoteByName(note, isSharp, isHighC);
 		}
 
+		public void PlayDrum(DrumSound sound)
+		{
+			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
+			DrumSoundInfo info = DrumMapping.Get(sound);
+			_keyboardService?.PlayNote(info.PrimaryKey, info.NeedsAlt);
+		}
+
 		public void PlayOctaveChange(bool up)
 		{
 			_keyboardService?.PlayOctaveChange(up);
