@@ -11,7 +11,6 @@ using Manlaan.CommanderMarkers.Settings.Services;
 using Manlaan.CommanderMarkers.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 
 namespace Manlaan.CommanderMarkers.Presets.Model
 {
@@ -99,23 +98,19 @@ namespace Manlaan.CommanderMarkers.Presets.Model
 
 		private Task PlaceMarkersInWorld(MarkerSet markers, MapData mapData)
 		{
-			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0144: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0149: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0141: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0146: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0148: Unknown result type (might be due to invalid IL or missing references)
 			//IL_014b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0153: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0157: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0160: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0168: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01fb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0202: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0150: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0154: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ec: Unknown result type (might be due to invalid IL or missing references)
 			if (markers.marks == null)
 			{
 				return Task.CompletedTask;
@@ -136,8 +131,8 @@ namespace Manlaan.CommanderMarkers.Presets.Model
 				_setting._settingClearGndBinding.get_Value()
 			};
 			int delay = _setting.AutoMarker_PlacementDelay.get_Value();
-			MouseState state = Mouse.GetState();
-			Point originalMousePos = ((MouseState)(ref state)).get_Position();
+			bool useScreenCoords = MarkerPlacementHelper.UseScreenCoordinatesForPlacement();
+			Point originalMousePos = MarkerPlacementHelper.GetPlacementCursorPosition(useScreenCoords);
 			Rectangle screenBounds = ScreenMap.Data.ScreenBounds;
 			InputHelper.DoHotKey(keys[0]);
 			Thread.Sleep(delay / 2);
@@ -148,10 +143,10 @@ namespace Manlaan.CommanderMarkers.Presets.Model
 				if (marker.icon <= 9 && marker.icon >= 0)
 				{
 					Vector2 blishCoord = mapData.WorldToScreenMap(marker.ToVector3());
-					Vector2 d = blishCoord * scale;
+					Point placementPos = MarkerPlacementHelper.BlishToPlacementPosition(blishCoord, scale);
 					if (((Rectangle)(ref screenBounds)).Contains(blishCoord))
 					{
-						Mouse.SetPosition((int)d.X, (int)d.Y);
+						MarkerPlacementHelper.SetPlacementMousePosition(placementPos, useScreenCoords);
 						Thread.Sleep(delay / 2);
 						InputHelper.DoHotKey(keys[marker.icon]);
 						Thread.Sleep(delay);
@@ -166,7 +161,7 @@ namespace Manlaan.CommanderMarkers.Presets.Model
 			{
 				ScreenNotification.ShowNotification($"Unable to place {errors.Count} marker(s)\nTry moving your map to the marker trigger", (NotificationType)1, (Texture2D)null, 6);
 			}
-			Mouse.SetPosition(originalMousePos.X, originalMousePos.Y);
+			MarkerPlacementHelper.SetPlacementMousePosition(originalMousePos, useScreenCoords);
 			return Task.CompletedTask;
 		}
 	}

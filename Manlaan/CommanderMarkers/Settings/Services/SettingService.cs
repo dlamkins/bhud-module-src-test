@@ -74,11 +74,15 @@ namespace Manlaan.CommanderMarkers.Settings.Services
 
 		public SettingEntry<bool> AutoMarker_LibraryFilterToCurrent { get; private set; }
 
+		public SettingEntry<bool> AutoMarker_LibraryFilterMine { get; private set; }
+
 		public SettingEntry<bool> AutoMarker_ShowPreview { get; private set; }
 
 		public SettingEntry<bool> AutoMarker_ShowTrigger { get; private set; }
 
 		public SettingEntry<bool> AutoMarker_Allow_Combat_Placement { get; private set; }
+
+		public SettingEntry<bool> RtApiIntegrationEnabled { get; private set; }
 
 		public SettingEntry<bool> AutoMarker_Billboard_FeatureEnabled { get; private set; }
 
@@ -180,13 +184,15 @@ namespace Manlaan.CommanderMarkers.Settings.Services
 			SettingComplianceExtensions.SetRange(_settingOpacity, 0.1f, 1f);
 			AutoMarker_OnlyWhenCommander = settings.DefineSetting<bool>("CmdMrkAMOnlyCommander", true, (Func<string>)(() => "Only show when I am the Commander"), (Func<string>)(() => "Only show the AutoMarker activation zones on the map when you are the Commander"));
 			AutoMarker_FeatureEnabled = settings.DefineSetting<bool>("CmdMrkAMEnabled", true, (Func<string>)(() => "Enable"), (Func<string>)(() => "Enable/Disable the entire AutoMarker feature"));
-			AutoMarker_LibraryFilterToCurrent = settings.DefineSetting<bool>("CmdMrkAMLibraryFilter", false, (Func<string>)(() => "Filter to current map"), (Func<string>)(() => "Filter the library list to only show marker sets for your current map"));
+			AutoMarker_LibraryFilterToCurrent = settings.DefineSetting<bool>("CmdMrkAMLibraryFilter", false, (Func<string>)(() => "Current map"), (Func<string>)(() => "Filter the library list to only show marker sets for your current map"));
+			AutoMarker_LibraryFilterMine = settings.DefineSetting<bool>("CmdMrkAMLibraryFilterMine", false, (Func<string>)(() => "Mine"), (Func<string>)(() => "Hide marker sets imported from the community library"));
 			AutoMarker_ShowPreview = settings.DefineSetting<bool>("CmdMrkAMShowPreview", true, (Func<string>)(() => "Show preview when map is open"), (Func<string>)(() => "Show a preview of the markers when the map is open and you are close enough to place the set"));
 			AutoMarker_ShowTrigger = settings.DefineSetting<bool>("CmdMrkAMShowTrigger", true, (Func<string>)(() => "Enable Map Marker"), (Func<string>)(() => "Display the Blish holding markers map icon in locations where AutoMarker sets may be activated from the map"));
 			AutoMarker_Billboard_FeatureEnabled = settings.DefineSetting<bool>("CmdMrkBillboardEnabled", true, (Func<string>)(() => "Enable markers in 3D game world"), (Func<string>)(() => "Show markers in the 3D game world"));
 			AutoMarker_Billboard_Placement = settings.DefineSetting<bool>("CmdMrkAMCanBypassMapOpen", true, (Func<string>)(() => "Allow placement without having the map open"), (Func<string>)(() => "Allow the marker placement even when the map is closed"));
 			AutoMarker_Billboard_Preview = settings.DefineSetting<bool>("CmdMrkBillboardPreview", true, (Func<string>)(() => "Preview marker set when near trigger"), (Func<string>)(() => "Show a preview of the markers to be placed in the game world"));
 			AutoMarker_Allow_Combat_Placement = settings.DefineSetting<bool>("CmdMrkCombatPlacement", false, (Func<string>)(() => "Allow AutoMarker features while In Combat"), (Func<string>)(() => "AutoMarker features will be available while in combat"));
+			RtApiIntegrationEnabled = settings.DefineSetting<bool>("CmdMrkRtApiEnabled", false, (Func<string>)(() => "Enable Raidcore.GG Nexus Real-Time API integration"), (Func<string>)(() => "Use RTAPI (via Nexus game memory reading) to import active squad marker positions in the library editor"));
 			CornerIconEnabled = settings.DefineSetting<bool>("CmdMrkCornerIconEnabled", true, (Func<string>)(() => "Show an icon in the top-left manu bar"), (Func<string>)(() => "Adds a shortcut icon in the top-left menu bar"));
 			CornerIconLeftClickAction = settings.DefineSetting<CornerIconActions>("CmdMrkAMCornerIconAction", CornerIconActions.SHOW_ICON_MENU, (Func<string>)(() => "Icon left-click action"), (Func<string>)(() => "Select an action for menu bar icon left-click\nRight click will always open a small menu"));
 		}

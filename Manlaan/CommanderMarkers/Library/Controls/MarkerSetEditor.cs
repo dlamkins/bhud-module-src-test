@@ -1,9 +1,16 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using Blish_HUD;
+using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Manlaan.CommanderMarkers.Presets.Model;
+using Manlaan.CommanderMarkers.RtApi;
+using Manlaan.CommanderMarkers.Utils;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Manlaan.CommanderMarkers.Library.Controls
 {
@@ -17,6 +24,8 @@ namespace Manlaan.CommanderMarkers.Library.Controls
 
 		protected StandardButton? _AddMarkerButton;
 
+		protected StandardButton? _importAllButton;
+
 		public MarkerSet MarkerSet => _markerSet;
 
 		public MarkerSetEditor(Action<bool> callback)
@@ -29,64 +38,76 @@ namespace Manlaan.CommanderMarkers.Library.Controls
 
 		public void LoadMarkerSet(MarkerSet? markerSet, int idx)
 		{
-			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0068: Expected O, but got Unknown
-			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0099: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e5: Expected O, but got Unknown
-			//IL_0128: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0168: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0174: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0184: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0199: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ba: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e5: Expected O, but got Unknown
-			//IL_01fc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0201: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0208: Unknown result type (might be due to invalid IL or missing references)
-			//IL_020d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0217: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0232: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0239: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0241: Unknown result type (might be due to invalid IL or missing references)
-			//IL_024b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0270: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0280: Expected O, but got Unknown
-			//IL_02a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02e4: Expected O, but got Unknown
+			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0080: Expected O, but got Unknown
+			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fd: Expected O, but got Unknown
+			//IL_0140: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0180: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0185: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0197: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ed: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01fd: Expected O, but got Unknown
+			//IL_0214: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0219: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0220: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0225: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0245: Unknown result type (might be due to invalid IL or missing references)
+			//IL_024a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0251: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0259: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0263: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0288: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0298: Expected O, but got Unknown
+			//IL_02cc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ee: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0303: Unknown result type (might be due to invalid IL or missing references)
+			//IL_030e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_032a: Expected O, but got Unknown
+			//IL_035f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0364: Unknown result type (might be due to invalid IL or missing references)
+			//IL_036b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0376: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0381: Unknown result type (might be due to invalid IL or missing references)
+			//IL_039f: Expected O, but got Unknown
 			_markerSet = markerSet ?? new MarkerSet();
 			_updateListingIndex = idx;
 			((Container)this).ClearChildren();
+			if (RtApiIntegrationHelper.IsEnabled)
+			{
+				Service.RtApiConnection?.EnsureActive();
+			}
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Parent((Container)(object)this);
 			val.set_FlowDirection((ControlFlowDirection)0);
@@ -149,7 +170,7 @@ namespace Manlaan.CommanderMarkers.Library.Controls
 			val7.set_Text("Map: " + Service.MapDataCache.Describe(_markerSet.MapId));
 			((Control)val7).set_BasicTooltipText("Set trigger location to update map");
 			Label label = val7;
-			PositionFields positionFields = new PositionFields(markerSet!.Trigger);
+			PositionFields positionFields = new PositionFields(_markerSet.trigger);
 			((Control)positionFields).set_Parent((Container)(object)metaFlow);
 			positionFields.WorldCoordChanged += delegate(object s, WorldCoord e)
 			{
@@ -157,13 +178,29 @@ namespace Manlaan.CommanderMarkers.Library.Controls
 				_markerSet.mapId = GameService.Gw2Mumble.get_CurrentMap().get_Id();
 				label.set_Text("Map: " + Service.MapDataCache.Describe(_markerSet.MapId));
 			};
-			StandardButton val8 = new StandardButton();
-			((Control)val8).set_Parent((Container)(object)this);
-			val8.set_Text("Add Marker");
-			((Control)val8).set_Width(410);
-			((Control)val8).set_Enabled(_markerSet.marks.Count < 8);
-			_AddMarkerButton = val8;
-			markerSet!.marks.ForEach(delegate(MarkerCoord mark)
+			if (RtApiIntegrationHelper.IsEnabled)
+			{
+				StandardButton val8 = new StandardButton();
+				((Control)val8).set_Parent((Container)(object)this);
+				val8.set_Text("Import active squad markers");
+				((Control)val8).set_Width(410);
+				val8.set_Icon(AsyncTexture2D.op_Implicit(Service.Textures!.IconImport));
+				((Control)val8).set_BasicTooltipText("Copy currently placed squad marker locations from the Real-Time API.\nRequires the Real-Time API addon.");
+				((Control)val8).set_Enabled(Service.RtApiConnection?.IsActive ?? false);
+				_importAllButton = val8;
+				((Control)_importAllButton).add_Click((EventHandler<MouseEventArgs>)ImportAllButton_Click);
+				if (Service.RtApiConnection != null)
+				{
+					Service.RtApiConnection!.ConnectionStateChanged += new EventHandler<RtApiConnectionState>(OnRtApiConnectionStateChanged);
+				}
+			}
+			StandardButton val9 = new StandardButton();
+			((Control)val9).set_Parent((Container)(object)this);
+			val9.set_Text("Add Marker");
+			((Control)val9).set_Width(410);
+			((Control)val9).set_Enabled(_markerSet.marks.Count < 8);
+			_AddMarkerButton = val9;
+			_markerSet.marks.ForEach(delegate(MarkerCoord mark)
 			{
 				((Control)new MarkerEditor(mark, new Action<MarkerEditor>(RemoveMarker))).set_Parent((Container)(object)this);
 			});
@@ -180,12 +217,72 @@ namespace Manlaan.CommanderMarkers.Library.Controls
 			});
 		}
 
+		private void OnRtApiConnectionStateChanged(object? sender, RtApiConnectionState state)
+		{
+			if (_importAllButton != null)
+			{
+				((Control)_importAllButton).set_Enabled(state == RtApiConnectionState.Active);
+			}
+		}
+
+		private void ImportAllButton_Click(object sender, MouseEventArgs e)
+		{
+			if (Service.RtApiConnection == null || !Service.RtApiConnection!.EnsureActive())
+			{
+				ScreenNotification.ShowNotification("Real-Time API is not available.", (NotificationType)2, (Texture2D)null, 4);
+				return;
+			}
+			List<MarkerCoord> imported = new List<MarkerCoord>();
+			for (int slotIndex = 0; slotIndex < 8; slotIndex++)
+			{
+				MarkerCoord marker = new MarkerCoord();
+				if (Service.RtApiConnection!.TryImportSquadMarker(slotIndex, marker))
+				{
+					imported.Add(marker);
+				}
+			}
+			if (imported.Count == 0)
+			{
+				ScreenNotification.ShowNotification("No active squad markers were found to import.", (NotificationType)2, (Texture2D)null, 4);
+				return;
+			}
+			_markerSet.marks = imported;
+			_markerSet.mapId = GameService.Gw2Mumble.get_CurrentMap().get_Id();
+			RebuildMarkerEditors();
+		}
+
+		private void RebuildMarkerEditors()
+		{
+			foreach (MarkerEditor editor in ((IEnumerable)((Container)this).get_Children()).OfType<MarkerEditor>().ToList())
+			{
+				((Container)this).RemoveChild((Control)(object)editor);
+				((Control)editor).Dispose();
+			}
+			foreach (MarkerCoord mark in _markerSet.marks)
+			{
+				((Control)new MarkerEditor(mark, new Action<MarkerEditor>(RemoveMarker))).set_Parent((Container)(object)this);
+			}
+			if (_AddMarkerButton != null)
+			{
+				((Control)_AddMarkerButton).set_Enabled(_markerSet.marks.Count < 8);
+			}
+		}
+
 		protected void RemoveMarker(MarkerEditor editor)
 		{
 			((Container)this).get_Children().Remove((Control)(object)editor);
 			_markerSet.marks.Remove(editor.Marker);
 			((Control)_AddMarkerButton).set_Enabled(_markerSet.marks.Count < 8);
 			((Control)this).Invalidate();
+		}
+
+		protected override void DisposeControl()
+		{
+			if (Service.RtApiConnection != null)
+			{
+				Service.RtApiConnection!.ConnectionStateChanged -= new EventHandler<RtApiConnectionState>(OnRtApiConnectionStateChanged);
+			}
+			((FlowPanel)this).DisposeControl();
 		}
 	}
 }

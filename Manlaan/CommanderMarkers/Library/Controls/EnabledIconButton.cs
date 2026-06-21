@@ -1,9 +1,7 @@
 using System;
-using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Extended.BitmapFonts;
 
 namespace Manlaan.CommanderMarkers.Library.Controls
 {
@@ -12,8 +10,6 @@ namespace Manlaan.CommanderMarkers.Library.Controls
 		private Texture2D _enabledTexture = Service.Textures!._imgCheck;
 
 		private Texture2D _disabledTexture = Service.Textures!._imgClear;
-
-		private static readonly BitmapFont _font = GameService.Content.get_DefaultFont16();
 
 		private bool _watchValue = true;
 
@@ -25,10 +21,15 @@ namespace Manlaan.CommanderMarkers.Library.Controls
 			}
 			set
 			{
-				_watchValue = value;
-				SetTexture();
+				if (_watchValue != value)
+				{
+					_watchValue = value;
+					SetTexture();
+				}
 			}
 		}
+
+		public event EventHandler<bool>? ValueChanged;
 
 		protected override CaptureType CapturesInput()
 		{
@@ -54,21 +55,21 @@ namespace Manlaan.CommanderMarkers.Library.Controls
 		{
 			if (_watchValue)
 			{
-				base.Icon = _disabledTexture;
-				((Control)this).set_BasicTooltipText("disable");
+				base.Icon = _enabledTexture;
+				((Control)this).set_BasicTooltipText("Click to disable this marker set");
 			}
 			else
 			{
-				base.Icon = _enabledTexture;
-				((Control)this).set_BasicTooltipText("enable");
+				base.Icon = _disabledTexture;
+				((Control)this).set_BasicTooltipText("Click to enable this marker set");
 			}
 			((Control)this).Invalidate();
 		}
 
 		private void EnabledIconButton_Click(object sender, MouseEventArgs e)
 		{
-			_watchValue = !_watchValue;
-			SetTexture();
+			WatchValue = !WatchValue;
+			this.ValueChanged?.Invoke(this, WatchValue);
 		}
 
 		protected override void DisposeControl()

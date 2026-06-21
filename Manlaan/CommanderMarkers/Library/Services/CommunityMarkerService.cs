@@ -7,9 +7,9 @@ namespace Manlaan.CommanderMarkers.Library.Services
 {
 	public class CommunityMarkerService
 	{
-		protected const string FILE_URL = "https://bhm.blishhud.com/Manlaan.CommanderMarkers/Community/Markers.json";
-
 		protected CommunitySets? _communitySets;
+
+		protected static string FileUrl => "https://bhm.blishhud.com/Manlaan.CommanderMarkers/Community/Markers.json";
 
 		public CommunitySets CommunitySets
 		{
@@ -30,7 +30,7 @@ namespace Manlaan.CommanderMarkers.Library.Services
 			try
 			{
 				using WebClient webClient = new WebClient();
-				CommunitySets sets = JsonConvert.DeserializeObject<CommunitySets>(webClient.DownloadString("https://bhm.blishhud.com/Manlaan.CommanderMarkers/Community/Markers.json"));
+				CommunitySets sets = JsonConvert.DeserializeObject<CommunitySets>(webClient.DownloadString(FileUrl));
 				if (sets == null)
 				{
 					return new CommunitySets();

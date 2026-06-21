@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
@@ -12,7 +11,6 @@ using Manlaan.CommanderMarkers.Settings.Services;
 using Manlaan.CommanderMarkers.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 
 namespace Manlaan.CommanderMarkers.Presets.Services
 {
@@ -62,6 +60,7 @@ namespace Manlaan.CommanderMarkers.Presets.Services
 			_setting.AutoMarker_ShowTrigger.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)AutoMarkerBooleanSettingChanged);
 			_setting.AutoMarker_Billboard_FeatureEnabled.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)AutoMarkerBooleanSettingChanged);
 			Service.LtMode.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)AutoMarkerBooleanSettingChanged);
+			_setting.RtApiIntegrationEnabled.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)AutoMarkerBooleanSettingChanged);
 		}
 
 		private void AutoMarkerBooleanSettingChanged(object sender, ValueChangedEventArgs<bool> e)
@@ -71,7 +70,34 @@ namespace Manlaan.CommanderMarkers.Presets.Services
 
 		private void MarkersListing_MarkersChanged(object sender, EventArgs e)
 		{
-			CurrentMap_MapChanged(this, new ValueEventArgs<int>(GameService.Gw2Mumble.get_CurrentMap().get_Id()));
+			int mapId = ((_currentmap != 0) ? _currentmap : GameService.Gw2Mumble.get_CurrentMap().get_Id());
+			RefreshMapMarkers(mapId);
+		}
+
+		private void RefreshMapMarkers(int mapId)
+		{
+			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+			RemovePreviewMarkerSet();
+			_screenMap.ResetPreviewState();
+			_screenMap.ClearEntities();
+			_billboards.ClearEntities();
+			_currentmap = mapId;
+			_markers = Service.MarkersListing.GetMarkersForMap(mapId);
+			if (!_setting.AutoMarker_ShowTrigger.get_Value() && !_setting.AutoMarker_Billboard_FeatureEnabled.get_Value())
+			{
+				return;
+			}
+			foreach (MarkerSet marker in _markers)
+			{
+				if (_setting.AutoMarker_ShowTrigger.get_Value())
+				{
+					_screenMap.AddEntity(new BasicMarker(_map, marker.trigger!.ToVector3(), marker.name, marker.description));
+				}
+				if (_setting.AutoMarker_Billboard_FeatureEnabled.get_Value())
+				{
+					_billboards.AddEntity(new BillBoardPreview(_map, marker));
+				}
+			}
 		}
 
 		private void _interactKeybind_Activated(object sender, EventArgs e)
@@ -133,6 +159,10 @@ namespace Manlaan.CommanderMarkers.Presets.Services
 
 		public Task PlaceMarkers(MarkerSet marders)
 		{
+			if (!marders.enabled)
+			{
+				return Task.CompletedTask;
+			}
 			return PlaceMarkers(marders, _map);
 		}
 
@@ -141,30 +171,26 @@ namespace Manlaan.CommanderMarkers.Presets.Services
 			bool shouldDoIt = Service.Settings.AutoMarker_FeatureEnabled.get_Value() && GameService.GameIntegration.get_Gw2Instance().get_Gw2IsRunning() && GameService.GameIntegration.get_Gw2Instance().get_IsInGame() && GameService.Gw2Mumble.get_IsAvailable();
 			if (Service.Settings._settingOnlyWhenCommander.get_Value() || Service.LtMode.get_Value())
 			{
-				shouldDoIt &= GameService.Gw2Mumble.get_PlayerCharacter().get_IsCommander() || Service.LtMode.get_Value();
+				shouldDoIt &= CommanderPermissionHelper.PassesCommanderGate();
 			}
 			return shouldDoIt;
 		}
 
 		private Task PlaceMarkers(MarkerSet markers, MapData mapData)
 		{
-			//IL_010c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0111: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0115: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0113: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0118: Unknown result type (might be due to invalid IL or missing references)
 			//IL_011a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0120: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0174: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0179: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0170: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0175: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0177: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0183: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0187: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0190: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0198: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0231: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021a: Unknown result type (might be due to invalid IL or missing references)
 			if (markers.marks == null)
 			{
 				return Task.CompletedTask;
@@ -184,8 +210,8 @@ namespace Manlaan.CommanderMarkers.Presets.Services
 				_setting._settingClearGndBinding.get_Value()
 			};
 			int delay = _setting.AutoMarker_PlacementDelay.get_Value();
-			MouseState state = Mouse.GetState();
-			Point originalMousePos = ((MouseState)(ref state)).get_Position();
+			bool useScreenCoords = MarkerPlacementHelper.UseScreenCoordinatesForPlacement();
+			Point originalMousePos = MarkerPlacementHelper.GetPlacementCursorPosition(useScreenCoords);
 			Rectangle screenBounds = ScreenMap.Data.ScreenBounds;
 			InputHelper.DoHotKey(keys[0]);
 			Thread.Sleep(delay / 2);
@@ -196,10 +222,10 @@ namespace Manlaan.CommanderMarkers.Presets.Services
 				if (marker.icon <= 9 && marker.icon >= 0)
 				{
 					Vector2 blishCoord = mapData.WorldToScreenMap(marker.ToVector3());
-					Vector2 d = blishCoord * scale;
+					Point placementPos = MarkerPlacementHelper.BlishToPlacementPosition(blishCoord, scale);
 					if (((Rectangle)(ref screenBounds)).Contains(blishCoord))
 					{
-						Mouse.SetPosition((int)d.X, (int)d.Y);
+						MarkerPlacementHelper.SetPlacementMousePosition(placementPos, useScreenCoords);
 						Thread.Sleep(delay / 2);
 						InputHelper.DoHotKey(keys[marker.icon]);
 						Thread.Sleep(delay);
@@ -214,40 +240,19 @@ namespace Manlaan.CommanderMarkers.Presets.Services
 			{
 				ScreenNotification.ShowNotification($"Unable to place {errors.Count} marker(s)\nTry moving your map to the marker trigger", (NotificationType)1, (Texture2D)null, 6);
 			}
-			Mouse.SetPosition(originalMousePos.X, originalMousePos.Y);
+			MarkerPlacementHelper.SetPlacementMousePosition(originalMousePos, useScreenCoords);
 			return Task.CompletedTask;
 		}
 
 		private void CurrentMap_MapChanged(object sender, ValueEventArgs<int> e)
 		{
-			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-			_screenMap.ClearEntities();
-			_billboards.ClearEntities();
-			if (!_setting.AutoMarker_ShowTrigger.get_Value() && !_setting.AutoMarker_Billboard_FeatureEnabled.get_Value())
-			{
-				return;
-			}
-			_currentmap = e.get_Value();
-			_markers = (from m in Service.MarkersListing.GetMarkersForMap(e.get_Value())
-				where m.enabled
-				select m).ToList();
-			foreach (MarkerSet marker in _markers)
-			{
-				if (_setting.AutoMarker_ShowTrigger.get_Value())
-				{
-					_screenMap.AddEntity(new BasicMarker(_map, marker.trigger!.ToVector3(), marker.name, marker.description));
-				}
-				if (_setting.AutoMarker_Billboard_FeatureEnabled.get_Value())
-				{
-					_billboards.AddEntity(new BillBoardPreview(_map, marker));
-				}
-			}
+			RefreshMapMarkers(e.get_Value());
 		}
 
 		public void PreviewMarkerSet(MarkerSet preview)
 		{
 			RemovePreviewMarkerSet();
-			if (Service.Settings.AutoMarker_ShowPreview.get_Value())
+			if (preview.enabled && Service.Settings.AutoMarker_ShowPreview.get_Value())
 			{
 				_previewMarkerSet = new MarkerPreview(_map, preview);
 				_screenMap.AddEntity(_previewMarkerSet);
@@ -307,8 +312,12 @@ namespace Manlaan.CommanderMarkers.Presets.Services
 			if (_previewMarkerSet != null)
 			{
 				_screenMap.RemoveEntity(_previewMarkerSet);
-				_billboards.RemoveEntity(_billboardPreview);
+				if (_billboardPreview != null)
+				{
+					_billboards.RemoveEntity(_billboardPreview);
+				}
 				_previewMarkerSet = null;
+				_billboardPreview = null;
 			}
 		}
 
@@ -320,6 +329,7 @@ namespace Manlaan.CommanderMarkers.Presets.Services
 			_setting.AutoMarker_ShowTrigger.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)AutoMarkerBooleanSettingChanged);
 			_setting.AutoMarker_FeatureEnabled.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)AutoMarkerBooleanSettingChanged);
 			Service.LtMode.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)AutoMarkerBooleanSettingChanged);
+			_setting.RtApiIntegrationEnabled.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)AutoMarkerBooleanSettingChanged);
 			Service.MarkersListing.MarkersChanged -= new EventHandler(MarkersListing_MarkersChanged);
 			GameService.Gw2Mumble.get_CurrentMap().remove_MapChanged((EventHandler<ValueEventArgs<int>>)CurrentMap_MapChanged);
 			_setting._settingInteractKeyBinding.get_Value().set_Enabled(false);

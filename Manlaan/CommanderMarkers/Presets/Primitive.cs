@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Manlaan.CommanderMarkers.Utils;
@@ -82,14 +83,16 @@ namespace Manlaan.CommanderMarkers.Presets
 		{
 		}
 
+		[IteratorStateMachine(typeof(_003CTransform_003Ed__6))]
 		public IEnumerable<Vector3> Transform(Matrix matrix)
 		{
 			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-			foreach (Vector3 p in Points)
+			return new _003CTransform_003Ed__6(-2)
 			{
-				yield return Vector3.Transform(p, matrix);
-			}
+				_003C_003E4__this = this,
+				_003C_003E3__matrix = matrix
+			};
 		}
 
 		public Primitive Transformed(Matrix matrix)

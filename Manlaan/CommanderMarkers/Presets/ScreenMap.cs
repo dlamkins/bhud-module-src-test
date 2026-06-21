@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Blish_HUD;
 using Blish_HUD.Controls;
+using Manlaan.CommanderMarkers.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.BitmapFonts;
@@ -101,6 +102,11 @@ namespace Manlaan.CommanderMarkers.Presets
 			_entities.Remove(entity);
 		}
 
+		public void ResetPreviewState()
+		{
+			_previewActive = false;
+		}
+
 		public void ClearEntities()
 		{
 			_entities.Clear();
@@ -123,13 +129,13 @@ namespace Manlaan.CommanderMarkers.Presets
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
-			if (!GameService.GameIntegration.get_Gw2Instance().get_IsInGame() || _mapData.Current == null || (GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat() && !Service.Settings.AutoMarker_Allow_Combat_Placement.get_Value()) || (Service.Settings.AutoMarker_OnlyWhenCommander.get_Value() && !GameService.Gw2Mumble.get_PlayerCharacter().get_IsCommander() && !Service.LtMode.get_Value()))
+			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
+			if (!GameService.GameIntegration.get_Gw2Instance().get_IsInGame() || _mapData.Current == null || (GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat() && !Service.Settings.AutoMarker_Allow_Combat_Placement.get_Value()) || (Service.Settings.AutoMarker_OnlyWhenCommander.get_Value() && !CommanderPermissionHelper.HasCommanderPermissions()))
 			{
 				return;
 			}

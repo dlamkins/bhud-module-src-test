@@ -162,15 +162,15 @@ namespace Manlaan.CommanderMarkers.Markers
 
 		public void Update(GameTime gt)
 		{
+			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0110: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f7: Unknown result type (might be due to invalid IL or missing references)
 			((Control)this).Update(gt);
 			bool shouldBeVisible = _panelEnabled && GameService.GameIntegration.get_Gw2Instance().get_Gw2IsRunning() && GameService.GameIntegration.get_Gw2Instance().get_IsInGame() && GameService.Gw2Mumble.get_IsAvailable();
 			if (GameService.Gw2Mumble.get_UI().get_IsMapOpen())
@@ -179,7 +179,7 @@ namespace Manlaan.CommanderMarkers.Markers
 			}
 			if (_settings._settingOnlyWhenCommander.get_Value() || Service.LtMode.get_Value())
 			{
-				shouldBeVisible = shouldBeVisible && (GameService.Gw2Mumble.get_PlayerCharacter().get_IsCommander() || Service.LtMode.get_Value());
+				shouldBeVisible = shouldBeVisible && CommanderPermissionHelper.PassesCommanderGate();
 			}
 			if (!((Control)this).get_Visible() && shouldBeVisible)
 			{

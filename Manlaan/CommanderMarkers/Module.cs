@@ -8,11 +8,14 @@ using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Modules;
 using Blish_HUD.Settings;
+using Gw2Sharp.WebApi.V2.Models;
 using Manlaan.CommanderMarkers.CornerIcon;
 using Manlaan.CommanderMarkers.Library.Controls;
+using Manlaan.CommanderMarkers.Library.Services;
 using Manlaan.CommanderMarkers.Markers;
 using Manlaan.CommanderMarkers.Presets;
 using Manlaan.CommanderMarkers.Presets.Services;
+using Manlaan.CommanderMarkers.Services;
 using Manlaan.CommanderMarkers.Settings.Controls;
 using Manlaan.CommanderMarkers.Settings.Enums;
 using Manlaan.CommanderMarkers.Settings.Services;
@@ -63,9 +66,25 @@ namespace Manlaan.CommanderMarkers
 		{
 			Service.Textures = new TextureService(Service.ContentsManager);
 			IconsPanel = new MarkersPanel(Settings, Service.Textures);
+			string moduleDirectory = Service.DirectoriesManager.GetFullDirectoryPath(DIRECTORY_PATH);
+			Service.ManifestService = new CommanderMarkersManifestService();
+			Service.ManifestService.LoadOrFetch();
+			Service.CommunityCatalog = new CommunityCatalogService(Service.ManifestService, moduleDirectory);
+			Service.PreviewImageCache = new PreviewImageCache();
+			Service.PreviewImageCache.SetModuleDirectory(moduleDirectory);
+			Service.PreviewImageCache.SetServerUrl(Service.ManifestService.Manifest.ServerUrl);
+			Service.SubtokenService = new SubtokenService();
+			Service.CommunityCatalog.LoadCached();
+			Task.Run(() => Service.CommunityCatalog.SyncCatalog());
+			if (Service.Gw2ApiManager != null)
+			{
+				Service.Gw2ApiManager.add_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)OnSubtokenUpdated);
+				Service.SubtokenService.RefreshAccountNameAsync();
+			}
 			Service.MapDataCache = new MapData(GetCacheFile().FullName);
 			Service.MarkersListing = MarkerListing.Load();
 			Service.MapWatch = new MapWatchService(Service.MapDataCache, Settings);
+			Service.RtApiConnection = new RtApiConnection();
 			Service.SettingsWindow = new SettingsPanel();
 			ContextMenuStripItem val = new ContextMenuStripItem("Lieutenant's Mode");
 			((Control)val).set_BasicTooltipText("Temporarily override the 'Only While Commander' settings");
@@ -121,6 +140,10 @@ namespace Manlaan.CommanderMarkers
 
 		protected override void Unload()
 		{
+			if (Service.Gw2ApiManager != null)
+			{
+				Service.Gw2ApiManager.remove_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)OnSubtokenUpdated);
+			}
 			if (Service.CornerIcon != null)
 			{
 				Service.CornerIcon!.IconLeftClicked -= new EventHandler<bool>(CornerIcon_IconLeftClicked);
@@ -133,6 +156,8 @@ namespace Manlaan.CommanderMarkers
 			}
 			Service.MapWatch?.Dispose();
 			Service.MapDataCache?.Dispose();
+			Service.RtApiConnection?.Dispose();
+			Service.RtApiConnection = null;
 			MarkersPanel iconsPanel = IconsPanel;
 			if (iconsPanel != null)
 			{
@@ -140,6 +165,12 @@ namespace Manlaan.CommanderMarkers
 			}
 			Service.Settings?.Dispose();
 			Service.Textures?.Dispose();
+			Service.PreviewImageCache?.Dispose();
+		}
+
+		private void OnSubtokenUpdated(object? sender, ValueEventArgs<IEnumerable<TokenPermission>> e)
+		{
+			Service.SubtokenService.RefreshAccountNameAsync();
 		}
 
 		private FileInfo GetCacheFile()

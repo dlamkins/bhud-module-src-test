@@ -1,8 +1,10 @@
 using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
 using Manlaan.CommanderMarkers.CornerIcon;
+using Manlaan.CommanderMarkers.Library.Services;
 using Manlaan.CommanderMarkers.Presets;
 using Manlaan.CommanderMarkers.Presets.Services;
+using Manlaan.CommanderMarkers.Services;
 using Manlaan.CommanderMarkers.Settings.Controls;
 using Manlaan.CommanderMarkers.Settings.Services;
 
@@ -41,6 +43,22 @@ namespace Manlaan.CommanderMarkers
 
 		public static CornerIconService? CornerIcon { get; set; } = null;
 
+
+		public static CommanderMarkersManifestService ManifestService { get; set; } = null;
+
+
+		public static CommunityCatalogService CommunityCatalog { get; set; } = null;
+
+
+		public static PreviewImageCache PreviewImageCache { get; set; } = null;
+
+
+		public static SubtokenService SubtokenService { get; set; } = null;
+
+
+		public static RtApiConnection? RtApiConnection { get; set; }
+
+		public static string? AccountDisplayName { get; set; }
 
 		public static SettingEntry<bool> LtMode { get; set; }
 

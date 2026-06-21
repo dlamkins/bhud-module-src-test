@@ -4,6 +4,7 @@ using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Manlaan.CommanderMarkers.Presets.Model;
+using Manlaan.CommanderMarkers.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -89,7 +90,7 @@ namespace Manlaan.CommanderMarkers.Library.Controls
 			{
 				markerEditor._onDeleteCallback(markerEditor);
 			});
-			PositionFields positionFields = new PositionFields(marker2);
+			PositionFields positionFields = new PositionFields(marker2, (RtApiIntegrationHelper.IsEnabled && marker2.icon >= 1 && marker2.icon <= 8) ? ((Func<int?>)(() => marker2.icon - 1)) : null);
 			((Control)positionFields).set_Parent((Container)(object)this);
 			_position = positionFields;
 			_position!.WorldCoordChanged += delegate(object s, WorldCoord e)

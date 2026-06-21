@@ -4,6 +4,7 @@ using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics;
 using Manlaan.CommanderMarkers.Presets.Model;
+using Manlaan.CommanderMarkers.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.BitmapFonts;
@@ -95,15 +96,15 @@ namespace Manlaan.CommanderMarkers.Presets
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0188: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0189: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01af: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01da: Unknown result type (might be due to invalid IL or missing references)
-			if (!GameService.GameIntegration.get_Gw2Instance().get_IsInGame() || _mapData.Current == null || (GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat() && !Service.Settings.AutoMarker_Allow_Combat_Placement.get_Value()) || (Service.Settings.AutoMarker_OnlyWhenCommander.get_Value() && !GameService.Gw2Mumble.get_PlayerCharacter().get_IsCommander() && !Service.LtMode.get_Value()) || GameService.Gw2Mumble.get_UI().get_IsMapOpen())
+			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0172: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0173: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0198: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0199: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c4: Unknown result type (might be due to invalid IL or missing references)
+			if (!GameService.GameIntegration.get_Gw2Instance().get_IsInGame() || _mapData.Current == null || (GameService.Gw2Mumble.get_PlayerCharacter().get_IsInCombat() && !Service.Settings.AutoMarker_Allow_Combat_Placement.get_Value()) || (Service.Settings.AutoMarker_OnlyWhenCommander.get_Value() && !CommanderPermissionHelper.HasCommanderPermissions()) || GameService.Gw2Mumble.get_UI().get_IsMapOpen())
 			{
 				return;
 			}

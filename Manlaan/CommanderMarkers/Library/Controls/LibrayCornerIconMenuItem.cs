@@ -40,10 +40,7 @@ namespace Manlaan.CommanderMarkers.Library.Controls
 			List<ContextMenuStripItem> menuListItems = new List<ContextMenuStripItem>();
 			markersForMap.ForEach(delegate(MarkerSet marker)
 			{
-				if (marker.enabled)
-				{
-					menuListItems.Add((ContextMenuStripItem)(object)new MarkerPlaceMenuItem(marker));
-				}
+				menuListItems.Add((ContextMenuStripItem)(object)new MarkerPlaceMenuItem(marker));
 			});
 			if (menuListItems.Count <= 0)
 			{

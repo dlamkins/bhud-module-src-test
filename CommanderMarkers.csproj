@@ -12,17 +12,20 @@
   <PropertyGroup>
     <RootNamespace />
   </PropertyGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Remove="builtin_marker_set_ids.json" />
+    <EmbeddedResource Include="builtin_marker_set_ids.json" />
+  </ItemGroup>
   <ItemGroup>
     <Reference Include="Blish HUD" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="MonoGame.Framework" />
     <Reference Include="Gw2Sharp" />
-    <Reference Include="MonoGame.Extended" />
-    <Reference Include="System.Text.Json" />
+    <Reference Include="System.Core" />
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\working\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="System.Core" />
+    <Reference Include="MonoGame.Extended" />
+    <Reference Include="System.Text.Json" />
   </ItemGroup>
 </Project>
