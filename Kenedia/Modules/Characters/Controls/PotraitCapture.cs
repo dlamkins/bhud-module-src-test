@@ -8,8 +8,8 @@ using System.Text.RegularExpressions;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
-using Blish_HUD.GameIntegration.GfxSettings;
 using Blish_HUD.Input;
+using Gw2Sharp.Mumble.Models;
 using Kenedia.Modules.Characters.Res;
 using Kenedia.Modules.Characters.Services;
 using Kenedia.Modules.Core.Controls;
@@ -57,6 +57,8 @@ namespace Kenedia.Modules.Characters.Controls
 		public Action OnImageCaptured { get; set; }
 
 		public Func<string> AccountImagePath { get; set; }
+
+		public Func<string> AccountName { get; set; }
 
 		public PotraitCapture(ClientWindowService clientWindowService, SharedSettings sharedSettings, TextureManager tM)
 		{
@@ -299,40 +301,74 @@ namespace Kenedia.Modules.Characters.Controls
 
 		private void CapturePotraits()
 		{
-			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0121: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0123: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0159: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0180: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0140: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01dd: Unknown result type (might be due to invalid IL or missing references)
+			string accountName = AccountName?.Invoke();
+			if (accountName == null || string.IsNullOrEmpty(accountName))
+			{
+				ScreenNotification.ShowNotification("[Characters]: Unable to determine account name.");
+				return;
+			}
 			string path2 = AccountImagePath?.Invoke();
 			if (string.IsNullOrEmpty(path2))
 			{
+				return;
+			}
+			try
+			{
+				Directory.CreateDirectory(path2);
+			}
+			catch (Exception)
+			{
+				ScreenNotification.ShowNotification("[Characters]: Unable to access the portrait image folder.");
 				return;
 			}
 			Regex regex = new Regex("Image.*[0-9].png");
 			List<string> images = (from path in Directory.GetFiles(path2, "*.png", SearchOption.AllDirectories)
 				where regex.IsMatch(path)
 				select path).ToList();
-			User32Dll.RECT wndBounds = _clientWindowService.WindowBounds;
-			ScreenModeSetting? screenMode = GameService.GameIntegration.GfxSettings.ScreenMode;
-			Point p = (Point)(((screenMode.HasValue ? ((string)screenMode.GetValueOrDefault()) : null) == (string)ScreenModeSetting.Windowed) ? new Point(_sharedSettings.WindowOffset.Left, _sharedSettings.WindowOffset.Top) : Point.get_Zero());
-			double factor = GameService.Graphics.UIScaleMultiplier;
-			Size size = new Size(_characterPotraitSize, _characterPotraitSize);
-			foreach (FramedMaskedRegion characterPotraitFrame in _characterPotraitFrames)
+			IntPtr hWnd = GameService.GameIntegration.Gw2Instance.Gw2WindowHandle;
+			User32Dll.POINT pOINT = default(User32Dll.POINT);
+			pOINT.X = 0;
+			pOINT.Y = 0;
+			User32Dll.POINT clientOrigin = pOINT;
+			if (hWnd != IntPtr.Zero)
 			{
-				Rectangle bounds = characterPotraitFrame.MaskedRegion;
-				using Bitmap bitmap = new Bitmap((int)((double)bounds.Width * factor), (int)((double)bounds.Height * factor));
+				User32Dll.ClientToScreen(hWnd, ref clientOrigin);
+			}
+			else
+				_ = 0;
+			User32Dll.GetWindowRect(hWnd, out var _);
+			User32Dll.GetClientRect(hWnd, out var _);
+			User32Dll.GetDpiForWindow(hWnd);
+			double uiScale = GameService.Graphics.UIScaleMultiplier;
+			Rectangle bounds = default(Rectangle);
+			for (int i = 0; i < _characterPotraitFrames.Count; i++)
+			{
+				FramedMaskedRegion c = _characterPotraitFrames[i];
+				((Rectangle)(ref bounds))._002Ector(c.AbsoluteBounds.X + c.BorderWidth.Horizontal / 2, c.AbsoluteBounds.Y + c.BorderWidth.Vertical / 2, c.AbsoluteBounds.Width - c.BorderWidth.Horizontal, c.AbsoluteBounds.Height - c.BorderWidth.Vertical);
+				int x = bounds.X;
+				int y = bounds.Y;
+				int width = Math.Max(1, bounds.Width);
+				int height = Math.Max(1, bounds.Height);
+				int scaledX = (int)Math.Round((double)x * uiScale);
+				int scaledY = (int)Math.Round((double)y * uiScale);
+				int scaledWidth = Math.Max(1, (int)Math.Round((double)width * uiScale));
+				int scaledHeight = Math.Max(1, (int)Math.Round((double)height * uiScale));
+				int captureX = clientOrigin.X + scaledX;
+				int captureY = clientOrigin.Y + scaledY;
+				_ = _sharedSettings.WindowOffset.Left;
+				_ = _sharedSettings.WindowOffset.Top;
+				using Bitmap bitmap = new Bitmap(scaledWidth, scaledHeight);
 				using (Graphics g = System.Drawing.Graphics.FromImage(bitmap))
 				{
-					int x = (int)((double)bounds.X * factor);
-					int y = (int)((double)bounds.Y * factor);
-					g.CopyFromScreen(new Point(wndBounds.Left + p.X + x, wndBounds.Top + p.Y + y), Point.Empty, size);
+					g.CopyFromScreen(new Point(captureX, captureY), Point.Empty, new Size(scaledWidth, scaledHeight));
 				}
 				bitmap.Save(GetImagePath(images), ImageFormat.Png);
 			}
@@ -340,9 +376,9 @@ namespace Kenedia.Modules.Characters.Controls
 			ScreenNotification.ShowNotification(string.Format("[Characters]: " + strings.CapturedXPotraits, _characterPotraitFrames.Count));
 			string GetImagePath(List<string> imagePaths)
 			{
-				for (int i = 1; i < int.MaxValue; i++)
+				for (int j = 1; j < int.MaxValue; j++)
 				{
-					string imagePath = path2 + "Image " + $"{i:00}" + ".png";
+					string imagePath = path2 + "Image " + $"{j:00}" + ".png";
 					if (!imagePaths.Contains(imagePath))
 					{
 						imagePaths.Add(imagePath);
@@ -370,7 +406,36 @@ namespace Kenedia.Modules.Characters.Controls
 			{
 				characterPotraitFrame.Show();
 			}
+			_sizeBox.Value = (_characterPotraitSize = GetPortraitDefaultSize());
+			_gapBox.Value = (_gap = GetPortraitDefaultGap());
 			ForceOnScreen();
+		}
+
+		private double GetScaling()
+		{
+			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0026: Expected I4, but got Unknown
+			UiSize uISize = GameService.Gw2Mumble.UI.UISize;
+			return (int)uISize switch
+			{
+				0 => 0.81f, 
+				1 => 0.897f, 
+				2 => 1f, 
+				3 => 1.103f, 
+				_ => 1f, 
+			};
+		}
+
+		private int GetPortraitDefaultSize()
+		{
+			return (int)(132.0 * GetScaling());
+		}
+
+		private int GetPortraitDefaultGap()
+		{
+			return (int)(12.0 * GetScaling());
 		}
 
 		protected override void OnHidden(EventArgs e)

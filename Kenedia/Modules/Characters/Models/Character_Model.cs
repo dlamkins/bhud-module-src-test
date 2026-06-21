@@ -783,6 +783,48 @@ namespace Kenedia.Modules.Characters.Models
 			_index = index;
 		}
 
+		public bool MatchesIdentity(Character_Model character)
+		{
+			if (character != null && Name == character.Name)
+			{
+				return Created == character.Created;
+			}
+			return false;
+		}
+
+		public bool MatchesIdentity(Character character)
+		{
+			if (character != null && Name == character.get_Name())
+			{
+				return Created == character.get_Created();
+			}
+			return false;
+		}
+
+		public void ApplyStoredData(Character_Model storedCharacter)
+		{
+			if (storedCharacter != null)
+			{
+				_map = ((storedCharacter.Map != 0) ? storedCharacter.Map : _map);
+				_beta = storedCharacter.Beta;
+				_specialization = ((storedCharacter.Specialization != 0) ? storedCharacter.Specialization : _specialization);
+				_lastLogin = ((storedCharacter.LastLogin > _lastLogin) ? storedCharacter.LastLogin : _lastLogin);
+				_iconPath = storedCharacter.IconPath;
+				_show = storedCharacter.Show;
+				MarkedAsDeleted = storedCharacter.MarkedAsDeleted;
+				_position = storedCharacter.Position;
+				_index = storedCharacter.Index;
+				_showOnRadial = storedCharacter.ShowOnRadial;
+				_hadBirthday = storedCharacter.HadBirthday;
+				Tags.Clear();
+				Tags.AddTags(storedCharacter.Tags, fireEvent: false);
+				Tags.ForceCollectionChanged();
+				Crafting.Clear();
+				Crafting.AddRange(storedCharacter.Crafting);
+				OnUpdated(save: false);
+			}
+		}
+
 		private void OnUpdated(bool save = true)
 		{
 			this.Updated?.Invoke(this, EventArgs.Empty);

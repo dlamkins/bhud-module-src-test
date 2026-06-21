@@ -150,17 +150,18 @@ namespace Kenedia.Modules.Characters
 			if (!File.Exists(Paths.ModulePath + "\\gw2.traineddata") || Settings.Version.Value != module_version)
 			{
 				using Stream destination = File.Create(Paths.ModulePath + "\\gw2.traineddata");
-				Stream fileStream = ContentsManager.GetFileStream("data\\gw2.traineddata");
-				fileStream.Seek(0L, SeekOrigin.Begin);
-				fileStream.CopyTo(destination);
+				using Stream stream = ContentsManager.GetFileStream("data\\gw2.traineddata");
+				stream.Seek(0L, SeekOrigin.Begin);
+				stream.CopyTo(destination);
 			}
-			if (!File.Exists(Paths.ModulePath + "\\tesseract.dll") || Settings.Version.Value != module_version)
+			if (File.Exists(Paths.ModulePath + "\\tesseract.dll") && !(Settings.Version.Value != module_version))
 			{
-				using Stream target = File.Create(Paths.ModulePath + "\\tesseract.dll");
-				Stream fileStream2 = ContentsManager.GetFileStream("data\\tesseract.dll");
-				fileStream2.Seek(0L, SeekOrigin.Begin);
-				fileStream2.CopyTo(target);
+				return;
 			}
+			using Stream target = File.Create(Paths.ModulePath + "\\tesseract.dll");
+			using Stream source = ContentsManager.GetFileStream("data\\tesseract.dll");
+			source.Seek(0L, SeekOrigin.Begin);
+			source.CopyTo(target);
 		}
 
 		public async Task<string?> Read(bool show = false)

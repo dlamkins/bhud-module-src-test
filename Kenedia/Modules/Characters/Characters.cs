@@ -333,11 +333,11 @@ namespace Kenedia.Modules.Characters
 		protected override void LoadGUI()
 		{
 			//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0268: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0283: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0370: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_027a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0295: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0382: Unknown result type (might be due to invalid IL or missing references)
 			base.LoadGUI();
 			OCR.OcrView = new OCRView(base.Settings, OCR)
 			{
@@ -356,7 +356,8 @@ namespace Kenedia.Modules.Characters
 				Parent = GameService.Graphics.SpriteScreen,
 				Visible = false,
 				ZIndex = 1073741822,
-				AccountImagePath = () => AccountImagesPath
+				AccountImagePath = () => AccountImagesPath,
+				AccountName = () => base.Paths.AccountName
 			};
 			RunIndicator = new RunIndicator(CharacterSorting, CharacterSwapping, base.Settings.ShowStatusWindow, TextureManager, base.Settings.ShowChoyaSpinner);
 			AsyncTexture2D settingsBg = AsyncTexture2D.FromAssetId(155997);
@@ -564,6 +565,23 @@ namespace Kenedia.Modules.Characters
 			}
 		}
 
+		private Character_Model FindCharacterModel(Character_Model character)
+		{
+			Character_Model character2 = character;
+			return CharacterModels.FirstOrDefault((Character_Model e) => e.MatchesIdentity(character2)) ?? CharacterModels.FirstOrDefault((Character_Model e) => e.Name == character2?.Name);
+		}
+
+		private Character_Model FindCharacterModel(Character character)
+		{
+			Character character2 = character;
+			return CharacterModels.FirstOrDefault((Character_Model e) => e.MatchesIdentity(character2)) ?? CharacterModels.FirstOrDefault(delegate(Character_Model e)
+			{
+				string name = e.Name;
+				Character obj = character2;
+				return name == ((obj != null) ? obj.get_Name() : null);
+			});
+		}
+
 		private void CreateCornerIcons()
 		{
 			//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
@@ -696,18 +714,18 @@ namespace Kenedia.Modules.Characters
 			bool updateMarkedCharacters = false;
 			for (int i = CharacterModels.Count - 1; i >= 0; i--)
 			{
-				Character_Model c3 = CharacterModels[i];
-				if (c3 != null && !freshList.Contains(new { c3.Name, c3.Created }))
+				Character_Model c2 = CharacterModels[i];
+				if (c2 != null && !freshList.Contains(new { c2.Name, c2.Created }))
 				{
 					if (base.Settings.AutomaticCharacterDelete.Value)
 					{
-						BaseModule<Characters, MainWindow, Settings, PathCollection, StaticHosting>.Logger?.Info($"{c3?.Name} created on {c3?.Created} no longer exists. Delete them!");
-						c3?.Delete();
+						BaseModule<Characters, MainWindow, Settings, PathCollection, StaticHosting>.Logger?.Info($"{c2?.Name} created on {c2?.Created} no longer exists. Delete them!");
+						c2?.Delete();
 					}
-					else if (!c3.MarkedAsDeleted)
+					else if (!c2.MarkedAsDeleted)
 					{
-						BaseModule<Characters, MainWindow, Settings, PathCollection, StaticHosting>.Logger?.Info($"{c3.Name} created on {c3.Created} does not exist in the api data. Mark them as potentially deleted!");
-						c3.MarkedAsDeleted = true;
+						BaseModule<Characters, MainWindow, Settings, PathCollection, StaticHosting>.Logger?.Info($"{c2.Name} created on {c2.Created} does not exist in the api data. Mark them as potentially deleted!");
+						c2.MarkedAsDeleted = true;
 						updateMarkedCharacters = true;
 					}
 				}
@@ -717,24 +735,24 @@ namespace Kenedia.Modules.Characters
 				base.MainWindow.UpdateMissingNotification();
 			}
 			int pos = 0;
-			foreach (Character c2 in (IEnumerable<Character>)characters)
+			foreach (Character c3 in (IEnumerable<Character>)characters)
 			{
+				Character_Model character = FindCharacterModel(c3);
 				if (!oldList.Contains(new
 				{
-					Name = c2.get_Name(),
-					Created = c2.get_Created()
-				}))
+					Name = c3.get_Name(),
+					Created = c3.get_Created()
+				}) || character == null)
 				{
-					BaseModule<Characters, MainWindow, Settings, PathCollection, StaticHosting>.Logger.Info($"{c2.get_Name()} created on {c2.get_Created()} does not exist yet. Create them!");
-					CharacterModels.Add(new Character_Model(c2, CharacterSwapping, base.Paths.ModulePath, new Action(RequestCharacterSave), CharacterModels, Data)
+					BaseModule<Characters, MainWindow, Settings, PathCollection, StaticHosting>.Logger.Info($"{c3.get_Name()} created on {c3.get_Created()} does not exist yet. Create them!");
+					CharacterModels.Add(new Character_Model(c3, CharacterSwapping, base.Paths.ModulePath, new Action(RequestCharacterSave), CharacterModels, Data)
 					{
 						Position = pos
 					});
 				}
 				else
 				{
-					Character_Model character = CharacterModels.FirstOrDefault((Character_Model e) => e.Name == c2.get_Name());
-					character?.UpdateCharacter(c2);
+					character?.UpdateCharacter(c3);
 					if (character != null)
 					{
 						character.Position = pos;
@@ -807,23 +825,27 @@ namespace Kenedia.Modules.Characters
 					string text = File.ReadAllText(CharactersPath);
 					_ = GameService.Gw2Mumble.PlayerCharacter;
 					List<Character_Model> characters = JsonConvert.DeserializeObject<List<Character_Model>>(text, SerializerSettings.Default);
-					List<string> names = CharacterModels.Select((Character_Model c) => c.Name).ToList();
 					if (characters != null)
 					{
 						characters.ForEach(delegate(Character_Model c)
 						{
-							//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-							//IL_009c: Expected O, but got Unknown
-							if (!names.Contains(c.Name))
+							//IL_005f: Unknown result type (might be due to invalid IL or missing references)
+							//IL_0069: Expected O, but got Unknown
+							Tags.AddTags(c.Tags, fireEvent: false);
+							Character_Model character_Model = FindCharacterModel(c);
+							if (character_Model == null)
 							{
-								Tags.AddTags(c.Tags);
 								CharacterModels.Add(new Character_Model(c, CharacterSwapping, base.Paths.ModulePath, new Action(RequestCharacterSave), CharacterModels, Data)
 								{
 									Beta = (_version >= new Version(1, 0, 20, (string)null, (string)null) && c.Beta)
 								});
-								names.Add(c.Name);
+							}
+							else
+							{
+								character_Model.ApplyStoredData(c);
 							}
 						});
+						Tags.ForceCollectionChanged();
 						BaseModule<Characters, MainWindow, Settings, PathCollection, StaticHosting>.Logger.Info("Loaded local characters from file '" + CharactersPath + "'.");
 						return true;
 					}
@@ -846,8 +868,17 @@ namespace Kenedia.Modules.Characters
 				_characterFileTokenSource = new CancellationTokenSource();
 				if (await FileExtension.WaitForFileUnlock(CharactersPath, 2500, _characterFileTokenSource.Token))
 				{
-					string json = JsonConvert.SerializeObject((object)CharacterModels, SerializerSettings.Default);
-					File.WriteAllText(CharactersPath, json);
+					string json = JsonConvert.SerializeObject((object)CharacterModels.ToList(), SerializerSettings.Default);
+					string tempPath = CharactersPath + ".tmp";
+					File.WriteAllText(tempPath, json);
+					if (File.Exists(CharactersPath))
+					{
+						File.Replace(tempPath, CharactersPath, null);
+					}
+					else
+					{
+						File.Move(tempPath, CharactersPath);
+					}
 				}
 				else if (!_characterFileTokenSource.IsCancellationRequested)
 				{

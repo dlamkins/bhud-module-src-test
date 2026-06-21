@@ -27,9 +27,10 @@ namespace Kenedia.Modules.Core.Utility
 
 		public static void ScrollToChild(this Container panel, Control child)
 		{
-			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0153: Unknown result type (might be due to invalid IL or missing references)
 			Container panel2 = panel;
 			if (!panel2.Children.Contains(child))
 			{
@@ -40,12 +41,34 @@ namespace Kenedia.Modules.Core.Utility
 			{
 				return;
 			}
-			if (child.Location.Y == 0)
+			Control[] visibleChildren = panel2.Children.Where((Control c) => c.Visible).ToArray();
+			if (visibleChildren.Length == 0)
 			{
 				scrollbar.ScrollDistance = 0f;
 				return;
 			}
-			scrollbar.ScrollDistance = (float)child.Location.Y / (float)(panel2.Children.Max((Control c) => c.Bottom) - scrollbar.Size.Y);
+			int maxOffset = Math.Max(Math.Max(visibleChildren.Max((Control c) => c.Bottom), panel2.ContentRegion.Height) - panel2.ContentRegion.Height, 0);
+			if (maxOffset == 0)
+			{
+				scrollbar.ScrollDistance = 0f;
+				return;
+			}
+			int margin = 10;
+			int viewportTop;
+			int num = (viewportTop = panel2.VerticalScrollOffset);
+			int viewportBottom = num + panel2.ContentRegion.Height;
+			int childTop = child.Top;
+			int childBottom = child.Bottom;
+			int targetOffset = num;
+			if (childTop < viewportTop + margin)
+			{
+				targetOffset = Math.Max(childTop - margin, 0);
+			}
+			else if (childBottom > viewportBottom - margin)
+			{
+				targetOffset = Math.Max(childBottom - panel2.ContentRegion.Height + margin, 0);
+			}
+			scrollbar.ScrollDistance = Math.Max(0f, Math.Min((float)targetOffset / (float)maxOffset, 1f));
 		}
 
 		public static int GetTextHeight(BitmapFont font, string text, int maxWidth)

@@ -37,6 +37,8 @@ namespace Kenedia.Modules.Core.Controls
 
 		private Point _delta;
 
+		private bool _hasCollapseAnchor;
+
 		private Rectangle _expanderBackgroundBounds;
 
 		protected readonly FlowPanel ItemsPanel;
@@ -145,31 +147,32 @@ namespace Kenedia.Modules.Core.Controls
 
 		private void OnExpandTypeChanged(object sender, Kenedia.Modules.Core.Models.ValueChangedEventArgs<ExpandType> e)
 		{
-			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0145: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ac: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0202: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0207: Unknown result type (might be due to invalid IL or missing references)
-			//IL_021b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0268: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02d8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0325: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0143: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0151: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0165: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0200: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0209: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0222: Unknown result type (might be due to invalid IL or missing references)
+			//IL_026f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02df: Unknown result type (might be due to invalid IL or missing references)
+			//IL_032c: Unknown result type (might be due to invalid IL or missing references)
 			if (ItemsPanel != null)
 			{
 				_resizeBarPending = true;
+				_hasCollapseAnchor = false;
 				ItemsPanel.Size = Point.get_Zero();
 				base.Size = Point.get_Zero();
 				switch (e.NewValue)
@@ -431,18 +434,18 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0179: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0188: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b4: Unknown result type (might be due to invalid IL or missing references)
 			bool isAnyVisible = ItemsPanel.Children.Any((Control e) => e.Visible);
 			int expandedItemsWidth = GetItemPanelSize(any: true);
 			int checkedItemsWidth = GetItemPanelSize(any: false, isChecked: true);
@@ -453,13 +456,17 @@ namespace Kenedia.Modules.Core.Controls
 				{
 					_start = base.Location;
 					_start_ItemWidth = new Point(checkedItemsWidth, 0);
+					_hasCollapseAnchor = true;
 					base.Location = _start.Add(new Point(-(expandedItemsWidth - checkedItemsWidth), 0));
 					ItemsPanel.Width = expandedItemsWidth + padding;
 				}
 				else
 				{
-					_delta = new Point(_start_ItemWidth.X - checkedItemsWidth, 0);
-					base.Location = _start.Add(_delta);
+					if (_hasCollapseAnchor)
+					{
+						_delta = new Point(_start_ItemWidth.X - checkedItemsWidth, 0);
+						base.Location = _start.Add(_delta);
+					}
 					ItemsPanel.Width = (isAnyVisible ? (checkedItemsWidth + padding) : 0);
 				}
 				_resizeBarPending = false;
@@ -512,19 +519,19 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0128: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0172: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0177: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0137: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0181: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0186: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019d: Unknown result type (might be due to invalid IL or missing references)
 			bool isAnyVisible = ItemsPanel.Children.Any((Control e) => e.Visible);
 			int expandedItemsWidth = GetItemPanelSize(any: true, isChecked: false, vertical: true);
 			int checkedItemsWidth = GetItemPanelSize(any: false, isChecked: true, vertical: true);
@@ -535,13 +542,17 @@ namespace Kenedia.Modules.Core.Controls
 				{
 					_start = base.Location;
 					_start_ItemWidth = new Point(checkedItemsWidth, 0);
+					_hasCollapseAnchor = true;
 					base.Location = _start.Add(new Point(0, -(expandedItemsWidth - checkedItemsWidth)));
 					ItemsPanel.Height = expandedItemsWidth + padding;
 				}
 				else
 				{
-					_delta = new Point(0, _start_ItemWidth.X - checkedItemsWidth);
-					base.Location = _start.Add(_delta);
+					if (_hasCollapseAnchor)
+					{
+						_delta = new Point(0, _start_ItemWidth.X - checkedItemsWidth);
+						base.Location = _start.Add(_delta);
+					}
 					ItemsPanel.Height = (isAnyVisible ? (checkedItemsWidth + padding) : 0);
 				}
 				_resizeBarPending = false;
@@ -603,17 +614,17 @@ namespace Kenedia.Modules.Core.Controls
 			//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0128: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0145: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0156: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0164: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0169: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0180: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0104: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0151: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0166: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0170: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018e: Unknown result type (might be due to invalid IL or missing references)
 			RecalculateLayout();
 			switch (ExpandType)
 			{
@@ -626,6 +637,7 @@ namespace Kenedia.Modules.Core.Controls
 				int checkedItemsWidth = GetItemPanelSize(any: false, isChecked: true);
 				base.Location = Control.Input.Mouse.Position.Add(new Point(-_dragStart.X, -_dragStart.Y));
 				_start = base.Location.Add(new Point(expandedItemsWidth - checkedItemsWidth, 0));
+				_hasCollapseAnchor = true;
 				break;
 			}
 			case ExpandType.TopToBottom:
@@ -637,11 +649,27 @@ namespace Kenedia.Modules.Core.Controls
 				int checkedItemsWidth2 = GetItemPanelSize(any: false, isChecked: true, vertical: true);
 				base.Location = Control.Input.Mouse.Position.Add(new Point(-_dragStart.X, -_dragStart.Y));
 				_start = base.Location.Add(new Point(0, expandedItemsWidth2 - checkedItemsWidth2));
+				_hasCollapseAnchor = true;
 				break;
 			}
 			}
 			ForceOnScreen();
-			OnMoveAction?.Invoke(base.Location);
+			OnMoveAction?.Invoke(GetPersistedLocation());
+		}
+
+		private Point GetPersistedLocation()
+		{
+			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+			ExpandType expandType = ExpandType;
+			if ((expandType == ExpandType.RightToLeft || expandType == ExpandType.BottomToTop) && _hasCollapseAnchor)
+			{
+				return _start;
+			}
+			return base.Location;
 		}
 
 		private void ForceOnScreen()
