@@ -6,10 +6,13 @@ namespace DavidRice.BlishHud.MidiControl.Core
 
 		public int DelayAfterMs { get; }
 
-		public SendAction(uint scanCode, int delayAfterMs = 0)
+		public KeyEventType EventType { get; }
+
+		public SendAction(uint scanCode, int delayAfterMs = 0, KeyEventType eventType = KeyEventType.KeyTap)
 		{
 			ScanCode = scanCode;
 			DelayAfterMs = delayAfterMs;
+			EventType = eventType;
 		}
 	}
 }

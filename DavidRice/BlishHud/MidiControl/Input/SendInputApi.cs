@@ -27,6 +27,13 @@ namespace DavidRice.BlishHud.MidiControl.Input
 			SendInput((uint)inputs.Length, inputs, InputSize);
 		}
 
+		public static void SendKeyDown(uint scanCode)
+		{
+			ValidateScanCode(scanCode);
+			INPUT input = CreateKeyboardInput(scanCode, keyUp: false);
+			SendInput(1u, new INPUT[1] { input }, InputSize);
+		}
+
 		public static void SendKeyUp(uint scanCode)
 		{
 			ValidateScanCode(scanCode);

@@ -10,15 +10,15 @@ namespace DavidRice.BlishHud.MidiControl.Core
 
 		private readonly Thread _thread;
 
-		private readonly Action<uint> _sendTap;
+		private readonly Action<SendAction> _sendAction;
 
 		private bool _disposed;
 
 		public bool IsAlive => _thread.IsAlive;
 
-		public KeySendThread(Action<uint> sendTap)
+		public KeySendThread(Action<SendAction> sendAction)
 		{
-			_sendTap = sendTap;
+			_sendAction = sendAction;
 			_queue = new BlockingCollection<SendAction>();
 			_thread = new Thread(Run)
 			{
@@ -66,7 +66,7 @@ namespace DavidRice.BlishHud.MidiControl.Core
 		{
 			foreach (SendAction action in _queue.GetConsumingEnumerable())
 			{
-				_sendTap(action.ScanCode);
+				_sendAction(action);
 				if (action.DelayAfterMs > 0)
 				{
 					Thread.Sleep(action.DelayAfterMs);

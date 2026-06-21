@@ -162,17 +162,10 @@ namespace DavidRice.BlishHud.MidiControl.Core
 
 		private void OnMessageReceived(object? sender, MidiInMessageEventArgs e)
 		{
-			NoteOnEvent noteOn = e.MidiEvent as NoteOnEvent;
-			if (noteOn != null)
+			MidiNoteEvent? noteEvent = MidiEventConverter.TryConvertToMidiNoteEvent(e.MidiEvent);
+			if (noteEvent.HasValue)
 			{
-				if (noteOn.Velocity > 0)
-				{
-					_noteQueue.Enqueue(new MidiNoteEvent(noteOn.NoteNumber, isNoteOn: true));
-				}
-				else
-				{
-					_noteQueue.Enqueue(new MidiNoteEvent(noteOn.NoteNumber, isNoteOn: false));
-				}
+				_noteQueue.Enqueue(noteEvent.Value);
 			}
 		}
 

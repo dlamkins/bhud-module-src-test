@@ -89,6 +89,8 @@ namespace DavidRice.BlishHud.MidiControl
 
 		private SettingEntry<bool> _sendNotes;
 
+		private SettingEntry<bool> _enableKeyHold;
+
 		private SettingEntry<bool> _autoSwapOctave;
 
 		private SettingEntry<int> _multipleOctaveShiftDelay;
@@ -120,6 +122,8 @@ namespace DavidRice.BlishHud.MidiControl
 		private TabbedWindow2? _settingsWindow;
 
 		private AsyncTexture2D? _settingsTabIcon;
+
+		private AsyncTexture2D? _layoutTabIcon;
 
 		private bool _wasRetrying;
 
@@ -154,6 +158,18 @@ namespace DavidRice.BlishHud.MidiControl
 			set
 			{
 				_sendNotes.set_Value(value);
+			}
+		}
+
+		public bool EnableKeyHoldEnabled
+		{
+			get
+			{
+				return _enableKeyHold.get_Value();
+			}
+			set
+			{
+				_enableKeyHold.set_Value(value);
 			}
 		}
 
@@ -227,6 +243,10 @@ namespace DavidRice.BlishHud.MidiControl
 
 		public event Action? RecentSendLogUpdated;
 
+		public event Action<bool>? SendNotesEnabledChanged;
+
+		public event Action<string>? SelectedKeymapChanged;
+
 		[ImportingConstructor]
 		public MidiModule([Import("ModuleParameters")] ModuleParameters moduleParameters)
 			: this(moduleParameters)
@@ -235,14 +255,16 @@ namespace DavidRice.BlishHud.MidiControl
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
-			//IL_0225: Unknown result type (might be due to invalid IL or missing references)
-			//IL_026d: Expected O, but got Unknown
+			//IL_028c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d4: Expected O, but got Unknown
 			_settingsCollection = settings;
 			_selectedMidiDeviceName = settings.DefineSetting<string>("SelectedMidiDeviceName", string.Empty, (Func<string>)(() => "Selected MIDI Device"), (Func<string>)(() => "Name of the MIDI input device used for playing."));
 			_selectedKeymapId = settings.DefineSetting<string>("SelectedKeymapId", "minstrel-auto", (Func<string>)(() => "Selected Keymap"), (Func<string>)(() => "The active keymap that maps MIDI notes to in-game keys."));
 			_sendNotes = settings.DefineSetting<bool>("SendNotes", true, (Func<string>)(() => "Send Notes"), (Func<string>)(() => "If enabled, MIDI notes are sent as GW2 keyboard keypresses."));
 			_sendNotes.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnSendNotesChanged);
 			_selectedKeymapId.add_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)OnKeymapChanged);
+			_enableKeyHold = settings.DefineSetting<bool>("EnableKeyHold", false, (Func<string>)(() => "Enable Key Hold"), (Func<string>)(() => "When enabled, MIDI note-on sends a key-down and note-off sends a key-up. Otherwise notes are tapped."));
+			_enableKeyHold.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnEnableKeyHoldChanged);
 			_autoSwapOctave = settings.DefineSetting<bool>("AutoSwapOctave", true, (Func<string>)(() => "Auto Swap Octave"), (Func<string>)(() => "Automatically shift octaves when playing notes outside the current range."));
 			_multipleOctaveShiftDelay = settings.DefineSetting<int>("MultipleOctaveShiftDelay", 75, (Func<string>)(() => "Multi-Octave Shift Delay (ms)"), (Func<string>)(() => "Delay between octave shift keypresses when shifting multiple octaves."));
 			_focusGuard = settings.DefineSetting<bool>("FocusGuard", true, (Func<string>)(() => "Focus Guard"), (Func<string>)(() => "Block key sending when Guild Wars 2 is not in focus."));
@@ -260,7 +282,7 @@ namespace DavidRice.BlishHud.MidiControl
 
 		protected override async Task LoadAsync()
 		{
-			_keySendThread = new KeySendThread(new Action<uint>(SendInputApi.SendKeyTap));
+			_keySendThread = new KeySendThread(new Action<SendAction>(HandleSendAction));
 			_keySendThread.Start();
 			_keySender = new KeySender(_keySendThread);
 			_keySender.NoteProcessed += new Action<MidiNoteEvent, KeySendResult>(OnNoteProcessed);
@@ -280,7 +302,12 @@ namespace DavidRice.BlishHud.MidiControl
 		protected override void Update(GameTime gameTime)
 		{
 			bool isRetrying = _midiInputManager.IsRetryingConnection;
+			bool isDeviceOpen = _midiInputManager.IsDeviceOpen;
 			_midiInputManager.CheckConnection(_selectedMidiDeviceName.get_Value());
+			if (isDeviceOpen && !_midiInputManager.IsDeviceOpen)
+			{
+				ReleaseAllKeys();
+			}
 			if (isRetrying != _wasRetrying)
 			{
 				_wasRetrying = isRetrying;
@@ -298,7 +325,7 @@ namespace DavidRice.BlishHud.MidiControl
 					Keymap keymap = GetActiveKeymap();
 					if (keymap != null)
 					{
-						_keySender.Send(noteEvent, keymap, _autoSwapOctave.get_Value(), _multipleOctaveShiftDelay.get_Value());
+						_keySender.Send(noteEvent, keymap, _autoSwapOctave.get_Value(), _multipleOctaveShiftDelay.get_Value(), _enableKeyHold.get_Value());
 					}
 				}
 			}
@@ -308,6 +335,7 @@ namespace DavidRice.BlishHud.MidiControl
 		{
 			_sendNotes.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnSendNotesChanged);
 			_selectedKeymapId.remove_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)OnKeymapChanged);
+			_enableKeyHold.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnEnableKeyHoldChanged);
 			_keySender.NoteProcessed -= new Action<MidiNoteEvent, KeySendResult>(OnNoteProcessed);
 			_toggleSendNotesKeybind.get_Value().set_Enabled(false);
 			_toggleSendNotesKeybind.get_Value().remove_Activated((EventHandler<EventArgs>)OnToggleSendNotesKeybind);
@@ -353,18 +381,21 @@ namespace DavidRice.BlishHud.MidiControl
 		{
 			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005d: Expected O, but got Unknown
-			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00aa: Expected O, but got Unknown
+			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0078: Expected O, but got Unknown
+			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c5: Expected O, but got Unknown
 			try
 			{
 				_activeIconTexture = ContentsManager.GetTexture("icon.png");
 				_mutedIconTexture = ContentsManager.GetTexture("icon_off.png");
 				_disconnectedIconTexture = ContentsManager.GetTexture("icon_disconnected.png");
 				_settingsTabIcon = new AsyncTexture2D(ContentsManager.GetTexture("icon.png"));
+				_layoutTabIcon = new AsyncTexture2D(ContentsManager.GetTexture("layout.png"));
 				CornerIcon val = new CornerIcon();
 				val.set_Icon(AsyncTexture2D.op_Implicit(_activeIconTexture));
 				((Control)val).set_BasicTooltipText(((Module)this).get_Name() + " — Active");
@@ -383,6 +414,8 @@ namespace DavidRice.BlishHud.MidiControl
 					//IL_0075: Expected O, but got Unknown
 					//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
 					//IL_00aa: Expected O, but got Unknown
+					//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
+					//IL_00df: Expected O, but got Unknown
 					try
 					{
 						if (_settingsWindow == null)
@@ -395,6 +428,7 @@ namespace DavidRice.BlishHud.MidiControl
 							((WindowBase2)val3).set_Id("MidiModule_Settings_6a2b3c4d");
 							_settingsWindow = val3;
 							_settingsWindow!.get_Tabs().Add(new Tab(_settingsTabIcon, (Func<IView>)(() => (IView)(object)new MidiSettingsTabView(this)), "Settings", (int?)null));
+							_settingsWindow!.get_Tabs().Add(new Tab(_layoutTabIcon, (Func<IView>)(() => (IView)(object)new KeymapLayoutTabView(this)), "Keymap Layout", (int?)null));
 						}
 						((WindowBase2)_settingsWindow).ToggleWindow();
 					}
@@ -434,6 +468,16 @@ namespace DavidRice.BlishHud.MidiControl
 		private void OnSendNotesChanged(object sender, ValueChangedEventArgs<bool> e)
 		{
 			UpdateCornerIconState();
+			this.SendNotesEnabledChanged?.Invoke(e.get_NewValue());
+			if (!e.get_NewValue())
+			{
+				ReleaseAllKeys();
+			}
+		}
+
+		private void OnEnableKeyHoldChanged(object sender, ValueChangedEventArgs<bool> e)
+		{
+			ReleaseAllKeys();
 		}
 
 		private void OnToggleSendNotesKeybind(object sender, EventArgs e)
@@ -443,6 +487,7 @@ namespace DavidRice.BlishHud.MidiControl
 
 		private void OnKeymapChanged(object sender, ValueChangedEventArgs<string> e)
 		{
+			ReleaseAllKeys();
 			if (_keySendThread != null)
 			{
 				_keySender.NoteProcessed -= new Action<MidiNoteEvent, KeySendResult>(OnNoteProcessed);
@@ -453,23 +498,39 @@ namespace DavidRice.BlishHud.MidiControl
 
 		private void OnNoteProcessed(MidiNoteEvent noteEvent, KeySendResult result)
 		{
-			if (result.SentKeyNames.Length != 0)
+			if (result.SentKeyNames.Length == 0 && !result.WasSuppressed)
 			{
-				string noteName = MidiNote.GetNoteName(noteEvent.NoteNumber);
-				string keys = string.Join(" + ", result.SentKeyNames);
-				string octavePrefix = ((result.PreviousOctave == result.NewOctave) ? $"oct {result.NewOctave}" : $"oct {result.PreviousOctave}→{result.NewOctave}");
-				string desc = octavePrefix + ": " + noteName + " → " + keys;
-				if (_recentSendLog.Count > 0 && _recentSendLog.Peek() == "No sends yet.")
-				{
-					_recentSendLog.Dequeue();
-				}
-				_recentSendLog.Enqueue(desc);
-				while (_recentSendLog.Count > 10)
-				{
-					_recentSendLog.Dequeue();
-				}
-				this.RecentSendLogUpdated?.Invoke();
+				return;
 			}
+			string noteName = MidiNote.GetNoteName(noteEvent.NoteNumber);
+			string keys = string.Join(" + ", result.SentKeyNames);
+			if (result.WasSuppressed)
+			{
+				Keymap keymap = GetActiveKeymap();
+				string mappedNoteName = MidiNote.GetNoteName(noteEvent.NoteNumber);
+				if (keymap != null && keymap.Notes.TryGetValue(mappedNoteName, out var definition) && definition.Key != null)
+				{
+					string skippedKey = definition.Key + " (skipped)";
+					keys = (string.IsNullOrEmpty(keys) ? skippedKey : (keys + " + " + skippedKey));
+				}
+			}
+			string octavePrefix = ((result.PreviousOctave == result.NewOctave) ? $"oct {result.NewOctave}" : $"oct {result.PreviousOctave}→{result.NewOctave}");
+			string suffix = string.Empty;
+			if (_enableKeyHold.get_Value())
+			{
+				suffix = ((!result.WasSuppressed) ? (noteEvent.IsNoteOn ? " (down)" : " (up)") : (noteEvent.IsNoteOn ? " (down - skipped)" : " (up - skipped)"));
+			}
+			string desc = octavePrefix + ": " + noteName + " → " + keys + suffix;
+			if (_recentSendLog.Count > 0 && _recentSendLog.Peek() == "No sends yet.")
+			{
+				_recentSendLog.Dequeue();
+			}
+			_recentSendLog.Enqueue(desc);
+			while (_recentSendLog.Count > 10)
+			{
+				_recentSendLog.Dequeue();
+			}
+			this.RecentSendLogUpdated?.Invoke();
 		}
 
 		private Keymap? GetActiveKeymap()
@@ -506,6 +567,7 @@ namespace DavidRice.BlishHud.MidiControl
 		public void SelectKeymap(string id)
 		{
 			_selectedKeymapId.set_Value(id);
+			this.SelectedKeymapChanged?.Invoke(id);
 		}
 
 		public void ReloadKeymaps()
@@ -517,6 +579,8 @@ namespace DavidRice.BlishHud.MidiControl
 			{
 				Logger.Warn("Selected keymap '" + currentId + "' no longer exists. Falling back to 'minstrel-auto'.");
 				_selectedKeymapId.set_Value("minstrel-auto");
+				this.SelectedKeymapChanged?.Invoke("minstrel-auto");
+				ReleaseAllKeys();
 				if (_keySendThread != null)
 				{
 					_keySender.NoteProcessed -= new Action<MidiNoteEvent, KeySendResult>(OnNoteProcessed);
@@ -524,6 +588,28 @@ namespace DavidRice.BlishHud.MidiControl
 					_keySender.NoteProcessed += new Action<MidiNoteEvent, KeySendResult>(OnNoteProcessed);
 				}
 			}
+		}
+
+		private void HandleSendAction(SendAction action)
+		{
+			switch (action.EventType)
+			{
+			case KeyEventType.KeyDown:
+				SendInputApi.SendKeyDown(action.ScanCode);
+				break;
+			case KeyEventType.KeyUp:
+				SendInputApi.SendKeyUp(action.ScanCode);
+				break;
+			default:
+				SendInputApi.SendKeyTap(action.ScanCode);
+				break;
+			}
+		}
+
+		public void ReleaseAllKeys()
+		{
+			_keySender?.ReleaseAllHeldKeys();
+			SafetyReleaseAllKeys();
 		}
 
 		private static void SafetyReleaseAllKeys()

@@ -39,6 +39,8 @@ namespace DavidRice.BlishHud.MidiControl.Keymaps
 			RegisterBuiltIn(MinstrelKeymap.Instance);
 			RegisterBuiltIn(MinstrelAutoKeymap.Instance);
 			RegisterBuiltIn(VerdarachAutoKeymap.Instance);
+			RegisterBuiltIn(FrameDrumAutoKeymap.Instance);
+			RegisterBuiltIn(BlackLionDrumKeymap.Instance);
 		}
 
 		public void Register(Keymap keymap)
