@@ -47,6 +47,8 @@ namespace Soeed.GuildGeoGuesser.Settings.Services
 
 		public SettingEntry<PuzzleSortEnum> PuzzleSort { get; private set; }
 
+		public SettingEntry<bool> ProtectedGuessButton { get; private set; }
+
 		public SettingService(SettingCollection settings)
 		{
 			//IL_01b6: Unknown result type (might be due to invalid IL or missing references)
@@ -79,6 +81,7 @@ namespace Soeed.GuildGeoGuesser.Settings.Services
 			CameraModeFilter = settings.DefineSetting<CameraModeFilterEnum>("GGGCameraModeFilter", CameraModeFilterEnum.ALL, (Func<string>)(() => "Camera"), (Func<string>)(() => "Filter puzzles based on their camera mode, first person or third person"));
 			ShowCameraModeFilter = settings.DefineSetting<bool>("GGGShowCameraModeFilter", false, (Func<string>)(() => "Show Camera Mode Filter"), (Func<string>)(() => "Show the camera mode filter in the puzzle list"));
 			PuzzleSort = settings.DefineSetting<PuzzleSortEnum>("GGGPuzzleSort", PuzzleSortEnum.NEWEST_FIRST, (Func<string>)(() => "Sort"), (Func<string>)(() => "How puzzles are sorted in the guild list"));
+			ProtectedGuessButton = settings.DefineSetting<bool>("GGGProtectedGuessButton", true, (Func<string>)(() => "Prevent accidental guesses"), (Func<string>)(() => "When enabled, hold Ctrl+Shift to activate the guess button and help prevent accidental guesses"));
 		}
 
 		public void Dispose()

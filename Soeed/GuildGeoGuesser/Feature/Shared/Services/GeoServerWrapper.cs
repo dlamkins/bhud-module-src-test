@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -22,8 +23,6 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Services
 	{
 		private static readonly Logger Logger = Logger.GetLogger<GeoServerWrapper>();
 
-		private static readonly HttpClient HttpClient = new HttpClient();
-
 		private readonly string _baseUrl;
 
 		private HelpScreen? HelpScreenData;
@@ -33,6 +32,10 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Services
 		private readonly GeoGuessWindow _geoGuessWindow;
 
 		private readonly SettingsWindow _settingsWindow;
+
+		private Task<List<Guild>>? _guildListRequest;
+
+		private static HttpClient HttpClient => ModuleHttpClient.Instance;
 
 		public GeoServerWrapper(string baseUrl, Module module, ConfigModel config, GeoGuessWindow geoGuessWindow, SettingsWindow settingsWindow)
 		{
@@ -79,7 +82,7 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Services
 							Dictionary<string, object> errorResponse = JsonConvert.DeserializeObject<Dictionary<string, object>>(content);
 							if (errorResponse != null && errorResponse.ContainsKey("error") && errorResponse["error"]?.ToString() == "Account banned")
 							{
-								banResponse.Ban.Reason = ((!errorResponse.ContainsKey("message")) ? "Account banned by server" : (errorResponse["message"]?.ToString() ?? "Account banned by server"));
+								banResponse.Ban!.Reason = ((!errorResponse.ContainsKey("message")) ? "Account banned by server" : (errorResponse["message"]?.ToString() ?? "Account banned by server"));
 							}
 						}
 						catch
@@ -212,10 +215,10 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Services
 			return (_baseUrl.EndsWith("/module/v3") ? _baseUrl : (_baseUrl + "/module/v3")) + "/p/" + puzzleId + "/map";
 		}
 
-		public string GetPuzzleMapWithGuessUrl(string puzzleId, int guessMapId, float[] guessCoords)
+		public string GetPuzzleMapWithGuessUrl(string puzzleId, int guessMapId, float[] guessCoords, double distance)
 		{
 			string basePath = (_baseUrl.EndsWith("/module/v3") ? _baseUrl : (_baseUrl + "/module/v3"));
-			return $"{basePath}/p/{puzzleId}/map?guess_map={guessMapId}&continent_x={guessCoords[0]}&continent_y={guessCoords[1]}";
+			return $"{basePath}/p/{puzzleId}/map?guess_map={guessMapId}&continent_x={guessCoords[0]}&continent_y={guessCoords[1]}&distance={distance.ToString(CultureInfo.InvariantCulture)}";
 		}
 
 		public string GetGuildEmblemUrl(string guid)
@@ -231,6 +234,24 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Services
 		}
 
 		public async Task<List<Guild>> GetGuildsInfoAsync()
+		{
+			if (_guildListRequest != null)
+			{
+				Logger.Debug("Reusing in-flight guild list request");
+				return await _guildListRequest;
+			}
+			_guildListRequest = FetchGuildListAsync();
+			try
+			{
+				return await _guildListRequest;
+			}
+			finally
+			{
+				_guildListRequest = null;
+			}
+		}
+
+		private async Task<List<Guild>> FetchGuildListAsync()
 		{
 			try
 			{
@@ -443,6 +464,83 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Services
 		public string GetSolutionMapUrl(string puzzleId, string accountName)
 		{
 			return (_baseUrl.EndsWith("/module/v3") ? _baseUrl : (_baseUrl + "/module/v3")) + "/solution-map/" + puzzleId;
+		}
+
+		public string GetTutorialImageUrl(string tutorialId)
+		{
+			return (_baseUrl.EndsWith("/module/v3") ? _baseUrl : (_baseUrl + "/module/v3")) + "/tutorial/image/" + tutorialId;
+		}
+
+		public string GetTutorialMapUrl(string tutorialId)
+		{
+			return (_baseUrl.EndsWith("/module/v3") ? _baseUrl : (_baseUrl + "/module/v3")) + "/tutorial/" + tutorialId + "/map";
+		}
+
+		public async Task<List<Tutorial>> GetTutorialListAsync()
+		{
+			string url = (_baseUrl.EndsWith("/module/v3") ? _baseUrl : (_baseUrl + "/module/v3")) + "/tutorial/list";
+			return (await Fetch<List<Tutorial>>(url)) ?? new List<Tutorial>();
+		}
+
+		public async Task<Tutorial?> GetTutorialAsync(string tutorialId)
+		{
+			string url = (_baseUrl.EndsWith("/module/v3") ? _baseUrl : (_baseUrl + "/module/v3")) + "/tutorial/" + tutorialId;
+			return await Fetch<Tutorial>(url);
+		}
+
+		public async Task<Tutorial?> SubmitTutorialGuessAsync(string tutorialId, Location location, Action<Tutorial?>? action = null)
+		{
+			try
+			{
+				string url = (_baseUrl.EndsWith("/module/v3") ? _baseUrl : (_baseUrl + "/module/v3")) + "/tutorial/" + tutorialId + "/guess";
+				var body = new
+				{
+					Location = location
+				};
+				Tutorial result = await Post<Tutorial>(url, body);
+				action?.Invoke(result);
+				return result;
+			}
+			catch (Exception ex)
+			{
+				Logger.Warn(ex, "Error submitting tutorial guess for " + tutorialId);
+				action?.Invoke(null);
+				return null;
+			}
+		}
+
+		public async Task<Tutorial?> ResetTutorialGuessAsync(string tutorialId, Action<Tutorial?>? action = null)
+		{
+			try
+			{
+				string url = (_baseUrl.EndsWith("/module/v3") ? _baseUrl : (_baseUrl + "/module/v3")) + "/tutorial/" + tutorialId + "/reset";
+				Tutorial result = await Post<Tutorial>(url, new { });
+				action?.Invoke(result);
+				return result;
+			}
+			catch (Exception ex)
+			{
+				Logger.Warn(ex, "Error resetting tutorial guess for " + tutorialId);
+				action?.Invoke(null);
+				return null;
+			}
+		}
+
+		public async Task<TutorialProgress?> OptOutOfTutorialAsync(Action<TutorialProgress?>? action = null)
+		{
+			try
+			{
+				string url = (_baseUrl.EndsWith("/module/v3") ? _baseUrl : (_baseUrl + "/module/v3")) + "/tutorial/opt-out";
+				TutorialProgress result = await Post<TutorialProgress>(url, new { });
+				action?.Invoke(result);
+				return result;
+			}
+			catch (Exception ex)
+			{
+				Logger.Warn(ex, "Error opting out of tutorial");
+				action?.Invoke(null);
+				return null;
+			}
 		}
 
 		public void Dispose()

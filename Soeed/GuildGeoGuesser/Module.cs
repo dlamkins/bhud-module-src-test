@@ -21,8 +21,6 @@ namespace Soeed.GuildGeoGuesser
 	[Export(typeof(Module))]
 	public class Module : Module
 	{
-		public static string MODULE_VERSION = "0.8.0";
-
 		public static string DIRECTORY_PATH = "guildgeoguesser";
 
 		public static string STATIC_HOST_URL = "https://bhm.blishhud.com/Soeed.GuildGeoGuesser";
@@ -30,6 +28,8 @@ namespace Soeed.GuildGeoGuesser
 		private static readonly Logger Logger = Logger.GetLogger<Module>();
 
 		private DynamicConfigService _configService;
+
+		public static string MODULE_VERSION => ModuleVersion.Value;
 
 		public static SettingService Settings { get; set; } = null;
 
@@ -97,6 +97,7 @@ namespace Soeed.GuildGeoGuesser
 
 		protected override void Update(GameTime gameTime)
 		{
+			TruePerfectionConfettiOverlay.ProcessPendingBurst(gameTime);
 			GeoGuessWindow geoGuessWindow = Service.GeoGuessWindow;
 			if (geoGuessWindow != null)
 			{

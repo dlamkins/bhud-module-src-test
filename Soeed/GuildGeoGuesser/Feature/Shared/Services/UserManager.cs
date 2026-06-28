@@ -16,7 +16,12 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Services
 
 		public Account? Account { get; set; }
 
+		public TutorialProgress TutorialState { get; private set; } = new TutorialProgress();
+
+
 		public event EventHandler<Account>? AccountUpdated;
+
+		public event EventHandler<TutorialProgress>? TutorialStateUpdated;
 
 		public event EventHandler<IEnumerable<Guild>>? GuildsUpdated;
 
@@ -42,54 +47,72 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Services
 			return Guilds.Find((Guild g) => g.Name.ToString() == guildName2);
 		}
 
+		public void SetTutorialState(TutorialProgress state)
+		{
+			TutorialState = state;
+			this.TutorialStateUpdated?.Invoke(this, state);
+		}
+
+		public async Task RefreshGuildsAsync()
+		{
+			if (await GW2ApiService.GenerateSubtoken() != null)
+			{
+				Guilds = await GW2ApiService.QueryGuilds();
+				this.GuildsUpdated?.Invoke(this, Guilds);
+			}
+		}
+
 		public void SubtokenUpdated()
 		{
-			if (Service.Gw2ApiManager.get_HasSubtoken() && !AccountQueryInProgress)
+			if (!Service.Gw2ApiManager.get_HasSubtoken() || AccountQueryInProgress)
 			{
-				Task.Run(async delegate
+				Logger.GetLogger<Module>().Debug($"SubtokenUpdated called but conditions not met: HasSubtoken={Service.Gw2ApiManager.get_HasSubtoken()}, InProgress={AccountQueryInProgress}");
+				return;
+			}
+			AccountQueryInProgress = true;
+			Task.Run(async delegate
+			{
+				_ = 3;
+				try
 				{
-					_ = 2;
-					try
+					Logger.GetLogger<Module>().Info("Starting account and guild update process");
+					Account account = await GW2ApiService.QueryAccount();
+					if (account != null)
 					{
-						AccountQueryInProgress = true;
-						Logger.GetLogger<Module>().Info("Starting account and guild update process");
-						Account account = await GW2ApiService.QueryAccount();
-						if (account != null)
+						Account = account;
+						this.AccountUpdated?.Invoke(this, Account);
+						Logger.GetLogger<Module>().Info("Account updated: " + account.get_Name());
+						if (await GW2ApiService.GenerateSubtoken() != null)
 						{
-							Account = account;
-							this.AccountUpdated?.Invoke(this, Account);
-							Logger.GetLogger<Module>().Info("Account updated: " + account.get_Name());
-							if (await GW2ApiService.GenerateSubtoken() != null)
+							Logger.GetLogger<Module>().Info("Subtoken generated successfully, loading guilds");
+							Guilds = await GW2ApiService.QueryGuilds();
+							Logger.GetLogger<Module>().Info($"Loaded {Guilds.Count} guilds");
+							this.GuildsUpdated?.Invoke(this, Guilds);
+							UserCheckServerResponse check = await Service.GeoServerWrapper.PerformUserCheck(account.get_Name());
+							if (check?.Tutorial != null)
 							{
-								Logger.GetLogger<Module>().Info("Subtoken generated successfully, loading guilds");
-								Guilds = await GW2ApiService.QueryGuilds();
-								Logger.GetLogger<Module>().Info($"Loaded {Guilds.Count} guilds");
-								this.GuildsUpdated?.Invoke(this, Guilds);
-							}
-							else
-							{
-								Logger.GetLogger<Module>().Warn("Failed to generate subtoken, skipping guild loading");
+								SetTutorialState(check.Tutorial);
 							}
 						}
 						else
 						{
-							Logger.GetLogger<Module>().Warn("Failed to query account");
+							Logger.GetLogger<Module>().Warn("Failed to generate subtoken, skipping guild loading");
 						}
 					}
-					catch (Exception ex)
+					else
 					{
-						Logger.GetLogger<Module>().Warn(ex, "Error in SubtokenUpdated");
+						Logger.GetLogger<Module>().Warn("Failed to query account");
 					}
-					finally
-					{
-						AccountQueryInProgress = false;
-					}
-				});
-			}
-			else
-			{
-				Logger.GetLogger<Module>().Debug($"SubtokenUpdated called but conditions not met: HasSubtoken={Service.Gw2ApiManager.get_HasSubtoken()}, InProgress={AccountQueryInProgress}");
-			}
+				}
+				catch (Exception ex)
+				{
+					Logger.GetLogger<Module>().Warn(ex, "Error in SubtokenUpdated");
+				}
+				finally
+				{
+					AccountQueryInProgress = false;
+				}
+			});
 		}
 
 		public void Dispose()

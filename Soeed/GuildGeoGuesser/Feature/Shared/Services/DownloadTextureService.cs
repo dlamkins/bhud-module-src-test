@@ -13,9 +13,9 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Services
 {
 	public class DownloadTextureService : IDisposable
 	{
-		private static readonly HttpClient httpClient = new HttpClient();
-
 		private readonly Dictionary<string, (AsyncTexture2D Texture, int RefCount)> _textureCache = new Dictionary<string, (AsyncTexture2D, int)>();
+
+		private static HttpClient HttpClient => ModuleHttpClient.Instance;
 
 		public void ResetDownloadCache()
 		{
@@ -176,7 +176,7 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Services
 			{
 				Logger.GetLogger<Module>().Info("Downloading image file " + fileName + " from " + url);
 				string savePath = GetImageSavePath(fileName);
-				HttpResponseMessage response = await httpClient.GetAsync(url, (HttpCompletionOption)1);
+				HttpResponseMessage response = await HttpClient.GetAsync(url, (HttpCompletionOption)1);
 				try
 				{
 					response.EnsureSuccessStatusCode();

@@ -94,7 +94,7 @@ namespace Soeed.GuildGeoGuesser.Settings.Views.SubViews
 			//IL_0099: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00aa: Expected O, but got Unknown
-			//IL_0114: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012b: Unknown result type (might be due to invalid IL or missing references)
 			if (scores == null || scores.Count == 0)
 			{
 				Label val = new Label();
@@ -118,7 +118,7 @@ namespace Soeed.GuildGeoGuesser.Settings.Views.SubViews
 				val2.set_TextColor(Color.get_LightGoldenrodYellow());
 				Label val3 = new Label();
 				((Control)val3).set_Parent((Container)(object)panel);
-				val3.set_Text($"Range: {score.Min}-{score.Max} | Value: {score.Value} | Color: {score.Color}");
+				val3.set_Text($"Range: {score.Min}-{score.Max} | Value: {score.Value} | Color: {score.Color} | VFX: {score.Vfx.ToString().ToLower()}");
 				val3.set_AutoSizeWidth(true);
 				val3.set_AutoSizeHeight(true);
 				val3.set_Font(GameService.Content.get_DefaultFont14());

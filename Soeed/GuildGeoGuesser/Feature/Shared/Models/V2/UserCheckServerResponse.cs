@@ -22,7 +22,10 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Models.V2
 		public bool Banned { get; set; }
 
 		[JsonProperty("Ban")]
-		public Ban Ban { get; set; } = new Ban();
+		public Ban? Ban { get; set; }
+
+		[JsonProperty("tutorial")]
+		public TutorialProgress Tutorial { get; set; } = new TutorialProgress();
 
 	}
 }

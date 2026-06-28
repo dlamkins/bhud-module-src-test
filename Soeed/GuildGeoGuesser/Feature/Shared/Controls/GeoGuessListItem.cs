@@ -26,7 +26,7 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Controls
 
 		private Rectangle SourceBounds;
 
-		private AsyncTexture2D _Icon = new AsyncTexture2D();
+		private AsyncTexture2D? _Icon = new AsyncTexture2D();
 
 		private bool _isImageLoaded;
 
@@ -206,7 +206,7 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Controls
 			}
 			if (_Icon != null && _textureSwappedHandler != null)
 			{
-				_Icon.remove_TextureSwapped(_textureSwappedHandler);
+				_Icon!.remove_TextureSwapped(_textureSwappedHandler);
 				_textureSwappedHandler = null;
 			}
 			_Icon = null;

@@ -63,6 +63,12 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Controls
 		{
 			switch (_windowState.State)
 			{
+			case GeoGuessState.TutorialList:
+				((StandardWindow)this).Show((IView)(object)new TutorialListingView(_windowState));
+				break;
+			case GeoGuessState.TutorialPuzzle:
+				((StandardWindow)this).Show((IView)(object)new TutorialPuzzleView(_windowState));
+				break;
 			case GeoGuessState.PuzzleDetails:
 				((StandardWindow)this).Show((IView)(object)new GeoGuessDetailsView(_windowState));
 				break;
@@ -78,6 +84,9 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Controls
 			case GeoGuessState.Leaders:
 			case GeoGuessState.Leaderboards:
 				((StandardWindow)this).Show((IView)(object)new LeaderboardView(_windowState));
+				break;
+			case GeoGuessState.Help:
+				((StandardWindow)this).Show((IView)(object)new HelpView(_windowState));
 				break;
 			case GeoGuessState.GuildSelect:
 				((StandardWindow)this).Show((IView)(object)new GeoGuessGuildSelectionView(_windowState));

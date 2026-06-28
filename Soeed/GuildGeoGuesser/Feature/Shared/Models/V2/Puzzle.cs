@@ -122,7 +122,7 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Models.V2
 			mapCoord = guessLocation.MapCoord;
 			array[1] = (float)((Coordinates2)(ref mapCoord)).get_Y();
 			float[] guessCoords = array;
-			return Service.Textures.GetURLTexture(Service.GeoServerWrapper.GetPuzzleMapWithGuessUrl(Id, guessLocation.MapId, guessCoords), localFileName);
+			return Service.Textures.GetURLTexture(Service.GeoServerWrapper.GetPuzzleMapWithGuessUrl(Id, guessLocation.MapId, guessCoords, guess.PuzzleGuess.Distance), localFileName);
 		}
 
 		public AsyncTexture2D GetAuthorSolutionMapTexture(string authorName, int? cacheBuster = null)

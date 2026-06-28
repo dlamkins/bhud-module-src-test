@@ -14,7 +14,15 @@ namespace Soeed.GuildGeoGuesser.Settings.Views.Tabs
 	{
 		private readonly List<MenuViewItem> _registeredMenuItems = new List<MenuViewItem>();
 
-		public event EventHandler<EventArgs>? RegistrarListChanged;
+		public event EventHandler<EventArgs>? RegistrarListChanged
+		{
+			add
+			{
+			}
+			remove
+			{
+			}
+		}
 
 		public ModuleSettingsTab()
 		{

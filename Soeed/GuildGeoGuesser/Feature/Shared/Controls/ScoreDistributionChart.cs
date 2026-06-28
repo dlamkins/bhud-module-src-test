@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using Blish_HUD;
 using Blish_HUD.Controls;
@@ -8,6 +7,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Soeed.GuildGeoGuesser.Feature.Shared.Models;
 using Soeed.GuildGeoGuesser.Feature.Shared.Models.V2;
+using Soeed.GuildGeoGuesser.Utils;
 
 namespace Soeed.GuildGeoGuesser.Feature.Shared.Controls
 {
@@ -21,9 +21,13 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Controls
 
 		private readonly Dictionary<string, Color> _scoreColors;
 
-		private List<string> _orderedScores;
+		private readonly HashSet<string> _rainbowScores = new HashSet<string>();
+
+		private List<string> _orderedScores = new List<string>();
 
 		private int _barWidth;
+
+		private double _animationTime;
 
 		private const int CHART_HEIGHT = 120;
 
@@ -47,58 +51,30 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Controls
 			CalculateLayout();
 		}
 
-		private void BuildColorMapping()
+		public override void DoUpdate(GameTime gameTime)
 		{
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-			_scoreColors.Clear();
-			foreach (ScoreModel scoreModel in Service.Config.Scores)
-			{
-				Color color = ParseHexColor(scoreModel.Color);
-				_scoreColors[scoreModel.Value] = color;
-			}
-			Color wrongMapColor = ParseHexColor(Service.Config.ScoreWrongMapColor);
-			_scoreColors[Service.Config.ScoreWrongMap] = wrongMapColor;
+			((Control)this).DoUpdate(gameTime);
+			_animationTime += gameTime.get_ElapsedGameTime().TotalSeconds;
 		}
 
-		private Color ParseHexColor(string hexColor)
+		private void BuildColorMapping()
 		{
-			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
-			try
+			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
+			_scoreColors.Clear();
+			_rainbowScores.Clear();
+			foreach (ScoreModel scoreModel in Service.Config.Scores)
 			{
-				if (hexColor.StartsWith("#"))
+				if (scoreModel.IsRainbow)
 				{
-					hexColor = hexColor.Substring(1);
+					_rainbowScores.Add(scoreModel.Value);
 				}
-				if (hexColor.Length == 6)
+				else
 				{
-					int num = int.Parse(hexColor.Substring(0, 2), NumberStyles.HexNumber);
-					int g2 = int.Parse(hexColor.Substring(2, 2), NumberStyles.HexNumber);
-					int b2 = int.Parse(hexColor.Substring(4, 2), NumberStyles.HexNumber);
-					return new Color(num, g2, b2);
-				}
-				if (hexColor.Length == 8)
-				{
-					int num2 = int.Parse(hexColor.Substring(0, 2), NumberStyles.HexNumber);
-					int g = int.Parse(hexColor.Substring(2, 2), NumberStyles.HexNumber);
-					int b = int.Parse(hexColor.Substring(4, 2), NumberStyles.HexNumber);
-					int a = int.Parse(hexColor.Substring(6, 2), NumberStyles.HexNumber);
-					return new Color(num2, g, b, a);
+					_scoreColors[scoreModel.Value] = ScoreModel.ParseHexColor(scoreModel.Color);
 				}
 			}
-			catch
-			{
-			}
-			return Color.get_White();
+			_scoreColors[Service.Config.ScoreWrongMap] = ScoreModel.ParseHexColor(Service.Config.ScoreWrongMapColor);
 		}
 
 		private void CalculateScoreDistribution()
@@ -134,20 +110,21 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Controls
 			//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0103: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0122: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0127: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_023c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0241: Unknown result type (might be due to invalid IL or missing references)
-			//IL_029b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0133: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0143: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0145: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ed: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0205: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0207: Unknown result type (might be due to invalid IL or missing references)
+			//IL_025a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_025f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02be: Unknown result type (might be due to invalid IL or missing references)
 			if (!_guesses.Any())
 			{
 				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, "No guesses yet", Control.get_Content().get_DefaultFont16(), new Rectangle(20, ((Control)this).get_Height() / 2 - 10, ((Control)this).get_Width() - 40, 20), Color.get_White(), true, (HorizontalAlignment)0, (VerticalAlignment)1);
@@ -161,6 +138,7 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Controls
 			}
 			int chartTop = 30;
 			int barStartY = chartTop + 120;
+			Rectangle barRect = default(Rectangle);
 			Rectangle shadowRect = default(Rectangle);
 			Rectangle backgroundRect = default(Rectangle);
 			Rectangle labelRect = default(Rectangle);
@@ -173,7 +151,15 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Controls
 				int barY = barStartY - barHeight;
 				Color barColor = (_scoreColors.ContainsKey(score) ? _scoreColors[score] : Color.get_White());
 				int actualBarHeight = Math.Max(1, barHeight);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), new Rectangle(barX, barY, _barWidth, actualBarHeight), barColor);
+				((Rectangle)(ref barRect))._002Ector(barX, barY, _barWidth, actualBarHeight);
+				if (_rainbowScores.Contains(score))
+				{
+					DrawShiftingRainbowBar(spriteBatch, barRect);
+				}
+				else
+				{
+					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), barRect, barColor);
+				}
 				string textValue = count.ToString();
 				int centerX = barX + _barWidth / 2;
 				int centerY = chartTop + 60;
@@ -198,6 +184,24 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Controls
 				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, labelText, Control.get_Content().get_DefaultFont12(), new Rectangle(barX, barStartY - 10, _barWidth, 40), Color.get_LightGray(), true, (HorizontalAlignment)0, (VerticalAlignment)1);
 			}
 			SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, $"Total Guesses: {_guesses.Count}", Control.get_Content().get_DefaultFont14(), new Rectangle(0, ((Control)this).get_Height() - 20, ((Control)this).get_Width(), 20), Color.get_LightGoldenrodYellow(), true, (HorizontalAlignment)0, (VerticalAlignment)1);
+		}
+
+		private void DrawShiftingRainbowBar(SpriteBatch spriteBatch, Rectangle barRect)
+		{
+			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+			Texture2D pixel = Textures.get_Pixel();
+			for (int x = ((Rectangle)(ref barRect)).get_Left(); x < ((Rectangle)(ref barRect)).get_Right(); x += 2)
+			{
+				int width = Math.Min(2, ((Rectangle)(ref barRect)).get_Right() - x);
+				Color color = RainbowColors.ShiftingColor((barRect.Width > 0) ? ((float)(x - ((Rectangle)(ref barRect)).get_Left()) / (float)barRect.Width) : 0f, (float)_animationTime);
+				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, pixel, new Rectangle(x, ((Rectangle)(ref barRect)).get_Top(), width, barRect.Height), color);
+			}
 		}
 
 		protected override void OnResized(ResizedEventArgs e)

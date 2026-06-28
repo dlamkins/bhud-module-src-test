@@ -22,32 +22,28 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Controls
 		public void RefreshMap(Puzzle puzzle, bool showAuthorView = false)
 		{
 			_cacheBuster++;
-			if (showAuthorView)
+			Account? account = Service.UserManager.Account;
+			string accountName = ((account != null) ? account!.get_Name() : null);
+			if (showAuthorView && accountName != null && puzzle.IsAuthor(accountName))
 			{
-				Account? account = Service.UserManager.Account;
-				if (puzzle.IsAuthor((account != null) ? account!.get_Name() : null))
-				{
-					string fileName = puzzle.Id + "author_solution.png";
-					Service.Textures.ForceRefreshTexture(fileName);
-				}
+				string fileName = puzzle.Id + "author_solution.png";
+				Service.Textures.ForceRefreshTexture(fileName);
 			}
 			UpdateTexture(puzzle, showAuthorView);
 		}
 
 		private void UpdateTexture(Puzzle puzzle, bool showAuthorView)
 		{
-			if (showAuthorView)
+			Account? account = Service.UserManager.Account;
+			string accountName = ((account != null) ? account!.get_Name() : null);
+			if (showAuthorView && accountName != null && puzzle.IsAuthor(accountName))
 			{
-				Account? account = Service.UserManager.Account;
-				if (puzzle.IsAuthor((account != null) ? account!.get_Name() : null))
-				{
-					Account? account2 = Service.UserManager.Account;
-					base._texture = puzzle.GetAuthorSolutionMapTexture((account2 != null) ? account2!.get_Name() : null, _cacheBuster);
-					return;
-				}
+				base._texture = puzzle.GetAuthorSolutionMapTexture(accountName, _cacheBuster);
 			}
-			Account? account3 = Service.UserManager.Account;
-			base._texture = puzzle.GetSolutionMapTexture((account3 != null) ? account3!.get_Name() : null);
+			else
+			{
+				base._texture = puzzle.GetSolutionMapTexture(accountName);
+			}
 		}
 	}
 }

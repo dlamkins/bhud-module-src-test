@@ -29,6 +29,8 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Services
 
 		public Puzzle DetailsModel { get; set; }
 
+		public Tutorial TutorialModel { get; set; }
+
 		public string SearchTerm { get; set; }
 
 		public int CurrentPage => _currentPage;
@@ -88,6 +90,7 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Services
 			Account = val;
 			SelectedGuild = new Guild();
 			DetailsModel = new Puzzle();
+			TutorialModel = new Tutorial();
 			SearchTerm = "";
 			base._002Ector();
 			Service.UserManager.AccountUpdated += new EventHandler<Account>(UserManager_AccountUpdated);
@@ -149,7 +152,14 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Services
 		public void SwapToGuildList(Guild newSelectedGuild)
 		{
 			SelectedGuild = newSelectedGuild;
-			State = GeoGuessState.GuildPuzzles;
+			if (Service.Config.IsTutorialGuild(newSelectedGuild.Id))
+			{
+				State = GeoGuessState.TutorialList;
+			}
+			else
+			{
+				State = GeoGuessState.GuildPuzzles;
+			}
 			if (((Control)Service.GeoGuessWindow).get_Visible())
 			{
 				Service.GeoGuessWindow.OpenWindowState();
@@ -158,6 +168,11 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Services
 
 		public void SwapToCreate()
 		{
+			if (Service.Config.IsTutorialGuild(SelectedGuild.Id))
+			{
+				ScreenNotification.ShowNotification("Cannot create puzzles in the tutorial guild", (NotificationType)1, (Texture2D)null, 3);
+				return;
+			}
 			if (GameService.Gw2Mumble.get_CurrentMap().get_IsCompetitiveMode())
 			{
 				ScreenNotification.ShowNotification("Cannot create puzzles in competitive mode maps (PvP, WvW, etc.)", (NotificationType)6, (Texture2D)null, 3);
@@ -210,9 +225,48 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Services
 			}
 		}
 
+		public void SelectTutorialForDetails(Tutorial model)
+		{
+			TutorialModel = model;
+			State = GeoGuessState.TutorialPuzzle;
+			if (((Control)Service.GeoGuessWindow).get_Visible())
+			{
+				Service.GeoGuessWindow.OpenWindowState();
+			}
+		}
+
+		public async void RefreshTutorialModel()
+		{
+			try
+			{
+				Tutorial model = await Service.GeoServerWrapper.GetTutorialAsync(TutorialModel.Id);
+				if (model != null)
+				{
+					TutorialModel = model;
+					if (((Control)Service.GeoGuessWindow).get_Visible())
+					{
+						Service.GeoGuessWindow.OpenWindowState();
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Logger.GetLogger<Module>().Error(ex, "Error refreshing tutorial model");
+			}
+		}
+
 		public void SwapToLeaderboards()
 		{
 			State = GeoGuessState.Leaderboards;
+			if (((Control)Service.GeoGuessWindow).get_Visible())
+			{
+				Service.GeoGuessWindow.OpenWindowState();
+			}
+		}
+
+		public void SwapToHelp()
+		{
+			State = GeoGuessState.Help;
 			if (((Control)Service.GeoGuessWindow).get_Visible())
 			{
 				Service.GeoGuessWindow.OpenWindowState();

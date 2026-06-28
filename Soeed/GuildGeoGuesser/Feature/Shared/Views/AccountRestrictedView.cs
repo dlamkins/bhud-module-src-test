@@ -62,6 +62,10 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Views
 				if (check != null)
 				{
 					_userCheck = check;
+					if (check.Tutorial != null)
+					{
+						Service.UserManager.SetTutorialState(check.Tutorial);
+					}
 				}
 			}
 			return true;

@@ -43,6 +43,19 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Views
 			//IL_012e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_012f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0139: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0182: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019f: Expected O, but got Unknown
+			//IL_01da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01df: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0200: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0215: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0229: Unknown result type (might be due to invalid IL or missing references)
 			((Control)_backButton).add_Click((EventHandler<MouseEventArgs>)GoBackClickHandler);
 			Label val = new Label();
 			((Control)val).set_Parent((Container)(object)_controlsHeader);
@@ -77,8 +90,25 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Views
 			}
 			foreach (Guild guild in _windowState.Guilds)
 			{
-				_flowPanel.AddControl(new GuildEmblemControl(guild), out var guildLabel);
-				((Control)guildLabel).add_Click((EventHandler<MouseEventArgs>)delegate
+				FlowPanel flowPanel = _flowPanel;
+				Panel val3 = new Panel();
+				((Control)val3).set_Width(400);
+				((Control)val3).set_Height(130);
+				flowPanel.AddControl<Panel>(val3, out Panel guildPanel);
+				GuildEmblemControl guildEmblemControl = new GuildEmblemControl(guild);
+				((Control)guildEmblemControl).set_Parent((Container)(object)guildPanel);
+				if (!Service.UserManager.TutorialState.PublicUnlocked && Service.Config.IsTutorialGuild(guild.Id))
+				{
+					Label val4 = new Label();
+					((Control)val4).set_Parent((Container)(object)guildPanel);
+					val4.set_Text("Practice Mode");
+					val4.set_AutoSizeWidth(true);
+					((Control)val4).set_Height(20);
+					((Control)val4).set_Location(new Point(5, ((Control)guildPanel).get_Height() - 22));
+					val4.set_Font(GameService.Content.GetFont((FontFace)0, (FontSize)14, (FontStyle)2));
+					val4.set_TextColor(Color.get_LightGreen());
+				}
+				((Control)guildEmblemControl).add_Click((EventHandler<MouseEventArgs>)delegate
 				{
 					_windowState.SwapToGuildList(guild);
 				});

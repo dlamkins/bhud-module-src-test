@@ -9,9 +9,9 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Services
 {
 	public class DynamicConfigService : IDisposable
 	{
-		private static readonly HttpClient HttpClient = new HttpClient();
-
 		private static readonly Logger Logger = Logger.GetLogger<DynamicConfigService>();
+
+		private static HttpClient HttpClient => ModuleHttpClient.Instance;
 
 		protected async Task<T?> Fetch<T>(string url)
 		{
@@ -44,7 +44,6 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Services
 
 		public void Dispose()
 		{
-			((HttpMessageInvoker)HttpClient).Dispose();
 		}
 	}
 }

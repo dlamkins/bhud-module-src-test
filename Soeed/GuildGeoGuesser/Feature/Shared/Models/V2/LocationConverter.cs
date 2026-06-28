@@ -7,24 +7,29 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Models.V2
 {
 	public class LocationConverter : JsonConverter<Location>
 	{
-		public override void WriteJson(JsonWriter writer, Location value, JsonSerializer serializer)
+		public override void WriteJson(JsonWriter writer, Location? value, JsonSerializer serializer)
 		{
-			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+			if (value == null)
+			{
+				writer.WriteNull();
+				return;
+			}
 			JArray jArray = new JArray();
-			jArray.Add(value.MapId);
-			jArray.Add(value.MapCoord.ToJArray());
-			jArray.Add(value.AvatarPosition.ToJArray());
-			jArray.Add(value.AvatarDirection.ToJArray());
-			jArray.Add(value.CameraPosition.ToJArray());
-			jArray.Add(value.CameraDirection.ToJArray());
+			jArray.Add(value!.MapId);
+			jArray.Add(value!.MapCoord.ToJArray());
+			jArray.Add(value!.AvatarPosition.ToJArray());
+			jArray.Add(value!.AvatarDirection.ToJArray());
+			jArray.Add(value!.CameraPosition.ToJArray());
+			jArray.Add(value!.CameraDirection.ToJArray());
 			jArray.WriteTo(writer);
 		}
 
-		public override Location ReadJson(JsonReader reader, Type objectType, Location existingValue, bool hasExistingValue, JsonSerializer serializer)
+		public override Location? ReadJson(JsonReader reader, Type objectType, Location? existingValue, bool hasExistingValue, JsonSerializer serializer)
 		{
 			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00cf: Unknown result type (might be due to invalid IL or missing references)

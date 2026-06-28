@@ -18,24 +18,28 @@ namespace Soeed.GuildGeoGuesser.Settings.Views.Generic
 		protected override void Build(Container buildPanel)
 		{
 			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
 			((SettingsMenuView)this).Build(buildPanel);
 			Menu menuPanel = GetMenuPanel();
 			if (menuPanel != null)
 			{
 				Container parent = ((Control)menuPanel).get_Parent();
-				((Panel)((parent is Panel) ? parent : null)).set_Title("");
-				((Control)((Control)menuPanel).get_Parent()).set_Size(new Point(NEW_MENU_WIDTH, ((Control)buildPanel).get_Height()));
-				Rectangle contentRegion = ((Control)menuPanel).get_Parent().get_ContentRegion();
-				((Control)menuPanel).set_Size(((Rectangle)(ref contentRegion)).get_Size());
+				Panel parentPanel = (Panel)(object)((parent is Panel) ? parent : null);
+				if (parentPanel != null)
+				{
+					parentPanel.set_Title("");
+					((Control)parentPanel).set_Size(new Point(NEW_MENU_WIDTH, ((Control)buildPanel).get_Height()));
+					Rectangle contentRegion = ((Container)parentPanel).get_ContentRegion();
+					((Control)menuPanel).set_Size(((Rectangle)(ref contentRegion)).get_Size());
+				}
 			}
 			ViewContainer viewContainer = GetViewContainer();
 			if (viewContainer != null)

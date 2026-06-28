@@ -19,5 +19,13 @@ namespace Soeed.GuildGeoGuesser.Utils
 			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 			return new Point((int)((float)point.X * scale), (int)((float)point.Y * scale));
 		}
+
+		public static Vector2 ToVector2(this Point point)
+		{
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+			return new Vector2((float)point.X, (float)point.Y);
+		}
 	}
 }

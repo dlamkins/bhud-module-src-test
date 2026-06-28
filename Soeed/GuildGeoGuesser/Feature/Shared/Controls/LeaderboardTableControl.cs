@@ -22,7 +22,7 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Controls
 
 		private int _headerHeight = 32;
 
-		private int _padding = 8;
+		private int _cellPadding = 8;
 
 		private Color _headerTextColor = Color.get_LightGoldenrodYellow();
 
@@ -65,11 +65,11 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Controls
 			}
 		}
 
-		public AsyncTexture2D GoldTrophy { get; set; }
+		public AsyncTexture2D? GoldTrophy { get; set; }
 
-		public AsyncTexture2D SilverTrophy { get; set; }
+		public AsyncTexture2D? SilverTrophy { get; set; }
 
-		public AsyncTexture2D BronzeTrophy { get; set; }
+		public AsyncTexture2D? BronzeTrophy { get; set; }
 
 		public string Title
 		{
@@ -150,38 +150,38 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Controls
 			//IL_01ed: Unknown result type (might be due to invalid IL or missing references)
 			//IL_024e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0253: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02bd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ec: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02f2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0358: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0369: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02cf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02f9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0365: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0376: Unknown result type (might be due to invalid IL or missing references)
 			if (_headers.Count == 0)
 			{
 				return;
 			}
 			int colCount = _headers.Count;
 			int[] colWidths = new int[colCount];
-			int totalWidth = bounds.Width - 2 * _padding;
+			int totalWidth = bounds.Width - 2 * _cellPadding;
 			int colWidth = totalWidth / colCount;
 			for (int j = 0; j < colCount; j++)
 			{
 				colWidths[j] = colWidth;
 			}
-			int y = bounds.Y + _padding;
+			int y = bounds.Y + _cellPadding;
 			if (!string.IsNullOrEmpty(_title))
 			{
-				DrawText(spriteBatch, _title, bounds.X + _padding, y, totalWidth, _titleTextColor, bold: true, (HorizontalAlignment)0, _titleHeight);
+				DrawText(spriteBatch, _title, bounds.X + _cellPadding, y, totalWidth, _titleTextColor, bold: true, (HorizontalAlignment)0, _titleHeight);
 				y += _titleHeight;
 			}
 			if (!string.IsNullOrEmpty(_subtitle))
 			{
-				DrawText(spriteBatch, _subtitle, bounds.X + _padding, y, totalWidth, _subtitleTextColor, bold: true, (HorizontalAlignment)0, _subtitleHeight);
+				DrawText(spriteBatch, _subtitle, bounds.X + _cellPadding, y, totalWidth, _subtitleTextColor, bold: true, (HorizontalAlignment)0, _subtitleHeight);
 				y += _subtitleHeight;
 			}
-			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_headerTexture), new Rectangle(bounds.X + _padding, y, totalWidth, _headerHeight), Color.get_White());
+			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_headerTexture), new Rectangle(bounds.X + _cellPadding, y, totalWidth, _headerHeight), Color.get_White());
 			int i = 0;
-			int x2 = bounds.X + _padding;
+			int x2 = bounds.X + _cellPadding;
 			for (; i < colCount; i++)
 			{
 				string text = _headers[i];
@@ -194,10 +194,10 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Controls
 			{
 				if (row % 2 == 1)
 				{
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_gradientRowTexture), new Rectangle(bounds.X + _padding, y, totalWidth, _rowHeight), Color.get_White());
+					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, AsyncTexture2D.op_Implicit(_gradientRowTexture), new Rectangle(bounds.X + _cellPadding, y, totalWidth, _rowHeight), Color.get_White());
 				}
 				int col = 0;
-				int x = bounds.X + _padding;
+				int x = bounds.X + _cellPadding;
 				for (; col < colCount; col++)
 				{
 					string text2 = ((col < _rows[row].Count) ? _rows[row][col] : string.Empty);
@@ -205,19 +205,13 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Controls
 					int iconOffset = 0;
 					if (_showTrophyIcons && col == 0 && row < 3)
 					{
-						AsyncTexture2D icon = null;
-						switch (row)
+						AsyncTexture2D icon = (AsyncTexture2D)(row switch
 						{
-						case 0:
-							icon = GoldTrophy;
-							break;
-						case 1:
-							icon = SilverTrophy;
-							break;
-						case 2:
-							icon = BronzeTrophy;
-							break;
-						}
+							0 => GoldTrophy, 
+							1 => SilverTrophy, 
+							2 => BronzeTrophy, 
+							_ => null, 
+						});
 						if (icon != null)
 						{
 							int iconSize = 24;
@@ -233,7 +227,7 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Controls
 			if (!string.IsNullOrEmpty(_footer))
 			{
 				y += 4;
-				DrawText(spriteBatch, _footer, bounds.X + _padding, y, totalWidth, _footerTextColor, bold: false, (HorizontalAlignment)0, _footerHeight);
+				DrawText(spriteBatch, _footer, bounds.X + _cellPadding, y, totalWidth, _footerTextColor, bold: false, (HorizontalAlignment)0, _footerHeight);
 			}
 		}
 
@@ -272,7 +266,7 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Controls
 		public override void RecalculateLayout()
 		{
 			((Control)this).RecalculateLayout();
-			int height = _headerHeight + _rows.Count * _rowHeight + 2 * _padding;
+			int height = _headerHeight + _rows.Count * _rowHeight + 2 * _cellPadding;
 			if (!string.IsNullOrEmpty(_title))
 			{
 				height += _titleHeight;

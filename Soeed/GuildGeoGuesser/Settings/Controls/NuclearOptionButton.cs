@@ -12,6 +12,21 @@ namespace Soeed.GuildGeoGuesser.Settings.Controls
 	{
 		private bool _safetyKeysPressed;
 
+		private bool _operationAllowed = true;
+
+		public bool OperationAllowed
+		{
+			get
+			{
+				return _operationAllowed;
+			}
+			set
+			{
+				_operationAllowed = value;
+				UpdateEnabled();
+			}
+		}
+
 		public NuclearOptionButton()
 			: this()
 		{
@@ -24,7 +39,12 @@ namespace Soeed.GuildGeoGuesser.Settings.Controls
 		{
 			IReadOnlyList<Keys> KeysDown = GameService.Input.get_Keyboard().get_KeysDown();
 			_safetyKeysPressed = (KeysDown.Contains((Keys)162) || KeysDown.Contains((Keys)163)) && (KeysDown.Contains((Keys)160) || KeysDown.Contains((Keys)161));
-			((Control)this).set_Enabled(_safetyKeysPressed);
+			UpdateEnabled();
+		}
+
+		private void UpdateEnabled()
+		{
+			((Control)this).set_Enabled(_operationAllowed && _safetyKeysPressed);
 		}
 
 		protected override void DisposeControl()

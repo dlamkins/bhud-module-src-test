@@ -36,6 +36,10 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Models
 		public List<ScoreModel> Scores { get; set; } = new List<ScoreModel>();
 
 
+		[JsonProperty("show_score_rings_button")]
+		public bool ShowScoreRingButton { get; set; } = true;
+
+
 		[JsonProperty("help_screen_file_version")]
 		public string HelpScreenFileVersion { get; set; } = "0.0.0";
 
@@ -60,7 +64,20 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Models
 		};
 
 
-		public AsyncTexture2D GetTrophyTexture(string type)
+		[JsonProperty("tutorial_guild_id")]
+		public string TutorialGuildId { get; set; } = "00000000-0000-0000-0000-000000000001";
+
+
+		[JsonProperty("tutorial_required_guesses")]
+		public int TutorialRequiredGuesses { get; set; } = 1;
+
+
+		public bool IsTutorialGuild(string guildId)
+		{
+			return string.Equals(guildId, TutorialGuildId, StringComparison.OrdinalIgnoreCase);
+		}
+
+		public AsyncTexture2D? GetTrophyTexture(string type)
 		{
 			if (TrophyAssetIds != null && TrophyAssetIds.TryGetValue(type.ToLower(), out var assetId))
 			{

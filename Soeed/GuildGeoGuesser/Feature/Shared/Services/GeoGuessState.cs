@@ -10,6 +10,9 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Services
 		PuzzleDetails,
 		PuzzleCreate,
 		PuzzleEdit,
-		Leaderboards
+		Leaderboards,
+		Help,
+		TutorialList,
+		TutorialPuzzle
 	}
 }

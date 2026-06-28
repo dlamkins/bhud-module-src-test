@@ -4,7 +4,6 @@ using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
-using Blish_HUD.Settings;
 using Gw2Sharp.WebApi.V2.Models;
 
 namespace Soeed.GuildGeoGuesser.Feature.Shared.Services
@@ -15,11 +14,9 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Services
 
 		private readonly AsyncTexture2D _cornerIconTexture;
 
-		private readonly SettingEntry<bool> _cornerIconIsVisibleSetting;
-
 		private readonly string _tooltip;
 
-		private CornerIcon _cornerIcon;
+		private CornerIcon? _cornerIcon;
 
 		private string _accountName = "Unknown account";
 
@@ -97,7 +94,10 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Services
 
 		private void CornerIconPriority_SettingChanged(object sender, ValueChangedEventArgs<int> e)
 		{
-			_cornerIcon.set_Priority((int)(2.1474836E+09f * ((1000f - (float)e.get_NewValue()) / 1000f)) - 1);
+			if (_cornerIcon != null)
+			{
+				_cornerIcon!.set_Priority((int)(2.1474836E+09f * ((1000f - (float)e.get_NewValue()) / 1000f)) - 1);
+			}
 		}
 
 		private void OnCornerIconClicked(object sender, MouseEventArgs e)

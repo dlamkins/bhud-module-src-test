@@ -31,7 +31,19 @@ namespace Soeed.GuildGeoGuesser.Feature.Shared.Models.V2
 				return Service.Config.ScoreWrongMap;
 			}
 			float diff = Vector3.Distance(AvatarPosition, source.AvatarPosition);
-			return Service.Config.Scores.Find((ScoreModel score) => (float)score.Min <= diff && (float)score.Max > diff)?.Value ?? "Missing Score";
+			return Service.Config.Scores.Find((ScoreModel score) => score.Min <= diff && score.Max > diff)?.Value ?? "Missing Score";
+		}
+
+		public ScoreModel? GetScoreBand(Location puzzleLocation)
+		{
+			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+			if (puzzleLocation.MapId != MapId)
+			{
+				return null;
+			}
+			float diff = Vector3.Distance(AvatarPosition, puzzleLocation.AvatarPosition);
+			return Service.Config.Scores.Find((ScoreModel score) => score.Min <= diff && score.Max > diff);
 		}
 
 		public bool IsFirstPersonCamera()
