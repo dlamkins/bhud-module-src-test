@@ -6,19 +6,25 @@ namespace WhereIsMyPSNA
 	{
 		public class AgentLocation
 		{
+			private readonly string _mapEn;
+
+			private readonly string _locationEn;
+
 			public string Npc { get; set; }
 
-			public string Map { get; set; }
-
-			public string Location { get; set; }
-
 			public string ChatCode { get; set; }
+
+			public string Map => PsnaScheduleLocalization.LocalizeMap(_mapEn);
+
+			public string Location => PsnaScheduleLocalization.LocalizeLocation(ChatCode, _locationEn);
+
+			public string NpcDisplay => PsnaNpcLocalization.LocalizeNpc(Npc);
 
 			public AgentLocation(string npc, string map, string location, string chatCode = null)
 			{
 				Npc = npc;
-				Map = map;
-				Location = location;
+				_mapEn = map;
+				_locationEn = location;
 				ChatCode = chatCode;
 			}
 		}
@@ -92,10 +98,14 @@ namespace WhereIsMyPSNA
 			}
 		};
 
+		public static int GetCurrentCycleIndex(DateTime? utcNow = null)
+		{
+			return ((int)Math.Floor(((utcNow ?? DateTime.UtcNow) - Anchor).TotalDays) % 7 + 7) % 7;
+		}
+
 		public static AgentLocation[] GetTodaysLocations(DateTime? utcNow = null)
 		{
-			int index = ((int)Math.Floor(((utcNow ?? DateTime.UtcNow) - Anchor).TotalDays) % 7 + 7) % 7;
-			return Cycle[index];
+			return Cycle[GetCurrentCycleIndex(utcNow)];
 		}
 	}
 }

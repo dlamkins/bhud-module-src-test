@@ -318,22 +318,22 @@ namespace WhereIsMyPSNA
 			int i = secs % 3600 / 60;
 			if (h > 0 && i > 0)
 			{
-				return $"Duration: {h}h {i}min";
+				return string.Format(Strings.Get("Duration_HoursMinutes"), h, i);
 			}
 			if (h > 0)
 			{
-				return $"Duration: {h}h";
+				return string.Format(Strings.Get("Duration_HoursOnly"), h);
 			}
-			return $"Duration: {i} min";
+			return string.Format(Strings.Get("Duration_MinutesOnly"), i);
 		}
 
 		private static string FormatBinding(string binding)
 		{
 			return binding switch
 			{
-				"AccountBound" => "Account Bound", 
-				"SoulboundOnAcquire" => "Soulbound on Acquire", 
-				"SoulboundOnUse" => "Soulbound on Use", 
+				"AccountBound" => Strings.Get("Binding_AccountBound"), 
+				"SoulboundOnAcquire" => Strings.Get("Binding_SoulboundOnAcquire"), 
+				"SoulboundOnUse" => Strings.Get("Binding_SoulboundOnUse"), 
 				_ => "", 
 			};
 		}

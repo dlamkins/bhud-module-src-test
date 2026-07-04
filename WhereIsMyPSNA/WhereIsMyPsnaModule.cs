@@ -32,7 +32,7 @@ namespace WhereIsMyPSNA
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
-			_hideKnownNpcs = settings.DefineSetting<bool>("HideKnownNpcs", false, (Func<string>)(() => "Hide NPC if recipe is already known"), (Func<string>)(() => "Hides the panel and copy button for NPCs whose today's recipe you already know."));
+			_hideKnownNpcs = settings.DefineSetting<bool>("HideKnownNpcs", false, (Func<string>)(() => Strings.Get("HideKnownNpcs_Name")), (Func<string>)(() => Strings.Get("HideKnownNpcs_Description")));
 		}
 
 		protected override void Initialize()
@@ -45,14 +45,14 @@ namespace WhereIsMyPSNA
 
 		protected override void OnModuleLoaded(EventArgs e)
 		{
-			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007a: Expected O, but got Unknown
+			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0085: Expected O, but got Unknown
 			Texture2D icon = _moduleParameters.get_ContentsManager().GetTexture("psna.png");
-			_psnaWindow = new PsnaWindow(_moduleParameters.get_ContentsManager(), _moduleParameters.get_Gw2ApiManager(), _hideKnownNpcs);
+			_psnaWindow = new PsnaWindow(_moduleParameters.get_ContentsManager(), _moduleParameters.get_Gw2ApiManager(), _moduleParameters.get_DirectoriesManager(), _hideKnownNpcs);
 			CornerIcon val = new CornerIcon();
 			val.set_Icon(AsyncTexture2D.op_Implicit(icon));
 			((Control)val).set_BasicTooltipText("Where Is My PSNA");
