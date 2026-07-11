@@ -109,8 +109,7 @@ namespace Estreya.BlishHUD.EventTable.Models
 		public WeakReference<EventCategory> Category { get; private set; }
 
 		[JsonProperty("reminderTimes")]
-		public Duration[] ReminderTimes { get; private set; } = new Duration[1] { Duration.FromMinutes(10L) };
-
+		public Duration[] ReminderTimes { get; private set; }
 
 		public event EventHandler<Duration> Reminder;
 
@@ -197,6 +196,12 @@ namespace Estreya.BlishHUD.EventTable.Models
 		public void UpdateReminderTimes(Duration[] reminderTimes)
 		{
 			ReminderTimes = reminderTimes;
+			_remindedFor.Clear();
+		}
+
+		public void UpdateReminderTimesDefault()
+		{
+			ReminderTimes = new Duration[1] { Duration.FromMinutes(10L) };
 			_remindedFor.Clear();
 		}
 

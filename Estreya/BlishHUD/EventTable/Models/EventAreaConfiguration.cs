@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using Blish_HUD.Settings;
+using Estreya.BlishHUD.Shared.Extensions;
 using Estreya.BlishHUD.Shared.Models.Drawers;
 using Estreya.BlishHUD.Shared.Models.GameIntegration.Chat;
 using Estreya.BlishHUD.Shared.Models.GameIntegration.Guild;
@@ -67,9 +69,14 @@ namespace Estreya.BlishHUD.EventTable.Models
 
 		public SettingEntry<DrawInterval> DrawInterval { get; set; }
 
+		[Obsolete("Use LimitMapType instead.", true)]
 		public SettingEntry<bool> LimitToCurrentMap { get; set; }
 
+		public SettingEntry<LimitMapType> LimitMapType { get; set; }
+
 		public SettingEntry<bool> AllowUnspecifiedMap { get; set; }
+
+		public SettingEntry<HighlightType> HighlightType { get; set; }
 
 		public SettingEntry<float> TimeLineOpacity { get; set; }
 
@@ -137,10 +144,12 @@ namespace Estreya.BlishHUD.EventTable.Models
 
 		public SettingEntry<bool> CompactMode { get; set; }
 
+		public SettingEntry<DateTimeOffset> CreatedAt { get; set; }
+
 		public void CopyTo(EventAreaConfiguration other)
 		{
 			CopyTo((DrawerConfiguration)other);
-			other.DisabledEventKeys.set_Value(DisabledEventKeys.get_Value());
+			other.DisabledEventKeys.set_Value(new List<string>(DisabledEventKeys.get_Value()));
 			other.CompletionAction.set_Value(CompletionAction.get_Value());
 			other.EnableLinkedCompletion.set_Value(EnableLinkedCompletion.get_Value());
 			other.ShowTooltips.set_Value(ShowTooltips.get_Value());
@@ -156,24 +165,25 @@ namespace Estreya.BlishHUD.EventTable.Models
 			other.HistorySplitScrollingSpeed.set_Value(HistorySplitScrollingSpeed.get_Value());
 			other.DrawBorders.set_Value(DrawBorders.get_Value());
 			other.UseFiller.set_Value(UseFiller.get_Value());
-			other.FillerTextColor.set_Value(FillerTextColor.get_Value());
+			other.FillerTextColor.set_Value(FillerTextColor.get_Value().Copy<Color>());
 			other.FillerTextOpacity.set_Value(FillerTextOpacity.get_Value());
 			other.DrawShadowsForFiller.set_Value(DrawShadowsForFiller.get_Value());
-			other.FillerShadowColor.set_Value(FillerShadowColor.get_Value());
+			other.FillerShadowColor.set_Value(FillerShadowColor.get_Value().Copy<Color>());
 			other.FillerShadowOpacity.set_Value(FillerShadowOpacity.get_Value());
 			other.EventHeight.set_Value(EventHeight.get_Value());
-			other.EventOrder.set_Value(EventOrder.get_Value());
+			other.EventOrder.set_Value(new List<string>(EventOrder.get_Value()));
 			other.EventBackgroundOpacity.set_Value(EventBackgroundOpacity.get_Value());
 			other.EventTextOpacity.set_Value(EventTextOpacity.get_Value());
 			other.DrawShadows.set_Value(DrawShadows.get_Value());
-			other.ShadowColor.set_Value(ShadowColor.get_Value());
+			other.ShadowColor.set_Value(ShadowColor.get_Value().Copy<Color>());
 			other.DrawInterval.set_Value(DrawInterval.get_Value());
-			other.LimitToCurrentMap.set_Value(LimitToCurrentMap.get_Value());
+			other.LimitMapType.set_Value(LimitMapType.get_Value());
 			other.AllowUnspecifiedMap.set_Value(AllowUnspecifiedMap.get_Value());
+			other.HighlightType.set_Value(HighlightType.get_Value());
 			other.TimeLineOpacity.set_Value(TimeLineOpacity.get_Value());
 			other.CompletedEventsBackgroundOpacity.set_Value(CompletedEventsBackgroundOpacity.get_Value());
 			other.CompletedEventsTextOpacity.set_Value(CompletedEventsTextOpacity.get_Value());
-			other.CompletedEventsInvertTextColor.set_Value(CompletedEventsInvertTextColor.get_Value());
+			other.CompletedEventsInvertTextColor.set_Value(CompletedEventsInvertTextColor.get_Value().Copy());
 			other.HideOnMissingMumbleTicks.set_Value(HideOnMissingMumbleTicks.get_Value());
 			other.HideInCombat.set_Value(HideInCombat.get_Value());
 			other.HideOnOpenMap.set_Value(HideOnOpenMap.get_Value());
@@ -182,9 +192,9 @@ namespace Estreya.BlishHUD.EventTable.Models
 			other.HideInWvW.set_Value(HideInWvW.get_Value());
 			other.HideInPvP.set_Value(HideInPvP.get_Value());
 			other.ShowCategoryNames.set_Value(ShowCategoryNames.get_Value());
-			other.CategoryNameColor.set_Value(CategoryNameColor.get_Value());
+			other.CategoryNameColor.set_Value(CategoryNameColor.get_Value().Copy<Color>());
 			other.CategoryNameOpacity.set_Value(CategoryNameOpacity.get_Value());
-			other.CategoryNameBackgroundColor.set_Value(CategoryNameBackgroundColor.get_Value());
+			other.CategoryNameBackgroundColor.set_Value(CategoryNameBackgroundColor.get_Value().Copy<Color>());
 			other.CategoryNameBackgroundOpacity.set_Value(CategoryNameBackgroundOpacity.get_Value());
 			other.EnableColorGradients.set_Value(EnableColorGradients.get_Value());
 			other.EventAbsoluteTimeFormatString.set_Value(EventAbsoluteTimeFormatString.get_Value());
@@ -193,15 +203,15 @@ namespace Estreya.BlishHUD.EventTable.Models
 			other.EventTimespanMinutesFormatString.set_Value(EventTimespanMinutesFormatString.get_Value());
 			other.ShowTopTimeline.set_Value(ShowTopTimeline.get_Value());
 			other.TopTimelineTimeFormatString.set_Value(TopTimelineTimeFormatString.get_Value());
-			other.TopTimelineBackgroundColor.set_Value(TopTimelineBackgroundColor.get_Value());
-			other.TopTimelineLineColor.set_Value(TopTimelineLineColor.get_Value());
-			other.TopTimelineTimeColor.set_Value(TopTimelineTimeColor.get_Value());
+			other.TopTimelineBackgroundColor.set_Value(TopTimelineBackgroundColor.get_Value().Copy<Color>());
+			other.TopTimelineLineColor.set_Value(TopTimelineLineColor.get_Value().Copy<Color>());
+			other.TopTimelineTimeColor.set_Value(TopTimelineTimeColor.get_Value().Copy<Color>());
 			other.TopTimelineBackgroundOpacity.set_Value(TopTimelineBackgroundOpacity.get_Value());
 			other.TopTimelineLineOpacity.set_Value(TopTimelineLineOpacity.get_Value());
 			other.TopTimelineTimeOpacity.set_Value(TopTimelineTimeOpacity.get_Value());
 			other.TopTimelineLinesOverWholeHeight.set_Value(TopTimelineLinesOverWholeHeight.get_Value());
 			other.TopTimelineLinesInBackground.set_Value(TopTimelineLinesInBackground.get_Value());
-			other.DisabledCompletionActionForEvents.set_Value(DisabledCompletionActionForEvents.get_Value());
+			other.DisabledCompletionActionForEvents.set_Value(new List<string>(DisabledCompletionActionForEvents.get_Value()));
 			other.CompactMode.set_Value(CompactMode.get_Value());
 		}
 	}

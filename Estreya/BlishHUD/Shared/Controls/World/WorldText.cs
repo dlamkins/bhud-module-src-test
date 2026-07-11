@@ -31,12 +31,17 @@ namespace Estreya.BlishHUD.Shared.Controls.World
 
 		public int TextureHeight { get; set; }
 
+		protected SpriteBatchParameters EffectParameters { get; set; } = new SpriteBatchParameters((SpriteSortMode)0, (BlendState)null, (SamplerState)null, (DepthStencilState)null, (RasterizerState)null, (Effect)null, (Matrix?)null);
+
+
 		public WorldText(Func<string> getText, BitmapFont font, Vector3 position, float scale, Color color)
 			: base(position, scale)
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001a: Expected O, but got Unknown
+			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
 			_getText = getText;
 			_font = font;
 			_color = color;
@@ -86,13 +91,13 @@ namespace Estreya.BlishHUD.Shared.Controls.World
 			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0049: Expected O, but got Unknown
-			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
 			SpriteBatch spriteBatch = new SpriteBatch(graphicsDevice);
 			try
 			{
@@ -101,7 +106,7 @@ namespace Estreya.BlishHUD.Shared.Controls.World
 				((GraphicsResource)spriteBatch).get_GraphicsDevice().SetRenderTarget(target);
 				try
 				{
-					spriteBatch.Begin((SpriteSortMode)0, (BlendState)null, (SamplerState)null, (DepthStencilState)null, (RasterizerState)null, (Effect)null, (Matrix?)null);
+					SpriteBatchExtensions.Begin(spriteBatch, EffectParameters);
 					((GraphicsResource)spriteBatch).get_GraphicsDevice().Clear(Color.get_Transparent());
 					BitmapFontExtensions.DrawString(spriteBatch, _font, text, new Vector2(textureSizes.Width / 2f - textSizes.Width / 2f, textureSizes.Height / 2f - textSizes.Height / 2f), _color, (Rectangle?)null);
 					spriteBatch.End();

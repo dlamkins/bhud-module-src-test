@@ -82,7 +82,9 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			//IL_0146: Unknown result type (might be due to invalid IL or missing references)
 			//IL_014d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0159: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0160: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0161: Expected O, but got Unknown
+			//IL_016d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018d: Unknown result type (might be due to invalid IL or missing references)
 			((Container)parent).set_HeightSizingMode((SizingMode)1);
 			((Container)parent).set_WidthSizingMode((SizingMode)1);
 			Image val = new Image();
@@ -115,7 +117,11 @@ namespace Estreya.BlishHUD.Shared.UI.Views
 			val3.set_WrapText(true);
 			val3.set_Text(Description);
 			((Control)val3).set_Parent((Container)(object)parent);
-			((Control)val3).set_Width(Math.Max(((Control)nameLabel).get_Width(), 500));
+			Label descriptionLabel = val3;
+			int val4 = (int)Math.Ceiling(descriptionLabel.get_Font().MeasureString(descriptionLabel.get_Text()).Width) + 10;
+			int nameWidth = (int)Math.Ceiling(nameLabel.get_Font().MeasureString(nameLabel.get_Text()).Width) + 10;
+			int width = Math.Min(Math.Max(val4, nameWidth), 500);
+			((Control)descriptionLabel).set_Width(width);
 		}
 
 		protected override Task<bool> InternalLoad(IProgress<string> progress)

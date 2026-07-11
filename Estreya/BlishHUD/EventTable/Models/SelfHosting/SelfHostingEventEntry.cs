@@ -1,5 +1,5 @@
-using System;
 using Newtonsoft.Json;
+using NodaTime;
 
 namespace Estreya.BlishHUD.EventTable.Models.SelfHosting
 {
@@ -21,9 +21,9 @@ namespace Estreya.BlishHUD.EventTable.Models.SelfHosting
 		public string InstanceIP { get; set; }
 
 		[JsonProperty("startTime")]
-		public DateTimeOffset StartTime { get; set; }
+		public Instant StartTime { get; set; }
 
 		[JsonProperty("duration")]
-		public int Duration { get; set; }
+		public Duration Duration { get; set; }
 	}
 }

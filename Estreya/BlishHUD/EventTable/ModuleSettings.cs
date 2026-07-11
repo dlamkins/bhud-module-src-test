@@ -16,6 +16,7 @@ using Estreya.BlishHUD.Shared.Settings;
 using Gw2Sharp.WebApi.V2.Models;
 using Humanizer.Localisation;
 using Microsoft.Xna.Framework.Input;
+using NodaTime;
 using SemVer;
 
 namespace Estreya.BlishHUD.EventTable
@@ -25,6 +26,8 @@ namespace Estreya.BlishHUD.EventTable
 		private const string EVENT_AREA_SETTINGS = "event-area-settings";
 
 		public const string ANY_AREA_NAME = "Any";
+
+		private Func<Instant> _getNowUtc;
 
 		private SettingCollection EventAreaSettings { get; set; }
 
@@ -142,12 +145,13 @@ namespace Estreya.BlishHUD.EventTable
 
 		public SettingEntry<bool> ShowEventTimeTableSettingButtonInExternalWindow { get; private set; }
 
-		public ModuleSettings(SettingCollection settings, Version moduleVersion)
+		public ModuleSettings(SettingCollection settings, Version moduleVersion, Func<Instant> getNowUtc)
 			: base(settings, moduleVersion, new KeyBinding())
 		{
-		}//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-		//IL_000d: Expected O, but got Unknown
-
+			//IL_0003: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000d: Expected O, but got Unknown
+			_getNowUtc = getNowUtc;
+		}
 
 		protected override void InitializeAdditionalSettings(SettingCollection settings)
 		{
@@ -373,6 +377,7 @@ namespace Estreya.BlishHUD.EventTable
 		public EventAreaConfiguration AddDrawer(string name, List<EventCategory> eventCategories, KeyBinding enabledKeybinding = null)
 		{
 			DrawerConfiguration drawer = AddDrawer(name, BuildDirection.Top, enabledKeybinding);
+			SettingEntry<DateTimeOffset> createdAt = base.DrawerSettings.DefineSetting<DateTimeOffset>(name + "-createdAt", _getNowUtc().ToDateTimeOffset(), (Func<string>)null, (Func<string>)null);
 			SettingEntry<LeftClickAction> leftClickAction = base.DrawerSettings.DefineSetting<LeftClickAction>(name + "-leftClickAction", LeftClickAction.CopyWaypoint, (Func<string>)(() => "Left Click Action"), (Func<string>)(() => "Defines the action which is executed when left clicking."));
 			SettingEntry<bool> showTooltips = base.DrawerSettings.DefineSetting<bool>(name + "-showTooltips", true, (Func<string>)(() => "Show Tooltips"), (Func<string>)(() => "Whether a tooltip should be displayed when hovering."));
 			SettingEntry<int> timespan = base.DrawerSettings.DefineSetting<int>(name + "-timespan", 120, (Func<string>)(() => "Timespan"), (Func<string>)(() => "Defines the timespan the event drawer covers."));
@@ -403,8 +408,10 @@ namespace Estreya.BlishHUD.EventTable
 			SettingEntry<bool> drawShadowsForFiller = base.DrawerSettings.DefineSetting<bool>(name + "-drawShadowsForFiller", false, (Func<string>)(() => "Draw Shadows for Filler"), (Func<string>)(() => "Whether the filler text should have shadows"));
 			SettingEntry<Color> fillerShadowColor = base.DrawerSettings.DefineSetting<Color>(name + "-fillerShadowColor", base.DefaultGW2Color, (Func<string>)(() => "Filler Shadow Color"), (Func<string>)(() => "Defines the color of the shadows for fillers"));
 			SettingEntry<DrawInterval> drawInterval = base.DrawerSettings.DefineSetting<DrawInterval>(name + "-drawInterval", DrawInterval.FAST, (Func<string>)(() => "Draw Interval"), (Func<string>)(() => "Defines the refresh rate of the drawer."));
-			SettingEntry<bool> limitToCurrentMap = base.DrawerSettings.DefineSetting<bool>(name + "-limitToCurrentMap", false, (Func<string>)(() => "Limit to current Map"), (Func<string>)(() => "Whether the drawer should only show events from the current map."));
+			base.DrawerSettings.DefineSetting<bool>(name + "-limitToCurrentMap", false, (Func<string>)(() => "Limit to current Map"), (Func<string>)(() => "Whether the drawer should only show events from the current map."));
+			SettingEntry<LimitMapType> limitMapType = base.DrawerSettings.DefineSetting<LimitMapType>(name + "-limitMapType", LimitMapType.None, (Func<string>)(() => "Limit map"), (Func<string>)(() => "Whether the drawer should only show events matching the selected type."));
 			SettingEntry<bool> allowUnspecifiedMap = base.DrawerSettings.DefineSetting<bool>(name + "-allowUnspecifiedMap", true, (Func<string>)(() => "Allow from unspecified Maps"), (Func<string>)(() => "Whether the table should show events which do not have a map id specified."));
+			SettingEntry<HighlightType> highlightEventsFromCurrentMap = base.DrawerSettings.DefineSetting<HighlightType>(name + "-highlightType", HighlightType.None, (Func<string>)(() => "Highlight events from current Map"), (Func<string>)(() => "In what mode the area should highlight events that are on the current map."));
 			SettingEntry<float> timeLineOpacity = base.DrawerSettings.DefineSetting<float>(name + "-timeLineOpacity", 1f, (Func<string>)(() => "Timeline Opacity"), (Func<string>)(() => "Defines the opacity of the time line bar."));
 			SettingComplianceExtensions.SetRange(timeLineOpacity, 0.1f, 1f);
 			SettingEntry<float> eventTextOpacity = base.DrawerSettings.DefineSetting<float>(name + "-eventTextOpacity", 1f, (Func<string>)(() => "Event Text Opacity"), (Func<string>)(() => "Defines the opacity of the event text."));
@@ -456,6 +463,7 @@ namespace Estreya.BlishHUD.EventTable
 			return new EventAreaConfiguration
 			{
 				Name = drawer.Name,
+				CreatedAt = createdAt,
 				Enabled = drawer.Enabled,
 				EnabledKeybinding = drawer.EnabledKeybinding,
 				BuildDirection = drawer.BuildDirection,
@@ -492,8 +500,9 @@ namespace Estreya.BlishHUD.EventTable
 				DrawShadowsForFiller = drawShadowsForFiller,
 				FillerShadowColor = fillerShadowColor,
 				DrawInterval = drawInterval,
-				LimitToCurrentMap = limitToCurrentMap,
+				LimitMapType = limitMapType,
 				AllowUnspecifiedMap = allowUnspecifiedMap,
+				HighlightType = highlightEventsFromCurrentMap,
 				TimeLineOpacity = timeLineOpacity,
 				EventTextOpacity = eventTextOpacity,
 				FillerTextOpacity = fillerTextOpacity,
@@ -550,6 +559,7 @@ namespace Estreya.BlishHUD.EventTable
 		public new void RemoveDrawer(string name)
 		{
 			base.RemoveDrawer(name);
+			base.DrawerSettings.UndefineSetting(name + "-createdAt");
 			base.DrawerSettings.UndefineSetting(name + "-leftClickAction");
 			base.DrawerSettings.UndefineSetting(name + "-showTooltips");
 			base.DrawerSettings.UndefineSetting(name + "-timespan");
@@ -574,7 +584,9 @@ namespace Estreya.BlishHUD.EventTable
 			base.DrawerSettings.UndefineSetting(name + "-fillerShadowColor");
 			base.DrawerSettings.UndefineSetting(name + "-drawInterval");
 			base.DrawerSettings.UndefineSetting(name + "-limitToCurrentMap");
+			base.DrawerSettings.UndefineSetting(name + "-limitMapType");
 			base.DrawerSettings.UndefineSetting(name + "-allowUnspecifiedMap");
+			base.DrawerSettings.UndefineSetting(name + "-highlightType");
 			base.DrawerSettings.UndefineSetting(name + "-timeLineOpacity");
 			base.DrawerSettings.UndefineSetting(name + "-eventTextOpacity");
 			base.DrawerSettings.UndefineSetting(name + "-fillerTextOpacity");
@@ -770,10 +782,6 @@ namespace Estreya.BlishHUD.EventTable
 			string drawIntervalDescriptionDefault = ((SettingEntry)drawerConfiguration.DrawInterval).get_Description();
 			((SettingEntry)drawerConfiguration.DrawInterval).set_GetDisplayNameFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerDrawInterval-name", drawIntervalDisplayNameDefault)));
 			((SettingEntry)drawerConfiguration.DrawInterval).set_GetDescriptionFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerDrawInterval-description", drawIntervalDescriptionDefault)));
-			string limitToCurrentMapDisplayNameDefault = ((SettingEntry)drawerConfiguration.LimitToCurrentMap).get_DisplayName();
-			string limitToCurrentMapDescriptionDefault = ((SettingEntry)drawerConfiguration.LimitToCurrentMap).get_Description();
-			((SettingEntry)drawerConfiguration.LimitToCurrentMap).set_GetDisplayNameFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerLimitToCurrentMap-name", limitToCurrentMapDisplayNameDefault)));
-			((SettingEntry)drawerConfiguration.LimitToCurrentMap).set_GetDescriptionFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerLimitToCurrentMap-description", limitToCurrentMapDescriptionDefault)));
 			string allowUnspecifiedMapDisplayNameDefault = ((SettingEntry)drawerConfiguration.AllowUnspecifiedMap).get_DisplayName();
 			string allowUnspecifiedMapDescriptionDefault = ((SettingEntry)drawerConfiguration.AllowUnspecifiedMap).get_Description();
 			((SettingEntry)drawerConfiguration.AllowUnspecifiedMap).set_GetDisplayNameFunc((Func<string>)(() => translationService.GetTranslation("setting-drawerAllowUnspecifiedMap-name", allowUnspecifiedMapDisplayNameDefault)));
@@ -874,6 +882,8 @@ namespace Estreya.BlishHUD.EventTable
 			//IL_001a: Expected O, but got Unknown
 			//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00bf: Expected O, but got Unknown
+			//IL_016a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0174: Expected O, but got Unknown
 			if (lastModuleVersion == (Version)null || lastModuleVersion <= new Version("3.15.0", false))
 			{
 				foreach (string item in EventAreaNames.get_Value())
@@ -887,20 +897,39 @@ namespace Estreya.BlishHUD.EventTable
 					}
 				}
 			}
-			if (!(lastModuleVersion == (Version)null) && !(lastModuleVersion <= new Version("3.16.5", false)))
+			if (lastModuleVersion == (Version)null || lastModuleVersion <= new Version("3.16.5", false))
+			{
+				foreach (string item2 in EventAreaNames.get_Value())
+				{
+					string entryKey = item2 + "-completionAction";
+					SettingEntry<EventCompletedAction> completionAction = base.DrawerSettings.get_Item(entryKey) as SettingEntry<EventCompletedAction>;
+					if (completionAction != null)
+					{
+						EventCompletedAction oldValue = completionAction.get_Value();
+						EventCompletedAction newValue2 = completionAction.get_Value() + 1;
+						completionAction.set_Value(newValue2);
+						Logger.Info($"Performed migration of {entryKey}. {oldValue} -> {newValue2}");
+					}
+				}
+			}
+			if (!(lastModuleVersion == (Version)null) && !(lastModuleVersion <= new Version("3.16.8", false)))
 			{
 				return;
 			}
-			foreach (string item2 in EventAreaNames.get_Value())
+			foreach (string item3 in EventAreaNames.get_Value())
 			{
-				string entryKey = item2 + "-completionAction";
-				SettingEntry<EventCompletedAction> completionAction = base.DrawerSettings.get_Item(entryKey) as SettingEntry<EventCompletedAction>;
-				if (completionAction != null)
+				string oldEntryKey = item3 + "-limitToCurrentMap";
+				string newEntryKey = item3 + "-limitMapType";
+				SettingEntry<bool> val = base.DrawerSettings.get_Item(oldEntryKey) as SettingEntry<bool>;
+				if (val != null && val.get_Value())
 				{
-					EventCompletedAction oldValue = completionAction.get_Value();
-					EventCompletedAction newValue = completionAction.get_Value() + 1;
-					completionAction.set_Value(newValue);
-					Logger.Info($"Performed migration of {entryKey}. {oldValue} -> {newValue}");
+					SettingEntry<LimitMapType> limitMapTypeSetting = base.DrawerSettings.get_Item(newEntryKey) as SettingEntry<LimitMapType>;
+					if (limitMapTypeSetting != null)
+					{
+						LimitMapType newValue = LimitMapType.OnlyCurrent;
+						limitMapTypeSetting.set_Value(newValue);
+						Logger.Info($"Performed migration of {oldEntryKey} to {newEntryKey}. true -> {newValue}");
+					}
 				}
 			}
 		}

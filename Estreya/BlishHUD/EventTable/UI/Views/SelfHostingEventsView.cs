@@ -106,15 +106,18 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		private List<SelfHostingCategoryDefinition> _categories;
 
+		private Func<Instant> _getNowUTC;
+
 		public Panel Panel { get; private set; }
 
-		public SelfHostingEventsView(ModuleSettings moduleSettings, SelfHostingEventService selfHostingEventService, Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, AccountService accountService, ChatService chatService)
+		public SelfHostingEventsView(ModuleSettings moduleSettings, SelfHostingEventService selfHostingEventService, Gw2ApiManager apiManager, IconService iconService, TranslationService translationService, AccountService accountService, ChatService chatService, Func<Instant> getNowUtc)
 			: base(apiManager, iconService, translationService)
 		{
 			_moduleSettings = moduleSettings;
 			_selfHostingEventService = selfHostingEventService;
 			_accountService = accountService;
 			_chatService = chatService;
+			_getNowUTC = getNowUtc;
 		}
 
 		protected override void InternalBuild(Panel parent)
@@ -157,7 +160,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 				if (child != null)
 				{
 					SelfHostingEventEntry entry = child.Data;
-					((DetailsButton)child).set_CurrentFill((int)MathHelper.Scale((DateTimeOffset.UtcNow - entry.StartTime.ToUniversalTime()).TotalMinutes, 0.0, entry.Duration, 0.0, ((DetailsButton)child).get_MaxFill()));
+					((DetailsButton)child).set_CurrentFill((int)MathHelper.Scale((_getNowUTC() - entry.StartTime).TotalMinutes, 0.0, entry.Duration.TotalMinutes, 0.0, ((DetailsButton)child).get_MaxFill()));
 				}
 			}
 		}
@@ -601,7 +604,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			{
 				try
 				{
-					await _selfHostingEventService.AddEntry(categoryDropdown.SelectedItem?.Key, zoneDropdown.SelectedItem?.Key, eventDropdown.SelectedItem?.Key, DateTimeOffset.UtcNow, durationDropdown.SelectedItem);
+					await _selfHostingEventService.AddEntry(categoryDropdown.SelectedItem?.Key, zoneDropdown.SelectedItem?.Key, eventDropdown.SelectedItem?.Key, _getNowUTC(), Duration.FromMinutes(durationDropdown.SelectedItem));
 					ShowInfo("Added successfully.");
 					BuildEntriesPanel();
 				}
@@ -648,51 +651,53 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		private void UpdateActiveEventsGroup()
 		{
-			//IL_02a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02d3: Expected O, but got Unknown
-			//IL_032d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0332: Unknown result type (might be due to invalid IL or missing references)
-			//IL_033a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0350: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0366: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0373: Expected O, but got Unknown
-			//IL_0379: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03c9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03e1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02c1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02f4: Expected O, but got Unknown
+			//IL_0357: Unknown result type (might be due to invalid IL or missing references)
+			//IL_035c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0364: Unknown result type (might be due to invalid IL or missing references)
+			//IL_037a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0390: Unknown result type (might be due to invalid IL or missing references)
+			//IL_039d: Expected O, but got Unknown
+			//IL_03a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03f5: Unknown result type (might be due to invalid IL or missing references)
 			//IL_03fa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03ff: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0407: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0412: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0442: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0447: Unknown result type (might be due to invalid IL or missing references)
-			//IL_044f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_045a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0481: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0486: Unknown result type (might be due to invalid IL or missing references)
-			//IL_048e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04ba: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04c7: Expected O, but got Unknown
-			//IL_04cd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0402: Unknown result type (might be due to invalid IL or missing references)
+			//IL_040d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0426: Unknown result type (might be due to invalid IL or missing references)
+			//IL_042b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0433: Unknown result type (might be due to invalid IL or missing references)
+			//IL_043e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_046f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0474: Unknown result type (might be due to invalid IL or missing references)
+			//IL_047c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0487: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04bc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04d2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04e8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04f5: Expected O, but got Unknown
+			//IL_04fb: Unknown result type (might be due to invalid IL or missing references)
 			((Container)_activeEventsGroup).ClearChildren();
 			Account account = _accountService.Account;
 			string currentAccountName = ((account != null) ? account.get_Name() : null);
-			foreach (SelfHostingEventEntry ev in _selfHostingEventService.Events.ToArray().ToList())
+			List<SelfHostingEventEntry> list = _selfHostingEventService.Events.ToArray().ToList();
+			Instant now = _getNowUTC();
+			foreach (SelfHostingEventEntry ev in list)
 			{
 				bool isMyHosting = ev.AccountName == currentAccountName;
-				TimeSpan runningDuration = DateTimeOffset.UtcNow - ev.StartTime;
+				Duration runningDuration = now - ev.StartTime;
 				SelfHostingCategoryDefinition obj = _categories?.FirstOrDefault((SelfHostingCategoryDefinition c) => c.Key == ev.CategoryKey);
 				string categoryName = obj?.Name ?? ev.CategoryKey;
 				SelfHostingZoneDefinition zoneDef = obj?.Zones?.FirstOrDefault((SelfHostingZoneDefinition z) => z.Key == ev.ZoneKey);
 				string zoneName = zoneDef?.Name ?? ev.ZoneKey;
 				SelfHostingEventDefinition eventDef = zoneDef?.Events?.FirstOrDefault((SelfHostingEventDefinition e) => e.Key == ev.EventKey);
 				string eventName = eventDef?.Name ?? ev.EventKey;
-				DateTimeOffset startTimeLocal = ev.StartTime.ToLocalTime();
+				DateTimeOffset startTimeLocal = ev.StartTime.ToDateTimeOffset().ToLocalTime();
 				string startTimeString = ((startTimeLocal.Date == DateTimeOffset.Now.Date) ? startTimeLocal.ToString("t") : startTimeLocal.ToString("g"));
 				DataDetailsButton<SelfHostingEventEntry> dataDetailsButton = new DataDetailsButton<SelfHostingEventEntry>();
 				((Control)dataDetailsButton).set_Parent((Container)(object)_activeEventsGroup);
@@ -709,7 +714,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 				{
 					((DetailsButton)detailsButton).set_MaxFill(100);
 					((DetailsButton)detailsButton).set_ShowVignette(true);
-					((DetailsButton)detailsButton).set_CurrentFill((int)MathHelper.Scale(runningDuration.TotalMinutes, 0.0, ev.Duration, 0.0, ((DetailsButton)detailsButton).get_MaxFill()));
+					((DetailsButton)detailsButton).set_CurrentFill((int)MathHelper.Scale(runningDuration.TotalMinutes, 0.0, ev.Duration.TotalMinutes, 0.0, ((DetailsButton)detailsButton).get_MaxFill()));
 					((DetailsButton)detailsButton).set_ShowFillFraction(true);
 				}
 				GlowButton val = new GlowButton();

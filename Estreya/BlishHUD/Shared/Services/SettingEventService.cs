@@ -11,11 +11,18 @@ namespace Estreya.BlishHUD.Shared.Services
 {
 	public class SettingEventService : ManagedService
 	{
+		private class RegisteredSetting
+		{
+			public SettingEntry Setting { get; set; }
+
+			public IComplianceRequisite ComplianceRequisite { get; set; }
+		}
+
 		private static readonly Logger _logger = Logger.GetLogger<SettingEventService>();
 
-		private List<(SettingEntry SettingEntry, IComplianceRequisite ComplianceRequisite)> _registeredForDisabledUpdates;
+		private List<RegisteredSetting> _registeredForDisabledUpdates;
 
-		private List<(SettingEntry SettingEntry, IComplianceRequisite ComplianceRequisite)> _registeredForRangeUpdates;
+		private List<RegisteredSetting> _registeredForRangeUpdates;
 
 		private AsyncLock _disabledStateLock = new AsyncLock();
 
@@ -32,8 +39,8 @@ namespace Estreya.BlishHUD.Shared.Services
 
 		protected override Task Initialize()
 		{
-			_registeredForRangeUpdates = new List<(SettingEntry, IComplianceRequisite)>();
-			_registeredForDisabledUpdates = new List<(SettingEntry, IComplianceRequisite)>();
+			_registeredForRangeUpdates = new List<RegisteredSetting>();
+			_registeredForDisabledUpdates = new List<RegisteredSetting>();
 			return Task.CompletedTask;
 		}
 
@@ -70,13 +77,17 @@ namespace Estreya.BlishHUD.Shared.Services
 			}
 			using (_rangeStateLock.Lock())
 			{
-				if (!_registeredForRangeUpdates.Any(delegate((SettingEntry SettingEntry, IComplianceRequisite ComplianceRequisite) p)
+				if (!_registeredForRangeUpdates.Any(delegate(RegisteredSetting p)
 				{
-					var (val, _) = p;
-					return ((val != null) ? val.get_EntryKey() : null) == settingEntry.get_EntryKey();
+					SettingEntry setting = p.Setting;
+					return ((setting != null) ? setting.get_EntryKey() : null) == settingEntry.get_EntryKey();
 				}))
 				{
-					_registeredForRangeUpdates.Add((settingEntry, defaultRange));
+					_registeredForRangeUpdates.Add(new RegisteredSetting
+					{
+						Setting = settingEntry,
+						ComplianceRequisite = defaultRange
+					});
 					_logger.Debug("Started tracking setting \"" + settingEntry.get_EntryKey() + "\" for range updates.");
 				}
 			}
@@ -90,10 +101,10 @@ namespace Estreya.BlishHUD.Shared.Services
 			}
 			using (_rangeStateLock.Lock())
 			{
-				_registeredForRangeUpdates.RemoveAll(delegate((SettingEntry SettingEntry, IComplianceRequisite ComplianceRequisite) p)
+				_registeredForRangeUpdates.RemoveAll(delegate(RegisteredSetting p)
 				{
-					var (val, _) = p;
-					return ((val != null) ? val.get_EntryKey() : null) == settingEntry.get_EntryKey();
+					SettingEntry setting = p.Setting;
+					return ((setting != null) ? setting.get_EntryKey() : null) == settingEntry.get_EntryKey();
 				});
 			}
 			_logger.Debug("Stopped tracking setting \"" + settingEntry.get_EntryKey() + "\" for range updates.");
@@ -107,13 +118,17 @@ namespace Estreya.BlishHUD.Shared.Services
 			}
 			using (_disabledStateLock.Lock())
 			{
-				if (!_registeredForDisabledUpdates.Any(delegate((SettingEntry SettingEntry, IComplianceRequisite ComplianceRequisite) p)
+				if (!_registeredForDisabledUpdates.Any(delegate(RegisteredSetting p)
 				{
-					var (val, _) = p;
-					return ((val != null) ? val.get_EntryKey() : null) == settingEntry.get_EntryKey();
+					SettingEntry setting = p.Setting;
+					return ((setting != null) ? setting.get_EntryKey() : null) == settingEntry.get_EntryKey();
 				}))
 				{
-					_registeredForDisabledUpdates.Add((settingEntry, defaultRange));
+					_registeredForDisabledUpdates.Add(new RegisteredSetting
+					{
+						Setting = settingEntry,
+						ComplianceRequisite = defaultRange
+					});
 					_logger.Debug("Started tracking setting \"" + settingEntry.get_EntryKey() + "\" for disabled updates.");
 				}
 			}
@@ -127,10 +142,10 @@ namespace Estreya.BlishHUD.Shared.Services
 			}
 			using (_disabledStateLock.Lock())
 			{
-				_registeredForDisabledUpdates.RemoveAll(delegate((SettingEntry SettingEntry, IComplianceRequisite ComplianceRequisite) p)
+				_registeredForDisabledUpdates.RemoveAll(delegate(RegisteredSetting p)
 				{
-					var (val, _) = p;
-					return ((val != null) ? val.get_EntryKey() : null) == settingEntry.get_EntryKey();
+					SettingEntry setting = p.Setting;
+					return ((setting != null) ? setting.get_EntryKey() : null) == settingEntry.get_EntryKey();
 				});
 			}
 			_logger.Debug("Stopped tracking setting \"" + settingEntry.get_EntryKey() + "\" for disabled updates.");
@@ -138,6 +153,14 @@ namespace Estreya.BlishHUD.Shared.Services
 
 		private void CheckRangeUpdates()
 		{
+			//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0100: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0132: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0147: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014c: Unknown result type (might be due to invalid IL or missing references)
 			if (!_rangeStateLock.IsFree())
 			{
 				return;
@@ -146,32 +169,75 @@ namespace Estreya.BlishHUD.Shared.Services
 			{
 				for (int i = 0; i < _registeredForRangeUpdates.Count; i++)
 				{
-					(SettingEntry, IComplianceRequisite) settingPair = _registeredForRangeUpdates[i];
+					RegisteredSetting registeredEntry = _registeredForRangeUpdates[i];
 					bool changed = false;
-					SettingEntry setting = settingPair.Item1;
-					IComplianceRequisite priorRange = settingPair.Item2;
-					IEnumerable<IComplianceRequisite> ranges = SettingComplianceExtensions.GetComplianceRequisite(setting);
+					IEnumerable<IComplianceRequisite> ranges = SettingComplianceExtensions.GetComplianceRequisite(registeredEntry.Setting);
+					SettingEntry setting = registeredEntry.Setting;
+					IComplianceRequisite numberRange;
+					int num;
 					if ((setting is SettingEntry<int> || setting is SettingEntry<float>) ? true : false)
 					{
-						IEnumerable<IComplianceRequisite> numberRanges = ranges.Where((IComplianceRequisite r) => (r is IntRangeRangeComplianceRequisite || r is FloatRangeRangeComplianceRequisite) ? true : false);
+						List<IComplianceRequisite> numberRanges = ranges.Where((IComplianceRequisite r) => (r is IntRangeRangeComplianceRequisite || r is FloatRangeRangeComplianceRequisite) ? true : false).ToList();
 						if (!numberRanges.Any())
 						{
-							if (priorRange != null)
+							if (registeredEntry.ComplianceRequisite != null)
 							{
-								settingPair.Item2 = null;
+								registeredEntry.ComplianceRequisite = null;
 								changed = true;
 							}
 						}
-						else if (priorRange != (settingPair.Item2 = numberRanges.First()))
+						else
 						{
-							changed = true;
+							numberRange = numberRanges.First();
+							if (registeredEntry.ComplianceRequisite != numberRange)
+							{
+								if (registeredEntry.ComplianceRequisite == null)
+								{
+									goto IL_0179;
+								}
+								if (numberRange is IntRangeRangeComplianceRequisite)
+								{
+									IntRangeRangeComplianceRequisite intRange = (IntRangeRangeComplianceRequisite)(object)numberRange;
+									IComplianceRequisite complianceRequisite = registeredEntry.ComplianceRequisite;
+									if (complianceRequisite is IntRangeRangeComplianceRequisite)
+									{
+										IntRangeRangeComplianceRequisite priorIntRange = (IntRangeRangeComplianceRequisite)(object)complianceRequisite;
+										if (((IntRangeRangeComplianceRequisite)(ref intRange)).get_MinValue() != ((IntRangeRangeComplianceRequisite)(ref priorIntRange)).get_MinValue() || ((IntRangeRangeComplianceRequisite)(ref intRange)).get_MaxValue() != ((IntRangeRangeComplianceRequisite)(ref priorIntRange)).get_MaxValue())
+										{
+											goto IL_0179;
+										}
+									}
+								}
+								if (numberRange is FloatRangeRangeComplianceRequisite)
+								{
+									FloatRangeRangeComplianceRequisite floatRange = (FloatRangeRangeComplianceRequisite)(object)numberRange;
+									IComplianceRequisite complianceRequisite = registeredEntry.ComplianceRequisite;
+									if (complianceRequisite is FloatRangeRangeComplianceRequisite)
+									{
+										FloatRangeRangeComplianceRequisite priorFloatRange = (FloatRangeRangeComplianceRequisite)(object)complianceRequisite;
+										num = ((((FloatRangeRangeComplianceRequisite)(ref floatRange)).get_MinValue() != ((FloatRangeRangeComplianceRequisite)(ref priorFloatRange)).get_MinValue() || ((FloatRangeRangeComplianceRequisite)(ref floatRange)).get_MaxValue() != ((FloatRangeRangeComplianceRequisite)(ref priorFloatRange)).get_MaxValue()) ? 1 : 0);
+										goto IL_017a;
+									}
+								}
+								num = 0;
+								goto IL_017a;
+							}
 						}
 					}
+					goto IL_0183;
+					IL_0179:
+					num = 1;
+					goto IL_017a;
+					IL_017a:
+					changed = (byte)num != 0;
+					registeredEntry.ComplianceRequisite = numberRange;
+					goto IL_0183;
+					IL_0183:
 					if (changed)
 					{
 						try
 						{
-							this.RangeUpdated?.Invoke(this, new ComplianceUpdated(setting, settingPair.Item2));
+							this.RangeUpdated?.Invoke(this, new ComplianceUpdated(registeredEntry.Setting, registeredEntry.ComplianceRequisite));
 						}
 						catch (Exception)
 						{
@@ -183,7 +249,7 @@ namespace Estreya.BlishHUD.Shared.Services
 
 		private void CheckDisabledUpdates()
 		{
-			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
 			if (!_disabledStateLock.IsFree())
 			{
 				return;
@@ -192,30 +258,32 @@ namespace Estreya.BlishHUD.Shared.Services
 			{
 				for (int i = 0; i < _registeredForDisabledUpdates.Count; i++)
 				{
-					(SettingEntry, IComplianceRequisite) settingPair = _registeredForDisabledUpdates[i];
+					RegisteredSetting registeredEntry = _registeredForDisabledUpdates[i];
 					bool changed = false;
-					SettingEntry setting = settingPair.Item1;
-					IComplianceRequisite priorRange = settingPair.Item2;
-					IEnumerable<IComplianceRequisite> disabledRanges = from r in SettingComplianceExtensions.GetComplianceRequisite(setting)
+					List<IComplianceRequisite> disabledRanges = (from r in SettingComplianceExtensions.GetComplianceRequisite(registeredEntry.Setting)
 						where r is SettingDisabledComplianceRequisite
-						select r;
+						select r).ToList();
 					if (!disabledRanges.Any())
 					{
-						if (priorRange != null)
+						if (registeredEntry.ComplianceRequisite != null)
 						{
-							settingPair.Item2 = (IComplianceRequisite)(object)new SettingDisabledComplianceRequisite(false);
+							registeredEntry.ComplianceRequisite = (IComplianceRequisite)(object)new SettingDisabledComplianceRequisite(false);
 							changed = true;
 						}
 					}
-					else if (priorRange != (settingPair.Item2 = disabledRanges.First()))
+					else
 					{
-						changed = true;
+						IComplianceRequisite disabledRange = (registeredEntry.ComplianceRequisite = disabledRanges.First());
+						if (registeredEntry.ComplianceRequisite != disabledRange)
+						{
+							changed = true;
+						}
 					}
 					if (changed)
 					{
 						try
 						{
-							this.DisabledUpdated?.Invoke(this, new ComplianceUpdated(setting, settingPair.Item2));
+							this.DisabledUpdated?.Invoke(this, new ComplianceUpdated(registeredEntry.Setting, registeredEntry.ComplianceRequisite));
 						}
 						catch (Exception)
 						{

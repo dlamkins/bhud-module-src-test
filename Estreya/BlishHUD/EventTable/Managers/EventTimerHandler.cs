@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Content;
@@ -16,6 +17,7 @@ using Estreya.BlishHUD.Shared.Controls.World;
 using Estreya.BlishHUD.Shared.Services;
 using Estreya.BlishHUD.Shared.Threading;
 using Estreya.BlishHUD.Shared.Utils;
+using Glide;
 using Humanizer;
 using Humanizer.Localisation;
 using Microsoft.Xna.Framework;
@@ -55,15 +57,19 @@ namespace Estreya.BlishHUD.EventTable.Managers
 
 		private readonly IconService _iconService;
 
+		private readonly ContentsManager _contentsManager;
+
 		private readonly ConcurrentQueue<(string Key, bool Add)> _entityQueue = new ConcurrentQueue<(string, bool)>();
 
 		private readonly ConcurrentDictionary<string, List<MapEntity>> _mapEntities = new ConcurrentDictionary<string, List<MapEntity>>();
 
 		private readonly ConcurrentDictionary<string, List<WorldEntity>> _worldEntities = new ConcurrentDictionary<string, List<WorldEntity>>();
 
+		private readonly ConcurrentDictionary<string, Tween> _worldEntityAnimations = new ConcurrentDictionary<string, Tween>();
+
 		public event EventHandler FoundLostEntities;
 
-		public EventTimerHandler(Func<Task<List<Event>>> getEvents, Func<Instant> getNow, MapUtil mapUtil, Gw2ApiManager apiManager, ModuleSettings moduleSettings, TranslationService translationService, IconService iconService)
+		public EventTimerHandler(Func<Task<List<Event>>> getEvents, Func<Instant> getNow, MapUtil mapUtil, Gw2ApiManager apiManager, ModuleSettings moduleSettings, TranslationService translationService, IconService iconService, ContentsManager contentsManager)
 		{
 			_getEvents = getEvents;
 			_getNow = getNow;
@@ -72,6 +78,7 @@ namespace Estreya.BlishHUD.EventTable.Managers
 			_moduleSettings = moduleSettings;
 			_translationService = translationService;
 			_iconService = iconService;
+			_contentsManager = contentsManager;
 			GameService.Gw2Mumble.get_CurrentMap().add_MapChanged((EventHandler<ValueEventArgs<int>>)CurrentMap_MapChanged);
 			_moduleSettings.ShowEventTimersOnMap.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowEventTimersOnMap_SettingChanged);
 			_moduleSettings.ShowEventTimersInWorld.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowEventTimersInWorld_SettingChanged);
@@ -213,87 +220,85 @@ namespace Estreya.BlishHUD.EventTable.Managers
 
 		public Task AddEventTimerToWorld(Event ev)
 		{
-			//IL_015d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0194: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01af: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0213: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0221: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0226: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0179: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0193: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01cc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0212: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0220: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0225: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0234: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0235: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0236: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0238: Unknown result type (might be due to invalid IL or missing references)
-			//IL_024c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0251: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0256: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0281: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02d7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02dc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_032e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0333: Unknown result type (might be due to invalid IL or missing references)
-			//IL_037b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0380: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03df: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03e4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0436: Unknown result type (might be due to invalid IL or missing references)
-			//IL_043b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_048d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0492: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0494: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04a5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04aa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04af: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04d4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04d9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04f9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04fe: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0503: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0518: Unknown result type (might be due to invalid IL or missing references)
-			//IL_051d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0522: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0524: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0533: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0538: Unknown result type (might be due to invalid IL or missing references)
-			//IL_053d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_053f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_054e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0553: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0558: Unknown result type (might be due to invalid IL or missing references)
-			//IL_055a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_056e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0573: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0588: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05dc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0609: Unknown result type (might be due to invalid IL or missing references)
-			//IL_063e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0642: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0677: Unknown result type (might be due to invalid IL or missing references)
-			//IL_067b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06ba: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06ef: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06f3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_072e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0732: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0768: Unknown result type (might be due to invalid IL or missing references)
-			//IL_076c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07ac: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07e2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07e6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0822: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0826: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0237: Unknown result type (might be due to invalid IL or missing references)
+			//IL_024b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0250: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0255: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0280: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02df: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0336: Unknown result type (might be due to invalid IL or missing references)
+			//IL_033b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0383: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0388: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03e7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_043e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0443: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0495: Unknown result type (might be due to invalid IL or missing references)
+			//IL_049a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_049c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04e1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0501: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0506: Unknown result type (might be due to invalid IL or missing references)
+			//IL_050b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0520: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0525: Unknown result type (might be due to invalid IL or missing references)
+			//IL_052a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_052c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_053b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0540: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0545: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0547: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0556: Unknown result type (might be due to invalid IL or missing references)
+			//IL_055b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0560: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0562: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0576: Unknown result type (might be due to invalid IL or missing references)
+			//IL_057b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0590: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05b0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0602: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0632: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0636: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0666: Unknown result type (might be due to invalid IL or missing references)
+			//IL_066a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06a4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06d8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_070e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0712: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0743: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0747: Unknown result type (might be due to invalid IL or missing references)
+			//IL_077e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0782: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07e8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0823: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0827: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0858: Unknown result type (might be due to invalid IL or missing references)
 			//IL_085c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0860: Unknown result type (might be due to invalid IL or missing references)
-			//IL_089c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08da: Unknown result type (might be due to invalid IL or missing references)
 			RemoveEventTimerFromWorld(ev);
 			if (!_moduleSettings.ShowEventTimersInWorld.get_Value() || !GameService.Gw2Mumble.get_IsAvailable() || ev.Timers == null || (_moduleSettings.DisabledEventTimerSettingKeys.get_Value()?.Contains(ev.SettingKey) ?? false))
 			{
@@ -304,11 +309,12 @@ namespace Estreya.BlishHUD.EventTable.Managers
 				Func<WorldEntity, bool> renderCondition = (WorldEntity entity) => entity.DistanceToPlayer <= (float)_moduleSettings.EventTimersRenderDistance.get_Value();
 				int mapId = GameService.Gw2Mumble.get_CurrentMap().get_Id();
 				_getNow();
-				List<EventWorldTimer> list = ev.Timers.Where((EventTimers t) => t.MapID == mapId && t.World != null && t.World.Length != 0).SelectMany((EventTimers t) => t.World).ToList();
+				List<EventWorldTimer> worldTimers = ev.Timers.Where((EventTimers t) => t.MapID == mapId && t.World != null && t.World.Length != 0).SelectMany((EventTimers t) => t.World).ToList();
 				List<WorldEntity> entites = new List<WorldEntity>();
 				Vector3 centerAsWorldMeters = default(Vector3);
-				foreach (EventWorldTimer worldTimer in list)
+				for (int i = 0; i < worldTimers.Count; i++)
 				{
+					EventWorldTimer worldTimer = worldTimers[i];
 					((Vector3)(ref centerAsWorldMeters))._002Ector(worldTimer.X, worldTimer.Y, worldTimer.Z);
 					float width = 5f;
 					float boxHeight = 3.5f;
@@ -336,6 +342,7 @@ namespace Estreya.BlishHUD.EventTable.Managers
 					float textureScale = 1f;
 					AsyncTexture2D textureIcon = _iconService.GetIcon(ev.Icon);
 					new Size(128, 128);
+					float rotation = worldTimer.Rotation;
 					Func<string> remainingText = delegate
 					{
 						Instant currentOccurrence = ev.GetCurrentOccurrence();
@@ -344,20 +351,21 @@ namespace Estreya.BlishHUD.EventTable.Managers
 						{
 							text = (currentOccurrence.Plus(ev.Duration) - _getNow()).ToTimeSpan().Humanize(2, null, TimeUnit.Week, TimeUnit.Second);
 						}
-						return "Current remaining: " + text;
+						return "Remaining: " + text;
 					};
 					BitmapFont remainingFont = GetFont((FontSize)36);
 					float remainingScale = 0.4f;
-					float remainingScaleWidth = 2.75f;
+					float remainingScaleWidth = 3.75f;
 					Color remainingColor = ColorExtensions.ToXnaColor(_moduleSettings.EventTimersRemainingTextColor.get_Value().get_Cloth());
 					Func<string> startsInText = () => "Next in: " + (ev.GetNextOccurrence() - _getNow()).ToTimeSpan().Humanize(2, null, TimeUnit.Week, TimeUnit.Second);
 					BitmapFont startsInFont = GetFont((FontSize)36);
 					float startsInScale = 0.4f;
-					float startsInScaleWidth = 2.5f;
+					float startsInScaleWidth = 4f;
 					Color startsInColor = ColorExtensions.ToXnaColor(_moduleSettings.EventTimersStartsInTextColor.get_Value().get_Cloth());
 					float nextOccurrenceScale = 0.4f;
-					float nextOccurrenceScaleWidth = 2f;
-					Func<string> nextOccurrenceText = () => ev.GetNextOccurrence().InZone(DateTimeZoneProviders.Tzdb.GetSystemDefault()).ToString();
+					float nextOccurrenceScaleWidth = 3f;
+					Func<string> nextOccurrenceText = () => ev.GetNextOccurrence().InZone(DateTimeZoneProviders.Tzdb.GetSystemDefault()).ToDateTimeOffset()
+						.ToString("g", Thread.CurrentThread.CurrentUICulture);
 					Color nextOccurrenceColor = ColorExtensions.ToXnaColor(_moduleSettings.EventTimersNextOccurenceTextColor.get_Value().get_Cloth());
 					BitmapFont nextOccurrenceFont = GetFont((FontSize)36);
 					Func<string> nameText = () => ev.Name ?? "";
@@ -365,15 +373,15 @@ namespace Estreya.BlishHUD.EventTable.Managers
 					float nameScale = 0.6f;
 					float nameScaleWidth = width / 1.5f;
 					Color nameColor = ColorExtensions.ToXnaColor(_moduleSettings.EventTimersNameTextColor.get_Value().get_Cloth());
-					Func<string> durationText = () => $"Duration: {ev.Duration}min";
+					Func<string> durationText = () => "Duration: " + ev.Duration.ToTimeSpan().Humanize(1, null, TimeUnit.Hour, TimeUnit.Minute);
 					BitmapFont durationFont = GetFont((FontSize)36);
 					float durationScale = 0.4f;
-					float durationScaleWidth = 2f;
+					float durationScaleWidth = 3.5f;
 					Color durationColor = ColorExtensions.ToXnaColor(_moduleSettings.EventTimersDurationTextColor.get_Value().get_Cloth());
 					Func<string> repeatText = () => "Repeats every: " + ev.Repeat.ToTimeSpan().Humanize();
 					BitmapFont repeatFont = GetFont((FontSize)36);
 					float repeatScale = 0.4f;
-					float repeatScaleWidth = 2f;
+					float repeatScaleWidth = 3.5f;
 					Color repeatColor = ColorExtensions.ToXnaColor(_moduleSettings.EventTimersRepeatTextColor.get_Value().get_Cloth());
 					Vector3 namePosition = texturePosition + new Vector3(0f, 0f, -0.75f);
 					Vector3 durationPosition = namePosition + new Vector3(0f, 0f, 0f - (nameScale / 2f + durationScale / 2f));
@@ -382,111 +390,104 @@ namespace Estreya.BlishHUD.EventTable.Managers
 					Vector3 startsInPosition = remainingPosition + new Vector3(0f, 0f, 0f - remainingScale);
 					Vector3 nextOccurrencePosition = startsInPosition + new Vector3(0f, 0f, 0f - startsInScale);
 					_ = halfCirclePosition + new Vector3(0f, 0f, halfCircleRadius + 0.5f);
-					entites.AddRange(new WorldEntity[16]
+					entites.AddRange(new WorldEntity[15]
 					{
 						new WorldPolygone(centerAsWorldMeters, statuePoints.ToArray())
 						{
-							RotationZ = worldTimer.Rotation,
+							RotationZ = rotation,
 							RenderCondition = renderCondition
 						},
 						new WorldHalfCircle(halfCirclePosition, halfCircleRadius)
 						{
-							RotationZ = worldTimer.Rotation,
+							RotationZ = rotation,
 							RotationX = 90f,
 							RenderCondition = renderCondition
 						},
 						new WorldTexture(textureIcon, texturePosition, textureScale)
 						{
-							RotationZ = worldTimer.Rotation,
+							RotationZ = rotation,
 							RotationX = 90f,
 							RenderCondition = renderCondition
 						},
 						new WorldTexture(textureIcon, texturePosition, textureScale)
 						{
-							RotationZ = worldTimer.Rotation + 180f,
+							RotationZ = rotation + 180f,
 							RotationX = 90f,
 							RenderCondition = renderCondition
 						},
 						new WorldText(remainingText, remainingFont, remainingPosition, remainingScale, remainingColor)
 						{
-							RotationZ = worldTimer.Rotation,
+							RotationZ = rotation,
 							RotationX = 90f,
 							ScaleX = remainingScaleWidth,
 							RenderCondition = renderCondition
 						},
 						new WorldText(remainingText, remainingFont, remainingPosition, remainingScale, remainingColor)
 						{
-							RotationZ = worldTimer.Rotation + 180f,
+							RotationZ = rotation + 180f,
 							RotationX = 90f,
 							ScaleX = remainingScaleWidth,
 							RenderCondition = renderCondition
 						},
 						new WorldText(startsInText, startsInFont, startsInPosition, startsInScale, startsInColor)
 						{
-							RotationZ = worldTimer.Rotation,
+							RotationZ = rotation,
 							RotationX = 90f,
 							ScaleX = startsInScaleWidth,
 							RenderCondition = renderCondition
 						},
 						new WorldText(startsInText, startsInFont, startsInPosition, startsInScale, startsInColor)
 						{
-							RotationZ = worldTimer.Rotation + 180f,
+							RotationZ = rotation + 180f,
 							RotationX = 90f,
 							ScaleX = startsInScaleWidth,
 							RenderCondition = renderCondition
 						},
 						new WorldText(nextOccurrenceText, nextOccurrenceFont, nextOccurrencePosition, nextOccurrenceScale, nextOccurrenceColor)
 						{
-							RotationZ = worldTimer.Rotation,
+							RotationZ = rotation,
 							RotationX = 90f,
 							ScaleX = nextOccurrenceScaleWidth,
 							RenderCondition = renderCondition
 						},
 						new WorldText(nextOccurrenceText, nextOccurrenceFont, nextOccurrencePosition, nextOccurrenceScale, nextOccurrenceColor)
 						{
-							RotationZ = worldTimer.Rotation + 180f,
+							RotationZ = rotation + 180f,
 							RotationX = 90f,
 							ScaleX = nextOccurrenceScaleWidth,
 							RenderCondition = renderCondition
 						},
 						new WorldText(nameText, nameFont, namePosition, nameScale, nameColor)
 						{
-							RotationZ = worldTimer.Rotation,
-							RotationX = 90f,
-							ScaleX = nameScaleWidth,
-							RenderCondition = renderCondition
-						},
-						new WorldText(nameText, nameFont, namePosition, nameScale, nameColor)
-						{
-							RotationZ = worldTimer.Rotation + 180f,
+							RotationZ = rotation,
 							RotationX = 90f,
 							ScaleX = nameScaleWidth,
 							RenderCondition = renderCondition
 						},
 						new WorldText(durationText, durationFont, durationPosition, durationScale, durationColor)
 						{
-							RotationZ = worldTimer.Rotation,
+							RotationZ = rotation,
 							RotationX = 90f,
 							ScaleX = durationScaleWidth,
 							RenderCondition = renderCondition
 						},
 						new WorldText(durationText, durationFont, durationPosition, durationScale, durationColor)
 						{
-							RotationZ = worldTimer.Rotation + 180f,
+							RotationZ = rotation + 180f,
 							RotationX = 90f,
 							ScaleX = durationScaleWidth,
 							RenderCondition = renderCondition
 						},
 						new WorldText(repeatText, repeatFont, repeatPosition, repeatScale, repeatColor)
 						{
-							RotationZ = worldTimer.Rotation,
+							RotationZ = rotation,
 							RotationX = 90f,
 							ScaleX = repeatScaleWidth,
 							RenderCondition = renderCondition
 						},
 						new WorldText(repeatText, repeatFont, repeatPosition, repeatScale, repeatColor)
 						{
-							RotationZ = worldTimer.Rotation + 180f,
+							RotationZ = rotation + 180f,
 							RotationX = 90f,
 							ScaleX = repeatScaleWidth,
 							RenderCondition = renderCondition

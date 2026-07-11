@@ -224,7 +224,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			Configuration.DisabledEventKeys.add_SettingChanged((EventHandler<ValueChangedEventArgs<List<string>>>)DisabledEventKeys_SettingChanged);
 			Configuration.EventOrder.add_SettingChanged((EventHandler<ValueChangedEventArgs<List<string>>>)EventOrder_SettingChanged);
 			Configuration.DrawInterval.add_SettingChanged((EventHandler<ValueChangedEventArgs<DrawInterval>>)DrawInterval_SettingChanged);
-			Configuration.LimitToCurrentMap.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)LimitToCurrentMap_SettingChanged);
+			Configuration.LimitMapType.add_SettingChanged((EventHandler<ValueChangedEventArgs<LimitMapType>>)LimitMapType_SettingChanged);
 			Configuration.AllowUnspecifiedMap.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)AllowUnspecifiedMap_SettingChanged);
 			Configuration.FontFace.add_SettingChanged((EventHandler<ValueChangedEventArgs<FontFace>>)FontFace_SettingChanged);
 			Configuration.CustomFontPath.add_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)CustomFontPath_SettingChanged);
@@ -348,7 +348,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		private void CurrentMap_MapChanged(object sender, ValueEventArgs<int> e)
 		{
-			if (Configuration.LimitToCurrentMap.get_Value())
+			if (Configuration.LimitMapType.get_Value() != 0)
 			{
 				ReAddEvents();
 			}
@@ -356,7 +356,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		private void AllowUnspecifiedMap_SettingChanged(object sender, ValueChangedEventArgs<bool> e)
 		{
-			if (Configuration.LimitToCurrentMap.get_Value())
+			if (Configuration.LimitMapType.get_Value() != 0)
 			{
 				ReAddEvents();
 			}
@@ -375,7 +375,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			}
 		}
 
-		private void LimitToCurrentMap_SettingChanged(object sender, ValueChangedEventArgs<bool> e)
+		private void LimitMapType_SettingChanged(object sender, ValueChangedEventArgs<LimitMapType> e)
 		{
 			ReAddEvents();
 		}
@@ -766,12 +766,23 @@ namespace Estreya.BlishHUD.EventTable.Controls
 		private bool EventTemporaryDisabled(Estreya.BlishHUD.EventTable.Models.Event ev)
 		{
 			bool disabled = false;
-			if (!ev.Filler && Configuration.LimitToCurrentMap.get_Value() && GameService.Gw2Mumble.get_IsAvailable())
+			if (!ev.Filler && GameService.Gw2Mumble.get_IsAvailable())
 			{
 				int mapId = GameService.Gw2Mumble.get_CurrentMap().get_Id();
-				if (!ev.MapIds.Contains(mapId) && (!Configuration.AllowUnspecifiedMap.get_Value() || ev.MapIds.Length != 0))
+				switch (Configuration.LimitMapType.get_Value())
 				{
-					disabled = true;
+				case LimitMapType.OnlyCurrent:
+					if (!ev.MapIds.Contains(mapId) && (!Configuration.AllowUnspecifiedMap.get_Value() || ev.MapIds.Length != 0))
+					{
+						disabled = true;
+					}
+					break;
+				case LimitMapType.NotCurrent:
+					if (ev.MapIds.Contains(mapId) || (!Configuration.AllowUnspecifiedMap.get_Value() && ev.MapIds.Length == 0))
+					{
+						disabled = true;
+					}
+					break;
 				}
 			}
 			return disabled;
@@ -1047,7 +1058,15 @@ namespace Estreya.BlishHUD.EventTable.Controls
 								Color color2 = ColorTranslator.FromHtml(cc);
 								return new Color((int)color2.R, (int)color2.G, (int)color2.B) * alpha;
 							}).ToArray();
-						}, () => (!ev2.Filler) ? Configuration.DrawShadows.get_Value() : Configuration.DrawShadowsForFiller.get_Value(), () => (!ev2.Filler) ? (((Configuration.ShadowColor.get_Value().get_Id() == 1) ? Color.get_Black() : ColorExtensions.ToXnaColor(Configuration.ShadowColor.get_Value().get_Cloth())) * Configuration.ShadowOpacity.get_Value()) : (((Configuration.FillerShadowColor.get_Value().get_Id() == 1) ? Color.get_Black() : ColorExtensions.ToXnaColor(Configuration.FillerShadowColor.get_Value().get_Cloth())) * Configuration.FillerShadowOpacity.get_Value()), () => Configuration.EventAbsoluteTimeFormatString.get_Value(), () => (Configuration.EventTimespanDaysFormatString.get_Value(), Configuration.EventTimespanHoursFormatString.get_Value(), Configuration.EventTimespanMinutesFormatString.get_Value()));
+						}, () => (!ev2.Filler) ? Configuration.DrawShadows.get_Value() : Configuration.DrawShadowsForFiller.get_Value(), () => (!ev2.Filler) ? (((Configuration.ShadowColor.get_Value().get_Id() == 1) ? Color.get_Black() : ColorExtensions.ToXnaColor(Configuration.ShadowColor.get_Value().get_Cloth())) * Configuration.ShadowOpacity.get_Value()) : (((Configuration.FillerShadowColor.get_Value().get_Id() == 1) ? Color.get_Black() : ColorExtensions.ToXnaColor(Configuration.FillerShadowColor.get_Value().get_Cloth())) * Configuration.FillerShadowOpacity.get_Value()), () => Configuration.EventAbsoluteTimeFormatString.get_Value(), () => (Configuration.EventTimespanDaysFormatString.get_Value(), Configuration.EventTimespanHoursFormatString.get_Value(), Configuration.EventTimespanMinutesFormatString.get_Value()), delegate
+						{
+							if (Configuration.HighlightType.get_Value() == HighlightType.None || !GameService.Gw2Mumble.get_IsAvailable())
+							{
+								return HighlightType.None;
+							}
+							int id = GameService.Gw2Mumble.get_CurrentMap().get_Id();
+							return (ev2.MapIds?.Contains(id) ?? false) ? Configuration.HighlightType.get_Value() : HighlightType.None;
+						});
 						AddEventHooks(newEventControl);
 						_logger.Debug($"Added event {ev2.Name} with occurence {occurence}");
 						using (_controlLock.Lock())
@@ -1067,19 +1086,20 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			try
 			{
 				Event currentEvent = _activeEvent;
-				if (currentEvent == null || currentEvent.Model.Filler)
+				if (currentEvent?.Model == null || currentEvent.Model.Filler)
 				{
 					return;
 				}
-				string waypoint = currentEvent.Model?.GetWaypoint(_accountService.Account);
+				string waypoint = currentEvent.Model.GetWaypoint(_accountService.Account);
+				if (string.IsNullOrWhiteSpace(waypoint))
+				{
+					_logger.Info("Event " + currentEvent.Model.SettingKey + " has no waypoint. Aborting.");
+					return;
+				}
 				switch (Configuration.LeftClickAction.get_Value())
 				{
 				case LeftClickAction.CopyWaypoint:
 				{
-					if (string.IsNullOrWhiteSpace(waypoint))
-					{
-						break;
-					}
 					string eventChatFormat = currentEvent.Model.GetChatText(Configuration.EventChatFormat.get_Value(), currentEvent.StartTime, _accountService.Account);
 					if ((int)GameService.Input.get_Keyboard().get_ActiveModifiers() == 1)
 					{
@@ -1108,10 +1128,6 @@ namespace Estreya.BlishHUD.EventTable.Controls
 				}
 				case LeftClickAction.NavigateToWaypoint:
 				{
-					if (string.IsNullOrWhiteSpace(waypoint))
-					{
-						break;
-					}
 					if (_pointOfInterestService.Loading)
 					{
 						ScreenNotification.ShowNotification("PointOfInterestService is still loading!", ScreenNotification.NotificationType.Error);
@@ -1517,7 +1533,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			Configuration.BuildDirection.remove_SettingChanged((EventHandler<ValueChangedEventArgs<BuildDirection>>)BuildDirection_SettingChanged);
 			Configuration.EventOrder.remove_SettingChanged((EventHandler<ValueChangedEventArgs<List<string>>>)EventOrder_SettingChanged);
 			Configuration.DrawInterval.remove_SettingChanged((EventHandler<ValueChangedEventArgs<DrawInterval>>)DrawInterval_SettingChanged);
-			Configuration.LimitToCurrentMap.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)LimitToCurrentMap_SettingChanged);
+			Configuration.LimitMapType.remove_SettingChanged((EventHandler<ValueChangedEventArgs<LimitMapType>>)LimitMapType_SettingChanged);
 			Configuration.AllowUnspecifiedMap.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)AllowUnspecifiedMap_SettingChanged);
 			Configuration.FontFace.remove_SettingChanged((EventHandler<ValueChangedEventArgs<FontFace>>)FontFace_SettingChanged);
 			Configuration.CustomFontPath.remove_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)CustomFontPath_SettingChanged);

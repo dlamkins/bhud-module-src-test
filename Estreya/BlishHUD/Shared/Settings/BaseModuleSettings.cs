@@ -16,9 +16,13 @@ namespace Estreya.BlishHUD.Shared.Settings
 	{
 		protected readonly SettingCollection _settings;
 
+		private readonly Version _moduleVersion;
+
 		private KeyBinding _globalEnabledKeybinding;
 
 		protected readonly Logger Logger;
+
+		private (bool PerformMigration, Version? LastMigrationVersion) _migrationResult;
 
 		private const string MIGRATION_SETTINGS = "migration-settings";
 
@@ -80,16 +84,13 @@ namespace Estreya.BlishHUD.Shared.Settings
 		{
 			Logger = Logger.GetLogger(GetType());
 			_settings = settings;
+			_moduleVersion = moduleVersion;
 			_globalEnabledKeybinding = globalEnabledKeybinding;
 			BuildDefaultColor();
-			(bool, Version) initMigrationResult = InitalizeMigrationSettings(_settings, moduleVersion);
+			(bool, Version) initMigrationResult = (_migrationResult = InitalizeMigrationSettings(_settings, moduleVersion));
 			InitializeGlobalSettings(_settings);
 			InitializeDrawerSettings(_settings);
 			InitializeAdditionalSettings(_settings);
-			if (initMigrationResult.Item1)
-			{
-				InternalPerformMigration(initMigrationResult.Item2, moduleVersion);
-			}
 		}
 
 		private (bool PerformMigration, Version? LastMigrationVersion) InitalizeMigrationSettings(SettingCollection settings, Version moduleVersion)
@@ -103,10 +104,15 @@ namespace Estreya.BlishHUD.Shared.Settings
 			return (!existed || LastMigrationVersion.get_Value() < moduleVersion, existed ? LastMigrationVersion.get_Value() : null);
 		}
 
-		private void InternalPerformMigration(Version? lastModuleVersion, Version currentModuleVersion)
+		public void RunMigration()
 		{
-			PerformMigration(lastModuleVersion, currentModuleVersion);
-			LastMigrationVersion.set_Value(currentModuleVersion);
+			if (_migrationResult.PerformMigration)
+			{
+				Logger.Info("Running migrations...");
+				PerformMigration(_migrationResult.LastMigrationVersion, _moduleVersion);
+				LastMigrationVersion.set_Value(_moduleVersion);
+				Logger.Info("Migrations finished.");
+			}
 		}
 
 		protected virtual void PerformMigration(Version? lastModuleVersion, Version currentModuleVersion)

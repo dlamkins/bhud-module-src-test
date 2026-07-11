@@ -159,11 +159,12 @@ namespace Estreya.BlishHUD.EventTable
 				{
 					return _eventCategories.SelectMany((EventCategory ec) => ec.Events).ToList();
 				}
-			}, () => NowUTC, MapUtil, base.Gw2ApiManager, base.ModuleSettings, base.TranslationService, base.IconService);
+			}, () => NowUTC, MapUtil, base.Gw2ApiManager, base.ModuleSettings, base.TranslationService, base.IconService, base.ContentsManager);
 			EventTimerHandler.FoundLostEntities += EventTimerHandler_FoundLostEntities;
 			base.ModuleSettings.ShowEventTimeTableWindowKeybinding.get_Value().add_Activated((EventHandler<EventArgs>)OnShowEventTimeTableWindowKeybindingActivated);
 			AddAllAreas();
 			await LoadEventsAsync();
+			await PerformSanityCheck();
 			sw.Stop();
 			base.Logger.Debug("Loaded in " + sw.Elapsed.TotalMilliseconds.ToString(CultureInfo.InvariantCulture) + "ms");
 		}
@@ -357,11 +358,13 @@ namespace Estreya.BlishHUD.EventTable
 				where !ev.Filler
 				select ev)
 			{
-				if (base.ModuleSettings.ReminderTimesOverride.get_Value().ContainsKey(ev2.SettingKey))
+				if (!base.ModuleSettings.ReminderTimesOverride.get_Value().ContainsKey(ev2.SettingKey))
 				{
-					List<Duration> times = base.ModuleSettings.ReminderTimesOverride.get_Value()[ev2.SettingKey].Select((TimeSpan x) => x.ToDuration()).ToList();
-					ev2.UpdateReminderTimes(times.ToArray());
+					ev2.UpdateReminderTimesDefault();
+					continue;
 				}
+				List<Duration> times = base.ModuleSettings.ReminderTimesOverride.get_Value()[ev2.SettingKey].Select((TimeSpan x) => x.ToDuration()).ToList();
+				ev2.UpdateReminderTimes(times.ToArray());
 			}
 		}
 
@@ -747,7 +750,7 @@ namespace Estreya.BlishHUD.EventTable
 
 		protected override BaseModuleSettings DefineModuleSettings(SettingCollection settings)
 		{
-			return new ModuleSettings(settings, ((Module)this).get_Version());
+			return new ModuleSettings(settings, ((Module)this).get_Version(), () => NowUTC);
 		}
 
 		protected override void OnSettingWindowBuild(TabbedWindow settingWindow)
@@ -860,7 +863,7 @@ namespace Estreya.BlishHUD.EventTable
 			{
 				DefaultColor = base.ModuleSettings.DefaultGW2Color
 			}), base.TranslationService.GetTranslation("eventTimersSettingsView-title", "Event Timers"), (int?)null));
-			base.SettingsWindow.Tabs.Add(new Tab(base.IconService.GetIcon("156680.png"), (Func<IView>)(() => (IView)(object)new SelfHostingEventsView(base.ModuleSettings, SelfHostingEventService, base.Gw2ApiManager, base.IconService, base.TranslationService, base.AccountService, base.ChatService)
+			base.SettingsWindow.Tabs.Add(new Tab(base.IconService.GetIcon("156680.png"), (Func<IView>)(() => (IView)(object)new SelfHostingEventsView(base.ModuleSettings, SelfHostingEventService, base.Gw2ApiManager, base.IconService, base.TranslationService, base.AccountService, base.ChatService, () => NowUTC)
 			{
 				DefaultColor = base.ModuleSettings.DefaultGW2Color
 			}), base.TranslationService.GetTranslation("selfHostingEventsSettingsView-title", "Self Hosting Events"), (int?)null));
@@ -994,6 +997,119 @@ namespace Estreya.BlishHUD.EventTable
 				new WizardAreasView(_areas.Values.Select((EventArea area) => area.Configuration).ToList(), base.Gw2ApiManager, base.IconService, base.TranslationService),
 				new WizardRemindersView(base.ModuleSettings, base.AudioService, base.Gw2ApiManager, base.IconService, base.TranslationService)
 			};
+		}
+
+		private async Task PerformSanityCheck()
+		{
+			List<string> reminderFunctionBlockers = await GetReminderFunctionBlockers();
+			if (reminderFunctionBlockers.Count > 0)
+			{
+				base.Logger.Warn("Found possible reminder function blockers: {blockers}", new object[1] { string.Join(", ", reminderFunctionBlockers) });
+			}
+			foreach (EventAreaConfiguration eventAreaConfiguration in _areas.Values.Select((EventArea x) => x.Configuration))
+			{
+				List<string> blockers = await GetEventAreaFunctionBlockers(eventAreaConfiguration);
+				if (blockers.Count > 0)
+				{
+					base.Logger.Warn("Found possible function blockers for event area {area}: {blockers}", new object[2]
+					{
+						eventAreaConfiguration.Name,
+						string.Join(", ", blockers)
+					});
+				}
+			}
+		}
+
+		private Task<List<string>> GetEventAreaFunctionBlockers(EventAreaConfiguration areaConfiguration)
+		{
+			List<string> blockers2 = new List<string>();
+			if (!areaConfiguration.Enabled.get_Value())
+			{
+				AddSureBlocker(blockers2, "not-enabled");
+			}
+			if (areaConfiguration.Size.X.get_Value() <= 100)
+			{
+				AddSureBlocker(blockers2, "unrealistic-small-width");
+			}
+			if (areaConfiguration.DisabledEventKeys.get_Value().Count > 0)
+			{
+				AddPossibleBlocker(blockers2, "disabled-for-some-events");
+			}
+			if (areaConfiguration.EventHeight.get_Value() <= 5)
+			{
+				AddPossibleBlocker(blockers2, "unrealistic-small-event-height");
+			}
+			if (areaConfiguration.LimitMapType.get_Value() != 0)
+			{
+				AddPossibleBlocker(blockers2, "limit-map-type");
+			}
+			if (areaConfiguration.HideOnMissingMumbleTicks.get_Value())
+			{
+				AddPossibleBlocker(blockers2, "hide-on-missing-mumble-ticks");
+			}
+			if (areaConfiguration.HideInPvE_OpenWorld.get_Value())
+			{
+				AddPossibleBlocker(blockers2, "hide-in-pve-open-world");
+			}
+			if (areaConfiguration.TimeSpan.get_Value() <= 10)
+			{
+				AddPossibleBlocker(blockers2, "unrealistic-small-timespan");
+			}
+			return Task.FromResult(blockers2);
+			static void AddBlocker(List<string> blockers, string prefix, string blocker)
+			{
+				blockers.Add(prefix + ":" + blocker);
+			}
+			static void AddPossibleBlocker(List<string> blockers, string blocker)
+			{
+				AddBlocker(blockers, "possible", blocker);
+			}
+			static void AddSureBlocker(List<string> blockers, string blocker)
+			{
+				AddBlocker(blockers, "sure", blocker);
+			}
+		}
+
+		private Task<List<string>> GetReminderFunctionBlockers()
+		{
+			List<string> blockers2 = new List<string>();
+			if (!base.ModuleSettings.RemindersEnabled.get_Value())
+			{
+				AddSureBlocker(blockers2, "not-enabled");
+			}
+			if (base.ModuleSettings.ReminderDisabledForEvents.get_Value().Count > 0)
+			{
+				AddPossibleBlocker(blockers2, "disabled-for-some-events");
+			}
+			if (base.ModuleSettings.ReminderType.get_Value() == ReminderType.Windows)
+			{
+				AddPossibleBlocker(blockers2, "type-windows");
+			}
+			if (base.ModuleSettings.DisableRemindersWhenEventFinished.get_Value())
+			{
+				AddPossibleBlocker(blockers2, "disabled-when-event-finished-from-" + base.ModuleSettings.DisableRemindersWhenEventFinishedArea.get_Value());
+			}
+			if (base.ModuleSettings.HideRemindersOnMissingMumbleTicks.get_Value())
+			{
+				AddPossibleBlocker(blockers2, "hide-on-missing-mumble-ticks");
+			}
+			if (base.ModuleSettings.HideRemindersInPvE_OpenWorld.get_Value())
+			{
+				AddPossibleBlocker(blockers2, "hide-in-pve-open-world");
+			}
+			return Task.FromResult(blockers2);
+			static void AddBlocker(List<string> blockers, string prefix, string blocker)
+			{
+				blockers.Add(prefix + ":" + blocker);
+			}
+			static void AddPossibleBlocker(List<string> blockers, string blocker)
+			{
+				AddBlocker(blockers, "possible", blocker);
+			}
+			static void AddSureBlocker(List<string> blockers, string blocker)
+			{
+				AddBlocker(blockers, "sure", blocker);
+			}
 		}
 
 		private void UnloadContext()

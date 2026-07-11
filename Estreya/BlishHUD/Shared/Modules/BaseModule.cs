@@ -683,7 +683,7 @@ namespace Estreya.BlishHUD.Shared.Modules
 						}
 						continue;
 					}
-					Task.Run((Func<Task>)state2.Start).ContinueWith(delegate(Task task)
+					Task.Factory.StartNew((Func<Task>)state2.Start, TaskCreationOptions.LongRunning | TaskCreationOptions.AttachedToParent).ContinueWith(delegate(Task<Task> task)
 					{
 						if (task.IsFaulted)
 						{
@@ -809,13 +809,14 @@ namespace Estreya.BlishHUD.Shared.Modules
 
 		protected override void OnModuleLoaded(EventArgs e)
 		{
-			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0098: Expected O, but got Unknown
-			//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e3: Expected O, but got Unknown
-			//IL_0120: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012a: Expected O, but got Unknown
+			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a8: Expected O, but got Unknown
+			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f3: Expected O, but got Unknown
+			//IL_0130: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013a: Expected O, but got Unknown
 			((Module)this).OnModuleLoaded(e);
+			ModuleSettings.RunMigration();
 			Logger.Debug("Start building settings window.");
 			if (SettingsWindow == null)
 			{

@@ -79,7 +79,9 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 
 		private void LoadConfigurations()
 		{
-			_areaConfigurations = _areaConfigurationFunc().ToList();
+			_areaConfigurations = (from x in _areaConfigurationFunc()
+				orderby x.CreatedAt.get_Value()
+				select x).ToList();
 		}
 
 		protected override void BuildView(FlowPanel parent)
@@ -391,7 +393,11 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 				if (num2 == DialogResult.Yes)
 				{
 					this.RemoveArea?.Invoke(this, areaConfiguration);
-					((Container)(((Control)menuItem).get_Parent() as Estreya.BlishHUD.Shared.Controls.Menu)).RemoveChild((Control)(object)menuItem);
+					Estreya.BlishHUD.Shared.Controls.Menu obj2 = ((Control)menuItem).get_Parent() as Estreya.BlishHUD.Shared.Controls.Menu;
+					if (obj2 != null)
+					{
+						((Container)obj2).RemoveChild((Control)(object)menuItem);
+					}
 					_menuItems.Remove(areaConfiguration.Name);
 					ClearAreaPanel();
 					LoadConfigurations();
@@ -399,6 +405,19 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			});
 			((Control)removeButton).set_Top(((Control)areaName).get_Top());
 			((Control)removeButton).set_Right(((Rectangle)(ref panelBounds)).get_Right());
+			FormattedLabel obj = RenderFormattedLabel(_areaPanel, delegate(FormattedLabelBuilder builder)
+			{
+				builder.AutoSizeWidth().AutoSizeHeight().CreatePart("Created at:", (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder partBuilder)
+				{
+					partBuilder.SetFontSize((FontSize)14);
+				})
+					.CreatePart(areaConfiguration.CreatedAt.get_Value().ToString("g"), (Action<FormattedLabelPartBuilder>)delegate(FormattedLabelPartBuilder partBuilder)
+					{
+						partBuilder.SetFontSize((FontSize)14).MakeBold();
+					});
+			});
+			((Control)obj).set_Top(((Control)removeButton).get_Bottom() + 5);
+			((Control)obj).set_Right(((Rectangle)(ref panelBounds)).get_Right());
 			((Control)areaName).set_Left(((Control)manageEventsButton).get_Right());
 			((Control)areaName).set_Width(((Control)removeButton).get_Left() - ((Control)areaName).get_Left());
 		}
@@ -430,7 +449,6 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			FlowPanel groupPanel = val;
 			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.Enabled);
 			RenderKeybindingSetting((Panel)(object)groupPanel, areaConfiguration.EnabledKeybinding);
-			RenderEnumSetting<DrawInterval>((Panel)(object)groupPanel, areaConfiguration.DrawInterval);
 			RenderEmptyLine((Panel)(object)groupPanel, 20);
 		}
 
@@ -506,9 +524,10 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.CompactMode, async (bool oldVal, bool newVal) => !newVal || await new ConfirmDialog("Compact Mode", "You are in the process of enabling compact mode.\n\nThis will reset some of the incompatible settings as the category names will change.\n\nA RESTART OF BLISHHUD IS NEEDED FOR THIS TO TAKE EFFECT!", base.IconService)
 			{
 				SelectedButtonIndex = 1
-			}.ShowDialog() == DialogResult.OK, async delegate
+			}.ShowDialog() == DialogResult.OK, delegate
 			{
 				rebuildAction();
+				return Task.CompletedTask;
 			});
 			RenderEmptyLine((Panel)(object)groupPanel, 20);
 		}
@@ -698,8 +717,10 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 				_eventStateService.Remove(areaConfiguration.Name, EventStateService.EventStates.Hidden);
 			});
 			RenderEmptyLine((Panel)(object)groupPanel);
-			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.LimitToCurrentMap);
+			RenderEnumSetting<LimitMapType>((Panel)(object)groupPanel, areaConfiguration.LimitMapType);
 			RenderBoolSetting((Panel)(object)groupPanel, areaConfiguration.AllowUnspecifiedMap);
+			RenderEmptyLine((Panel)(object)groupPanel);
+			RenderEnumSetting<HighlightType>((Panel)(object)groupPanel, areaConfiguration.HighlightType);
 			RenderEmptyLine((Panel)(object)groupPanel, 20);
 		}
 
@@ -822,7 +843,7 @@ namespace Estreya.BlishHUD.EventTable.UI.Views
 			}
 			ReorderEventsView view = new ReorderEventsView(_allEvents(configuration), configuration.EventOrder.get_Value(), configuration, base.APIManager, base.IconService, base.TranslationService);
 			view.SaveClicked += new EventHandler<(EventAreaConfiguration, string[])>(ReorderView_SaveClicked);
-			_reorderEventsWindow.Show((IView)(object)view);
+			_reorderEventsWindow?.Show((IView)(object)view);
 		}
 
 		private void ReorderView_SaveClicked(object sender, (EventAreaConfiguration AreaConfiguration, string[] CategoryKeys) e)

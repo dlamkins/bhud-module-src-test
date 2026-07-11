@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
 using Blish_HUD;
@@ -19,6 +20,8 @@ namespace Estreya.BlishHUD.EventTable.Controls
 {
 	public class Event : IDisposable
 	{
+		private static ConcurrentDictionary<(BitmapFont Font, string Text), float> _textWidthCache = new ConcurrentDictionary<(BitmapFont, string), float>();
+
 		private static Logger logger = Logger.GetLogger<Event>();
 
 		private readonly Instant _endTime;
@@ -41,6 +44,8 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		private readonly Func<(string DaysFormat, string HoursFormat, string MinutesFormat)> _getTimespanFormatStrings;
 
+		private readonly Func<HighlightType> _getHighlightTypeAction;
+
 		private readonly Func<Color> _getTextColor;
 
 		private Texture2D _backgroundColorTexture;
@@ -48,6 +53,8 @@ namespace Estreya.BlishHUD.EventTable.Controls
 		private IconService _iconService;
 
 		private TranslationService _translationService;
+
+		private int _highlightFrameCounter;
 
 		public Instant StartTime { get; private set; }
 
@@ -67,7 +74,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 
 		public event EventHandler DisableReminderClicked;
 
-		public Event(Estreya.BlishHUD.EventTable.Models.Event ev, IconService iconService, TranslationService translationService, Func<Instant> getNowAction, Instant startTime, Instant endTime, Func<BitmapFont> getFontAction, Func<bool> getDrawBorders, Func<bool> getDrawCrossout, Func<Color> getTextColor, Func<Color[]> getColorAction, Func<bool> getDrawShadowAction, Func<Color> getShadowColor, Func<string> getDateTimeFormatString, Func<(string DaysFormat, string HoursFormat, string MinutesFormat)> getTimespanFormatStrings)
+		public Event(Estreya.BlishHUD.EventTable.Models.Event ev, IconService iconService, TranslationService translationService, Func<Instant> getNowAction, Instant startTime, Instant endTime, Func<BitmapFont> getFontAction, Func<bool> getDrawBorders, Func<bool> getDrawCrossout, Func<Color> getTextColor, Func<Color[]> getColorAction, Func<bool> getDrawShadowAction, Func<Color> getShadowColor, Func<string> getDateTimeFormatString, Func<(string DaysFormat, string HoursFormat, string MinutesFormat)> getTimespanFormatStrings, Func<HighlightType> getHighlightTypeAction)
 		{
 			Model = ev;
 			_iconService = iconService;
@@ -84,6 +91,7 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			_getShadowColor = getShadowColor;
 			_getAbsoluteTimeFormatStrings = getDateTimeFormatString;
 			_getTimespanFormatStrings = getTimespanFormatStrings;
+			_getHighlightTypeAction = getHighlightTypeAction;
 		}
 
 		public ContextMenuStrip BuildContextMenu(Func<List<string>> getAreaNames, string currentAreaName, Func<List<string>> getDisabledReminderKeys)
@@ -251,113 +259,155 @@ namespace Estreya.BlishHUD.EventTable.Controls
 			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-			BitmapFont font = _getFontAction();
-			DrawBackground(spriteBatch, bounds);
-			float nameWidth = (Model.Filler ? 0f : DrawName(spriteBatch, bounds, font));
-			DrawRemainingTime(spriteBatch, bounds, font, nameWidth);
-			DrawCrossout(spriteBatch, bounds);
+			try
+			{
+				BitmapFont font = _getFontAction();
+				DrawBackground(spriteBatch, bounds);
+				float nameWidth = (Model.Filler ? 0f : DrawName(spriteBatch, bounds, font));
+				DrawRemainingTime(spriteBatch, bounds, font, nameWidth);
+				DrawCrossout(spriteBatch, bounds);
+			}
+			finally
+			{
+			}
 		}
 
 		private void DrawBackground(SpriteBatch spriteBatch, RectangleF bounds)
 		{
-			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-			Color[] colors = _getColorAction();
-			if (colors.Length == 1)
+			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0099: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0114: Unknown result type (might be due to invalid IL or missing references)
+			try
 			{
-				spriteBatch.DrawRectangle(Textures.get_Pixel(), bounds, colors[0], _getDrawBorders() ? 1 : 0, Color.get_Black());
-				return;
-			}
-			int width = (int)Math.Ceiling(bounds.Width);
-			int height = (int)Math.Ceiling(bounds.Height);
-			if (_backgroundColorTexture == null || _backgroundColorTexture.get_Height() != height || _backgroundColorTexture.get_Width() != width)
-			{
-				Texture2D backgroundColorTexture = _backgroundColorTexture;
-				if (backgroundColorTexture != null)
+				HighlightType highlightType = _getHighlightTypeAction();
+				int borderSize = ((highlightType != 0 || _getDrawBorders()) ? 1 : 0);
+				switch (highlightType)
 				{
-					((GraphicsResource)backgroundColorTexture).Dispose();
+				case HighlightType.Static:
+					borderSize = 3;
+					break;
+				case HighlightType.Animated:
+					if (_highlightFrameCounter > 7)
+					{
+						_highlightFrameCounter = 0;
+					}
+					borderSize = _highlightFrameCounter / 2;
+					_highlightFrameCounter++;
+					break;
 				}
-				_backgroundColorTexture = ColorUtil.CreateColorGradientsTexture(colors, width, height);
+				Color[] colors = _getColorAction();
+				Color borderColor = (Color)((highlightType != 0) ? new Color(((Color)(ref colors[0])).get_PackedValue() ^ 0xFFFFFFu) : Color.get_Black());
+				if (colors.Length == 1)
+				{
+					spriteBatch.DrawRectangle(Textures.get_Pixel(), bounds, colors[0], borderSize, borderColor);
+					return;
+				}
+				int width = (int)Math.Ceiling(bounds.Width);
+				int height = (int)Math.Ceiling(bounds.Height);
+				if (_backgroundColorTexture == null || _backgroundColorTexture.get_Height() != height || _backgroundColorTexture.get_Width() != width)
+				{
+					Texture2D backgroundColorTexture = _backgroundColorTexture;
+					if (backgroundColorTexture != null)
+					{
+						((GraphicsResource)backgroundColorTexture).Dispose();
+					}
+					_backgroundColorTexture = ColorUtil.CreateColorGradientsTexture(colors, width, height);
+				}
+				spriteBatch.DrawRectangle(_backgroundColorTexture, bounds, Color.get_White(), borderSize, borderColor);
 			}
-			spriteBatch.DrawRectangle(_backgroundColorTexture, bounds, Color.get_White(), _getDrawBorders() ? 1 : 0, Color.get_Black());
+			finally
+			{
+			}
 		}
 
 		private float DrawName(SpriteBatch spriteBatch, RectangleF bounds, BitmapFont font)
 		{
 			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-			float xOffset = 5f;
-			float maxWidth = bounds.Width - xOffset * 2f;
-			float nameWidth = 0f;
-			string text = Model.Name;
-			do
+			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
+			try
 			{
-				nameWidth = (float)Math.Ceiling(font.MeasureString(text).Width);
-				if (string.IsNullOrWhiteSpace(text))
+				float xOffset = 5f;
+				float maxWidth = bounds.Width - xOffset * 2f;
+				float nameWidth = 0f;
+				string text = Model.Name;
+				do
 				{
-					return 0f;
+					if (string.IsNullOrWhiteSpace(text))
+					{
+						return 0f;
+					}
+					nameWidth = _textWidthCache.GetOrAdd((font, text), ((BitmapFont Font, string Text) key) => (float)Math.Ceiling(key.Font.MeasureString(key.Text).Width));
+					if (nameWidth > maxWidth)
+					{
+						text = text.Substring(0, text.Length - 1);
+					}
 				}
-				if (nameWidth > maxWidth)
-				{
-					text = text.Substring(0, text.Length - 1);
-				}
+				while (nameWidth > maxWidth);
+				RectangleF nameRect = default(RectangleF);
+				((RectangleF)(ref nameRect))._002Ector(bounds.X + xOffset, bounds.Y, nameWidth, bounds.Height);
+				spriteBatch.DrawString(text, font, nameRect, _getTextColor(), wrap: false, _getDrawShadowAction(), 1, _getShadowColor(), 1f, (HorizontalAlignment)0, (VerticalAlignment)1);
+				return nameRect.Width;
 			}
-			while (nameWidth > maxWidth);
-			RectangleF nameRect = default(RectangleF);
-			((RectangleF)(ref nameRect))._002Ector(bounds.X + xOffset, bounds.Y, nameWidth, bounds.Height);
-			spriteBatch.DrawString(text, font, nameRect, _getTextColor(), wrap: false, _getDrawShadowAction(), 1, _getShadowColor(), 1f, (HorizontalAlignment)0, (VerticalAlignment)1);
-			return nameRect.Width;
+			finally
+			{
+			}
 		}
 
 		private void DrawRemainingTime(SpriteBatch spriteBatch, RectangleF bounds, BitmapFont font, float nameWidth)
 		{
 			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-			if (nameWidth > bounds.Width)
+			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
+			try
 			{
-				return;
-			}
-			Duration remainingTime = GetTimeRemaining(_getNowAction());
-			if (!(remainingTime == Duration.Zero))
-			{
-				string remainingTimeString = FormatDuration(remainingTime);
-				float timeWidth = (float)Math.Ceiling(font.MeasureString(remainingTimeString).Width);
+				if (nameWidth >= bounds.Width)
+				{
+					return;
+				}
 				float maxWidth = bounds.Width - nameWidth;
-				float centerX = maxWidth / 2f - timeWidth / 2f;
-				if (centerX < nameWidth)
+				if (maxWidth <= 0f)
 				{
-					centerX = nameWidth + 10f;
+					return;
 				}
-				if (!(centerX + timeWidth > bounds.Width))
+				Duration remainingTime = GetTimeRemaining(_getNowAction());
+				if (!(remainingTime == Duration.Zero))
 				{
-					RectangleF timeRect = default(RectangleF);
-					((RectangleF)(ref timeRect))._002Ector(centerX + bounds.X, bounds.Y, maxWidth, bounds.Height);
-					Color textColor = _getTextColor();
-					spriteBatch.DrawString(remainingTimeString, font, timeRect, textColor, wrap: false, _getDrawShadowAction(), 1, _getShadowColor(), 1f, (HorizontalAlignment)0, (VerticalAlignment)1);
+					string remainingTimeString = FormatDuration(remainingTime);
+					float timeWidth = _textWidthCache.GetOrAdd((font, remainingTimeString), ((BitmapFont Font, string Text) key) => (float)Math.Ceiling(key.Font.MeasureString(key.Text).Width));
+					float xOffset = nameWidth + maxWidth / 2f - timeWidth / 2f;
+					if (!(xOffset + timeWidth > bounds.Width + 2f))
+					{
+						RectangleF timeRect = default(RectangleF);
+						((RectangleF)(ref timeRect))._002Ector(bounds.X + xOffset, bounds.Y, maxWidth, bounds.Height);
+						Color textColor = _getTextColor();
+						spriteBatch.DrawString(remainingTimeString, font, timeRect, textColor, wrap: false, _getDrawShadowAction(), 1, _getShadowColor(), 1f, (HorizontalAlignment)0, (VerticalAlignment)1);
+					}
 				}
+			}
+			finally
+			{
 			}
 		}
 

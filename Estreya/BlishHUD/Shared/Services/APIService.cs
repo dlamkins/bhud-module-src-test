@@ -139,6 +139,11 @@ namespace Estreya.BlishHUD.Shared.Services
 		protected void SignalUpdated()
 		{
 			LastUpdated = DateTimeOffset.UtcNow;
+			OnUpdated();
+		}
+
+		protected virtual void OnUpdated()
+		{
 			this.Updated?.Invoke(this, EventArgs.Empty);
 		}
 

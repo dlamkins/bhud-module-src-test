@@ -147,7 +147,7 @@ namespace Estreya.BlishHUD.EventTable.Services
 			}
 		}
 
-		public async Task AddEntry(string categoryKey, string zoneKey, string eventKey, DateTimeOffset startTime, int duration)
+		public async Task AddEntry(string categoryKey, string zoneKey, string eventKey, Instant startTime, Duration duration)
 		{
 			if (string.IsNullOrWhiteSpace(categoryKey))
 			{
@@ -186,7 +186,7 @@ namespace Estreya.BlishHUD.EventTable.Services
 				AccountName = accountName,
 				InstanceIP = instanceIP,
 				Duration = duration,
-				StartTime = startTime.ToUniversalTime()
+				StartTime = startTime
 			}, default(CancellationToken), (HttpCompletionOption)0);
 			await Reload();
 		}

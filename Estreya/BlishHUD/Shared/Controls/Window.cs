@@ -700,19 +700,42 @@ namespace Estreya.BlishHUD.Shared.Controls
 			await SetView(view, unloadCurrent: true);
 		}
 
-		private async Task SetView(IView view, bool unloadCurrent = true)
+		private async Task SetView(IView view, bool unloadCurrent)
 		{
 			ClearView(view == null || unloadCurrent);
-			if (view != null)
+			if (view == null)
 			{
-				ViewState = (ViewState)1;
-				CurrentView = view;
-				Progress<string> progress = new Progress<string>(delegate
-				{
-				});
-				view.add_Loaded((EventHandler<EventArgs>)OnViewBuilt);
-				await view.DoLoad((IProgress<string>)progress).ContinueWith(BuildView);
+				return;
 			}
+			ViewState = (ViewState)1;
+			CurrentView = view;
+			Panel val = new Panel();
+			((Control)val).set_Parent((Container)(object)this);
+			((Control)val).set_Width(((Container)this).get_ContentRegion().Width);
+			((Control)val).set_Height(((Container)this).get_ContentRegion().Height);
+			Panel loadingPanel = val;
+			Progress<string> progress = new Progress<string>(delegate(string status)
+			{
+				//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0088: Unknown result type (might be due to invalid IL or missing references)
+				if (status == null)
+				{
+					status = "Loading...";
+				}
+				((Container)loadingPanel).ClearChildren();
+				FormattedLabel val2 = new FormattedLabelBuilder().AutoSizeHeight().AutoSizeWidth().CreatePart(status, (Action<FormattedLabelPartBuilder>)delegate
+				{
+				})
+					.Build();
+				((Control)val2).set_Parent((Container)(object)loadingPanel);
+				((Control)val2).set_Location(new Point(((Control)loadingPanel).get_Width() / 2 - ((Control)val2).get_Width() / 2, ((Control)loadingPanel).get_Height() / 2 - ((Control)val2).get_Height() / 2));
+			});
+			view.add_Loaded((EventHandler<EventArgs>)OnViewBuilt);
+			int hashCode = ((object)CurrentView).GetHashCode();
+			await view.DoLoad((IProgress<string>)progress).ContinueWith(delegate(Task<bool> t)
+			{
+				BuildView(t, hashCode);
+			});
 		}
 
 		public async Task Show(IView view)
@@ -741,11 +764,36 @@ namespace Estreya.BlishHUD.Shared.Controls
 			ViewState = (ViewState)2;
 		}
 
-		private void BuildView(Task<bool> loadResult)
+		private void BuildView(Task<bool> loadResult, int originalHashCode)
 		{
-			if (loadResult.Result)
+			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0061: Expected O, but got Unknown
+			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
+			if (((object)CurrentView).GetHashCode() == originalHashCode)
 			{
-				CurrentView.DoBuild((Container)(object)this);
+				if (!loadResult.IsFaulted && loadResult.Result)
+				{
+					((Container)this).ClearChildren();
+					CurrentView.DoBuild((Container)(object)this);
+					return;
+				}
+				Panel val = new Panel();
+				((Control)val).set_Parent((Container)(object)this);
+				((Control)val).set_Width(((Container)this).get_ContentRegion().Width);
+				((Control)val).set_Height(((Container)this).get_ContentRegion().Height);
+				Panel panel = val;
+				FormattedLabel label = new FormattedLabelBuilder().AutoSizeHeight().AutoSizeWidth().CreatePart("Loading failed.", (Action<FormattedLabelPartBuilder>)delegate
+				{
+				})
+					.Build();
+				((Control)label).set_Parent((Container)(object)panel);
+				((Control)label).set_Location(new Point(((Control)panel).get_Width() / 2 - ((Control)label).get_Width() / 2, ((Control)panel).get_Height() / 2 - ((Control)label).get_Height() / 2));
 			}
 		}
 

@@ -133,16 +133,13 @@ namespace Estreya.BlishHUD.Shared.Services
 							}
 							SignalUpdated();
 							loadedFromStatic = true;
+							base.Loading = false;
+							SignalCompletion();
 						}
 					}
 					catch (Exception ex3)
 					{
 						Logger.Warn(ex3, "Could not load from static file. Fallback to filesystem cache.");
-					}
-					finally
-					{
-						base.Loading = false;
-						SignalCompletion();
 					}
 				}
 				bool canLoadFiles = !loadedFromStatic && !forceAPI && CanLoadFiles();
