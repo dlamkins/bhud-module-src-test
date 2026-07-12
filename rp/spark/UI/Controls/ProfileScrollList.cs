@@ -3,6 +3,7 @@ using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Microsoft.Xna.Framework;
+using MonoGame.Extended.BitmapFonts;
 
 namespace rp.spark.UI.Controls
 {
@@ -95,27 +96,53 @@ namespace rp.spark.UI.Controls
 
 		public Label AddCell(Container parent, string text, int x, int y, int width, Color color)
 		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006d: Expected O, but got Unknown
+			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0068: Expected O, but got Unknown
+			BitmapFont font = GameService.Content.get_DefaultFont14();
 			Label val = new Label();
-			val.set_Text(string.IsNullOrWhiteSpace(text) ? "-" : text);
-			val.set_Font(GameService.Content.get_DefaultFont14());
+			val.set_Text(FitCellText(text, width, font));
+			val.set_Font(font);
 			val.set_TextColor(color);
 			val.set_WrapText(false);
 			((Control)val).set_Location(new Point(x, y));
 			((Control)val).set_Size(new Point(width, Math.Max(24, _rowHeight - y)));
 			((Control)val).set_Parent(parent);
 			return val;
+		}
+
+		private static string FitCellText(string text, int width, BitmapFont font)
+		{
+			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
+			text = (string.IsNullOrWhiteSpace(text) ? "-" : text.Trim());
+			if (font == null || width <= 0 || font.MeasureString(text).Width <= (float)width)
+			{
+				return text;
+			}
+			if (font.MeasureString("...").Width >= (float)width)
+			{
+				return "...";
+			}
+			while (text.Length > 0 && font.MeasureString(text + "...").Width > (float)width)
+			{
+				text = text.Substring(0, text.Length - 1).TrimEnd();
+			}
+			if (!string.IsNullOrWhiteSpace(text))
+			{
+				return text + "...";
+			}
+			return "...";
 		}
 
 		public void ShowEmptyMessage(string text)

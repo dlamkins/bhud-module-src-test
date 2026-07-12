@@ -55,6 +55,7 @@ namespace rp.spark.Services
 			playerPresence.OfficialCharacterName = officialCharacterName;
 			playerPresence.DisplayCharacterName = activeProfile?.DisplayName?.Trim() ?? string.Empty;
 			playerPresence.Race = TextUtil.FirstNonEmpty(state.Race, activeProfile?.Race);
+			playerPresence.CustomRace = activeProfile?.CustomRace?.Trim() ?? string.Empty;
 			playerPresence.Profession = TextUtil.FirstNonEmpty(state.Profession, activeProfile?.Profession);
 			playerPresence.CustomProfession = activeProfile?.CustomProfession?.Trim() ?? string.Empty;
 			playerPresence.ActiveProfileId = (hasActiveProfile ? activeProfile.ProfileId : string.Empty);

@@ -32,6 +32,8 @@ namespace rp.spark.Services
 
 		public const int MaxRaceLength = 16;
 
+		public const int MaxCustomRaceLength = 16;
+
 		public const int MaxProfessionLength = 40;
 	}
 }

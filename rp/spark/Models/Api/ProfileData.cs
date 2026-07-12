@@ -22,6 +22,9 @@ namespace rp.spark.Models.Api
 		public string Pronouns { get; set; } = string.Empty;
 
 
+		public string CustomRace { get; set; } = string.Empty;
+
+
 		public string CustomProfession { get; set; } = string.Empty;
 
 
@@ -63,6 +66,7 @@ namespace rp.spark.Models.Api
 				ProfileName = (string.IsNullOrWhiteSpace(profile?.ProfileName) ? "Default" : profile.ProfileName.Trim()),
 				DisplayCharacterName = (profile?.DisplayName?.Trim() ?? string.Empty),
 				Pronouns = (profile?.Pronouns?.Trim() ?? string.Empty),
+				CustomRace = (profile?.CustomRace?.Trim() ?? string.Empty),
 				CustomProfession = (profile?.CustomProfession?.Trim() ?? string.Empty),
 				Currently = (profile?.Currently?.Trim() ?? string.Empty),
 				OutOfCharacterInfo = (profile?.OutOfCharacterInfo?.Trim() ?? string.Empty),
@@ -89,9 +93,10 @@ namespace rp.spark.Models.Api
 			characterProfile.DisplayName = DisplayCharacterName;
 			characterProfile.Pronouns = Pronouns;
 			characterProfile.Race = TextUtil.FirstNonEmpty(identity?.Race, presence?.Race);
+			characterProfile.CustomRace = TextUtil.FirstNonEmpty(CustomRace, presence?.CustomRace);
 			characterProfile.Profession = TextUtil.FirstNonEmpty(identity?.Profession, presence?.Profession);
 			characterProfile.Specialization = identity?.Specialization?.Trim() ?? string.Empty;
-			characterProfile.CustomProfession = CustomProfession;
+			characterProfile.CustomProfession = TextUtil.FirstNonEmpty(CustomProfession, presence?.CustomProfession);
 			characterProfile.IsCharacterVerified = identity?.IsCharacterApiVerified ?? presence?.IsVerified ?? false;
 			characterProfile.Region = identity?.Region ?? presence?.Region ?? ProfileRegion.NA;
 			characterProfile.Currently = Currently;

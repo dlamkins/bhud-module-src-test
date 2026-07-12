@@ -54,6 +54,45 @@ namespace rp.spark.UI.Views
 			return val;
 		}
 
+		public static Label AddCharacterCounter(Container parent, string text, int maxLength, int width)
+		{
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0041: Expected O, but got Unknown
+			//IL_0042: Expected O, but got Unknown
+			Label val = new Label();
+			val.set_Font(GameService.Content.get_DefaultFont12());
+			val.set_WrapText(false);
+			val.set_HorizontalAlignment((HorizontalAlignment)2);
+			((Control)val).set_Width(width);
+			((Control)val).set_Height(18);
+			((Control)val).set_Parent(parent);
+			UpdateCharacterCounter(val, text, maxLength);
+			return val;
+		}
+
+		public static void UpdateCharacterCounter(Label label, string text, int maxLength)
+		{
+			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
+			if (label != null)
+			{
+				int length = (text ?? string.Empty).Length;
+				if (maxLength > 0 && length > maxLength)
+				{
+					length = maxLength;
+				}
+				label.set_Text($"{length}/{maxLength}");
+				label.set_TextColor((maxLength > 0 && (float)length >= (float)maxLength * 0.9f) ? SparkViewUI.WarningTextColor : SparkViewUI.SecondaryTextColor);
+			}
+		}
+
 		public static Label AddHeaderLabel(Container parent, ProfileEditorSession session, int y = 560)
 		{
 			//IL_0000: Unknown result type (might be due to invalid IL or missing references)

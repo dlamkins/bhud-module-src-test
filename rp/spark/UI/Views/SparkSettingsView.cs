@@ -333,6 +333,11 @@ namespace rp.spark.UI.Views
 				_buttons.Refresh();
 				_enforceGameplayWindowVisibility?.Invoke();
 			});
+			Checkbox cornerIconCheckbox = SparkFormLayout.AddCheckbox((Container)(object)optionsRow, "Show SPARK icon", _settings.ShowCornerIcon.get_Value(), 125);
+			cornerIconCheckbox.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
+			{
+				_settings.ShowCornerIcon.set_Value(cornerIconCheckbox.get_Checked());
+			});
 		}
 
 		private void SetMatureProfilesEnabled(bool enabled)

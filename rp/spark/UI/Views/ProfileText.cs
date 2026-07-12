@@ -48,9 +48,10 @@ namespace rp.spark.UI.Views
 
 		public static string PresenceRace(PlayerPresence presence, string fallback = "Unknown")
 		{
-			if (!string.IsNullOrWhiteSpace(presence?.Race))
+			string race = presence?.VisibleRace();
+			if (!string.IsNullOrWhiteSpace(race))
 			{
-				return presence.Race.Trim();
+				return race.Trim();
 			}
 			return fallback;
 		}
@@ -69,9 +70,18 @@ namespace rp.spark.UI.Views
 			return Clean(profile?.Profession);
 		}
 
+		public static string ProfileRace(CharacterProfile profile)
+		{
+			if (!string.IsNullOrWhiteSpace(profile?.CustomRace))
+			{
+				return profile.CustomRace.Trim();
+			}
+			return Clean(profile?.Race);
+		}
+
 		public static string ProfileCharacterDetails(CharacterProfile profile)
 		{
-			return CharacterDetails(profile?.Race, ProfileProfession(profile));
+			return CharacterDetails(ProfileRace(profile), ProfileProfession(profile));
 		}
 
 		public static string SavedCharacterName(SavedProfile record)
@@ -132,9 +142,14 @@ namespace rp.spark.UI.Views
 
 		public static string SavedRace(SavedProfile record, string fallback = "Unknown")
 		{
-			if (!string.IsNullOrWhiteSpace(record?.Presence?.Race))
+			string race = record?.Presence?.VisibleRace();
+			if (!string.IsNullOrWhiteSpace(race))
 			{
-				return record.Presence.Race.Trim();
+				return race.Trim();
+			}
+			if (!string.IsNullOrWhiteSpace(record?.Profile?.CustomRace))
+			{
+				return record.Profile.CustomRace.Trim();
 			}
 			if (!string.IsNullOrWhiteSpace(record?.Profile?.Race))
 			{
@@ -145,6 +160,10 @@ namespace rp.spark.UI.Views
 
 		public static string SavedRace(SavedProfileSummary summary, string fallback = "Unknown")
 		{
+			if (!string.IsNullOrWhiteSpace(summary?.CustomRace))
+			{
+				return summary.CustomRace.Trim();
+			}
 			if (!string.IsNullOrWhiteSpace(summary?.Race))
 			{
 				return summary.Race.Trim();

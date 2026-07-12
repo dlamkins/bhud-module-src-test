@@ -68,6 +68,8 @@ namespace rp.spark
 
 		private SparkWindows _windows;
 
+		private SparkCornerIcon _cornerIcon;
+
 		private Task<PlayerState> _initialStateTask;
 
 		private CancellationTokenSource _stateLoadCancel;
@@ -131,6 +133,7 @@ namespace rp.spark
 				service.Start();
 			});
 			_windows = new SparkWindows(new WindowBuilder(), _profileRepository, _profileCache, _notes, _playerState, _iconIndex, _sparkSettings, _profileLoader, _profileActions, _nearbyPresenceService);
+			_cornerIcon = new SparkCornerIcon(_sparkSettings, ContentsManager, _windows.OpenProfileManager, _windows.OpenOnlineList, _windows.OpenNearby, _windows.OpenSavedProfiles, _windows.OpenBlocklist);
 		}
 
 		protected override Task LoadAsync()
@@ -184,6 +187,7 @@ namespace rp.spark
 			GameService.Gw2Mumble.get_PlayerCharacter().add_NameChanged((EventHandler<ValueEventArgs<string>>)HandlePlayerStateChanged);
 			EnsurePlayerStateLoad();
 			_serviceHost.Start();
+			_cornerIcon?.Refresh();
 		}
 
 		public override IView GetSettingsView()
@@ -314,18 +318,21 @@ namespace rp.spark
 
 		private void HandleMumbleAvailableChanged(object sender, ValueEventArgs<bool> e)
 		{
+			_cornerIcon?.RefreshForGameState();
 			CloseGameplayWindowsIfUnavailableSoon();
 			ReloadPlayerState();
 		}
 
 		private void HandleIsInGameChanged(object sender, ValueEventArgs<bool> e)
 		{
+			_cornerIcon?.RefreshForGameState();
 			CloseGameplayWindowsIfUnavailableSoon();
 			ReloadPlayerState();
 		}
 
 		private void HandleMapOpenChanged(object sender, ValueEventArgs<bool> e)
 		{
+			_cornerIcon?.RefreshForGameState();
 			CloseGameplayWindowsIfUnavailableSoon();
 		}
 
@@ -550,6 +557,7 @@ namespace rp.spark
 
 		private void HandlePlayerStateChanged(object sender, EventArgs e)
 		{
+			_cornerIcon?.RefreshForGameState();
 			ReloadPlayerState();
 		}
 
@@ -577,6 +585,8 @@ namespace rp.spark
 			GameService.Gw2Mumble.get_PlayerCharacter().remove_NameChanged((EventHandler<ValueEventArgs<string>>)HandlePlayerStateChanged);
 			CancelPlayerStateLoad();
 			_initialStateTask = null;
+			_cornerIcon?.Dispose();
+			_cornerIcon = null;
 			_windows?.Dispose();
 			_windows = null;
 			_serviceHost?.Dispose();

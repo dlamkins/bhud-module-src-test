@@ -58,6 +58,9 @@ namespace rp.spark.Services
 			public string Race { get; set; } = string.Empty;
 
 
+			public string CustomRace { get; set; } = string.Empty;
+
+
 			public string Profession { get; set; } = string.Empty;
 
 
@@ -85,6 +88,9 @@ namespace rp.spark.Services
 
 
 			public string Race { get; set; } = string.Empty;
+
+
+			public string CustomRace { get; set; } = string.Empty;
 
 
 			public string Profession { get; set; } = string.Empty;
@@ -584,6 +590,7 @@ namespace rp.spark.Services
 			savedProfileSummary.OfficialCharacterName = Clean(TextUtil.FirstNonEmpty(record.Presence?.OfficialCharacterName, record.Profile?.CharacterName));
 			savedProfileSummary.DisplayCharacterName = Clean(TextUtil.FirstNonEmpty(record.Presence?.DisplayCharacterName, record.Profile?.DisplayName));
 			savedProfileSummary.Race = Clean(TextUtil.FirstNonEmpty(record.Presence?.Race, record.Profile?.Race));
+			savedProfileSummary.CustomRace = Clean(TextUtil.FirstNonEmpty(record.Presence?.CustomRace, record.Profile?.CustomRace));
 			savedProfileSummary.Profession = Clean(TextUtil.FirstNonEmpty(record.Presence?.Profession, record.Profile?.Profession));
 			savedProfileSummary.CustomProfession = Clean(TextUtil.FirstNonEmpty(record.Presence?.CustomProfession, record.Profile?.CustomProfession));
 			savedProfileSummary.ActiveProfileId = Clean(TextUtil.FirstNonEmpty(record.Presence?.ActiveProfileId, record.Profile?.ProfileId));
@@ -615,6 +622,7 @@ namespace rp.spark.Services
 			savedProfileSummary.OfficialCharacterName = Clean(TextUtil.FirstNonEmpty(snapshot.Presence?.OfficialCharacterName, snapshot.Profile?.CharacterName));
 			savedProfileSummary.DisplayCharacterName = Clean(TextUtil.FirstNonEmpty(snapshot.Presence?.DisplayCharacterName, snapshot.Profile?.DisplayName));
 			savedProfileSummary.Race = Clean(TextUtil.FirstNonEmpty(snapshot.Presence?.Race, snapshot.Profile?.Race));
+			savedProfileSummary.CustomRace = Clean(TextUtil.FirstNonEmpty(snapshot.Presence?.CustomRace, snapshot.Profile?.CustomRace));
 			savedProfileSummary.Profession = Clean(TextUtil.FirstNonEmpty(snapshot.Presence?.Profession, snapshot.Profile?.Profession));
 			savedProfileSummary.CustomProfession = Clean(TextUtil.FirstNonEmpty(snapshot.Presence?.CustomProfession, snapshot.Profile?.CustomProfession));
 			savedProfileSummary.ActiveProfileId = Clean(TextUtil.FirstNonEmpty(snapshot.Presence?.ActiveProfileId, snapshot.Profile?.ProfileId));
@@ -647,6 +655,7 @@ namespace rp.spark.Services
 				OfficialCharacterName = summary.OfficialCharacterName,
 				DisplayCharacterName = summary.DisplayCharacterName,
 				Race = summary.Race,
+				CustomRace = summary.CustomRace,
 				Profession = summary.Profession,
 				CustomProfession = summary.CustomProfession,
 				ActiveProfileId = summary.ActiveProfileId,

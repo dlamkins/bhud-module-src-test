@@ -29,7 +29,7 @@ namespace rp.spark.UI.Views
 
 		private const int GlancePadding = 8;
 
-		private const int DescriptionHeight = 185;
+		private const int DescriptionHeight = 175;
 
 		private const int KnownForHeight = 58;
 
@@ -65,6 +65,8 @@ namespace rp.spark.UI.Views
 
 		private TextBox _customProfession;
 
+		private TextBox _customRace;
+
 		private TextBox _pronouns;
 
 		private MultilineTextBox _knownFor;
@@ -78,6 +80,10 @@ namespace rp.spark.UI.Views
 		private bool _isRefreshing;
 
 		private Checkbox _matureCheckbox;
+
+		private Label _descriptionCounter;
+
+		private Label _knownForCounter;
 
 		public ProfileEditorView(ProfileEditorSession session, IconIndexService iconIndex = null)
 			: this()
@@ -104,13 +110,22 @@ namespace rp.spark.UI.Views
 
 		private void BuildFields(Container buildPanel)
 		{
-			FlowPanel form = SparkFormLayout.AddVerticalStack(buildPanel, 0, 0, 760, 425, 4);
-			_displayName = SparkFormLayout.AddLabeledTextBox(form, "Character Name", string.Empty, string.Empty, 400, 35, 30);
+			FlowPanel form = SparkFormLayout.AddVerticalStack(buildPanel, 0, 0, 760, 433, 4);
+			FlowPanel nameRow = SparkFormLayout.AddRow((Container)(object)form, 760, 60, 30);
+			_displayName = SparkFormLayout.AddLabeledTextBox(nameRow, "Character Name", string.Empty, string.Empty, 400, 35, 30);
 			((TextInputBase)_displayName).add_TextChanged((EventHandler<EventArgs>)delegate
 			{
 				if (!_isRefreshing)
 				{
 					_session.Profile.DisplayName = ((TextInputBase)_displayName).get_Text()?.Trim() ?? string.Empty;
+				}
+			});
+			_pronouns = SparkFormLayout.AddLabeledTextBox(nameRow, "Pronouns", string.Empty, string.Empty, 220, 35, 20);
+			((TextInputBase)_pronouns).add_TextChanged((EventHandler<EventArgs>)delegate
+			{
+				if (!_isRefreshing)
+				{
+					_session.Profile.Pronouns = ((TextInputBase)_pronouns).get_Text()?.Trim() ?? string.Empty;
 				}
 			});
 			FlowPanel professionRow = SparkFormLayout.AddRow((Container)(object)form, 760, 60, 30);
@@ -122,25 +137,32 @@ namespace rp.spark.UI.Views
 					_session.Profile.CustomProfession = ((TextInputBase)_customProfession).get_Text()?.Trim() ?? string.Empty;
 				}
 			});
-			_pronouns = SparkFormLayout.AddLabeledTextBox(professionRow, "Pronouns", string.Empty, string.Empty, 220, 35, 20);
-			((TextInputBase)_pronouns).add_TextChanged((EventHandler<EventArgs>)delegate
+			_customRace = SparkFormLayout.AddLabeledTextBox(professionRow, "Custom Race", string.Empty, string.Empty, 220, 35, 16);
+			((TextInputBase)_customRace).add_TextChanged((EventHandler<EventArgs>)delegate
 			{
 				if (!_isRefreshing)
 				{
-					_session.Profile.Pronouns = ((TextInputBase)_pronouns).get_Text()?.Trim() ?? string.Empty;
+					_session.Profile.CustomRace = ((TextInputBase)_customRace).get_Text()?.Trim() ?? string.Empty;
 				}
 			});
 			_knownFor = (MultilineTextBox)(object)SparkFormLayout.AddLabeledMultilineTextBox(form, "Known For", string.Empty, string.Empty, 760, 58, 500);
 			((TextInputBase)_knownFor).add_TextChanged((EventHandler<EventArgs>)delegate
 			{
+				ProfileEditorUI.UpdateCharacterCounter(_knownForCounter, ((TextInputBase)_knownFor).get_Text(), 500);
 				if (!_isRefreshing)
 				{
 					_session.Profile.KnownFor = ((TextInputBase)_knownFor).get_Text()?.Trim() ?? string.Empty;
 				}
 			});
-			_description = (MultilineTextBox)(object)SparkFormLayout.AddLabeledMultilineTextBox(form, "Description", string.Empty, string.Empty, 760, 185, 8000);
+			FlowPanel descriptionGroup = SparkFormLayout.AddAutoStack((Container)(object)form, 760, 0);
+			FlowPanel descriptionHeader = SparkFormLayout.AddRow((Container)(object)descriptionGroup, 760, 25, 0);
+			SparkFormLayout.AddLabel((Container)(object)descriptionHeader, "Description", 620);
+			_knownForCounter = ProfileEditorUI.AddCharacterCounter((Container)(object)descriptionHeader, ((TextInputBase)_knownFor).get_Text(), 500, 140);
+			_description = (MultilineTextBox)(object)SparkFormLayout.AddMultilineTextBox((Container)(object)descriptionGroup, string.Empty, string.Empty, 760, 175, 8000);
+			_descriptionCounter = ProfileEditorUI.AddCharacterCounter((Container)(object)descriptionGroup, ((TextInputBase)_description).get_Text(), 8000, 760);
 			((TextInputBase)_description).add_TextChanged((EventHandler<EventArgs>)delegate
 			{
+				ProfileEditorUI.UpdateCharacterCounter(_descriptionCounter, ((TextInputBase)_description).get_Text(), 8000);
 				if (!_isRefreshing)
 				{
 					_session.Profile.Description = ((TextInputBase)_description).get_Text()?.Trim() ?? string.Empty;
@@ -193,9 +215,12 @@ namespace rp.spark.UI.Views
 			{
 				((TextInputBase)_displayName).set_Text(_session.Profile.DisplayName ?? string.Empty);
 				((TextInputBase)_customProfession).set_Text(_session.Profile.CustomProfession ?? string.Empty);
+				((TextInputBase)_customRace).set_Text(_session.Profile.CustomRace ?? string.Empty);
 				((TextInputBase)_pronouns).set_Text(_session.Profile.Pronouns ?? string.Empty);
 				((TextInputBase)_knownFor).set_Text(_session.Profile.KnownFor ?? string.Empty);
 				((TextInputBase)_description).set_Text(_session.Profile.Description ?? string.Empty);
+				ProfileEditorUI.UpdateCharacterCounter(_knownForCounter, ((TextInputBase)_knownFor).get_Text(), 500);
+				ProfileEditorUI.UpdateCharacterCounter(_descriptionCounter, ((TextInputBase)_description).get_Text(), 8000);
 				_matureCheckbox.set_Checked(_session.Profile.IsMature);
 				if (_glanceSlots != null)
 				{
@@ -247,9 +272,13 @@ namespace rp.spark.UI.Views
 
 		private static Tooltip MakeGlanceTooltip(AtAGlanceEntry entry)
 		{
-			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0028: Expected O, but got Unknown
-			return new Tooltip((ITooltipView)(object)new ProfileTooltipView(entry?.Title, entry?.Description, "At a Glance"));
+			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003b: Expected O, but got Unknown
+			if (entry != null && (!string.IsNullOrWhiteSpace(entry.Title) || !string.IsNullOrWhiteSpace(entry.Description)))
+			{
+				return new Tooltip((ITooltipView)(object)new ProfileTooltipView(entry.Title, entry.Description, "At A Glance"));
+			}
+			return null;
 		}
 
 		private void EditGlance(int index)

@@ -53,6 +53,11 @@ namespace rp.spark.Services
 			{
 				result.AddError("Race is too long.");
 			}
+			string customRace = profile.CustomRace;
+			if (customRace != null && customRace.Length > 16)
+			{
+				result.AddError("Custom race is too long.");
+			}
 			string profession = profile.Profession;
 			if (profession != null && profession.Length > 40)
 			{

@@ -314,59 +314,59 @@ namespace rp.spark.UI.Views
 			//IL_028c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0296: Unknown result type (might be due to invalid IL or missing references)
 			//IL_029e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0311: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02e9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ee: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02f6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0306: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0316: Unknown result type (might be due to invalid IL or missing references)
-			//IL_031e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_032e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_033e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0348: Unknown result type (might be due to invalid IL or missing references)
-			//IL_034f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0353: Unknown result type (might be due to invalid IL or missing references)
-			//IL_035d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0365: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0382: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0387: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0392: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0399: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03db: Expected O, but got Unknown
-			//IL_03dc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03e1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03ed: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03f4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03fe: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0403: Unknown result type (might be due to invalid IL or missing references)
-			//IL_040d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0419: Expected O, but got Unknown
-			//IL_0431: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0436: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0442: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0449: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0453: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0458: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0320: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0327: Unknown result type (might be due to invalid IL or missing references)
+			//IL_032b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0335: Unknown result type (might be due to invalid IL or missing references)
+			//IL_033d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_035a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_035f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_036a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0371: Unknown result type (might be due to invalid IL or missing references)
+			//IL_037b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0380: Unknown result type (might be due to invalid IL or missing references)
+			//IL_038a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03b3: Expected O, but got Unknown
+			//IL_03b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03cc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03d6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03f1: Expected O, but got Unknown
+			//IL_0409: Unknown result type (might be due to invalid IL or missing references)
+			//IL_040e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_041a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0421: Unknown result type (might be due to invalid IL or missing references)
+			//IL_042b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0430: Unknown result type (might be due to invalid IL or missing references)
+			//IL_043a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0446: Expected O, but got Unknown
+			//IL_045d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0462: Unknown result type (might be due to invalid IL or missing references)
-			//IL_046e: Expected O, but got Unknown
-			//IL_0485: Unknown result type (might be due to invalid IL or missing references)
-			//IL_048a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0495: Unknown result type (might be due to invalid IL or missing references)
-			//IL_049c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_046d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0474: Unknown result type (might be due to invalid IL or missing references)
+			//IL_047e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0483: Unknown result type (might be due to invalid IL or missing references)
+			//IL_048d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_04a6: Unknown result type (might be due to invalid IL or missing references)
 			//IL_04ab: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04b5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04d3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04ee: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04fe: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0508: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0510: Unknown result type (might be due to invalid IL or missing references)
-			//IL_051a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0522: Unknown result type (might be due to invalid IL or missing references)
-			//IL_052c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0533: Unknown result type (might be due to invalid IL or missing references)
-			//IL_053f: Expected O, but got Unknown
+			//IL_04b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04d6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04e8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04f2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0504: Unknown result type (might be due to invalid IL or missing references)
+			//IL_050b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0517: Expected O, but got Unknown
 			string displayName = ProfileText.DisplayName(_profile);
 			string pronouns = GetPronounsText();
 			string officialName = _profile.CharacterName?.Trim() ?? string.Empty;
@@ -427,10 +427,6 @@ namespace rp.spark.UI.Views
 				((Control)val4).set_Parent(buildPanel);
 			}
 			string metadata = "Current location: " + ProfileText.PresenceLocation(_presence) + " | Account: " + ProfileText.AccountName(_profile, _presence, string.Empty);
-			if (_profile.IsMature || _presence.IsMature)
-			{
-				metadata += " | Mature/18+";
-			}
 			if (!string.IsNullOrWhiteSpace(metadata))
 			{
 				Label val5 = new Label();
@@ -504,9 +500,18 @@ namespace rp.spark.UI.Views
 
 		private bool HasProfileTraits()
 		{
-			if (_profile.Experience == ProfileExperience.Hidden && _profile.Preferences == ProfilePreferenceFlags.None && _profile.Themes == ProfileThemeFlags.None)
+			if (_profile.Experience == ProfileExperience.Hidden && _profile.Preferences == ProfilePreferenceFlags.None && _profile.Themes == ProfileThemeFlags.None && _profile.Styles == ProfileStyleFlags.None)
 			{
-				return _profile.Styles != ProfileStyleFlags.None;
+				return IsMatureProfile();
+			}
+			return true;
+		}
+
+		private bool IsMatureProfile()
+		{
+			if (!(_profile?.IsMature ?? false))
+			{
+				return _presence?.IsMature ?? false;
 			}
 			return true;
 		}
@@ -712,6 +717,11 @@ namespace rp.spark.UI.Views
 			AddProfileTraitLabel(parent, ref x, y, "Themes", MakeProfileTraitTooltip("Themes", string.IsNullOrWhiteSpace(themes) ? "No themes set." : themes), !string.IsNullOrWhiteSpace(themes));
 			AddProfileTraitSeparator(parent, ref x, y);
 			AddProfileTraitLabel(parent, ref x, y, "Styles", MakeProfileTraitTooltip("Styles", string.IsNullOrWhiteSpace(styles) ? "No styles set." : styles), !string.IsNullOrWhiteSpace(styles));
+			if (IsMatureProfile())
+			{
+				AddProfileTraitSeparator(parent, ref x, y);
+				AddProfileTraitLabel(parent, ref x, y, "Mature", MakeProfileTraitTooltip("Mature", "This profile is marked Mature/18+."), isSet: true);
+			}
 		}
 
 		private static void AddProfileTraitLabel(Container parent, ref int x, int y, string text, Tooltip tooltip, bool isSet)
@@ -842,9 +852,13 @@ namespace rp.spark.UI.Views
 
 		private static Tooltip MakeGlanceTooltip(AtAGlanceEntry entry)
 		{
-			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0028: Expected O, but got Unknown
-			return new Tooltip((ITooltipView)(object)new ProfileTooltipView(entry?.Title, entry?.Description, "At A Glance"));
+			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003b: Expected O, but got Unknown
+			if (entry != null && (!string.IsNullOrWhiteSpace(entry.Title) || !string.IsNullOrWhiteSpace(entry.Description)))
+			{
+				return new Tooltip((ITooltipView)(object)new ProfileTooltipView(entry.Title, entry.Description, "At A Glance"));
+			}
+			return null;
 		}
 
 		private string GetBookmarkButtonText()
@@ -1189,10 +1203,10 @@ namespace rp.spark.UI.Views
 			return string.Empty;
 		}
 
-		[IteratorStateMachine(typeof(_003CWrapTextLines_003Ed__59))]
+		[IteratorStateMachine(typeof(_003CWrapTextLines_003Ed__60))]
 		private static IEnumerable<string> WrapTextLines(string text, float maxWidth, BitmapFont font)
 		{
-			return new _003CWrapTextLines_003Ed__59(-2)
+			return new _003CWrapTextLines_003Ed__60(-2)
 			{
 				_003C_003E3__text = text,
 				_003C_003E3__maxWidth = maxWidth,
@@ -1200,10 +1214,10 @@ namespace rp.spark.UI.Views
 			};
 		}
 
-		[IteratorStateMachine(typeof(_003CBreakLongWord_003Ed__60))]
+		[IteratorStateMachine(typeof(_003CBreakLongWord_003Ed__61))]
 		private static IEnumerable<string> BreakLongWord(string word, float maxWidth, BitmapFont font)
 		{
-			return new _003CBreakLongWord_003Ed__60(-2)
+			return new _003CBreakLongWord_003Ed__61(-2)
 			{
 				_003C_003E3__word = word,
 				_003C_003E3__maxWidth = maxWidth,

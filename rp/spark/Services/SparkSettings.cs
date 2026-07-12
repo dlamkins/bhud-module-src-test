@@ -42,6 +42,8 @@ namespace rp.spark.Services
 
 		private const string NearbyWindowLockKey = "NearbyWindowLock";
 
+		private const string ShowCornerIconKey = "ShowCornerIcon";
+
 		private static readonly Regex AccountNameRegex = new Regex("^[^.\\r\\n]+\\.\\d{4}$", RegexOptions.Compiled);
 
 		public SettingCollection SharingSettings { get; }
@@ -76,6 +78,8 @@ namespace rp.spark.Services
 
 		public SettingEntry<bool> NearbyWindowLock { get; }
 
+		public SettingEntry<bool> ShowCornerIcon { get; }
+
 		public SparkSettings(SettingCollection settings)
 		{
 			SharingSettings = settings.AddSubCollection("profile-sharing", true, (Func<string>)(() => "Profile sharing"));
@@ -94,6 +98,7 @@ namespace rp.spark.Services
 			BlockedAccounts = PrivacySettings.DefineSetting<string>("BlockedAccounts", string.Empty, (Func<string>)(() => "Block list"), (Func<string>)(() => "One account per line. Blocked accounts will be hidden from results."));
 			NearbyWindowLocation = UiSettings.DefineSetting<string>("NearbyWindowLocation", string.Empty, (Func<string>)(() => "Nearby Players window location"), (Func<string>)(() => "Stores the last screen position of the Nearby Players window."));
 			NearbyWindowLock = UiSettings.DefineSetting<bool>("NearbyWindowLock", false, (Func<string>)(() => "Lock Nearby Players window"), (Func<string>)(() => "Prevents dragging the Nearby Players window while still allowing profile clicks, refresh, and scrolling."));
+			ShowCornerIcon = UiSettings.DefineSetting<bool>("ShowCornerIcon", true, (Func<string>)(() => "Show corner icon"), (Func<string>)(() => "Shows the SPARK shortcut menu in the Blish HUD corner icon area."));
 		}
 
 		public IReadOnlyCollection<string> GetBlockedAccountNames()
