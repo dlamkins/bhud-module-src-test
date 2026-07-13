@@ -42,7 +42,6 @@
     <None Remove="Maestro\ref.undo-icon.png" />
     <None Remove="Maestro\ref.upload-emblem.png" />
     <None Remove="Maestro\ref.upload-icon.png" />
-    <None Remove="Maestro\ref.songs.json" />
     <EmbeddedResource Include="Maestro\ref.cancel-icon.png" />
     <EmbeddedResource Include="Maestro\ref.check-icon.png" />
     <EmbeddedResource Include="Maestro\ref.clipboard-icon.png" />
@@ -72,7 +71,6 @@
     <EmbeddedResource Include="Maestro\ref.undo-icon.png" />
     <EmbeddedResource Include="Maestro\ref.upload-emblem.png" />
     <EmbeddedResource Include="Maestro\ref.upload-icon.png" />
-    <EmbeddedResource Include="Maestro\ref.songs.json" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Blish HUD" />

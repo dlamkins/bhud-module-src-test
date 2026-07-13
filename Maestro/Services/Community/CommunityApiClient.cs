@@ -15,9 +15,7 @@ namespace Maestro.Services.Community
 	{
 		private static readonly Logger Logger = Logger.GetLogger<CommunityApiClient>();
 
-		private const string BASE_URL = "https://raw.githubusercontent.com/uwponcel/Maestro/main/Community";
-
-		private const string PENDING_BASE_URL = "https://raw.githubusercontent.com/uwponcel/Maestro/community/pending/Community";
+		private const string STATIC_HOST_BASE = "https://bhm.blishhud.com/Aex.Maestro";
 
 		private const string UPLOAD_API_URL = "https://maestro-api.uwponcel.workers.dev/api";
 
@@ -37,110 +35,74 @@ namespace Maestro.Services.Community
 			((HttpHeaders)_httpClient.get_DefaultRequestHeaders()).Add("User-Agent", "Maestro-BlishHUD-Module");
 		}
 
-		public async Task<CommunityManifest> FetchManifestAsync(CancellationToken cancellationToken = default(CancellationToken))
+		private static string NamespaceSegment(SongNamespace ns)
+		{
+			return ns switch
+			{
+				SongNamespace.Builtin => "builtin", 
+				SongNamespace.Community => "community", 
+				SongNamespace.CommunityPending => "community-pending", 
+				_ => throw new ArgumentOutOfRangeException("ns", ns, null), 
+			};
+		}
+
+		public async Task<CommunityManifest> FetchManifestAsync(SongNamespace ns, CancellationToken cancellationToken = default(CancellationToken))
 		{
 			_ = 1;
 			try
 			{
-				string url = "https://raw.githubusercontent.com/uwponcel/Maestro/main/Community/manifest.json";
-				Logger.Info("Fetching community manifest from " + url);
+				string url = "https://bhm.blishhud.com/Aex.Maestro/" + NamespaceSegment(ns) + "/manifest.json";
+				Logger.Info($"Fetching {ns} manifest from {url}");
 				HttpResponseMessage obj = await _httpClient.GetAsync(url, cancellationToken);
 				obj.EnsureSuccessStatusCode();
 				CommunityManifest manifest = JsonConvert.DeserializeObject<CommunityManifest>(await obj.get_Content().ReadAsStringAsync());
-				Logger.Info($"Fetched manifest with {(manifest?.Songs?.Count).GetValueOrDefault()} songs");
+				Logger.Info($"Fetched {ns} manifest with {(manifest?.Songs?.Count).GetValueOrDefault()} songs");
 				return manifest;
 			}
 			catch (OperationCanceledException)
 			{
-				Logger.Debug("Manifest fetch cancelled");
+				Logger.Debug($"{ns} manifest fetch cancelled");
 				throw;
 			}
 			catch (Exception ex)
 			{
-				Logger.Error(ex, "Failed to fetch community manifest");
+				Logger.Error(ex, $"Failed to fetch {ns} manifest");
 				throw;
 			}
 		}
 
-		public async Task<Song> FetchSongAsync(string songId, CancellationToken cancellationToken = default(CancellationToken))
+		public async Task<Song> FetchSongAsync(SongNamespace ns, string songId, CancellationToken cancellationToken = default(CancellationToken))
 		{
 			_ = 1;
 			try
 			{
-				string url = "https://raw.githubusercontent.com/uwponcel/Maestro/main/Community/songs/" + songId + ".json";
-				Logger.Info("Fetching community song " + songId);
+				string url = "https://bhm.blishhud.com/Aex.Maestro/" + NamespaceSegment(ns) + "/songs/" + songId + ".json";
+				Logger.Info($"Fetching {ns} song {songId}");
 				HttpResponseMessage obj = await _httpClient.GetAsync(url, cancellationToken);
 				obj.EnsureSuccessStatusCode();
 				Song song = SongSerializer.DeserializeJsonContent(await obj.get_Content().ReadAsStringAsync());
 				if (song != null)
 				{
-					song.CommunityId = songId;
+					if (ns == SongNamespace.Builtin)
+					{
+						song.BuiltInId = songId;
+					}
+					else
+					{
+						song.CommunityId = songId;
+					}
 				}
-				Logger.Info("Fetched song: " + song?.Name);
+				Logger.Info($"Fetched {ns} song: {song?.Name}");
 				return song;
 			}
 			catch (OperationCanceledException)
 			{
-				Logger.Debug("Song fetch cancelled for " + songId);
+				Logger.Debug($"{ns} song fetch cancelled for {songId}");
 				throw;
 			}
 			catch (Exception ex)
 			{
-				Logger.Error(ex, "Failed to fetch community song " + songId);
-				throw;
-			}
-		}
-
-		public async Task<CommunityManifest> FetchPendingManifestAsync(CancellationToken cancellationToken = default(CancellationToken))
-		{
-			_ = 1;
-			try
-			{
-				string url = "https://raw.githubusercontent.com/uwponcel/Maestro/community/pending/Community/manifest.json";
-				Logger.Info("Fetching pending manifest from " + url);
-				HttpResponseMessage obj = await _httpClient.GetAsync(url, cancellationToken);
-				obj.EnsureSuccessStatusCode();
-				CommunityManifest manifest = JsonConvert.DeserializeObject<CommunityManifest>(await obj.get_Content().ReadAsStringAsync());
-				Logger.Info($"Fetched pending manifest with {(manifest?.Songs?.Count).GetValueOrDefault()} songs");
-				return manifest;
-			}
-			catch (OperationCanceledException)
-			{
-				Logger.Debug("Pending manifest fetch cancelled");
-				throw;
-			}
-			catch (Exception ex)
-			{
-				Logger.Error(ex, "Failed to fetch pending manifest");
-				throw;
-			}
-		}
-
-		public async Task<Song> FetchPendingSongAsync(string songId, CancellationToken cancellationToken = default(CancellationToken))
-		{
-			_ = 1;
-			try
-			{
-				string url = "https://raw.githubusercontent.com/uwponcel/Maestro/community/pending/Community/songs/" + songId + ".json";
-				Logger.Info("Fetching pending song " + songId);
-				HttpResponseMessage obj = await _httpClient.GetAsync(url, cancellationToken);
-				obj.EnsureSuccessStatusCode();
-				Song song = SongSerializer.DeserializeJsonContent(await obj.get_Content().ReadAsStringAsync());
-				if (song != null)
-				{
-					song.CommunityId = songId;
-				}
-				Logger.Info("Fetched pending song: " + song?.Name);
-				return song;
-			}
-			catch (OperationCanceledException)
-			{
-				Logger.Debug("Pending song fetch cancelled for " + songId);
-				throw;
-			}
-			catch (Exception ex)
-			{
-				Logger.Error(ex, "Failed to fetch pending song " + songId);
+				Logger.Error(ex, $"Failed to fetch {ns} song {songId}");
 				throw;
 			}
 		}

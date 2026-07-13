@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -6,6 +7,7 @@ using System.Threading.Tasks;
 using Blish_HUD;
 using Maestro.Models;
 using Maestro.Services.Data;
+using Microsoft.Xna.Framework;
 
 namespace Maestro.Services.Community
 {
@@ -19,11 +21,13 @@ namespace Maestro.Services.Community
 
 		private readonly List<Song> _mainSongList;
 
-		private readonly Dictionary<string, CancellationTokenSource> _activeDownloads;
+		private readonly ConcurrentDictionary<string, CancellationTokenSource> _activeDownloads;
 
 		private CommunityManifest _manifest;
 
 		private bool _isRefreshing;
+
+		private const string BUILTIN_SYNC_KEY = "__builtin_sync__";
 
 		public CommunityManifest Manifest => _manifest;
 
@@ -35,13 +39,17 @@ namespace Maestro.Services.Community
 
 		public event EventHandler ManifestRefreshed;
 
+		public event EventHandler<Song> BuiltInSongSynced;
+
+		public event EventHandler BuiltInSyncFailed;
+
 		public CommunityService(SongStorage songStorage, List<Song> mainSongList)
 		{
 			_apiClient = new CommunityApiClient();
 			_songStorage = songStorage;
 			_mainSongList = mainSongList;
-			_activeDownloads = new Dictionary<string, CancellationTokenSource>();
-			_manifest = _songStorage.GetCachedManifest();
+			_activeDownloads = new ConcurrentDictionary<string, CancellationTokenSource>();
+			_manifest = _songStorage.GetCachedManifest(SongNamespace.Community);
 		}
 
 		public async Task RefreshManifestAsync(CancellationToken cancellationToken = default(CancellationToken))
@@ -53,8 +61,8 @@ namespace Maestro.Services.Community
 			_isRefreshing = true;
 			try
 			{
-				_manifest = await _apiClient.FetchManifestAsync(cancellationToken);
-				_songStorage.SaveManifest(_manifest);
+				_manifest = await _apiClient.FetchManifestAsync(SongNamespace.Community, cancellationToken);
+				_songStorage.SaveManifest(SongNamespace.Community, _manifest);
 				this.ManifestRefreshed?.Invoke(this, EventArgs.Empty);
 				Logger.Info($"Refreshed manifest with {_manifest.Songs.Count} songs");
 			}
@@ -67,7 +75,7 @@ namespace Maestro.Services.Community
 				Logger.Error(ex, "Failed to refresh manifest");
 				if (_manifest == null)
 				{
-					_manifest = _songStorage.GetCachedManifest();
+					_manifest = _songStorage.GetCachedManifest(SongNamespace.Community);
 				}
 			}
 			finally
@@ -125,7 +133,7 @@ namespace Maestro.Services.Community
 			{
 				progress?.Report(10);
 				RaiseDownloadProgress(communitySong.Id, 10, DownloadState.Downloading);
-				Song song = await _apiClient.FetchSongAsync(communitySong.Id, cts.Token);
+				Song song = await _apiClient.FetchSongAsync(SongNamespace.Community, communitySong.Id, cts.Token);
 				progress?.Report(80);
 				RaiseDownloadProgress(communitySong.Id, 80, DownloadState.Downloading);
 				if (song == null)
@@ -136,7 +144,10 @@ namespace Maestro.Services.Community
 				_songStorage.SaveSong(song);
 				progress?.Report(100);
 				RaiseDownloadProgress(communitySong.Id, 100, DownloadState.Completed);
-				_mainSongList.Add(song);
+				GameService.Overlay.QueueMainThreadUpdate((Action<GameTime>)delegate
+				{
+					_mainSongList.Add(song);
+				});
 				Logger.Info("Downloaded and added song: " + song.Name);
 				return song;
 			}
@@ -154,7 +165,7 @@ namespace Maestro.Services.Community
 			}
 			finally
 			{
-				_activeDownloads.Remove(communitySong.Id);
+				_activeDownloads.TryRemove(communitySong.Id, out var _);
 				cts.Dispose();
 			}
 		}
@@ -180,7 +191,7 @@ namespace Maestro.Services.Community
 			List<Song> submittals = new List<Song>();
 			try
 			{
-				CommunityManifest pendingManifest = await _apiClient.FetchPendingManifestAsync(cancellationToken);
+				CommunityManifest pendingManifest = await _apiClient.FetchManifestAsync(SongNamespace.CommunityPending, cancellationToken);
 				if (pendingManifest?.Songs == null || pendingManifest.Songs.Count == 0)
 				{
 					return submittals;
@@ -188,7 +199,7 @@ namespace Maestro.Services.Community
 				CommunityManifest communityManifest = _manifest;
 				if (communityManifest == null)
 				{
-					communityManifest = await _apiClient.FetchManifestAsync(cancellationToken);
+					communityManifest = await _apiClient.FetchManifestAsync(SongNamespace.Community, cancellationToken);
 				}
 				HashSet<string> mainSongIds = new HashSet<string>(communityManifest?.Songs?.Select((CommunitySong s) => s.Id) ?? Enumerable.Empty<string>());
 				List<CommunitySong> newSongs = pendingManifest.Songs.Where((CommunitySong s) => !mainSongIds.Contains(s.Id)).ToList();
@@ -197,7 +208,7 @@ namespace Maestro.Services.Community
 				{
 					try
 					{
-						Song song = await _apiClient.FetchPendingSongAsync(communitySong.Id, cancellationToken);
+						Song song = await _apiClient.FetchSongAsync(SongNamespace.CommunityPending, communitySong.Id, cancellationToken);
 						if (song != null)
 						{
 							song.IsSubmittal = true;
@@ -216,6 +227,65 @@ namespace Maestro.Services.Community
 				Logger.Error(ex, "Failed to load submittals from pending branch");
 			}
 			return submittals;
+		}
+
+		public async Task SyncBuiltInSongsAsync(CancellationToken cancellationToken = default(CancellationToken))
+		{
+			if (_activeDownloads.ContainsKey("__builtin_sync__"))
+			{
+				return;
+			}
+			CancellationTokenSource cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+			_activeDownloads["__builtin_sync__"] = cts;
+			try
+			{
+				CommunityManifest manifest = await _apiClient.FetchManifestAsync(SongNamespace.Builtin, cts.Token);
+				_songStorage.SaveManifest(SongNamespace.Builtin, manifest);
+				HashSet<string> knownIds = new HashSet<string>(from s in _mainSongList
+					where !string.IsNullOrEmpty(s.BuiltInId)
+					select s.BuiltInId);
+				List<CommunitySong> missing = manifest.Songs.Where((CommunitySong s) => !knownIds.Contains(s.Id)).ToList();
+				Logger.Info($"Built-in sync: {missing.Count} song(s) to download");
+				Song song;
+				foreach (CommunitySong entry in missing)
+				{
+					try
+					{
+						song = await _apiClient.FetchSongAsync(SongNamespace.Builtin, entry.Id, cts.Token);
+						if (song != null)
+						{
+							_songStorage.SaveSong(song);
+							GameService.Overlay.QueueMainThreadUpdate((Action<GameTime>)delegate
+							{
+								_mainSongList.Add(song);
+								this.BuiltInSongSynced?.Invoke(this, song);
+							});
+						}
+					}
+					catch (OperationCanceledException)
+					{
+						throw;
+					}
+					catch (Exception ex2)
+					{
+						Logger.Warn(ex2, "Failed to sync built-in song " + entry.Id + ", skipping");
+					}
+				}
+			}
+			catch (OperationCanceledException)
+			{
+				Logger.Debug("Built-in sync cancelled");
+			}
+			catch (Exception ex)
+			{
+				Logger.Error(ex, "Failed to sync built-in songs");
+				this.BuiltInSyncFailed?.Invoke(this, EventArgs.Empty);
+			}
+			finally
+			{
+				_activeDownloads.TryRemove("__builtin_sync__", out var _);
+				cts.Dispose();
+			}
 		}
 
 		private void RaiseDownloadProgress(string communityId, int progress, DownloadState state)

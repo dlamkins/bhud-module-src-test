@@ -64,6 +64,10 @@ namespace Maestro
 
 		private Song _editingOriginalSong;
 
+		private DateTime _lastBuiltInRefresh = DateTime.MinValue;
+
+		private static readonly TimeSpan BuiltInRefreshThrottle = TimeSpan.FromMilliseconds(250.0);
+
 		internal static Module Instance { get; private set; }
 
 		internal SettingsManager SettingsManager => base.ModuleParameters.get_SettingsManager();
@@ -103,20 +107,33 @@ namespace Maestro
 		{
 			_songStorage = new SongStorage(DirectoriesManager);
 			_favoriteService = new FavoriteService(_songStorage.Database);
-			if (Directory.Exists("C:\\git\\perso\\Maestro\\Songs"))
+			bool isDebugMode = Directory.Exists("C:\\git\\perso\\Maestro\\module\\Songs");
+			if (isDebugMode)
 			{
 				Logger.Info("Debug mode: Loading songs from directory");
-				_songs = await SongLoader.LoadFromDirectoryAsync("C:\\git\\perso\\Maestro\\Songs");
+				_songs = await SongLoader.LoadFromDirectoryAsync("C:\\git\\perso\\Maestro\\module\\Songs");
 			}
 			else
 			{
-				Logger.Info("Production mode: Loading songs from ContentsManager");
-				_songs = await SongLoader.LoadFromContentsManagerAsync(ContentsManager);
+				_songs = new List<Song>();
 			}
-			List<Song> userSongs = _songStorage.GetAllSongs();
-			Logger.Info($"Loaded {userSongs.Count} user songs from storage");
-			_songs.AddRange(userSongs);
+			List<Song> storedSongs = _songStorage.GetAllSongs();
+			Logger.Info($"Loaded {storedSongs.Count} stored song(s) from local database");
+			_songs.AddRange(storedSongs);
 			_communityService = new CommunityService(_songStorage, _songs);
+			_communityService.BuiltInSongSynced += delegate
+			{
+				MaybeRefreshAfterBuiltInSync();
+			};
+			_communityService.BuiltInSyncFailed += delegate
+			{
+				ScreenNotification.ShowNotification("Failed to load built-in songs", (NotificationType)2, (Texture2D)null, 4);
+			};
+			if (!isDebugMode)
+			{
+				Logger.Info("Production mode: syncing built-in songs from static hosting");
+				SyncBuiltInSongsAndRefreshAsync();
+			}
 			_uploadRateLimiter = new UploadRateLimiter(_songStorage.Database);
 			_uploadRateLimiter.CleanupOldRecords();
 			_uploadService = new CommunityUploadService(new CommunityApiClient(_moduleSettings.ClientId), _communityService, _uploadRateLimiter, _songStorage);
@@ -396,6 +413,30 @@ namespace Maestro
 			_maestroWindow?.RefreshAfterCommunityDownload();
 		}
 
+		private void MaybeRefreshAfterBuiltInSync()
+		{
+			DateTime now = DateTime.UtcNow;
+			if (!(now - _lastBuiltInRefresh < BuiltInRefreshThrottle))
+			{
+				_lastBuiltInRefresh = now;
+				_maestroWindow?.RefreshAfterCommunityDownload();
+			}
+		}
+
+		private async Task SyncBuiltInSongsAndRefreshAsync()
+		{
+			try
+			{
+				await _communityService.SyncBuiltInSongsAsync();
+				_maestroWindow?.RefreshAfterCommunityDownload();
+			}
+			catch (Exception ex)
+			{
+				Logger.Error(ex, "Built-in song sync failed unexpectedly");
+				ScreenNotification.ShowNotification("Failed to load built-in songs", (NotificationType)2, (Texture2D)null, 4);
+			}
+		}
+
 		private void OnCommunitySongDeleteRequested(object sender, string communityId)
 		{
 			Song song = _songs.Find((Song s) => s.CommunityId == communityId);
@@ -471,6 +512,7 @@ namespace Maestro
 			{
 				((Control)maestroWindow).Dispose();
 			}
+			_maestroWindow = null;
 			_communityService?.Dispose();
 			_songStorage?.Dispose();
 			CornerIcon cornerIcon = _cornerIcon;

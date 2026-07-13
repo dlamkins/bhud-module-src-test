@@ -24,7 +24,7 @@ namespace Maestro.Services.Data
 
 		private class CachedManifest
 		{
-			public int Id { get; set; }
+			public string Id { get; set; }
 
 			public CommunityManifest Manifest { get; set; }
 
@@ -113,21 +113,21 @@ namespace Maestro.Services.Data
 			return SongExists(key);
 		}
 
-		public CommunityManifest GetCachedManifest()
+		public CommunityManifest GetCachedManifest(SongNamespace ns)
 		{
-			return _manifestCollection.FindById(1)?.Manifest;
+			return _manifestCollection.FindById(ns.ToString())?.Manifest;
 		}
 
-		public void SaveManifest(CommunityManifest manifest)
+		public void SaveManifest(SongNamespace ns, CommunityManifest manifest)
 		{
 			CachedManifest cached = new CachedManifest
 			{
-				Id = 1,
+				Id = ns.ToString(),
 				Manifest = manifest,
 				CachedAt = DateTime.UtcNow
 			};
 			_manifestCollection.Upsert(cached);
-			Logger.Debug("Saved manifest to cache");
+			Logger.Debug($"Saved {ns} manifest to cache");
 		}
 
 		private string GetSongKey(Song song)
@@ -135,6 +135,10 @@ namespace Maestro.Services.Data
 			if (!string.IsNullOrEmpty(song.CommunityId))
 			{
 				return song.CommunityId;
+			}
+			if (!string.IsNullOrEmpty(song.BuiltInId))
+			{
+				return song.BuiltInId;
 			}
 			return $"{song.Name}|{song.Artist}|{song.Instrument}".ToLowerInvariant();
 		}

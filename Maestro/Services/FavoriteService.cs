@@ -77,6 +77,10 @@ namespace Maestro.Services
 			{
 				return song.CommunityId;
 			}
+			if (!string.IsNullOrEmpty(song.BuiltInId))
+			{
+				return song.BuiltInId;
+			}
 			return $"{song.Name}|{song.Artist}|{song.Instrument}".ToLowerInvariant();
 		}
 	}

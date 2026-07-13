@@ -13,7 +13,7 @@ namespace Maestro.Services
 	{
 		private static readonly Logger Logger = Logger.GetLogger<DebugLogger>();
 
-		private const string DEBUG_FOLDER = "C:\\git\\perso\\Maestro\\SongsDebug";
+		private const string DEBUG_FOLDER = "C:\\git\\perso\\Maestro\\module\\SongsDebug";
 
 		private readonly StringBuilder _log = new StringBuilder();
 
@@ -50,9 +50,9 @@ namespace Maestro.Services
 			_hasLoggedNotes = false;
 			try
 			{
-				if (!Directory.Exists("C:\\git\\perso\\Maestro\\SongsDebug"))
+				if (!Directory.Exists("C:\\git\\perso\\Maestro\\module\\SongsDebug"))
 				{
-					Directory.CreateDirectory("C:\\git\\perso\\Maestro\\SongsDebug");
+					Directory.CreateDirectory("C:\\git\\perso\\Maestro\\module\\SongsDebug");
 				}
 				string logPath = GetUniqueLogPath(SanitizeFileName(_songName));
 				string header = "=== Debug Log for: " + _songName + " ===\n" + $"=== Time: {DateTime.Now:yyyy-MM-dd HH:mm:ss} ===\n\n";
@@ -67,7 +67,7 @@ namespace Maestro.Services
 
 		private static string GetUniqueLogPath(string baseName)
 		{
-			string basePath = Path.Combine("C:\\git\\perso\\Maestro\\SongsDebug", baseName + ".txt");
+			string basePath = Path.Combine("C:\\git\\perso\\Maestro\\module\\SongsDebug", baseName + ".txt");
 			if (!File.Exists(basePath))
 			{
 				return basePath;
@@ -76,7 +76,7 @@ namespace Maestro.Services
 			string newPath;
 			do
 			{
-				newPath = Path.Combine("C:\\git\\perso\\Maestro\\SongsDebug", $"{baseName} - {counter}.txt");
+				newPath = Path.Combine("C:\\git\\perso\\Maestro\\module\\SongsDebug", $"{baseName} - {counter}.txt");
 				counter++;
 			}
 			while (File.Exists(newPath));
