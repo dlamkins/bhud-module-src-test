@@ -4,6 +4,9 @@ namespace GW2app
 {
 	internal class EntryDto
 	{
+		[JsonProperty("name")]
+		public string Name;
+
 		[JsonProperty("completed")]
 		public bool Completed;
 

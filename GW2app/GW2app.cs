@@ -23,6 +23,7 @@ using Blish_HUD.Modules.Managers;
 using Blish_HUD.Settings;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -31,6 +32,51 @@ namespace GW2app
 	[Export(typeof(Module))]
 	public class GW2app : Module
 	{
+		private sealed class PollChannel
+		{
+			public DateTime LastPollUtc;
+
+			public bool StateSeen;
+
+			private volatile bool _superseded;
+
+			private readonly ConcurrentQueue<string> _outbound = new ConcurrentQueue<string>();
+
+			public string SessionId { get; }
+
+			public bool Superseded => _superseded;
+
+			public PollChannel(string sessionId)
+			{
+				SessionId = sessionId;
+				LastPollUtc = DateTime.UtcNow;
+			}
+
+			public void MarkSuperseded()
+			{
+				_superseded = true;
+			}
+
+			public void Enqueue(string json)
+			{
+				if (!_superseded)
+				{
+					_outbound.Enqueue(json);
+				}
+			}
+
+			public List<string> DrainOutbound()
+			{
+				List<string> list = new List<string>();
+				string s;
+				while (_outbound.TryDequeue(out s))
+				{
+					list.Add(s);
+				}
+				return list;
+			}
+		}
+
 		private static readonly Logger Logger = Logger.GetLogger<GW2app>();
 
 		private const int HttpPort = 38473;
@@ -47,6 +93,8 @@ namespace GW2app
 
 		private const int CloseCodeProtocolViolation = 4002;
 
+		private static readonly TimeSpan PollSessionTimeout = TimeSpan.FromSeconds(5.0);
+
 		internal const int Gw2ChatMaxLength = 199;
 
 		internal const int MaxWaypointsPerMessage = 15;
@@ -54,6 +102,8 @@ namespace GW2app
 		internal static GW2app GW2appInstance;
 
 		private Texture2D _iconTexture;
+
+		private Texture2D _iconHiddenTexture;
 
 		private Texture2D _cornerSourceTexture;
 
@@ -84,6 +134,10 @@ namespace GW2app
 		private WebSocket _activeClient;
 
 		private CancellationTokenSource _activeClientCts;
+
+		private PollChannel _activePollSession;
+
+		private string _lastSupersededPollId;
 
 		private int _hasActiveConnection;
 
@@ -125,6 +179,8 @@ namespace GW2app
 
 		private readonly HashSet<string> _deferredRefreshes = new HashSet<string>();
 
+		private bool _contextMenuRebuildPending;
+
 		private SettingEntry<GW2appWindow.WindowTheme> _windowTheme;
 
 		private SettingEntry<int> _bgOpacityPct;
@@ -134,6 +190,12 @@ namespace GW2app
 		private SettingEntry<bool> _showAccountName;
 
 		private SettingEntry<bool> _showCopyWaypointsButton;
+
+		private SettingEntry<KeyBinding> _toggleListsKeybind;
+
+		private readonly HashSet<string> _peekHiddenIds = new HashSet<string>();
+
+		private bool _suppressListVisibilityHandlers;
 
 		private readonly ConcurrentQueue<IncomingMessage> _incomingMessages = new ConcurrentQueue<IncomingMessage>();
 
@@ -234,13 +296,19 @@ namespace GW2app
 			get
 			{
 				WebSocket ws;
+				PollChannel poll;
 				lock (_clientLock)
 				{
 					ws = _activeClient;
+					poll = _activePollSession;
 				}
-				if (ws != null)
+				if (ws != null && ws.State == WebSocketState.Open)
 				{
-					return ws.State == WebSocketState.Open;
+					return true;
+				}
+				if (poll != null)
+				{
+					return !poll.Superseded;
 				}
 				return false;
 			}
@@ -290,6 +358,8 @@ namespace GW2app
 
 		protected override void DefineSettings(SettingCollection settings)
 		{
+			//IL_023c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0284: Expected O, but got Unknown
 			SettingCollection appearance = settings.AddSubCollection("appearance", true, (Func<string>)(() => "Appearance"));
 			_windowTheme = appearance.DefineSetting<GW2appWindow.WindowTheme>("windowTheme", GW2appWindow.WindowTheme.Game, (Func<string>)(() => "Window theme"), (Func<string>)(() => "Changes the background of windows"));
 			_showAccountName = appearance.DefineSetting<bool>("showAccountName", true, (Func<string>)(() => "Show GW2 account name in list header"), (Func<string>)(() => "Hides the account-name subtitle on the list windows when off."));
@@ -299,6 +369,8 @@ namespace GW2app
 			SettingCollection sizing = settings.AddSubCollection("sizing", true, (Func<string>)(() => "Sizing"));
 			_uiScalePct = sizing.DefineSetting<int>("uiScalePct", 100, (Func<string>)(() => "List scale"), (Func<string>)(() => "Scales list window dimensions and entry images"));
 			SettingComplianceExtensions.SetRange(_uiScalePct, 75, 125);
+			SettingCollection controls = settings.AddSubCollection("controls", true, (Func<string>)(() => "Controls"));
+			_toggleListsKeybind = controls.DefineSetting<KeyBinding>("toggleListsVisibility", new KeyBinding((Keys)0), (Func<string>)(() => "Show/hide all lists"), (Func<string>)(() => "Hides or restores every open list window. Purely visual: hidden lists stay connected and reappear instantly."));
 			SettingCollection internalSettings = settings.AddSubCollection("internal", false);
 			_persistedOpenListsJson = internalSettings.DefineSetting<string>("openLists", "[]", (Func<string>)null, (Func<string>)null);
 			_maxWaypointsPerCopy = internalSettings.DefineSetting<int>("maxWaypointsPerCopy", 15, (Func<string>)null, (Func<string>)null);
@@ -306,7 +378,7 @@ namespace GW2app
 
 		public override IView GetSettingsView()
 		{
-			return (IView)(object)new GW2appSettingsView(_windowTheme, _bgOpacityPct, _showAccountName, _showCopyWaypointsButton, _uiScalePct, delegate
+			return (IView)(object)new GW2appSettingsView(_windowTheme, _bgOpacityPct, _showAccountName, _showCopyWaypointsButton, _uiScalePct, _toggleListsKeybind, delegate
 			{
 				if (_uiScalePct != null)
 				{
@@ -320,6 +392,11 @@ namespace GW2app
 			_iconTexture = ContentsManager.GetTexture("gw2app-icon.png");
 			CreateCornerIcon();
 			RebuildContextMenu();
+			if (_toggleListsKeybind?.get_Value() != null)
+			{
+				_toggleListsKeybind.get_Value().set_Enabled(true);
+				_toggleListsKeybind.get_Value().add_Activated((EventHandler<EventArgs>)OnToggleListsKeybind);
+			}
 		}
 
 		protected override async Task LoadAsync()
@@ -329,6 +406,11 @@ namespace GW2app
 			_logoTexture = ContentsManager.GetTexture("gw2app-logo.png");
 			_dotConnectedTexture = ContentsManager.GetTexture("connected.png");
 			_dotNotConnectedTexture = ContentsManager.GetTexture("not-connected.png");
+			Texture2D hiddenIcon = ContentsManager.GetTexture("gw2app-icon-lists-hidden.png");
+			if (hiddenIcon != null && hiddenIcon != Textures.get_Error())
+			{
+				_iconHiddenTexture = hiddenIcon;
+			}
 			AsyncTexture2D.FromAssetId(155997);
 			if (_windowTheme != null)
 			{
@@ -433,6 +515,7 @@ namespace GW2app
 		{
 			bool catalogChanged = false;
 			HashSet<string> dirtyLists = new HashSet<string>();
+			ReapStalePollSession();
 			IncomingMessage msg;
 			while (_incomingMessages.TryDequeue(out msg))
 			{
@@ -498,6 +581,14 @@ namespace GW2app
 				foreach (string id in _listWindows.Keys)
 				{
 					dirtyLists.Add(id);
+				}
+			}
+			if (_contextMenuRebuildPending)
+			{
+				_contextMenuRebuildPending = false;
+				if (!catalogChanged)
+				{
+					RebuildContextMenu();
 				}
 			}
 			if (_loadingLists.Count > 0)
@@ -606,8 +697,8 @@ namespace GW2app
 
 		private bool ApplyEntry(EntryMessage entry)
 		{
-			//IL_0196: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c0: Unknown result type (might be due to invalid IL or missing references)
 			if (entry == null || string.IsNullOrEmpty(entry.ListId))
 			{
 				return false;
@@ -625,10 +716,14 @@ namespace GW2app
 			{
 				return false;
 			}
-			EntryDto entryDto = list.Entries[entry.Index];
-			entryDto.Completed = entry.Completed;
-			entryDto.AutoCompleted = entry.AutoCompleted;
-			entryDto.HasHoverCard = entry.HasHoverCard;
+			EntryDto e = list.Entries[entry.Index];
+			if (!string.IsNullOrEmpty(entry.Name))
+			{
+				e.Name = entry.Name;
+			}
+			e.Completed = entry.Completed;
+			e.AutoCompleted = entry.AutoCompleted;
+			e.HasHoverCard = entry.HasHoverCard;
 			string chatKey = EntryKey(entry.ListId, entry.Index);
 			if (string.IsNullOrEmpty(entry.ChatLink))
 			{
@@ -826,6 +921,10 @@ namespace GW2app
 			{
 				_showCopyWaypointsButton.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnShowCopyWaypointsButtonChanged);
 			}
+			if (_toggleListsKeybind?.get_Value() != null)
+			{
+				_toggleListsKeybind.get_Value().remove_Activated((EventHandler<EventArgs>)OnToggleListsKeybind);
+			}
 			try
 			{
 				_httpCts?.Cancel();
@@ -870,6 +969,8 @@ namespace GW2app
 				{
 				}
 				_activeClientCts = null;
+				_activePollSession?.MarkSuperseded();
+				_activePollSession = null;
 			}
 			if (activeClient != null)
 			{
@@ -939,6 +1040,11 @@ namespace GW2app
 			{
 				((GraphicsResource)iconTexture).Dispose();
 			}
+			Texture2D iconHiddenTexture = _iconHiddenTexture;
+			if (iconHiddenTexture != null)
+			{
+				((GraphicsResource)iconHiddenTexture).Dispose();
+			}
 			Texture2D cornerSourceTexture = _cornerSourceTexture;
 			if (cornerSourceTexture != null)
 			{
@@ -984,15 +1090,18 @@ namespace GW2app
 			//IL_004d: Expected O, but got Unknown
 			CornerIcon val = new CornerIcon();
 			val.set_Icon(AsyncTexture2D.op_Implicit(_iconTexture));
-			((Control)val).set_BasicTooltipText("GW2.app (Not connected)");
+			((Control)val).set_BasicTooltipText("GW2.app (not connected)");
 			val.set_Priority(1645843523);
 			((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			_cornerIcon = val;
 			_contextMenuStrip = new ContextMenuStrip();
-			((Control)_cornerIcon).set_Menu(_contextMenuStrip);
 			((Control)_cornerIcon).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				OpenInfoWindow();
+				_contextMenuStrip.Show((Control)(object)_cornerIcon);
+			});
+			((Control)_cornerIcon).add_RightMouseButtonReleased((EventHandler<MouseEventArgs>)delegate
+			{
+				_contextMenuStrip.Show((Control)(object)_cornerIcon);
 			});
 		}
 
@@ -1197,7 +1306,7 @@ namespace GW2app
 				bool connected = _hasActiveConnection != 0;
 				int listCount = (_catalog?.Lists?.Count).GetValueOrDefault();
 				_infoStatusDot.set_Texture(AsyncTexture2D.op_Implicit(connected ? _dotConnectedTexture : _dotNotConnectedTexture));
-				_infoStatusLabel.set_Text(connected ? ("Connected (" + listCount + ((listCount == 1) ? " list)" : " lists)")) : "Not connected");
+				_infoStatusLabel.set_Text(connected ? ("connected (" + listCount + ((listCount == 1) ? " list)" : " lists)")) : "not connected");
 				_infoStatusLabel.set_TextColor(connected ? new Color(50, 205, 50) : new Color(220, 20, 60));
 				int visualWidth = 18 + ((Control)_infoStatusLabel).get_Width();
 				int num = (((Container)_infoWindow).get_ContentRegion().Width - visualWidth) / 2;
@@ -1228,23 +1337,52 @@ namespace GW2app
 				item.Dispose();
 			}
 			bool connected = _hasActiveConnection != 0;
+			int hiddenCount = _peekHiddenIds.Count;
 			if (_cornerIcon != null)
 			{
 				if (connected)
 				{
 					int listCount = (_catalog?.Lists?.Count).GetValueOrDefault();
-					((Control)_cornerIcon).set_BasicTooltipText("GW2.app (Connected, " + listCount + ((listCount == 1) ? " list)" : " lists)"));
+					string tip = "GW2.app (connected, " + listCount + ((listCount == 1) ? " list" : " lists");
+					if (hiddenCount > 0)
+					{
+						tip = tip + ", " + hiddenCount + " hidden";
+					}
+					((Control)_cornerIcon).set_BasicTooltipText(tip + ")");
 				}
 				else
 				{
-					((Control)_cornerIcon).set_BasicTooltipText("GW2.app (Not connected)");
+					((Control)_cornerIcon).set_BasicTooltipText("GW2.app (not connected)");
 				}
+				_cornerIcon.set_Icon(AsyncTexture2D.op_Implicit((hiddenCount > 0 && _iconHiddenTexture != null) ? _iconHiddenTexture : _iconTexture));
 			}
 			RefreshInfoStatus();
+			((Control)_contextMenuStrip.AddMenuItem("Show instructions")).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				OpenInfoWindow();
+			});
+			int visibleCount = 0;
+			foreach (ListWindowEntry w in _listWindows.Values)
+			{
+				if (w.Window != null && ((Control)w.Window).get_Visible())
+				{
+					visibleCount++;
+				}
+			}
+			if (visibleCount > 0 || hiddenCount > 0)
+			{
+				ContextMenuStripItem obj = _contextMenuStrip.AddMenuItem("Hide all subscribed lists");
+				obj.set_CanCheck(true);
+				obj.set_Checked(hiddenCount > 0);
+				obj.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
+				{
+					ToggleActiveListsVisibility();
+				});
+			}
 			List<ListDto> lists = _catalog?.Lists;
 			if (!connected)
 			{
-				((Control)_contextMenuStrip.AddMenuItem("(Not connected: no lists available)")).set_Enabled(false);
+				((Control)_contextMenuStrip.AddMenuItem("(Not connected, no lists available)")).set_Enabled(false);
 				return;
 			}
 			if (lists == null || lists.Count == 0)
@@ -1276,16 +1414,13 @@ namespace GW2app
 			int addedCount = 0;
 			foreach (KeyValuePair<string, List<ListDto>> kvp in byAccount)
 			{
-				if (!string.IsNullOrEmpty(kvp.Key))
-				{
-					((Control)_contextMenuStrip.AddMenuItem(kvp.Key)).set_Enabled(false);
-				}
+				string headerText = (string.IsNullOrEmpty(kvp.Key) ? "Lists with no account" : kvp.Key);
+				((Control)_contextMenuStrip.AddMenuItem(headerText)).set_Enabled(false);
 				foreach (ListDto list in kvp.Value.OrderBy((ListDto l) => l.Name ?? l.Id, StringComparer.OrdinalIgnoreCase))
 				{
 					string listId = list.Id;
 					string name = list.Name ?? list.Id;
-					string label = (string.IsNullOrEmpty(kvp.Key) ? name : ("   " + name));
-					((Control)_contextMenuStrip.AddMenuItem(label)).add_Click((EventHandler<MouseEventArgs>)delegate
+					((Control)_contextMenuStrip.AddMenuItem("   " + name)).add_Click((EventHandler<MouseEventArgs>)delegate
 					{
 						OpenListWindow(listId);
 					});
@@ -1300,28 +1435,29 @@ namespace GW2app
 
 		private void OpenListWindow(string listId)
 		{
-			//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0152: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0157: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0164: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0185: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0196: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ab: Expected O, but got Unknown
-			//IL_01ab: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f6: Expected O, but got Unknown
+			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0131: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0158: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0160: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0171: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0181: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0195: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b1: Expected O, but got Unknown
+			//IL_01b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ee: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01fc: Expected O, but got Unknown
+			RestorePeekedLists();
 			if (_listWindows.TryGetValue(listId, out var existing))
 			{
 				if (!((Control)existing.Window).get_Visible())
@@ -1331,71 +1467,79 @@ namespace GW2app
 				return;
 			}
 			ListDto list = _catalog?.Lists?.FirstOrDefault((ListDto l) => l.Id == listId);
-			if (list != null)
+			if (list == null)
 			{
-				bool compact = UiScale < 1f;
-				int initialWidth = WindowWidthFor(list);
-				GW2appWindow gW2appWindow = new GW2appWindow(initialWidth, WindowMaxHeight, _windowTheme?.get_Value() ?? GW2appWindow.WindowTheme.Game, compact, BgOpacity);
-				((Control)gW2appWindow).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-				gW2appWindow.Title = TitleFor(list);
-				gW2appWindow.Subtitle = SubtitleFor(list);
-				((Control)gW2appWindow).set_Location(new Point(300, 300));
-				((WindowBase2)gW2appWindow).set_SavesPosition(true);
-				((WindowBase2)gW2appWindow).set_CanResize(true);
-				((WindowBase2)gW2appWindow).set_SavesSize(true);
-				((WindowBase2)gW2appWindow).set_Id("GW2app_List_" + listId);
-				GW2appWindow window = gW2appWindow;
-				window.SetEmblemTinted(_cornerSourceTexture, EmblemTintFor(list), UiScale);
-				window.SetResetCountdownOverlay(_rechargeTexture, ResetCountdownFor(list));
-				Panel val = new Panel();
-				((Control)val).set_Location(new Point(0, 0));
-				((Control)val).set_Size(new Point(((Container)window).get_ContentRegion().Width, ((Container)window).get_ContentRegion().Height));
-				val.set_CanScroll(true);
-				val.set_ShowBorder(true);
-				((Control)val).set_Parent((Container)(object)window);
-				Panel panel = val;
-				Panel val2 = new Panel();
-				((Control)val2).set_Location(new Point(0, ((Container)window).get_ContentRegion().Height));
-				((Control)val2).set_Size(new Point(((Container)window).get_ContentRegion().Width, 0));
-				((Control)val2).set_Parent((Container)(object)window);
-				Panel footerPanel = val2;
-				ListWindowEntry entry = new ListWindowEntry
-				{
-					Window = window,
-					Panel = panel,
-					FooterPanel = footerPanel,
-					ListId = listId
-				};
-				window.LayoutRefreshed += delegate
-				{
-					ResizePanelToWindow(entry);
-				};
-				EventHandler<EventArgs> onHidden = delegate
+				return;
+			}
+			bool compact = UiScale < 1f;
+			int initialWidth = WindowWidthFor(list);
+			GW2appWindow gW2appWindow = new GW2appWindow(initialWidth, WindowMaxHeight, _windowTheme?.get_Value() ?? GW2appWindow.WindowTheme.Game, compact, BgOpacity);
+			((Control)gW2appWindow).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+			gW2appWindow.Title = TitleFor(list);
+			gW2appWindow.Subtitle = SubtitleFor(list);
+			((Control)gW2appWindow).set_Location(new Point(300, 300));
+			((WindowBase2)gW2appWindow).set_SavesPosition(true);
+			((WindowBase2)gW2appWindow).set_CanResize(true);
+			((WindowBase2)gW2appWindow).set_SavesSize(true);
+			((WindowBase2)gW2appWindow).set_Id("GW2app_List_" + listId);
+			GW2appWindow window = gW2appWindow;
+			window.SetEmblemTinted(_cornerSourceTexture, EmblemTintFor(list), UiScale);
+			window.SetResetCountdownOverlay(_rechargeTexture, ResetCountdownFor(list));
+			Panel val = new Panel();
+			((Control)val).set_Location(new Point(0, 0));
+			((Control)val).set_Size(new Point(((Container)window).get_ContentRegion().Width, ((Container)window).get_ContentRegion().Height));
+			val.set_CanScroll(true);
+			val.set_ShowBorder(true);
+			((Control)val).set_Parent((Container)(object)window);
+			Panel panel = val;
+			Panel val2 = new Panel();
+			((Control)val2).set_Location(new Point(0, ((Container)window).get_ContentRegion().Height));
+			((Control)val2).set_Size(new Point(((Container)window).get_ContentRegion().Width, 0));
+			((Control)val2).set_Parent((Container)(object)window);
+			Panel footerPanel = val2;
+			ListWindowEntry entry = new ListWindowEntry
+			{
+				Window = window,
+				Panel = panel,
+				FooterPanel = footerPanel,
+				ListId = listId
+			};
+			window.LayoutRefreshed += delegate
+			{
+				ResizePanelToWindow(entry);
+			};
+			EventHandler<EventArgs> onHidden = delegate
+			{
+				if (!_suppressListVisibilityHandlers)
 				{
 					RemovePersisted(listId);
 					UpdateSubscriptions();
-				};
-				EventHandler<EventArgs> onShown = delegate
+				}
+			};
+			EventHandler<EventArgs> onShown = delegate
+			{
+				if (!_suppressListVisibilityHandlers)
 				{
 					AddPersisted(listId);
 					UpdateSubscriptions();
-				};
-				EventHandler<EventArgs> onDisposed = null;
-				onDisposed = delegate
-				{
-					((Control)window).remove_Hidden(onHidden);
-					((Control)window).remove_Shown(onShown);
-					((Control)window).remove_Disposed(onDisposed);
-					_listWindows.Remove(listId);
-					UpdateSubscriptions();
-				};
-				((Control)window).add_Hidden(onHidden);
-				((Control)window).add_Shown(onShown);
-				((Control)window).add_Disposed(onDisposed);
-				_listWindows[listId] = entry;
-				((Control)window).Show();
-				RefreshListWindow(listId);
-			}
+				}
+			};
+			EventHandler<EventArgs> onDisposed = null;
+			onDisposed = delegate
+			{
+				((Control)window).remove_Hidden(onHidden);
+				((Control)window).remove_Shown(onShown);
+				((Control)window).remove_Disposed(onDisposed);
+				_listWindows.Remove(listId);
+				_peekHiddenIds.Remove(listId);
+				UpdateSubscriptions();
+			};
+			((Control)window).add_Hidden(onHidden);
+			((Control)window).add_Shown(onShown);
+			((Control)window).add_Disposed(onDisposed);
+			_listWindows[listId] = entry;
+			((Control)window).Show();
+			RefreshListWindow(listId);
 		}
 
 		private void RefreshOpenWindowCountdowns()
@@ -1712,14 +1856,14 @@ namespace GW2app
 			//IL_015a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0164: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0172: Expected O, but got Unknown
-			//IL_0247: Unknown result type (might be due to invalid IL or missing references)
-			//IL_024c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_024f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_025e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0253: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0258: Unknown result type (might be due to invalid IL or missing references)
+			//IL_025b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_026a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0274: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0279: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0293: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0276: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0280: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0285: Unknown result type (might be due to invalid IL or missing references)
+			//IL_029f: Unknown result type (might be due to invalid IL or missing references)
 			string key = EntryKey(listId, index);
 			if (!_entryImages.TryGetValue(key, out var tex) || tex == null)
 			{
@@ -1780,6 +1924,7 @@ namespace GW2app
 					OpenUrlInBrowser(capturedUrl);
 				});
 			}
+			AttachEntryContextMenu(image, listId, index, entryDto);
 			if (entryDto != null && entryDto.HasHoverCard)
 			{
 				HoverCard.Attach((Control)(object)image, listId, index);
@@ -2393,7 +2538,7 @@ namespace GW2app
 			HashSet<string> subs = new HashSet<string>();
 			foreach (KeyValuePair<string, ListWindowEntry> kvp in _listWindows)
 			{
-				if (kvp.Value.Window != null && ((Control)kvp.Value.Window).get_Visible())
+				if (kvp.Value.Window != null && (((Control)kvp.Value.Window).get_Visible() || _peekHiddenIds.Contains(kvp.Key)))
 				{
 					subs.Add(kvp.Key);
 				}
@@ -2418,6 +2563,62 @@ namespace GW2app
 			}
 			_lastSubscribedIds = subs;
 			SendSubscribeAsync(subs.ToList());
+		}
+
+		private void OnToggleListsKeybind(object sender, EventArgs e)
+		{
+			ToggleActiveListsVisibility();
+		}
+
+		private void ToggleActiveListsVisibility()
+		{
+			if (_peekHiddenIds.Count > 0)
+			{
+				RestorePeekedLists();
+				return;
+			}
+			_suppressListVisibilityHandlers = true;
+			try
+			{
+				foreach (KeyValuePair<string, ListWindowEntry> kvp in _listWindows)
+				{
+					if (kvp.Value.Window != null && ((Control)kvp.Value.Window).get_Visible())
+					{
+						_peekHiddenIds.Add(kvp.Key);
+						((Control)kvp.Value.Window).set_Visible(false);
+					}
+				}
+			}
+			finally
+			{
+				_suppressListVisibilityHandlers = false;
+			}
+			_contextMenuRebuildPending = true;
+		}
+
+		private void RestorePeekedLists()
+		{
+			if (_peekHiddenIds.Count == 0)
+			{
+				return;
+			}
+			_suppressListVisibilityHandlers = true;
+			try
+			{
+				foreach (string id in _peekHiddenIds)
+				{
+					if (_listWindows.TryGetValue(id, out var entry) && entry.Window != null)
+					{
+						((Control)entry.Window).set_Visible(true);
+					}
+				}
+			}
+			finally
+			{
+				_suppressListVisibilityHandlers = false;
+			}
+			_peekHiddenIds.Clear();
+			_contextMenuRebuildPending = true;
 		}
 
 		private void RestorePersistedOpenLists()
@@ -2544,6 +2745,77 @@ namespace GW2app
 			}
 		}
 
+		private void AttachEntryContextMenu(Image image, string listId, int index, EntryDto entryDto)
+		{
+			if (image == null)
+			{
+				return;
+			}
+			ContextMenuStrip menu = null;
+			string entryName = entryDto?.Name;
+			if (!string.IsNullOrEmpty(entryName))
+			{
+				string capturedName = entryName;
+				AddItem("Copy name", delegate
+				{
+					CopyNameToClipboard(capturedName);
+				});
+			}
+			if (menu == null)
+			{
+				return;
+			}
+			((Control)image).set_Menu(menu);
+			((Control)image).add_Disposed((EventHandler<EventArgs>)delegate
+			{
+				try
+				{
+					((Control)menu).Dispose();
+				}
+				catch
+				{
+				}
+			});
+			ContextMenuStripItem AddItem(string label, Action onClick)
+			{
+				//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0020: Expected O, but got Unknown
+				if (menu == null)
+				{
+					menu = new ContextMenuStrip();
+				}
+				ContextMenuStripItem obj = menu.AddMenuItem(label);
+				((Control)obj).add_Click((EventHandler<MouseEventArgs>)delegate
+				{
+					onClick();
+				});
+				return obj;
+			}
+		}
+
+		private async void CopyNameToClipboard(string name)
+		{
+			if (string.IsNullOrEmpty(name))
+			{
+				return;
+			}
+			try
+			{
+				if (!(await ClipboardUtil.get_WindowsClipboardService().SetTextAsync(name)))
+				{
+					Logger.Warn("Clipboard set returned false for entry name.");
+				}
+				else
+				{
+					ScreenNotification.ShowNotification("Name copied", (NotificationType)0, (Texture2D)null, 4);
+				}
+			}
+			catch (Exception e)
+			{
+				Logger.Warn(e, "Failed to copy entry name.");
+			}
+		}
+
 		private void OpenUrlInBrowser(string url)
 		{
 			if (string.IsNullOrEmpty(url))
@@ -2648,7 +2920,7 @@ namespace GW2app
 
 		private async Task HandleHttpRequest(HttpListenerContext ctx)
 		{
-			_ = 1;
+			_ = 2;
 			try
 			{
 				if (ctx.Request.IsWebSocketRequest)
@@ -2669,12 +2941,26 @@ namespace GW2app
 				{
 					ctx.Response.StatusCode = 204;
 					ctx.Response.Close();
-					return;
 				}
-				ctx.Response.StatusCode = 426;
-				byte[] msg = Encoding.UTF8.GetBytes("This endpoint expects a WebSocket connection.");
-				await ctx.Response.OutputStream.WriteAsync(msg, 0, msg.Length);
-				ctx.Response.Close();
+				else if (ctx.Request.HttpMethod == "POST" && ctx.Request.Url.AbsolutePath == "/poll")
+				{
+					string pollOrigin = ctx.Request.Headers["Origin"];
+					if (IsAllowedOrigin(pollOrigin))
+					{
+						await HandlePoll(ctx);
+						return;
+					}
+					Logger.Warn($"Rejecting poll from disallowed origin '{pollOrigin}' ({ctx.Request.RemoteEndPoint})");
+					ctx.Response.StatusCode = 403;
+					ctx.Response.Close();
+				}
+				else
+				{
+					ctx.Response.StatusCode = 426;
+					byte[] msg = Encoding.UTF8.GetBytes("This endpoint expects a WebSocket connection.");
+					await ctx.Response.OutputStream.WriteAsync(msg, 0, msg.Length);
+					ctx.Response.Close();
+				}
 			}
 			catch (Exception e)
 			{
@@ -2698,8 +2984,8 @@ namespace GW2app
 				ctx.Response.Headers["Access-Control-Allow-Origin"] = origin;
 				ctx.Response.Headers["Vary"] = "Origin";
 			}
-			ctx.Response.Headers["Access-Control-Allow-Methods"] = "GET, OPTIONS";
-			ctx.Response.Headers["Access-Control-Allow-Headers"] = "Upgrade, Connection";
+			ctx.Response.Headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS";
+			ctx.Response.Headers["Access-Control-Allow-Headers"] = "Upgrade, Connection, Content-Type";
 			ctx.Response.Headers["Access-Control-Allow-Private-Network"] = "true";
 		}
 
@@ -2796,21 +3082,32 @@ namespace GW2app
 			Logger.Info($"WS client connected from {remote}");
 			WebSocket previous;
 			CancellationTokenSource previousCts;
+			PollChannel previousPoll;
 			lock (_clientLock)
 			{
 				previous = _activeClient;
 				previousCts = _activeClientCts;
+				previousPoll = _activePollSession;
 				_activeClient = ws;
 				_activeClientCts = new CancellationTokenSource();
+				_activePollSession = null;
+				if (previousPoll != null)
+				{
+					_lastSupersededPollId = previousPoll.SessionId;
+				}
 			}
-			if (previous != null)
+			previousPoll?.MarkSuperseded();
+			if (previous != null || previousPoll != null)
 			{
-				Logger.Info("Superseding previous WS client.");
+				Logger.Info("Superseding previous " + ((previous != null) ? "WS" : "poll") + " client.");
 				_incomingMessages.Enqueue(new IncomingMessage
 				{
 					Kind = MessageKind.ClientReplaced
 				});
-				SupersedePreviousAsync(previous, previousCts);
+				if (previous != null)
+				{
+					SupersedePreviousAsync(previous, previousCts);
+				}
 			}
 			Interlocked.Exchange(ref _hasActiveConnection, 1);
 			Interlocked.Exchange(ref _connectionStateDirty, 1);
@@ -3020,111 +3317,81 @@ namespace GW2app
 			}
 		}
 
-		private async Task SendSubscribeAsync(List<string> listIds)
+		private async Task<bool> SendToClientAsync(string json)
 		{
 			WebSocket ws;
+			PollChannel poll;
 			lock (_clientLock)
 			{
 				ws = _activeClient;
+				poll = _activePollSession;
+			}
+			if (poll != null && !poll.Superseded)
+			{
+				poll.Enqueue(json);
+				return true;
 			}
 			if (ws != null && ws.State == WebSocketState.Open)
 			{
-				string json = JsonConvert.SerializeObject(new SubscribeMessage
-				{
-					Type = "subscribe",
-					ListIds = (listIds ?? new List<string>())
-				});
 				byte[] bytes = Encoding.UTF8.GetBytes(json);
 				try
 				{
 					await ws.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Text, endOfMessage: true, CancellationToken.None);
-					Logger.Info($"Sent subscribe with {listIds?.Count ?? 0} list ids.");
+					return true;
 				}
 				catch (Exception e)
 				{
-					Logger.Warn(e, "Failed to send subscribe.");
+					Logger.Warn(e, "Failed to send to client.");
 				}
+			}
+			return false;
+		}
+
+		private async Task SendSubscribeAsync(List<string> listIds)
+		{
+			SubscribeMessage payload = new SubscribeMessage
+			{
+				Type = "subscribe",
+				ListIds = (listIds ?? new List<string>())
+			};
+			if (await SendToClientAsync(JsonConvert.SerializeObject(payload)))
+			{
+				Logger.Info($"Sent subscribe with {listIds?.Count ?? 0} list ids.");
 			}
 		}
 
 		private async Task SendOpenHoverAsync(string listId, int index)
 		{
-			WebSocket ws;
-			lock (_clientLock)
+			OpenHoverMessage payload = new OpenHoverMessage
 			{
-				ws = _activeClient;
-			}
-			if (ws != null && ws.State == WebSocketState.Open)
-			{
-				string json = JsonConvert.SerializeObject(new OpenHoverMessage
-				{
-					Type = "open_hover",
-					ListId = listId,
-					Index = index
-				});
-				byte[] bytes = Encoding.UTF8.GetBytes(json);
-				try
-				{
-					await ws.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Text, endOfMessage: true, CancellationToken.None);
-				}
-				catch (Exception e)
-				{
-					Logger.Warn(e, "Failed to send open_hover.");
-				}
-			}
+				Type = "open_hover",
+				ListId = listId,
+				Index = index
+			};
+			await SendToClientAsync(JsonConvert.SerializeObject(payload));
 		}
 
 		private async Task SendCloseHoverAsync()
 		{
-			WebSocket ws;
-			lock (_clientLock)
+			CloseHoverMessage payload = new CloseHoverMessage
 			{
-				ws = _activeClient;
-			}
-			if (ws != null && ws.State == WebSocketState.Open)
-			{
-				string json = JsonConvert.SerializeObject(new CloseHoverMessage
-				{
-					Type = "close_hover"
-				});
-				byte[] bytes = Encoding.UTF8.GetBytes(json);
-				try
-				{
-					await ws.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Text, endOfMessage: true, CancellationToken.None);
-				}
-				catch (Exception e)
-				{
-					Logger.Warn(e, "Failed to send close_hover.");
-				}
-			}
+				Type = "close_hover"
+			};
+			await SendToClientAsync(JsonConvert.SerializeObject(payload));
 		}
 
 		private async Task SendSetEntryCompletedAsync(string listId, int index, bool completed)
 		{
-			WebSocket ws;
-			lock (_clientLock)
+			SetEntryCompletedMessage payload = new SetEntryCompletedMessage
 			{
-				ws = _activeClient;
-			}
-			if (ws != null && ws.State == WebSocketState.Open)
+				Type = "set_entry_completed",
+				ListId = listId,
+				Index = index,
+				Completed = completed
+			};
+			if (await SendToClientAsync(JsonConvert.SerializeObject(payload)))
 			{
-				string json = JsonConvert.SerializeObject(new SetEntryCompletedMessage
-				{
-					Type = "set_entry_completed",
-					ListId = listId,
-					Index = index,
-					Completed = completed
-				});
-				byte[] bytes = Encoding.UTF8.GetBytes(json);
-				try
-				{
-					await ws.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Text, endOfMessage: true, CancellationToken.None);
-					Logger.Info($"Sent set_entry_completed listId={listId} index={index} completed={completed}");
-				}
-				catch (Exception e)
-				{
-					Logger.Warn(e, "Failed to send set_entry_completed.");
-				}
+				Logger.Info($"Sent set_entry_completed listId={listId} index={index} completed={completed}");
 			}
 		}
 
@@ -3193,6 +3460,239 @@ namespace GW2app
 			}
 			default:
 				throw new ProtocolException("unknown message type '" + type + "'");
+			}
+		}
+
+		private async Task HandlePoll(HttpListenerContext ctx)
+		{
+			string body;
+			try
+			{
+				using StreamReader reader = new StreamReader(ctx.Request.InputStream, ctx.Request.ContentEncoding ?? Encoding.UTF8);
+				body = await reader.ReadToEndAsync();
+			}
+			catch (Exception e)
+			{
+				Logger.Warn(e, "Failed to read poll body.");
+				ctx.Response.StatusCode = 400;
+				ctx.Response.Close();
+				return;
+			}
+			string session;
+			JArray inbound;
+			JToken closeTok;
+			try
+			{
+				JObject jObject = JObject.Parse(body);
+				session = jObject["session"]?.Value<string>();
+				inbound = (jObject["messages"] as JArray) ?? new JArray();
+				closeTok = jObject["close"];
+			}
+			catch (Exception e3)
+			{
+				Logger.Warn(e3, "Bad poll request JSON.");
+				ctx.Response.StatusCode = 400;
+				ctx.Response.Close();
+				return;
+			}
+			if (string.IsNullOrEmpty(session))
+			{
+				ctx.Response.StatusCode = 400;
+				ctx.Response.Close();
+				return;
+			}
+			if (closeTok != null && closeTok.Type != JTokenType.Null)
+			{
+				bool cleared = false;
+				lock (_clientLock)
+				{
+					if (_activePollSession != null && _activePollSession.SessionId == session)
+					{
+						_activePollSession.MarkSuperseded();
+						_activePollSession = null;
+						_lastSupersededPollId = session;
+						cleared = true;
+					}
+				}
+				if (cleared)
+				{
+					MarkPollDisconnected();
+				}
+				await WritePollResponse(ctx, null, null);
+				return;
+			}
+			PollChannel channel = null;
+			bool returnSuperseded = false;
+			bool replacedPrevious = false;
+			bool resync = false;
+			WebSocket supersededWs = null;
+			CancellationTokenSource supersededWsCts = null;
+			lock (_clientLock)
+			{
+				if (_activePollSession != null && _activePollSession.SessionId == session)
+				{
+					channel = _activePollSession;
+					channel.LastPollUtc = DateTime.UtcNow;
+				}
+				else if (session == _lastSupersededPollId)
+				{
+					returnSuperseded = true;
+				}
+				else
+				{
+					replacedPrevious = _activeClient != null || _activePollSession != null;
+					resync = true;
+					supersededWs = _activeClient;
+					supersededWsCts = _activeClientCts;
+					_activeClient = null;
+					_activeClientCts = null;
+					if (_activePollSession != null)
+					{
+						_activePollSession.MarkSuperseded();
+						_lastSupersededPollId = _activePollSession.SessionId;
+					}
+					channel = (_activePollSession = new PollChannel(session));
+					Interlocked.Exchange(ref _hasActiveConnection, 1);
+					Interlocked.Exchange(ref _connectionStateDirty, 1);
+				}
+			}
+			if (returnSuperseded)
+			{
+				await WritePollResponse(ctx, null, MakeClose(4000, "superseded"));
+				return;
+			}
+			if (replacedPrevious)
+			{
+				_incomingMessages.Enqueue(new IncomingMessage
+				{
+					Kind = MessageKind.ClientReplaced
+				});
+			}
+			if (supersededWs != null)
+			{
+				SupersedePreviousAsync(supersededWs, supersededWsCts);
+			}
+			bool superseded = false;
+			foreach (JToken tok in inbound)
+			{
+				IncomingMessage parsed;
+				try
+				{
+					parsed = ParseMessage(tok.ToString(Formatting.None));
+				}
+				catch (Exception e2)
+				{
+					Logger.Warn(e2, "Skipping bad poll message.");
+					continue;
+				}
+				if (!channel.StateSeen)
+				{
+					if (parsed.Kind != 0)
+					{
+						continue;
+					}
+					channel.StateSeen = true;
+				}
+				lock (_clientLock)
+				{
+					superseded = _activePollSession != channel;
+				}
+				if (!superseded)
+				{
+					_incomingMessages.Enqueue(parsed);
+					continue;
+				}
+				break;
+			}
+			List<string> outMsgs = channel.DrainOutbound();
+			await WritePollResponse(ctx, outMsgs, superseded ? MakeClose(4000, "superseded") : null, resync);
+		}
+
+		private static JObject MakeClose(int code, string reason)
+		{
+			return new JObject
+			{
+				["code"] = (JToken)code,
+				["reason"] = (JToken)reason
+			};
+		}
+
+		private static async Task WritePollResponse(HttpListenerContext ctx, List<string> messages, JObject close, bool resync = false)
+		{
+			JArray arr = new JArray();
+			if (messages != null)
+			{
+				foreach (string s in messages)
+				{
+					try
+					{
+						arr.Add(JToken.Parse(s));
+					}
+					catch
+					{
+					}
+				}
+			}
+			JObject root = new JObject
+			{
+				["messages"] = arr,
+				["close"] = (JToken?)(((object)close) ?? ((object)JValue.CreateNull()))
+			};
+			if (resync)
+			{
+				root["resync"] = (JToken)true;
+			}
+			byte[] bytes = Encoding.UTF8.GetBytes(root.ToString(Formatting.None));
+			try
+			{
+				ctx.Response.StatusCode = 200;
+				ctx.Response.ContentType = "application/json";
+				await ctx.Response.OutputStream.WriteAsync(bytes, 0, bytes.Length);
+			}
+			catch (Exception e)
+			{
+				Logger.Warn(e, "Failed to write poll response.");
+			}
+			finally
+			{
+				try
+				{
+					ctx.Response.Close();
+				}
+				catch
+				{
+				}
+			}
+		}
+
+		private void MarkPollDisconnected()
+		{
+			Interlocked.Exchange(ref _hasActiveConnection, 0);
+			Interlocked.Exchange(ref _connectionStateDirty, 1);
+			_incomingMessages.Enqueue(new IncomingMessage
+			{
+				Kind = MessageKind.ConnectionLost
+			});
+			_lastSubscribedIds = new HashSet<string>();
+			_restoredFromPersistence = false;
+		}
+
+		private void ReapStalePollSession()
+		{
+			bool reaped = false;
+			lock (_clientLock)
+			{
+				if (_activePollSession != null && DateTime.UtcNow - _activePollSession.LastPollUtc > PollSessionTimeout)
+				{
+					Logger.Info("Poll session timed out; treating as disconnected.");
+					_activePollSession.MarkSuperseded();
+					_activePollSession = null;
+					reaped = true;
+				}
+			}
+			if (reaped)
+			{
+				MarkPollDisconnected();
 			}
 		}
 	}

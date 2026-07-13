@@ -37,6 +37,8 @@ namespace GW2app
 
 		private readonly SettingEntry<int> _uiScalePct;
 
+		private readonly SettingEntry<KeyBinding> _toggleListsKeybind;
+
 		private readonly Action _onResetScale;
 
 		private EventHandler<ValueChangedEventArgs<int>> _scaleChangedHandler;
@@ -49,7 +51,7 @@ namespace GW2app
 
 		private EventHandler<ValueChangedEventArgs<GW2appWindow.WindowTheme>> _themeChangedHandler;
 
-		public GW2appSettingsView(SettingEntry<GW2appWindow.WindowTheme> windowTheme, SettingEntry<int> bgOpacityPct, SettingEntry<bool> showAccountName, SettingEntry<bool> showCopyWaypointsButton, SettingEntry<int> uiScalePct, Action onResetScale)
+		public GW2appSettingsView(SettingEntry<GW2appWindow.WindowTheme> windowTheme, SettingEntry<int> bgOpacityPct, SettingEntry<bool> showAccountName, SettingEntry<bool> showCopyWaypointsButton, SettingEntry<int> uiScalePct, SettingEntry<KeyBinding> toggleListsKeybind, Action onResetScale)
 			: this()
 		{
 			_windowTheme = windowTheme;
@@ -57,6 +59,7 @@ namespace GW2app
 			_showAccountName = showAccountName;
 			_showCopyWaypointsButton = showCopyWaypointsButton;
 			_uiScalePct = uiScalePct;
+			_toggleListsKeybind = toggleListsKeybind;
 			_onResetScale = onResetScale;
 		}
 
@@ -155,25 +158,40 @@ namespace GW2app
 			//IL_0451: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0457: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0461: Unknown result type (might be due to invalid IL or missing references)
-			//IL_049b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0480: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0485: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0490: Unknown result type (might be due to invalid IL or missing references)
 			//IL_04a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04a1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04ab: Unknown result type (might be due to invalid IL or missing references)
 			//IL_04b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04b7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04bd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04cd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04d8: Unknown result type (might be due to invalid IL or missing references)
 			//IL_04dd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04e3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04ed: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04f4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04fb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0506: Unknown result type (might be due to invalid IL or missing references)
-			//IL_050e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_051f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0529: Unknown result type (might be due to invalid IL or missing references)
-			//IL_052b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0535: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0541: Expected O, but got Unknown
+			//IL_04e8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04f6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04fd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0506: Expected O, but got Unknown
+			//IL_0532: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0537: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0549: Unknown result type (might be due to invalid IL or missing references)
+			//IL_054e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0554: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0559: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0564: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0574: Unknown result type (might be due to invalid IL or missing references)
+			//IL_057a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0584: Unknown result type (might be due to invalid IL or missing references)
+			//IL_058b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0592: Unknown result type (might be due to invalid IL or missing references)
+			//IL_059d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05c2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05cc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05d8: Expected O, but got Unknown
 			int columnWidth = (Math.Max(420, ((Control)buildPanel).get_Width() - 30) - 30) / 2;
 			int leftX = 15;
 			int rightX = 15 + columnWidth + 30;
@@ -305,22 +323,37 @@ namespace GW2app
 			{
 				_onResetScale();
 			});
-			int rightBottom = ry + 6 + 26;
+			ry += 60;
+			Label val13 = new Label();
+			val13.set_Text("Controls");
+			val13.set_Font(GameService.Content.get_DefaultFont18());
+			val13.set_TextColor(Color.get_White());
+			val13.set_AutoSizeWidth(true);
+			((Control)val13).set_Location(new Point(rightX, ry));
+			((Control)val13).set_Parent(buildPanel);
+			ry += 28;
+			KeybindingAssigner val14 = new KeybindingAssigner(_toggleListsKeybind.get_Value());
+			val14.set_KeyBindingName("Show/hide all lists");
+			((Control)val14).set_Location(new Point(rightX, ry));
+			((Control)val14).set_Width(columnWidth);
+			((Control)val14).set_Parent(buildPanel);
+			KeybindingAssigner keybindAssigner = val14;
+			int rightBottom = ry + Math.Max(30, ((Control)keybindAssigner).get_Height());
 			int bottomY = Math.Max(val8, rightBottom) + 24;
 			Color brandColor = new Color(255, 123, 198);
 			Color brandHover = new Color(229, 110, 178);
-			Label val13 = new Label();
-			val13.set_Text("Open gw2.app/blish");
-			val13.set_Font(GameService.Content.get_DefaultFont16());
-			val13.set_TextColor(new Color(20, 4, 13));
-			val13.set_HorizontalAlignment((HorizontalAlignment)1);
-			val13.set_VerticalAlignment((VerticalAlignment)1);
-			((Control)val13).set_Width(200);
-			((Control)val13).set_Height(30);
-			((Control)val13).set_Location(new Point((((Control)buildPanel).get_Width() - 200) / 2, bottomY));
-			((Control)val13).set_BackgroundColor(brandColor);
-			((Control)val13).set_Parent(buildPanel);
-			Label openSiteBtn = val13;
+			Label val15 = new Label();
+			val15.set_Text("Open gw2.app/blish");
+			val15.set_Font(GameService.Content.get_DefaultFont16());
+			val15.set_TextColor(new Color(20, 4, 13));
+			val15.set_HorizontalAlignment((HorizontalAlignment)1);
+			val15.set_VerticalAlignment((VerticalAlignment)1);
+			((Control)val15).set_Width(200);
+			((Control)val15).set_Height(30);
+			((Control)val15).set_Location(new Point((((Control)buildPanel).get_Width() - 200) / 2, bottomY));
+			((Control)val15).set_BackgroundColor(brandColor);
+			((Control)val15).set_Parent(buildPanel);
+			Label openSiteBtn = val15;
 			((Control)openSiteBtn).add_MouseEntered((EventHandler<MouseEventArgs>)delegate
 			{
 				//IL_0007: Unknown result type (might be due to invalid IL or missing references)

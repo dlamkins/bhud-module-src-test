@@ -13,6 +13,9 @@ namespace GW2app
 		[JsonProperty("index")]
 		public int Index;
 
+		[JsonProperty("name")]
+		public string Name;
+
 		[JsonProperty("completed")]
 		public bool Completed;
 
