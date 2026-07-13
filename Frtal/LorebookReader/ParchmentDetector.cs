@@ -135,10 +135,15 @@ namespace Frtal.LorebookReader
 
 		public static Rectangle InnerCrop(Rectangle box)
 		{
-			int dx = (int)((double)box.Width * 0.03);
-			int dyT = (int)((double)box.Height * 0.04);
-			int dyB = (int)((double)box.Height * 0.02);
-			return new Rectangle(box.X + dx, box.Y + dyT, box.Width - 2 * dx, box.Height - dyT - dyB);
+			return InnerCrop(box, 4.0, 2.0, 3.0);
+		}
+
+		public static Rectangle InnerCrop(Rectangle box, double topPct, double bottomPct, double sidePct)
+		{
+			int dxs = (int)((double)box.Width * sidePct / 100.0);
+			int dyT = (int)((double)box.Height * topPct / 100.0);
+			int dyB = (int)((double)box.Height * bottomPct / 100.0);
+			return new Rectangle(box.X + dxs, box.Y + dyT, box.Width - 2 * dxs, box.Height - dyT - dyB);
 		}
 	}
 }

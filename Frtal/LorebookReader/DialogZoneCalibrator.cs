@@ -91,7 +91,7 @@ namespace Frtal.LorebookReader
 			((Control)this).set_ZIndex(2147483637);
 			Label val = new Label();
 			((Control)val).set_Parent((Container)(object)screen);
-			val.set_Text("Drag the frame over the dialogue TEXT area (corners = resize). Exclude 'Read on.'. Then Save.");
+			val.set_Text("Drag the frame over the TEXT to capture (corners = resize). Then Save.");
 			val.set_AutoSizeWidth(true);
 			val.set_AutoSizeHeight(true);
 			((Control)val).set_ZIndex(2147483638);

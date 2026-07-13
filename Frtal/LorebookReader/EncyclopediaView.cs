@@ -314,6 +314,35 @@ namespace Frtal.LorebookReader
 			}
 		}
 
+		public void RefreshFromCatalog()
+		{
+			RebuildExpansionFilter();
+			RefreshList();
+			if (_mode == DetailMode.Edit || _selected == null)
+			{
+				return;
+			}
+			LorebookEntry fresh = null;
+			foreach (LorebookEntry e in _catalog.All)
+			{
+				if (e.Id == _selected.Id)
+				{
+					fresh = e;
+					break;
+				}
+			}
+			if (fresh != null)
+			{
+				_selected = fresh;
+				ShowPreview(fresh);
+			}
+			else
+			{
+				_selected = null;
+				ShowEmpty();
+			}
+		}
+
 		private void AddListRow(LorebookEntry entry)
 		{
 			//IL_0014: Unknown result type (might be due to invalid IL or missing references)

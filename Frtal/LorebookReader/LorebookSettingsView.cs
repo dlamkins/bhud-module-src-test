@@ -81,155 +81,171 @@ namespace Frtal.LorebookReader
 			//IL_0217: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0222: Unknown result type (might be due to invalid IL or missing references)
 			//IL_022d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0271: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0276: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0287: Unknown result type (might be due to invalid IL or missing references)
-			//IL_028c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0297: Unknown result type (might be due to invalid IL or missing references)
-			//IL_029e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ac: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c8: Expected O, but got Unknown
-			//IL_033d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0342: Unknown result type (might be due to invalid IL or missing references)
-			//IL_034d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0354: Unknown result type (might be due to invalid IL or missing references)
-			//IL_035b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0367: Expected O, but got Unknown
+			//IL_0262: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0267: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0291: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0298: Unknown result type (might be due to invalid IL or missing references)
+			//IL_029f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ab: Expected O, but got Unknown
+			//IL_02bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02e1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0304: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0309: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0314: Unknown result type (might be due to invalid IL or missing references)
+			//IL_031f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0363: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0368: Unknown result type (might be due to invalid IL or missing references)
-			//IL_036d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0378: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0384: Expected O, but got Unknown
-			//IL_0457: Unknown result type (might be due to invalid IL or missing references)
-			//IL_045c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0467: Unknown result type (might be due to invalid IL or missing references)
-			//IL_046e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0475: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0481: Expected O, but got Unknown
-			//IL_0482: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0487: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0492: Unknown result type (might be due to invalid IL or missing references)
-			//IL_049e: Expected O, but got Unknown
-			//IL_0529: Unknown result type (might be due to invalid IL or missing references)
-			//IL_052e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0379: Unknown result type (might be due to invalid IL or missing references)
+			//IL_037e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0389: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0390: Unknown result type (might be due to invalid IL or missing references)
+			//IL_039e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03ae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03ba: Expected O, but got Unknown
+			//IL_042f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0434: Unknown result type (might be due to invalid IL or missing references)
+			//IL_043f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0446: Unknown result type (might be due to invalid IL or missing references)
+			//IL_044d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0459: Expected O, but got Unknown
+			//IL_045a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_045f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_046a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0476: Expected O, but got Unknown
 			//IL_0549: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0550: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0557: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0563: Expected O, but got Unknown
-			//IL_0564: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0569: Unknown result type (might be due to invalid IL or missing references)
+			//IL_054e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0559: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0560: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0567: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0573: Expected O, but got Unknown
 			//IL_0574: Unknown result type (might be due to invalid IL or missing references)
-			//IL_057f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_059b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05a6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05b2: Expected O, but got Unknown
-			//IL_05c9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05d9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05e0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05ee: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05f3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05fe: Unknown result type (might be due to invalid IL or missing references)
-			//IL_060a: Expected O, but got Unknown
-			//IL_06d7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06dc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06e7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06fd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0709: Expected O, but got Unknown
-			//IL_0721: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0726: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0741: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0748: Unknown result type (might be due to invalid IL or missing references)
-			//IL_074f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_075b: Expected O, but got Unknown
-			//IL_075c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0761: Unknown result type (might be due to invalid IL or missing references)
-			//IL_076c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0777: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0793: Unknown result type (might be due to invalid IL or missing references)
-			//IL_079e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07aa: Expected O, but got Unknown
-			//IL_07c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07e7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07ee: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07f5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0801: Expected O, but got Unknown
-			//IL_0802: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0807: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0812: Unknown result type (might be due to invalid IL or missing references)
-			//IL_081d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0579: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0584: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0590: Expected O, but got Unknown
+			//IL_061b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0620: Unknown result type (might be due to invalid IL or missing references)
+			//IL_063b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0642: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0649: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0655: Expected O, but got Unknown
+			//IL_0656: Unknown result type (might be due to invalid IL or missing references)
+			//IL_065b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0666: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0671: Unknown result type (might be due to invalid IL or missing references)
+			//IL_068d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0698: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06a4: Expected O, but got Unknown
+			//IL_06bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06d2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06f0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06fc: Expected O, but got Unknown
+			//IL_07c9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07fb: Expected O, but got Unknown
+			//IL_0813: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0818: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0833: Unknown result type (might be due to invalid IL or missing references)
-			//IL_083e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_084a: Expected O, but got Unknown
-			//IL_0862: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0867: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0887: Unknown result type (might be due to invalid IL or missing references)
-			//IL_088e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0895: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08a1: Expected O, but got Unknown
-			//IL_08a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08a7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08bd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08d3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08ea: Expected O, but got Unknown
-			//IL_0901: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0906: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0911: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0918: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0926: Unknown result type (might be due to invalid IL or missing references)
-			//IL_092b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0936: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0942: Expected O, but got Unknown
-			//IL_09ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_09b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_09be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_09c9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_09d5: Expected O, but got Unknown
-			//IL_09ec: Unknown result type (might be due to invalid IL or missing references)
-			//IL_09f1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_09fc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0a07: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0a57: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0a5c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0a67: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0a6e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0a7c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0a81: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0a8c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0a98: Expected O, but got Unknown
-			//IL_0b02: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0b07: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0b12: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0b19: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0b27: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0b2c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0b37: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0b43: Expected O, but got Unknown
-			//IL_0bb6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0bbb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0bc6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0bcd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0bda: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0bdf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0bea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0bf1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0bff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_083a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0841: Unknown result type (might be due to invalid IL or missing references)
+			//IL_084d: Expected O, but got Unknown
+			//IL_084e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0853: Unknown result type (might be due to invalid IL or missing references)
+			//IL_085e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0869: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0885: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0890: Unknown result type (might be due to invalid IL or missing references)
+			//IL_089c: Expected O, but got Unknown
+			//IL_08b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08e7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08f3: Expected O, but got Unknown
+			//IL_08f4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_08f9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0904: Unknown result type (might be due to invalid IL or missing references)
+			//IL_090f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0925: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0930: Unknown result type (might be due to invalid IL or missing references)
+			//IL_093c: Expected O, but got Unknown
+			//IL_0954: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0959: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0979: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0980: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0987: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0993: Expected O, but got Unknown
+			//IL_0994: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0999: Unknown result type (might be due to invalid IL or missing references)
+			//IL_09a4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_09af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_09c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_09d0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_09dc: Expected O, but got Unknown
+			//IL_09f3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_09f8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0a03: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0a0a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0a18: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0a1d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0a28: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0a34: Expected O, but got Unknown
+			//IL_0a9f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0aa4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0ab0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0abb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0ac7: Expected O, but got Unknown
+			//IL_0ade: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0ae3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0aee: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0af9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0b49: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0b4e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0b59: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0b60: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0b6e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0b73: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0b7e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0b8a: Expected O, but got Unknown
+			//IL_0bf4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0bf9: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0c04: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c2d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c34: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c3b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c47: Expected O, but got Unknown
-			//IL_0c48: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c4d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c58: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c63: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c7a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c85: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c91: Expected O, but got Unknown
+			//IL_0c0b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0c19: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0c1e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0c29: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0c35: Expected O, but got Unknown
+			//IL_0ca8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0cad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0cb8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0cbf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0ccc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0cd1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0cdc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0ce3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0cf1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0cf6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0d1f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0d26: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0d2d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0d39: Expected O, but got Unknown
+			//IL_0d3a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0d3f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0d4a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0d55: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0d6c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0d77: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0d83: Expected O, but got Unknown
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Parent(buildPanel);
 			((Container)val).set_WidthSizingMode((SizingMode)2);
@@ -297,18 +313,47 @@ namespace Frtal.LorebookReader
 			{
 				calibStatus.set_Text((!string.IsNullOrEmpty(e.get_NewValue())) ? "Dialogue zone: calibrated" : "Dialogue zone: not calibrated");
 			});
-			KeybindingAssigner val11 = new KeybindingAssigner(_module.DebugDumpKeybindSetting.get_Value());
-			val11.set_KeyBindingName("Save debug capture");
+			Label val11 = new Label();
+			val11.set_Text((_module.BookZoneSetting.get_Value().Length > 0) ? "Lorebook OCR area: calibrated" : "Lorebook OCR area: auto (default)");
+			val11.set_AutoSizeWidth(true);
+			val11.set_AutoSizeHeight(true);
 			((Control)val11).set_Parent((Container)(object)panel);
-			Label val12 = new Label();
-			val12.set_Text("Voice engine");
-			val12.set_AutoSizeWidth(true);
-			val12.set_AutoSizeHeight(true);
+			Label bookCalibStatus = val11;
+			KeybindingAssigner val12 = new KeybindingAssigner(_module.BookCalibrateKeybindSetting.get_Value());
+			val12.set_KeyBindingName("Calibrate lorebook OCR area");
 			((Control)val12).set_Parent((Container)(object)panel);
-			Dropdown val13 = new Dropdown();
+			StandardButton val13 = new StandardButton();
+			val13.set_Text("Calibrate lorebook OCR area (open a book, drag a frame)");
 			((Control)val13).set_Width(360);
 			((Control)val13).set_Parent((Container)(object)panel);
-			Dropdown engineDropdown = val13;
+			((Control)val13).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				_module.StartBookCalibration();
+			});
+			StandardButton val14 = new StandardButton();
+			val14.set_Text("Clear lorebook OCR area (use auto-detect)");
+			((Control)val14).set_Width(360);
+			((Control)val14).set_Parent((Container)(object)panel);
+			((Control)val14).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				_module.BookZoneSetting.set_Value("");
+			});
+			_module.BookZoneSetting.add_SettingChanged((EventHandler<ValueChangedEventArgs<string>>)delegate(object s, ValueChangedEventArgs<string> e)
+			{
+				bookCalibStatus.set_Text((!string.IsNullOrEmpty(e.get_NewValue())) ? "Lorebook OCR area: calibrated" : "Lorebook OCR area: auto (default)");
+			});
+			KeybindingAssigner val15 = new KeybindingAssigner(_module.DebugDumpKeybindSetting.get_Value());
+			val15.set_KeyBindingName("Save debug capture");
+			((Control)val15).set_Parent((Container)(object)panel);
+			Label val16 = new Label();
+			val16.set_Text("Voice engine");
+			val16.set_AutoSizeWidth(true);
+			val16.set_AutoSizeHeight(true);
+			((Control)val16).set_Parent((Container)(object)panel);
+			Dropdown val17 = new Dropdown();
+			((Control)val17).set_Width(360);
+			((Control)val17).set_Parent((Container)(object)panel);
+			Dropdown engineDropdown = val17;
 			engineDropdown.get_Items().Add("Windows voices (offline)");
 			engineDropdown.get_Items().Add("Edge neural voices (online)");
 			engineDropdown.set_SelectedItem((_module.VoiceEngineSetting.get_Value() == "edge") ? "Edge neural voices (online)" : "Windows voices (offline)");
@@ -317,16 +362,16 @@ namespace Frtal.LorebookReader
 				_module.VoiceEngineSetting.set_Value((engineDropdown.get_SelectedItem() == "Edge neural voices (online)") ? "edge" : "windows");
 				UpdateEngineVisibility();
 			});
-			Label val14 = new Label();
-			val14.set_Text("Windows voice");
-			val14.set_AutoSizeWidth(true);
-			val14.set_AutoSizeHeight(true);
-			((Control)val14).set_Parent((Container)(object)panel);
-			_winVoiceLabel = val14;
-			Dropdown val15 = new Dropdown();
-			((Control)val15).set_Width(360);
-			((Control)val15).set_Parent((Container)(object)panel);
-			_winVoiceDropdown = val15;
+			Label val18 = new Label();
+			val18.set_Text("Windows voice");
+			val18.set_AutoSizeWidth(true);
+			val18.set_AutoSizeHeight(true);
+			((Control)val18).set_Parent((Container)(object)panel);
+			_winVoiceLabel = val18;
+			Dropdown val19 = new Dropdown();
+			((Control)val19).set_Width(360);
+			((Control)val19).set_Parent((Container)(object)panel);
+			_winVoiceDropdown = val19;
 			_winVoiceDropdown.get_Items().Add("(auto — match OCR language)");
 			foreach (var (name2, lang2) in TtsService.InstalledVoices())
 			{
@@ -339,16 +384,16 @@ namespace Frtal.LorebookReader
 				string selectedItem = _winVoiceDropdown.get_SelectedItem();
 				_module.VoiceNameSetting.set_Value((selectedItem == "(auto — match OCR language)") ? "" : selectedItem.Split(new string[1] { "  [" }, StringSplitOptions.None)[0]);
 			});
-			Label val16 = new Label();
-			val16.set_Text("Edge neural voice (requires internet)");
-			val16.set_AutoSizeWidth(true);
-			val16.set_AutoSizeHeight(true);
-			((Control)val16).set_Parent((Container)(object)panel);
-			_edgeVoiceLabel = val16;
-			Dropdown val17 = new Dropdown();
-			((Control)val17).set_Width(360);
-			((Control)val17).set_Parent((Container)(object)panel);
-			_edgeVoiceDropdown = val17;
+			Label val20 = new Label();
+			val20.set_Text("Edge neural voice (requires internet)");
+			val20.set_AutoSizeWidth(true);
+			val20.set_AutoSizeHeight(true);
+			((Control)val20).set_Parent((Container)(object)panel);
+			_edgeVoiceLabel = val20;
+			Dropdown val21 = new Dropdown();
+			((Control)val21).set_Width(360);
+			((Control)val21).set_Parent((Container)(object)panel);
+			_edgeVoiceDropdown = val21;
 			string[] curatedVoices = EdgeTtsService.CuratedVoices;
 			foreach (string v in curatedVoices)
 			{
@@ -359,34 +404,34 @@ namespace Frtal.LorebookReader
 			{
 				_module.EdgeVoiceSetting.set_Value(_edgeVoiceDropdown.get_SelectedItem());
 			});
-			Label val18 = new Label();
-			val18.set_Text(RateText(_module.SpeakingRateSetting.get_Value()));
-			val18.set_AutoSizeWidth(true);
-			val18.set_AutoSizeHeight(true);
-			((Control)val18).set_Parent((Container)(object)panel);
-			Label rateLabel = val18;
-			TrackBar val19 = new TrackBar();
-			val19.set_MinValue(50f);
-			val19.set_MaxValue(200f);
-			val19.set_Value(_module.SpeakingRateSetting.get_Value() * 100f);
-			((Control)val19).set_Width(360);
-			((Control)val19).set_Parent((Container)(object)panel);
-			TrackBar rateBar = val19;
+			Label val22 = new Label();
+			val22.set_Text(RateText(_module.SpeakingRateSetting.get_Value()));
+			val22.set_AutoSizeWidth(true);
+			val22.set_AutoSizeHeight(true);
+			((Control)val22).set_Parent((Container)(object)panel);
+			Label rateLabel = val22;
+			TrackBar val23 = new TrackBar();
+			val23.set_MinValue(50f);
+			val23.set_MaxValue(200f);
+			val23.set_Value(_module.SpeakingRateSetting.get_Value() * 100f);
+			((Control)val23).set_Width(360);
+			((Control)val23).set_Parent((Container)(object)panel);
+			TrackBar rateBar = val23;
 			rateBar.add_ValueChanged((EventHandler<ValueEventArgs<float>>)delegate
 			{
 				float num5 = (float)Math.Round(rateBar.get_Value()) / 100f;
 				_module.SpeakingRateSetting.set_Value(num5);
 				rateLabel.set_Text(RateText(num5));
 			});
-			Label val20 = new Label();
-			val20.set_Text("OCR language (your GW2 client language)");
-			val20.set_AutoSizeWidth(true);
-			val20.set_AutoSizeHeight(true);
-			((Control)val20).set_Parent((Container)(object)panel);
-			Dropdown val21 = new Dropdown();
-			((Control)val21).set_Width(360);
-			((Control)val21).set_Parent((Container)(object)panel);
-			Dropdown ocrDropdown = val21;
+			Label val24 = new Label();
+			val24.set_Text("OCR language (your GW2 client language)");
+			val24.set_AutoSizeWidth(true);
+			val24.set_AutoSizeHeight(true);
+			((Control)val24).set_Parent((Container)(object)panel);
+			Dropdown val25 = new Dropdown();
+			((Control)val25).set_Width(360);
+			((Control)val25).set_Parent((Container)(object)panel);
+			Dropdown ocrDropdown = val25;
 			foreach (Language lang in OcrEngine.AvailableRecognizerLanguages)
 			{
 				ocrDropdown.get_Items().Add(lang.LanguageTag + "  (" + lang.DisplayName + ")");
@@ -397,81 +442,81 @@ namespace Frtal.LorebookReader
 			{
 				_module.OcrLanguageSetting.set_Value(ocrDropdown.get_SelectedItem().Split(' ')[0]);
 			});
-			Checkbox val22 = new Checkbox();
-			val22.set_Text("Show subtitles while reading");
-			val22.set_Checked(_module.ShowSubtitlesSetting.get_Value());
-			((Control)val22).set_Parent((Container)(object)panel);
-			Checkbox subsCheckbox = val22;
+			Checkbox val26 = new Checkbox();
+			val26.set_Text("Show subtitles while reading");
+			val26.set_Checked(_module.ShowSubtitlesSetting.get_Value());
+			((Control)val26).set_Parent((Container)(object)panel);
+			Checkbox subsCheckbox = val26;
 			subsCheckbox.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate(object s, CheckChangedEvent e)
 			{
 				_module.ShowSubtitlesSetting.set_Value(e.get_Checked());
 			});
-			Label val23 = new Label();
-			val23.set_Text(OpacityText(_module.SubtitleOpacitySetting.get_Value()));
-			val23.set_AutoSizeWidth(true);
-			val23.set_AutoSizeHeight(true);
-			((Control)val23).set_Parent((Container)(object)panel);
-			Label opacityLabel = val23;
-			TrackBar val24 = new TrackBar();
-			val24.set_MinValue(20f);
-			val24.set_MaxValue(100f);
-			val24.set_Value(_module.SubtitleOpacitySetting.get_Value() * 100f);
-			((Control)val24).set_Width(360);
-			((Control)val24).set_Parent((Container)(object)panel);
-			TrackBar opacityBar = val24;
+			Label val27 = new Label();
+			val27.set_Text(OpacityText(_module.SubtitleOpacitySetting.get_Value()));
+			val27.set_AutoSizeWidth(true);
+			val27.set_AutoSizeHeight(true);
+			((Control)val27).set_Parent((Container)(object)panel);
+			Label opacityLabel = val27;
+			TrackBar val28 = new TrackBar();
+			val28.set_MinValue(20f);
+			val28.set_MaxValue(100f);
+			val28.set_Value(_module.SubtitleOpacitySetting.get_Value() * 100f);
+			((Control)val28).set_Width(360);
+			((Control)val28).set_Parent((Container)(object)panel);
+			TrackBar opacityBar = val28;
 			opacityBar.add_ValueChanged((EventHandler<ValueEventArgs<float>>)delegate
 			{
 				float num4 = (float)Math.Round(opacityBar.get_Value()) / 100f;
 				_module.SubtitleOpacitySetting.set_Value(num4);
 				opacityLabel.set_Text(OpacityText(num4));
 			});
-			Label val25 = new Label();
-			val25.set_Text(PosText("X", _module.SubtitleXSetting.get_Value()));
-			val25.set_AutoSizeWidth(true);
-			val25.set_AutoSizeHeight(true);
-			((Control)val25).set_Parent((Container)(object)panel);
-			Label posXLabel = val25;
-			TrackBar val26 = new TrackBar();
-			val26.set_MinValue(0f);
-			val26.set_MaxValue(100f);
-			val26.set_Value(_module.SubtitleXSetting.get_Value());
-			((Control)val26).set_Width(360);
-			((Control)val26).set_Parent((Container)(object)panel);
-			TrackBar posXBar = val26;
+			Label val29 = new Label();
+			val29.set_Text(PosText("X", _module.SubtitleXSetting.get_Value()));
+			val29.set_AutoSizeWidth(true);
+			val29.set_AutoSizeHeight(true);
+			((Control)val29).set_Parent((Container)(object)panel);
+			Label posXLabel = val29;
+			TrackBar val30 = new TrackBar();
+			val30.set_MinValue(0f);
+			val30.set_MaxValue(100f);
+			val30.set_Value(_module.SubtitleXSetting.get_Value());
+			((Control)val30).set_Width(360);
+			((Control)val30).set_Parent((Container)(object)panel);
+			TrackBar posXBar = val30;
 			posXBar.add_ValueChanged((EventHandler<ValueEventArgs<float>>)delegate
 			{
 				float num3 = (float)Math.Round(posXBar.get_Value());
 				_module.SubtitleXSetting.set_Value(num3);
 				posXLabel.set_Text(PosText("X", num3));
 			});
-			Label val27 = new Label();
-			val27.set_Text(PosText("Y", _module.SubtitleYSetting.get_Value()));
-			val27.set_AutoSizeWidth(true);
-			val27.set_AutoSizeHeight(true);
-			((Control)val27).set_Parent((Container)(object)panel);
-			Label posYLabel = val27;
-			TrackBar val28 = new TrackBar();
-			val28.set_MinValue(0f);
-			val28.set_MaxValue(100f);
-			val28.set_Value(_module.SubtitleYSetting.get_Value());
-			((Control)val28).set_Width(360);
-			((Control)val28).set_Parent((Container)(object)panel);
-			TrackBar posYBar = val28;
+			Label val31 = new Label();
+			val31.set_Text(PosText("Y", _module.SubtitleYSetting.get_Value()));
+			val31.set_AutoSizeWidth(true);
+			val31.set_AutoSizeHeight(true);
+			((Control)val31).set_Parent((Container)(object)panel);
+			Label posYLabel = val31;
+			TrackBar val32 = new TrackBar();
+			val32.set_MinValue(0f);
+			val32.set_MaxValue(100f);
+			val32.set_Value(_module.SubtitleYSetting.get_Value());
+			((Control)val32).set_Width(360);
+			((Control)val32).set_Parent((Container)(object)panel);
+			TrackBar posYBar = val32;
 			posYBar.add_ValueChanged((EventHandler<ValueEventArgs<float>>)delegate
 			{
 				float num2 = (float)Math.Round(posYBar.get_Value());
 				_module.SubtitleYSetting.set_Value(num2);
 				posYLabel.set_Text(PosText("Y", num2));
 			});
-			Label val29 = new Label();
-			val29.set_Text("Subtitle size");
-			val29.set_AutoSizeWidth(true);
-			val29.set_AutoSizeHeight(true);
-			((Control)val29).set_Parent((Container)(object)panel);
-			Dropdown val30 = new Dropdown();
-			((Control)val30).set_Width(360);
-			((Control)val30).set_Parent((Container)(object)panel);
-			Dropdown sizeDropdown = val30;
+			Label val33 = new Label();
+			val33.set_Text("Subtitle size");
+			val33.set_AutoSizeWidth(true);
+			val33.set_AutoSizeHeight(true);
+			((Control)val33).set_Parent((Container)(object)panel);
+			Dropdown val34 = new Dropdown();
+			((Control)val34).set_Width(360);
+			((Control)val34).set_Parent((Container)(object)panel);
+			Dropdown sizeDropdown = val34;
 			curatedVoices = _sizeItems;
 			foreach (string item in curatedVoices)
 			{
@@ -482,21 +527,21 @@ namespace Frtal.LorebookReader
 			{
 				_module.SubtitleFontSizeSetting.set_Value(ItemToSize(sizeDropdown.get_SelectedItem()));
 			});
-			StandardButton val31 = new StandardButton();
-			val31.set_Text(EditButtonText());
-			((Control)val31).set_Width(360);
-			((Control)val31).set_Parent((Container)(object)panel);
-			StandardButton editButton = val31;
+			StandardButton val35 = new StandardButton();
+			val35.set_Text(EditButtonText());
+			((Control)val35).set_Width(360);
+			((Control)val35).set_Parent((Container)(object)panel);
+			StandardButton editButton = val35;
 			((Control)editButton).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				_module.SubtitleEditMode = !_module.SubtitleEditMode;
 				editButton.set_Text(EditButtonText());
 			});
-			StandardButton val32 = new StandardButton();
-			val32.set_Text("Reset subtitles to defaults");
-			((Control)val32).set_Width(360);
-			((Control)val32).set_Parent((Container)(object)panel);
-			((Control)val32).add_Click((EventHandler<MouseEventArgs>)delegate
+			StandardButton val36 = new StandardButton();
+			val36.set_Text("Reset subtitles to defaults");
+			((Control)val36).set_Width(360);
+			((Control)val36).set_Parent((Container)(object)panel);
+			((Control)val36).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				_module.SubtitleEditMode = false;
 				editButton.set_Text(EditButtonText());
@@ -524,15 +569,15 @@ namespace Frtal.LorebookReader
 				posYBar.set_Value(e.get_NewValue());
 				posYLabel.set_Text(PosText("Y", e.get_NewValue()));
 			});
-			Label val33 = new Label();
-			val33.set_Text("Translation");
-			val33.set_AutoSizeWidth(true);
-			val33.set_AutoSizeHeight(true);
-			((Control)val33).set_Parent((Container)(object)panel);
-			Dropdown val34 = new Dropdown();
-			((Control)val34).set_Width(360);
-			((Control)val34).set_Parent((Container)(object)panel);
-			Dropdown modeDropdown = val34;
+			Label val37 = new Label();
+			val37.set_Text("Translation");
+			val37.set_AutoSizeWidth(true);
+			val37.set_AutoSizeHeight(true);
+			((Control)val37).set_Parent((Container)(object)panel);
+			Dropdown val38 = new Dropdown();
+			((Control)val38).set_Width(360);
+			((Control)val38).set_Parent((Container)(object)panel);
+			Dropdown modeDropdown = val38;
 			curatedVoices = _translateModes;
 			foreach (string item2 in curatedVoices)
 			{
@@ -543,15 +588,15 @@ namespace Frtal.LorebookReader
 			{
 				_module.TranslateModeSetting.set_Value(ItemToMode(modeDropdown.get_SelectedItem()));
 			});
-			Label val35 = new Label();
-			val35.set_Text("Translate to");
-			val35.set_AutoSizeWidth(true);
-			val35.set_AutoSizeHeight(true);
-			((Control)val35).set_Parent((Container)(object)panel);
-			Dropdown val36 = new Dropdown();
-			((Control)val36).set_Width(360);
-			((Control)val36).set_Parent((Container)(object)panel);
-			Dropdown langDropdown = val36;
+			Label val39 = new Label();
+			val39.set_Text("Translate to");
+			val39.set_AutoSizeWidth(true);
+			val39.set_AutoSizeHeight(true);
+			((Control)val39).set_Parent((Container)(object)panel);
+			Dropdown val40 = new Dropdown();
+			((Control)val40).set_Width(360);
+			((Control)val40).set_Parent((Container)(object)panel);
+			Dropdown langDropdown = val40;
 			(string, string)[] targetLanguages = TranslationService.TargetLanguages;
 			for (int j = 0; j < targetLanguages.Length; j++)
 			{
@@ -563,29 +608,29 @@ namespace Frtal.LorebookReader
 			{
 				_module.TranslateTargetSetting.set_Value(LangNameToCode(langDropdown.get_SelectedItem()));
 			});
-			Label val37 = new Label();
-			val37.set_Text("Note: translation uses a free online service and may occasionally be unavailable.");
-			val37.set_AutoSizeWidth(true);
-			val37.set_AutoSizeHeight(true);
-			((Control)val37).set_Parent((Container)(object)panel);
-			Label val38 = new Label();
-			val38.set_Text("Reading history is available via the Lorebook Reader icon in the top-left icon bar.");
-			val38.set_AutoSizeWidth(true);
-			val38.set_AutoSizeHeight(true);
-			((Control)val38).set_Parent((Container)(object)panel);
-			Label val39 = new Label();
-			val39.set_Text("Catalog size: " + _module.HistoryCapacitySetting.get_Value());
-			val39.set_AutoSizeWidth(true);
-			val39.set_AutoSizeHeight(true);
-			((Control)val39).set_Parent((Container)(object)panel);
-			Label capLabel = val39;
-			TrackBar val40 = new TrackBar();
-			val40.set_MinValue(5f);
-			val40.set_MaxValue(100f);
-			val40.set_Value((float)_module.HistoryCapacitySetting.get_Value());
-			((Control)val40).set_Width(360);
-			((Control)val40).set_Parent((Container)(object)panel);
-			TrackBar capBar = val40;
+			Label val41 = new Label();
+			val41.set_Text("Note: translation uses a free online service and may occasionally be unavailable.");
+			val41.set_AutoSizeWidth(true);
+			val41.set_AutoSizeHeight(true);
+			((Control)val41).set_Parent((Container)(object)panel);
+			Label val42 = new Label();
+			val42.set_Text("Reading history is available via the Lorebook Reader icon in the top-left icon bar.");
+			val42.set_AutoSizeWidth(true);
+			val42.set_AutoSizeHeight(true);
+			((Control)val42).set_Parent((Container)(object)panel);
+			Label val43 = new Label();
+			val43.set_Text("Catalog size: " + _module.HistoryCapacitySetting.get_Value());
+			val43.set_AutoSizeWidth(true);
+			val43.set_AutoSizeHeight(true);
+			((Control)val43).set_Parent((Container)(object)panel);
+			Label capLabel = val43;
+			TrackBar val44 = new TrackBar();
+			val44.set_MinValue(5f);
+			val44.set_MaxValue(100f);
+			val44.set_Value((float)_module.HistoryCapacitySetting.get_Value());
+			((Control)val44).set_Width(360);
+			((Control)val44).set_Parent((Container)(object)panel);
+			TrackBar capBar = val44;
 			capBar.add_ValueChanged((EventHandler<ValueEventArgs<float>>)delegate
 			{
 				int num = (int)Math.Round(capBar.get_Value());

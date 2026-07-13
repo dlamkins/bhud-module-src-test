@@ -67,6 +67,10 @@ namespace Frtal.LorebookReader
 
 		private SettingEntry<KeyBinding> _calibrateKeybind;
 
+		private SettingEntry<string> _bookZone;
+
+		private SettingEntry<KeyBinding> _bookCalibrateKeybind;
+
 		private TtsService _tts;
 
 		private EdgeTtsService _edgeTts;
@@ -131,6 +135,8 @@ namespace Frtal.LorebookReader
 
 		private int _dumpBusy;
 
+		private Rectangle _bookCalibBox;
+
 		internal SettingEntry<KeyBinding> ReadKeybindSetting => _readKeybind;
 
 		internal SettingEntry<KeyBinding> StopKeybindSetting => _stopKeybind;
@@ -172,6 +178,10 @@ namespace Frtal.LorebookReader
 		internal SettingEntry<string> DialogZoneSetting => _dialogZone;
 
 		internal SettingEntry<KeyBinding> CalibrateKeybindSetting => _calibrateKeybind;
+
+		internal SettingEntry<string> BookZoneSetting => _bookZone;
+
+		internal SettingEntry<KeyBinding> BookCalibrateKeybindSetting => _bookCalibrateKeybind;
 
 		internal TextRenderer SharedTextRenderer => _textRenderer;
 
@@ -242,6 +252,8 @@ namespace Frtal.LorebookReader
 			//IL_0685: Expected O, but got Unknown
 			//IL_06e8: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0730: Expected O, but got Unknown
+			//IL_0793: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07db: Expected O, but got Unknown
 			_readKeybind = settings.DefineSetting<KeyBinding>("ReadKeybind", new KeyBinding((ModifierKeys)3, (Keys)82), (Func<string>)(() => "Read lorebook"), (Func<string>)(() => "Reads the currently open lorebook aloud."));
 			_stopKeybind = settings.DefineSetting<KeyBinding>("StopKeybind", new KeyBinding((ModifierKeys)3, (Keys)83), (Func<string>)(() => "Stop reading"), (Func<string>)(() => "Stops the current text-to-speech playback."));
 			_showSpeakerButton = settings.DefineSetting<bool>("ShowSpeakerButton", true, (Func<string>)(() => "Show speaker icon on open books"), (Func<string>)(() => "Displays a clickable speaker icon next to a detected lorebook."));
@@ -267,6 +279,8 @@ namespace Frtal.LorebookReader
 			_debugDumpKeybind = settings.DefineSetting<KeyBinding>("DebugDumpKeybind", new KeyBinding((ModifierKeys)3, (Keys)68), (Func<string>)(() => "Save debug capture"), (Func<string>)(() => "Saves the current frame, detector results and OCR output to the lorebook_reader\\debug folder. Attach that folder to bug reports."));
 			_dialogZone = settings.DefineSetting<string>("DialogZone", "", (Func<string>)(() => "Calibrated dialogue zone"), (Func<string>)(() => "Internal store of the calibrated dialogue area (pixels + resolution stamp)."));
 			_calibrateKeybind = settings.DefineSetting<KeyBinding>("CalibrateKeybind", new KeyBinding((ModifierKeys)3, (Keys)90), (Func<string>)(() => "Calibrate dialogue zone"), (Func<string>)(() => "Opens a draggable frame to mark where dialogue text appears. Do this once per screen resolution."));
+			_bookZone = settings.DefineSetting<string>("BookZone", "", (Func<string>)(() => "Lorebook OCR area (calibrated)"), (Func<string>)(() => "Internal store of the calibrated lorebook OCR area."));
+			_bookCalibrateKeybind = settings.DefineSetting<KeyBinding>("BookCalibrateKeybind", new KeyBinding((ModifierKeys)3, (Keys)66), (Func<string>)(() => "Calibrate lorebook OCR area"), (Func<string>)(() => "Open a lorebook, then press this to drag a frame over the book text. Fixes text getting cut off. Once per resolution."));
 		}
 
 		protected override async Task LoadAsync()
@@ -287,18 +301,18 @@ namespace Frtal.LorebookReader
 
 		protected override void OnModuleLoaded(EventArgs e)
 		{
-			//IL_0284: Unknown result type (might be due to invalid IL or missing references)
-			//IL_028e: Expected O, but got Unknown
-			//IL_02c8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ef: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02f4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0304: Unknown result type (might be due to invalid IL or missing references)
-			//IL_030f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0316: Unknown result type (might be due to invalid IL or missing references)
-			//IL_031d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_032d: Expected O, but got Unknown
+			//IL_02b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02bb: Expected O, but got Unknown
+			//IL_02f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0308: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0317: Unknown result type (might be due to invalid IL or missing references)
+			//IL_031c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0321: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0331: Unknown result type (might be due to invalid IL or missing references)
+			//IL_033c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0343: Unknown result type (might be due to invalid IL or missing references)
+			//IL_034a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_035a: Expected O, but got Unknown
 			_readKeybind.get_Value().set_Enabled(true);
 			_readKeybind.get_Value().add_Activated((EventHandler<EventArgs>)OnReadActivated);
 			_stopKeybind.get_Value().set_Enabled(true);
@@ -309,6 +323,8 @@ namespace Frtal.LorebookReader
 			_debugDumpKeybind.get_Value().add_Activated((EventHandler<EventArgs>)OnDebugDumpActivated);
 			_calibrateKeybind.get_Value().set_Enabled(true);
 			_calibrateKeybind.get_Value().add_Activated((EventHandler<EventArgs>)OnCalibrateActivated);
+			_bookCalibrateKeybind.get_Value().set_Enabled(true);
+			_bookCalibrateKeybind.get_Value().add_Activated((EventHandler<EventArgs>)OnBookCalibrateActivated);
 			if (!string.IsNullOrEmpty(_catalog?.LoadWarning))
 			{
 				Logger.Warn("Catalog load warning: " + _catalog.LoadWarning);
@@ -463,7 +479,13 @@ namespace Frtal.LorebookReader
 					Rectangle? box = parch ?? convUse?.Panel;
 					if (box.HasValue)
 					{
-						Rectangle inner = (isConversation ? convUse.TextArea : ParchmentDetector.InnerCrop(box.Value));
+						Rectangle? bookCropDbg = (parch.HasValue ? GetCalibratedBookCrop(parch.Value) : null);
+						Rectangle inner = (isConversation ? convUse.TextArea : (bookCropDbg ?? ParchmentDetector.InnerCrop(box.Value)));
+						inner = Rectangle.Intersect(inner, new Rectangle(0, 0, screen.Width, screen.Height));
+						if (!isConversation)
+						{
+							info.AppendLine("Book crop: " + (bookCropDbg.HasValue ? "calibrated size (auto-positioned)" : "auto InnerCrop"));
+						}
 						info.AppendLine("Detector used: " + (isConversation ? "conversation" : "parchment"));
 						info.AppendLine($"Text crop: {inner}");
 						using Bitmap crop = screen.Clone(inner, screen.PixelFormat);
@@ -627,6 +649,111 @@ namespace Frtal.LorebookReader
 			return new Rectangle(x, y, w, h);
 		}
 
+		internal void StartBookCalibration()
+		{
+			OnBookCalibrateActivated(null, EventArgs.Empty);
+		}
+
+		private void OnBookCalibrateActivated(object sender, EventArgs e)
+		{
+			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
+			if (_calibrator == null)
+			{
+				if (!_bookVisible || _gw2ClientRect.Width <= 0)
+				{
+					ScreenNotification.ShowNotification("Open a lorebook first (wait for the buttons), then calibrate.", (NotificationType)0, (Texture2D)null, 4);
+					return;
+				}
+				_bookCalibBox = _bookBox;
+				Point size = ((Control)GameService.Graphics.get_SpriteScreen()).get_Size();
+				float sx = (float)size.X / (float)_gw2ClientRect.Width;
+				float sy = (float)size.Y / (float)_gw2ClientRect.Height;
+				Rectangle seed = GetCalibratedBookCrop(_bookBox) ?? ParchmentDetector.InnerCrop(_bookBox);
+				Rectangle start = default(Rectangle);
+				((Rectangle)(ref start))._002Ector((int)((float)seed.X * sx), (int)((float)seed.Y * sy), (int)((float)seed.Width * sx), (int)((float)seed.Height * sy));
+				_calibrator = new DialogZoneCalibrator(start, OnBookZoneSaved, CloseCalibrator);
+			}
+		}
+
+		private void OnBookZoneSaved(Rectangle spriteRect)
+		{
+			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
+			try
+			{
+				Rectangle b = _bookCalibBox;
+				if (b.Width <= 0 || b.Height <= 0)
+				{
+					ScreenNotification.ShowNotification("Calibration lost the book — open it and try again.", (NotificationType)0, (Texture2D)null, 4);
+					CloseCalibrator();
+					return;
+				}
+				Rectangle screenRect;
+				int cw;
+				int ch;
+				using (Bitmap s = ScreenCapture.Grab(GameService.GameIntegration.get_Gw2Instance().get_Gw2WindowHandle(), out screenRect))
+				{
+					cw = s.Width;
+					ch = s.Height;
+				}
+				Point sp = ((Control)GameService.Graphics.get_SpriteScreen()).get_Size();
+				float sx = (float)cw / (float)Math.Max(1, sp.X);
+				float sy = (float)ch / (float)Math.Max(1, sp.Y);
+				double num = (float)spriteRect.X * sx;
+				double fy = (float)spriteRect.Y * sy;
+				double fw = (float)spriteRect.Width * sx;
+				double fh = (float)spriteRect.Height * sy;
+				int xBp = (int)Math.Round((num - (double)b.X) * 10000.0 / (double)b.Width);
+				int yBp = (int)Math.Round((fy - (double)b.Y) * 10000.0 / (double)b.Height);
+				int wBp = (int)Math.Round(fw * 10000.0 / (double)b.Width);
+				int hBp = (int)Math.Round(fh * 10000.0 / (double)b.Height);
+				_bookZone.set_Value($"{xBp},{yBp},{wBp},{hBp}");
+				ScreenNotification.ShowNotification("Lorebook OCR area saved (position stays auto-detected).", (NotificationType)0, (Texture2D)null, 4);
+				Logger.Info("Lorebook OCR area (rel bp): " + _bookZone.get_Value());
+			}
+			catch (Exception ex)
+			{
+				Logger.Warn(ex, "Book calibration save failed.");
+				ScreenNotification.ShowNotification("Book calibration save failed: " + ex.Message, (NotificationType)0, (Texture2D)null, 4);
+			}
+			CloseCalibrator();
+		}
+
+		private Rectangle? GetCalibratedBookCrop(Rectangle box)
+		{
+			string raw = _bookZone.get_Value();
+			if (string.IsNullOrEmpty(raw))
+			{
+				return null;
+			}
+			string[] p = raw.Split(',');
+			if (p.Length != 4)
+			{
+				return null;
+			}
+			if (!int.TryParse(p[0], out var xBp) || !int.TryParse(p[1], out var yBp) || !int.TryParse(p[2], out var wBp) || !int.TryParse(p[3], out var hBp))
+			{
+				return null;
+			}
+			if (wBp < 100 || hBp < 100)
+			{
+				return null;
+			}
+			int x = box.X + (int)Math.Round((double)xBp / 10000.0 * (double)box.Width);
+			int y = box.Y + (int)Math.Round((double)yBp / 10000.0 * (double)box.Height);
+			int w = (int)Math.Round((double)wBp / 10000.0 * (double)box.Width);
+			int h = (int)Math.Round((double)hBp / 10000.0 * (double)box.Height);
+			return new Rectangle(x, y, w, h);
+		}
+
 		private void StartRead()
 		{
 			if (!_readBusy)
@@ -695,6 +822,7 @@ namespace Frtal.LorebookReader
 			{
 				double solidity;
 				Rectangle? box = ParchmentDetector.Find(screen, out solidity);
+				bool parchmentDetected = box.HasValue;
 				bool isConversation = false;
 				Rectangle? convText = null;
 				if (box.HasValue)
@@ -724,7 +852,9 @@ namespace Frtal.LorebookReader
 					box = new Rectangle((int)((double)screen.Width * 0.34), (int)((double)screen.Height * 0.12), (int)((double)screen.Width * 0.32), (int)((double)screen.Height * 0.8));
 					Logger.Info("Neither parchment nor conversation detected, using center fallback.");
 				}
-				Rectangle inner = ((!isConversation) ? ParchmentDetector.InnerCrop(box.Value) : (convText ?? ConversationDetector.TextCrop(box.Value)));
+				Rectangle? bookCrop = ((parchmentDetected && !isConversation) ? GetCalibratedBookCrop(box.Value) : null);
+				Rectangle inner = ((!isConversation) ? (bookCrop ?? ParchmentDetector.InnerCrop(box.Value)) : (convText ?? ConversationDetector.TextCrop(box.Value)));
+				inner = Rectangle.Intersect(inner, new Rectangle(0, 0, screen.Width, screen.Height));
 				using (Bitmap crop = screen.Clone(inner, screen.PixelFormat))
 				{
 					text = TextCleaner.CleanForTts(await OcrService.RecognizeAsync(crop, _ocrLanguage.get_Value(), isConversation));
@@ -1002,23 +1132,23 @@ namespace Frtal.LorebookReader
 
 		protected override void Update(GameTime gameTime)
 		{
-			//IL_01bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0228: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0248: Unknown result type (might be due to invalid IL or missing references)
-			//IL_026d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_023b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0260: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0275: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0282: Unknown result type (might be due to invalid IL or missing references)
-			//IL_028f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_032e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0333: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0335: Unknown result type (might be due to invalid IL or missing references)
-			//IL_034c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03eb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0408: Unknown result type (might be due to invalid IL or missing references)
+			//IL_029c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0321: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0326: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0328: Unknown result type (might be due to invalid IL or missing references)
+			//IL_033f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0397: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03c1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03fb: Unknown result type (might be due to invalid IL or missing references)
 			_detectTimerMs += gameTime.get_ElapsedGameTime().TotalMilliseconds;
 			if (_detectTimerMs >= 1000.0)
 			{
@@ -1036,11 +1166,7 @@ namespace Frtal.LorebookReader
 			if (_catalogDirty && _historyWindow != null && ((Control)_historyWindow).get_Visible())
 			{
 				_catalogDirty = false;
-				if (_encyclopediaView != null)
-				{
-					_encyclopediaView.RebuildExpansionFilter();
-					_encyclopediaView.RefreshList();
-				}
+				_encyclopediaView?.RefreshFromCatalog();
 			}
 			if (_subtitleLabel != null)
 			{
@@ -1185,6 +1311,7 @@ namespace Frtal.LorebookReader
 			_convToggleKeybind.get_Value().remove_Activated((EventHandler<EventArgs>)OnConvToggleActivated);
 			_debugDumpKeybind.get_Value().remove_Activated((EventHandler<EventArgs>)OnDebugDumpActivated);
 			_calibrateKeybind.get_Value().remove_Activated((EventHandler<EventArgs>)OnCalibrateActivated);
+			_bookCalibrateKeybind.get_Value().remove_Activated((EventHandler<EventArgs>)OnBookCalibrateActivated);
 			DialogZoneCalibrator calibrator = _calibrator;
 			if (calibrator != null)
 			{
