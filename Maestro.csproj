@@ -29,6 +29,7 @@
     <None Remove="Maestro\ref.pause-icon.png" />
     <None Remove="Maestro\ref.play-icon.png" />
     <None Remove="Maestro\ref.playall-icon.png" />
+    <None Remove="Maestro\ref.practice-icon.png" />
     <None Remove="Maestro\ref.queue-icon.png" />
     <None Remove="Maestro\ref.refresh-icon.png" />
     <None Remove="Maestro\ref.repeat-icon.png" />
@@ -58,6 +59,7 @@
     <EmbeddedResource Include="Maestro\ref.pause-icon.png" />
     <EmbeddedResource Include="Maestro\ref.play-icon.png" />
     <EmbeddedResource Include="Maestro\ref.playall-icon.png" />
+    <EmbeddedResource Include="Maestro\ref.practice-icon.png" />
     <EmbeddedResource Include="Maestro\ref.queue-icon.png" />
     <EmbeddedResource Include="Maestro\ref.refresh-icon.png" />
     <EmbeddedResource Include="Maestro\ref.repeat-icon.png" />

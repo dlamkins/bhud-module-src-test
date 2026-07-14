@@ -37,7 +37,15 @@ namespace Maestro.UI.Main
 
 			public const int PlayButtonRightMargin = 15;
 
-			public static int LabelRightMargin => 79;
+			public const int PracticeButtonWidth = 26;
+
+			public const int PracticeButtonHeight = 26;
+
+			public const int PracticeButtonY = 22;
+
+			public const int PracticeButtonGap = 6;
+
+			public static int LabelRightMargin => 111;
 		}
 
 		private readonly Panel _indicator;
@@ -49,6 +57,8 @@ namespace Maestro.UI.Main
 		private readonly Label _artistLabel;
 
 		private readonly StarButton _starButton;
+
+		private readonly IconButton _practiceButton;
 
 		private readonly StandardButton _playButton;
 
@@ -95,6 +105,18 @@ namespace Maestro.UI.Main
 			set
 			{
 				_starButton.IsFavorite = value;
+			}
+		}
+
+		public bool IsPracticing
+		{
+			get
+			{
+				return _practiceButton.Selected;
+			}
+			set
+			{
+				_practiceButton.Selected = value;
 			}
 		}
 
@@ -158,11 +180,13 @@ namespace Maestro.UI.Main
 			//IL_01ad: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01ae: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01bd: Expected O, but got Unknown
-			//IL_01d9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0205: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0259: Unknown result type (might be due to invalid IL or missing references)
-			//IL_025f: Expected O, but got Unknown
+			//IL_01de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_028c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02e6: Expected O, but got Unknown
 			Song = song;
 			((Control)this).set_Size(new Point(width, 70));
 			((Control)this).set_BackgroundColor(MaestroTheme.PanelBackground);
@@ -206,18 +230,33 @@ namespace Maestro.UI.Main
 			_artistLabel = val4;
 			StarButton starButton = new StarButton();
 			((Control)starButton).set_Parent((Container)(object)this);
-			((Control)starButton).set_Location(new Point(width - 40 - 15 - 20 - 4, 25));
+			((Control)starButton).set_Location(new Point(width - 40 - 15 - 26 - 6 - 20 - 4, 25));
 			_starButton = starButton;
 			((Control)_starButton).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				this.FavoriteToggleRequested?.Invoke(this, EventArgs.Empty);
 			});
-			IconButton iconButton = new IconButton(MaestroIcons.Play, MaestroTheme.IconGlyph);
+			IconButton iconButton = new IconButton(MaestroIcons.Practice, MaestroTheme.IconGlyph);
 			((Control)iconButton).set_Parent((Container)(object)this);
-			((Control)iconButton).set_BasicTooltipText("Play");
-			((Control)iconButton).set_Location(new Point(width - 40 - 15, 22));
-			((Control)iconButton).set_Width(40);
-			_playButton = (StandardButton)(object)iconButton;
+			((Control)iconButton).set_Location(new Point(width - 40 - 15 - 26 - 6, 22));
+			((Control)iconButton).set_Width(26);
+			((Control)iconButton).set_Height(26);
+			((Control)iconButton).set_Enabled(song.IsPracticeSupported);
+			((Control)iconButton).set_BasicTooltipText(song.IsPracticeSupported ? "Practice this song (Guitar Hero-style)" : "Practice mode supports melodic songs in the modern note format. Drum Set songs and legacy imports can't be practiced.");
+			_practiceButton = iconButton;
+			((Control)_practiceButton).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				if (Song.IsPracticeSupported)
+				{
+					Module.Instance.StartPractice(Song);
+				}
+			});
+			IconButton iconButton2 = new IconButton(MaestroIcons.Play, MaestroTheme.IconGlyph);
+			((Control)iconButton2).set_Parent((Container)(object)this);
+			((Control)iconButton2).set_BasicTooltipText("Play");
+			((Control)iconButton2).set_Location(new Point(width - 40 - 15, 22));
+			((Control)iconButton2).set_Width(40);
+			_playButton = (StandardButton)(object)iconButton2;
 			((Control)_playButton).add_Click((EventHandler<MouseEventArgs>)delegate(object s, MouseEventArgs e)
 			{
 				this.PlayClicked?.Invoke(this, e);
@@ -288,6 +327,11 @@ namespace Maestro.UI.Main
 			if (starButton != null)
 			{
 				((Control)starButton).Dispose();
+			}
+			IconButton practiceButton = _practiceButton;
+			if (practiceButton != null)
+			{
+				((Control)practiceButton).Dispose();
 			}
 			StandardButton playButton = _playButton;
 			if (playButton != null)

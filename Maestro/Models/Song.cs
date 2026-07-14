@@ -81,5 +81,17 @@ namespace Maestro.Models
 				return span.ToString("h\\:mm\\:ss");
 			}
 		}
+
+		public bool IsPracticeSupported
+		{
+			get
+			{
+				if (Notes != null && Notes.Count > 0)
+				{
+					return !InstrumentCatalog.Get(Instrument).IsPercussion;
+				}
+				return false;
+			}
+		}
 	}
 }

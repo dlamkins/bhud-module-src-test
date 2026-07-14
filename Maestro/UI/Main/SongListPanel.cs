@@ -157,12 +157,14 @@ namespace Maestro.UI.Main
 
 		public void UpdateCardStates()
 		{
+			Song practicingSong = Module.Instance?.CurrentPracticeSong;
 			foreach (KeyValuePair<Song, SongCard> kvp in _songCards)
 			{
 				bool isPlaying = _songPlayer.IsPlaying && _songPlayer.CurrentSong == kvp.Key;
 				bool isSelected = kvp.Key == SelectedSong;
 				kvp.Value.IsPlaying = isPlaying;
 				kvp.Value.IsSelected = isSelected;
+				kvp.Value.IsPracticing = kvp.Key == practicingSong;
 			}
 		}
 

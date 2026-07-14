@@ -256,6 +256,27 @@ namespace Maestro.UI.Main
 			_songPlayer.OnCompleted += OnSongCompleted;
 			_playlistService.QueueChanged += OnQueueChanged;
 			_favoriteService.FavoritesChanged += OnFavoritesChanged;
+			Module.Instance.PracticeActiveChanged += OnPracticeActiveChanged;
+		}
+
+		private void OnPracticeActiveChanged(object sender, EventArgs e)
+		{
+			RefreshPlayButtonState();
+		}
+
+		private void RefreshPlayButtonState()
+		{
+			_songListPanel.UpdateCardStates();
+		}
+
+		private bool BlockIfPracticeActive()
+		{
+			if (Module.Instance != null && Module.Instance.IsPracticeActive)
+			{
+				ScreenNotification.ShowNotification("Practice mode is running. Close it first to play normally.", (NotificationType)1, (Texture2D)null, 4);
+				return true;
+			}
+			return false;
 		}
 
 		private void OnWindowClicked(object sender, MouseEventArgs e)
@@ -280,13 +301,16 @@ namespace Maestro.UI.Main
 
 		private void OnSongPlayRequested(object sender, Song song)
 		{
-			if (_pendingSong != null)
+			if (!BlockIfPracticeActive())
 			{
-				_pendingSong = null;
-				_nowPlayingPanel.ClearPendingSong();
-				_playlistDrawer.HideInstrumentConfirmation();
+				if (_pendingSong != null)
+				{
+					_pendingSong = null;
+					_nowPlayingPanel.ClearPendingSong();
+					_playlistDrawer.HideInstrumentConfirmation();
+				}
+				PlaySongDirectly(song);
 			}
-			PlaySongDirectly(song);
 		}
 
 		private void OnSongDeleteRequested(object sender, Song song)
@@ -365,20 +389,23 @@ namespace Maestro.UI.Main
 
 		private void OnPlayPendingRequested(object sender, Song song)
 		{
-			_playlistDrawer.HideInstrumentConfirmation();
-			if (!_isPlayingFromQueue)
+			if (!BlockIfPracticeActive())
 			{
-				SetQueuePlaybackMode(isPlaying: false);
+				_playlistDrawer.HideInstrumentConfirmation();
+				if (!_isPlayingFromQueue)
+				{
+					SetQueuePlaybackMode(isPlaying: false);
+				}
+				if (!_playlistService.HasItems)
+				{
+					_isDrawerOpen = false;
+					((Control)_playlistDrawer).Hide();
+				}
+				_lastPlayedInstrument = song.Instrument;
+				_nowPlayingPanel.SetCurrentInstrument(song.Instrument);
+				_pendingSong = null;
+				_songPlayer.Play(song);
 			}
-			if (!_playlistService.HasItems)
-			{
-				_isDrawerOpen = false;
-				((Control)_playlistDrawer).Hide();
-			}
-			_lastPlayedInstrument = song.Instrument;
-			_nowPlayingPanel.SetCurrentInstrument(song.Instrument);
-			_pendingSong = null;
-			_songPlayer.Play(song);
 		}
 
 		private void ShowInstrumentConfirmation(Song song)
@@ -424,7 +451,7 @@ namespace Maestro.UI.Main
 
 		private void OnPlayQueueRequested(object sender, EventArgs e)
 		{
-			if (_playlistService.HasItems)
+			if (!BlockIfPracticeActive() && _playlistService.HasItems)
 			{
 				if (_isPlayingFromQueue)
 				{
@@ -622,6 +649,7 @@ namespace Maestro.UI.Main
 			_nowPlayingPanel.StopRequested -= OnStopRequested;
 			_nowPlayingPanel.PlayPendingRequested -= OnPlayPendingRequested;
 			_nowPlayingPanel.QueueToggleClicked -= OnQueueToggleClicked;
+			Module.Instance.PracticeActiveChanged -= OnPracticeActiveChanged;
 		}
 
 		private void DisposeControls()

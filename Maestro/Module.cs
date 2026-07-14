@@ -20,6 +20,7 @@ using Maestro.UI.Community;
 using Maestro.UI.Import;
 using Maestro.UI.MaestroCreator;
 using Maestro.UI.Main;
+using Maestro.UI.Practice;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -33,6 +34,10 @@ namespace Maestro
 		private static readonly Logger Logger = Logger.GetLogger<Module>();
 
 		private ModuleSettings _moduleSettings;
+
+		private PracticeSettings _practiceSettings;
+
+		private PracticeWindow _practiceWindow;
 
 		private KeyboardService _keyboardService;
 
@@ -80,9 +85,27 @@ namespace Maestro
 
 		internal ModuleSettings Settings => _moduleSettings;
 
+		internal PracticeSettings PracticeSettings => _practiceSettings;
+
+		public bool IsPracticeActive
+		{
+			get
+			{
+				if (_practiceWindow != null && _practiceWindow.Session != null)
+				{
+					return !_practiceWindow.Session.IsCompleted;
+				}
+				return false;
+			}
+		}
+
+		public Song CurrentPracticeSong => _practiceWindow?.Song;
+
 		internal KeyboardService KeyboardService => _keyboardService;
 
 		internal SongPlayer SongPlayer => _songPlayer;
+
+		public event EventHandler PracticeActiveChanged;
 
 		[ImportingConstructor]
 		public Module([Import("ModuleParameters")] ModuleParameters moduleParameters)
@@ -94,6 +117,7 @@ namespace Maestro
 		protected override void DefineSettings(SettingCollection settings)
 		{
 			_moduleSettings = new ModuleSettings(settings);
+			_practiceSettings = new PracticeSettings(settings.AddSubCollection("Practice", true, false));
 		}
 
 		protected override void Initialize()
@@ -241,6 +265,11 @@ namespace Maestro
 
 		private void OnCreateRequested(object sender, InstrumentType instrument)
 		{
+			if (IsPracticeActive)
+			{
+				ScreenNotification.ShowNotification("Practice mode is running. Close it first to open the Creator.", (NotificationType)1, (Texture2D)null, 4);
+				return;
+			}
 			if (_maestroCreatorWindow == null)
 			{
 				_maestroCreatorWindow = new MaestroCreatorWindow();
@@ -273,6 +302,11 @@ namespace Maestro
 
 		private void OnEditRequested(object sender, Song song)
 		{
+			if (IsPracticeActive)
+			{
+				ScreenNotification.ShowNotification("Practice mode is running. Close it first to edit a song.", (NotificationType)1, (Texture2D)null, 4);
+				return;
+			}
 			if (_maestroCreatorWindow == null)
 			{
 				_maestroCreatorWindow = new MaestroCreatorWindow();
@@ -338,6 +372,43 @@ namespace Maestro
 				Logger.Error(ex, "Failed to save created song: " + song.Name);
 				ScreenNotification.ShowNotification("Failed to save song", (NotificationType)2, (Texture2D)null, 4);
 			}
+		}
+
+		public void StartPractice(Song song)
+		{
+			if (song == null || !song.IsPracticeSupported)
+			{
+				Logger.Warn("Cannot start practice: unsupported song " + song?.Name);
+				return;
+			}
+			if (_keyboardService == null || _practiceSettings == null)
+			{
+				Logger.Warn("Cannot start practice: module not yet initialized");
+				return;
+			}
+			if (_maestroCreatorWindow != null && ((Control)_maestroCreatorWindow).get_Visible())
+			{
+				ScreenNotification.ShowNotification("The Creator is open. Close it first to start Practice mode.", (NotificationType)1, (Texture2D)null, 4);
+				return;
+			}
+			_songPlayer.Stop();
+			if (_practiceWindow != null)
+			{
+				((Control)_practiceWindow).remove_Disposed((EventHandler<EventArgs>)OnPracticeWindowDisposed);
+				((Control)_practiceWindow).Hide();
+				((Control)_practiceWindow).Dispose();
+				_practiceWindow = null;
+			}
+			_practiceWindow = new PracticeWindow(song, _keyboardService, _practiceSettings);
+			((Control)_practiceWindow).add_Disposed((EventHandler<EventArgs>)OnPracticeWindowDisposed);
+			((Control)_practiceWindow).Show();
+			this.PracticeActiveChanged?.Invoke(this, EventArgs.Empty);
+		}
+
+		private void OnPracticeWindowDisposed(object sender, EventArgs e)
+		{
+			_practiceWindow = null;
+			this.PracticeActiveChanged?.Invoke(this, EventArgs.Empty);
 		}
 
 		public void PlayNote(string note, bool isSharp = false, bool isHighC = false)
@@ -487,6 +558,12 @@ namespace Maestro
 		protected override void Unload()
 		{
 			_songPlayer?.Stop();
+			if (_practiceWindow != null)
+			{
+				((Control)_practiceWindow).remove_Disposed((EventHandler<EventArgs>)OnPracticeWindowDisposed);
+				((Control)_practiceWindow).Dispose();
+				_practiceWindow = null;
+			}
 			MaestroCreatorWindow maestroCreatorWindow = _maestroCreatorWindow;
 			if (maestroCreatorWindow != null)
 			{

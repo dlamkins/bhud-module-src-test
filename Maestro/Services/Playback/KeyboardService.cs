@@ -22,6 +22,8 @@ namespace Maestro.Services.Playback
 
 		private readonly HashSet<Keys> _heldKeys;
 
+		private readonly HashSet<Keys> _justSent = new HashSet<Keys>();
+
 		private readonly DebugLogger _debugLogger = new DebugLogger();
 
 		private bool _altHeld;
@@ -136,6 +138,30 @@ namespace Maestro.Services.Playback
 			}
 			_activeSharpKeys.Clear();
 			_altHeld = false;
+		}
+
+		public void MarkJustSent(Keys key)
+		{
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			_justSent.Add(key);
+		}
+
+		public Keys GetConfiguredPrimaryKey(Keys key)
+		{
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
+			if (!_keyRemappings.TryGetValue(key, out var setting))
+			{
+				return key;
+			}
+			return setting.get_Value().get_PrimaryKey();
+		}
+
+		public bool WasJustSent(Keys key)
+		{
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			return _justSent.Remove(key);
 		}
 
 		public void PlayNote(Keys key, bool isSharp = false)
