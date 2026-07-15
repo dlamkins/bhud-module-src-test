@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using NAudio.Wave;
+using Windows.Media;
 using Windows.Media.SpeechSynthesis;
 using Windows.Storage.Streams;
 
@@ -27,12 +29,13 @@ namespace Frtal.LorebookReader
 				select v;
 		}
 
-		public async Task<string> SpeakAsync(string text, string voiceName, double rate, string languageTag, Action<string> onChunk = null)
+		public async Task<string> SpeakAsync(string text, string voiceName, double rate, string languageTag, Action<string> onChunk = null, Action<int> onWord = null)
 		{
 			Stop();
 			CancellationToken ct = (_cts = new CancellationTokenSource()).Token;
 			string warning = SelectVoice(voiceName, languageTag);
 			_synth.Options.SpeakingRate = Math.Max(0.5, Math.Min(3.0, rate));
+			_synth.Options.IncludeWordBoundaryMetadata = true;
 			List<string> chunks = TextCleaner.SplitChunks(text);
 			if (chunks.Count == 0)
 			{
@@ -40,17 +43,17 @@ namespace Frtal.LorebookReader
 			}
 			try
 			{
-				Task<byte[]> nextTask = SynthesizeChunkAsync(chunks[0]);
+				Task<(byte[] wav, List<TimeSpan> words)> nextTask = SynthesizeChunkAsync(chunks[0]);
 				for (int i = 0; i < chunks.Count; i++)
 				{
-					byte[] wav = await nextTask.ConfigureAwait(continueOnCapturedContext: false);
+					var (wav, words) = await nextTask.ConfigureAwait(continueOnCapturedContext: false);
 					if (ct.IsCancellationRequested)
 					{
 						return warning;
 					}
-					nextTask = ((i + 1 < chunks.Count) ? SynthesizeChunkAsync(chunks[i + 1]) : Task.FromResult<byte[]>(null));
+					nextTask = (Task<(byte[] wav, List<TimeSpan> words)>)((i + 1 < chunks.Count) ? ((Task)SynthesizeChunkAsync(chunks[i + 1])) : ((Task)Task.FromResult<(byte[], List<TimeSpan>)>((null, null))));
 					onChunk?.Invoke(chunks[i]);
-					await PlayWavAsync(wav, ct).ConfigureAwait(continueOnCapturedContext: false);
+					await PlayWavAsync(wav, words, onWord, ct).ConfigureAwait(continueOnCapturedContext: false);
 					if (ct.IsCancellationRequested)
 					{
 						return warning;
@@ -118,7 +121,7 @@ namespace Frtal.LorebookReader
 			return warning;
 		}
 
-		private async Task<byte[]> SynthesizeChunkAsync(string chunk)
+		private async Task<(byte[] wav, List<TimeSpan> words)> SynthesizeChunkAsync(string chunk)
 		{
 			TaskAwaiter<SpeechSynthesisStream> taskAwaiter = WindowsRuntimeSystemExtensions.GetAwaiter<SpeechSynthesisStream>(_synth.SynthesizeTextToStreamAsync(chunk));
 			if (!taskAwaiter.IsCompleted)
@@ -129,12 +132,23 @@ namespace Frtal.LorebookReader
 			}
 			SpeechSynthesisStream result = taskAwaiter.GetResult();
 			using SpeechSynthesisStream stream = result;
+			List<TimeSpan> words = new List<TimeSpan>();
+			try
+			{
+				foreach (IMediaMarker i in stream.Markers)
+				{
+					words.Add(i.Time);
+				}
+			}
+			catch
+			{
+			}
 			MemoryStream ms = new MemoryStream();
 			await WindowsRuntimeStreamExtensions.AsStreamForRead((IInputStream)stream).CopyToAsync(ms).ConfigureAwait(continueOnCapturedContext: false);
-			return ms.ToArray();
+			return (ms.ToArray(), words);
 		}
 
-		private async Task PlayWavAsync(byte[] wav, CancellationToken ct)
+		private async Task PlayWavAsync(byte[] wav, List<TimeSpan> words, Action<int> onWord, CancellationToken ct)
 		{
 			if (wav == null || wav.Length == 0)
 			{
@@ -153,6 +167,8 @@ namespace Frtal.LorebookReader
 				};
 				output.Init(reader);
 				output.Play();
+				Stopwatch sw = Stopwatch.StartNew();
+				int wi = 0;
 				using (ct.Register(delegate
 				{
 					try
@@ -165,7 +181,23 @@ namespace Frtal.LorebookReader
 					done.TrySetResult(result: true);
 				}))
 				{
-					await done.Task.ConfigureAwait(continueOnCapturedContext: false);
+					while (!done.Task.IsCompleted)
+					{
+						if (words != null && onWord != null)
+						{
+							for (; wi < words.Count && sw.Elapsed >= words[wi]; wi++)
+							{
+								try
+								{
+									onWord(wi);
+								}
+								catch
+								{
+								}
+							}
+						}
+						await Task.WhenAny(done.Task, Task.Delay(25)).ConfigureAwait(continueOnCapturedContext: false);
+					}
 				}
 				_currentOut = null;
 			}

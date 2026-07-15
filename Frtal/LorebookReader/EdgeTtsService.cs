@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using NAudio.Wave;
@@ -119,7 +121,7 @@ namespace Frtal.LorebookReader
 			ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12;
 		}
 
-		public async Task SpeakAsync(string text, string voice, double rate, Action<string> onChunk = null)
+		public async Task SpeakAsync(string text, string voice, double rate, Action<string> onChunk = null, Action<int> onWord = null)
 		{
 			Stop();
 			CancellationToken ct = (_cts = new CancellationTokenSource()).Token;
@@ -131,17 +133,17 @@ namespace Frtal.LorebookReader
 			string prosodyRate = RateToProsody(rate);
 			try
 			{
-				Task<byte[]> nextTask = SynthesizeChunkAsync(chunks[0], voice, prosodyRate, ct);
+				Task<(byte[] mp3, List<TimeSpan> words)> nextTask = SynthesizeChunkAsync(chunks[0], voice, prosodyRate, ct);
 				for (int i = 0; i < chunks.Count; i++)
 				{
-					byte[] mp3 = await nextTask.ConfigureAwait(continueOnCapturedContext: false);
+					var (mp3, words) = await nextTask.ConfigureAwait(continueOnCapturedContext: false);
 					if (ct.IsCancellationRequested)
 					{
 						break;
 					}
-					nextTask = ((i + 1 < chunks.Count) ? SynthesizeChunkAsync(chunks[i + 1], voice, prosodyRate, ct) : Task.FromResult<byte[]>(null));
+					nextTask = (Task<(byte[] mp3, List<TimeSpan> words)>)((i + 1 < chunks.Count) ? ((Task)SynthesizeChunkAsync(chunks[i + 1], voice, prosodyRate, ct)) : ((Task)Task.FromResult<(byte[], List<TimeSpan>)>((null, null))));
 					onChunk?.Invoke(chunks[i]);
-					await PlayMp3Async(mp3, ct).ConfigureAwait(continueOnCapturedContext: false);
+					await PlayMp3Async(mp3, words, onWord, ct).ConfigureAwait(continueOnCapturedContext: false);
 					if (ct.IsCancellationRequested)
 					{
 						break;
@@ -178,7 +180,7 @@ namespace Frtal.LorebookReader
 			_currentOut?.Dispose();
 		}
 
-		private static async Task<byte[]> SynthesizeChunkAsync(string text, string voice, string prosodyRate, CancellationToken outerCt)
+		private static async Task<(byte[] mp3, List<TimeSpan> words)> SynthesizeChunkAsync(string text, string voice, string prosodyRate, CancellationToken outerCt)
 		{
 			using CancellationTokenSource timeout = new CancellationTokenSource(TimeSpan.FromSeconds(15.0));
 			using CancellationTokenSource linked = CancellationTokenSource.CreateLinkedTokenSource(outerCt, timeout.Token);
@@ -197,12 +199,13 @@ namespace Frtal.LorebookReader
 			};
 			await ws.ConnectAsync("speech.platform.bing.com", pathAndQuery, headers, ct).ConfigureAwait(continueOnCapturedContext: false);
 			string ts = DateTime.UtcNow.ToString("ddd MMM dd yyyy HH:mm:ss 'GMT+0000 (Coordinated Universal Time)'");
-			string config = "X-Timestamp:" + ts + "\r\nContent-Type:application/json; charset=utf-8\r\nPath:speech.config\r\n\r\n{\"context\":{\"synthesis\":{\"audio\":{\"metadataoptions\":{\"sentenceBoundaryEnabled\":\"false\",\"wordBoundaryEnabled\":\"false\"},\"outputFormat\":\"audio-24khz-48kbitrate-mono-mp3\"}}}}\r\n";
+			string config = "X-Timestamp:" + ts + "\r\nContent-Type:application/json; charset=utf-8\r\nPath:speech.config\r\n\r\n{\"context\":{\"synthesis\":{\"audio\":{\"metadataoptions\":{\"sentenceBoundaryEnabled\":\"false\",\"wordBoundaryEnabled\":\"true\"},\"outputFormat\":\"audio-24khz-48kbitrate-mono-mp3\"}}}}\r\n";
 			await ws.SendTextAsync(config, ct).ConfigureAwait(continueOnCapturedContext: false);
 			string ssml = "<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xml:lang='en-US'><voice name='" + voice + "'><prosody pitch='+0Hz' rate='" + prosodyRate + "' volume='+0%'>" + XmlEscape(text) + "</prosody></voice></speak>";
 			string ssmlMsg = $"X-RequestId:{Guid.NewGuid():N}\r\n" + "Content-Type:application/ssml+xml\r\nX-Timestamp:" + ts + "Z\r\nPath:ssml\r\n\r\n" + ssml;
 			await ws.SendTextAsync(ssmlMsg, ct).ConfigureAwait(continueOnCapturedContext: false);
 			MemoryStream audio = new MemoryStream();
+			List<TimeSpan> words = new List<TimeSpan>();
 			while (true)
 			{
 				var (type, data) = await ws.ReceiveAsync(ct).ConfigureAwait(continueOnCapturedContext: false);
@@ -211,15 +214,26 @@ namespace Frtal.LorebookReader
 				case WebSocketLite.FrameType.Closed:
 					throw new IOException("Edge TTS closed the connection.");
 				case WebSocketLite.FrameType.Text:
-					if (Encoding.UTF8.GetString(data).Contains("Path:turn.end"))
+				{
+					string msg = Encoding.UTF8.GetString(data);
+					if (!msg.Contains("Path:turn.end"))
 					{
-						if (audio.Length == 0L)
+						if (msg.Contains("Path:audio.metadata"))
 						{
-							throw new IOException("Edge TTS returned no audio.");
+							Match mm = Regex.Match(msg, "\"Offset\"\\s*:\\s*(\\d+)");
+							if (mm.Success && long.TryParse(mm.Groups[1].Value, out var off))
+							{
+								words.Add(TimeSpan.FromTicks(off));
+							}
 						}
-						return audio.ToArray();
+						continue;
 					}
-					continue;
+					if (audio.Length == 0L)
+					{
+						throw new IOException("Edge TTS returned no audio.");
+					}
+					return (audio.ToArray(), words);
+				}
 				}
 				if (data.Length >= 2)
 				{
@@ -233,7 +247,7 @@ namespace Frtal.LorebookReader
 			}
 		}
 
-		private async Task PlayMp3Async(byte[] mp3, CancellationToken ct)
+		private async Task PlayMp3Async(byte[] mp3, List<TimeSpan> words, Action<int> onWord, CancellationToken ct)
 		{
 			if (mp3 == null || mp3.Length == 0)
 			{
@@ -252,6 +266,8 @@ namespace Frtal.LorebookReader
 				};
 				output.Init(reader);
 				output.Play();
+				Stopwatch sw = Stopwatch.StartNew();
+				int wi = 0;
 				using (ct.Register(delegate
 				{
 					try
@@ -264,7 +280,23 @@ namespace Frtal.LorebookReader
 					done.TrySetResult(result: true);
 				}))
 				{
-					await done.Task.ConfigureAwait(continueOnCapturedContext: false);
+					while (!done.Task.IsCompleted)
+					{
+						if (words != null && onWord != null)
+						{
+							for (; wi < words.Count && sw.Elapsed >= words[wi]; wi++)
+							{
+								try
+								{
+									onWord(wi);
+								}
+								catch
+								{
+								}
+							}
+						}
+						await Task.WhenAny(done.Task, Task.Delay(25)).ConfigureAwait(continueOnCapturedContext: false);
+					}
 				}
 				_currentOut = null;
 			}

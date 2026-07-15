@@ -1,10 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.Globalization;
@@ -35,8 +37,8 @@ namespace Frtal.LorebookReader
 				TaskAwaiter<SoftwareBitmap> taskAwaiter4 = default(TaskAwaiter<SoftwareBitmap>);
 				taskAwaiter3 = taskAwaiter4;
 			}
-			SoftwareBitmap result2 = taskAwaiter3.GetResult();
-			using SoftwareBitmap sb = result2;
+			SoftwareBitmap result = taskAwaiter3.GetResult();
+			using SoftwareBitmap sb = result;
 			OcrEngine obj = OcrEngine.TryCreateFromLanguage(new Language(languageTag)) ?? OcrEngine.TryCreateFromUserProfileLanguages();
 			if (obj == null)
 			{
@@ -49,13 +51,67 @@ namespace Frtal.LorebookReader
 				TaskAwaiter<OcrResult> taskAwaiter6 = default(TaskAwaiter<OcrResult>);
 				taskAwaiter5 = taskAwaiter6;
 			}
-			OcrResult result = taskAwaiter5.GetResult();
-			return string.Join("\n", result.Lines.Select((OcrLine l) => l.Text));
+			return AssembleWithParagraphs(taskAwaiter5.GetResult());
 		}
 
 		public static async Task<string> RecognizeLineAsync(Bitmap source, string languageTag, bool invert = false)
 		{
 			return Regex.Replace(((await RecognizeAsync(source, languageTag, invert).ConfigureAwait(continueOnCapturedContext: false)) ?? "").Replace("\r", " ").Replace("\n", " "), "\\s+", " ").Trim();
+		}
+
+		private static string AssembleWithParagraphs(OcrResult result)
+		{
+			IReadOnlyList<OcrLine> lines = result?.Lines;
+			if (lines == null || lines.Count == 0)
+			{
+				return "";
+			}
+			List<double> tops = new List<double>(lines.Count);
+			foreach (OcrLine item in lines)
+			{
+				double top = double.MaxValue;
+				foreach (OcrWord word in item.Words)
+				{
+					if (word.BoundingRect.get_Y() < top)
+					{
+						top = word.BoundingRect.get_Y();
+					}
+				}
+				tops.Add((top == double.MaxValue) ? 0.0 : top);
+			}
+			List<double> deltas = new List<double>(Math.Max(0, tops.Count - 1));
+			for (int j = 1; j < tops.Count; j++)
+			{
+				deltas.Add(tops[j] - tops[j - 1]);
+			}
+			double pitch = Median(deltas);
+			StringBuilder sb = new StringBuilder();
+			for (int i = 0; i < lines.Count; i++)
+			{
+				if (i > 0)
+				{
+					double delta = tops[i] - tops[i - 1];
+					bool paragraphBreak = pitch > 0.0 && delta > pitch * 1.5;
+					sb.Append(paragraphBreak ? "\n\n" : "\n");
+				}
+				sb.Append(lines[i].Text);
+			}
+			return sb.ToString();
+		}
+
+		private static double Median(List<double> xs)
+		{
+			if (xs == null || xs.Count == 0)
+			{
+				return 0.0;
+			}
+			List<double> s = xs.OrderBy((double x) => x).ToList();
+			int i = s.Count;
+			if (i % 2 != 1)
+			{
+				return (s[i / 2 - 1] + s[i / 2]) / 2.0;
+			}
+			return s[i / 2];
 		}
 
 		private static Bitmap Preprocess(Bitmap src, bool invert = false)

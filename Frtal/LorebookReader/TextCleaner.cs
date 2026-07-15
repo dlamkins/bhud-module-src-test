@@ -45,7 +45,40 @@ namespace Frtal.LorebookReader
 			{
 				lines.RemoveAt(lines.Count - 1);
 			}
-			string text = Regex.Replace(string.Join(" ", lines), "\\s+", " ");
+			return TrimTrailingNoise(CleanInline(string.Join(" ", lines)));
+		}
+
+		public static string CleanForEncyclopedia(string raw)
+		{
+			if (string.IsNullOrWhiteSpace(raw))
+			{
+				return "";
+			}
+			string[] array = Regex.Split(raw, "\\n[ \\t]*\\n");
+			List<string> outParas = new List<string>();
+			string[] array2 = array;
+			for (int i = 0; i < array2.Length; i++)
+			{
+				IEnumerable<string> plines = from l in array2[i].Split('\n')
+					select l.Trim() into l
+					where l.Length > 0
+					select l;
+				string joined = CleanInline(string.Join(" ", plines));
+				if (joined.Length > 0)
+				{
+					outParas.Add(joined);
+				}
+			}
+			while (outParas.Count > 0 && !IsGoodLine(outParas[outParas.Count - 1]))
+			{
+				outParas.RemoveAt(outParas.Count - 1);
+			}
+			return string.Join("\n\n", outParas).Trim();
+		}
+
+		private static string CleanInline(string text)
+		{
+			text = Regex.Replace(text, "\\s+", " ");
 			text = Regex.Replace(text, "(?<![\\w])\\|(?=\\s+[a-z])", "I");
 			text = Regex.Replace(text, "(?<![\\w])\\|(?![\\w])", " ");
 			text = Regex.Replace(text, "(?<=[A-Za-z,.!?;:])11(?=\\s|$)", " ");
@@ -54,10 +87,19 @@ namespace Frtal.LorebookReader
 			text = Regex.Replace(text, "(?<!\\w)1(?=\\s+[a-z])", "I");
 			text = Regex.Replace(text, "(?<![A-Za-z])J(?=\\s+[a-z])", "I");
 			text = FixConfusableChars(text);
-			Match i = Regex.Match(text, ".*[.!?][\"')\\]]*", RegexOptions.Singleline);
+			return text.Trim();
+		}
+
+		private static string TrimTrailingNoise(string text)
+		{
+			Match i = Regex.Match(text, "^(.*[.!?][\"')\\]]*)(.*)$", RegexOptions.Singleline);
 			if (i.Success)
 			{
-				text = i.Value;
+				string tail = i.Groups[2].Value.Trim();
+				if (tail.Length > 0 && !Regex.IsMatch(tail, "[A-Za-z]{2,}"))
+				{
+					text = i.Groups[1].Value;
+				}
 			}
 			return text.Trim();
 		}
@@ -255,6 +297,7 @@ namespace Frtal.LorebookReader
 			{
 				return new List<string>();
 			}
+			text = Regex.Replace(text, "\\s+", " ").Trim();
 			string[] array = Regex.Split(text, "(?<=[.!?\\u2026])\\s+");
 			List<string> phrases = new List<string>();
 			string[] array2 = array;

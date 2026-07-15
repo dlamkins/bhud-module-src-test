@@ -1,10 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
@@ -106,6 +108,24 @@ namespace Frtal.LorebookReader
 		private volatile bool _subtitleDirty;
 
 		private string _pendingSubtitle;
+
+		private volatile string _cueSource;
+
+		private volatile bool _cueSourceDirty;
+
+		private List<string> _cues;
+
+		private int _cueIndex;
+
+		private double _cueElapsedMs;
+
+		private int[] _cueWordStart;
+
+		private volatile int _currentWordIndex;
+
+		private volatile bool _haveWordEvents;
+
+		private volatile bool _wordSyncValid = true;
 
 		private int _lastSubWidth = -1;
 
@@ -492,7 +512,7 @@ namespace Frtal.LorebookReader
 						crop.Save(Path.Combine(dir, "crop.png"), ImageFormat.Png);
 						string raw = await OcrService.RecognizeAsync(crop, _ocrLanguage.get_Value(), isConversation);
 						File.WriteAllText(Path.Combine(dir, "ocr_raw.txt"), raw ?? "");
-						File.WriteAllText(Path.Combine(dir, "ocr_clean.txt"), TextCleaner.CleanForTts(raw ?? ""));
+						File.WriteAllText(Path.Combine(dir, "ocr_clean.txt"), TextCleaner.CleanForEncyclopedia(raw ?? ""));
 					}
 					else
 					{
@@ -783,6 +803,10 @@ namespace Frtal.LorebookReader
 
 		private void OnTtsChunk(string chunk)
 		{
+			if (chunk != null)
+			{
+				_wordSyncValid = !_chunkTranslate;
+			}
 			if (chunk != null && _chunkTranslate)
 			{
 				int session = _speakSession;
@@ -800,16 +824,84 @@ namespace Frtal.LorebookReader
 					}
 					if (session == _speakSession)
 					{
-						_pendingSubtitle = TextCleaner.SanitizeForDisplay(shown);
-						_subtitleDirty = true;
+						_cueSource = shown;
+						_cueSourceDirty = true;
 					}
 				});
 			}
 			else
 			{
-				_pendingSubtitle = ((chunk == null) ? null : TextCleaner.SanitizeForDisplay(chunk));
-				_subtitleDirty = true;
+				_cueSource = chunk;
+				_cueSourceDirty = true;
 			}
+		}
+
+		private void OnTtsWord(int wordIndex)
+		{
+			_currentWordIndex = wordIndex;
+			_haveWordEvents = true;
+		}
+
+		private List<string> BuildSubtitleCues(string text, int lineWidthPx, int fontSize)
+		{
+			List<string> cues = new List<string>();
+			if (string.IsNullOrWhiteSpace(text) || _textRenderer == null)
+			{
+				return cues;
+			}
+			text = Regex.Replace(text, "\\s+", " ").Trim();
+			string[] array = Regex.Split(text, "(?<=[.!?])\\s+");
+			foreach (string obj in array)
+			{
+				List<string> lines = new List<string>();
+				string line = "";
+				string[] array2 = obj.Split(' ');
+				foreach (string w in array2)
+				{
+					if (w.Length != 0)
+					{
+						string cand = ((line.Length == 0) ? w : (line + " " + w));
+						if (line.Length == 0 || _textRenderer.MeasureWidth(cand, fontSize) <= (float)lineWidthPx)
+						{
+							line = cand;
+							continue;
+						}
+						lines.Add(line);
+						line = w;
+					}
+				}
+				if (line.Length > 0)
+				{
+					lines.Add(line);
+				}
+				List<string> sentCues = new List<string>();
+				int idx = lines.Count;
+				while (idx > 0)
+				{
+					int start = Math.Max(0, idx - 2);
+					sentCues.Add(string.Join(" ", lines.GetRange(start, idx - start)));
+					idx = start;
+				}
+				sentCues.Reverse();
+				cues.AddRange(sentCues);
+			}
+			return cues;
+		}
+
+		private static int[] BuildCueWordStarts(List<string> cues)
+		{
+			if (cues == null || cues.Count == 0)
+			{
+				return null;
+			}
+			int[] starts = new int[cues.Count];
+			int acc = 0;
+			for (int i = 0; i < cues.Count; i++)
+			{
+				starts[i] = acc;
+				acc += cues[i].Split(' ').Length;
+			}
+			return starts;
 		}
 
 		private async Task<(bool ok, string title, string text)> CaptureBookAsync()
@@ -857,7 +949,7 @@ namespace Frtal.LorebookReader
 				inner = Rectangle.Intersect(inner, new Rectangle(0, 0, screen.Width, screen.Height));
 				using (Bitmap crop = screen.Clone(inner, screen.PixelFormat))
 				{
-					text = TextCleaner.CleanForTts(await OcrService.RecognizeAsync(crop, _ocrLanguage.get_Value(), isConversation));
+					text = TextCleaner.CleanForEncyclopedia(await OcrService.RecognizeAsync(crop, _ocrLanguage.get_Value(), isConversation));
 				}
 				title = (isConversation ? TryReadNpcName(screen, box.Value) : TryReadHeader(screen, box.Value));
 			}
@@ -974,7 +1066,7 @@ namespace Frtal.LorebookReader
 			{
 				try
 				{
-					await _edgeTts.SpeakAsync(text, edgeVoice, _speakingRate.get_Value(), OnTtsChunk);
+					await _edgeTts.SpeakAsync(text, edgeVoice, _speakingRate.get_Value(), OnTtsChunk, OnTtsWord);
 					return;
 				}
 				catch (Exception edgeEx)
@@ -983,7 +1075,7 @@ namespace Frtal.LorebookReader
 					ScreenNotification.ShowNotification("Lorebook Reader: online voice unavailable — using offline voice.", (NotificationType)0, (Texture2D)null, 4);
 				}
 			}
-			string warning = await _tts.SpeakAsync(text, _voiceName.get_Value(), _speakingRate.get_Value(), speechLang, OnTtsChunk);
+			string warning = await _tts.SpeakAsync(text, _voiceName.get_Value(), _speakingRate.get_Value(), speechLang, OnTtsChunk, OnTtsWord);
 			if (warning != null)
 			{
 				ScreenNotification.ShowNotification("Lorebook Reader: " + warning, (NotificationType)0, (Texture2D)null, 4);
@@ -1132,23 +1224,24 @@ namespace Frtal.LorebookReader
 
 		protected override void Update(GameTime gameTime)
 		{
-			//IL_01b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ba: Unknown result type (might be due to invalid IL or missing references)
-			//IL_021b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_023b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0260: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0275: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0282: Unknown result type (might be due to invalid IL or missing references)
-			//IL_029c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0321: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0326: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0328: Unknown result type (might be due to invalid IL or missing references)
-			//IL_033f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0397: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03fb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_045f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0464: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0468: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04f0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0516: Unknown result type (might be due to invalid IL or missing references)
+			//IL_052d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_053b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0555: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05df: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05e1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05f8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0650: Unknown result type (might be due to invalid IL or missing references)
+			//IL_067a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0697: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06b4: Unknown result type (might be due to invalid IL or missing references)
 			_detectTimerMs += gameTime.get_ElapsedGameTime().TotalMilliseconds;
 			if (_detectTimerMs >= 1000.0)
 			{
@@ -1182,6 +1275,49 @@ namespace Frtal.LorebookReader
 				}
 				else
 				{
+					int cueBoxW = Math.Max(100, Math.Min((int)((float)((Control)GameService.Graphics.get_SpriteScreen()).get_Size().X * 0.45f), (_subWidthCap > 0) ? _subWidthCap : int.MaxValue));
+					if (_cueSourceDirty)
+					{
+						_cueSourceDirty = false;
+						_cues = (string.IsNullOrEmpty(_cueSource) ? null : BuildSubtitleCues(_cueSource, (int)((float)cueBoxW * 0.9f), _lastFontSize));
+						_cueWordStart = BuildCueWordStarts(_cues);
+						_cueIndex = 0;
+						_cueElapsedMs = 0.0;
+						_haveWordEvents = false;
+						_currentWordIndex = 0;
+						_pendingSubtitle = ((_cues != null && _cues.Count > 0) ? TextCleaner.SanitizeForDisplay(_cues[0]) : null);
+						_subtitleDirty = true;
+					}
+					else if (_cues != null && _cues.Count > 0)
+					{
+						if (_wordSyncValid && _haveWordEvents && _cueWordStart != null)
+						{
+							int wi = _currentWordIndex;
+							int target;
+							for (target = _cueIndex; target + 1 < _cues.Count && wi >= _cueWordStart[target + 1]; target++)
+							{
+							}
+							if (target > _cueIndex)
+							{
+								_cueIndex = target;
+								_pendingSubtitle = TextCleaner.SanitizeForDisplay(_cues[_cueIndex]);
+								_subtitleDirty = true;
+							}
+						}
+						else if (_cueIndex < _cues.Count)
+						{
+							_cueElapsedMs += gameTime.get_ElapsedGameTime().TotalMilliseconds;
+							double cps = 17.0 * Math.Max(0.5, _speakingRate.get_Value());
+							double dur = Math.Max(700.0, Math.Min(7000.0, (double)_cues[_cueIndex].Length / cps * 1000.0));
+							if (_cueElapsedMs >= dur && _cueIndex + 1 < _cues.Count)
+							{
+								_cueIndex++;
+								_cueElapsedMs = 0.0;
+								_pendingSubtitle = TextCleaner.SanitizeForDisplay(_cues[_cueIndex]);
+								_subtitleDirty = true;
+							}
+						}
+					}
 					if (_subtitleDirty)
 					{
 						_subtitleDirty = false;
