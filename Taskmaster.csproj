@@ -1,0 +1,52 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>Taskmaster</AssemblyName>
+    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+    <TargetFramework>net48</TargetFramework>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup>
+    <LangVersion>Preview</LangVersion>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace />
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="Taskmaster\ref.cancel-icon.png" />
+    <None Remove="Taskmaster\ref.check-icon.png" />
+    <None Remove="Taskmaster\ref.chevron-down-icon.png" />
+    <None Remove="Taskmaster\ref.chevron-up-icon.png" />
+    <None Remove="Taskmaster\ref.clipboard-icon.png" />
+    <None Remove="Taskmaster\ref.corner-icon.png" />
+    <None Remove="Taskmaster\ref.eye-icon.png" />
+    <None Remove="Taskmaster\ref.lock-icon.png" />
+    <None Remove="Taskmaster\ref.note-icon.png" />
+    <None Remove="Taskmaster\ref.pencil-icon.png" />
+    <None Remove="Taskmaster\ref.plus-icon.png" />
+    <None Remove="Taskmaster\ref.taskmaster-emblem.png" />
+    <None Remove="Taskmaster\ref.trash-icon.png" />
+    <EmbeddedResource Include="Taskmaster\ref.cancel-icon.png" />
+    <EmbeddedResource Include="Taskmaster\ref.check-icon.png" />
+    <EmbeddedResource Include="Taskmaster\ref.chevron-down-icon.png" />
+    <EmbeddedResource Include="Taskmaster\ref.chevron-up-icon.png" />
+    <EmbeddedResource Include="Taskmaster\ref.clipboard-icon.png" />
+    <EmbeddedResource Include="Taskmaster\ref.corner-icon.png" />
+    <EmbeddedResource Include="Taskmaster\ref.eye-icon.png" />
+    <EmbeddedResource Include="Taskmaster\ref.lock-icon.png" />
+    <EmbeddedResource Include="Taskmaster\ref.note-icon.png" />
+    <EmbeddedResource Include="Taskmaster\ref.pencil-icon.png" />
+    <EmbeddedResource Include="Taskmaster\ref.plus-icon.png" />
+    <EmbeddedResource Include="Taskmaster\ref.taskmaster-emblem.png" />
+    <EmbeddedResource Include="Taskmaster\ref.trash-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Blish HUD" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="MonoGame.Framework" />
+    <Reference Include="MonoGame.Extended" />
+    <Reference Include="System.Core" />
+    <Reference Include="Newtonsoft.Json" />
+    <Reference Include="AsyncClipboardService" />
+  </ItemGroup>
+</Project>
