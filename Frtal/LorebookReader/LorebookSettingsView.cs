@@ -233,19 +233,6 @@ namespace Frtal.LorebookReader
 			//IL_0cd1: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0cdc: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0ce3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0cf1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0cf6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0d1f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0d26: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0d2d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0d39: Expected O, but got Unknown
-			//IL_0d3a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0d3f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0d4a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0d55: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0d6c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0d77: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0d83: Expected O, but got Unknown
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Parent(buildPanel);
 			((Container)val).set_WidthSizingMode((SizingMode)2);
@@ -419,9 +406,9 @@ namespace Frtal.LorebookReader
 			TrackBar rateBar = val23;
 			rateBar.add_ValueChanged((EventHandler<ValueEventArgs<float>>)delegate
 			{
-				float num5 = (float)Math.Round(rateBar.get_Value()) / 100f;
-				_module.SpeakingRateSetting.set_Value(num5);
-				rateLabel.set_Text(RateText(num5));
+				float num4 = (float)Math.Round(rateBar.get_Value()) / 100f;
+				_module.SpeakingRateSetting.set_Value(num4);
+				rateLabel.set_Text(RateText(num4));
 			});
 			Label val24 = new Label();
 			val24.set_Text("OCR language (your GW2 client language)");
@@ -466,9 +453,9 @@ namespace Frtal.LorebookReader
 			TrackBar opacityBar = val28;
 			opacityBar.add_ValueChanged((EventHandler<ValueEventArgs<float>>)delegate
 			{
-				float num4 = (float)Math.Round(opacityBar.get_Value()) / 100f;
-				_module.SubtitleOpacitySetting.set_Value(num4);
-				opacityLabel.set_Text(OpacityText(num4));
+				float num3 = (float)Math.Round(opacityBar.get_Value()) / 100f;
+				_module.SubtitleOpacitySetting.set_Value(num3);
+				opacityLabel.set_Text(OpacityText(num3));
 			});
 			Label val29 = new Label();
 			val29.set_Text(PosText("X", _module.SubtitleXSetting.get_Value()));
@@ -485,9 +472,9 @@ namespace Frtal.LorebookReader
 			TrackBar posXBar = val30;
 			posXBar.add_ValueChanged((EventHandler<ValueEventArgs<float>>)delegate
 			{
-				float num3 = (float)Math.Round(posXBar.get_Value());
-				_module.SubtitleXSetting.set_Value(num3);
-				posXLabel.set_Text(PosText("X", num3));
+				float num2 = (float)Math.Round(posXBar.get_Value());
+				_module.SubtitleXSetting.set_Value(num2);
+				posXLabel.set_Text(PosText("X", num2));
 			});
 			Label val31 = new Label();
 			val31.set_Text(PosText("Y", _module.SubtitleYSetting.get_Value()));
@@ -504,9 +491,9 @@ namespace Frtal.LorebookReader
 			TrackBar posYBar = val32;
 			posYBar.add_ValueChanged((EventHandler<ValueEventArgs<float>>)delegate
 			{
-				float num2 = (float)Math.Round(posYBar.get_Value());
-				_module.SubtitleYSetting.set_Value(num2);
-				posYLabel.set_Text(PosText("Y", num2));
+				float num = (float)Math.Round(posYBar.get_Value());
+				_module.SubtitleYSetting.set_Value(num);
+				posYLabel.set_Text(PosText("Y", num));
 			});
 			Label val33 = new Label();
 			val33.set_Text("Subtitle size");
@@ -618,26 +605,6 @@ namespace Frtal.LorebookReader
 			val42.set_AutoSizeWidth(true);
 			val42.set_AutoSizeHeight(true);
 			((Control)val42).set_Parent((Container)(object)panel);
-			Label val43 = new Label();
-			val43.set_Text("Catalog size: " + _module.HistoryCapacitySetting.get_Value());
-			val43.set_AutoSizeWidth(true);
-			val43.set_AutoSizeHeight(true);
-			((Control)val43).set_Parent((Container)(object)panel);
-			Label capLabel = val43;
-			TrackBar val44 = new TrackBar();
-			val44.set_MinValue(5f);
-			val44.set_MaxValue(100f);
-			val44.set_Value((float)_module.HistoryCapacitySetting.get_Value());
-			((Control)val44).set_Width(360);
-			((Control)val44).set_Parent((Container)(object)panel);
-			TrackBar capBar = val44;
-			capBar.add_ValueChanged((EventHandler<ValueEventArgs<float>>)delegate
-			{
-				int num = (int)Math.Round(capBar.get_Value());
-				_module.HistoryCapacitySetting.set_Value(num);
-				capLabel.set_Text("Catalog size: " + num);
-				_module.Catalog?.SetCapacity(num);
-			});
 			UpdateEngineVisibility();
 		}
 

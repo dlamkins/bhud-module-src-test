@@ -30,6 +30,9 @@ namespace Frtal.LorebookReader
 
 		public string TranslatedLang { get; set; }
 
+		public bool Opened { get; set; } = true;
+
+
 		public string DisplayTitle
 		{
 			get

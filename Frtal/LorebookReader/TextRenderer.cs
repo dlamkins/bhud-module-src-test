@@ -22,7 +22,11 @@ namespace Frtal.LorebookReader
 
 		private static readonly string[] FontCandidates = new string[4] { "Cantarell", "Segoe UI", "Tahoma", "Arial" };
 
-		private static readonly string ResolvedFamily = ResolveFontFamily();
+		private static readonly string ResolvedFamily = ResolveFontFamily(FontCandidates, "Arial");
+
+		private static readonly string[] SerifCandidates = new string[4] { "Palatino Linotype", "Book Antiqua", "Georgia", "Times New Roman" };
+
+		private static readonly string ResolvedSerifFamily = ResolveFontFamily(SerifCandidates, "Georgia");
 
 		private readonly object _measureLock = new object();
 
@@ -37,19 +41,19 @@ namespace Frtal.LorebookReader
 			_graphicsDevice = graphicsDevice;
 		}
 
-		public Texture2D RenderLine(string text, float fontSize, Color color, bool bold = false)
+		public Texture2D RenderLine(string text, float fontSize, Color color, bool bold = false, bool serif = false)
 		{
-			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
 			if (string.IsNullOrEmpty(text))
 			{
 				return null;
 			}
-			string key = $"{fontSize}|{(bold ? 1 : 0)}|{((Color)(ref color)).get_PackedValue()}|{text}";
+			string key = string.Format("{0}|{1}{2}|{3}|{4}", fontSize, bold ? 1 : 0, serif ? "s" : "", ((Color)(ref color)).get_PackedValue(), text);
 			if (_cache.TryGetValue(key, out var cached))
 			{
 				return cached;
 			}
-			Texture2D tex = Render(text, fontSize, color, bold);
+			Texture2D tex = Render(text, fontSize, color, bold, serif);
 			_cache[key] = tex;
 			_cacheOrder.Enqueue(key);
 			if (_cacheOrder.Count > 60)
@@ -64,7 +68,7 @@ namespace Frtal.LorebookReader
 			return tex;
 		}
 
-		public float MeasureWidth(string text, float fontSize, bool bold = false)
+		public float MeasureWidth(string text, float fontSize, bool bold = false, bool serif = false)
 		{
 			if (string.IsNullOrEmpty(text))
 			{
@@ -73,7 +77,7 @@ namespace Frtal.LorebookReader
 			lock (_measureLock)
 			{
 				EnsureMeasureContext();
-				using Font font = MakeFont(fontSize, bold);
+				using Font font = MakeFont(fontSize, bold, serif);
 				return _measureGraphics.MeasureString(text, font, int.MaxValue, StringFormat.GenericTypographic).Width;
 			}
 		}
@@ -88,7 +92,7 @@ namespace Frtal.LorebookReader
 			}
 		}
 
-		public List<string> WrapText(string text, float fontSize, int maxWidth, bool bold = false)
+		public List<string> WrapText(string text, float fontSize, int maxWidth, bool bold = false, bool serif = false)
 		{
 			List<string> lines = new List<string>();
 			if (string.IsNullOrEmpty(text))
@@ -109,7 +113,7 @@ namespace Frtal.LorebookReader
 				foreach (string word in array3)
 				{
 					string candidate = ((current.Length == 0) ? word : (current + " " + word));
-					if (MeasureWidth(candidate, fontSize, bold) <= (float)maxWidth || current.Length == 0)
+					if (MeasureWidth(candidate, fontSize, bold, serif) <= (float)maxWidth || current.Length == 0)
 					{
 						current = candidate;
 						continue;
@@ -125,14 +129,14 @@ namespace Frtal.LorebookReader
 			return lines;
 		}
 
-		public float LineHeight(float fontSize, bool bold = false)
+		public float LineHeight(float fontSize, bool bold = false, bool serif = false)
 		{
-			long key = ((long)(fontSize * 10f) << 1) | (bold ? 1 : 0);
+			long key = ((long)(fontSize * 10f) << 2) | (bold ? 1 : 0) | (serif ? 2 : 0);
 			if (_lineHeightCache.TryGetValue(key, out var h))
 			{
 				return h;
 			}
-			using (Font font = MakeFont(fontSize, bold))
+			using (Font font = MakeFont(fontSize, bold, serif))
 			{
 				h = font.GetHeight();
 			}
@@ -140,9 +144,9 @@ namespace Frtal.LorebookReader
 			return h;
 		}
 
-		private Texture2D Render(string text, float fontSize, Color color, bool bold)
+		private Texture2D Render(string text, float fontSize, Color color, bool bold, bool serif = false)
 		{
-			using Font font = MakeFont(fontSize, bold);
+			using Font font = MakeFont(fontSize, bold, serif);
 			int w;
 			int h;
 			using (Bitmap measureBmp = new Bitmap(1, 1))
@@ -195,12 +199,12 @@ namespace Frtal.LorebookReader
 			}
 		}
 
-		private static Font MakeFont(float size, bool bold)
+		private static Font MakeFont(float size, bool bold, bool serif = false)
 		{
-			return new Font(ResolvedFamily, size, bold ? FontStyle.Bold : FontStyle.Regular, GraphicsUnit.Pixel);
+			return new Font(serif ? ResolvedSerifFamily : ResolvedFamily, size, bold ? FontStyle.Bold : FontStyle.Regular, GraphicsUnit.Pixel);
 		}
 
-		private static string ResolveFontFamily()
+		private static string ResolveFontFamily(string[] candidates, string fallback)
 		{
 			try
 			{
@@ -211,19 +215,19 @@ namespace Frtal.LorebookReader
 				{
 					names.Add(fam.Name);
 				}
-				string[] fontCandidates = FontCandidates;
-				foreach (string candidate in fontCandidates)
+				foreach (string candidate in candidates)
 				{
 					if (names.Contains(candidate))
 					{
 						return candidate;
 					}
 				}
+				return fallback;
 			}
 			catch
 			{
+				return fallback;
 			}
-			return "Arial";
 		}
 
 		public void Dispose()

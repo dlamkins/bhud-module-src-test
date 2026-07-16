@@ -9,6 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Windows.Foundation;
 using Windows.Globalization;
 using Windows.Graphics.Imaging;
 using Windows.Media.Ocr;
@@ -66,37 +67,60 @@ namespace Frtal.LorebookReader
 			{
 				return "";
 			}
-			List<double> tops = new List<double>(lines.Count);
+			int m = lines.Count;
+			List<double> tops = new List<double>(m);
+			List<double> widths = new List<double>(m);
 			foreach (OcrLine item in lines)
 			{
 				double top = double.MaxValue;
+				double l = double.MaxValue;
+				double r = 0.0;
 				foreach (OcrWord word in item.Words)
 				{
-					if (word.BoundingRect.get_Y() < top)
+					Windows.Foundation.Rect b = word.BoundingRect;
+					if (b.get_Y() < top)
 					{
-						top = word.BoundingRect.get_Y();
+						top = b.get_Y();
+					}
+					if (b.get_X() < l)
+					{
+						l = b.get_X();
+					}
+					if (b.get_X() + b.get_Width() > r)
+					{
+						r = b.get_X() + b.get_Width();
 					}
 				}
 				tops.Add((top == double.MaxValue) ? 0.0 : top);
+				widths.Add((r > l) ? (r - l) : 0.0);
 			}
-			List<double> deltas = new List<double>(Math.Max(0, tops.Count - 1));
-			for (int j = 1; j < tops.Count; j++)
+			List<double> deltas = new List<double>(Math.Max(0, m - 1));
+			for (int k = 1; k < m; k++)
 			{
-				deltas.Add(tops[j] - tops[j - 1]);
+				deltas.Add(tops[k] - tops[k - 1]);
 			}
 			double pitch = Median(deltas);
+			double medWidth = Median(widths);
 			StringBuilder sb = new StringBuilder();
-			for (int i = 0; i < lines.Count; i++)
+			for (int j = 0; j < m; j++)
 			{
-				if (i > 0)
+				if (j > 0)
 				{
-					double delta = tops[i] - tops[i - 1];
-					bool paragraphBreak = pitch > 0.0 && delta > pitch * 1.5;
-					sb.Append(paragraphBreak ? "\n\n" : "\n");
+					double delta = tops[j] - tops[j - 1];
+					bool brk = (pitch > 0.0 && delta > pitch * 1.5) || IsHeading(j - 1) || IsHeading(j);
+					sb.Append(brk ? "\n\n" : "\n");
 				}
-				sb.Append(lines[i].Text);
+				sb.Append(lines[j].Text);
 			}
 			return sb.ToString();
+			bool IsHeading(int i)
+			{
+				if (pitch > 0.0 && medWidth > 0.0 && m >= 3 && widths[i] < medWidth * 0.62 && i + 1 < m)
+				{
+					return tops[i + 1] - tops[i] <= pitch * 1.5;
+				}
+				return false;
+			}
 		}
 
 		private static double Median(List<double> xs)

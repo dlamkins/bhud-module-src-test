@@ -12,8 +12,6 @@ namespace Frtal.LorebookReader
 
 		private readonly string _filePath;
 
-		private int _capacity;
-
 		private readonly object _lock = new object();
 
 		private bool _saveBlocked;
@@ -33,22 +31,10 @@ namespace Frtal.LorebookReader
 
 		public event Action Changed;
 
-		public LorebookCatalog(string directory, int capacity)
+		public LorebookCatalog(string directory)
 		{
-			_capacity = Math.Max(1, capacity);
 			_filePath = Path.Combine(directory, "catalog.json");
 			Load();
-		}
-
-		public void SetCapacity(int capacity)
-		{
-			lock (_lock)
-			{
-				_capacity = Math.Max(1, capacity);
-				TrimToCapacity();
-				Save();
-			}
-			this.Changed?.Invoke();
 		}
 
 		public LorebookEntry AddCaptured(string title, string text)
@@ -74,10 +60,10 @@ namespace Frtal.LorebookReader
 						Title = (string.IsNullOrWhiteSpace(title) ? MakeFallbackTitle(text) : title),
 						Text = text,
 						TimestampUtc = DateTime.UtcNow.ToString("o"),
-						ColorTag = "None"
+						ColorTag = "None",
+						Opened = false
 					};
 					_entries.Insert(0, entry);
-					TrimToCapacity();
 					Save();
 				}
 			}
@@ -119,6 +105,7 @@ namespace Frtal.LorebookReader
 				}
 				latest.Text = (string.IsNullOrEmpty(latest.Text) ? text : (latest.Text.TrimEnd() + "\n\n" + text.TrimStart()));
 				latest.TimestampUtc = DateTime.UtcNow.ToString("o");
+				latest.Opened = false;
 				latest.TranslatedText = null;
 				latest.TranslatedLang = null;
 				Save();
@@ -267,28 +254,6 @@ namespace Frtal.LorebookReader
 				return haystack.IndexOf(needle, StringComparison.OrdinalIgnoreCase) >= 0;
 			}
 			return false;
-		}
-
-		private static bool HasUserMetadata(LorebookEntry e)
-		{
-			if ((string.IsNullOrWhiteSpace(e.ColorTag) || string.Equals(e.ColorTag, "None", StringComparison.OrdinalIgnoreCase)) && string.IsNullOrWhiteSpace(e.Notes) && string.IsNullOrWhiteSpace(e.Theme) && string.IsNullOrWhiteSpace(e.Expansion) && string.IsNullOrWhiteSpace(e.Location))
-			{
-				return !string.IsNullOrWhiteSpace(e.IconKey);
-			}
-			return true;
-		}
-
-		private void TrimToCapacity()
-		{
-			int i = _entries.Count - 1;
-			while (i >= 0 && _entries.Count > _capacity)
-			{
-				if (!HasUserMetadata(_entries[i]))
-				{
-					_entries.RemoveAt(i);
-				}
-				i--;
-			}
 		}
 
 		private static bool TryLoadFile(string path, out List<LorebookEntry> entries)
