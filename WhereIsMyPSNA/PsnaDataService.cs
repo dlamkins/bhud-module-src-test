@@ -1,16 +1,15 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Net.Http;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
+using Blish_HUD.Content;
 using Blish_HUD.Modules.Managers;
 using Gw2Sharp.WebApi.V2;
 using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
-using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json;
 
 namespace WhereIsMyPSNA
@@ -23,16 +22,16 @@ namespace WhereIsMyPSNA
 
 			public int ItemId;
 
-			public Texture2D IconTexture;
+			public AsyncTexture2D IconTexture;
 
-			public Texture2D CraftedIconTexture;
+			public AsyncTexture2D CraftedIconTexture;
 		}
 
 		public class FetchResult
 		{
 			public SlotData[] Slots;
 
-			public Texture2D KarmaTexture;
+			public AsyncTexture2D KarmaTexture;
 		}
 
 		private class Gw2Currency
@@ -49,17 +48,19 @@ namespace WhereIsMyPSNA
 
 		private const string Gw2KarmaCurrency = "https://api.guildwars2.com/v2/currencies/2";
 
-		private const string CoinGoldUrl = "https://assets.gw2dat.com/156904.png";
+		private const int CoinGoldAssetId = 156904;
 
-		private const string CoinSilverUrl = "https://assets.gw2dat.com/156907.png";
+		private const int CoinSilverAssetId = 156907;
 
-		private const string CoinCopperUrl = "https://assets.gw2dat.com/156902.png";
+		private const int CoinCopperAssetId = 156902;
 
 		private static readonly int[] ScheduleToSheetCol = new int[6] { 0, 1, 3, 2, 4, 5 };
 
 		private readonly Gw2ApiManager _apiManager;
 
 		private readonly CommunitySubmissionService _submissionService;
+
+		private static readonly Regex AssetIdRegex = new Regex("/(\\d+)\\.png$", RegexOptions.Compiled);
 
 		public FetchResult LastResult { get; private set; }
 
@@ -69,11 +70,11 @@ namespace WhereIsMyPSNA
 
 		public bool CoinTexturesLoaded { get; private set; }
 
-		public Texture2D CoinGoldTexture { get; private set; }
+		public AsyncTexture2D CoinGoldTexture { get; private set; }
 
-		public Texture2D CoinSilverTexture { get; private set; }
+		public AsyncTexture2D CoinSilverTexture { get; private set; }
 
-		public Texture2D CoinCopperTexture { get; private set; }
+		public AsyncTexture2D CoinCopperTexture { get; private set; }
 
 		public bool LastFetchFailed { get; private set; }
 
@@ -104,31 +105,28 @@ namespace WhereIsMyPSNA
 				Task accountRecipesTask = FetchAccountRecipesAsync();
 				if (!CoinTexturesLoaded)
 				{
-					Texture2D[] coins = await Task.WhenAll<Texture2D>(FetchTextureAsync("https://assets.gw2dat.com/156904.png"), FetchTextureAsync("https://assets.gw2dat.com/156907.png"), FetchTextureAsync("https://assets.gw2dat.com/156902.png"));
-					CoinGoldTexture = coins[0];
-					CoinSilverTexture = coins[1];
-					CoinCopperTexture = coins[2];
+					CoinGoldTexture = GetTexture(156904);
+					CoinSilverTexture = GetTexture(156907);
+					CoinCopperTexture = GetTexture(156902);
 					CoinTexturesLoaded = true;
 				}
 				this.StatusChanged?.Invoke(Strings.Get("Status_FetchingSchedule"));
-				Task<Texture2D> karmaTask = FetchKarmaIconAsync();
+				Task<AsyncTexture2D> karmaTask = FetchKarmaIconAsync();
 				Task<(int[] itemIds, bool[] todayFlags)> sheetTask = FetchSheetAsync();
 				Task<Dictionary<string, int>> fallbackTask = _submissionService.FetchCurrentSubmissionsAsync();
 				await Task.WhenAll(karmaTask, sheetTask, fallbackTask);
-				Texture2D karmaTexture = karmaTask.Result;
+				AsyncTexture2D karmaTexture = karmaTask.Result;
 				(int[] itemIds, bool[] todayFlags) result = sheetTask.Result;
 				int[] itemIds = result.itemIds;
 				bool[] todayFlags = result.todayFlags;
 				Dictionary<string, int> fallbackSubmissions = fallbackTask.Result;
 				this.StatusChanged?.Invoke(Strings.Get("Status_LoadingRecipeData"));
 				SlotData[] slotResults = new SlotData[6];
-				Task<Texture2D>[] iconTasks = new Task<Texture2D>[6];
-				Task<Texture2D>[] craftedIconTasks = new Task<Texture2D>[6];
 				PsnaSchedule.AgentLocation[] locations = PsnaSchedule.GetTodaysLocations();
-				for (int j = 0; j < 6; j++)
+				for (int i = 0; i < 6; i++)
 				{
-					int sheetCol = ScheduleToSheetCol[j];
-					slotResults[j] = new SlotData();
+					int sheetCol = ScheduleToSheetCol[i];
+					slotResults[i] = new SlotData();
 					int resolvedItemId = 0;
 					string shortNpc;
 					int fallbackId;
@@ -136,32 +134,18 @@ namespace WhereIsMyPSNA
 					{
 						resolvedItemId = itemIds[sheetCol];
 					}
-					else if (_submissionService.TryGetShortName(locations[j].Npc, out shortNpc) && fallbackSubmissions.TryGetValue(shortNpc, out fallbackId))
+					else if (_submissionService.TryGetShortName(locations[i].Npc, out shortNpc) && fallbackSubmissions.TryGetValue(shortNpc, out fallbackId))
 					{
 						resolvedItemId = fallbackId;
 					}
 					if (resolvedItemId <= 0 || !RecipeDefs.ByRecipeSheetId.TryGetValue(resolvedItemId, out var def))
 					{
-						slotResults[j].IsNotDetermined = true;
-						iconTasks[j] = Task.FromResult<Texture2D>(null);
-						craftedIconTasks[j] = Task.FromResult<Texture2D>(null);
+						slotResults[i].IsNotDetermined = true;
+						continue;
 					}
-					else
-					{
-						slotResults[j].ItemId = resolvedItemId;
-						iconTasks[j] = FetchTextureAsync(def.SheetIconUrl);
-						craftedIconTasks[j] = FetchTextureAsync(def.IconUrl);
-					}
-				}
-				this.StatusChanged?.Invoke(Strings.Get("Status_LoadingIcons"));
-				await Task.WhenAll(iconTasks.Concat(craftedIconTasks).ToArray());
-				for (int i = 0; i < 6; i++)
-				{
-					if (!slotResults[i].IsNotDetermined)
-					{
-						slotResults[i].IconTexture = iconTasks[i].Result;
-						slotResults[i].CraftedIconTexture = craftedIconTasks[i].Result;
-					}
+					slotResults[i].ItemId = resolvedItemId;
+					slotResults[i].IconTexture = GetTexture(def.SheetIconId);
+					slotResults[i].CraftedIconTexture = GetTexture(def.IconId);
 				}
 				this.StatusChanged?.Invoke(Strings.Get("Status_CheckingKnownRecipes"));
 				await accountRecipesTask;
@@ -221,16 +205,17 @@ namespace WhereIsMyPSNA
 			return (itemIds, todayFlags);
 		}
 
-		private async Task<Texture2D> FetchKarmaIconAsync()
+		private async Task<AsyncTexture2D> FetchKarmaIconAsync()
 		{
-			_ = 1;
 			try
 			{
 				Gw2Currency currency = JsonConvert.DeserializeObject<Gw2Currency>(await Http.GetStringAsync("https://api.guildwars2.com/v2/currencies/2"));
-				if (!string.IsNullOrEmpty(currency?.Icon))
+				Match match = (string.IsNullOrEmpty(currency?.Icon) ? null : AssetIdRegex.Match(currency.Icon));
+				if (match != null && match.Success && int.TryParse(match.Groups[1].Value, out var assetId))
 				{
-					return await FetchTextureAsync(currency.Icon);
+					return GetTexture(assetId);
 				}
+				Logger.Warn("Could not extract asset id from karma icon URL: '" + currency?.Icon + "'");
 			}
 			catch (Exception ex)
 			{
@@ -239,32 +224,14 @@ namespace WhereIsMyPSNA
 			return null;
 		}
 
-		private async Task<Texture2D> FetchTextureAsync(string url)
+		private static AsyncTexture2D GetTexture(int assetId)
 		{
-			_ = 1;
-			try
+			AsyncTexture2D texture = default(AsyncTexture2D);
+			if (!AsyncTexture2D.TryFromAssetId(assetId, ref texture))
 			{
-				byte[] bytes = await Http.GetByteArrayAsync(url);
-				TaskCompletionSource<Texture2D> tcs = new TaskCompletionSource<Texture2D>();
-				GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate(GraphicsDevice gd)
-				{
-					try
-					{
-						using MemoryStream memoryStream = new MemoryStream(bytes);
-						tcs.SetResult(Texture2D.FromStream(gd, (Stream)memoryStream));
-					}
-					catch (Exception exception)
-					{
-						tcs.SetException(exception);
-					}
-				});
-				return await tcs.Task;
-			}
-			catch (Exception ex)
-			{
-				Logger.Warn(ex, "Failed to fetch texture: " + url);
 				return null;
 			}
+			return texture;
 		}
 	}
 }

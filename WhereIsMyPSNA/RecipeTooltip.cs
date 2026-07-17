@@ -3,7 +3,6 @@ using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.BitmapFonts;
 
 namespace WhereIsMyPSNA
@@ -174,17 +173,22 @@ namespace WhereIsMyPSNA
 			_copperLabel = val11;
 		}
 
-		public void SetCoinTextures(Texture2D gold, Texture2D silver, Texture2D copper)
+		protected override CaptureType CapturesInput()
 		{
-			_goldIcon.set_Texture(AsyncTexture2D.op_Implicit(gold));
-			_silverIcon.set_Texture(AsyncTexture2D.op_Implicit(silver));
-			_copperIcon.set_Texture(AsyncTexture2D.op_Implicit(copper));
+			return (CaptureType)1;
 		}
 
-		public void SetRecipe(RecipeDef def, Texture2D icon = null)
+		public void SetCoinTextures(AsyncTexture2D gold, AsyncTexture2D silver, AsyncTexture2D copper)
 		{
-			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-			_itemIcon.set_Texture(AsyncTexture2D.op_Implicit(icon));
+			_goldIcon.set_Texture(gold);
+			_silverIcon.set_Texture(silver);
+			_copperIcon.set_Texture(copper);
+		}
+
+		public void SetRecipe(RecipeDef def, AsyncTexture2D icon = null)
+		{
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			_itemIcon.set_Texture(icon);
 			_nameLabel.set_Text(def.Name);
 			_nameLabel.set_TextColor(GetRarityColor(def.Rarity));
 			_descLabel.set_Text(def.Description);

@@ -51,15 +51,6 @@ namespace WhereIsMyPSNA
 
 		public string Description => Localize(DescriptionEn, DescriptionDe, DescriptionEs, DescriptionFr);
 
-		public string IconUrl => AssetUrl(IconId);
-
-		public string SheetIconUrl => AssetUrl(SheetIconId);
-
-		private static string AssetUrl(int assetId)
-		{
-			return $"https://assets.gw2dat.com/{assetId}.png";
-		}
-
 		private static string Localize(string en, string de, string es, string fr)
 		{
 			//IL_000a: Unknown result type (might be due to invalid IL or missing references)

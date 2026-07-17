@@ -61,7 +61,7 @@ namespace WhereIsMyPSNA
 
 		private readonly int[] _slotItemIds = new int[6];
 
-		private readonly Texture2D[] _slotCraftedIconTextures = (Texture2D[])(object)new Texture2D[6];
+		private readonly AsyncTexture2D[] _slotCraftedIconTextures = (AsyncTexture2D[])(object)new AsyncTexture2D[6];
 
 		private bool _isBuilt;
 
@@ -572,9 +572,9 @@ namespace WhereIsMyPSNA
 					_slotCraftedIconTextures[i] = slot.CraftedIconTexture;
 					_recipeLabels[i].set_Text(RecipeDefs.ByRecipeSheetId.TryGetValue(slot.ItemId, out var def) ? def.SheetName : "");
 					((Control)_recipeLabels[i]).set_Visible(true);
-					_recipeIcons[i].set_Texture(AsyncTexture2D.op_Implicit(slot.IconTexture));
+					_recipeIcons[i].set_Texture(slot.IconTexture);
 					((Control)_recipeIcons[i]).set_Visible(slot.IconTexture != null);
-					_karmaIcons[i].set_Texture(AsyncTexture2D.op_Implicit(result.KarmaTexture));
+					_karmaIcons[i].set_Texture(result.KarmaTexture);
 					((Control)_karmaIcons[i]).set_Visible(result.KarmaTexture != null);
 					((Control)_karmaLabels[i]).set_Visible(true);
 					((Control)_knownLabels[i]).set_Visible(false);
