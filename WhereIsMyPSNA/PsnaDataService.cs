@@ -49,17 +49,15 @@ namespace WhereIsMyPSNA
 
 		private const string Gw2KarmaCurrency = "https://api.guildwars2.com/v2/currencies/2";
 
-		private const string CoinGoldUrl = "https://render.guildwars2.com/file/090A980A96D39FD36FBB004903644C6DBEFB1FFB/156904.png";
+		private const string CoinGoldUrl = "https://assets.gw2dat.com/156904.png";
 
-		private const string CoinSilverUrl = "https://render.guildwars2.com/file/E5A2197D78ECE4AE0349C8B3710D033D22DB0DA6/156907.png";
+		private const string CoinSilverUrl = "https://assets.gw2dat.com/156907.png";
 
-		private const string CoinCopperUrl = "https://render.guildwars2.com/file/6CF8F96A3299CFC75D5CC90617C3C70331A1EF0E/156902.png";
+		private const string CoinCopperUrl = "https://assets.gw2dat.com/156902.png";
 
 		private static readonly int[] ScheduleToSheetCol = new int[6] { 0, 1, 3, 2, 4, 5 };
 
 		private readonly Gw2ApiManager _apiManager;
-
-		private readonly ContentsManager _contentsManager;
 
 		private readonly CommunitySubmissionService _submissionService;
 
@@ -83,10 +81,9 @@ namespace WhereIsMyPSNA
 
 		public event Action<string> StatusChanged;
 
-		public PsnaDataService(Gw2ApiManager apiManager, ContentsManager contentsManager, CommunitySubmissionService submissionService)
+		public PsnaDataService(Gw2ApiManager apiManager, CommunitySubmissionService submissionService)
 		{
 			_apiManager = apiManager;
-			_contentsManager = contentsManager;
 			_submissionService = submissionService;
 		}
 
@@ -107,7 +104,7 @@ namespace WhereIsMyPSNA
 				Task accountRecipesTask = FetchAccountRecipesAsync();
 				if (!CoinTexturesLoaded)
 				{
-					Texture2D[] coins = await Task.WhenAll<Texture2D>(FetchTextureAsync("https://render.guildwars2.com/file/090A980A96D39FD36FBB004903644C6DBEFB1FFB/156904.png"), FetchTextureAsync("https://render.guildwars2.com/file/E5A2197D78ECE4AE0349C8B3710D033D22DB0DA6/156907.png"), FetchTextureAsync("https://render.guildwars2.com/file/6CF8F96A3299CFC75D5CC90617C3C70331A1EF0E/156902.png"));
+					Texture2D[] coins = await Task.WhenAll<Texture2D>(FetchTextureAsync("https://assets.gw2dat.com/156904.png"), FetchTextureAsync("https://assets.gw2dat.com/156907.png"), FetchTextureAsync("https://assets.gw2dat.com/156902.png"));
 					CoinGoldTexture = coins[0];
 					CoinSilverTexture = coins[1];
 					CoinCopperTexture = coins[2];
@@ -152,8 +149,8 @@ namespace WhereIsMyPSNA
 					else
 					{
 						slotResults[j].ItemId = resolvedItemId;
-						iconTasks[j] = LoadBundledTextureAsync(def.SheetIconFile);
-						craftedIconTasks[j] = LoadBundledTextureAsync(def.IconFile);
+						iconTasks[j] = FetchTextureAsync(def.SheetIconUrl);
+						craftedIconTasks[j] = FetchTextureAsync(def.IconUrl);
 					}
 				}
 				this.StatusChanged?.Invoke(Strings.Get("Status_LoadingIcons"));
@@ -222,27 +219,6 @@ namespace WhereIsMyPSNA
 				todayFlags[col] = !string.IsNullOrEmpty(currentDate) && colDate == currentDate;
 			}
 			return (itemIds, todayFlags);
-		}
-
-		private Task<Texture2D> LoadBundledTextureAsync(string relativePath)
-		{
-			if (string.IsNullOrEmpty(relativePath))
-			{
-				return Task.FromResult<Texture2D>(null);
-			}
-			TaskCompletionSource<Texture2D> tcs = new TaskCompletionSource<Texture2D>();
-			GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate
-			{
-				try
-				{
-					tcs.SetResult(_contentsManager.GetTexture(relativePath));
-				}
-				catch (Exception exception)
-				{
-					tcs.SetException(exception);
-				}
-			});
-			return tcs.Task;
 		}
 
 		private async Task<Texture2D> FetchKarmaIconAsync()

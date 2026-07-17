@@ -33,9 +33,9 @@ namespace WhereIsMyPSNA
 
 		public string DescriptionFr { get; set; }
 
-		public string IconFile { get; set; }
+		public int IconId { get; set; }
 
-		public string SheetIconFile { get; set; }
+		public int SheetIconId { get; set; }
 
 		public string Rarity { get; set; }
 
@@ -50,6 +50,15 @@ namespace WhereIsMyPSNA
 		public string SheetName => Localize(SheetNameEn, SheetNameDe, SheetNameEs, SheetNameFr);
 
 		public string Description => Localize(DescriptionEn, DescriptionDe, DescriptionEs, DescriptionFr);
+
+		public string IconUrl => AssetUrl(IconId);
+
+		public string SheetIconUrl => AssetUrl(SheetIconId);
+
+		private static string AssetUrl(int assetId)
+		{
+			return $"https://assets.gw2dat.com/{assetId}.png";
+		}
 
 		private static string Localize(string en, string de, string es, string fr)
 		{

@@ -39,21 +39,21 @@ namespace WhereIsMyPSNA
 		{
 			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ad: Expected O, but got Unknown
-			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00be: Expected O, but got Unknown
-			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e6: Expected O, but got Unknown
-			//IL_0105: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010f: Expected O, but got Unknown
+			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ac: Expected O, but got Unknown
+			//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bd: Expected O, but got Unknown
+			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e5: Expected O, but got Unknown
+			//IL_0104: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010e: Expected O, but got Unknown
 			((Control)this).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			((WindowBase2)this).set_Title("Where Is My PSNA");
 			((WindowBase2)this).set_Emblem(contentsManager.GetTexture("window_emblem.png"));
 			((WindowBase2)this).set_SavesPosition(true);
 			((WindowBase2)this).set_Id("PsnaWindow_com.odizinne.whereismypsna_38d37290-b5f9-447d-97ea-45b0b50e5f56");
 			_submissionService = new CommunitySubmissionService(directoriesManager);
-			_dataService = new PsnaDataService(apiManager, contentsManager, _submissionService);
+			_dataService = new PsnaDataService(apiManager, _submissionService);
 			_hideKnownNpcs = hideKnownNpcs;
 			AsyncTexture2D todayIcon = new AsyncTexture2D(contentsManager.GetTexture("pact.png"));
 			AsyncTexture2D commuIcon = new AsyncTexture2D(contentsManager.GetTexture("commu.png"));
