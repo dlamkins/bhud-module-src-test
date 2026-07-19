@@ -10,7 +10,7 @@ namespace WhereIsMyPSNA
 
 		static RecipeDefs()
 		{
-			RecipeDef[] obj = new RecipeDef[140]
+			RecipeDef[] obj = new RecipeDef[141]
 			{
 				new RecipeDef
 				{
@@ -882,6 +882,29 @@ namespace WhereIsMyPSNA
 					DescriptionDe = "Element: KontrolleDoppelklicken, um auf eine Waffe anzuwenden.",
 					DescriptionEs = "Elemento: ControlHaz doble clic para aplicar a un arma.",
 					DescriptionFr = "Élément\u00a0: contrôleDouble-cliquez pour l'appliquer à une arme.",
+					DurationSecs = 0,
+					Binding = "None",
+					VendorValue = 108
+				},
+				new RecipeDef
+				{
+					RecipeSheetIds = new int[1] { 44659 },
+					CraftingRecipeIds = new int[1] { 7294 },
+					NameEn = "Major Sigil of Bursting",
+					NameDe = "Beachtliches Sigill der Explosion",
+					NameEs = "Sello formidable de estallido",
+					NameFr = "Cachet d'explosion majeur",
+					SheetNameEn = "Recipe: Minor Sigil of Bursting (rare)",
+					SheetNameDe = "Rezept: Geringes Sigill der Explosion (rare)",
+					SheetNameEs = "Receta: Sello menor de estallido (rare)",
+					SheetNameFr = "Recette : cachet d'explosion mineur (rare)",
+					IconId = 619702,
+					SheetIconId = 849267,
+					Rarity = "Rare",
+					DescriptionEn = "Element: EnhancementDouble-click to apply to a weapon.",
+					DescriptionDe = "Element: VerbesserungDoppelklicken, um auf eine Waffe anzuwenden.",
+					DescriptionEs = "Elemento: MejoraHaz doble clic para aplicar a un arma.",
+					DescriptionFr = "Élément\u00a0: améliorationDouble-cliquez pour l'appliquer à une arme.",
 					DurationSecs = 0,
 					Binding = "None",
 					VendorValue = 108

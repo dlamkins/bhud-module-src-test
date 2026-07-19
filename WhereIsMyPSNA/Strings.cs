@@ -47,6 +47,13 @@ namespace WhereIsMyPSNA
 				Es = "Envíos de la comunidad",
 				Fr = "Contributions de la communauté"
 			},
+			["Tab_AllRecipes"] = new Entry
+			{
+				En = "Own Recipes",
+				De = "Eigene Rezepte",
+				Es = "Recetas propias",
+				Fr = "Recettes possédées"
+			},
 			["Duration_HoursMinutes"] = new Entry
 			{
 				En = "Duration: {0}h {1}min",

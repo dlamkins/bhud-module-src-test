@@ -20,6 +20,8 @@ namespace WhereIsMyPSNA
 
 		private const int ContentWidth = 835;
 
+		private const int ContentHeight = 636;
+
 		private readonly PsnaDataService _dataService;
 
 		private readonly CommunitySubmissionService _submissionService;
@@ -28,9 +30,13 @@ namespace WhereIsMyPSNA
 
 		private readonly Tab _todayTab;
 
+		private readonly Tab _allRecipesTab;
+
 		private readonly Tab _communityTab;
 
 		private TodayLocationsView _activeTodayView;
+
+		private AllRecipesView _activeAllRecipesView;
 
 		private CommunitySubmitView _activeCommunityView;
 
@@ -43,10 +49,12 @@ namespace WhereIsMyPSNA
 			//IL_00ac: Expected O, but got Unknown
 			//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00bd: Expected O, but got Unknown
-			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e5: Expected O, but got Unknown
-			//IL_0104: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010e: Expected O, but got Unknown
+			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f0: Expected O, but got Unknown
+			//IL_010f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0119: Expected O, but got Unknown
+			//IL_0138: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0142: Expected O, but got Unknown
 			((Control)this).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			((WindowBase2)this).set_Title("Where Is My PSNA");
 			((WindowBase2)this).set_Emblem(contentsManager.GetTexture("window_emblem.png"));
@@ -57,9 +65,12 @@ namespace WhereIsMyPSNA
 			_hideKnownNpcs = hideKnownNpcs;
 			AsyncTexture2D todayIcon = new AsyncTexture2D(contentsManager.GetTexture("pact.png"));
 			AsyncTexture2D commuIcon = new AsyncTexture2D(contentsManager.GetTexture("commu.png"));
+			AsyncTexture2D allRecipesIcon = AsyncTexture2D.FromAssetId(156909);
 			_todayTab = new Tab(todayIcon, (Func<IView>)CreateTodayView, Strings.Get("Tab_TodayLocations"), (int?)0);
+			_allRecipesTab = new Tab(allRecipesIcon, (Func<IView>)CreateAllRecipesView, Strings.Get("Tab_AllRecipes"), (int?)50);
 			_communityTab = new Tab(commuIcon, (Func<IView>)CreateCommunityView, Strings.Get("Tab_Community"), (int?)100);
 			((TabbedWindow2)this).get_Tabs().Add(_todayTab);
+			((TabbedWindow2)this).get_Tabs().Add(_allRecipesTab);
 			((TabbedWindow2)this).get_Tabs().Add(_communityTab);
 			((TabbedWindow2)this).set_SelectedTab(_todayTab);
 			((WindowBase2)this).set_Subtitle(_todayTab.get_Name());
@@ -74,6 +85,7 @@ namespace WhereIsMyPSNA
 		private void OnUserLocaleChanged(object sender, ValueEventArgs<CultureInfo> e)
 		{
 			_todayTab.set_Name(Strings.Get("Tab_TodayLocations"));
+			_allRecipesTab.set_Name(Strings.Get("Tab_AllRecipes"));
 			_communityTab.set_Name(Strings.Get("Tab_Community"));
 			Tab selectedTab = ((TabbedWindow2)this).get_SelectedTab();
 			((WindowBase2)this).set_Subtitle((selectedTab != null) ? selectedTab.get_Name() : null);
@@ -99,6 +111,11 @@ namespace WhereIsMyPSNA
 			return (IView)(object)new CommunitySubmitView(_submissionService, 835, RegisterActiveCommunityView, UnregisterActiveCommunityView);
 		}
 
+		private IView CreateAllRecipesView()
+		{
+			return (IView)(object)new AllRecipesView(_dataService, 835, 636, RegisterActiveAllRecipesView, UnregisterActiveAllRecipesView);
+		}
+
 		private void RegisterActiveView(TodayLocationsView view)
 		{
 			_activeTodayView = view;
@@ -109,6 +126,19 @@ namespace WhereIsMyPSNA
 			if (_activeTodayView == view)
 			{
 				_activeTodayView = null;
+			}
+		}
+
+		private void RegisterActiveAllRecipesView(AllRecipesView view)
+		{
+			_activeAllRecipesView = view;
+		}
+
+		private void UnregisterActiveAllRecipesView(AllRecipesView view)
+		{
+			if (_activeAllRecipesView == view)
+			{
+				_activeAllRecipesView = null;
 			}
 		}
 
@@ -134,6 +164,7 @@ namespace WhereIsMyPSNA
 				bool num = ((TabbedWindow2)this).get_SelectedTab() != _todayTab;
 				((TabbedWindow2)this).set_SelectedTab(_todayTab);
 				_todayTab.set_Name(Strings.Get("Tab_TodayLocations"));
+				_allRecipesTab.set_Name(Strings.Get("Tab_AllRecipes"));
 				_communityTab.set_Name(Strings.Get("Tab_Community"));
 				((WindowBase2)this).set_Subtitle(((TabbedWindow2)this).get_SelectedTab().get_Name());
 				if (!num)
@@ -144,6 +175,7 @@ namespace WhereIsMyPSNA
 			else if (!((Control)this).get_Visible())
 			{
 				_activeTodayView?.OnWindowHidden();
+				_activeAllRecipesView?.OnWindowHidden();
 				_activeCommunityView?.OnWindowHidden();
 			}
 		}

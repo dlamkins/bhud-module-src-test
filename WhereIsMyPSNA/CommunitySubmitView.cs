@@ -385,6 +385,7 @@ namespace WhereIsMyPSNA
 				val2.set_Font(GameService.Content.get_DefaultFont14());
 				((Control)val2).set_Visible(false);
 				Label label = val2;
+				int slotIndex = i;
 				((Control)label).add_MouseEntered((EventHandler<MouseEventArgs>)delegate
 				{
 					//IL_0015: Unknown result type (might be due to invalid IL or missing references)
@@ -392,10 +393,9 @@ namespace WhereIsMyPSNA
 				});
 				((Control)label).add_MouseLeft((EventHandler<MouseEventArgs>)delegate
 				{
-					//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-					label.set_TextColor(Color.get_White());
+					//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+					label.set_TextColor(RowColor(slotIndex));
 				});
-				int slotIndex = i;
 				((Control)label).add_Click((EventHandler<MouseEventArgs>)delegate
 				{
 					OnResultClicked(slotIndex);
@@ -415,18 +415,18 @@ namespace WhereIsMyPSNA
 
 		private void OnSearchTextChanged(int rowIndex)
 		{
-			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0136: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0141: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0162: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0177: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0139: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0144: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0160: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0165: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0192: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b4: Unknown result type (might be due to invalid IL or missing references)
 			if (_suppressTextChanged)
 			{
 				return;
@@ -452,7 +452,7 @@ namespace WhereIsMyPSNA
 				if (i < matches.Length)
 				{
 					_flyoutRows[i].set_Text(matches[i].SheetName);
-					_flyoutRows[i].set_TextColor(Color.get_White());
+					_flyoutRows[i].set_TextColor(RowColor(i));
 					((Control)_flyoutRows[i]).set_Visible(true);
 				}
 				else
@@ -505,6 +505,17 @@ namespace WhereIsMyPSNA
 			{
 				((Control)_flyout).set_Visible(false);
 			}
+		}
+
+		private Color RowColor(int slotIndex)
+		{
+			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+			if (slotIndex >= _currentMatches.Length)
+			{
+				return Color.get_White();
+			}
+			return RecipeTooltip.GetRarityColor(_currentMatches[slotIndex].Rarity);
 		}
 
 		public void OnWindowHidden()

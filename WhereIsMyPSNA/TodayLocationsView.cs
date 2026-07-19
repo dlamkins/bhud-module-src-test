@@ -183,12 +183,14 @@ namespace WhereIsMyPSNA
 
 		private void ShowFetchFailed()
 		{
+			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
 			((Control)_centerSpinner).set_Visible(false);
 			((Control)_statusLabel).set_Visible(false);
 			for (int i = 0; i < 6; i++)
 			{
 				((Control)_rowPanels[i]).set_Visible(true);
 				_recipeLabels[i].set_Text(Strings.Get("FetchFailed"));
+				_recipeLabels[i].set_TextColor(Color.get_White());
 				((Control)_recipeLabels[i]).set_Visible(true);
 				((Control)_copyButtons[i]).set_Visible(true);
 			}
@@ -550,6 +552,9 @@ namespace WhereIsMyPSNA
 
 		private void ApplyResult(PsnaDataService.FetchResult result, bool animate)
 		{
+			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0124: Unknown result type (might be due to invalid IL or missing references)
 			((Control)_centerSpinner).set_Visible(false);
 			((Control)_statusLabel).set_Visible(false);
 			for (int i = 0; i < 6; i++)
@@ -560,6 +565,7 @@ namespace WhereIsMyPSNA
 				if (slot.IsNotDetermined)
 				{
 					_recipeLabels[i].set_Text(Strings.Get("NotDeterminedYet"));
+					_recipeLabels[i].set_TextColor(Color.get_White());
 					((Control)_recipeLabels[i]).set_Visible(true);
 					((Control)_recipeIcons[i]).set_Visible(false);
 					((Control)_karmaIcons[i]).set_Visible(false);
@@ -570,7 +576,10 @@ namespace WhereIsMyPSNA
 				{
 					_slotItemIds[i] = slot.ItemId;
 					_slotCraftedIconTextures[i] = slot.CraftedIconTexture;
-					_recipeLabels[i].set_Text(RecipeDefs.ByRecipeSheetId.TryGetValue(slot.ItemId, out var def) ? def.SheetName : "");
+					RecipeDef def;
+					bool hasDef = RecipeDefs.ByRecipeSheetId.TryGetValue(slot.ItemId, out def);
+					_recipeLabels[i].set_Text(hasDef ? def.SheetName : "");
+					_recipeLabels[i].set_TextColor(hasDef ? RecipeTooltip.GetRarityColor(def.Rarity) : Color.get_White());
 					((Control)_recipeLabels[i]).set_Visible(true);
 					_recipeIcons[i].set_Texture(slot.IconTexture);
 					((Control)_recipeIcons[i]).set_Visible(slot.IconTexture != null);

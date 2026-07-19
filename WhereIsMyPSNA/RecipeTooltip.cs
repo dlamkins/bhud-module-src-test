@@ -342,7 +342,7 @@ namespace WhereIsMyPSNA
 			};
 		}
 
-		private static Color GetRarityColor(string rarity)
+		internal static Color GetRarityColor(string rarity)
 		{
 			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
