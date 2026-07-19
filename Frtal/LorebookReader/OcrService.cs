@@ -67,13 +67,13 @@ namespace Frtal.LorebookReader
 			{
 				return "";
 			}
-			int m = lines.Count;
-			List<double> tops = new List<double>(m);
-			List<double> widths = new List<double>(m);
+			int n = lines.Count;
+			List<double> tops = new List<double>(n);
+			List<double> widths = new List<double>(n);
 			foreach (OcrLine item in lines)
 			{
 				double top = double.MaxValue;
-				double l = double.MaxValue;
+				double m = double.MaxValue;
 				double r = 0.0;
 				foreach (OcrWord word in item.Words)
 				{
@@ -82,9 +82,9 @@ namespace Frtal.LorebookReader
 					{
 						top = b.get_Y();
 					}
-					if (b.get_X() < l)
+					if (b.get_X() < m)
 					{
-						l = b.get_X();
+						m = b.get_X();
 					}
 					if (b.get_X() + b.get_Width() > r)
 					{
@@ -92,22 +92,27 @@ namespace Frtal.LorebookReader
 					}
 				}
 				tops.Add((top == double.MaxValue) ? 0.0 : top);
-				widths.Add((r > l) ? (r - l) : 0.0);
+				widths.Add((r > m) ? (r - m) : 0.0);
 			}
-			List<double> deltas = new List<double>(Math.Max(0, m - 1));
-			for (int k = 1; k < m; k++)
+			List<double> deltas = new List<double>(Math.Max(0, n - 1));
+			for (int l = 1; l < n; l++)
 			{
-				deltas.Add(tops[k] - tops[k - 1]);
+				deltas.Add(tops[l] - tops[l - 1]);
 			}
 			double pitch = Median(deltas);
 			double medWidth = Median(widths);
+			bool[] shortLine = new bool[n];
+			for (int k = 0; k < n; k++)
+			{
+				shortLine[k] = medWidth > 0.0 && widths[k] > 0.0 && widths[k] < medWidth * 0.8;
+			}
 			StringBuilder sb = new StringBuilder();
-			for (int j = 0; j < m; j++)
+			for (int j = 0; j < n; j++)
 			{
 				if (j > 0)
 				{
 					double delta = tops[j] - tops[j - 1];
-					bool brk = (pitch > 0.0 && delta > pitch * 1.5) || IsHeading(j - 1) || IsHeading(j);
+					bool brk = (pitch > 0.0 && delta > pitch * 1.5) || IsHeading(j - 1) || IsHeading(j) || IsListLine(j - 1) || IsListLine(j);
 					sb.Append(brk ? "\n\n" : "\n");
 				}
 				sb.Append(lines[j].Text);
@@ -115,11 +120,38 @@ namespace Frtal.LorebookReader
 			return sb.ToString();
 			bool IsHeading(int i)
 			{
-				if (pitch > 0.0 && medWidth > 0.0 && m >= 3 && widths[i] < medWidth * 0.62 && i + 1 < m)
+				if (pitch > 0.0 && medWidth > 0.0 && n >= 3 && widths[i] < medWidth * 0.62 && i + 1 < n)
 				{
 					return tops[i + 1] - tops[i] <= pitch * 1.5;
 				}
 				return false;
+			}
+			bool IsListLine(int i)
+			{
+				if (i < 0 || i >= n)
+				{
+					return false;
+				}
+				if (Regex.IsMatch((lines[i].Text ?? "").TrimStart(), "^([•·●○◦▪‣*\\-–—]|\\d{1,3}[.)])\\s"))
+				{
+					return true;
+				}
+				if (!shortLine[i])
+				{
+					return false;
+				}
+				int run = 1;
+				int j3 = i - 1;
+				while (j3 >= 0 && shortLine[j3])
+				{
+					run++;
+					j3--;
+				}
+				for (int j2 = i + 1; j2 < n && shortLine[j2]; j2++)
+				{
+					run++;
+				}
+				return run >= 3;
 			}
 		}
 

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Drawing;
@@ -84,6 +85,8 @@ namespace Frtal.LorebookReader
 		private StandardWindow _historyWindow;
 
 		private volatile bool _catalogDirty;
+
+		private readonly ConcurrentQueue<Action> _mainThreadQueue = new ConcurrentQueue<Action>();
 
 		private TextRenderer _textRenderer;
 
@@ -325,16 +328,26 @@ namespace Frtal.LorebookReader
 		{
 			//IL_02b2: Unknown result type (might be due to invalid IL or missing references)
 			//IL_02bc: Expected O, but got Unknown
-			//IL_02f6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0309: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0318: Unknown result type (might be due to invalid IL or missing references)
-			//IL_031d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02f9: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0322: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0332: Unknown result type (might be due to invalid IL or missing references)
-			//IL_033d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0344: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0331: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0336: Unknown result type (might be due to invalid IL or missing references)
+			//IL_033b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_034b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_035b: Expected O, but got Unknown
+			//IL_0356: Unknown result type (might be due to invalid IL or missing references)
+			//IL_035d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0364: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0374: Expected O, but got Unknown
+			//IL_039c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03d8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0401: Expected O, but got Unknown
 			_readKeybind.get_Value().set_Enabled(true);
 			_readKeybind.get_Value().add_Activated((EventHandler<EventArgs>)OnReadActivated);
 			_stopKeybind.get_Value().set_Enabled(true);
@@ -385,18 +398,19 @@ namespace Frtal.LorebookReader
 				Point size = ((Control)GameService.Graphics.get_SpriteScreen()).get_Size();
 				if (size.X > 0 && size.Y > 0)
 				{
-					float val2 = ((float)((Control)_subtitleLabel).get_Location().X + (float)((Control)_subtitleLabel).get_Width() / 2f) / (float)size.X * 100f;
-					float val3 = (float)((Control)_subtitleLabel).get_Location().Y / (float)size.Y * 100f;
-					_subtitleX.set_Value(Math.Max(0f, Math.Min(100f, val2)));
-					_subtitleY.set_Value(Math.Max(0f, Math.Min(100f, val3)));
+					float val3 = ((float)((Control)_subtitleLabel).get_Location().X + (float)((Control)_subtitleLabel).get_Width() / 2f) / (float)size.X * 100f;
+					float val4 = (float)((Control)_subtitleLabel).get_Location().Y / (float)size.Y * 100f;
+					_subtitleX.set_Value(Math.Max(0f, Math.Min(100f, val3)));
+					_subtitleY.set_Value(Math.Max(0f, Math.Min(100f, val4)));
 				}
 			};
 			_parchmentTexture = base.ModuleParameters.get_ContentsManager().GetTexture("parchment.png");
-			_cornerIcon = new CornerIcon(AsyncTexture2D.op_Implicit(base.ModuleParameters.get_ContentsManager().GetTexture("book.png")), AsyncTexture2D.op_Implicit(base.ModuleParameters.get_ContentsManager().GetTexture("book_hover.png")), "Lorebook Encyclopedia");
+			_cornerIcon = new CornerIcon(AsyncTexture2D.op_Implicit(base.ModuleParameters.get_ContentsManager().GetTexture("book.png")), AsyncTexture2D.op_Implicit(base.ModuleParameters.get_ContentsManager().GetTexture("book_hover.png")), "Lorebook Codex");
 			((Control)_cornerIcon).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				if (((Control)_historyWindow).get_Visible())
 				{
+					_encyclopediaView?.FlushEdits();
 					((Control)_historyWindow).Hide();
 				}
 				else
@@ -404,13 +418,33 @@ namespace Frtal.LorebookReader
 					ShowEncyclopedia();
 				}
 			});
-			StandardWindow val = new StandardWindow(GameService.Content.get_DatAssetCache().GetTextureFromAssetId(155985), new Rectangle(40, 26, 913, 691), new Rectangle(70, 71, 839, 605), new Point(880, 640));
-			((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-			((WindowBase2)val).set_Title("Lorebook Encyclopedia");
-			((WindowBase2)val).set_SavesPosition(true);
-			((WindowBase2)val).set_CanResize(true);
-			((WindowBase2)val).set_Id("frtal_lorebook_reader_encyclopedia");
-			_historyWindow = val;
+			Texture2D winTex = GetRefTexture("window_bg.png");
+			if (winTex != null)
+			{
+				int tw = winTex.get_Width();
+				int th = winTex.get_Height();
+				StandardWindow val = new StandardWindow(winTex, new Rectangle(0, 0, tw, th), new Rectangle((int)((float)tw * 0.03f), (int)((float)th * 0.078f), (int)((float)tw * 0.94f), (int)((float)th * 0.88f)), new Point(1120, 800));
+				((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+				((WindowBase2)val).set_Title("Lorebook Codex");
+				((WindowBase2)val).set_SavesPosition(true);
+				((WindowBase2)val).set_CanResize(true);
+				((WindowBase2)val).set_Id("frtal_lorebook_reader_encyclopedia_v2");
+				_historyWindow = val;
+			}
+			else
+			{
+				StandardWindow val2 = new StandardWindow(GameService.Content.get_DatAssetCache().GetTextureFromAssetId(155985), new Rectangle(40, 26, 913, 691), new Rectangle(70, 71, 839, 605), new Point(1120, 800));
+				((Control)val2).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+				((WindowBase2)val2).set_Title("Lorebook Codex");
+				((WindowBase2)val2).set_SavesPosition(true);
+				((WindowBase2)val2).set_CanResize(true);
+				((WindowBase2)val2).set_Id("frtal_lorebook_reader_encyclopedia_v2");
+				_historyWindow = val2;
+			}
+			((Control)_historyWindow).add_Hidden((EventHandler<EventArgs>)delegate
+			{
+				_encyclopediaView?.FlushEdits();
+			});
 			((Module)this).OnModuleLoaded(e);
 		}
 
@@ -1185,6 +1219,11 @@ namespace Frtal.LorebookReader
 			return LoadRefTexture(ExpansionIconFile(expansion));
 		}
 
+		internal Texture2D GetRefTexture(string file)
+		{
+			return LoadRefTexture(file);
+		}
+
 		internal Texture2D GetExpansionStampIcon(string expansion)
 		{
 			string file = ExpansionIconFile(expansion);
@@ -1335,26 +1374,46 @@ namespace Frtal.LorebookReader
 			}
 		}
 
+		internal void RunOnMainThread(Action action)
+		{
+			if (action != null)
+			{
+				_mainThreadQueue.Enqueue(action);
+			}
+		}
+
 		protected override void Update(GameTime gameTime)
 		{
-			//IL_015e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0460: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0465: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0469: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04f1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0517: Unknown result type (might be due to invalid IL or missing references)
-			//IL_052e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_053c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0556: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05e0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05e2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05f9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0651: Unknown result type (might be due to invalid IL or missing references)
-			//IL_067b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0698: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06b5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0188: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0491: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0496: Unknown result type (might be due to invalid IL or missing references)
+			//IL_049a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0500: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0522: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0548: Unknown result type (might be due to invalid IL or missing references)
+			//IL_055f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_056d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0587: Unknown result type (might be due to invalid IL or missing references)
+			//IL_060d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0612: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0614: Unknown result type (might be due to invalid IL or missing references)
+			//IL_062b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0683: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06e7: Unknown result type (might be due to invalid IL or missing references)
+			Action act;
+			while (_mainThreadQueue.TryDequeue(out act))
+			{
+				try
+				{
+					act();
+				}
+				catch (Exception ex)
+				{
+					Logger.Warn(ex, "Main-thread action failed.");
+				}
+			}
 			_detectTimerMs += gameTime.get_ElapsedGameTime().TotalMilliseconds;
 			if (_detectTimerMs >= 1000.0)
 			{
@@ -1555,6 +1614,7 @@ namespace Frtal.LorebookReader
 
 		protected override void Unload()
 		{
+			_encyclopediaView?.FlushEdits();
 			_readKeybind.get_Value().remove_Activated((EventHandler<EventArgs>)OnReadActivated);
 			_stopKeybind.get_Value().remove_Activated((EventHandler<EventArgs>)OnStopActivated);
 			_convToggleKeybind.get_Value().remove_Activated((EventHandler<EventArgs>)OnConvToggleActivated);

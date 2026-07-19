@@ -326,6 +326,14 @@ namespace Frtal.LorebookReader
 			}
 		}
 
+		public void Flush()
+		{
+			lock (_lock)
+			{
+				Save();
+			}
+		}
+
 		private void Save()
 		{
 			if (_saveBlocked)
