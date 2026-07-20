@@ -26,6 +26,8 @@ namespace Estreya.BlishHUD.Shared.Controls.Map
 			InternalDispose();
 		}
 
+		public abstract void Update(GameTime gameTime);
+
 		public abstract RectangleF? RenderToMiniMap(SpriteBatch spriteBatch, Rectangle bounds, double offsetX, double offsetY, double scale, float opacity);
 
 		protected virtual void InternalDispose()

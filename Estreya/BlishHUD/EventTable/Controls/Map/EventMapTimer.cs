@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Estreya.BlishHUD.EventTable.Models;
@@ -18,6 +19,12 @@ namespace Estreya.BlishHUD.EventTable.Controls.Map
 {
 	public class EventMapTimer : MapEntity
 	{
+		private static TimeSpan _updateCurrentOccurrenceInterval = TimeSpan.FromSeconds(1.0);
+
+		private double _lastUpdateCurrentOccurrence;
+
+		private Instant? _currentOccurrence;
+
 		private readonly Estreya.BlishHUD.EventTable.Models.Event _ev;
 
 		private readonly Estreya.BlishHUD.EventTable.Models.EventMapTimer _mapTimer;
@@ -48,65 +55,79 @@ namespace Estreya.BlishHUD.EventTable.Controls.Map
 			_translationService = translationService;
 		}
 
+		private void UpdateCurrentOccurrence()
+		{
+			Instant now = _getNow();
+			_currentOccurrence = (from o in _ev.Occurences
+				where o >= now || o.Plus(_ev.Duration) >= now
+				select o into x
+				orderby x
+				select x).First();
+		}
+
+		public override void Update(GameTime gameTime)
+		{
+			UpdateUtil.Update(UpdateCurrentOccurrence, gameTime, _updateCurrentOccurrenceInterval.TotalMilliseconds, ref _lastUpdateCurrentOccurrence);
+		}
+
 		public override RectangleF? RenderToMiniMap(SpriteBatch spriteBatch, Rectangle bounds, double offsetX, double offsetY, double scale, float opacity)
 		{
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0230: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0232: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0233: Unknown result type (might be due to invalid IL or missing references)
-			//IL_023d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0243: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0248: Unknown result type (might be due to invalid IL or missing references)
-			//IL_024d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ed: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01fd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0202: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0207: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0212: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0220: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_023a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0251: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0258: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0266: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0273: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0280: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0297: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0299: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0253: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0267: Unknown result type (might be due to invalid IL or missing references)
 			Vector2 location = GetScaledLocation(X, Y, scale, offsetX, offsetY);
 			float radius = Radius / (float)scale;
 			CircleF circle = default(CircleF);
 			((CircleF)(ref circle))._002Ector(new Point2(location.X, location.Y), radius);
 			ShapeExtensions.DrawCircle(spriteBatch, circle, 50, _color * opacity, _thickness, 0f);
-			Instant now = _getNow();
-			Instant startTime = (from o in _ev.Occurences
-				where o >= now || o.Plus(_ev.Duration) >= now
-				select o into x
-				orderby x
-				select x).First();
-			Instant endTime = startTime.Plus(_ev.Duration);
-			int occurenceIndex = _ev.Occurences.IndexOf(startTime);
-			Instant now2 = now;
-			Instant startTime2 = startTime;
-			Instant endTime2 = endTime;
-			bool flag = (((uint)(occurenceIndex - -1) <= 1u) ? true : false);
-			(Duration, Duration) remainingTime = GetTime(now2, startTime2, endTime2, flag ? null : new Instant?(_ev.Occurences[occurenceIndex - 1]));
-			double degree = remainingTime.Item2.TotalSeconds.Remap(0.0, remainingTime.Item1.TotalSeconds, 0.0, 360.0) * -1.0;
-			double angle = Math.PI * (degree - 90.0) / 180.0;
-			_ = _thickness;
-			Math.Cos(angle);
-			_ = _thickness;
-			Math.Sin(angle);
-			if (!GameService.Gw2Mumble.get_UI().get_IsMapOpen() || GameService.Gw2Mumble.get_UI().get_MapScale() <= 1.0)
+			if (_currentOccurrence.HasValue)
 			{
-				string text = _ev.Name + "\n" + GetEventDescription(now, startTime, endTime);
-				BitmapFont font = GameService.Content.get_DefaultFont18();
-				Size2 textSize = font.MeasureString(text);
-				Point2 circleBottomCenter = circle.Center + new Vector2(0f, circle.Radius);
-				RectangleF textLocation = default(RectangleF);
-				((RectangleF)(ref textLocation))._002Ector(circleBottomCenter.X - textSize.Width / 2f, circleBottomCenter.Y + 10f, textSize.Width + 5f, textSize.Height + 5f);
-				spriteBatch.DrawString(text, font, textLocation, Color.get_Red(), wrap: false, 1f, (HorizontalAlignment)1, (VerticalAlignment)0);
+				Instant now = _getNow();
+				Instant startTime = _currentOccurrence.Value;
+				Instant endTime = startTime.Plus(_ev.Duration);
+				int occurenceIndex = _ev.Occurences.IndexOf(startTime);
+				Instant now2 = now;
+				Instant startTime2 = startTime;
+				Instant endTime2 = endTime;
+				bool flag = (((uint)(occurenceIndex - -1) <= 1u) ? true : false);
+				(Duration, Duration) remainingTime = GetTime(now2, startTime2, endTime2, flag ? null : new Instant?(_ev.Occurences[occurenceIndex - 1]));
+				double degree = remainingTime.Item2.TotalSeconds.Remap(0.0, remainingTime.Item1.TotalSeconds, 0.0, 360.0) * -1.0;
+				double angle = Math.PI * (degree - 90.0) / 180.0;
+				_ = _thickness;
+				Math.Cos(angle);
+				_ = _thickness;
+				Math.Sin(angle);
+				if (!GameService.Gw2Mumble.get_UI().get_IsMapOpen() || GameService.Gw2Mumble.get_UI().get_MapScale() <= 1.0)
+				{
+					string text = _ev.Name + "\n" + GetEventDescription(now, startTime, endTime);
+					BitmapFont font = GameService.Content.get_DefaultFont18();
+					Size2 textSize = font.MeasureString(text);
+					Point2 circleBottomCenter = circle.Center + new Vector2(0f, circle.Radius);
+					RectangleF textLocation = default(RectangleF);
+					((RectangleF)(ref textLocation))._002Ector(circleBottomCenter.X - textSize.Width / 2f, circleBottomCenter.Y + 10f, textSize.Width + 5f, textSize.Height + 5f);
+					spriteBatch.DrawString(text, font, textLocation, Color.get_Red(), wrap: false, 1f, (HorizontalAlignment)1, (VerticalAlignment)0);
+				}
 			}
 			return ((CircleF)(ref circle)).ToRectangleF();
 		}
@@ -139,23 +160,24 @@ namespace Estreya.BlishHUD.EventTable.Controls.Map
 			bool num = endTime < now;
 			bool isNext = !num && startTime > now;
 			bool isCurrent = !num && !isNext;
-			string description = "";
+			StringBuilder description = new StringBuilder();
 			if (num)
 			{
 				Duration finishedSince = now - endTime;
-				description = description + _translationService.GetTranslation("event-tooltip-finishedSince", "Finished since") + ": " + FormatDuration(finishedSince);
+				description.Append(_translationService.GetTranslation("event-tooltip-finishedSince", "Finished since") + ": " + FormatDuration(finishedSince));
 			}
 			else if (isNext)
 			{
 				Duration startsIn = startTime - now;
-				description = description + _translationService.GetTranslation("event-tooltip-startsIn", "Starts in") + ": " + FormatDuration(startsIn);
+				description.Append(_translationService.GetTranslation("event-tooltip-startsIn", "Starts in") + ": " + FormatDuration(startsIn));
 			}
 			else if (isCurrent)
 			{
 				Duration remaining = GetTimeRemaining(now, startTime, endTime);
-				description = description + _translationService.GetTranslation("event-tooltip-remaining", "Remaining") + ": " + FormatDuration(remaining);
+				description.Append(_translationService.GetTranslation("event-tooltip-remaining", "Remaining") + ": " + FormatDuration(remaining));
 			}
-			return description + " (" + _translationService.GetTranslation("event-tooltip-startsAt", "Starts at") + ": " + FormatAbsoluteTime(startTime) + ")";
+			description.Append(" (" + _translationService.GetTranslation("event-tooltip-startsAt", "Starts at") + ": " + FormatAbsoluteTime(startTime) + ")");
+			return description.ToString();
 		}
 
 		private string FormatDuration(Duration ts)

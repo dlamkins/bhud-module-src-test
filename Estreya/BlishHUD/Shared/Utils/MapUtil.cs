@@ -1,6 +1,7 @@
 using System;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Controls;
@@ -11,6 +12,7 @@ using Blish_HUD.Modules.Managers;
 using Estreya.BlishHUD.Shared.Controls;
 using Estreya.BlishHUD.Shared.Controls.Map;
 using Estreya.BlishHUD.Shared.Extensions;
+using Estreya.BlishHUD.Shared.Windows.API;
 using Gw2Sharp.Models;
 using Gw2Sharp.WebApi.V2.Models;
 using Microsoft.Xna.Framework;
@@ -51,6 +53,9 @@ namespace Estreya.BlishHUD.Shared.Utils
 
 		public static int KeyboardPressDelay { get; set; } = 20;
 
+
+		[DllImport("user32.dll", SetLastError = true)]
+		private static extern uint SendInput(uint nInputs, [In][MarshalAs(UnmanagedType.LPArray)] Input[] pInputs, int cbSize);
 
 		public MapUtil(KeyBinding mapKeybinding, Gw2ApiManager apiManager)
 		{
@@ -221,22 +226,42 @@ namespace Estreya.BlishHUD.Shared.Utils
 				double offsetY = ((Coordinates2)(ref mapPos)).get_Y() - y;
 				Logger.Debug($"Distance remaining: {GetDistance(((Coordinates2)(ref mapPos)).get_X(), ((Coordinates2)(ref mapPos)).get_Y(), x, y)}");
 				Logger logger = Logger;
-				Coordinates2 mapPosition = GameService.Gw2Mumble.get_UI().get_MapPosition();
-				object arg = ((Coordinates2)(ref mapPosition)).get_X();
-				mapPosition = GameService.Gw2Mumble.get_UI().get_MapPosition();
-				logger.Debug($"Map Position: {arg}, {((Coordinates2)(ref mapPosition)).get_Y()}");
+				Coordinates2 val = GameService.Gw2Mumble.get_UI().get_MapPosition();
+				object arg = ((Coordinates2)(ref val)).get_X();
+				val = GameService.Gw2Mumble.get_UI().get_MapPosition();
+				logger.Debug($"Map Position: {arg}, {((Coordinates2)(ref val)).get_Y()}");
 				if (Math.Sqrt(Math.Pow(offsetX, 2.0) + Math.Pow(offsetY, 2.0)) < targetDistance)
 				{
 					break;
 				}
-				Mouse.SetPosition(GameService.Graphics.get_WindowWidth() / 2, GameService.Graphics.get_WindowHeight() / 2, false);
+				Logger.Debug($"Distance remaining: {offsetX}, {offsetY}");
+				Mouse.SetPosition(GameService.Graphics.get_WindowWidth() / 2, GameService.Graphics.get_WindowHeight() / 2, true);
 				Point startPos = Mouse.GetPosition();
+				Mouse.SetPosition(startPos.X - (int)MathHelper.Clamp((float)offsetX / (float)(GetMapScale() * 0.9), -500f, 500f), startPos.Y - (int)MathHelper.Clamp((float)offsetY / (float)(GetMapScale() * 0.9), -500f, 500f), true);
+				await Task.Delay(MouseMoveAndClickDelay);
 				Mouse.Press((MouseButton)1, -1, -1, false);
-				Mouse.SetPosition(startPos.X + (int)MathHelper.Clamp((float)offsetX / (float)(GetMapScale() * 0.9), -100000f, 100000f), startPos.Y + (int)MathHelper.Clamp((float)offsetY / (float)(GetMapScale() * 0.9), -100000f, 100000f), false);
-				await WaitForTick();
-				startPos = Mouse.GetPosition();
-				Mouse.SetPosition(startPos.X + (int)MathHelper.Clamp((float)offsetX / (float)(GetMapScale() * 0.9), -100000f, 100000f), startPos.Y + (int)MathHelper.Clamp((float)offsetY / (float)(GetMapScale() * 0.9), -100000f, 100000f), false);
+				await Task.Delay(MouseMoveAndClickDelay);
+				Mouse.SetPosition(GameService.Graphics.get_WindowWidth() / 2, GameService.Graphics.get_WindowHeight() / 2, true);
+				await Task.Delay(MouseMoveAndClickDelay);
 				Mouse.Release((MouseButton)1, -1, -1, false);
+				double x2 = ((Coordinates2)(ref mapPos)).get_X();
+				val = GameService.Gw2Mumble.get_UI().get_MapCenter();
+				double canMoveOffsetX = x2 - ((Coordinates2)(ref val)).get_X();
+				double y2 = ((Coordinates2)(ref mapPos)).get_Y();
+				val = GameService.Gw2Mumble.get_UI().get_MapCenter();
+				double canMoveOffsetY = y2 - ((Coordinates2)(ref val)).get_Y();
+				double canMoveDistance = Math.Sqrt(Math.Pow(canMoveOffsetX, 2.0) + Math.Pow(canMoveOffsetY, 2.0));
+				Logger.Debug($"CanMove Offset: {canMoveOffsetX}, {canMoveOffsetY}");
+				Logger.Debug($"CanMove Distance: {canMoveDistance}");
+				if (Math.Abs(canMoveDistance) <= 2.0)
+				{
+					double nextTargetZoom = GetMapScale() - 1.0;
+					if (nextTargetZoom <= 0.0)
+					{
+						return false;
+					}
+					await ZoomIn(nextTargetZoom);
+				}
 				await Task.Delay(MouseMoveAndClickDelay);
 			}
 			return true;
@@ -396,12 +421,38 @@ namespace Estreya.BlishHUD.Shared.Utils
 			}
 		}
 
-		private async Task<NavigationResult> MoveMouse(int x, int y, bool sendToSystem = false)
+		private async Task<NavigationResult> MoveMouse(int x, int y)
 		{
-			Mouse.GetPosition();
-			Mouse.SetPosition(x, y, sendToSystem);
-			await WaitForTick();
-			return new NavigationResult(success: true, null);
+			int counter = 0;
+			do
+			{
+				counter++;
+				Point mapPos = Mouse.GetPosition();
+				int offsetX = mapPos.X - x;
+				int offsetY = mapPos.Y - y;
+				if (Math.Sqrt(Math.Pow(offsetX, 2.0) + Math.Pow(offsetY, 2.0)) <= 1.0)
+				{
+					return new NavigationResult(success: true, null);
+				}
+				int clampedOffsetX = (int)MathHelper.Clamp((float)offsetX / (float)(GetMapScale() * 0.9), -100f, 100f);
+				int clampedOffsetY = (int)MathHelper.Clamp((float)offsetY / (float)(GetMapScale() * 0.9), -100f, 100f);
+				Input input2 = default(Input);
+				input2.type = InputType.MOUSE;
+				input2.U = new InputUnion
+				{
+					mi = new MouseInput
+					{
+						dx = clampedOffsetX,
+						dy = clampedOffsetY,
+						dwFlags = MouseEventF.MOVE
+					}
+				};
+				Input input = input2;
+				SendInput(1u, new Input[1] { input }, Input.Size);
+				await WaitForTick();
+			}
+			while (counter < 50);
+			return new NavigationResult(success: false, "Mouse cursor did not reach target position.");
 		}
 	}
 }

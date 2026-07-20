@@ -161,6 +161,13 @@ namespace Estreya.BlishHUD.Shared.Controls.Map
 		public override void DoUpdate(GameTime gameTime)
 		{
 			UpdateBounds();
+			using (_entityLock.Lock())
+			{
+				foreach (MapEntity entity in _entities)
+				{
+					entity.Update(gameTime);
+				}
+			}
 		}
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)

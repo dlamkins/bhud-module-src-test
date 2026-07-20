@@ -30,6 +30,10 @@ namespace Estreya.BlishHUD.Shared.Controls.Map
 			_thickness = thickness;
 		}
 
+		public override void Update(GameTime gameTime)
+		{
+		}
+
 		public override RectangleF? RenderToMiniMap(SpriteBatch spriteBatch, Rectangle bounds, double offsetX, double offsetY, double scale, float opacity)
 		{
 			//IL_0045: Unknown result type (might be due to invalid IL or missing references)

@@ -23,10 +23,10 @@ namespace Estreya.BlishHUD.Shared.Controls.World
 			set
 			{
 				_amount = value;
-				Effect effect = base.EffectParameters.get_Effect();
+				Effect? effect = base.Effect;
 				if (effect != null)
 				{
-					effect.get_Parameters().get_Item("Amount").SetValue(_amount);
+					effect!.get_Parameters().get_Item("Amount").SetValue(_amount);
 				}
 			}
 		}
@@ -36,16 +36,15 @@ namespace Estreya.BlishHUD.Shared.Controls.World
 		};
 
 
-		public DissolvableWorldText(Func<string> getText, BitmapFont font, Vector3 position, float scale, Color color, ContentsManager contentsManager)
-			: base(getText, font, position, scale, color)
+		public DissolvableWorldText(Func<string> getText, BitmapFont font, Vector3 position, float scale, Func<Color> getColor, ContentsManager contentsManager)
+			: base(getText, font, position, scale, getColor)
 		{
 			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
 			Effect dissolveEffectForText = contentsManager.GetEffect("effects/dissolve.mgfx");
 			dissolveEffectForText.get_Parameters().get_Item("Amount").SetValue(0f);
 			dissolveEffectForText.get_Parameters().get_Item("Opacity").SetValue(1f);
 			dissolveEffectForText.get_Parameters().get_Item("Glow").SetValue(false);
-			base.EffectParameters.set_Effect(dissolveEffectForText);
+			base.Effect = dissolveEffectForText;
 		}
 
 		protected override void InternalRender(GraphicsDevice graphicsDevice, IWorld world, ICamera camera)

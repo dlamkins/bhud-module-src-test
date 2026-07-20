@@ -105,6 +105,30 @@ namespace Estreya.BlishHUD.EventTable
 
 		public SettingEntry<Color> EventTimersRepeatTextColor { get; private set; }
 
+		public SettingEntry<int> EventTimersNextOccurrenceTextureWidth { get; set; }
+
+		public SettingEntry<int> EventTimersStartsInTextureWidth { get; set; }
+
+		public SettingEntry<int> EventTimersRemainingTextureWidth { get; set; }
+
+		public SettingEntry<int> EventTimersRepeatTextureWidth { get; set; }
+
+		public SettingEntry<int> EventTimersDurationTextureWidth { get; set; }
+
+		public SettingEntry<int> EventTimersNameTextureWidth { get; set; }
+
+		public SettingEntry<int> EventTimersNextOccurrenceTextureHeight { get; set; }
+
+		public SettingEntry<int> EventTimersStartsInTextureHeight { get; set; }
+
+		public SettingEntry<int> EventTimersRemainingTextureHeight { get; set; }
+
+		public SettingEntry<int> EventTimersRepeatTextureHeight { get; set; }
+
+		public SettingEntry<int> EventTimersDurationTextureHeight { get; set; }
+
+		public SettingEntry<int> EventTimersNameTextureHeight { get; set; }
+
 		public SettingEntry<bool> ShowDynamicEventsOnMap { get; private set; }
 
 		public SettingEntry<bool> ShowDynamicEventInWorld { get; private set; }
@@ -168,12 +192,12 @@ namespace Estreya.BlishHUD.EventTable
 			//IL_0c46: Expected O, but got Unknown
 			//IL_0c95: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0cdd: Expected O, but got Unknown
-			//IL_124f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1297: Expected O, but got Unknown
-			//IL_12e6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_132e: Expected O, but got Unknown
-			//IL_1628: Unknown result type (might be due to invalid IL or missing references)
-			//IL_1670: Expected O, but got Unknown
+			//IL_172f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1777: Expected O, but got Unknown
+			//IL_17c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_180e: Expected O, but got Unknown
+			//IL_1b08: Unknown result type (might be due to invalid IL or missing references)
+			//IL_1b50: Expected O, but got Unknown
 			((SettingEntry)base.RegisterContext).set_GetDisplayNameFunc((Func<string>)(() => "Allow Cross Module Interaction"));
 			((SettingEntry)base.RegisterContext).set_GetDescriptionFunc((Func<string>)(() => "Allow other BlishHUD modules to add certain elements to this module (events, reminders, ...). Requires a restart."));
 			MapKeybinding = base.GlobalSettings.DefineSetting<KeyBinding>("MapKeybinding", new KeyBinding((Keys)77), (Func<string>)(() => "Open Map Hotkey"), (Func<string>)(() => "Defines the key used to open the fullscreen map."));
@@ -245,12 +269,36 @@ namespace Estreya.BlishHUD.EventTable
 			EventTimersRenderDistance = base.GlobalSettings.DefineSetting<int>("EventTimersRenderDistance", 75, (Func<string>)(() => "Event Timer Render Distance"), (Func<string>)(() => "Defines the max render distance for in-world event timers."));
 			SettingComplianceExtensions.SetRange(EventTimersRenderDistance, 25, 500);
 			DisabledEventTimerSettingKeys = base.GlobalSettings.DefineSetting<List<string>>("DisabledEventTimerSettingKeys", new List<string>(), (Func<string>)(() => "Disabled Event Timers"), (Func<string>)(() => "Defines which event timers are disabled."));
-			EventTimersRemainingTextColor = base.GlobalSettings.DefineSetting<Color>("EventTimersRemainingTextColor", base.DefaultGW2Color, (Func<string>)(() => "Remaining Text Color"), (Func<string>)(() => "Defines the text color of the remaining section."));
-			EventTimersStartsInTextColor = base.GlobalSettings.DefineSetting<Color>("EventTimersStartsInTextColor", base.DefaultGW2Color, (Func<string>)(() => "Starts in Text Color"), (Func<string>)(() => "Defines the text color of the starts in section."));
-			EventTimersRepeatTextColor = base.GlobalSettings.DefineSetting<Color>("EventTimersRepeatTextColor", base.DefaultGW2Color, (Func<string>)(() => "Repeat Text Color"), (Func<string>)(() => "Defines the text color of the repeat section."));
-			EventTimersDurationTextColor = base.GlobalSettings.DefineSetting<Color>("EventTimersDurationTextColor", base.DefaultGW2Color, (Func<string>)(() => "Duration Text Color"), (Func<string>)(() => "Defines the text color of the duration section."));
 			EventTimersNameTextColor = base.GlobalSettings.DefineSetting<Color>("EventTimersNameTextColor", base.DefaultGW2Color, (Func<string>)(() => "Name Text Color"), (Func<string>)(() => "Defines the text color of the name section."));
+			EventTimersNameTextureWidth = base.GlobalSettings.DefineSetting<int>("EventTimersNameTextureWidth", 400, (Func<string>)(() => "Name X Resolution"), (Func<string>)(() => "Defines the width of the name section."));
+			SettingComplianceExtensions.SetRange(EventTimersNameTextureWidth, 100, 1024);
+			EventTimersNameTextureHeight = base.GlobalSettings.DefineSetting<int>("EventTimersNameTextureHeight", 50, (Func<string>)(() => "Name Y Resolution"), (Func<string>)(() => "Defines the height of the name section."));
+			SettingComplianceExtensions.SetRange(EventTimersNameTextureHeight, 10, 100);
+			EventTimersDurationTextColor = base.GlobalSettings.DefineSetting<Color>("EventTimersDurationTextColor", base.DefaultGW2Color, (Func<string>)(() => "Duration Text Color"), (Func<string>)(() => "Defines the text color of the duration section."));
+			EventTimersDurationTextureWidth = base.GlobalSettings.DefineSetting<int>("EventTimersDurationTextureWidth", 400, (Func<string>)(() => "Duration X Resolution"), (Func<string>)(() => "Defines the width of the duration section."));
+			SettingComplianceExtensions.SetRange(EventTimersDurationTextureWidth, 100, 1024);
+			EventTimersDurationTextureHeight = base.GlobalSettings.DefineSetting<int>("EventTimersDurationTextureHeight", 50, (Func<string>)(() => "Duration Y Resolution"), (Func<string>)(() => "Defines the height of the duration section."));
+			SettingComplianceExtensions.SetRange(EventTimersDurationTextureHeight, 10, 100);
+			EventTimersRepeatTextColor = base.GlobalSettings.DefineSetting<Color>("EventTimersRepeatTextColor", base.DefaultGW2Color, (Func<string>)(() => "Repeat Text Color"), (Func<string>)(() => "Defines the text color of the repeat section."));
+			EventTimersRepeatTextureWidth = base.GlobalSettings.DefineSetting<int>("EventTimersRepeatTextureWidth", 400, (Func<string>)(() => "Repeat X Resolution"), (Func<string>)(() => "Defines the width of the repeat section."));
+			SettingComplianceExtensions.SetRange(EventTimersRepeatTextureWidth, 100, 1024);
+			EventTimersRepeatTextureHeight = base.GlobalSettings.DefineSetting<int>("EventTimersRepeatTextureHeight", 50, (Func<string>)(() => "Repeat Y Resolution"), (Func<string>)(() => "Defines the height of the repeat section."));
+			SettingComplianceExtensions.SetRange(EventTimersRepeatTextureHeight, 10, 100);
+			EventTimersRemainingTextColor = base.GlobalSettings.DefineSetting<Color>("EventTimersRemainingTextColor", base.DefaultGW2Color, (Func<string>)(() => "Remaining Text Color"), (Func<string>)(() => "Defines the text color of the remaining section."));
+			EventTimersRemainingTextureWidth = base.GlobalSettings.DefineSetting<int>("EventTimersRemainingTextureWidth", 600, (Func<string>)(() => "Remaining X Resolution"), (Func<string>)(() => "Defines the width of the remaining section."));
+			SettingComplianceExtensions.SetRange(EventTimersRemainingTextureWidth, 100, 1024);
+			EventTimersRemainingTextureHeight = base.GlobalSettings.DefineSetting<int>("EventTimersRemainingTextureHeight", 50, (Func<string>)(() => "Remaining Y Resolution"), (Func<string>)(() => "Defines the height of the remaining section."));
+			SettingComplianceExtensions.SetRange(EventTimersRemainingTextureHeight, 10, 100);
+			EventTimersStartsInTextColor = base.GlobalSettings.DefineSetting<Color>("EventTimersStartsInTextColor", base.DefaultGW2Color, (Func<string>)(() => "Starts in Text Color"), (Func<string>)(() => "Defines the text color of the starts in section."));
+			EventTimersStartsInTextureWidth = base.GlobalSettings.DefineSetting<int>("EventTimersStartsInTextureWidth", 600, (Func<string>)(() => "Starts in X Resolution"), (Func<string>)(() => "Defines the width of the starts in section."));
+			SettingComplianceExtensions.SetRange(EventTimersStartsInTextureWidth, 100, 1024);
+			EventTimersStartsInTextureHeight = base.GlobalSettings.DefineSetting<int>("EventTimersStartsInTextureHeight", 50, (Func<string>)(() => "Starts in Y Resolution"), (Func<string>)(() => "Defines the height of the starts in section."));
+			SettingComplianceExtensions.SetRange(EventTimersStartsInTextureHeight, 10, 100);
 			EventTimersNextOccurenceTextColor = base.GlobalSettings.DefineSetting<Color>("EventTimersNextOccurenceTextColor", base.DefaultGW2Color, (Func<string>)(() => "Next Occurence Text Color"), (Func<string>)(() => "Defines the text color of the next occurence section."));
+			EventTimersNextOccurrenceTextureWidth = base.GlobalSettings.DefineSetting<int>("EventTimersNextOccurrenceTextureWidth", 600, (Func<string>)(() => "Next Occurrence X Resolution"), (Func<string>)(() => "Defines the width of the next occurrence section."));
+			SettingComplianceExtensions.SetRange(EventTimersNextOccurrenceTextureWidth, 100, 1024);
+			EventTimersNextOccurrenceTextureHeight = base.GlobalSettings.DefineSetting<int>("EventTimersNextOccurrenceTextureHeight", 50, (Func<string>)(() => "Next Occurrence Y Resolution"), (Func<string>)(() => "Defines the height of the next occurrence section."));
+			SettingComplianceExtensions.SetRange(EventTimersNextOccurrenceTextureHeight, 10, 100);
 			ShowDynamicEventsOnMap = base.GlobalSettings.DefineSetting<bool>("ShowDynamicEventsOnMap", false, (Func<string>)(() => "Show Dynamic Events on Map"), (Func<string>)(() => "Whether the dynamic events of the map should be shown."));
 			ShowDynamicEventInWorld = base.GlobalSettings.DefineSetting<bool>("ShowDynamicEventInWorld", false, (Func<string>)(() => "Show Dynamic Events in World"), (Func<string>)(() => "Whether dynamic events should be shown inside the world."));
 			ShowDynamicEventInWorld.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)ShowDynamicEventInWorld_SettingChanged);

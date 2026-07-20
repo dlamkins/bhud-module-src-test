@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Estreya.BlishHUD.Shared.Controls.World
 {
-	public abstract class WorldEntity : IEntity, IUpdatable, IRenderable3D
+	public abstract class WorldEntity : IEntity, IUpdatable, IRenderable3D, IDisposable
 	{
 		protected Vector3 Position { get; set; }
 
@@ -87,5 +87,14 @@ namespace Estreya.BlishHUD.Shared.Controls.World
 		protected abstract void InternalRender(GraphicsDevice graphicsDevice, IWorld world, ICamera camera);
 
 		public abstract bool IsPlayerInside(bool includeZAxis = true);
+
+		public virtual void Dispose()
+		{
+			BasicEffect renderEffect = RenderEffect;
+			if (renderEffect != null)
+			{
+				((GraphicsResource)renderEffect).Dispose();
+			}
+		}
 	}
 }
