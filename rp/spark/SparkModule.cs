@@ -132,8 +132,8 @@ namespace rp.spark
 			{
 				service.Start();
 			});
-			_windows = new SparkWindows(new WindowBuilder(), _profileRepository, _profileCache, _notes, _playerState, _iconIndex, _sparkSettings, _profileLoader, _profileActions, _nearbyPresenceService);
-			_cornerIcon = new SparkCornerIcon(_sparkSettings, ContentsManager, _windows.OpenProfileManager, _windows.OpenOnlineList, _windows.OpenNearby, _windows.OpenSavedProfiles, _windows.OpenBlocklist);
+			_windows = new SparkWindows(new WindowBuilder(), _profileRepository, _profileCache, _notes, _playerState, _iconIndex, _sparkSettings, _profileLoader, _profileActions, _nearbyPresenceService, RefreshPresenceSoon, SetNearbySharing);
+			_cornerIcon = new SparkCornerIcon(_sparkSettings, ContentsManager, _windows.OpenMyProfile, _windows.OpenProfileManager, _windows.OpenOnlineList, _windows.OpenNearby, _windows.OpenSavedProfiles, _windows.OpenBlocklist, _windows.OpenSettings, RefreshPresenceSoon, SetNearbySharing);
 		}
 
 		protected override Task LoadAsync()
@@ -193,7 +193,7 @@ namespace rp.spark
 		public override IView GetSettingsView()
 		{
 			EnsurePlayerStateLoad();
-			return (IView)(object)new SparkSettingsView(_windows.OpenProfileManager, _windows.OpenMyProfile, _windows.OpenOnlineList, _windows.OpenNearby, _windows.OpenSavedProfiles, _windows.OpenAbout, _windows.OpenBlocklist, WaitForPlayerStateAsync, GetPlayerStateMessage, ReloadPlayerState, _sparkSettings, GetServerSyncStatus, WatchServerSyncStatus, UnwatchServerSyncStatus, RefreshPresenceSoon, GetImportantSettingsNotice, _windows.ShouldHideGameplayWindows, CloseGameplayWindowsIfUnavailableSoon, _profileActions.WatchBlockedAccounts, _profileActions.UnwatchBlockedAccounts, _windows.HandleMaturePreferenceChanged);
+			return (IView)(object)new SparkSettingsView(_windows.OpenProfileManager, _windows.OpenMyProfile, _windows.OpenOnlineList, _windows.OpenNearby, _windows.OpenSavedProfiles, _windows.OpenAbout, _windows.OpenSettings, _windows.OpenBlocklist, WaitForPlayerStateAsync, GetPlayerStateMessage, ReloadPlayerState, _sparkSettings, GetServerSyncStatus, WatchServerSyncStatus, UnwatchServerSyncStatus, RefreshPresenceSoon, GetImportantSettingsNotice, _windows.ShouldHideGameplayWindows, _profileActions.WatchBlockedAccounts, _profileActions.UnwatchBlockedAccounts, _windows.HandleMaturePreferenceChanged);
 		}
 
 		private void ProfileSaved(CharacterProfile savedProfile)
@@ -252,6 +252,32 @@ namespace rp.spark
 				{
 					Logger.Warn(ex, "Failed to refresh SPARK data after a profile change.");
 				}
+			}
+		}
+
+		private async void SetNearbySharing(bool enabled)
+		{
+			_sparkSettings.ShowNearbyPresence.set_Value(enabled);
+			try
+			{
+				if (_nearbyPresenceService != null)
+				{
+					if (!enabled)
+					{
+						await _nearbyPresenceService.RemoveAsync();
+					}
+					else
+					{
+						await _nearbyPresenceService.PublishNowAsync();
+					}
+				}
+			}
+			catch (OperationCanceledException)
+			{
+			}
+			catch (Exception ex)
+			{
+				Logger.Warn(ex, "Failed to update nearby sharing from the SPARK menu.");
 			}
 		}
 

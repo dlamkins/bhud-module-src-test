@@ -1,17 +1,24 @@
 using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Blish_HUD.Modules.Managers;
 using Microsoft.Xna.Framework.Graphics;
+using rp.spark.Models;
 using rp.spark.Services;
+using rp.spark.UI.Controls;
+using rp.spark.UI.Views;
 
 namespace rp.spark.UI
 {
 	internal sealed class SparkCornerIcon : IDisposable
 	{
-		private const int MenuWidth = 170;
+		private const int MinimumMenuWidth = 190;
+
+		private const int MenuItemTextPadding = 72;
 
 		private readonly SparkSettings _settings;
 
@@ -20,6 +27,8 @@ namespace rp.spark.UI
 		private readonly AsyncTexture2D _hoverIcon;
 
 		private readonly bool _disposeHoverIcon;
+
+		private readonly Action _openMyProfile;
 
 		private readonly Action _openProfileManager;
 
@@ -31,9 +40,17 @@ namespace rp.spark.UI
 
 		private readonly Action _openBlocklist;
 
+		private readonly Action _openSettings;
+
+		private readonly Action _requestServerSync;
+
+		private readonly Action<bool> _setNearbySharing;
+
 		private CornerIcon _cornerIcon;
 
 		private ContextMenuStrip _menu;
+
+		private ContextMenuStripItem _myProfileItem;
 
 		private ContextMenuStripItem _profileEditorItem;
 
@@ -43,20 +60,30 @@ namespace rp.spark.UI
 
 		private ContextMenuStripItem _savedProfilesItem;
 
+		private ContextMenuStripItem _statusMenuItem;
+
+		private readonly Dictionary<RPStatus, ContextMenuStripItem> _statusMenuItems = new Dictionary<RPStatus, ContextMenuStripItem>();
+
+		private bool _isSyncingStatusMenu;
+
 		private bool _isDisposed;
 
-		public SparkCornerIcon(SparkSettings settings, ContentsManager contentsManager, Action openProfileManager, Action openOnlineList, Action openNearby, Action openSavedProfiles, Action openBlocklist)
+		public SparkCornerIcon(SparkSettings settings, ContentsManager contentsManager, Action openMyProfile, Action openProfileManager, Action openOnlineList, Action openNearby, Action openSavedProfiles, Action openBlocklist, Action openSettings, Action requestServerSync, Action<bool> setNearbySharing)
 		{
-			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0059: Expected O, but got Unknown
-			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0077: Expected O, but got Unknown
+			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0084: Expected O, but got Unknown
+			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a2: Expected O, but got Unknown
 			_settings = settings;
+			_openMyProfile = openMyProfile;
 			_openProfileManager = openProfileManager;
 			_openOnlineList = openOnlineList;
 			_openNearby = openNearby;
 			_openSavedProfiles = openSavedProfiles;
 			_openBlocklist = openBlocklist;
+			_openSettings = openSettings;
+			_requestServerSync = requestServerSync;
+			_setNearbySharing = setNearbySharing;
 			Texture2D iconTexture = contentsManager.GetTexture("spark-corner-icon.png");
 			Texture2D hoverTexture = contentsManager.GetTexture("spark-corner-icon-hover.png", iconTexture);
 			_icon = new AsyncTexture2D(iconTexture);
@@ -70,6 +97,7 @@ namespace rp.spark.UI
 				_disposeHoverIcon = true;
 			}
 			_settings.ShowCornerIcon.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnShowCornerIconChanged);
+			_settings.CurrentStatus.add_SettingChanged((EventHandler<ValueChangedEventArgs<RPStatus>>)OnCurrentStatusChanged);
 		}
 
 		public void Refresh()
@@ -106,17 +134,45 @@ namespace rp.spark.UI
 		{
 			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0011: Expected O, but got Unknown
+			//IL_0012: Expected O, but got Unknown
 			ContextMenuStrip val = new ContextMenuStrip();
-			((Control)val).set_Width(170);
+			((Control)val).set_Width(CalculateMenuWidth());
 			ContextMenuStrip menu = val;
+			AddStatusSubmenu(menu);
+			_myProfileItem = AddMenuItem(menu, "My Profile", _openMyProfile);
 			_profileEditorItem = AddMenuItem(menu, "Profile Editor", _openProfileManager);
+			AddSectionHeader(menu, "Players");
 			_onlineListItem = AddMenuItem(menu, "Online List", _openOnlineList);
 			_nearbyPlayersItem = AddMenuItem(menu, "Nearby Players", _openNearby);
 			_savedProfilesItem = AddMenuItem(menu, "Saved Profiles", _openSavedProfiles);
+			AddSectionHeader(menu, "Config");
+			AddMenuItem(menu, "Settings", _openSettings);
 			AddMenuItem(menu, "Manage Blocks", _openBlocklist);
+			AddPrivacySubmenu(menu);
 			RefreshMenuState();
 			return menu;
+		}
+
+		private int CalculateMenuWidth()
+		{
+			int width = 190;
+			width = Math.Max(width, MenuItemWidth("My Profile"));
+			width = Math.Max(width, MenuItemWidth("Profile Editor"));
+			width = Math.Max(width, MenuItemWidth("Nearby Players"));
+			width = Math.Max(width, MenuItemWidth("Saved Profiles"));
+			width = Math.Max(width, MenuItemWidth("Manage Blocks"));
+			string[] rpStatusOptions = ProfileLabels.RpStatusOptions;
+			foreach (string label in rpStatusOptions)
+			{
+				width = Math.Max(width, MenuItemWidth("Status: " + label));
+			}
+			return Math.Max(width, MenuItemWidth("Status: " + CurrentStatusLabel()));
+		}
+
+		private static int MenuItemWidth(string text)
+		{
+			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
+			return (int)Math.Ceiling(GameService.Content.get_DefaultFont14().MeasureString(text).Width) + 72;
 		}
 
 		private static ContextMenuStripItem AddMenuItem(ContextMenuStrip menu, string text, Action action)
@@ -132,10 +188,186 @@ namespace rp.spark.UI
 			return item;
 		}
 
+		private static void AddSectionHeader(ContextMenuStrip menu, string text)
+		{
+			menu.AddMenuItem((ContextMenuStripItem)(object)new ContextMenuHeader(text));
+		}
+
+		private void AddPrivacySubmenu(ContextMenuStrip menu)
+		{
+			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0021: Expected O, but got Unknown
+			menu.AddMenuItem("Privacy").set_Submenu(new ContextMenuStrip((Func<IEnumerable<ContextMenuStripItem>>)GetPrivacyMenuItems));
+		}
+
+		[IteratorStateMachine(typeof(_003CGetPrivacyMenuItems_003Ed__35))]
+		private IEnumerable<ContextMenuStripItem> GetPrivacyMenuItems()
+		{
+			return new _003CGetPrivacyMenuItems_003Ed__35(-2)
+			{
+				_003C_003E4__this = this
+			};
+		}
+
+		private static ContextMenuStripItem CreateCheckMenuItem(string text, bool isChecked, Action<bool> onChanged)
+		{
+			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003a: Expected O, but got Unknown
+			ContextMenuStripItem val = new ContextMenuStripItem();
+			val.set_Text(text);
+			val.set_CanCheck(true);
+			val.set_Checked(isChecked);
+			val.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate(object s, CheckChangedEvent e)
+			{
+				onChanged?.Invoke(e.get_Checked());
+			});
+			return val;
+		}
+
+		private void SetShareProfile(bool enabled)
+		{
+			if (_settings.BroadcastProfile.get_Value() != enabled)
+			{
+				_settings.BroadcastProfile.set_Value(enabled);
+				_requestServerSync?.Invoke();
+			}
+		}
+
+		private void SetHideLocation(bool enabled)
+		{
+			if (_settings.HideLocation.get_Value() != enabled)
+			{
+				_settings.HideLocation.set_Value(enabled);
+				_requestServerSync?.Invoke();
+			}
+		}
+
+		private void SetNearbyPresence(bool enabled)
+		{
+			if (_settings.ShowNearbyPresence.get_Value() != enabled)
+			{
+				if (_setNearbySharing != null)
+				{
+					_setNearbySharing(enabled);
+				}
+				else
+				{
+					_settings.ShowNearbyPresence.set_Value(enabled);
+				}
+			}
+		}
+
+		private void AddStatusSubmenu(ContextMenuStrip menu)
+		{
+			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004a: Expected O, but got Unknown
+			RPStatus currentStatus = CurrentStatus();
+			_statusMenuItem = menu.AddMenuItem((ContextMenuStripItem)(object)new ContextMenuColours("Status: " + ProfileLabels.StatusLabel(currentStatus), ProfileStatusColors.Get(currentStatus)));
+			_statusMenuItem.set_Submenu(new ContextMenuStrip((Func<IEnumerable<ContextMenuStripItem>>)GetStatusMenuItems));
+		}
+
+		private static ContextMenuColours CreateColoredCheckMenuItem(string text, RPStatus status, bool isChecked, Action<bool> onChanged)
+		{
+			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+			ContextMenuColours contextMenuColours = new ContextMenuColours(text, ProfileStatusColors.Get(status));
+			((ContextMenuStripItem)contextMenuColours).set_CanCheck(true);
+			((ContextMenuStripItem)contextMenuColours).set_Checked(isChecked);
+			((ContextMenuStripItem)contextMenuColours).add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate(object s, CheckChangedEvent e)
+			{
+				onChanged?.Invoke(e.get_Checked());
+			});
+			return contextMenuColours;
+		}
+
+		[IteratorStateMachine(typeof(_003CGetStatusMenuItems_003Ed__42))]
+		private IEnumerable<ContextMenuStripItem> GetStatusMenuItems()
+		{
+			return new _003CGetStatusMenuItems_003Ed__42(-2)
+			{
+				_003C_003E4__this = this
+			};
+		}
+
+		private RPStatus CurrentStatus()
+		{
+			RPStatus status = _settings.CurrentStatus.get_Value();
+			if (status != RPStatus.Offline)
+			{
+				return status;
+			}
+			return RPStatus.Online;
+		}
+
+		private string CurrentStatusLabel()
+		{
+			return ProfileLabels.StatusLabel(CurrentStatus());
+		}
+
+		private void SetStatus(RPStatus status)
+		{
+			if (status == RPStatus.Offline)
+			{
+				status = RPStatus.Online;
+			}
+			if (_settings.CurrentStatus.get_Value() != status)
+			{
+				_settings.CurrentStatus.set_Value(status);
+				_requestServerSync?.Invoke();
+			}
+		}
+
+		private void OnCurrentStatusChanged(object sender, ValueChangedEventArgs<RPStatus> e)
+		{
+			SparkUiThread.Queue(delegate
+			{
+				if (!_isDisposed)
+				{
+					SyncStatusMenuFromSettings();
+				}
+			});
+		}
+
+		private void SyncStatusMenuFromSettings()
+		{
+			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+			RPStatus currentStatus = CurrentStatus();
+			if (_statusMenuItem != null)
+			{
+				_statusMenuItem.set_Text("Status: " + ProfileLabels.StatusLabel(currentStatus));
+				ContextMenuColours coloredStatusMenuItem = _statusMenuItem as ContextMenuColours;
+				if (coloredStatusMenuItem != null)
+				{
+					coloredStatusMenuItem.TextColor = ProfileStatusColors.Get(currentStatus);
+				}
+			}
+			_isSyncingStatusMenu = true;
+			try
+			{
+				foreach (KeyValuePair<RPStatus, ContextMenuStripItem> pair in _statusMenuItems)
+				{
+					bool shouldBeChecked = pair.Key == currentStatus;
+					if (pair.Value.get_Checked() != shouldBeChecked)
+					{
+						pair.Value.set_Checked(shouldBeChecked);
+					}
+				}
+			}
+			finally
+			{
+				_isSyncingStatusMenu = false;
+			}
+		}
+
 		private void RefreshMenuState()
 		{
 			bool enabled = !ShouldDisableGameplayMenuItems();
 			string tooltip = (enabled ? string.Empty : DisabledMenuTooltip());
+			SetMenuItemState(_myProfileItem, enabled, tooltip);
 			SetMenuItemState(_profileEditorItem, enabled, tooltip);
 			SetMenuItemState(_onlineListItem, enabled, tooltip);
 			SetMenuItemState(_nearbyPlayersItem, enabled, tooltip);
@@ -226,10 +458,13 @@ namespace rp.spark.UI
 				((Control)menu).Dispose();
 			}
 			_menu = null;
+			_myProfileItem = null;
 			_profileEditorItem = null;
 			_onlineListItem = null;
 			_nearbyPlayersItem = null;
 			_savedProfilesItem = null;
+			_statusMenuItem = null;
+			_statusMenuItems.Clear();
 		}
 
 		public void Dispose()
@@ -240,6 +475,7 @@ namespace rp.spark.UI
 			}
 			_isDisposed = true;
 			_settings.ShowCornerIcon.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnShowCornerIconChanged);
+			_settings.CurrentStatus.remove_SettingChanged((EventHandler<ValueChangedEventArgs<RPStatus>>)OnCurrentStatusChanged);
 			Clear();
 			AsyncTexture2D icon = _icon;
 			if (icon != null)

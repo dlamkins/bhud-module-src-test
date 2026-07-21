@@ -262,6 +262,7 @@ namespace rp.spark.Services
 			}
 			profile.ProfileId = (string.IsNullOrWhiteSpace(profile.ProfileId) ? Guid.NewGuid().ToString() : profile.ProfileId.Trim());
 			profile.ProfileName = ProfileName(profile);
+			profile.DiscoveryTags = ProfileDiscoveryMapper.Normalize(profile.DiscoveryTags);
 			if (profile.CreatedAt == default(DateTime))
 			{
 				profile.CreatedAt = DateTime.UtcNow;
@@ -382,6 +383,7 @@ namespace rp.spark.Services
 			{
 				profile.ProfileId = (string.IsNullOrWhiteSpace(profile.ProfileId) ? Guid.NewGuid().ToString() : profile.ProfileId.Trim());
 				profile.ProfileName = ProfileName(profile);
+				profile.DiscoveryTags = ProfileDiscoveryMapper.Normalize(profile.DiscoveryTags);
 				if (profile.CreatedAt == default(DateTime))
 				{
 					profile.CreatedAt = ((profile.UpdatedAt == default(DateTime)) ? DateTime.UtcNow : profile.UpdatedAt);

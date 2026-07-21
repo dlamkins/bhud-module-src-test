@@ -48,6 +48,12 @@ namespace rp.spark.UI
 
 		private readonly NearbyPresenceService _nearbyPresenceService;
 
+		private readonly Action _requestServerSync;
+
+		private readonly Action<bool> _setNearbySharing;
+
+		private TabbedWindow2 _settingsWindow;
+
 		private ProfileEditorSession _profileEditorSession;
 
 		private TabbedWindow2 _profileWindow;
@@ -94,7 +100,7 @@ namespace rp.spark.UI
 			}
 		}
 
-		public SparkWindows(WindowBuilder windowBuilder, ProfileRepository profileRepository, ProfileCache profileCache, ProfileNotes notes, PlayerStateService playerState, IconIndexService iconIndexService, SparkSettings settings, ProfileLoader profileLoader, ProfileActions profileActions, NearbyPresenceService nearbyPresenceService)
+		public SparkWindows(WindowBuilder windowBuilder, ProfileRepository profileRepository, ProfileCache profileCache, ProfileNotes notes, PlayerStateService playerState, IconIndexService iconIndexService, SparkSettings settings, ProfileLoader profileLoader, ProfileActions profileActions, NearbyPresenceService nearbyPresenceService, Action requestServerSync, Action<bool> setNearbySharing)
 		{
 			_windowBuilder = windowBuilder;
 			_profileRepository = profileRepository;
@@ -106,6 +112,8 @@ namespace rp.spark.UI
 			_profileLoader = profileLoader;
 			_profileActions = profileActions;
 			_nearbyPresenceService = nearbyPresenceService;
+			_requestServerSync = requestServerSync;
+			_setNearbySharing = setNearbySharing;
 		}
 
 		internal static bool IsLoadingScreen()
@@ -172,7 +180,10 @@ namespace rp.spark.UI
 				{
 					CreateOnlineListWindow();
 				}
-				_onlineListWindow.Show((IView)(object)new OnlineProfilesView((CancellationToken cancellationToken) => _profileLoader.LoadOnlineAsync(cancellationToken), _profileLoader.LoadCachedOnlineRows, OpenPresence, _profileActions.IsPresenceBookmarked, _profileActions.WatchSavedProfiles, _profileActions.UnwatchSavedProfiles, () => _settings.AutoRefreshOnlineProfiles.get_Value()));
+				_onlineListWindow.Show((IView)(object)new OnlineProfilesView((CancellationToken cancellationToken) => _profileLoader.LoadOnlineAsync(cancellationToken), _profileLoader.LoadCachedOnlineRows, OpenPresence, _profileActions.IsPresenceBookmarked, _profileActions.WatchSavedProfiles, _profileActions.UnwatchSavedProfiles, () => _settings.AutoRefreshOnlineProfiles.get_Value(), delegate(bool value)
+				{
+					_settings.AutoRefreshOnlineProfiles.set_Value(value);
+				}));
 			}
 		}
 
@@ -235,6 +246,20 @@ namespace rp.spark.UI
 				CreateBlocklistWindow();
 			}
 			_blocklistWindow.Show((IView)(object)new SparkBlocklistView(_settings, _profileActions.BlockAccount, _profileActions.UnblockAccount, _profileActions.WatchBlockedAccounts, _profileActions.UnwatchBlockedAccounts));
+		}
+
+		public void OpenSettings()
+		{
+			if (_settingsWindow != null && ((Control)_settingsWindow).get_Visible())
+			{
+				((WindowBase2)_settingsWindow).BringWindowToFront();
+				return;
+			}
+			if (_settingsWindow == null)
+			{
+				CreateSettingsWindow();
+			}
+			((Control)_settingsWindow).Show();
 		}
 
 		public void ShowProfileViewer(ProfileViewData viewData)
@@ -474,6 +499,14 @@ namespace rp.spark.UI
 			_blocklistWindow = _windowBuilder.MakeWindow("Blocked Accounts", "rp.spark.blocklist-window", new Rectangle(70, 60, 760, 610));
 		}
 
+		private void CreateSettingsWindow()
+		{
+			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0058: Expected O, but got Unknown
+			_settingsWindow = _windowBuilder.MakeTabbedWindow("Settings", "rp.spark.settings-window");
+			_settingsWindow.get_Tabs().Add(new Tab(_windowBuilder.IconFromAsset(155052), (Func<IView>)(() => (IView)(object)new SparkOptionsView(_settings, _requestServerSync, _setNearbySharing, HandleMaturePreferenceChanged)), "General", (int?)100));
+		}
+
 		public void HandleMaturePreferenceChanged(bool enabled)
 		{
 			if (enabled)
@@ -535,6 +568,8 @@ namespace rp.spark.UI
 			_aboutWindow = null;
 			_windowBuilder.DisposeWindow((WindowBase2)(object)_blocklistWindow);
 			_blocklistWindow = null;
+			_windowBuilder.DisposeWindow((WindowBase2)(object)_settingsWindow);
+			_settingsWindow = null;
 			_windowBuilder.Clear();
 		}
 	}

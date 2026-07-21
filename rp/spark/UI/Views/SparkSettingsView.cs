@@ -33,11 +33,11 @@ namespace rp.spark.UI.Views
 
 		private readonly Action _requestServerSync;
 
-		private readonly Action _enforceGameplayWindowVisibility;
-
 		private readonly Func<string> _getImportantNotice;
 
 		private readonly SparkSettingsButtons _buttons;
+
+		private readonly Action _openSettings;
 
 		private readonly Action _openBlocklist;
 
@@ -45,13 +45,15 @@ namespace rp.spark.UI.Views
 
 		private readonly Action<Action> _unwatchBlockedAccountsChanged;
 
-		private readonly Action<bool> _maturePreferenceChanged;
+		private readonly MatureProfilesConfirmation _matureProfilesConfirm;
 
 		private Label _blockedAccountsLabel;
 
-		private Container _buildPanel;
+		private Dropdown _statusDropdown;
 
-		private Panel _matureConfirmationPanel;
+		private Dropdown _regionDropdown;
+
+		private Container _buildPanel;
 
 		private bool _isUnloaded;
 
@@ -65,7 +67,7 @@ namespace rp.spark.UI.Views
 
 		private Task _noticeRefreshTask;
 
-		public SparkSettingsView(Action openProfileManager, Action openProfileViewer, Action openOnlineList, Action openNearby, Action openSavedProfiles, Action openAbout, Action openBlocklist, Func<Task<string>> waitForInitialState, Func<string> getCurrentStateMessage, Action requestStateRefresh, SparkSettings settings, Func<ServerSyncStatus> getServerSyncStatus, Action<Action<ServerSyncStatus>> watchServerSyncStatus, Action<Action<ServerSyncStatus>> unwatchServerSyncStatus, Action requestServerSync, Func<string> getImportantNotice, Func<bool> shouldHideGameplayWindows, Action enforceGameplayWindowVisibility, Action<Action> watchBlockedAccountsChanged, Action<Action> unwatchBlockedAccountsChanged, Action<bool> maturePreferenceChanged)
+		public SparkSettingsView(Action openProfileManager, Action openProfileViewer, Action openOnlineList, Action openNearby, Action openSavedProfiles, Action openAbout, Action openSettings, Action openBlocklist, Func<Task<string>> waitForInitialState, Func<string> getCurrentStateMessage, Action requestStateRefresh, SparkSettings settings, Func<ServerSyncStatus> getServerSyncStatus, Action<Action<ServerSyncStatus>> watchServerSyncStatus, Action<Action<ServerSyncStatus>> unwatchServerSyncStatus, Action requestServerSync, Func<string> getImportantNotice, Func<bool> shouldHideGameplayWindows, Action<Action> watchBlockedAccountsChanged, Action<Action> unwatchBlockedAccountsChanged, Action<bool> maturePreferenceChanged)
 			: this()
 		{
 			_settings = settings;
@@ -74,12 +76,12 @@ namespace rp.spark.UI.Views
 			_unwatchServerSyncStatus = unwatchServerSyncStatus;
 			_requestServerSync = requestServerSync;
 			_getImportantNotice = getImportantNotice;
-			_enforceGameplayWindowVisibility = enforceGameplayWindowVisibility;
 			_buttons = new SparkSettingsButtons(openProfileManager, openProfileViewer, openOnlineList, openNearby, openSavedProfiles, openAbout, GetMatureProfilesButtonText, ToggleMatureProfiles, waitForInitialState, getCurrentStateMessage, requestStateRefresh, shouldHideGameplayWindows);
+			_openSettings = openSettings;
 			_openBlocklist = openBlocklist;
 			_watchBlockedAccountsChanged = watchBlockedAccountsChanged;
 			_unwatchBlockedAccountsChanged = unwatchBlockedAccountsChanged;
-			_maturePreferenceChanged = maturePreferenceChanged;
+			_matureProfilesConfirm = new MatureProfilesConfirmation(settings, maturePreferenceChanged);
 		}
 
 		protected override void Build(Container buildPanel)
@@ -89,6 +91,7 @@ namespace rp.spark.UI.Views
 			BuildSettings(buildPanel);
 			WatchServer();
 			WatchGameState();
+			WatchSettings();
 			StartNoticeRefresh();
 			RefreshServerStatus();
 		}
@@ -100,9 +103,12 @@ namespace rp.spark.UI.Views
 			BuildServerStatus(settingsStack);
 			BuildReadinessNotice(settingsStack);
 			_buttons.Build((Container)(object)settingsStack);
+			((Control)SparkFormLayout.AddButton((Container)(object)SparkFormLayout.AddRow((Container)(object)settingsStack, 660, 30, 8), "Settings", 110, 30)).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				_openSettings?.Invoke();
+			});
 			SparkFormLayout.AddSpacer((Container)(object)settingsStack, 660, 4);
 			BuildPresence(settingsStack);
-			BuildGlobalSettings(settingsStack);
 			SparkFormLayout.AddSpacer((Container)(object)settingsStack, 660, 4);
 			BuildBlockSummary(settingsStack);
 		}
@@ -125,33 +131,38 @@ namespace rp.spark.UI.Views
 
 		private void BuildPresence(FlowPanel settingsStack)
 		{
-			RPStatus currentStatus = ((_settings.CurrentStatus.get_Value() != RPStatus.Offline) ? _settings.CurrentStatus.get_Value() : RPStatus.Online);
+			if (_settings.CurrentStatus.get_Value() != RPStatus.Offline)
+			{
+				_settings.CurrentStatus.get_Value();
+			}
 			FlowPanel statusRow = SparkFormLayout.AddRow((Container)(object)settingsStack, 660, 30, 8);
 			SparkFormLayout.AddLabel((Container)(object)statusRow, "Status:", 55, 30, GameService.Content.get_DefaultFont14());
-			Dropdown statusDropdown = SparkFormLayout.AddDropdown((Container)(object)statusRow, ProfileLabels.RpStatusOptions, ProfileLabels.StatusLabel(currentStatus), 155, 30);
-			statusDropdown.add_ValueChanged((EventHandler<ValueChangedEventArgs>)delegate
+			_statusDropdown = SparkFormLayout.AddDropdown((Container)(object)statusRow, ProfileLabels.RpStatusOptions, ProfileLabels.StatusLabel(_settings.CurrentStatus.get_Value()), 155, 30);
+			_statusDropdown.add_ValueChanged((EventHandler<ValueChangedEventArgs>)delegate
 			{
-				_settings.CurrentStatus.set_Value(ProfileLabels.ParseStatus(statusDropdown.get_SelectedItem()?.ToString()));
-				_requestServerSync?.Invoke();
+				RPStatus rPStatus = ProfileLabels.ParseStatus(_statusDropdown.get_SelectedItem()?.ToString());
+				if (_settings.CurrentStatus.get_Value() != rPStatus)
+				{
+					_settings.CurrentStatus.set_Value(rPStatus);
+					_requestServerSync?.Invoke();
+				}
 			});
-			Checkbox broadcastCheckbox = SparkFormLayout.AddCheckbox((Container)(object)statusRow, "Share my profile", _settings.BroadcastProfile.get_Value(), 230);
-			broadcastCheckbox.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
+			SyncStatusDropdownFromSettings();
+			SparkFormLayout.AddLabel((Container)(object)statusRow, "Region:", 58, 30, GameService.Content.get_DefaultFont14());
+			_regionDropdown = SparkFormLayout.AddDropdown((Container)(object)statusRow, new string[2]
 			{
-				_settings.BroadcastProfile.set_Value(broadcastCheckbox.get_Checked());
-			});
-			broadcastCheckbox.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
+				ProfileRegion.NA.ToString(),
+				ProfileRegion.EU.ToString()
+			}, _settings.RegionFilter.get_Value().ToString(), 90, 30);
+			_regionDropdown.add_ValueChanged((EventHandler<ValueChangedEventArgs>)delegate
 			{
-				_requestServerSync?.Invoke();
+				if (Enum.TryParse<ProfileRegion>(_regionDropdown.get_SelectedItem()?.ToString(), out var result) && _settings.RegionFilter.get_Value() != result)
+				{
+					_settings.RegionFilter.set_Value(result);
+					_requestServerSync?.Invoke();
+				}
 			});
-			Checkbox hideLocationCheckbox = SparkFormLayout.AddCheckbox((Container)(object)statusRow, "Hide my location", _settings.HideLocation.get_Value(), 180);
-			hideLocationCheckbox.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
-			{
-				_settings.HideLocation.set_Value(hideLocationCheckbox.get_Checked());
-			});
-			hideLocationCheckbox.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
-			{
-				_requestServerSync?.Invoke();
-			});
+			SyncRegionDropdownFromSettings();
 		}
 
 		private void BuildBlockSummary(FlowPanel settingsStack)
@@ -196,6 +207,77 @@ namespace rp.spark.UI.Views
 		private void UnwatchServer()
 		{
 			_unwatchServerSyncStatus?.Invoke(OnServerStatus);
+		}
+
+		private void WatchSettings()
+		{
+			_settings.CurrentStatus.add_SettingChanged((EventHandler<ValueChangedEventArgs<RPStatus>>)OnCurrentStatusChanged);
+			_settings.RegionFilter.add_SettingChanged((EventHandler<ValueChangedEventArgs<ProfileRegion>>)OnRegionFilterChanged);
+			_settings.ShowMatureProfiles.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnMatureProfilesChanged);
+		}
+
+		private void UnwatchSettings()
+		{
+			_settings.CurrentStatus.remove_SettingChanged((EventHandler<ValueChangedEventArgs<RPStatus>>)OnCurrentStatusChanged);
+			_settings.RegionFilter.remove_SettingChanged((EventHandler<ValueChangedEventArgs<ProfileRegion>>)OnRegionFilterChanged);
+			_settings.ShowMatureProfiles.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnMatureProfilesChanged);
+		}
+
+		private void OnCurrentStatusChanged(object sender, ValueChangedEventArgs<RPStatus> e)
+		{
+			SparkUiThread.Queue(delegate
+			{
+				if (!_isUnloaded)
+				{
+					SyncStatusDropdownFromSettings();
+				}
+			});
+		}
+
+		private void OnRegionFilterChanged(object sender, ValueChangedEventArgs<ProfileRegion> e)
+		{
+			SparkUiThread.Queue(delegate
+			{
+				if (!_isUnloaded)
+				{
+					SyncRegionDropdownFromSettings();
+				}
+			});
+		}
+
+		private void OnMatureProfilesChanged(object sender, ValueChangedEventArgs<bool> e)
+		{
+			SparkUiThread.Queue(delegate
+			{
+				if (!_isUnloaded)
+				{
+					_buttons.RefreshMatureButtonText();
+				}
+			});
+		}
+
+		private void SyncRegionDropdownFromSettings()
+		{
+			if (_regionDropdown != null)
+			{
+				string label = _settings.RegionFilter.get_Value().ToString();
+				if (!string.Equals(_regionDropdown.get_SelectedItem()?.ToString(), label, StringComparison.Ordinal))
+				{
+					_regionDropdown.set_SelectedItem(label);
+				}
+			}
+		}
+
+		private void SyncStatusDropdownFromSettings()
+		{
+			if (_statusDropdown != null)
+			{
+				string label = ProfileLabels.StatusLabel((_settings.CurrentStatus.get_Value() != RPStatus.Offline) ? _settings.CurrentStatus.get_Value() : RPStatus.Online);
+				if (!string.Equals(_statusDropdown.get_SelectedItem()?.ToString(), label, StringComparison.Ordinal))
+				{
+					_statusDropdown.set_SelectedItem(label);
+				}
+			}
 		}
 
 		private void StartNoticeRefresh()
@@ -303,202 +385,15 @@ namespace rp.spark.UI.Views
 			}
 		}
 
-		private void BuildGlobalSettings(FlowPanel settingsStack)
-		{
-			FlowPanel optionsRow = SparkFormLayout.AddRow((Container)(object)settingsStack, 660, 30, 12);
-			SparkFormLayout.AddLabel((Container)(object)optionsRow, "Region:", 55, 30, GameService.Content.get_DefaultFont14());
-			Dropdown regionDropdown = SparkFormLayout.AddDropdown((Container)(object)optionsRow, new string[2]
-			{
-				ProfileRegion.NA.ToString(),
-				ProfileRegion.EU.ToString()
-			}, _settings.RegionFilter.get_Value().ToString(), 90, 30);
-			regionDropdown.add_ValueChanged((EventHandler<ValueChangedEventArgs>)delegate
-			{
-				if (Enum.TryParse<ProfileRegion>(regionDropdown.get_SelectedItem()?.ToString(), out var result))
-				{
-					_settings.RegionFilter.set_Value(result);
-					_requestServerSync?.Invoke();
-				}
-			});
-			Checkbox autoRefreshCheckbox = SparkFormLayout.AddCheckbox((Container)(object)optionsRow, "Auto-refresh Online List", _settings.AutoRefreshOnlineProfiles.get_Value(), 220);
-			autoRefreshCheckbox.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
-			{
-				_settings.AutoRefreshOnlineProfiles.set_Value(autoRefreshCheckbox.get_Checked());
-			});
-			Checkbox autoHideCheckbox = SparkFormLayout.AddCheckbox((Container)(object)optionsRow, "Auto-hide UI", _settings.AutoHideGameUi.get_Value(), 230);
-			autoHideCheckbox.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
-			{
-				_settings.AutoHideGameUi.set_Value(autoHideCheckbox.get_Checked());
-				RefreshReadinessNotice();
-				_buttons.Refresh();
-				_enforceGameplayWindowVisibility?.Invoke();
-			});
-			Checkbox cornerIconCheckbox = SparkFormLayout.AddCheckbox((Container)(object)optionsRow, "Show SPARK icon", _settings.ShowCornerIcon.get_Value(), 125);
-			cornerIconCheckbox.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
-			{
-				_settings.ShowCornerIcon.set_Value(cornerIconCheckbox.get_Checked());
-			});
-		}
-
-		private void SetMatureProfilesEnabled(bool enabled)
-		{
-			_settings.ShowMatureProfiles.set_Value(enabled);
-			_buttons.RefreshMatureButtonText();
-			_maturePreferenceChanged?.Invoke(enabled);
-		}
-
-		private void OpenMatureConfirmation()
-		{
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008a: Expected O, but got Unknown
-			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0129: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0130: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0134: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0146: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0160: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0173: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0185: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ac: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01dd: Unknown result type (might be due to invalid IL or missing references)
-			CloseMatureConfirmation();
-			Container popupParent = (Container)(((object)_buildPanel) ?? ((object)GameService.Graphics.get_SpriteScreen()));
-			Panel val = new Panel();
-			val.set_ShowBorder(true);
-			val.set_Title("Enable Mature Profiles?");
-			((Control)val).set_Size(new Point(500, 190));
-			((Control)val).set_Location(GetCenteredPopupLocation(popupParent, 500, 190));
-			((Control)val).set_Parent(popupParent);
-			((Control)val).set_BackgroundColor(new Color(38, 35, 32));
-			((Control)val).set_ClipsBounds(false);
-			((Control)val).set_ZIndex(100);
-			_matureConfirmationPanel = val;
-			StandardButton val2 = new StandardButton();
-			val2.set_Text("X");
-			((Control)val2).set_Location(new Point(468, -28));
-			((Control)val2).set_Size(new Point(24, 24));
-			((Control)val2).set_Parent((Container)(object)_matureConfirmationPanel);
-			((Control)val2).set_ClipsBounds(false);
-			((Control)val2).set_ZIndex(10011);
-			((Control)val2).add_Click((EventHandler<MouseEventArgs>)delegate
-			{
-				CloseMatureConfirmation();
-			});
-			Label val3 = new Label();
-			val3.set_Text("Enabling this will allow you to view profiles marked as mature/18+. These profiles may contain explicit details not suitable for minors." + Environment.NewLine + Environment.NewLine + "Are you sure you want to continue?");
-			val3.set_Font(GameService.Content.get_DefaultFont14());
-			val3.set_TextColor(Color.get_White());
-			val3.set_WrapText(true);
-			((Control)val3).set_Location(new Point(16, 6));
-			((Control)val3).set_Size(new Point(468, 92));
-			((Control)val3).set_Parent((Container)(object)_matureConfirmationPanel);
-			StandardButton val4 = new StandardButton();
-			val4.set_Text("Show Mature Profiles");
-			((Control)val4).set_Location(new Point(200, 108));
-			((Control)val4).set_Size(new Point(165, 32));
-			((Control)val4).set_Parent((Container)(object)_matureConfirmationPanel);
-			((Control)val4).add_Click((EventHandler<MouseEventArgs>)delegate
-			{
-				SetMatureProfilesEnabled(enabled: true);
-				CloseMatureConfirmation();
-			});
-			StandardButton val5 = new StandardButton();
-			val5.set_Text("No");
-			((Control)val5).set_Location(new Point(379, 108));
-			((Control)val5).set_Size(new Point(105, 32));
-			((Control)val5).set_Parent((Container)(object)_matureConfirmationPanel);
-			((Control)val5).add_Click((EventHandler<MouseEventArgs>)delegate
-			{
-				CloseMatureConfirmation();
-			});
-		}
-
-		private void CloseMatureConfirmation()
-		{
-			Panel matureConfirmationPanel = _matureConfirmationPanel;
-			if (matureConfirmationPanel != null)
-			{
-				((Control)matureConfirmationPanel).Dispose();
-			}
-			_matureConfirmationPanel = null;
-		}
-
 		private string GetMatureProfilesButtonText()
 		{
-			if (!_settings.ShowMatureProfiles.get_Value())
-			{
-				return "Mature Profiles Hidden";
-			}
-			return "Mature Profiles Visible";
+			return _matureProfilesConfirm.ButtonText;
 		}
 
 		private void ToggleMatureProfiles()
 		{
-			if (_settings.ShowMatureProfiles.get_Value())
-			{
-				SetMatureProfilesEnabled(enabled: false);
-			}
-			else
-			{
-				OpenMatureConfirmation();
-			}
-		}
-
-		private static Point GetCenteredPopupLocation(Container parent, int width, int height)
-		{
-			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-			Point size;
-			if (parent == null)
-			{
-				size = ((Control)GameService.Graphics.get_SpriteScreen()).get_Size();
-			}
-			else
-			{
-				Rectangle contentRegion = parent.get_ContentRegion();
-				size = ((Rectangle)(ref contentRegion)).get_Size();
-			}
-			int x = (size.X - width) / 2;
-			int y = (size.Y - height) / 2;
-			return new Point(Math.Max(8, x), Math.Max(8, y));
+			_matureProfilesConfirm.Toggle(_buildPanel);
+			_buttons.RefreshMatureButtonText();
 		}
 
 		private string GetImportantNotice()
@@ -533,13 +428,16 @@ namespace rp.spark.UI.Views
 		protected override void Unload()
 		{
 			_isUnloaded = true;
-			CloseMatureConfirmation();
+			_matureProfilesConfirm.Dispose();
 			_buildPanel = null;
 			StopNoticeRefresh();
 			_buttons.Dispose();
 			_unwatchBlockedAccountsChanged?.Invoke(OnBlockedAccountsChanged);
 			UnwatchServer();
 			UnwatchGameState();
+			UnwatchSettings();
+			_statusDropdown = null;
+			_regionDropdown = null;
 		}
 	}
 }

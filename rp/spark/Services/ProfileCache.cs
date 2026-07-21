@@ -46,6 +46,8 @@ namespace rp.spark.Services
 
 			public bool IsMature { get; set; }
 
+			public ProfileExperience Experience { get; set; }
+
 			public string AccountName { get; set; } = string.Empty;
 
 
@@ -73,6 +75,15 @@ namespace rp.spark.Services
 
 
 			public string OutOfCharacterInfo { get; set; } = string.Empty;
+
+
+			public ProfilePreferenceFlags Preferences { get; set; }
+
+			public ProfileThemeFlags Themes { get; set; }
+
+			public ProfileStyleFlags Styles { get; set; }
+
+			public ProfileDiscoveryTags DiscoveryTags { get; set; } = new ProfileDiscoveryTags();
 
 		}
 
@@ -107,6 +118,8 @@ namespace rp.spark.Services
 
 			public bool IsMature { get; set; }
 
+			public ProfileExperience Experience { get; set; }
+
 			public RPStatus Status { get; set; }
 
 			public string Currently { get; set; } = string.Empty;
@@ -119,6 +132,9 @@ namespace rp.spark.Services
 
 
 			public ProfileRegion Region { get; set; }
+
+			public ProfileDiscoveryTags DiscoveryTags { get; set; } = new ProfileDiscoveryTags();
+
 
 			public DateTime LastSeen { get; set; }
 		}
@@ -502,6 +518,7 @@ namespace rp.spark.Services
 				return null;
 			}
 			summary.CacheKey = NormalizeCacheKey(summary.CacheKey);
+			summary.DiscoveryTags = ProfileDiscoveryMapper.Normalize(summary.DiscoveryTags);
 			if (summary.CachedAt == default(DateTime))
 			{
 				summary.CachedAt = GetFallbackCachedAt(summary.BookmarkedAt, summary.LastSeen, path);
@@ -586,6 +603,7 @@ namespace rp.spark.Services
 			savedProfileSummary.ProfileId = Clean(TextUtil.FirstNonEmpty(record.Profile?.ProfileId, record.Presence?.ActiveProfileId));
 			savedProfileSummary.ProfileName = Clean(TextUtil.FirstNonEmpty(record.Profile?.ProfileName, record.Presence?.ActiveProfileName));
 			savedProfileSummary.IsMature = (record.Profile?.IsMature ?? false) || (record.Presence?.IsMature ?? false);
+			savedProfileSummary.Experience = record.Profile?.Experience ?? record.Presence?.Experience ?? ProfileExperience.Hidden;
 			savedProfileSummary.AccountName = Clean(TextUtil.FirstNonEmpty(record.Presence?.AccountName, record.Profile?.AccountName));
 			savedProfileSummary.OfficialCharacterName = Clean(TextUtil.FirstNonEmpty(record.Presence?.OfficialCharacterName, record.Profile?.CharacterName));
 			savedProfileSummary.DisplayCharacterName = Clean(TextUtil.FirstNonEmpty(record.Presence?.DisplayCharacterName, record.Profile?.DisplayName));
@@ -600,6 +618,7 @@ namespace rp.spark.Services
 			savedProfileSummary.OutOfCharacterInfo = Clean(TextUtil.FirstNonEmpty(record.Presence?.OutOfCharacterInfo, record.Profile?.OutOfCharacterInfo));
 			savedProfileSummary.LocationName = Clean(record.Presence?.LocationName);
 			savedProfileSummary.Region = record.Presence?.Region ?? record.Profile?.Region ?? ProfileRegion.NA;
+			savedProfileSummary.DiscoveryTags = ProfileDiscoveryMapper.Merge(record.Presence?.DiscoveryTags, ProfileDiscoveryMapper.FromProfile(record.Profile));
 			savedProfileSummary.LastSeen = record.Presence?.LastSeen ?? default(DateTime);
 			savedProfileSummary.CachedAt = record.CachedAt;
 			savedProfileSummary.IsBookmarked = record.IsBookmarked;
@@ -618,6 +637,7 @@ namespace rp.spark.Services
 			savedProfileSummary.ProfileId = Clean(TextUtil.FirstNonEmpty(snapshot.Profile?.ProfileId, snapshot.Presence?.ActiveProfileId));
 			savedProfileSummary.ProfileName = Clean(TextUtil.FirstNonEmpty(snapshot.Profile?.ProfileName, snapshot.Presence?.ActiveProfileName));
 			savedProfileSummary.IsMature = (snapshot.Profile?.IsMature ?? false) || (snapshot.Presence?.IsMature ?? false);
+			savedProfileSummary.Experience = snapshot.Profile?.Experience ?? snapshot.Presence?.Experience ?? ProfileExperience.Hidden;
 			savedProfileSummary.AccountName = Clean(TextUtil.FirstNonEmpty(snapshot.Presence?.AccountName, snapshot.Profile?.AccountName));
 			savedProfileSummary.OfficialCharacterName = Clean(TextUtil.FirstNonEmpty(snapshot.Presence?.OfficialCharacterName, snapshot.Profile?.CharacterName));
 			savedProfileSummary.DisplayCharacterName = Clean(TextUtil.FirstNonEmpty(snapshot.Presence?.DisplayCharacterName, snapshot.Profile?.DisplayName));
@@ -632,11 +652,17 @@ namespace rp.spark.Services
 			savedProfileSummary.OutOfCharacterInfo = Clean(TextUtil.FirstNonEmpty(snapshot.Presence?.OutOfCharacterInfo, snapshot.Profile?.OutOfCharacterInfo));
 			savedProfileSummary.LocationName = Clean(snapshot.Presence?.LocationName);
 			savedProfileSummary.Region = snapshot.Presence?.Region ?? snapshot.Profile?.Region ?? ProfileRegion.NA;
+			savedProfileSummary.DiscoveryTags = GetDiscoveryTags(snapshot.Profile, snapshot.Presence);
 			savedProfileSummary.LastSeen = snapshot.Presence?.LastSeen ?? default(DateTime);
 			savedProfileSummary.CachedAt = snapshot.CachedAt;
 			savedProfileSummary.IsBookmarked = snapshot.IsBookmarked;
 			savedProfileSummary.BookmarkedAt = snapshot.BookmarkedAt;
 			return savedProfileSummary;
+		}
+
+		private static ProfileDiscoveryTags GetDiscoveryTags(ProfileIndexFields profile, PresenceIndexFields presence)
+		{
+			return ProfileDiscoveryMapper.Merge(presence?.DiscoveryTags, ProfileDiscoveryMapper.FromSelections(profile?.Preferences ?? ProfilePreferenceFlags.None, profile?.Themes ?? ProfileThemeFlags.None, profile?.Styles ?? ProfileStyleFlags.None, profile?.DiscoveryTags));
 		}
 
 		private static SavedProfileSummary CloneSummary(SavedProfileSummary summary)
@@ -651,6 +677,7 @@ namespace rp.spark.Services
 				ProfileId = summary.ProfileId,
 				ProfileName = summary.ProfileName,
 				IsMature = summary.IsMature,
+				Experience = summary.Experience,
 				AccountName = summary.AccountName,
 				OfficialCharacterName = summary.OfficialCharacterName,
 				DisplayCharacterName = summary.DisplayCharacterName,
@@ -665,6 +692,7 @@ namespace rp.spark.Services
 				OutOfCharacterInfo = summary.OutOfCharacterInfo,
 				LocationName = summary.LocationName,
 				Region = summary.Region,
+				DiscoveryTags = ProfileDiscoveryMapper.Normalize(summary.DiscoveryTags),
 				LastSeen = summary.LastSeen,
 				CachedAt = summary.CachedAt,
 				IsBookmarked = summary.IsBookmarked,

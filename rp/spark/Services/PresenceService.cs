@@ -61,6 +61,7 @@ namespace rp.spark.Services
 			playerPresence.ActiveProfileId = (hasActiveProfile ? activeProfile.ProfileId : string.Empty);
 			playerPresence.ActiveProfileName = ((!hasActiveProfile) ? string.Empty : (activeProfile.ProfileName?.Trim() ?? string.Empty));
 			playerPresence.IsMature = hasActiveProfile && activeProfile.IsMature;
+			playerPresence.Experience = (hasActiveProfile ? activeProfile.Experience : ProfileExperience.Hidden);
 			playerPresence.ProfileUpdatedAtTime = (hasActiveProfile ? activeProfile.UpdatedAt : default(DateTime));
 			playerPresence.Status = status;
 			playerPresence.Currently = ((!hasActiveProfile) ? string.Empty : (activeProfile.Currently?.Trim() ?? string.Empty));
@@ -73,6 +74,7 @@ namespace rp.spark.Services
 			playerPresence.HasActiveProfile = hasActiveProfile;
 			playerPresence.ShareEnabled = broadcastEnabled && isInGame;
 			playerPresence.LastSeen = DateTime.UtcNow;
+			playerPresence.DiscoveryTags = (hasActiveProfile ? ProfileDiscoveryMapper.FromProfile(activeProfile) : new ProfileDiscoveryTags());
 			playerPresence.CanShare = CanShare(playerPresence);
 			playerPresence.ShareBlockReason = GetShareBlockReason(playerPresence);
 			return playerPresence;

@@ -48,6 +48,8 @@ namespace rp.spark.UI.Views
 
 		private Dropdown _sortDropdown;
 
+		private ProfileFilterMenu _discoveryFilters;
+
 		private ProfileScrollList _profileList;
 
 		private Label _status;
@@ -105,6 +107,10 @@ namespace rp.spark.UI.Views
 			_searchBox = controls.SearchBox;
 			_searchFieldDropdown = controls.SearchFieldDropdown;
 			_sortDropdown = controls.SortDropdown;
+			_discoveryFilters = new ProfileFilterMenu(parent, delegate
+			{
+				RefreshRows(resetPage: true);
+			});
 		}
 
 		private void BuildHeader(Container parent)
@@ -144,10 +150,12 @@ namespace rp.spark.UI.Views
 				return;
 			}
 			_profileList.ClearRows(resetScroll);
-			IEnumerable<SavedProfileSummary> filteredRows = (from savedProfile in _loadSavedProfiles?.Invoke() ?? new List<SavedProfileSummary>()
-				where savedProfile != null
-				where !IsHidden(savedProfile)
-				select savedProfile).Where(MatchesSearch);
+			IEnumerable<SavedProfileSummary> filteredRows = from savedProfile in (from savedProfile in _loadSavedProfiles?.Invoke() ?? new List<SavedProfileSummary>()
+					where savedProfile != null
+					where !IsHidden(savedProfile)
+					select savedProfile).Where(MatchesSearch)
+				where _discoveryFilters == null || _discoveryFilters.Matches(savedProfile.Experience, savedProfile.DiscoveryTags)
+				select savedProfile;
 			List<SavedProfileSummary> rows = SortRows(filteredRows).ToList();
 			string statusOverride = _statusOverride;
 			if (resetPage)
@@ -304,6 +312,11 @@ namespace rp.spark.UI.Views
 
 		private string GetEmptyBookmarksMessage()
 		{
+			ProfileFilterMenu discoveryFilters = _discoveryFilters;
+			if (discoveryFilters != null && discoveryFilters.ActiveCount > 0)
+			{
+				return "No bookmarks match these filters.";
+			}
 			TextBox searchBox = _searchBox;
 			if (!string.IsNullOrWhiteSpace((searchBox != null) ? ((TextInputBase)searchBox).get_Text() : null))
 			{
@@ -314,6 +327,11 @@ namespace rp.spark.UI.Views
 
 		private string GetEmptyRecentMessage()
 		{
+			ProfileFilterMenu discoveryFilters = _discoveryFilters;
+			if (discoveryFilters != null && discoveryFilters.ActiveCount > 0)
+			{
+				return "No recent profiles match these filters.";
+			}
 			TextBox searchBox = _searchBox;
 			if (!string.IsNullOrWhiteSpace((searchBox != null) ? ((TextInputBase)searchBox).get_Text() : null))
 			{
@@ -386,6 +404,8 @@ namespace rp.spark.UI.Views
 		{
 			_isUnloaded = true;
 			_unwatchSavedProfiles?.Invoke(HandleSavedProfilesChanged);
+			_discoveryFilters?.Dispose();
+			_discoveryFilters = null;
 		}
 	}
 }

@@ -36,6 +36,8 @@ namespace rp.spark.Models
 
 		public bool IsMature { get; set; }
 
+		public ProfileExperience Experience { get; set; }
+
 		public DateTime ProfileUpdatedAtTime { get; set; }
 
 		public RPStatus Status { get; set; }
@@ -67,6 +69,9 @@ namespace rp.spark.Models
 
 
 		public DateTime LastSeen { get; set; } = DateTime.UtcNow;
+
+
+		public ProfileDiscoveryTags DiscoveryTags { get; set; } = new ProfileDiscoveryTags();
 
 
 		public string VisibleName()

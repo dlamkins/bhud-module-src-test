@@ -29,6 +29,8 @@ namespace rp.spark.UI.Views
 
 		private readonly Func<bool> _isAutoRefreshEnabled;
 
+		private readonly Action<bool> _setAutoRefreshEnabled;
+
 		private readonly PageList _page = new PageList();
 
 		private PageListControls _pageControls;
@@ -59,11 +61,13 @@ namespace rp.spark.UI.Views
 
 		private Dropdown _sortDropdown;
 
+		private ProfileFilterMenu _discoveryFilters;
+
 		private ProfileScrollList _profileList;
 
 		private Label _status;
 
-		public OnlineProfilesView(Func<CancellationToken, Task<IReadOnlyList<PlayerPresence>>> getPresenceRows, Func<IReadOnlyList<PlayerPresence>> getCachedPresenceRows, Action<PlayerPresence> openProfile, Func<PlayerPresence, bool> isBookmarked = null, Action<Action> watchBookmarksChanged = null, Action<Action> unwatchBookmarksChanged = null, Func<bool> isAutoRefreshEnabled = null)
+		public OnlineProfilesView(Func<CancellationToken, Task<IReadOnlyList<PlayerPresence>>> getPresenceRows, Func<IReadOnlyList<PlayerPresence>> getCachedPresenceRows, Action<PlayerPresence> openProfile, Func<PlayerPresence, bool> isBookmarked = null, Action<Action> watchBookmarksChanged = null, Action<Action> unwatchBookmarksChanged = null, Func<bool> isAutoRefreshEnabled = null, Action<bool> setAutoRefreshEnabled = null)
 			: this()
 		{
 			_loadRows = getPresenceRows;
@@ -73,12 +77,22 @@ namespace rp.spark.UI.Views
 			_watchBookmarks = watchBookmarksChanged;
 			_unwatchBookmarks = unwatchBookmarksChanged;
 			_isAutoRefreshEnabled = isAutoRefreshEnabled;
+			_setAutoRefreshEnabled = setAutoRefreshEnabled;
 		}
 
 		protected override void Build(Container buildPanel)
 		{
-			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d5: Expected O, but got Unknown
+			//IL_0111: Unknown result type (might be due to invalid IL or missing references)
 			_isUnloaded = false;
 			ProfileListViewUI.AddTitle(buildPanel, "Online Profiles", 300);
 			SparkUiActions.BindClick(ProfileListViewUI.AddRefreshButton(buildPanel), () => RefreshAsync(resetPage: false), SetStatusText, "Couldn't refresh online profiles.");
@@ -88,6 +102,18 @@ namespace rp.spark.UI.Views
 			((Control)profileScrollList).set_Location(new Point(0, 128));
 			((Control)profileScrollList).set_Parent(buildPanel);
 			_profileList = profileScrollList;
+			Checkbox val = new Checkbox();
+			val.set_Text("Auto-refresh");
+			val.set_Checked(IsAutoRefreshEnabled());
+			((Control)val).set_Location(new Point(510, 1));
+			((Control)val).set_Size(new Point(130, 28));
+			((Control)val).set_Parent(buildPanel);
+			Checkbox autoRefreshCheckbox = val;
+			autoRefreshCheckbox.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate
+			{
+				_setAutoRefreshEnabled?.Invoke(autoRefreshCheckbox.get_Checked());
+				RefreshVisibleRows(resetScroll: false);
+			});
 			_pageControls = new PageListControls(buildPanel, _page, 760, delegate
 			{
 				RefreshVisibleRows(resetScroll: false);
@@ -119,6 +145,10 @@ namespace rp.spark.UI.Views
 			_searchBox = controls.SearchBox;
 			_searchFieldDropdown = controls.SearchFieldDropdown;
 			_sortDropdown = controls.SortDropdown;
+			_discoveryFilters = new ProfileFilterMenu(parent, delegate
+			{
+				RefreshVisibleRows(resetScroll: true);
+			});
 		}
 
 		private void HandleBookmarksChanged()
@@ -288,7 +318,9 @@ namespace rp.spark.UI.Views
 				return;
 			}
 			_profileList.ClearRows();
-			IEnumerable<PlayerPresence> filteredRows = (presenceRows ?? new List<PlayerPresence>()).Where((PlayerPresence row) => row != null && row.Status != RPStatus.Invisible).Where(MatchesSearch);
+			IEnumerable<PlayerPresence> filteredRows = from row in (presenceRows ?? new List<PlayerPresence>()).Where((PlayerPresence row) => row != null && row.Status != RPStatus.Invisible).Where(MatchesSearch)
+				where _discoveryFilters == null || _discoveryFilters.Matches(row.Experience, row.DiscoveryTags)
+				select row;
 			List<PlayerPresence> rows = SortRows(filteredRows).ToList();
 			if (resetScroll)
 			{
@@ -400,6 +432,11 @@ namespace rp.spark.UI.Views
 
 		private string GetEmptyMessage()
 		{
+			ProfileFilterMenu discoveryFilters = _discoveryFilters;
+			if (discoveryFilters != null && discoveryFilters.ActiveCount > 0)
+			{
+				return "No online profiles match these filters.";
+			}
 			TextBox searchBox = _searchBox;
 			if (!string.IsNullOrWhiteSpace((searchBox != null) ? ((TextInputBase)searchBox).get_Text() : null))
 			{
@@ -435,6 +472,8 @@ namespace rp.spark.UI.Views
 			_isUnloaded = true;
 			_unwatchBookmarks?.Invoke(HandleBookmarksChanged);
 			StopRefresh();
+			_discoveryFilters?.Dispose();
+			_discoveryFilters = null;
 		}
 
 		private void SetStatusText(string text)
