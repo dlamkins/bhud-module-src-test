@@ -171,7 +171,6 @@ namespace Taskmaster.UI
 		public void SetTabs(IReadOnlyList<TodoTab> tabs)
 		{
 			_tabs = tabs ?? new List<TodoTab>();
-			_ensureActiveVisible = true;
 			((Control)this).Invalidate();
 		}
 

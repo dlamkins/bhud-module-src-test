@@ -600,20 +600,30 @@ namespace Taskmaster.UI
 			menu.Show(GameService.Input.get_Mouse().get_Position());
 		}
 
-		private void ShowTaskMenu(TodoTask task)
+		private void ShowTaskMenu(TodoTask task, TodoTask parent)
 		{
-			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0040: Expected O, but got Unknown
-			//IL_010b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0112: Expected O, but got Unknown
-			//IL_01e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0036: Expected O, but got Unknown
+			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d2: Expected O, but got Unknown
+			//IL_02a5: Unknown result type (might be due to invalid IL or missing references)
 			TodoTab tab = ActiveTab;
 			if (tab == null)
 			{
 				return;
 			}
-			IReadOnlyList<TodoTask> selectedTasks = _listPanel.GetSelectedTasks();
 			ContextMenuStrip menu = new ContextMenuStrip();
+			if (parent != null)
+			{
+				((Control)menu.AddMenuItem("Delete subtask")).add_Click((EventHandler<MouseEventArgs>)delegate
+				{
+					_listPanel.DeleteSubtask(parent, task);
+				});
+				menu.Show(GameService.Input.get_Mouse().get_Position());
+				return;
+			}
+			IReadOnlyList<TodoTask> selectedTasks = _listPanel.GetSelectedTasks();
 			((Control)menu.AddMenuItem("Edit")).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				_listPanel.BeginEdit(task);
@@ -645,19 +655,26 @@ namespace Taskmaster.UI
 				select t).ToList();
 			if (otherTabs.Count > 0)
 			{
-				ContextMenuStripItem moveTo = menu.AddMenuItem("Move to");
+				IReadOnlyList<TodoTask> readOnlyList2;
+				if (selectedTasks.Count <= 1)
+				{
+					IReadOnlyList<TodoTask> readOnlyList = new List<TodoTask> { task };
+					readOnlyList2 = readOnlyList;
+				}
+				else
+				{
+					readOnlyList2 = selectedTasks;
+				}
+				IReadOnlyList<TodoTask> tasksToMove = readOnlyList2;
+				string moveToLabel = ((tasksToMove.Count > 1) ? $"Move selected ({tasksToMove.Count}) to" : "Move to");
+				ContextMenuStripItem moveTo = menu.AddMenuItem(moveToLabel);
 				ContextMenuStrip moveMenu = new ContextMenuStrip();
 				foreach (TodoTab other in otherTabs)
 				{
 					TodoTab captured = other;
 					((Control)moveMenu.AddMenuItem(other.Name)).add_Click((EventHandler<MouseEventArgs>)delegate
 					{
-						tab.Tasks.Remove(task);
-						NormalizeTaskOrder(tab);
-						task.Order = captured.Tasks.Count;
-						captured.Tasks.Add(task);
-						_listPanel.ClearSelection();
-						MarkDirtyAndRefresh();
+						MoveTasksToTab(tab, captured, tasksToMove);
 					});
 				}
 				moveTo.set_Submenu(moveMenu);
@@ -681,6 +698,31 @@ namespace Taskmaster.UI
 				});
 			}
 			menu.Show(GameService.Input.get_Mouse().get_Position());
+		}
+
+		private void MoveTasksToTab(TodoTab source, TodoTab destination, IReadOnlyList<TodoTask> tasks)
+		{
+			List<TodoTask> orderedTasks = (from candidate in tasks.Where(source.Tasks.Contains)
+				orderby candidate.Order
+				select candidate).ToList();
+			if (orderedTasks.Count == 0)
+			{
+				return;
+			}
+			foreach (TodoTask task2 in orderedTasks)
+			{
+				source.Tasks.Remove(task2);
+			}
+			NormalizeTaskOrder(source);
+			NormalizeTaskOrder(destination);
+			int nextOrder = destination.Tasks.Count;
+			foreach (TodoTask task in orderedTasks)
+			{
+				task.Order = nextOrder++;
+				destination.Tasks.Add(task);
+			}
+			_listPanel.ClearSelection();
+			MarkDirtyAndRefresh();
 		}
 
 		private void MoveTask(TodoTab tab, TodoTask task, int delta)

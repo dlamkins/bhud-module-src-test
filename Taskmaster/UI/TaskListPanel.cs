@@ -32,6 +32,10 @@ namespace Taskmaster.UI
 
 		private int _scrollApplyFrames;
 
+		private float? _pendingScrollDistance;
+
+		private int _scrollRestoreFrames;
+
 		private Scrollbar _scrollbar;
 
 		private static readonly FieldInfo PanelScrollbarField = typeof(Panel).GetField("_panelScrollbar", BindingFlags.Instance | BindingFlags.NonPublic);
@@ -70,7 +74,7 @@ namespace Taskmaster.UI
 
 		public event Action DataChanged;
 
-		public event Action<TodoTask> TaskContextMenuRequested;
+		public event Action<TodoTask, TodoTask> TaskContextMenuRequested;
 
 		public event Action<TodoTask> CopyToClipboardRequested;
 
@@ -91,6 +95,8 @@ namespace Taskmaster.UI
 				_selection.Clear();
 				_pendingScrollTaskId = null;
 				_scrollApplyFrames = 0;
+				_pendingScrollDistance = null;
+				_scrollRestoreFrames = 0;
 			}
 			_tab = tab;
 			Rebuild();
@@ -114,8 +120,31 @@ namespace Taskmaster.UI
 			ApplySelectionToRows();
 		}
 
+		public void DeleteSubtask(TodoTask parent, TodoTask subtask)
+		{
+			if (parent?.Subtasks != null && parent.Subtasks.Contains(subtask))
+			{
+				PreserveScrollDistance();
+				parent.Subtasks.Remove(subtask);
+				DateTime nowUtc = DateTime.UtcNow;
+				if (parent.HasSubtasks)
+				{
+					parent.SyncGroupAnchor(nowUtc);
+				}
+				else
+				{
+					parent.CurrentCount = 0;
+					parent.LastCompletedUtc = null;
+					parent.LastActivityUtc = null;
+					parent.EnsureDurationAnchor(nowUtc);
+				}
+				AfterMutation();
+			}
+		}
+
 		public void BeginEdit(TodoTask task)
 		{
+			PreserveScrollDistance();
 			_editingTaskId = task.Id;
 			_newTaskId = null;
 			Rebuild();
@@ -193,7 +222,20 @@ namespace Taskmaster.UI
 		public override void UpdateContainer(GameTime gameTime)
 		{
 			((Container)this).UpdateContainer(gameTime);
-			if (_pendingScrollTaskId.HasValue && _scrollApplyFrames > 0)
+			if (_pendingScrollDistance.HasValue && _scrollRestoreFrames > 0)
+			{
+				Scrollbar scrollbar = GetScrollbar();
+				if (scrollbar != null)
+				{
+					scrollbar.set_ScrollDistance(_pendingScrollDistance.Value);
+				}
+				_scrollRestoreFrames--;
+				if (_scrollRestoreFrames == 0)
+				{
+					_pendingScrollDistance = null;
+				}
+			}
+			else if (_pendingScrollTaskId.HasValue && _scrollApplyFrames > 0)
 			{
 				_scrollApplyFrames--;
 				ScrollPendingTaskIntoView();
@@ -235,6 +277,7 @@ namespace Taskmaster.UI
 			};
 			row.ExpandToggled += delegate
 			{
+				PreserveScrollDistance();
 				if (!_expanded.Remove(task.Id))
 				{
 					_expanded.Add(task.Id);
@@ -243,12 +286,14 @@ namespace Taskmaster.UI
 			};
 			row.SaveRequested += delegate
 			{
+				PreserveScrollDistance();
 				_activeEditPanel?.Apply();
 			};
 			row.EditRequested += delegate
 			{
 				if (_editingTaskId == task.Id)
 				{
+					PreserveScrollDistance();
 					_editingTaskId = null;
 					_newTaskId = null;
 					Rebuild();
@@ -274,7 +319,7 @@ namespace Taskmaster.UI
 					_selection.SelectForContext(task.Id);
 				}
 				ApplySelectionToRows();
-				this.TaskContextMenuRequested?.Invoke(task);
+				this.TaskContextMenuRequested?.Invoke(task, parent);
 			};
 			row.CopyRequested += delegate
 			{
@@ -289,7 +334,9 @@ namespace Taskmaster.UI
 			TaskEditPanel taskEditPanel = new TaskEditPanel(task, isNew);
 			((Control)taskEditPanel).set_Parent((Container)(object)this);
 			((Control)taskEditPanel).set_Width(((Container)this).get_ContentRegion().Width);
-			(_activeEditPanel = taskEditPanel).Saved += delegate
+			TaskEditPanel edit = (_activeEditPanel = taskEditPanel);
+			edit.ContentHeightChanging += PreserveScrollDistance;
+			edit.Saved += delegate
 			{
 				_editingTaskId = null;
 				_newTaskId = null;
@@ -309,6 +356,22 @@ namespace Taskmaster.UI
 			{
 				row.IsSelected = _selection.IsSelected(row.Task.Id);
 			}
+		}
+
+		private void PreserveScrollDistance()
+		{
+			Scrollbar scrollbar = GetScrollbar();
+			if (scrollbar != null)
+			{
+				_pendingScrollDistance = scrollbar.get_ScrollDistance();
+				_scrollRestoreFrames = 5;
+			}
+		}
+
+		private Scrollbar GetScrollbar()
+		{
+			_scrollbar = (Scrollbar)((_scrollbar != null && ((Control)_scrollbar).get_Parent() != null) ? ((object)_scrollbar) : ((object)/*isinst with value type is only supported in some contexts*/));
+			return _scrollbar;
 		}
 
 		private void ScrollPendingTaskIntoView()
@@ -331,11 +394,11 @@ namespace Taskmaster.UI
 			int scrollableRange = Math.Max(0, contentHeight - viewportHeight);
 			if (scrollableRange != 0)
 			{
-				_scrollbar = (Scrollbar)((_scrollbar != null && ((Control)_scrollbar).get_Parent() != null) ? ((object)_scrollbar) : ((object)/*isinst with value type is only supported in some contexts*/));
-				if (_scrollbar != null)
+				Scrollbar scrollbar = GetScrollbar();
+				if (scrollbar != null)
 				{
 					int targetOffset = Math.Max(0, Math.Min(target.get_Bottom() - viewportHeight + 8, scrollableRange));
-					_scrollbar.set_ScrollDistance((float)targetOffset / (float)scrollableRange);
+					scrollbar.set_ScrollDistance((float)targetOffset / (float)scrollableRange);
 				}
 			}
 		}

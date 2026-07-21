@@ -93,6 +93,8 @@ namespace Taskmaster.UI
 
 		public event Action Saved;
 
+		public event Action ContentHeightChanging;
+
 		public TaskEditPanel(TodoTask task, bool isNew = false)
 			: this()
 		{
@@ -162,6 +164,7 @@ namespace Taskmaster.UI
 			{
 				if (!string.IsNullOrWhiteSpace(((TextInputBase)_newSubtaskBox).get_Text()))
 				{
+					this.ContentHeightChanging?.Invoke();
 					_workingSubtasks.Add(new TodoTask
 					{
 						Name = ((TextInputBase)_newSubtaskBox).get_Text().Trim(),
@@ -333,6 +336,7 @@ namespace Taskmaster.UI
 				TodoTask captured = sub;
 				((Control)iconButton).add_Click((EventHandler<MouseEventArgs>)delegate
 				{
+					this.ContentHeightChanging?.Invoke();
 					_workingSubtasks.Remove(captured);
 					RebuildSubtaskList();
 				});
