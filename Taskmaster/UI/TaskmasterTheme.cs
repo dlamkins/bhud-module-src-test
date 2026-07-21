@@ -26,15 +26,29 @@ namespace Taskmaster.UI
 
 		public static readonly Color RowHover = Color.get_White() * 0.07f;
 
+		public static readonly Color RowSelected = Gold * 0.18f;
+
 		public static readonly Color SubtleBorder = Color.get_White() * 0.1f;
 
-		public static readonly Color TabActiveFill = new Color(38, 38, 44);
+		public static readonly Color TabActiveFill = new Color(46, 40, 41);
+
+		public static readonly Color TabActiveBorder = new Color(82, 70, 68);
+
+		public static readonly Color TabHoverFill = Color.get_White() * 0.055f;
+
+		public static readonly Color TabBadgeFill = new Color(29, 28, 34);
+
+		public static readonly Color TabBadgeActiveFill = new Color(31, 29, 31);
+
+		public static readonly Color TabBadgeBorder = Color.get_White() * 0.09f;
 
 		public static readonly Color TabInactiveText = new Color(138, 138, 128);
 
 		public static readonly Color ChipFill = new Color(38, 38, 44);
 
 		public static readonly Color ChipBorder = new Color(74, 74, 82);
+
+		public static readonly Color ActionBarFill = new Color(25, 24, 29, 235);
 
 		public static readonly Color IconGlyph = new Color(57, 50, 38);
 
