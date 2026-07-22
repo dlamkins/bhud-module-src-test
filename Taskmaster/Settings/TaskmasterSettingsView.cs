@@ -22,36 +22,39 @@ namespace Taskmaster.Settings
 
 		protected override void Build(Container buildPanel)
 		{
-			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ec: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01fb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_021d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0222: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0229: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0237: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0246: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0082: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01fc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0201: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0208: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0216: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0225: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0247: Unknown result type (might be due to invalid IL or missing references)
+			//IL_024c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0253: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0257: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0261: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0270: Unknown result type (might be due to invalid IL or missing references)
 			int y = 10;
-			SettingEntry[] array = (SettingEntry[])(object)new SettingEntry[3]
+			SettingEntry[] array = (SettingEntry[])(object)new SettingEntry[6]
 			{
 				(SettingEntry)_settings.ToggleWindow,
 				(SettingEntry)_settings.UnfocusedOpacity,
+				(SettingEntry)_settings.InterfaceScale,
+				(SettingEntry)_settings.TextScale,
+				(SettingEntry)_settings.EnableDragReordering,
 				(SettingEntry)_settings.ShowOnMap
 			};
 			for (int i = 0; i < array.Length; i++)

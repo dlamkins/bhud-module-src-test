@@ -1,3 +1,4 @@
+using System;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Microsoft.Xna.Framework;
@@ -7,13 +8,13 @@ namespace Taskmaster.UI.Controls
 {
 	public class IconButton : StandardButton
 	{
-		private const int IconSize = 16;
-
 		private Color _tint;
 
 		private Texture2D _iconTexture;
 
 		private bool _selected;
+
+		private int _glyphSize = 16;
 
 		public Color Tint
 		{
@@ -68,11 +69,28 @@ namespace Taskmaster.UI.Controls
 			}
 		}
 
+		public int GlyphSize
+		{
+			get
+			{
+				return _glyphSize;
+			}
+			set
+			{
+				int next = Math.Max(1, value);
+				if (_glyphSize != next)
+				{
+					_glyphSize = next;
+					((Control)this).Invalidate();
+				}
+			}
+		}
+
 		public IconButton(Texture2D icon, Color tint)
 			: this()
 		{
-			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 			_iconTexture = icon;
 			_tint = tint;
 		}
@@ -85,8 +103,8 @@ namespace Taskmaster.UI.Controls
 			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
 			((StandardButton)this).Paint(spriteBatch, bounds);
 			if (_iconTexture != null)
 			{
@@ -97,8 +115,9 @@ namespace Taskmaster.UI.Controls
 					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, Textures.get_Pixel(), fill, TaskmasterTheme.ToggleActiveFill);
 				}
 				Color glyphColor = (_selected ? TaskmasterTheme.ToggleActiveGlyph : _tint);
+				int iconSize = Math.Min(_glyphSize, Math.Min(((Control)this)._size.X, ((Control)this)._size.Y));
 				Rectangle iconBounds = default(Rectangle);
-				((Rectangle)(ref iconBounds))._002Ector(((Control)this)._size.X / 2 - 8, ((Control)this)._size.Y / 2 - 8, 16, 16);
+				((Rectangle)(ref iconBounds))._002Ector(((Control)this)._size.X / 2 - iconSize / 2, ((Control)this)._size.Y / 2 - iconSize / 2, iconSize, iconSize);
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, _iconTexture, iconBounds, glyphColor);
 			}
 		}

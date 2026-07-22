@@ -15,29 +15,13 @@ namespace Taskmaster.UI
 {
 	public class TaskRow : Control
 	{
-		private const int RowHeight = 30;
-
-		private const int SubtaskIndent = 22;
-
-		private const int CheckboxSize = 16;
-
-		private const int IconSize = 14;
-
-		private const int ChevronHitSize = 24;
-
-		private const int ChevronIconSize = 18;
-
-		private const int EditIconSize = 24;
-
-		private const int EditActionIconSize = 28;
-
-		private const int Pad = 6;
-
 		private static readonly TimeSpan DueSoonThreshold = TimeSpan.FromHours(1.0);
 
 		private readonly TodoTask _task;
 
 		private readonly bool _isSubtask;
+
+		private readonly TaskmasterSizing _sizing;
 
 		private string _countdownText = "";
 
@@ -46,6 +30,8 @@ namespace Taskmaster.UI
 		private bool _hover;
 
 		private bool _isSelected;
+
+		private bool _isDropTarget;
 
 		private DateTime _copiedFlashUntilUtc;
 
@@ -59,13 +45,33 @@ namespace Taskmaster.UI
 
 		private Rectangle _saveBounds;
 
-		private const int ScrollbarMargin = 20;
-
 		public TodoTask Task => _task;
+
+		public TodoTask ParentTask { get; set; }
 
 		public bool IsExpanded { get; set; }
 
 		public bool Locked { get; set; }
+
+		public bool DragReorderingEnabled { get; set; }
+
+		public bool DropAfter { get; set; }
+
+		public bool IsDropTarget
+		{
+			get
+			{
+				return _isDropTarget;
+			}
+			set
+			{
+				if (_isDropTarget != value)
+				{
+					_isDropTarget = value;
+					((Control)this).Invalidate();
+				}
+			}
+		}
 
 		public bool IsSelected
 		{
@@ -87,9 +93,31 @@ namespace Taskmaster.UI
 
 		public TodoTask CountdownAnchor { get; set; }
 
-		private int LeftOffset => 6 + (_isSubtask ? 22 : 0);
+		private int RowHeight => _sizing.Px(34);
 
-		private Rectangle ChevronBounds => new Rectangle(((Control)this).get_Width() - 20 - 24, (((Control)this).get_Height() - 24) / 2, 24, 24);
+		private int SubtaskIndent => _sizing.Px(22);
+
+		private int CheckboxSize => _sizing.Px(18);
+
+		private int InlineIconHitSize => _sizing.Px(26);
+
+		private int InlineIconSize => _sizing.Px(18);
+
+		private int ChevronHitSize => _sizing.Px(26);
+
+		private int ChevronIconSize => _sizing.Px(19);
+
+		private int EditIconSize => _sizing.Px(24);
+
+		private int EditActionIconSize => _sizing.Px(28);
+
+		private int Pad => _sizing.Px(6);
+
+		private int LeftOffset => Pad + (_isSubtask ? SubtaskIndent : 0);
+
+		private int ScrollbarMargin => _sizing.Px(20);
+
+		private Rectangle ChevronBounds => new Rectangle(((Control)this).get_Width() - ScrollbarMargin - ChevronHitSize, (((Control)this).get_Height() - ChevronHitSize) / 2, ChevronHitSize, ChevronHitSize);
 
 		private Rectangle ChevronGlyphBounds
 		{
@@ -99,15 +127,15 @@ namespace Taskmaster.UI
 				//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 				//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-				//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-				//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+				//IL_001d: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0023: Unknown result type (might be due to invalid IL or missing references)
+				//IL_003f: Unknown result type (might be due to invalid IL or missing references)
 				Rectangle hitBounds = ChevronBounds;
-				return new Rectangle(hitBounds.X + (hitBounds.Width - 18) / 2, hitBounds.Y + (hitBounds.Height - 18) / 2, 18, 18);
+				return new Rectangle(hitBounds.X + (hitBounds.Width - ChevronIconSize) / 2, hitBounds.Y + (hitBounds.Height - ChevronIconSize) / 2, ChevronIconSize, ChevronIconSize);
 			}
 		}
 
-		private Rectangle CheckboxBounds => new Rectangle(LeftOffset, (((Control)this).get_Height() - 16) / 2, 16, 16);
+		private Rectangle CheckboxBounds => new Rectangle(LeftOffset, (((Control)this).get_Height() - CheckboxSize) / 2, CheckboxSize, CheckboxSize);
 
 		private bool HasClipboard => !string.IsNullOrEmpty(_task.ClipboardContent);
 
@@ -137,12 +165,15 @@ namespace Taskmaster.UI
 
 		public event Action<bool, bool> SelectionRequested;
 
-		public TaskRow(TodoTask task, bool isSubtask)
+		public event Action<bool> DragCandidateRequested;
+
+		public TaskRow(TodoTask task, bool isSubtask, TaskmasterSizing sizing)
 			: this()
 		{
 			_task = task;
 			_isSubtask = isSubtask;
-			((Control)this).set_Height(30);
+			_sizing = sizing ?? new TaskmasterSizing(1f, 1f);
+			((Control)this).set_Height(RowHeight);
 		}
 
 		private bool InChipZone(Point p)
@@ -185,16 +216,22 @@ namespace Taskmaster.UI
 		public void FlashCopied()
 		{
 			_copiedFlashUntilUtc = DateTime.UtcNow.AddSeconds(1.5);
+			UpdateTooltip();
 			((Control)this).Invalidate();
 		}
 
 		protected override void OnMouseMoved(MouseEventArgs e)
 		{
-			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 			((Control)this).OnMouseMoved(e);
 			_hover = true;
-			((Control)this).set_BasicTooltipText((HasClipboard && ((Rectangle)(ref _clipboardBounds)).Contains(((Control)this).get_RelativeMousePosition())) ? "Click to copy to clipboard" : (string.IsNullOrEmpty(_task.Notes) ? null : _task.Notes));
+			UpdateTooltip();
 			((Control)this).Invalidate();
+		}
+
+		private void UpdateTooltip()
+		{
+			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
+			((Control)this).set_BasicTooltipText((!HasClipboard || !((Rectangle)(ref _clipboardBounds)).Contains(((Control)this).get_RelativeMousePosition())) ? (string.IsNullOrEmpty(_task.Notes) ? null : _task.Notes) : ((DateTime.UtcNow < _copiedFlashUntilUtc) ? "Copied!" : "Click to copy to clipboard"));
 		}
 
 		protected override void OnMouseLeft(MouseEventArgs e)
@@ -222,10 +259,10 @@ namespace Taskmaster.UI
 			//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0123: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0128: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0134: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0145: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0125: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013e: Unknown result type (might be due to invalid IL or missing references)
 			((Control)this).OnLeftMouseButtonPressed(e);
 			Point p = ((Control)this).get_RelativeMousePosition();
 			Rectangle val;
@@ -242,23 +279,38 @@ namespace Taskmaster.UI
 			if (((Rectangle)(ref val)).Contains(p) || InChipZone(p))
 			{
 				this.ToggleRequested?.Invoke();
+				return;
 			}
-			else if (!Locked && _saveBounds != Rectangle.get_Empty() && ((Rectangle)(ref _saveBounds)).Contains(p))
+			if (!Locked && _saveBounds != Rectangle.get_Empty() && ((Rectangle)(ref _saveBounds)).Contains(p))
 			{
 				this.SaveRequested?.Invoke();
+				return;
 			}
-			else if (!Locked && _pencilBounds != Rectangle.get_Empty() && ((Rectangle)(ref _pencilBounds)).Contains(p))
+			if (!Locked && _pencilBounds != Rectangle.get_Empty() && ((Rectangle)(ref _pencilBounds)).Contains(p))
 			{
 				this.EditRequested?.Invoke();
+				return;
 			}
-			else if (HasClipboard && ((Rectangle)(ref _clipboardBounds)).Contains(p))
+			if (HasClipboard && ((Rectangle)(ref _clipboardBounds)).Contains(p))
 			{
 				this.CopyRequested?.Invoke();
+				return;
 			}
-			else if (!Locked && !_isSubtask)
+			bool selectSingleOnRelease = false;
+			if (!Locked && !_isSubtask)
 			{
 				ModifierKeys modifiers = GameService.Input.get_Keyboard().get_ActiveModifiers();
-				this.SelectionRequested?.Invoke(((Enum)modifiers).HasFlag((Enum)(object)(ModifierKeys)4), ((Enum)modifiers).HasFlag((Enum)(object)(ModifierKeys)1));
+				bool extendRange = ((Enum)modifiers).HasFlag((Enum)(object)(ModifierKeys)4);
+				bool toggle = ((Enum)modifiers).HasFlag((Enum)(object)(ModifierKeys)1);
+				selectSingleOnRelease = DragReorderingEnabled && !extendRange && !toggle && IsSelected;
+				if (!selectSingleOnRelease)
+				{
+					this.SelectionRequested?.Invoke(extendRange, toggle);
+				}
+			}
+			if (!Locked && DragReorderingEnabled)
+			{
+				this.DragCandidateRequested?.Invoke(selectSingleOnRelease);
 			}
 		}
 
@@ -273,101 +325,111 @@ namespace Taskmaster.UI
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0105: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0114: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0126: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0111: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0116: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_012f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0144: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0146: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0138: Unknown result type (might be due to invalid IL or missing references)
+			//IL_013f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0154: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0156: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0162: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0167: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0173: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0196: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0186: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0198: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0213: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0218: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0228: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0235: Unknown result type (might be due to invalid IL or missing references)
-			//IL_023a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0243: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0248: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0255: Unknown result type (might be due to invalid IL or missing references)
-			//IL_025a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_026a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_026f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02df: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02e4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02eb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0305: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0307: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0320: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0325: Unknown result type (might be due to invalid IL or missing references)
-			//IL_032d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0332: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0351: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0356: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0375: Unknown result type (might be due to invalid IL or missing references)
-			//IL_037e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0236: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0247: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0249: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0299: Unknown result type (might be due to invalid IL or missing references)
+			//IL_029e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02da: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02e8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02f5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_030a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_030f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0380: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0385: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03a1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_038c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_03a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03c2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03c7: Unknown result type (might be due to invalid IL or missing references)
 			//IL_03cf: Unknown result type (might be due to invalid IL or missing references)
 			//IL_03d4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03e1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03e6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_043e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0443: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0449: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0455: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0473: Unknown result type (might be due to invalid IL or missing references)
-			//IL_047d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0484: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0491: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04e0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0511: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0513: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03ff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0404: Unknown result type (might be due to invalid IL or missing references)
+			//IL_040a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0415: Unknown result type (might be due to invalid IL or missing references)
+			//IL_041a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0435: Unknown result type (might be due to invalid IL or missing references)
+			//IL_043b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0442: Unknown result type (might be due to invalid IL or missing references)
+			//IL_045f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0464: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0499: Unknown result type (might be due to invalid IL or missing references)
+			//IL_049e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04d8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_052e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0533: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0538: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0569: Unknown result type (might be due to invalid IL or missing references)
-			//IL_056b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_058b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0590: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05c3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05d3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05da: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05df: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05e5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0539: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0545: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0563: Unknown result type (might be due to invalid IL or missing references)
+			//IL_056d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0574: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0581: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05e2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05e7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0634: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0636: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0657: Unknown result type (might be due to invalid IL or missing references)
+			//IL_065c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06a9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06d3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06d8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0725: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0727: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0732: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0737: Unknown result type (might be due to invalid IL or missing references)
+			//IL_073e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0743: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0749: Unknown result type (might be due to invalid IL or missing references)
+			//IL_074e: Unknown result type (might be due to invalid IL or missing references)
 			Texture2D pixel = Textures.get_Pixel();
-			BitmapFont font = GameService.Content.get_DefaultFont14();
-			BitmapFont smallFont = GameService.Content.get_DefaultFont12();
+			BitmapFont font = _sizing.BodyFont;
+			BitmapFont smallFont = _sizing.SmallFont;
 			if (IsSelected)
 			{
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, pixel, bounds, TaskmasterTheme.RowSelected);
@@ -375,6 +437,12 @@ namespace Taskmaster.UI
 			if (_hover)
 			{
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, pixel, bounds, TaskmasterTheme.RowHover);
+			}
+			if (IsDropTarget)
+			{
+				int markerHeight = _sizing.Px(2);
+				int markerY = (DropAfter ? (bounds.Height - markerHeight) : 0);
+				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, pixel, new Rectangle(_sizing.Px(4), markerY, Math.Max(0, bounds.Width - _sizing.Px(8)), markerHeight), TaskmasterTheme.Gold);
 			}
 			bool done = _task.IsDone;
 			Color textColor = (done ? TaskmasterTheme.DoneText : (_dueSoon ? TaskmasterTheme.DueSoon : TaskmasterTheme.CreamWhite));
@@ -404,6 +472,8 @@ namespace Taskmaster.UI
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, TaskmasterIcons.Check, glyph, TaskmasterTheme.Success);
 			}
 			int x = ((Rectangle)(ref cb)).get_Right() + 8;
+			int itemGap = _sizing.Px(8);
+			int compactGap = _sizing.Px(6);
 			Size2 nameSize = font.MeasureString(_task.Name);
 			Rectangle nameRect = default(Rectangle);
 			((Rectangle)(ref nameRect))._002Ector(x, 0, (int)nameSize.Width + 2, ((Control)this).get_Height());
@@ -414,16 +484,17 @@ namespace Taskmaster.UI
 				((Rectangle)(ref strike))._002Ector(x, ((Control)this).get_Height() / 2, (int)nameSize.Width, 1);
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, pixel, strike, TaskmasterTheme.DoneText);
 			}
-			x = ((Rectangle)(ref nameRect)).get_Right() + 8;
+			x = ((Rectangle)(ref nameRect)).get_Right() + itemGap;
 			if (HasCounter)
 			{
 				string chipText = $"{_task.CurrentCount}/{_task.TargetCount}";
 				Size2 chipSize = smallFont.MeasureString(chipText);
-				_chipBounds = new Rectangle(x, (((Control)this).get_Height() - 18) / 2, (int)chipSize.Width + 12, 18);
+				int chipHeight = _sizing.Px(18);
+				_chipBounds = new Rectangle(x, (((Control)this).get_Height() - chipHeight) / 2, (int)chipSize.Width + _sizing.Px(12), chipHeight);
 				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, pixel, _chipBounds, TaskmasterTheme.ChipFill);
 				DrawBorder(spriteBatch, _chipBounds, TaskmasterTheme.ChipBorder);
 				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, chipText, smallFont, _chipBounds, TaskmasterTheme.Gold, false, (HorizontalAlignment)1, (VerticalAlignment)1);
-				x = ((Rectangle)(ref _chipBounds)).get_Right() + 8;
+				x = ((Rectangle)(ref _chipBounds)).get_Right() + itemGap;
 			}
 			else if (!_isSubtask && _task.HasSubtasks)
 			{
@@ -433,7 +504,7 @@ namespace Taskmaster.UI
 				Rectangle subRect = default(Rectangle);
 				((Rectangle)(ref subRect))._002Ector(x, 0, (int)subSize.Width + 2, ((Control)this).get_Height());
 				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, subText, smallFont, subRect, TaskmasterTheme.DimText, false, (HorizontalAlignment)0, (VerticalAlignment)1);
-				x = ((Rectangle)(ref subRect)).get_Right() + 8;
+				x = ((Rectangle)(ref subRect)).get_Right() + itemGap;
 				_chipBounds = Rectangle.get_Empty();
 			}
 			else
@@ -442,10 +513,11 @@ namespace Taskmaster.UI
 			}
 			if (HasClipboard)
 			{
-				_clipboardBounds = new Rectangle(x, (((Control)this).get_Height() - 14) / 2, 14, 14);
+				_clipboardBounds = new Rectangle(x, (((Control)this).get_Height() - InlineIconHitSize) / 2, InlineIconHitSize, InlineIconHitSize);
+				Rectangle clipboardGlyphBounds = CenteredGlyph(_clipboardBounds, InlineIconSize);
 				bool flashing = DateTime.UtcNow < _copiedFlashUntilUtc;
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, TaskmasterIcons.Clipboard, _clipboardBounds, flashing ? TaskmasterTheme.Success : TaskmasterTheme.DimText);
-				x = ((Rectangle)(ref _clipboardBounds)).get_Right() + 6;
+				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, TaskmasterIcons.Clipboard, clipboardGlyphBounds, flashing ? TaskmasterTheme.Success : TaskmasterTheme.DimText);
+				x = ((Rectangle)(ref _clipboardBounds)).get_Right() + compactGap;
 			}
 			else
 			{
@@ -453,37 +525,44 @@ namespace Taskmaster.UI
 			}
 			if (!string.IsNullOrEmpty(_task.Notes))
 			{
-				_noteBounds = new Rectangle(x, (((Control)this).get_Height() - 14) / 2, 14, 14);
-				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, TaskmasterIcons.Note, _noteBounds, TaskmasterTheme.DimText);
-				x = ((Rectangle)(ref _noteBounds)).get_Right() + 6;
+				_noteBounds = new Rectangle(x, (((Control)this).get_Height() - InlineIconHitSize) / 2, InlineIconHitSize, InlineIconHitSize);
+				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, TaskmasterIcons.Note, CenteredGlyph(_noteBounds, InlineIconSize), TaskmasterTheme.DimText);
+				x = ((Rectangle)(ref _noteBounds)).get_Right() + compactGap;
 			}
-			int rightX = (_isSubtask ? (((Control)this).get_Width() - 20) : (((Control)this).get_Width() - 20 - 24 - 6));
+			else
+			{
+				_noteBounds = Rectangle.get_Empty();
+			}
+			int rightX = (_isSubtask ? (((Control)this).get_Width() - ScrollbarMargin) : (((Control)this).get_Width() - ScrollbarMargin - ChevronHitSize - compactGap));
 			if (!_isSubtask && !string.IsNullOrEmpty(_countdownText))
 			{
 				Size2 cdSize = smallFont.MeasureString(_countdownText);
 				Rectangle cdRect = default(Rectangle);
 				((Rectangle)(ref cdRect))._002Ector(rightX - (int)cdSize.Width - 2, 0, (int)cdSize.Width + 2, ((Control)this).get_Height());
 				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, _countdownText, smallFont, cdRect, _dueSoon ? TaskmasterTheme.DueSoon : TaskmasterTheme.DimText, false, (HorizontalAlignment)2, (VerticalAlignment)1);
-				rightX = cdRect.X - 8;
+				rightX = cdRect.X - itemGap;
 			}
 			if (!_isSubtask && (_hover || IsEditing) && !Locked)
 			{
 				if (IsEditing)
 				{
-					_pencilBounds = new Rectangle(rightX - 30, 0, 30, 30);
+					int hitSize2 = RowHeight;
+					int actionGap = _sizing.Px(2);
+					_pencilBounds = new Rectangle(rightX - hitSize2, 0, hitSize2, hitSize2);
 					Rectangle closeGlyphBounds = default(Rectangle);
-					((Rectangle)(ref closeGlyphBounds))._002Ector(_pencilBounds.X + 1, _pencilBounds.Y + 1, 28, 28);
+					((Rectangle)(ref closeGlyphBounds))._002Ector(_pencilBounds.X + (hitSize2 - EditActionIconSize) / 2, _pencilBounds.Y + (hitSize2 - EditActionIconSize) / 2, EditActionIconSize, EditActionIconSize);
 					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, TaskmasterIcons.Cancel, closeGlyphBounds, TaskmasterTheme.CreamWhite);
-					_saveBounds = new Rectangle(_pencilBounds.X - 2 - 30, 0, 30, 30);
+					_saveBounds = new Rectangle(_pencilBounds.X - actionGap - hitSize2, 0, hitSize2, hitSize2);
 					Rectangle saveGlyphBounds = default(Rectangle);
-					((Rectangle)(ref saveGlyphBounds))._002Ector(_saveBounds.X + 1, _saveBounds.Y + 1, 28, 28);
+					((Rectangle)(ref saveGlyphBounds))._002Ector(_saveBounds.X + (hitSize2 - EditActionIconSize) / 2, _saveBounds.Y + (hitSize2 - EditActionIconSize) / 2, EditActionIconSize, EditActionIconSize);
 					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, TaskmasterIcons.Check, saveGlyphBounds, TaskmasterTheme.Success);
 				}
 				else
 				{
-					_pencilBounds = new Rectangle(rightX - 30, (((Control)this).get_Height() - 30) / 2, 30, 30);
+					int hitSize = RowHeight;
+					_pencilBounds = new Rectangle(rightX - hitSize, (((Control)this).get_Height() - hitSize) / 2, hitSize, hitSize);
 					Rectangle pencilGlyphBounds = default(Rectangle);
-					((Rectangle)(ref pencilGlyphBounds))._002Ector(_pencilBounds.X + 3, _pencilBounds.Y + 3, 24, 24);
+					((Rectangle)(ref pencilGlyphBounds))._002Ector(_pencilBounds.X + (hitSize - EditIconSize) / 2, _pencilBounds.Y + (hitSize - EditIconSize) / 2, EditIconSize, EditIconSize);
 					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, TaskmasterIcons.Pencil, pencilGlyphBounds, TaskmasterTheme.CreamWhite);
 					_saveBounds = Rectangle.get_Empty();
 				}
@@ -520,6 +599,16 @@ namespace Taskmaster.UI
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, pixel, new Rectangle(r.X, ((Rectangle)(ref r)).get_Bottom() - 1, r.Width, 1), color);
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, pixel, new Rectangle(r.X, r.Y, 1, r.Height), color);
 			SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, pixel, new Rectangle(((Rectangle)(ref r)).get_Right() - 1, r.Y, 1, r.Height), color);
+		}
+
+		private static Rectangle CenteredGlyph(Rectangle bounds, int glyphSize)
+		{
+			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
+			return new Rectangle(bounds.X + (bounds.Width - glyphSize) / 2, bounds.Y + (bounds.Height - glyphSize) / 2, glyphSize, glyphSize);
 		}
 	}
 }

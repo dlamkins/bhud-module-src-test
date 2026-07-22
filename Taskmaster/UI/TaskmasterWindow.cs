@@ -35,6 +35,8 @@ namespace Taskmaster.UI
 
 		private const int ListActionBarGap = 4;
 
+		private static readonly TimeSpan WindowFadeSettleDelay = TimeSpan.FromMilliseconds(250.0);
+
 		private readonly TaskStore _store;
 
 		private readonly ModuleSettings _settings;
@@ -60,6 +62,14 @@ namespace Taskmaster.UI
 		private Guid? _renamingTabId;
 
 		private Guid? _activeTabId;
+
+		private TaskmasterSizing _sizing;
+
+		private bool _hideDone;
+
+		private bool _locked;
+
+		private DateTime? _applyUnfocusedOpacityAtUtc;
 
 		private bool _isConstructed;
 
@@ -115,38 +125,35 @@ namespace Taskmaster.UI
 		{
 			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c0: Expected O, but got Unknown
-			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00da: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e9: Expected O, but got Unknown
-			//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0141: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0193: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b7: Expected O, but got Unknown
-			//IL_01d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0252: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0257: Unknown result type (might be due to invalid IL or missing references)
-			//IL_025e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0266: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0276: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0281: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0282: Unknown result type (might be due to invalid IL or missing references)
-			//IL_028c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0293: Unknown result type (might be due to invalid IL or missing references)
-			//IL_029a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a6: Expected O, but got Unknown
+			//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00eb: Expected O, but got Unknown
+			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0104: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0105: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0114: Expected O, but got Unknown
+			//IL_011a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0152: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0185: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0196: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a6: Expected O, but got Unknown
+			//IL_0223: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0228: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_023a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_023b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0245: Unknown result type (might be due to invalid IL or missing references)
+			//IL_024c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0253: Unknown result type (might be due to invalid IL or missing references)
+			//IL_025f: Expected O, but got Unknown
 			_store = store;
 			_settings = settings;
+			_sizing = new TaskmasterSizing(_settings.InterfaceScale.get_Value(), _settings.TextScale.get_Value());
 			((Control)this).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			((WindowBase2)this).set_Title("Taskmaster");
 			((WindowBase2)this).set_Emblem(Module.Instance.ContentsManager.GetTexture("taskmaster-emblem.png"));
@@ -166,44 +173,40 @@ namespace Taskmaster.UI
 			_actionBarSeparator = val2;
 			IconButton iconButton = new IconButton(TaskmasterIcons.Eye, TaskmasterTheme.IconGlyph);
 			((Control)iconButton).set_Parent((Container)(object)_actionBar);
-			((Control)iconButton).set_Width(30);
-			((Control)iconButton).set_Height(26);
-			iconButton.Selected = _settings.HideDone.get_Value();
+			iconButton.Selected = _hideDone;
 			((Control)iconButton).set_BasicTooltipText("Hide completed tasks and fully completed tabs");
 			_hideDoneBtn = iconButton;
 			IconButton iconButton2 = new IconButton(TaskmasterIcons.Lock, TaskmasterTheme.IconGlyph);
 			((Control)iconButton2).set_Parent((Container)(object)_actionBar);
-			((Control)iconButton2).set_Width(30);
-			((Control)iconButton2).set_Height(26);
-			iconButton2.Selected = _settings.LockTasks.get_Value();
+			iconButton2.Selected = _locked;
 			((Control)iconButton2).set_BasicTooltipText("Lock tasks (checking still works)");
 			_lockBtn = iconButton2;
 			StandardButton val3 = new StandardButton();
 			((Control)val3).set_Parent((Container)(object)_actionBar);
-			((Control)val3).set_Height(26);
 			val3.set_Text("+  Add task");
 			_addTaskBtn = val3;
-			((Control)_addTaskBtn).set_Width((int)GameService.Content.get_DefaultFont14().MeasureString(_addTaskBtn.get_Text()).Width + 24);
 			UpdateAddTaskButtonState();
 			TabStrip tabStrip = new TabStrip();
 			((Control)tabStrip).set_Parent((Container)(object)this);
-			tabStrip.Locked = _settings.LockTasks.get_Value();
+			tabStrip.Locked = _locked;
+			tabStrip.Sizing = _sizing;
 			_tabStrip = tabStrip;
 			TaskListPanel taskListPanel = new TaskListPanel();
 			((Control)taskListPanel).set_Parent((Container)(object)this);
-			taskListPanel.HideDone = _settings.HideDone.get_Value();
-			taskListPanel.Locked = _settings.LockTasks.get_Value();
+			taskListPanel.HideDone = _hideDone;
+			taskListPanel.Locked = _locked;
+			taskListPanel.DragReorderingEnabled = _settings.EnableDragReordering.get_Value();
+			taskListPanel.Sizing = _sizing;
 			_listPanel = taskListPanel;
 			Label val4 = new Label();
 			((Control)val4).set_Parent((Container)(object)this);
-			((Control)val4).set_Height(28);
-			val4.set_Font(GameService.Content.get_DefaultFont16());
 			val4.set_Text("Create your first tab with the + in the top right corner");
 			val4.set_TextColor(TaskmasterTheme.DimText);
 			val4.set_HorizontalAlignment((HorizontalAlignment)1);
 			val4.set_VerticalAlignment((VerticalAlignment)1);
 			((Control)val4).set_Visible(false);
 			_emptyLabel = val4;
+			ApplySizing();
 			RelayoutChildren();
 			WireEvents();
 			SelectInitialTab();
@@ -213,40 +216,44 @@ namespace Taskmaster.UI
 
 		private void RelayoutChildren()
 		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0109: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0110: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0143: Unknown result type (might be due to invalid IL or missing references)
+			int listTop = ((Control)_tabStrip).get_Height() + _sizing.Px(4);
+			int actionBarHeight = _sizing.Px(40);
+			int listActionBarGap = _sizing.Px(4);
 			((Control)_tabStrip).set_Location(Point.get_Zero());
 			((Control)_tabStrip).set_Width(((Container)this).get_ContentRegion().Width);
-			((Control)_actionBar).set_Location(new Point(0, Math.Max(0, ((Container)this).get_ContentRegion().Height - 40)));
-			((Control)_actionBar).set_Size(new Point(((Container)this).get_ContentRegion().Width, 40));
+			((Control)_actionBar).set_Location(new Point(0, Math.Max(0, ((Container)this).get_ContentRegion().Height - actionBarHeight)));
+			((Control)_actionBar).set_Size(new Point(((Container)this).get_ContentRegion().Width, actionBarHeight));
 			((Control)_actionBarSeparator).set_Width(((Control)_actionBar).get_Width());
 			RelayoutActionBarControls();
-			((Control)_listPanel).set_Location(new Point(0, 36));
+			((Control)_listPanel).set_Location(new Point(0, listTop));
 			((Control)_listPanel).set_Width(((Container)this).get_ContentRegion().Width);
-			((Control)_listPanel).set_Height(Math.Max(0, ((Control)_actionBar).get_Top() - 36 - 4));
+			((Control)_listPanel).set_Height(Math.Max(0, ((Control)_actionBar).get_Top() - listTop - listActionBarGap));
 			_listPanel.Rebuild();
 			((Control)_emptyLabel).set_Width(((Container)this).get_ContentRegion().Width);
-			((Control)_emptyLabel).set_Location(new Point(0, 36 + ((Control)_listPanel).get_Height() / 2 - 14));
+			((Control)_emptyLabel).set_Location(new Point(0, listTop + ((Control)_listPanel).get_Height() / 2 - ((Control)_emptyLabel).get_Height() / 2));
 			RelayoutTabRenameBox();
 		}
 
 		private void RelayoutActionBarControls()
 		{
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-			int controlY = (40 - ((Control)_hideDoneBtn).get_Height()) / 2;
-			((Control)_hideDoneBtn).set_Location(new Point(6, controlY));
-			((Control)_lockBtn).set_Location(new Point(((Control)_hideDoneBtn).get_Right() + 4, controlY));
-			((Control)_addTaskBtn).set_Location(new Point(Math.Max(6, ((Control)_actionBar).get_Width() - ((Control)_addTaskBtn).get_Width() - 6), (40 - ((Control)_addTaskBtn).get_Height()) / 2));
+			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
+			int padding = _sizing.Px(6);
+			int controlY = (((Control)_actionBar).get_Height() - ((Control)_hideDoneBtn).get_Height()) / 2;
+			((Control)_hideDoneBtn).set_Location(new Point(padding, controlY));
+			((Control)_lockBtn).set_Location(new Point(((Control)_hideDoneBtn).get_Right() + _sizing.Px(4), controlY));
+			((Control)_addTaskBtn).set_Location(new Point(Math.Max(padding, ((Control)_actionBar).get_Width() - ((Control)_addTaskBtn).get_Width() - padding), (((Control)_actionBar).get_Height() - ((Control)_addTaskBtn).get_Height()) / 2));
 		}
 
 		private void RelayoutTabRenameBox()
@@ -272,12 +279,12 @@ namespace Taskmaster.UI
 
 		protected override void OnResized(ResizedEventArgs e)
 		{
-			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
 			((WindowBase2)this).OnResized(e);
 			if (_isConstructed)
 			{
-				int correctedWidth = Math.Max(550, ((Control)this).get_Width());
-				int correctedHeight = Math.Max(360, ((Control)this).get_Height());
+				int correctedWidth = Math.Max(_sizing.Px(550), ((Control)this).get_Width());
+				int correctedHeight = Math.Max(_sizing.Px(360), ((Control)this).get_Height());
 				if (correctedWidth != ((Control)this).get_Width() || correctedHeight != ((Control)this).get_Height())
 				{
 					((Control)this).set_Size(new Point(correctedWidth, correctedHeight));
@@ -298,19 +305,31 @@ namespace Taskmaster.UI
 					((Control)this).set_Opacity(_settings.UnfocusedOpacity.get_Value());
 				}
 			});
+			((SettingEntry)_settings.InterfaceScale).add_PropertyChanged((PropertyChangedEventHandler)delegate
+			{
+				ApplySizingAndRelayout();
+			});
+			((SettingEntry)_settings.TextScale).add_PropertyChanged((PropertyChangedEventHandler)delegate
+			{
+				ApplySizingAndRelayout();
+			});
+			((SettingEntry)_settings.EnableDragReordering).add_PropertyChanged((PropertyChangedEventHandler)delegate
+			{
+				_listPanel.DragReorderingEnabled = _settings.EnableDragReordering.get_Value();
+			});
 			((Control)_hideDoneBtn).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				_settings.HideDone.set_Value(!_settings.HideDone.get_Value());
-				_hideDoneBtn.Selected = _settings.HideDone.get_Value();
-				_listPanel.HideDone = _settings.HideDone.get_Value();
+				_hideDone = !_hideDone;
+				_hideDoneBtn.Selected = _hideDone;
+				_listPanel.HideDone = _hideDone;
 				RefreshAll();
 			});
 			((Control)_lockBtn).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
-				_settings.LockTasks.set_Value(!_settings.LockTasks.get_Value());
-				_lockBtn.Selected = _settings.LockTasks.get_Value();
-				_listPanel.Locked = _settings.LockTasks.get_Value();
-				_tabStrip.Locked = _settings.LockTasks.get_Value();
+				_locked = !_locked;
+				_lockBtn.Selected = _locked;
+				_listPanel.Locked = _locked;
+				_tabStrip.Locked = _locked;
 				UpdateAddTaskButtonState();
 			});
 			((Control)_addTaskBtn).add_Click((EventHandler<MouseEventArgs>)delegate
@@ -344,7 +363,7 @@ namespace Taskmaster.UI
 
 		private bool ShouldHideTab(TodoTab tab)
 		{
-			if (_settings.HideDone.get_Value() && tab.TotalCount > 0)
+			if (_hideDone && tab.TotalCount > 0)
 			{
 				return tab.DoneCount == tab.TotalCount;
 			}
@@ -396,7 +415,7 @@ namespace Taskmaster.UI
 
 		private void AddTab()
 		{
-			if (!_settings.LockTasks.get_Value())
+			if (!_locked)
 			{
 				TodoTab tab = new TodoTab
 				{
@@ -412,15 +431,14 @@ namespace Taskmaster.UI
 
 		private void UpdateAddTaskButtonState()
 		{
-			bool locked = _settings.LockTasks.get_Value();
 			bool hasActiveTab = ActiveTab != null;
-			((Control)_addTaskBtn).set_Enabled(!locked && hasActiveTab);
-			((Control)_addTaskBtn).set_BasicTooltipText(locked ? "Locked - unlock to add tasks" : (hasActiveTab ? null : "Add a tab first"));
+			((Control)_addTaskBtn).set_Enabled(!_locked && hasActiveTab);
+			((Control)_addTaskBtn).set_BasicTooltipText(_locked ? "Locked - unlock to add tasks" : (hasActiveTab ? null : "Add a tab first"));
 		}
 
 		private void AddTaskToActiveTab()
 		{
-			if (!_settings.LockTasks.get_Value())
+			if (!_locked)
 			{
 				TodoTab tab = ActiveTab;
 				if (tab == null)
@@ -444,9 +462,10 @@ namespace Taskmaster.UI
 			//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ec: Expected O, but got Unknown
+			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0108: Expected O, but got Unknown
 			TextBox renameBox = _renameBox;
 			if (renameBox != null)
 			{
@@ -461,7 +480,8 @@ namespace Taskmaster.UI
 			_tabStrip.EditingTabId = tab.Id;
 			TextBox val = new TextBox();
 			((Control)val).set_Parent((Container)(object)this);
-			((Control)val).set_Height(26);
+			((Control)val).set_Height(_sizing.Px(26));
+			((TextInputBase)val).set_Font(_sizing.BodyFont);
 			((TextInputBase)val).set_Text(isNew ? "" : tab.Name);
 			((TextInputBase)val).set_PlaceholderText(isNew ? tab.Name : null);
 			_renameBox = val;
@@ -493,6 +513,47 @@ namespace Taskmaster.UI
 					UpdateAddTaskButtonState();
 					MarkDirtyAndRefresh();
 				}
+			}
+		}
+
+		private void ApplySizingAndRelayout()
+		{
+			ApplySizing();
+			RelayoutChildren();
+		}
+
+		private void ApplySizing()
+		{
+			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ca: Unknown result type (might be due to invalid IL or missing references)
+			_sizing = new TaskmasterSizing(_settings.InterfaceScale.get_Value(), _settings.TextScale.get_Value());
+			int compactButtonHeight = _sizing.Px(26);
+			int iconButtonWidth = _sizing.Px(30);
+			int glyphSize = _sizing.Px(16);
+			((Control)_hideDoneBtn).set_Size(new Point(iconButtonWidth, compactButtonHeight));
+			_hideDoneBtn.GlyphSize = glyphSize;
+			((Control)_lockBtn).set_Size(new Point(iconButtonWidth, compactButtonHeight));
+			_lockBtn.GlyphSize = glyphSize;
+			((Control)_addTaskBtn).set_Height(compactButtonHeight);
+			int addTaskTextWidth = (int)Math.Max(GameService.Content.get_DefaultFont14().MeasureString(_addTaskBtn.get_Text()).Width, _sizing.BodyFont.MeasureString(_addTaskBtn.get_Text()).Width);
+			((Control)_addTaskBtn).set_Width(addTaskTextWidth + _sizing.Px(24));
+			_tabStrip.Sizing = _sizing;
+			_listPanel.Sizing = _sizing;
+			((Control)_emptyLabel).set_Height(_sizing.Px(28));
+			_emptyLabel.set_Font(_sizing.HeadingFont);
+			if (_renameBox != null)
+			{
+				((Control)_renameBox).set_Height(compactButtonHeight);
+				((TextInputBase)_renameBox).set_Font(_sizing.BodyFont);
+			}
+			int minWidth = _sizing.Px(550);
+			int minHeight = _sizing.Px(360);
+			if (((Control)this).get_Width() < minWidth || ((Control)this).get_Height() < minHeight)
+			{
+				((Control)this).set_Size(new Point(Math.Max(((Control)this).get_Width(), minWidth), Math.Max(((Control)this).get_Height(), minHeight)));
 			}
 		}
 
@@ -604,10 +665,10 @@ namespace Taskmaster.UI
 		{
 			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0036: Expected O, but got Unknown
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d2: Expected O, but got Unknown
-			//IL_02a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0145: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0353: Unknown result type (might be due to invalid IL or missing references)
+			//IL_035a: Expected O, but got Unknown
+			//IL_042f: Unknown result type (might be due to invalid IL or missing references)
 			TodoTab tab = ActiveTab;
 			if (tab == null)
 			{
@@ -616,6 +677,33 @@ namespace Taskmaster.UI
 			ContextMenuStrip menu = new ContextMenuStrip();
 			if (parent != null)
 			{
+				List<TodoTask> visibleSubtasks = (from candidate in parent.Subtasks
+					where !_hideDone || !candidate.IsDone || candidate == task
+					orderby candidate.Order
+					select candidate).ToList();
+				int subtaskIndex = visibleSubtasks.IndexOf(task);
+				if (subtaskIndex > 0)
+				{
+					((Control)menu.AddMenuItem("Move up")).add_Click((EventHandler<MouseEventArgs>)delegate
+					{
+						ReorderSubtask(parent, task, () => TaskOrdering.MoveByVisible(parent.Subtasks, task, -1, (TodoTask candidate) => !_hideDone || !candidate.IsDone));
+					});
+					((Control)menu.AddMenuItem("Move to top")).add_Click((EventHandler<MouseEventArgs>)delegate
+					{
+						ReorderSubtask(parent, task, () => TaskOrdering.MoveToStart(parent.Subtasks, task));
+					});
+				}
+				if (subtaskIndex >= 0 && subtaskIndex < visibleSubtasks.Count - 1)
+				{
+					((Control)menu.AddMenuItem("Move down")).add_Click((EventHandler<MouseEventArgs>)delegate
+					{
+						ReorderSubtask(parent, task, () => TaskOrdering.MoveByVisible(parent.Subtasks, task, 1, (TodoTask candidate) => !_hideDone || !candidate.IsDone));
+					});
+					((Control)menu.AddMenuItem("Move to bottom")).add_Click((EventHandler<MouseEventArgs>)delegate
+					{
+						ReorderSubtask(parent, task, () => TaskOrdering.MoveToEnd(parent.Subtasks, task));
+					});
+				}
 				((Control)menu.AddMenuItem("Delete subtask")).add_Click((EventHandler<MouseEventArgs>)delegate
 				{
 					_listPanel.DeleteSubtask(parent, task);
@@ -624,6 +712,11 @@ namespace Taskmaster.UI
 				return;
 			}
 			IReadOnlyList<TodoTask> selectedTasks = _listPanel.GetSelectedTasks();
+			List<TodoTask> visibleTasks = (from candidate in tab.Tasks
+				where !_hideDone || !candidate.IsDone || candidate == task
+				orderby candidate.Order
+				select candidate).ToList();
+			int taskIndex = visibleTasks.IndexOf(task);
 			((Control)menu.AddMenuItem("Edit")).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				_listPanel.BeginEdit(task);
@@ -641,14 +734,28 @@ namespace Taskmaster.UI
 				_listPanel.ClearSelection();
 				MarkDirtyAndRefresh();
 			});
-			((Control)menu.AddMenuItem("Move up")).add_Click((EventHandler<MouseEventArgs>)delegate
+			if (taskIndex > 0)
 			{
-				MoveTask(tab, task, -1);
-			});
-			((Control)menu.AddMenuItem("Move down")).add_Click((EventHandler<MouseEventArgs>)delegate
+				((Control)menu.AddMenuItem("Move up")).add_Click((EventHandler<MouseEventArgs>)delegate
+				{
+					MoveTask(tab, task, -1);
+				});
+				((Control)menu.AddMenuItem("Move to top")).add_Click((EventHandler<MouseEventArgs>)delegate
+				{
+					MoveTaskToEdge(tab, task, toStart: true);
+				});
+			}
+			if (taskIndex >= 0 && taskIndex < visibleTasks.Count - 1)
 			{
-				MoveTask(tab, task, 1);
-			});
+				((Control)menu.AddMenuItem("Move down")).add_Click((EventHandler<MouseEventArgs>)delegate
+				{
+					MoveTask(tab, task, 1);
+				});
+				((Control)menu.AddMenuItem("Move to bottom")).add_Click((EventHandler<MouseEventArgs>)delegate
+				{
+					MoveTaskToEdge(tab, task, toStart: false);
+				});
+			}
 			List<TodoTab> otherTabs = (from t in _store.Tabs
 				where t.Id != tab.Id
 				orderby t.Order
@@ -727,30 +834,34 @@ namespace Taskmaster.UI
 
 		private void MoveTask(TodoTab tab, TodoTask task, int delta)
 		{
-			List<TodoTask> ordered = tab.Tasks.OrderBy((TodoTask t) => t.Order).ToList();
-			int i = ordered.IndexOf(task);
-			int j = i + delta;
-			if (i >= 0 && j >= 0 && j < ordered.Count)
+			_listPanel.PreserveScrollPosition();
+			if (TaskOrdering.MoveByVisible(tab.Tasks, task, delta, (TodoTask candidate) => !_hideDone || !candidate.IsDone))
 			{
-				TodoTask tmp = ordered[i];
-				ordered[i] = ordered[j];
-				ordered[j] = tmp;
-				for (int k = 0; k < ordered.Count; k++)
-				{
-					ordered[k].Order = k;
-				}
-				_listPanel.ClearSelection();
+				MarkDirtyAndRefresh();
+			}
+		}
+
+		private void MoveTaskToEdge(TodoTab tab, TodoTask task, bool toStart)
+		{
+			_listPanel.PreserveScrollPosition();
+			if (toStart ? TaskOrdering.MoveToStart(tab.Tasks, task) : TaskOrdering.MoveToEnd(tab.Tasks, task))
+			{
+				MarkDirtyAndRefresh();
+			}
+		}
+
+		private void ReorderSubtask(TodoTask parent, TodoTask subtask, Func<bool> reorder)
+		{
+			_listPanel.PreserveScrollPosition();
+			if (reorder())
+			{
 				MarkDirtyAndRefresh();
 			}
 		}
 
 		private static void NormalizeTaskOrder(TodoTab tab)
 		{
-			List<TodoTask> ordered = tab.Tasks.OrderBy((TodoTask task) => task.Order).ToList();
-			for (int i = 0; i < ordered.Count; i++)
-			{
-				ordered[i].Order = i;
-			}
+			TaskOrdering.Normalize(tab.Tasks);
 		}
 
 		protected override void OnMouseEntered(MouseEventArgs e)
@@ -768,7 +879,27 @@ namespace Taskmaster.UI
 		protected override void OnShown(EventArgs e)
 		{
 			((Control)this).OnShown(e);
+			_applyUnfocusedOpacityAtUtc = DateTime.UtcNow + WindowFadeSettleDelay;
 			OnMinuteTick(DateTime.UtcNow);
+		}
+
+		public override void UpdateContainer(GameTime gameTime)
+		{
+			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
+			((WindowBase2)this).UpdateContainer(gameTime);
+			if (_applyUnfocusedOpacityAtUtc.HasValue && !(DateTime.UtcNow < _applyUnfocusedOpacityAtUtc.Value))
+			{
+				_applyUnfocusedOpacityAtUtc = null;
+				Rectangle windowBounds = default(Rectangle);
+				((Rectangle)(ref windowBounds))._002Ector(((Control)this).get_Left(), ((Control)this).get_Top(), ((Control)this).get_Width(), ((Control)this).get_Height());
+				((Control)this).set_Opacity(((Rectangle)(ref windowBounds)).Contains(GameService.Input.get_Mouse().get_Position()) ? 1f : _settings.UnfocusedOpacity.get_Value());
+			}
+		}
+
+		public override void Hide()
+		{
+			_applyUnfocusedOpacityAtUtc = null;
+			((WindowBase2)this).Hide();
 		}
 
 		protected override void DisposeControl()
