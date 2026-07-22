@@ -17,7 +17,7 @@ namespace Kenedia.Modules.Core.Utility
 	{
 		private static char[] s_invalids;
 
-		public static double Now => GameService.Overlay.CurrentGameTime.get_TotalGameTime().TotalMilliseconds;
+		public static double Now => GameService.Overlay.CurrentGameTime.TotalGameTime.TotalMilliseconds;
 
 		public static bool SetProperty<T>(T oldValue, T newValue, Action<T> assign)
 		{
@@ -164,11 +164,11 @@ namespace Kenedia.Modules.Core.Utility
 
 		public static int GetAssetIdFromRenderUrl(this RenderUrl url)
 		{
-			if ((object)((RenderUrl)(ref url)).get_Url() == null)
+			if ((object)url.Url == null)
 			{
 				return 0;
 			}
-			string s = ((object)(RenderUrl)(ref url)).ToString();
+			string s = url.ToString();
 			if (s == null)
 			{
 				return 0;
@@ -255,12 +255,6 @@ namespace Kenedia.Modules.Core.Utility
 
 		public static double CalculateDistance(Vector3 vector1, Vector3 vector2)
 		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
 			return Math.Sqrt(Math.Pow(vector2.X - vector1.X, 2.0) + Math.Pow(vector2.Y - vector1.Y, 2.0) + Math.Pow(vector2.Z - vector1.Z, 2.0));
 		}
 	}

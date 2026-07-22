@@ -21,16 +21,9 @@ namespace Kenedia.Modules.Core.Models
 
 		public LocalizedString()
 		{
-			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002b: Invalid comparison between Unknown and I4
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002f: Invalid comparison between Unknown and I4
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
 			foreach (Locale locale in Enum.GetValues(typeof(Locale)))
 			{
-				if ((int)locale != 4 && (int)locale != 5)
+				if (locale != Locale.Korean && locale != Locale.Chinese)
 				{
 					Add(locale, null);
 				}
@@ -40,21 +33,17 @@ namespace Kenedia.Modules.Core.Models
 		public LocalizedString(string comon)
 			: this()
 		{
-			base[(Locale)0] = comon;
+			base[Locale.English] = comon;
 		}
 
 		public LocalizedString(string comon, Locale lang)
 			: this()
 		{
-			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 			base[lang] = comon;
 		}
 
 		public new void Add(Locale key, string value)
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 			if (!ContainsKey(key))
 			{
 				base.Add(key, value);
@@ -67,12 +56,6 @@ namespace Kenedia.Modules.Core.Models
 
 		private void SetText(string value, Locale? lang = null)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
 			Locale valueOrDefault = lang.GetValueOrDefault();
 			if (!lang.HasValue)
 			{
@@ -87,12 +70,6 @@ namespace Kenedia.Modules.Core.Models
 
 		public string GetText(Locale? lang = null)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
 			Locale valueOrDefault = lang.GetValueOrDefault();
 			if (!lang.HasValue)
 			{
@@ -101,7 +78,7 @@ namespace Kenedia.Modules.Core.Models
 			}
 			if (!lang.HasValue || !TryGetValue(lang.Value, out var text) || string.IsNullOrEmpty(text))
 			{
-				if (!TryGetValue((Locale)0, out var english) || string.IsNullOrEmpty(english))
+				if (!TryGetValue(Locale.English, out var english) || string.IsNullOrEmpty(english))
 				{
 					return null;
 				}

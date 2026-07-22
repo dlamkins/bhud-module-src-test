@@ -20,7 +20,6 @@ namespace Kenedia.Modules.Characters.Views
 
 		protected override void Build(Container buildPanel)
 		{
-			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
 			_openSettingsButton = new StandardButton
 			{
 				Text = strings_common.OpenSettings,

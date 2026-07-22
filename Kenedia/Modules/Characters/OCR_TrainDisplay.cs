@@ -37,31 +37,12 @@ namespace Kenedia.Modules.Characters
 
 		public OCR_TrainDisplay()
 		{
-			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0123: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0224: Unknown result type (might be due to invalid IL or missing references)
-			//IL_023e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0291: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04e3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0537: Unknown result type (might be due to invalid IL or missing references)
-			//IL_054b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05aa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0600: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0614: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0656: Unknown result type (might be due to invalid IL or missing references)
-			//IL_066d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06e7: Unknown result type (might be due to invalid IL or missing references)
 			base.Parent = GameService.Graphics.SpriteScreen;
 			base.Width = GameService.Graphics.SpriteScreen.Width;
 			base.Height = GameService.Graphics.SpriteScreen.Height;
 			ZIndex = 0;
 			base.Visible = true;
-			base.BackgroundColor = Color.get_White();
+			base.BackgroundColor = Color.White;
 			_characterString = new string(_characters);
 			_characterString += " ";
 			string text = "";
@@ -93,7 +74,7 @@ namespace Kenedia.Modules.Characters
 				Width = Control.Graphics.SpriteScreen.Width - 20,
 				AutoSizeHeight = true,
 				Font = GameService.Content.DefaultFont12,
-				TextColor = Color.get_Black(),
+				TextColor = Color.Black,
 				Visible = false
 			};
 			new Label
@@ -105,7 +86,7 @@ namespace Kenedia.Modules.Characters
 				Width = Control.Graphics.SpriteScreen.Width - 20,
 				AutoSizeHeight = true,
 				Font = GameService.Content.DefaultFont16,
-				TextColor = Color.get_Black(),
+				TextColor = Color.Black,
 				Visible = false
 			};
 			new Label
@@ -117,7 +98,7 @@ namespace Kenedia.Modules.Characters
 				Width = Control.Graphics.SpriteScreen.Width - 20,
 				AutoSizeHeight = true,
 				Font = GameService.Content.DefaultFont32,
-				TextColor = Color.get_Black(),
+				TextColor = Color.Black,
 				Visible = false
 			};
 			string upper = "A   B   C   D   E   F   G   H   I   J   K   L   M   N   O   P   Q   R   S   T   U   V   W   X   Y   Z   Á   Â   Ä   À   Æ   Ç   Ê   É   Ë   È   Ï   Í   Î   Ñ   Œ   Ô   Ö   Ó   Ú   Ü   Û   Ù";
@@ -142,7 +123,7 @@ namespace Kenedia.Modules.Characters
 				Width = 400,
 				AutoSizeHeight = true,
 				Font = GameService.Content.DefaultFont32,
-				TextColor = Color.get_Black()
+				TextColor = Color.Black
 			};
 			new Label
 			{
@@ -153,7 +134,7 @@ namespace Kenedia.Modules.Characters
 				Width = 400,
 				AutoSizeHeight = true,
 				Font = GameService.Content.DefaultFont32,
-				TextColor = Color.get_Black()
+				TextColor = Color.Black
 			};
 			new Label
 			{
@@ -164,7 +145,7 @@ namespace Kenedia.Modules.Characters
 				Width = 400,
 				AutoSizeHeight = true,
 				Font = GameService.Content.DefaultFont32,
-				TextColor = Color.get_Black()
+				TextColor = Color.Black
 			};
 			new Label
 			{
@@ -175,7 +156,7 @@ namespace Kenedia.Modules.Characters
 				Width = 400,
 				AutoSizeHeight = true,
 				Font = GameService.Content.DefaultFont32,
-				TextColor = Color.get_Black()
+				TextColor = Color.Black
 			};
 			Label label = new Label
 			{
@@ -186,7 +167,7 @@ namespace Kenedia.Modules.Characters
 				Width = Control.Graphics.SpriteScreen.Width - 20,
 				AutoSizeHeight = true,
 				Font = GameService.Content.DefaultFont32,
-				TextColor = Color.get_Black()
+				TextColor = Color.Black
 			};
 		}
 	}

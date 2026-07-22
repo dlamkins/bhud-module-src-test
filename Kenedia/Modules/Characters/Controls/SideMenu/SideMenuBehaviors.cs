@@ -14,7 +14,7 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 {
 	public class SideMenuBehaviors : FlowTab, ILocalizable
 	{
-		private readonly List<KeyValuePair<string, DisplayCheckToggle>> _toggles = new List<KeyValuePair<string, DisplayCheckToggle>>(13)
+		private readonly List<KeyValuePair<string, DisplayCheckToggle>> _toggles = new List<KeyValuePair<string, DisplayCheckToggle>>(14)
 		{
 			new KeyValuePair<string, DisplayCheckToggle>("Name", null),
 			new KeyValuePair<string, DisplayCheckToggle>("Level", null),
@@ -25,6 +25,7 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 			new KeyValuePair<string, DisplayCheckToggle>("NextBirthday", null),
 			new KeyValuePair<string, DisplayCheckToggle>("Age", null),
 			new KeyValuePair<string, DisplayCheckToggle>("Map", null),
+			new KeyValuePair<string, DisplayCheckToggle>("FreeInventorySlots", null),
 			new KeyValuePair<string, DisplayCheckToggle>("CraftingProfession", null),
 			new KeyValuePair<string, DisplayCheckToggle>("OnlyMaxCrafting", null),
 			new KeyValuePair<string, DisplayCheckToggle>("CustomIndex", null),
@@ -53,12 +54,6 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 
 		public SideMenuBehaviors(ResourceManager resourceManager, TextureManager textureManager, Settings settings, Action onSortChanged)
 		{
-			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0133: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0148: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0156: Unknown result type (might be due to invalid IL or missing references)
-			//IL_028b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0295: Unknown result type (might be due to invalid IL or missing references)
 			_resourceManager = resourceManager;
 			_settings = settings;
 			_onSortChanged = onSortChanged;
@@ -99,7 +94,7 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 			_toggleAll.ShowTooltipChanged += new EventHandler<bool>(All_ShowTooltipCheckChanged);
 			_separator = new Kenedia.Modules.Core.Controls.Panel
 			{
-				BackgroundColor = Color.get_White() * 0.6f,
+				BackgroundColor = Color.White * 0.6f,
 				Height = 2,
 				Parent = this
 			};
@@ -120,7 +115,7 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 					show = false;
 					break;
 				}
-				DisplayCheckToggle ctrl = new DisplayCheckToggle(textureManager, settings2, key, show)
+				DisplayCheckToggle ctrl = new DisplayCheckToggle(textureManager, settings2, key, show, check: true, !(t.Key == "FreeInventorySlots"))
 				{
 					Parent = this
 				};
@@ -230,12 +225,6 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 
 		protected override void OnResized(ResizedEventArgs e)
 		{
-			//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
 			base.OnResized(e);
 			_contentRectangle = new Rectangle((int)base.OuterControlPadding.X, (int)base.OuterControlPadding.Y, base.Width - (int)base.OuterControlPadding.X * 2, base.Height - (int)base.OuterControlPadding.Y * 2);
 			_orderDropdown.Width = _contentRectangle.Width;

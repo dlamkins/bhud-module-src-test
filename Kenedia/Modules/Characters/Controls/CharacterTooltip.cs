@@ -36,7 +36,7 @@ namespace Kenedia.Modules.Characters.Controls
 
 		private readonly List<Tag> _tags = new List<Tag>();
 
-		public Color BackgroundTint { get; set; } = Color.get_Honeydew() * 0.95f;
+		public Color BackgroundTint { get; set; } = Color.Honeydew * 0.95f;
 
 
 		public BitmapFont Font { get; set; } = GameService.Content.DefaultFont14;
@@ -72,27 +72,14 @@ namespace Kenedia.Modules.Characters.Controls
 
 		public CharacterTooltip(Func<Character_Model> currentCharacter, TextureManager textureManager, Data data, Settings settings)
 		{
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0111: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0126: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0133: Unknown result type (might be due to invalid IL or missing references)
 			_currentCharacter = currentCharacter;
 			_textureManager = textureManager;
 			_data = data;
 			base.TextureRectangle = new Rectangle(60, 25, 250, 250);
 			base.BackgroundImage = AsyncTexture2D.FromAssetId(156003);
-			base.BorderColor = Color.get_Black();
+			base.BorderColor = Color.Black;
 			base.BorderWidth = new RectangleDimensions(2);
-			base.BackgroundColor = Color.get_Black() * 0.6f;
+			base.BackgroundColor = Color.Black * 0.6f;
 			HeightSizingMode = SizingMode.AutoSize;
 			base.AutoSizePadding = new Point(5, 5);
 			_contentPanel = new Kenedia.Modules.Core.Controls.FlowPanel
@@ -126,16 +113,12 @@ namespace Kenedia.Modules.Characters.Controls
 
 		public override void UpdateContainer(GameTime gameTime)
 		{
-			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
 			base.UpdateContainer(gameTime);
 			base.Location = new Point(Control.Input.Mouse.Position.X, Control.Input.Mouse.Position.Y + 35);
 		}
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 			base.PaintBeforeChildren(spriteBatch, bounds);
 		}
 
@@ -156,9 +139,6 @@ namespace Kenedia.Modules.Characters.Controls
 
 		protected override void OnShown(EventArgs e)
 		{
-			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
 			base.OnShown(e);
 			base.Location = new Point(Control.Input.Mouse.Position.X, Control.Input.Mouse.Position.Y + 35);
 			Character_Updated(this, null);

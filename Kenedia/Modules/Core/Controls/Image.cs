@@ -53,16 +53,11 @@ namespace Kenedia.Modules.Core.Controls
 
 		private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
 			if (e.PropertyName == "BackgroundColor")
 			{
 				Color backgroundColor = base.BackgroundColor;
 				Color? hoveredBackgroundColor = _hoveredBackgroundColor;
-				if (!hoveredBackgroundColor.HasValue || backgroundColor != hoveredBackgroundColor.GetValueOrDefault())
+				if (backgroundColor != hoveredBackgroundColor)
 				{
 					_defaultBackgroundColor = base.BackgroundColor;
 				}
@@ -85,18 +80,14 @@ namespace Kenedia.Modules.Core.Controls
 
 		protected override void OnMouseEntered(MouseEventArgs e)
 		{
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
 			base.OnMouseEntered(e);
-			base.BackgroundColor = (Color)(((_003F?)_hoveredBackgroundColor) ?? base.BackgroundColor);
+			base.BackgroundColor = _hoveredBackgroundColor ?? base.BackgroundColor;
 		}
 
 		protected override void OnMouseLeft(MouseEventArgs e)
 		{
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
 			base.OnMouseLeft(e);
-			base.BackgroundColor = (Color)(((_003F?)_defaultBackgroundColor) ?? base.BackgroundColor);
+			base.BackgroundColor = _defaultBackgroundColor ?? base.BackgroundColor;
 		}
 	}
 }

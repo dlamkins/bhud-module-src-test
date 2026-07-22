@@ -72,6 +72,8 @@ namespace Kenedia.Modules.Characters.Models
 
 		private bool _beta;
 
+		private int? _freeInventorySlots;
+
 		public bool IsCurrentCharacter
 		{
 			[CompilerGenerated]
@@ -180,12 +182,10 @@ namespace Kenedia.Modules.Characters.Models
 		{
 			get
 			{
-				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 				return _profession;
 			}
 			set
 			{
-				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 				SetProperty(ref _profession, value, "Profession");
 			}
 		}
@@ -290,7 +290,6 @@ namespace Kenedia.Modules.Characters.Models
 		{
 			get
 			{
-				//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 				if (_data == null || !_data.Professions.TryGetValue(Profession, out var profession))
 				{
 					return "Data not loaded.";
@@ -315,7 +314,6 @@ namespace Kenedia.Modules.Characters.Models
 		{
 			get
 			{
-				//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 				if (_data == null || !_data.Professions.TryGetValue(Profession, out var profession))
 				{
 					return null;
@@ -328,7 +326,6 @@ namespace Kenedia.Modules.Characters.Models
 		{
 			get
 			{
-				//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 				if (_data == null || !_data.Professions.TryGetValue(Profession, out var profession))
 				{
 					return null;
@@ -368,7 +365,7 @@ namespace Kenedia.Modules.Characters.Models
 				if (!_pathChecked)
 				{
 					string path = ModulePath + (IconPath ?? string.Empty);
-					if (IconPath != null && File.Exists(path))
+					if (IconPath != null && System.IO.File.Exists(path))
 					{
 						GameService.Graphics.QueueMainThreadRender(delegate(GraphicsDevice graphicsDevice)
 						{
@@ -419,6 +416,35 @@ namespace Kenedia.Modules.Characters.Models
 		public TagList Tags { get; private set; } = new TagList();
 
 
+		public IEnumerable<string> DisplayTags
+		{
+			[IteratorStateMachine(typeof(_003Cget_DisplayTags_003Ed__117))]
+			get
+			{
+				return new _003Cget_DisplayTags_003Ed__117(-2)
+				{
+					_003C_003E4__this = this
+				};
+			}
+		}
+
+		[DataMember]
+		public int? FreeInventorySlots
+		{
+			get
+			{
+				return _freeInventorySlots;
+			}
+			set
+			{
+				SetProperty(ref _freeInventorySlots, value, "FreeInventorySlots");
+			}
+		}
+
+		public bool HasInventoryData => FreeInventorySlots.HasValue;
+
+		public bool HasFullInventory => FreeInventorySlots == 0;
+
 		[DataMember]
 		public int Position
 		{
@@ -452,13 +478,10 @@ namespace Kenedia.Modules.Characters.Models
 		{
 			get
 			{
-				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 				return _gender;
 			}
 			set
 			{
-				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 				_gender = value;
 				Save();
 			}
@@ -565,32 +588,27 @@ namespace Kenedia.Modules.Characters.Models
 
 		public Character_Model(Character character, CharacterSwapping characterSwapping, string modulePath, Action requestSave, ObservableCollection<Character_Model> characterModels, Data data)
 		{
-			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0131: Unknown result type (might be due to invalid IL or missing references)
 			_characterSwapping = characterSwapping;
 			ModulePath = modulePath;
 			_requestSave = requestSave;
 			_characterModels = characterModels;
 			_data = data;
-			_name = character.get_Name();
-			_level = character.get_Level();
-			_race = (Enum.TryParse<Races>(character.get_Race(), out var race) ? race : Races.None);
-			_profession = (ProfessionType)((!Enum.TryParse<ProfessionType>(character.get_Profession(), out ProfessionType profession)) ? 1 : ((int)profession));
+			_name = character.Name;
+			_level = character.Level;
+			_race = (Enum.TryParse<Races>(character.Race, out var race) ? race : Races.None);
+			_profession = ((!Enum.TryParse<ProfessionType>(character.Profession, out var profession)) ? ProfessionType.Guardian : profession);
 			_specialization = 0;
-			_created = character.get_Created();
-			_lastModified = character.get_LastModified().UtcDateTime;
-			_lastLogin = ((_lastLogin > character.get_LastModified().UtcDateTime) ? _lastLogin : character.get_LastModified().UtcDateTime);
-			_gender = ApiEnum<Gender>.op_Implicit(character.get_Gender());
-			foreach (CharacterCraftingDiscipline disc in character.get_Crafting().ToList())
+			_created = character.Created;
+			_lastModified = character.LastModified.UtcDateTime;
+			_lastLogin = ((_lastLogin > character.LastModified.UtcDateTime) ? _lastLogin : character.LastModified.UtcDateTime);
+			_gender = character.Gender;
+			foreach (CharacterCraftingDiscipline disc in character.Crafting.ToList())
 			{
 				Crafting.Add(new CharacterCrafting
 				{
-					Id = disc.get_Discipline().get_Value(),
-					Rating = disc.get_Rating(),
-					Active = disc.get_Active()
+					Id = disc.Discipline.Value,
+					Rating = disc.Rating,
+					Active = disc.Active
 				});
 			}
 			_initialized = true;
@@ -598,10 +616,6 @@ namespace Kenedia.Modules.Characters.Models
 
 		public Character_Model(Character_Model character, CharacterSwapping characterSwapping, string modulePath, Action requestSave, ObservableCollection<Character_Model> characterModels, Data data)
 		{
-			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0110: Unknown result type (might be due to invalid IL or missing references)
 			_characterSwapping = characterSwapping;
 			ModulePath = modulePath;
 			_requestSave = requestSave;
@@ -626,6 +640,7 @@ namespace Kenedia.Modules.Characters.Models
 			_gender = character.Gender;
 			_showOnRadial = character.ShowOnRadial;
 			_hadBirthday = character.HadBirthday;
+			_freeInventorySlots = character.FreeInventorySlots;
 			_initialized = true;
 		}
 
@@ -747,30 +762,25 @@ namespace Kenedia.Modules.Characters.Models
 
 		public void UpdateCharacter(Character character)
 		{
-			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
-			_name = character.get_Name();
-			_level = character.get_Level();
-			_race = (Races)Enum.Parse(typeof(Races), character.get_Race());
-			_profession = (ProfessionType)Enum.Parse(typeof(ProfessionType), character.get_Profession());
-			_created = character.get_Created();
-			_lastModified = character.get_LastModified().UtcDateTime;
-			_lastLogin = ((_lastLogin > character.get_LastModified().UtcDateTime) ? _lastLogin : character.get_LastModified().UtcDateTime);
-			_gender = ApiEnum<Gender>.op_Implicit(character.get_Gender());
-			foreach (CharacterCraftingDiscipline disc in character.get_Crafting().ToList())
+			_name = character.Name;
+			_level = character.Level;
+			_race = (Races)Enum.Parse(typeof(Races), character.Race);
+			_profession = (ProfessionType)Enum.Parse(typeof(ProfessionType), character.Profession);
+			_created = character.Created;
+			_lastModified = character.LastModified.UtcDateTime;
+			_lastLogin = ((_lastLogin > character.LastModified.UtcDateTime) ? _lastLogin : character.LastModified.UtcDateTime);
+			_gender = character.Gender;
+			foreach (CharacterCraftingDiscipline disc in character.Crafting.ToList())
 			{
-				CharacterCrafting craft = Crafting.Find((CharacterCrafting e) => e.Id == disc.get_Discipline().get_Value());
+				CharacterCrafting craft = Crafting.Find((CharacterCrafting e) => e.Id == disc.Discipline.Value);
 				bool num = craft != null;
 				if (craft == null)
 				{
 					craft = new CharacterCrafting();
 				}
-				craft.Id = disc.get_Discipline().get_Value();
-				craft.Rating = disc.get_Rating();
-				craft.Active = disc.get_Active();
+				craft.Id = disc.Discipline.Value;
+				craft.Rating = disc.Rating;
+				craft.Active = disc.Active;
 				if (!num)
 				{
 					Crafting.Add(craft);
@@ -794,9 +804,9 @@ namespace Kenedia.Modules.Characters.Models
 
 		public bool MatchesIdentity(Character character)
 		{
-			if (character != null && Name == character.get_Name())
+			if (character != null && Name == character.Name)
 			{
-				return Created == character.get_Created();
+				return Created == character.Created;
 			}
 			return false;
 		}
@@ -816,6 +826,7 @@ namespace Kenedia.Modules.Characters.Models
 				_index = storedCharacter.Index;
 				_showOnRadial = storedCharacter.ShowOnRadial;
 				_hadBirthday = storedCharacter.HadBirthday;
+				_freeInventorySlots = storedCharacter.FreeInventorySlots;
 				Tags.Clear();
 				Tags.AddTags(storedCharacter.Tags, fireEvent: false);
 				Tags.ForceCollectionChanged();
@@ -832,6 +843,11 @@ namespace Kenedia.Modules.Characters.Models
 			{
 				Save();
 			}
+		}
+
+		public override string ToString()
+		{
+			return Name;
 		}
 	}
 }

@@ -18,6 +18,8 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 {
 	public class SideMenuToggles : FlowTab, ILocalizable
 	{
+		private const string FullInventoryFilterKey = "FullInventory";
+
 		private readonly List<Tag> _tags = new List<Tag>();
 
 		private readonly Kenedia.Modules.Core.Controls.FlowPanel _toggleFlowPanel;
@@ -34,26 +36,25 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 
 		private readonly Action _onFilterChanged;
 
+		private readonly Func<bool> _hasFullInventoryCharacters;
+
 		private readonly TagList _allTags;
 
 		private readonly Data _data;
 
-		private Rectangle _contentRectangle;
+		private Microsoft.Xna.Framework.Rectangle _contentRectangle;
+
+		private Tag _fullInventoryTag;
 
 		public event EventHandler TogglesChanged;
 
-		public SideMenuToggles(TextureManager textureManager, SearchFilterCollection tagFilters, SearchFilterCollection searchFilters, Action onFilterChanged, TagList allTags, Data data)
+		public SideMenuToggles(TextureManager textureManager, SearchFilterCollection tagFilters, SearchFilterCollection searchFilters, Action onFilterChanged, Func<bool> hasFullInventoryCharacters, TagList allTags, Data data)
 		{
-			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0100: Unknown result type (might be due to invalid IL or missing references)
 			_textureManager = textureManager;
 			_tagFilters = tagFilters;
 			_searchFilters = searchFilters;
 			_onFilterChanged = onFilterChanged;
+			_hasFullInventoryCharacters = hasFullInventoryCharacters;
 			_allTags = allTags;
 			_data = data;
 			base.FlowDirection = ControlFlowDirection.SingleTopToBottom;
@@ -110,8 +111,10 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 
 		private void CreateTags()
 		{
-			//IL_0228: Unknown result type (might be due to invalid IL or missing references)
-			IEnumerable<string> tagLlist = _tags.Select((Tag e) => e.Text);
+			SyncFullInventoryTag();
+			IEnumerable<string> tagLlist = from e in _tags
+				where e.ShowDelete
+				select e.Text;
 			IEnumerable<string> deleteTags = tagLlist.Except(_allTags);
 			IEnumerable<string> addTags = _allTags.Except(tagLlist);
 			if (!deleteTags.Any() && !addTags.Any())
@@ -162,30 +165,59 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 			_tagFlowPanel.FitWidestTag(base.ContentRegion.Width);
 		}
 
+		public void UpdateComputedTags()
+		{
+			SyncFullInventoryTag();
+			_tagFlowPanel.FitWidestTag(base.ContentRegion.Width);
+			Invalidate();
+		}
+
+		private void SyncFullInventoryTag()
+		{
+			if (!(_hasFullInventoryCharacters?.Invoke() ?? false))
+			{
+				if (_fullInventoryTag != null)
+				{
+					_tags.Remove(_fullInventoryTag);
+					_fullInventoryTag.Dispose();
+					_fullInventoryTag = null;
+				}
+				if (_searchFilters.TryGetValue("FullInventory", out var filter) && filter.IsEnabled)
+				{
+					filter.IsEnabled = false;
+					_onFilterChanged?.Invoke();
+				}
+				return;
+			}
+			if (_fullInventoryTag != null)
+			{
+				_fullInventoryTag.Text = strings.FullInventory;
+				return;
+			}
+			Tag tag = new Tag
+			{
+				Parent = _tagFlowPanel,
+				Text = strings.FullInventory,
+				ShowDelete = false,
+				CanInteract = true
+			};
+			tag.OnClickAction = delegate
+			{
+				_searchFilters["FullInventory"].IsEnabled = tag.Active;
+				_onFilterChanged?.Invoke();
+			};
+			tag.SetActive(_searchFilters["FullInventory"].IsEnabled);
+			_fullInventoryTag = tag;
+			_tags.Insert(0, tag);
+		}
+
 		private void CreateToggles()
 		{
-			//IL_0143: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0171: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0327: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0442: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0448: Invalid comparison between Unknown and I4
-			//IL_0485: Unknown result type (might be due to invalid IL or missing references)
-			//IL_048b: Invalid comparison between Unknown and I4
-			//IL_0493: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_054f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05ba: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0750: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07bd: Unknown result type (might be due to invalid IL or missing references)
-			Dictionary<ProfessionType, Profession> profs = _data.Professions.ToDictionary<KeyValuePair<ProfessionType, Profession>, ProfessionType, Profession>((KeyValuePair<ProfessionType, Profession> entry) => entry.Key, (KeyValuePair<ProfessionType, Profession> entry) => entry.Value);
+			Dictionary<ProfessionType, Kenedia.Modules.Characters.Models.Profession> profs = _data.Professions.ToDictionary<KeyValuePair<ProfessionType, Kenedia.Modules.Characters.Models.Profession>, ProfessionType, Kenedia.Modules.Characters.Models.Profession>((KeyValuePair<ProfessionType, Kenedia.Modules.Characters.Models.Profession> entry) => entry.Key, (KeyValuePair<ProfessionType, Kenedia.Modules.Characters.Models.Profession> entry) => entry.Value);
 			profs = (from e in profs
 				orderby e.Value.WeightClass, e.Value.Id
-				select e).ToDictionary((KeyValuePair<ProfessionType, Profession> e) => e.Key, (KeyValuePair<ProfessionType, Profession> e) => e.Value);
-			foreach (KeyValuePair<ProfessionType, Profession> profession2 in profs)
+				select e).ToDictionary((KeyValuePair<ProfessionType, Kenedia.Modules.Characters.Models.Profession> e) => e.Key, (KeyValuePair<ProfessionType, Kenedia.Modules.Characters.Models.Profession> e) => e.Value);
+			foreach (KeyValuePair<ProfessionType, Kenedia.Modules.Characters.Models.Profession> profession2 in profs)
 			{
 				ImageColorToggle t5 = new ImageColorToggle(delegate(bool b)
 				{
@@ -203,7 +235,7 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 				};
 				_toggles.Add(t5);
 			}
-			foreach (KeyValuePair<ProfessionType, Profession> profession in profs)
+			foreach (KeyValuePair<ProfessionType, Kenedia.Modules.Characters.Models.Profession> profession in profs)
 			{
 				ImageColorToggle t4 = new ImageColorToggle(delegate(bool b)
 				{
@@ -217,7 +249,7 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 				_toggles.Add(t4);
 			}
 			List<ImageColorToggle> specToggles = new List<ImageColorToggle>();
-			foreach (KeyValuePair<int, Specialization> specialization in _data.Specializations)
+			foreach (KeyValuePair<int, Kenedia.Modules.Characters.Models.Specialization> specialization in _data.Specializations)
 			{
 				ImageColorToggle t3 = new ImageColorToggle(delegate(bool b)
 				{
@@ -233,7 +265,7 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 			}
 			for (int i = 0; i < 4; i++)
 			{
-				foreach (KeyValuePair<ProfessionType, Profession> p in profs)
+				foreach (KeyValuePair<ProfessionType, Kenedia.Modules.Characters.Models.Profession> p in profs)
 				{
 					ImageColorToggle t = specToggles.Find((ImageColorToggle e) => p.Key == e.Profession && !_toggles.Contains(e));
 					if (t != null)
@@ -244,7 +276,7 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 			}
 			foreach (KeyValuePair<CraftingDisciplineType, CraftingProfession> crafting in _data.CraftingProfessions)
 			{
-				if ((int)crafting.Key > 0)
+				if (crafting.Key > CraftingDisciplineType.Unknown)
 				{
 					ImageColorToggle img = new ImageColorToggle(delegate(bool b)
 					{
@@ -253,8 +285,8 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 					{
 						Texture = crafting.Value.Icon,
 						UseGrayScale = false,
-						TextureRectangle = (((int)crafting.Key > 0) ? new Rectangle(8, 7, 17, 19) : new Rectangle(4, 4, 24, 24)),
-						SizeRectangle = new Rectangle(4, 4, 20, 20),
+						TextureRectangle = ((crafting.Key > CraftingDisciplineType.Unknown) ? new Microsoft.Xna.Framework.Rectangle(8, 7, 17, 19) : new Microsoft.Xna.Framework.Rectangle(4, 4, 24, 24)),
+						SizeRectangle = new Microsoft.Xna.Framework.Rectangle(4, 4, 20, 20),
 						Active = _searchFilters[crafting.Value.Name].IsEnabled,
 						SetLocalizedTooltip = () => crafting.Value.Name
 					};
@@ -268,7 +300,7 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 			{
 				Texture = AsyncTexture2D.FromAssetId(605021),
 				UseGrayScale = true,
-				TextureRectangle = new Rectangle(4, 4, 24, 24),
+				TextureRectangle = new Microsoft.Xna.Framework.Rectangle(4, 4, 24, 24),
 				SetLocalizedTooltip = () => strings.ShowHidden_Tooltip
 			};
 			_toggles.Add(hidden);
@@ -279,11 +311,22 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 			{
 				Texture = AsyncTexture2D.FromAssetId(593864),
 				UseGrayScale = true,
-				TextureRectangle = new Rectangle(1, 0, 30, 32),
+				TextureRectangle = new Microsoft.Xna.Framework.Rectangle(1, 0, 30, 32),
 				SetLocalizedTooltip = () => strings.Show_Birthday_Tooltip
 			};
 			_toggles.Add(birthday);
-			foreach (Race race in _data.Races.Values)
+			ImageColorToggle fullInventory = new ImageColorToggle(delegate(bool b)
+			{
+				action(b, "FullInventory");
+			})
+			{
+				Texture = AsyncTexture2D.FromAssetId(156736),
+				UseGrayScale = true,
+				TextureRectangle = new Microsoft.Xna.Framework.Rectangle(2, 2, 28, 28),
+				SetLocalizedTooltip = () => strings.FullInventory
+			};
+			_toggles.Add(fullInventory);
+			foreach (Kenedia.Modules.Characters.Models.Race race in _data.Races.Values)
 			{
 				if (race.Id != Races.None)
 				{
@@ -306,7 +349,7 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 			{
 				Texture = (AsyncTexture2D)_textureManager.GetIcon(TextureManager.Icons.Male),
 				UseGrayScale = true,
-				TextureRectangle = new Rectangle(1, 0, 30, 32),
+				TextureRectangle = new Microsoft.Xna.Framework.Rectangle(1, 0, 30, 32),
 				SetLocalizedTooltip = () => strings.Male
 			};
 			_toggles.Add(male);
@@ -317,7 +360,7 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 			{
 				Texture = (AsyncTexture2D)_textureManager.GetIcon(TextureManager.Icons.Female),
 				UseGrayScale = true,
-				TextureRectangle = new Rectangle(1, 0, 30, 32),
+				TextureRectangle = new Microsoft.Xna.Framework.Rectangle(1, 0, 30, 32),
 				SetLocalizedTooltip = () => strings.Female
 			};
 			_toggles.Add(female);
@@ -349,21 +392,14 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 
 		protected override void OnResized(ResizedEventArgs e)
 		{
-			//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
 			base.OnResized(e);
-			_contentRectangle = new Rectangle((int)base.OuterControlPadding.X, (int)base.OuterControlPadding.Y, base.Width - (int)base.OuterControlPadding.X * 2, base.Height - (int)base.OuterControlPadding.Y * 2);
+			_contentRectangle = new Microsoft.Xna.Framework.Rectangle((int)base.OuterControlPadding.X, (int)base.OuterControlPadding.Y, base.Width - (int)base.OuterControlPadding.X * 2, base.Height - (int)base.OuterControlPadding.Y * 2);
 			_toggleFlowPanel.Width = _contentRectangle.Width;
 			_tagFlowPanel.FitWidestTag(_contentRectangle.Width);
 		}
 
 		protected override void OnShown(EventArgs e)
 		{
-			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 			base.OnShown(e);
 			_tagFlowPanel.FitWidestTag(base.ContentRegion.Width);
 			Invalidate();

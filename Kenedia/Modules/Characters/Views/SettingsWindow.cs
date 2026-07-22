@@ -39,11 +39,6 @@ namespace Kenedia.Modules.Characters.Views
 		public SettingsWindow(AsyncTexture2D background, Rectangle windowRegion, Rectangle contentRegion, SharedSettingsView sharedSettingsView, OCR ocr, Settings settings)
 			: base(background, windowRegion, contentRegion)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
 			_sharedSettingsView = sharedSettingsView;
 			_ocr = ocr;
 			_settings = settings;
@@ -71,26 +66,6 @@ namespace Kenedia.Modules.Characters.Views
 
 		private void CreateRadial()
 		{
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0424: Unknown result type (might be due to invalid IL or missing references)
-			//IL_050c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0517: Unknown result type (might be due to invalid IL or missing references)
-			//IL_053a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_056c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05b0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05d7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0609: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0630: Unknown result type (might be due to invalid IL or missing references)
-			//IL_066e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06e4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_070b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_073d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0764: Unknown result type (might be due to invalid IL or missing references)
 			Kenedia.Modules.Core.Controls.Panel headerPanel = new Kenedia.Modules.Core.Controls.Panel
 			{
 				Parent = _contentPanel,
@@ -234,8 +209,6 @@ namespace Kenedia.Modules.Characters.Views
 				SelectedColor = _settings.Radial_SliceBackground.Value.Start,
 				OnColorChangedAction = delegate(Color color)
 				{
-					//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0029: Unknown result type (might be due to invalid IL or missing references)
 					_settings.Radial_SliceBackground.Value = new ColorGradient(color, _settings.Radial_SliceBackground.Value.End);
 				}
 			};
@@ -247,8 +220,6 @@ namespace Kenedia.Modules.Characters.Views
 				SelectedColor = _settings.Radial_SliceBackground.Value.End,
 				OnColorChangedAction = delegate(Color color)
 				{
-					//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-					//IL_002d: Unknown result type (might be due to invalid IL or missing references)
 					_settings.Radial_SliceBackground.Value = new ColorGradient(_settings.Radial_SliceBackground.Value.Start, color);
 				}
 			};
@@ -278,8 +249,6 @@ namespace Kenedia.Modules.Characters.Views
 				SelectedColor = _settings.Radial_SliceHighlight.Value.Start,
 				OnColorChangedAction = delegate(Color color)
 				{
-					//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-					//IL_0029: Unknown result type (might be due to invalid IL or missing references)
 					_settings.Radial_SliceHighlight.Value = new ColorGradient(color, _settings.Radial_SliceHighlight.Value.End);
 				}
 			};
@@ -291,8 +260,6 @@ namespace Kenedia.Modules.Characters.Views
 				SelectedColor = _settings.Radial_SliceHighlight.Value.End,
 				OnColorChangedAction = delegate(Color color)
 				{
-					//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-					//IL_002d: Unknown result type (might be due to invalid IL or missing references)
 					_settings.Radial_SliceHighlight.Value = new ColorGradient(_settings.Radial_SliceHighlight.Value.Start, color);
 				}
 			};
@@ -300,16 +267,6 @@ namespace Kenedia.Modules.Characters.Views
 
 		private void CreateOCR()
 		{
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0102: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0112: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_023e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0264: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0274: Unknown result type (might be due to invalid IL or missing references)
-			//IL_030a: Unknown result type (might be due to invalid IL or missing references)
 			Kenedia.Modules.Core.Controls.Panel headerPanel = new Kenedia.Modules.Core.Controls.Panel
 			{
 				Parent = _contentPanel,
@@ -384,14 +341,6 @@ namespace Kenedia.Modules.Characters.Views
 
 		private void CreateKeybinds()
 		{
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0152: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0274: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0305: Unknown result type (might be due to invalid IL or missing references)
 			Kenedia.Modules.Core.Controls.Panel p = new Kenedia.Modules.Core.Controls.Panel
 			{
 				Parent = _contentPanel,
@@ -418,7 +367,6 @@ namespace Kenedia.Modules.Characters.Views
 				KeyBinding = _settings.LogoutKey.Value,
 				KeybindChangedAction = delegate(KeyBinding kb)
 				{
-					//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 					_settings.LogoutKey.Value = new KeyBinding
 					{
 						ModifierKeys = kb.ModifierKeys,
@@ -437,7 +385,6 @@ namespace Kenedia.Modules.Characters.Views
 				KeyBinding = _settings.ShortcutKey.Value,
 				KeybindChangedAction = delegate(KeyBinding kb)
 				{
-					//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 					_settings.ShortcutKey.Value = new KeyBinding
 					{
 						ModifierKeys = kb.ModifierKeys,
@@ -456,7 +403,6 @@ namespace Kenedia.Modules.Characters.Views
 				KeyBinding = _settings.RadialKey.Value,
 				KeybindChangedAction = delegate(KeyBinding kb)
 				{
-					//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 					_settings.RadialKey.Value = new KeyBinding
 					{
 						ModifierKeys = kb.ModifierKeys,
@@ -475,7 +421,6 @@ namespace Kenedia.Modules.Characters.Views
 				KeyBinding = _settings.InventoryKey.Value,
 				KeybindChangedAction = delegate(KeyBinding kb)
 				{
-					//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 					_settings.InventoryKey.Value = new KeyBinding
 					{
 						ModifierKeys = kb.ModifierKeys,
@@ -494,7 +439,6 @@ namespace Kenedia.Modules.Characters.Views
 				KeyBinding = _settings.MailKey.Value,
 				KeybindChangedAction = delegate(KeyBinding kb)
 				{
-					//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 					_settings.MailKey.Value = new KeyBinding
 					{
 						ModifierKeys = kb.ModifierKeys,
@@ -506,15 +450,46 @@ namespace Kenedia.Modules.Characters.Views
 				SetLocalizedKeyBindingName = () => strings.MailKey,
 				SetLocalizedTooltip = () => strings.MailKey_Tooltip
 			};
+			new Kenedia.Modules.Core.Controls.KeybindingAssigner
+			{
+				Parent = cP,
+				Width = base.ContentRegion.Width - 35,
+				KeyBinding = _settings.ToggleCharacterRoutineKey.Value,
+				KeybindChangedAction = delegate(KeyBinding kb)
+				{
+					_settings.ToggleCharacterRoutineKey.Value = new KeyBinding
+					{
+						ModifierKeys = kb.ModifierKeys,
+						PrimaryKey = kb.PrimaryKey,
+						Enabled = kb.Enabled,
+						IgnoreWhenInTextField = true
+					};
+				},
+				SetLocalizedKeyBindingName = () => strings.ToggleCharacterRoutineKey,
+				SetLocalizedTooltip = () => strings.ToggleCharacterRoutineKey_Tooltip
+			};
+			new Kenedia.Modules.Core.Controls.KeybindingAssigner
+			{
+				Parent = cP,
+				Width = base.ContentRegion.Width - 35,
+				KeyBinding = _settings.NextCharacterRoutineStepKey.Value,
+				KeybindChangedAction = delegate(KeyBinding kb)
+				{
+					_settings.NextCharacterRoutineStepKey.Value = new KeyBinding
+					{
+						ModifierKeys = kb.ModifierKeys,
+						PrimaryKey = kb.PrimaryKey,
+						Enabled = kb.Enabled,
+						IgnoreWhenInTextField = true
+					};
+				},
+				SetLocalizedKeyBindingName = () => strings.NextCharacterRoutineStepKey,
+				SetLocalizedTooltip = () => strings.NextCharacterRoutineStepKey_Tooltip
+			};
 		}
 
 		private void CreateBehavior()
 		{
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0704: Unknown result type (might be due to invalid IL or missing references)
 			Kenedia.Modules.Core.Controls.Panel p = new Kenedia.Modules.Core.Controls.Panel
 			{
 				Parent = _contentPanel,
@@ -660,6 +635,35 @@ namespace Kenedia.Modules.Characters.Views
 			{
 				Parent = cP,
 				WidthSizingMode = SizingMode.Fill,
+				Height = 30
+			};
+			new Kenedia.Modules.Core.Controls.Label
+			{
+				Parent = subP,
+				AutoSizeWidth = true,
+				Height = 30,
+				Text = strings.CompletedRoutineStepsBehavior
+			};
+			new Kenedia.Modules.Core.Controls.Dropdown
+			{
+				Parent = subP,
+				Location = new Point(250, 0),
+				SetLocalizedItems = () => new List<string>(3)
+				{
+					strings.CompletedRoutineStepsBehavior_Nothing,
+					strings.CompletedRoutineStepsBehavior_Hide,
+					strings.CompletedRoutineStepsBehavior_MoveToBottom
+				},
+				SelectedItem = ToCompletedRoutineStepsBehaviorText(_settings.CompletedRoutineStepsBehavior.Value),
+				ValueChangedAction = delegate(string selected)
+				{
+					_settings.CompletedRoutineStepsBehavior.Value = ParseCompletedRoutineStepsBehavior(selected);
+				}
+			};
+			subP = new Kenedia.Modules.Core.Controls.Panel
+			{
+				Parent = cP,
+				WidthSizingMode = SizingMode.Fill,
 				HeightSizingMode = SizingMode.AutoSize
 			};
 			Kenedia.Modules.Core.Controls.Label checkDistanceLabel = new Kenedia.Modules.Core.Controls.Label
@@ -689,17 +693,6 @@ namespace Kenedia.Modules.Characters.Views
 
 		private void CreateAppearance()
 		{
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_031c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03ec: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_053d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0664: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0686: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0753: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0775: Unknown result type (might be due to invalid IL or missing references)
 			Kenedia.Modules.Core.Controls.Panel p = new Kenedia.Modules.Core.Controls.Panel
 			{
 				Parent = _contentPanel,
@@ -934,15 +927,6 @@ namespace Kenedia.Modules.Characters.Views
 
 		private void CreateDelays()
 		{
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0227: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0267: Unknown result type (might be due to invalid IL or missing references)
-			//IL_030f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_034f: Unknown result type (might be due to invalid IL or missing references)
 			Kenedia.Modules.Core.Controls.Panel p = new Kenedia.Modules.Core.Controls.Panel
 			{
 				Parent = _contentPanel,
@@ -1050,9 +1034,6 @@ namespace Kenedia.Modules.Characters.Views
 
 		private void CreateGeneral()
 		{
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
 			Kenedia.Modules.Core.Controls.Panel p = new Kenedia.Modules.Core.Controls.Panel
 			{
 				Parent = _contentPanel,
@@ -1158,6 +1139,29 @@ namespace Kenedia.Modules.Characters.Views
 			}
 		}
 
+		private static string ToCompletedRoutineStepsBehaviorText(Settings.CompletedRoutineStepsDisplayBehavior behavior)
+		{
+			return behavior switch
+			{
+				Settings.CompletedRoutineStepsDisplayBehavior.HideCompletedRoutineSteps => strings.CompletedRoutineStepsBehavior_Hide, 
+				Settings.CompletedRoutineStepsDisplayBehavior.MoveCompletedRoutineStepsToBottomOfDisplay => strings.CompletedRoutineStepsBehavior_MoveToBottom, 
+				_ => strings.CompletedRoutineStepsBehavior_Nothing, 
+			};
+		}
+
+		private static Settings.CompletedRoutineStepsDisplayBehavior ParseCompletedRoutineStepsBehavior(string value)
+		{
+			if (value == strings.CompletedRoutineStepsBehavior_Hide)
+			{
+				return Settings.CompletedRoutineStepsDisplayBehavior.HideCompletedRoutineSteps;
+			}
+			if (value == strings.CompletedRoutineStepsBehavior_MoveToBottom)
+			{
+				return Settings.CompletedRoutineStepsDisplayBehavior.MoveCompletedRoutineStepsToBottomOfDisplay;
+			}
+			return Settings.CompletedRoutineStepsDisplayBehavior.Nothing;
+		}
+
 		public void OnLanguageChanged(object s = null, EventArgs e = null)
 		{
 			base.Name = string.Format(strings.ItemSettings, BaseModule<Characters, MainWindow, Settings, PathCollection, StaticHosting>.ModuleName ?? "");
@@ -1166,9 +1170,9 @@ namespace Kenedia.Modules.Characters.Views
 		public override void UpdateContainer(GameTime gameTime)
 		{
 			base.UpdateContainer(gameTime);
-			if (gameTime.get_TotalGameTime().TotalMilliseconds - _tick >= 1000.0)
+			if (gameTime.TotalGameTime.TotalMilliseconds - _tick >= 1000.0)
 			{
-				_tick = gameTime.get_TotalGameTime().TotalMilliseconds;
+				_tick = gameTime.TotalGameTime.TotalMilliseconds;
 				if (GameService.GameIntegration.Gw2Instance.Gw2HasFocus)
 				{
 					_sharedSettingsView?.SetWindowOffsetImages();

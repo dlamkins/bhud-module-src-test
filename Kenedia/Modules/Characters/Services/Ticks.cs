@@ -11,5 +11,7 @@ namespace Kenedia.Modules.Characters.Services
 		public double Tags { get; set; }
 
 		public double OCR { get; set; }
+
+		public double CharacterRoutineReset { get; set; }
 	}
 }

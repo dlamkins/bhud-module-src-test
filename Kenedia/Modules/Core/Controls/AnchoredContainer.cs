@@ -61,13 +61,11 @@ namespace Kenedia.Modules.Core.Controls
 
 		private void Anchor_Moved(object sender, EventArgs e)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 			base.Location = GetPosition();
 		}
 
 		protected override void OnResized(ResizedEventArgs e)
 		{
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 			base.OnResized(e);
 			if (Anchor != null)
 			{
@@ -77,43 +75,29 @@ namespace Kenedia.Modules.Core.Controls
 
 		private Point GetPosition()
 		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0161: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0231: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0238: Unknown result type (might be due to invalid IL or missing references)
 			Rectangle anchorBounds = Anchor.AbsoluteBounds;
 			switch (AnchorPosition)
 			{
 			case AnchorPos.Left:
-				return new Point(((Rectangle)(ref anchorBounds)).get_Left() - base.Width + RelativePosition.Left, ((Rectangle)(ref anchorBounds)).get_Top() + RelativePosition.Top);
+				return new Point(anchorBounds.Left - base.Width + RelativePosition.Left, anchorBounds.Top + RelativePosition.Top);
 			case AnchorPos.Top:
-				return new Point(((Rectangle)(ref anchorBounds)).get_Left() + RelativePosition.Left, ((Rectangle)(ref anchorBounds)).get_Top() - base.Height + RelativePosition.Top);
+				return new Point(anchorBounds.Left + RelativePosition.Left, anchorBounds.Top - base.Height + RelativePosition.Top);
 			case AnchorPos.Right:
-				return new Point(((Rectangle)(ref anchorBounds)).get_Right() + RelativePosition.Right, ((Rectangle)(ref anchorBounds)).get_Top() + RelativePosition.Top);
+				return new Point(anchorBounds.Right + RelativePosition.Right, anchorBounds.Top + RelativePosition.Top);
 			case AnchorPos.Bottom:
-				return new Point(((Rectangle)(ref anchorBounds)).get_Left() + RelativePosition.Left, ((Rectangle)(ref anchorBounds)).get_Bottom() + RelativePosition.Bottom);
+				return new Point(anchorBounds.Left + RelativePosition.Left, anchorBounds.Bottom + RelativePosition.Bottom);
 			case AnchorPos.AutoHorizontal:
-				if (((Rectangle)(ref anchorBounds)).get_Left() + anchorBounds.Width / 2 <= GameService.Graphics.SpriteScreen.Right / 2)
+				if (anchorBounds.Left + anchorBounds.Width / 2 <= GameService.Graphics.SpriteScreen.Right / 2)
 				{
-					return new Point(((Rectangle)(ref anchorBounds)).get_Right() + RelativePosition.Right, ((Rectangle)(ref anchorBounds)).get_Top() + RelativePosition.Top);
+					return new Point(anchorBounds.Right + RelativePosition.Right, anchorBounds.Top + RelativePosition.Top);
 				}
-				return new Point(((Rectangle)(ref anchorBounds)).get_Left() - base.Width + RelativePosition.Left, ((Rectangle)(ref anchorBounds)).get_Top() + RelativePosition.Top);
+				return new Point(anchorBounds.Left - base.Width + RelativePosition.Left, anchorBounds.Top + RelativePosition.Top);
 			case AnchorPos.AutoVertical:
-				if (((Rectangle)(ref anchorBounds)).get_Top() + anchorBounds.Height / 2 <= GameService.Graphics.SpriteScreen.Bottom / 2)
+				if (anchorBounds.Top + anchorBounds.Height / 2 <= GameService.Graphics.SpriteScreen.Bottom / 2)
 				{
-					return new Point(((Rectangle)(ref anchorBounds)).get_Left() + RelativePosition.Left, ((Rectangle)(ref anchorBounds)).get_Bottom() + RelativePosition.Bottom);
+					return new Point(anchorBounds.Left + RelativePosition.Left, anchorBounds.Bottom + RelativePosition.Bottom);
 				}
-				return new Point(((Rectangle)(ref anchorBounds)).get_Left() + RelativePosition.Left, ((Rectangle)(ref anchorBounds)).get_Top() - base.Height + RelativePosition.Top);
+				return new Point(anchorBounds.Left + RelativePosition.Left, anchorBounds.Top - base.Height + RelativePosition.Top);
 			case AnchorPos.None:
 				return base.Location;
 			default:

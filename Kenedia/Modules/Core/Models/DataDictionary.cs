@@ -75,7 +75,7 @@ namespace Kenedia.Modules.Core.Models
 
 		public virtual async Task Save()
 		{
-			string content = JsonConvert.SerializeObject((object)new DataDictionaryDto<TKey, TValue>
+			string content = JsonConvert.SerializeObject(new DataDictionaryDto<TKey, TValue>
 			{
 				Version = Version,
 				Data = new Dictionary<TKey, TValue>(this)

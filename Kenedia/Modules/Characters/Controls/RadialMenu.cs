@@ -14,6 +14,7 @@ using Kenedia.Modules.Core.Extensions;
 using Kenedia.Modules.Core.Structs;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace Kenedia.Modules.Characters.Controls
 {
@@ -47,9 +48,6 @@ namespace Kenedia.Modules.Characters.Controls
 
 		public RadialMenu(Settings settings, ObservableCollection<Character_Model> characters, Blish_HUD.Controls.Container parent, Func<Character_Model> currentCharacter, Data data, TextureManager textureManager)
 		{
-			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
 			_settings = settings;
 			_settings.Radial_SliceHighlight.PropertyChanged += Radial_Colors_PropertyChanged;
 			_settings.Radial_SliceBackground.PropertyChanged += Radial_Colors_PropertyChanged;
@@ -64,7 +62,7 @@ namespace Kenedia.Modules.Characters.Controls
 				Size = new Point(300, 50),
 				Visible = false
 			};
-			base.BackgroundColor = Color.get_Transparent() * 0.2f;
+			base.BackgroundColor = Color.Transparent * 0.2f;
 			foreach (Character_Model character in _characters)
 			{
 				character.Updated += new EventHandler(Character_Updated);
@@ -94,9 +92,7 @@ namespace Kenedia.Modules.Characters.Controls
 
 		private void Keyboard_KeyPressed(object sender, KeyboardEventArgs e)
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0008: Invalid comparison between Unknown and I4
-			if ((int)e.Key == 27)
+			if (e.Key == Keys.Escape)
 			{
 				Hide();
 			}
@@ -125,7 +121,6 @@ namespace Kenedia.Modules.Characters.Controls
 
 		public override void DoUpdate(GameTime gameTime)
 		{
-			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
 			base.DoUpdate(gameTime);
 			if (!Control.Input.Keyboard.KeysDown.Contains(_settings.RadialKey.Value.PrimaryKey))
 			{
@@ -135,16 +130,12 @@ namespace Kenedia.Modules.Characters.Controls
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 			_tooltip?.Hide();
 			base.Paint(spriteBatch, bounds);
 		}
 
 		protected override ColorGradient GetSliceColors(int index, bool contains_mouse)
 		{
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
 			if (_settings.Radial_UseProfessionColor.Value && _displayedCharacters.Count > index)
 			{
 				return new ColorGradient(_displayedCharacters[index].Profession.GetProfessionColor() * (contains_mouse ? 0.8f : 0.5f));
@@ -154,27 +145,6 @@ namespace Kenedia.Modules.Characters.Controls
 
 		protected override void DrawSliceContent(SpriteBatch spriteBatch, bool contains_mouse, Vector2 center, float midAngle, float iconRadius, int sliceIndex)
 		{
-			//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0106: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0110: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0124: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0131: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0136: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0142: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0153: Unknown result type (might be due to invalid IL or missing references)
 			if (_displayedCharacters.Count <= sliceIndex)
 			{
 				return;
@@ -189,12 +159,9 @@ namespace Kenedia.Modules.Characters.Controls
 			float sliceAngle = (float)Math.PI * 2f / (float)totalSlices;
 			float scale = 2f * iconRadius * (float)Math.Sin(sliceAngle / 2f) * 0.75f / (float)texture.Width;
 			_ = new Vector2((float)Math.Cos(midAngle), (float)Math.Sin(midAngle)) * iconRadius;
-			Vector2 val = center / base.DpiScale;
-			Rectangle bounds = texture.Bounds;
-			Point size = ((Rectangle)(ref bounds)).get_Size();
-			Vector2 relativeCenter = val - ((Point)(ref size)).ToVector2() * scale / 2f;
-			Color color = (_settings.Radial_UseProfessionIconsColor.Value ? character.Profession.GetProfessionColor() : Color.get_White());
-			spriteBatch.Draw((Texture2D)texture, relativeCenter, (Rectangle?)texture.Bounds, color, 0f, Vector2.get_Zero(), scale, (SpriteEffects)0, 1f);
+			Vector2 relativeCenter = center / base.DpiScale - texture.Bounds.Size.ToVector2() * scale / 2f;
+			Color color = (_settings.Radial_UseProfessionIconsColor.Value ? character.Profession.GetProfessionColor() : Color.White);
+			spriteBatch.Draw(texture, relativeCenter, texture.Bounds, color, 0f, Vector2.Zero, scale, SpriteEffects.None, 1f);
 			if (contains_mouse)
 			{
 				_selected = character;

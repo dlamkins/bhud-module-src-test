@@ -43,8 +43,6 @@ namespace Kenedia.Modules.Core.Controls
 
 		public Pointer()
 		{
-			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
 			base.Size = new Point(32);
 			base.Parent = Control.Graphics.SpriteScreen;
 			base.ClipsBounds = false;
@@ -65,21 +63,13 @@ namespace Kenedia.Modules.Core.Controls
 
 		private static bool IsDrawn(Control c, Rectangle b)
 		{
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-			if (c.Parent != null && c.Parent.Visible)
+			if (c.Parent != null && c.Parent.Visible && c.Parent.AbsoluteBounds.Contains(b.Center))
 			{
-				Rectangle absoluteBounds = c.Parent.AbsoluteBounds;
-				if (((Rectangle)(ref absoluteBounds)).Contains(((Rectangle)(ref b)).get_Center()))
+				if (c.Parent != Control.Graphics.SpriteScreen)
 				{
-					if (c.Parent != Control.Graphics.SpriteScreen)
-					{
-						return IsDrawn(c.Parent, b);
-					}
-					return true;
+					return IsDrawn(c.Parent, b);
 				}
+				return true;
 			}
 			return false;
 		}
@@ -95,7 +85,6 @@ namespace Kenedia.Modules.Core.Controls
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
 			if (Anchor != null && Anchor.Visible && IsDrawn(Anchor, base.AbsoluteBounds))
 			{
 				_pointerArrow.Draw(this, spriteBatch);
@@ -104,25 +93,12 @@ namespace Kenedia.Modules.Core.Controls
 
 		public override void DoUpdate(GameTime gameTime)
 		{
-			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
 			base.DoUpdate(gameTime);
 			if (Anchor != null && Anchor.Visible)
 			{
-				_animationStart += (float)gameTime.get_ElapsedGameTime().TotalSeconds;
+				_animationStart += (float)gameTime.ElapsedGameTime.TotalSeconds;
 				int size = Math.Min(base.Width, base.Height);
-				Rectangle absoluteBounds = Anchor.AbsoluteBounds;
-				int num = ((Rectangle)(ref absoluteBounds)).get_Left() - size / 2;
-				absoluteBounds = Anchor.AbsoluteBounds;
-				base.Location = new Point(num, ((Rectangle)(ref absoluteBounds)).get_Center().Y - size / 2);
+				base.Location = new Point(Anchor.AbsoluteBounds.Left - size / 2, Anchor.AbsoluteBounds.Center.Y - size / 2);
 				_anchorDrawBounds = new Rectangle(1, 0, size, size);
 				BounceDistance = 15f;
 				float duration = 0.75f;

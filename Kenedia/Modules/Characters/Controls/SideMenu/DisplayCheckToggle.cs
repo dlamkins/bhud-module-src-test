@@ -138,10 +138,6 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 
 		public DisplayCheckToggle(TextureManager textureManager, bool displayButton_Checked = true, bool checkbox_Checked = true, bool showTooltip_Checked = true)
 		{
-			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0142: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b1: Unknown result type (might be due to invalid IL or missing references)
 			_eye = (AsyncTexture2D)textureManager.GetControlTexture(TextureManager.ControlTextures.Eye_Button);
 			_eyeHovered = (AsyncTexture2D)textureManager.GetControlTexture(TextureManager.ControlTextures.Eye_Button_Hovered);
 			_telescope = (AsyncTexture2D)textureManager.GetControlTexture(TextureManager.ControlTextures.Telescope_Button);

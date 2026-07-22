@@ -21,9 +21,9 @@ namespace Characters.Views
 
 		private readonly Settings _settings;
 
-		private readonly Color _spacingColor = Color.FromArgb(255, 200, 200, 200);
+		private readonly System.Drawing.Color _spacingColor = System.Drawing.Color.FromArgb(255, 200, 200, 200);
 
-		private readonly Color _ignoredColor = Color.FromArgb(255, 100, 100, 100);
+		private readonly System.Drawing.Color _ignoredColor = System.Drawing.Color.FromArgb(255, 100, 100, 100);
 
 		private readonly NumberBox _columnBox;
 
@@ -53,81 +53,11 @@ namespace Characters.Views
 
 		public OCRView(Settings settings, OCR ocr)
 		{
-			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0143: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0164: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0245: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0286: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0290: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02aa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02f4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0342: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03ac: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03ed: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03f7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0407: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0411: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0436: Unknown result type (might be due to invalid IL or missing references)
-			//IL_045b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0513: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0545: Unknown result type (might be due to invalid IL or missing references)
-			//IL_054f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_055f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0569: Unknown result type (might be due to invalid IL or missing references)
-			//IL_058e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0636: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0668: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0672: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0682: Unknown result type (might be due to invalid IL or missing references)
-			//IL_068c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06e8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0759: Unknown result type (might be due to invalid IL or missing references)
-			//IL_078b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0795: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07a5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07af: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07d4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_080b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_087c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0891: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0927: Unknown result type (might be due to invalid IL or missing references)
-			//IL_09cc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_09df: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0a06: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0a93: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0aa6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0acd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0bf3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0bf8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0bfc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c0d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c12: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c16: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c21: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0c54: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0cae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0cb3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0cb7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0cdd: Unknown result type (might be due to invalid IL or missing references)
 			_settings = settings;
 			_ocr = ocr;
-			base.BorderColor = Color.get_Black();
+			base.BorderColor = Microsoft.Xna.Framework.Color.Black;
 			base.BackgroundImage = AsyncTexture2D.FromAssetId(156003);
-			base.TextureRectangle = new Rectangle(50, 50, 500, 500);
+			base.TextureRectangle = new Microsoft.Xna.Framework.Rectangle(50, 50, 500, 500);
 			base.Height = 350;
 			base.Width = 620;
 			Kenedia.Modules.Core.Controls.FlowPanel contentFlowPanel = new Kenedia.Modules.Core.Controls.FlowPanel
@@ -135,11 +65,11 @@ namespace Characters.Views
 				Parent = this,
 				Width = base.Width,
 				HeightSizingMode = SizingMode.AutoSize,
-				AutoSizePadding = new Point(3, 3),
+				AutoSizePadding = new Microsoft.Xna.Framework.Point(3, 3),
 				OuterControlPadding = new Vector2(3f, 3f),
 				ControlPadding = new Vector2(3f, 3f),
 				FlowDirection = ControlFlowDirection.SingleTopToBottom,
-				BorderColor = Color.get_Black(),
+				BorderColor = Microsoft.Xna.Framework.Color.Black,
 				BorderWidth = new RectangleDimensions(2)
 			};
 			Kenedia.Modules.Core.Controls.FlowPanel headerPanel = new Kenedia.Modules.Core.Controls.FlowPanel
@@ -164,8 +94,8 @@ namespace Characters.Views
 				Parent = headerPanel,
 				Texture = AsyncTexture2D.FromAssetId(156012),
 				HoveredTexture = AsyncTexture2D.FromAssetId(156011),
-				Size = new Point(25, 25),
-				TextureRectangle = new Rectangle(7, 7, 20, 20)
+				Size = new Microsoft.Xna.Framework.Point(25, 25),
+				TextureRectangle = new Microsoft.Xna.Framework.Rectangle(7, 7, 20, 20)
 			};
 			_closeButton.Click += CloseButton_Click;
 			Kenedia.Modules.Core.Controls.FlowPanel fp = new Kenedia.Modules.Core.Controls.FlowPanel
@@ -180,14 +110,14 @@ namespace Characters.Views
 			{
 				Parent = fp,
 				Width = 500,
-				Height = GameService.Content.DefaultFont32.get_LineHeight() + 8,
-				BorderColor = Color.get_Black() * 0.7f,
-				BackgroundColor = Color.get_Black() * 0.4f,
+				Height = GameService.Content.DefaultFont32.LineHeight + 8,
+				BorderColor = Microsoft.Xna.Framework.Color.Black * 0.7f,
+				BackgroundColor = Microsoft.Xna.Framework.Color.Black * 0.4f,
 				BorderWidth = new RectangleDimensions(2)
 			};
 			_bestMatchLabel = new Kenedia.Modules.Core.Controls.Label
 			{
-				Location = new Point(5, 0),
+				Location = new Microsoft.Xna.Framework.Point(5, 0),
 				Parent = p,
 				Height = p.Height,
 				AutoSizeWidth = true,
@@ -201,7 +131,7 @@ namespace Characters.Views
 				VerticalAlignment = VerticalAlignment.Middle,
 				Height = p.Height,
 				Width = 100,
-				TextColor = Color.get_White(),
+				TextColor = Microsoft.Xna.Framework.Color.White,
 				Font = GameService.Content.DefaultFont16,
 				WrapText = true,
 				SetLocalizedText = () => "Best Match"
@@ -218,14 +148,14 @@ namespace Characters.Views
 			{
 				Parent = fp,
 				Width = 500,
-				Height = GameService.Content.DefaultFont32.get_LineHeight() + 8,
-				BorderColor = Color.get_Black() * 0.7f,
-				BackgroundColor = Color.get_Black() * 0.4f,
+				Height = GameService.Content.DefaultFont32.LineHeight + 8,
+				BorderColor = Microsoft.Xna.Framework.Color.Black * 0.7f,
+				BackgroundColor = Microsoft.Xna.Framework.Color.Black * 0.4f,
 				BorderWidth = new RectangleDimensions(2)
 			};
 			_resultLabel = new Kenedia.Modules.Core.Controls.Label
 			{
-				Location = new Point(5, 0),
+				Location = new Microsoft.Xna.Framework.Point(5, 0),
 				Parent = p,
 				Height = p.Height,
 				AutoSizeWidth = true,
@@ -239,7 +169,7 @@ namespace Characters.Views
 				VerticalAlignment = VerticalAlignment.Middle,
 				Height = p.Height,
 				Width = 100,
-				TextColor = Color.get_White(),
+				TextColor = Microsoft.Xna.Framework.Color.White,
 				Font = GameService.Content.DefaultFont16,
 				WrapText = true,
 				SetLocalizedText = () => "OCR Result"
@@ -257,13 +187,13 @@ namespace Characters.Views
 				Parent = fp,
 				Width = 500,
 				Height = 55,
-				BorderColor = Color.get_Black() * 0.7f,
-				BackgroundColor = Color.get_Black() * 0.4f,
+				BorderColor = Microsoft.Xna.Framework.Color.Black * 0.7f,
+				BackgroundColor = Microsoft.Xna.Framework.Color.Black * 0.4f,
 				BorderWidth = new RectangleDimensions(2)
 			};
 			_scaledImage = new Kenedia.Modules.Core.Controls.Image
 			{
-				Location = new Point(5, 5),
+				Location = new Microsoft.Xna.Framework.Point(5, 5),
 				Parent = p
 			};
 			new Kenedia.Modules.Core.Controls.Label
@@ -271,7 +201,7 @@ namespace Characters.Views
 				Parent = fp,
 				Height = p.Height,
 				Width = 100,
-				TextColor = Color.get_White(),
+				TextColor = Microsoft.Xna.Framework.Color.White,
 				Font = GameService.Content.DefaultFont16,
 				WrapText = true,
 				SetLocalizedText = () => "Scaled",
@@ -290,13 +220,13 @@ namespace Characters.Views
 				Parent = fp,
 				Width = 500,
 				Height = 55,
-				BorderColor = Color.get_Black() * 0.7f,
-				BackgroundColor = Color.get_Black() * 0.4f,
+				BorderColor = Microsoft.Xna.Framework.Color.Black * 0.7f,
+				BackgroundColor = Microsoft.Xna.Framework.Color.Black * 0.4f,
 				BorderWidth = new RectangleDimensions(2)
 			};
 			_cleanedImage = new Kenedia.Modules.Core.Controls.Image
 			{
-				Location = new Point(5, 5),
+				Location = new Microsoft.Xna.Framework.Point(5, 5),
 				Parent = p
 			};
 			new Kenedia.Modules.Core.Controls.Label
@@ -304,7 +234,7 @@ namespace Characters.Views
 				Parent = fp,
 				Height = p.Height,
 				Width = 100,
-				TextColor = Color.get_White(),
+				TextColor = Microsoft.Xna.Framework.Color.White,
 				Font = GameService.Content.DefaultFont16,
 				WrapText = true,
 				SetLocalizedText = () => "Cleaned",
@@ -323,13 +253,13 @@ namespace Characters.Views
 				Parent = fp,
 				Width = 500,
 				Height = 55,
-				BorderColor = Color.get_Black() * 0.7f,
-				BackgroundColor = Color.get_Black() * 0.4f,
+				BorderColor = Microsoft.Xna.Framework.Color.Black * 0.7f,
+				BackgroundColor = Microsoft.Xna.Framework.Color.Black * 0.4f,
 				BorderWidth = new RectangleDimensions(2)
 			};
 			_sourceImage = new Kenedia.Modules.Core.Controls.Image
 			{
-				Location = new Point(5, 5),
+				Location = new Microsoft.Xna.Framework.Point(5, 5),
 				Parent = p
 			};
 			new Kenedia.Modules.Core.Controls.Label
@@ -337,7 +267,7 @@ namespace Characters.Views
 				Parent = fp,
 				Height = p.Height,
 				Width = 100,
-				TextColor = Color.get_White(),
+				TextColor = Microsoft.Xna.Framework.Color.White,
 				Font = GameService.Content.DefaultFont16,
 				WrapText = true,
 				SetLocalizedText = () => "Source",
@@ -364,7 +294,7 @@ namespace Characters.Views
 			_columnBox = new NumberBox
 			{
 				Parent = thresholdPanel,
-				Size = new Point(100, 25),
+				Size = new Microsoft.Xna.Framework.Point(100, 25),
 				MinValue = 0,
 				MaxValue = 100,
 				Value = _settings.OCRNoPixelColumns.Value,
@@ -377,8 +307,8 @@ namespace Characters.Views
 			new Kenedia.Modules.Core.Controls.Panel
 			{
 				Parent = thresholdPanel,
-				BackgroundColor = new Color(_spacingColor.R, _spacingColor.G, _spacingColor.B, _spacingColor.A),
-				Size = new Point(25, 25)
+				BackgroundColor = new Microsoft.Xna.Framework.Color(_spacingColor.R, _spacingColor.G, _spacingColor.B, _spacingColor.A),
+				Size = new Microsoft.Xna.Framework.Point(25, 25)
 			};
 			new Kenedia.Modules.Core.Controls.Label
 			{
@@ -392,8 +322,8 @@ namespace Characters.Views
 			new Kenedia.Modules.Core.Controls.Panel
 			{
 				Parent = thresholdPanel,
-				BackgroundColor = new Color(_ignoredColor.R, _ignoredColor.G, _ignoredColor.B, _ignoredColor.A),
-				Size = new Point(25, 25)
+				BackgroundColor = new Microsoft.Xna.Framework.Color(_ignoredColor.R, _ignoredColor.G, _ignoredColor.B, _ignoredColor.A),
+				Size = new Microsoft.Xna.Framework.Point(25, 25)
 			};
 			new Kenedia.Modules.Core.Controls.Label
 			{
@@ -424,40 +354,32 @@ namespace Characters.Views
 				ZIndex = int.MaxValue,
 				Visible = false
 			};
-			ResizeableContainer obj = new ResizeableContainer
+			_ocrRegionContainer = new ResizeableContainer
 			{
 				Parent = GameService.Graphics.SpriteScreen,
-				Visible = false
+				Visible = false,
+				Location = _settings.ActiveOCRRegion.Location,
+				Size = _settings.ActiveOCRRegion.Size,
+				BorderColor = ContentService.Colors.ColonialWhite,
+				ShowResizeOnlyOnMouseOver = true,
+				Width = base.Width,
+				Height = 50,
+				MaxSize = new Microsoft.Xna.Framework.Point(base.Width, 100),
+				BorderWidth = new RectangleDimensions(2),
+				ZIndex = 2147483646
 			};
-			Rectangle activeOCRRegion = _settings.ActiveOCRRegion;
-			obj.Location = ((Rectangle)(ref activeOCRRegion)).get_Location();
-			activeOCRRegion = _settings.ActiveOCRRegion;
-			obj.Size = ((Rectangle)(ref activeOCRRegion)).get_Size();
-			obj.BorderColor = ContentService.Colors.ColonialWhite;
-			obj.ShowResizeOnlyOnMouseOver = true;
-			obj.Width = base.Width;
-			obj.Height = 50;
-			obj.MaxSize = new Point(base.Width, 100);
-			obj.BorderWidth = new RectangleDimensions(2);
-			obj.ZIndex = 2147483646;
-			_ocrRegionContainer = obj;
 			_ocrRegionContainer.Resized += Container_Changed;
 			_ocrRegionContainer.Moved += Container_Changed;
-			activeOCRRegion = _settings.ActiveOCRRegion;
-			((Rectangle)(ref activeOCRRegion)).get_Size();
-			base.Location = new Point(_ocrRegionContainer.Left, _ocrRegionContainer.Top - base.Height - 5);
+			_ = _settings.ActiveOCRRegion.Size;
+			base.Location = new Microsoft.Xna.Framework.Point(_ocrRegionContainer.Left, _ocrRegionContainer.Top - base.Height - 5);
 			ForceOnScreen();
 		}
 
 		public void EnableMaskedRegion()
 		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			Rectangle b = _settings.ActiveOCRRegion;
-			_maskedRegion.Size = ((Rectangle)(ref b)).get_Size();
-			_maskedRegion.Location = ((Rectangle)(ref b)).get_Location();
+			Microsoft.Xna.Framework.Rectangle b = _settings.ActiveOCRRegion;
+			_maskedRegion.Size = b.Size;
+			_maskedRegion.Location = b.Location;
 			_maskedRegion?.Show();
 		}
 
@@ -468,19 +390,11 @@ namespace Characters.Views
 
 		private void Container_Changed(object sender, EventArgs e)
 		{
-			//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0101: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0106: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0121: Unknown result type (might be due to invalid IL or missing references)
 			if (!_sizeSet)
 			{
 				string key = _settings.OCRKey;
-				Dictionary<string, Rectangle> regions = _settings.OCRRegions.Value;
-				Rectangle bounds = default(Rectangle);
-				((Rectangle)(ref bounds))._002Ector(_ocrRegionContainer.Left + _ocrRegionContainer.BorderWidth.Left, _ocrRegionContainer.Top + _ocrRegionContainer.BorderWidth.Top, _ocrRegionContainer.Width - _ocrRegionContainer.BorderWidth.Horizontal, _ocrRegionContainer.Height - _ocrRegionContainer.BorderWidth.Vertical);
+				Dictionary<string, Microsoft.Xna.Framework.Rectangle> regions = _settings.OCRRegions.Value;
+				Microsoft.Xna.Framework.Rectangle bounds = new Microsoft.Xna.Framework.Rectangle(_ocrRegionContainer.Left + _ocrRegionContainer.BorderWidth.Left, _ocrRegionContainer.Top + _ocrRegionContainer.BorderWidth.Top, _ocrRegionContainer.Width - _ocrRegionContainer.BorderWidth.Horizontal, _ocrRegionContainer.Height - _ocrRegionContainer.BorderWidth.Vertical);
 				if (!regions.ContainsKey(key))
 				{
 					regions.Add(key, bounds);
@@ -491,10 +405,10 @@ namespace Characters.Views
 				}
 			}
 			_sizeSet = false;
-			base.Location = new Point(_ocrRegionContainer.Left, _ocrRegionContainer.Top - base.Height - 5);
-			Rectangle b = _settings.ActiveOCRRegion;
-			_maskedRegion.Size = ((Rectangle)(ref b)).get_Size();
-			_maskedRegion.Location = ((Rectangle)(ref b)).get_Location();
+			base.Location = new Microsoft.Xna.Framework.Point(_ocrRegionContainer.Left, _ocrRegionContainer.Top - base.Height - 5);
+			Microsoft.Xna.Framework.Rectangle b = _settings.ActiveOCRRegion;
+			_maskedRegion.Size = b.Size;
+			_maskedRegion.Location = b.Location;
 		}
 
 		private void CloseButton_Click(object sender, MouseEventArgs e)
@@ -504,16 +418,6 @@ namespace Characters.Views
 
 		public void ToggleContainer()
 		{
-			//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
 			bool visible = this.ToggleVisibility();
 			ForceOnScreen();
 			_ocrRegionContainer?.ToggleVisibility(visible);
@@ -521,12 +425,8 @@ namespace Characters.Views
 			if (_ocrRegionContainer.Visible)
 			{
 				_sizeSet = true;
-				ResizeableContainer ocrRegionContainer = _ocrRegionContainer;
-				Rectangle activeOCRRegion = _settings.ActiveOCRRegion;
-				ocrRegionContainer.Location = ((Rectangle)(ref activeOCRRegion)).get_Location().Add(new Point(-_ocrRegionContainer.BorderWidth.Left, -_ocrRegionContainer.BorderWidth.Top));
-				ResizeableContainer ocrRegionContainer2 = _ocrRegionContainer;
-				activeOCRRegion = _settings.ActiveOCRRegion;
-				ocrRegionContainer2.Size = ((Rectangle)(ref activeOCRRegion)).get_Size().Add(new Point(_ocrRegionContainer.BorderWidth.Horizontal, _ocrRegionContainer.BorderWidth.Vertical));
+				_ocrRegionContainer.Location = _settings.ActiveOCRRegion.Location.Add(new Microsoft.Xna.Framework.Point(-_ocrRegionContainer.BorderWidth.Left, -_ocrRegionContainer.BorderWidth.Top));
+				_ocrRegionContainer.Size = _settings.ActiveOCRRegion.Size.Add(new Microsoft.Xna.Framework.Point(_ocrRegionContainer.BorderWidth.Horizontal, _ocrRegionContainer.BorderWidth.Vertical));
 			}
 		}
 
@@ -538,27 +438,19 @@ namespace Characters.Views
 				return;
 			}
 			ForceOnScreen();
-			MaskedRegion maskedRegion = _maskedRegion;
-			Rectangle val = _ocrRegionContainer.AbsoluteBounds;
-			maskedRegion.Visible = !((Rectangle)(ref val)).Contains(Control.Input.Mouse.Position);
-			if (gameTime.get_TotalGameTime().TotalMilliseconds - _readTick > 250.0 && _maskedRegion.Visible)
+			_maskedRegion.Visible = !_ocrRegionContainer.AbsoluteBounds.Contains(Control.Input.Mouse.Position);
+			if (gameTime.TotalGameTime.TotalMilliseconds - _readTick > 250.0 && _maskedRegion.Visible)
 			{
-				_readTick = gameTime.get_TotalGameTime().TotalMilliseconds;
+				_readTick = gameTime.TotalGameTime.TotalMilliseconds;
 				string result = await _ocr.Read(show: true);
 				if (result != null && _ocr.SourceTexture != null)
 				{
 					_sourceImage.Texture = _ocr.SourceTexture;
-					Kenedia.Modules.Core.Controls.Image sourceImage = _sourceImage;
-					val = _ocr.SourceTexture.get_Bounds();
-					sourceImage.Size = ((Rectangle)(ref val)).get_Size();
+					_sourceImage.Size = _ocr.SourceTexture.Bounds.Size;
 					_cleanedImage.Texture = _ocr.CleanedTexture;
-					Kenedia.Modules.Core.Controls.Image cleanedImage = _cleanedImage;
-					val = _ocr.CleanedTexture.get_Bounds();
-					cleanedImage.Size = ((Rectangle)(ref val)).get_Size();
+					_cleanedImage.Size = _ocr.CleanedTexture.Bounds.Size;
 					_scaledImage.Texture = _ocr.ScaledTexture;
-					Kenedia.Modules.Core.Controls.Image scaledImage = _scaledImage;
-					val = _ocr.ScaledTexture.get_Bounds();
-					scaledImage.Size = ((Rectangle)(ref val)).get_Size();
+					_scaledImage.Size = _ocr.ScaledTexture.Bounds.Size;
 					_resultLabel.Font = Control.Content.DefaultFont32;
 					_resultLabel.WrapText = false;
 					_bestMatchLabel.Text = _ocr.BestMatchResult;

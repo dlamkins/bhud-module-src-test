@@ -38,7 +38,7 @@ namespace Kenedia.Modules.Core.Controls
 		public string Text { get; set; } = string.Empty;
 
 
-		public Color TextColor { get; set; } = Color.get_White();
+		public Color TextColor { get; set; } = Color.White;
 
 
 		public BitmapFont TextFont { get; set; } = Control.Content.DefaultFont18;
@@ -58,14 +58,11 @@ namespace Kenedia.Modules.Core.Controls
 
 		private void CoveredControl_Resized(object sender, ResizedEventArgs e)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 			base.Size = e.CurrentSize;
 		}
 
 		public override void RecalculateLayout()
 		{
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
 			_borders.Clear();
 			ZIndex = (base.Parent?.ZIndex ?? 0) + 25;
@@ -99,16 +96,9 @@ namespace Kenedia.Modules.Core.Controls
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
 			foreach (var (r, opacity, thickness) in _borders)
 			{
-				spriteBatch.DrawFrame(this, r, Color.get_Black() * opacity, thickness);
+				spriteBatch.DrawFrame(this, r, Color.Black * opacity, thickness);
 			}
 			if (!string.IsNullOrEmpty(Text))
 			{

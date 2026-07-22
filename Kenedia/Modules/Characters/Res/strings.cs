@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 
 namespace Kenedia.Modules.Characters.Res
 {
-	[GeneratedCode("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
+	[GeneratedCode("System.Resources.Tools.StronglyTypedResourceBuilder", "18.0.0.0")]
 	[DebuggerNonUserCode]
 	[CompilerGenerated]
 	internal class strings
@@ -48,9 +48,13 @@ namespace Kenedia.Modules.Characters.Res
 
 		internal static string AddItem => ResourceManager.GetString("AddItem", resourceCulture);
 
+		internal static string AddRoutineEntry => ResourceManager.GetString("AddRoutineEntry", resourceCulture);
+
 		internal static string AdjustSettings => ResourceManager.GetString("AdjustSettings", resourceCulture);
 
 		internal static string Age => ResourceManager.GetString("Age", resourceCulture);
+
+		internal static string AllRoutineEntriesComplete => ResourceManager.GetString("AllRoutineEntriesComplete", resourceCulture);
 
 		internal static string AnyProfession => ResourceManager.GetString("AnyProfession", resourceCulture);
 
@@ -79,6 +83,8 @@ namespace Kenedia.Modules.Characters.Res
 		internal static string AutomaticCharacterDelete => ResourceManager.GetString("AutomaticCharacterDelete", resourceCulture);
 
 		internal static string AutomaticCharacterDelete_Tooltip => ResourceManager.GetString("AutomaticCharacterDelete_Tooltip", resourceCulture);
+
+		internal static string AutoResetField => ResourceManager.GetString("AutoResetField", resourceCulture);
 
 		internal static string BestResultLargerDisclaimer => ResourceManager.GetString("BestResultLargerDisclaimer", resourceCulture);
 
@@ -138,6 +144,8 @@ namespace Kenedia.Modules.Characters.Res
 
 		internal static string CharacterSwap_SwitchTo => ResourceManager.GetString("CharacterSwap_SwitchTo", resourceCulture);
 
+		internal static string CheckAll => ResourceManager.GetString("CheckAll", resourceCulture);
+
 		internal static string CheckDistance => ResourceManager.GetString("CheckDistance", resourceCulture);
 
 		internal static string CheckDistance_Tooltip => ResourceManager.GetString("CheckDistance_Tooltip", resourceCulture);
@@ -159,6 +167,24 @@ namespace Kenedia.Modules.Characters.Res
 		internal static string CloseWindowOnSwap => ResourceManager.GetString("CloseWindowOnSwap", resourceCulture);
 
 		internal static string CloseWindowOnSwap_Tooltip => ResourceManager.GetString("CloseWindowOnSwap_Tooltip", resourceCulture);
+
+		internal static string CompletedRoutineEntriesBehavior => ResourceManager.GetString("CompletedRoutineEntriesBehavior", resourceCulture);
+
+		internal static string CompletedRoutineEntriesBehavior_Hide => ResourceManager.GetString("CompletedRoutineEntriesBehavior_Hide", resourceCulture);
+
+		internal static string CompletedRoutineEntriesBehavior_MoveToBottom => ResourceManager.GetString("CompletedRoutineEntriesBehavior_MoveToBottom", resourceCulture);
+
+		internal static string CompletedRoutineEntriesBehavior_Nothing => ResourceManager.GetString("CompletedRoutineEntriesBehavior_Nothing", resourceCulture);
+
+		internal static string CompletedRoutineEntriesHiddenTooltip => ResourceManager.GetString("CompletedRoutineEntriesHiddenTooltip", resourceCulture);
+
+		internal static string CompleteCharacterRoutine => ResourceManager.GetString("CompleteCharacterRoutine", resourceCulture);
+
+		internal static string CopyCharacterName => ResourceManager.GetString("CopyCharacterName", resourceCulture);
+
+		internal static string CopyCharacterRoutine => ResourceManager.GetString("CopyCharacterRoutine", resourceCulture);
+
+		internal static string CopyCharacterRoutineTooltip => ResourceManager.GetString("CopyCharacterRoutineTooltip", resourceCulture);
 
 		internal static string CoreProfession => ResourceManager.GetString("CoreProfession", resourceCulture);
 
@@ -194,7 +220,17 @@ namespace Kenedia.Modules.Characters.Res
 
 		internal static string DeletedCharacterNotification_DismissTooltip => ResourceManager.GetString("DeletedCharacterNotification_DismissTooltip", resourceCulture);
 
+		internal static string ConfirmCharacterRoutineEntryDelete => ResourceManager.GetString("ConfirmCharacterRoutineEntryDelete", resourceCulture);
+
+		internal static string ConfirmCharacterRoutineDelete => ResourceManager.GetString("ConfirmCharacterRoutineDelete", resourceCulture);
+
+		internal static string CharacterRoutineCopyName => ResourceManager.GetString("CharacterRoutineCopyName", resourceCulture);
+
+		internal static string DeleteConfirmationTitle => ResourceManager.GetString("DeleteConfirmationTitle", resourceCulture);
+
 		internal static string DeleteItem => ResourceManager.GetString("DeleteItem", resourceCulture);
+
+		internal static string DeleteList => ResourceManager.GetString("DeleteList", resourceCulture);
 
 		internal static string Descending => ResourceManager.GetString("Descending", resourceCulture);
 
@@ -213,6 +249,8 @@ namespace Kenedia.Modules.Characters.Res
 		internal static string DoubleClickToSwap => ResourceManager.GetString("DoubleClickToSwap", resourceCulture);
 
 		internal static string DragOverCharacter_Instructions => ResourceManager.GetString("DragOverCharacter_Instructions", resourceCulture);
+
+		internal static string EditEntry => ResourceManager.GetString("EditEntry", resourceCulture);
 
 		internal static string EditOCR => ResourceManager.GetString("EditOCR", resourceCulture);
 
@@ -270,6 +308,8 @@ namespace Kenedia.Modules.Characters.Res
 
 		internal static string FilterToggles => ResourceManager.GetString("FilterToggles", resourceCulture);
 
+		internal static string Finish => ResourceManager.GetString("Finish", resourceCulture);
+
 		internal static string FixCharacter_FetchName => ResourceManager.GetString("FixCharacter_FetchName", resourceCulture);
 
 		internal static string FixCharacter_MoveNext => ResourceManager.GetString("FixCharacter_MoveNext", resourceCulture);
@@ -301,6 +341,8 @@ namespace Kenedia.Modules.Characters.Res
 		internal static string GW2API => ResourceManager.GetString("GW2API", resourceCulture);
 
 		internal static string Hidden => ResourceManager.GetString("Hidden", resourceCulture);
+
+		internal static string HideComplete => ResourceManager.GetString("HideComplete", resourceCulture);
 
 		internal static string Huntsman => ResourceManager.GetString("Huntsman", resourceCulture);
 
@@ -382,7 +424,17 @@ namespace Kenedia.Modules.Characters.Res
 
 		internal static string NameFontSize => ResourceManager.GetString("NameFontSize", resourceCulture);
 
+		internal static string NewCharacterRoutine => ResourceManager.GetString("NewCharacterRoutine", resourceCulture);
+
+		internal static string Next => ResourceManager.GetString("Next", resourceCulture);
+
 		internal static string NextBirthday => ResourceManager.GetString("NextBirthday", resourceCulture);
+
+		internal static string NextClickMarksComplete => ResourceManager.GetString("NextClickMarksComplete", resourceCulture);
+
+		internal static string NextCharacterRoutineEntryKey => ResourceManager.GetString("NextCharacterRoutineEntryKey", resourceCulture);
+
+		internal static string NextCharacterRoutineEntryKey_Tooltip => ResourceManager.GetString("NextCharacterRoutineEntryKey_Tooltip", resourceCulture);
 
 		internal static string NoCraftingProfession => ResourceManager.GetString("NoCraftingProfession", resourceCulture);
 
@@ -492,7 +544,17 @@ namespace Kenedia.Modules.Characters.Res
 
 		internal static string RefreshImages => ResourceManager.GetString("RefreshImages", resourceCulture);
 
+		internal static string RemoveRoutineEntry => ResourceManager.GetString("RemoveRoutineEntry", resourceCulture);
+
 		internal static string RemoveItem => ResourceManager.GetString("RemoveItem", resourceCulture);
+
+		internal static string ResetDaily => ResourceManager.GetString("ResetDaily", resourceCulture);
+
+		internal static string ResetNone => ResourceManager.GetString("ResetNone", resourceCulture);
+
+		internal static string ResetWeekly => ResourceManager.GetString("ResetWeekly", resourceCulture);
+
+		internal static string Retry => ResourceManager.GetString("Retry", resourceCulture);
 
 		internal static string RightOffset => ResourceManager.GetString("RightOffset", resourceCulture);
 
@@ -504,7 +566,11 @@ namespace Kenedia.Modules.Characters.Res
 
 		internal static string Search => ResourceManager.GetString("Search", resourceCulture);
 
+		internal static string SearchCharacterName => ResourceManager.GetString("SearchCharacterName", resourceCulture);
+
 		internal static string SearchGuide => ResourceManager.GetString("SearchGuide", resourceCulture);
+
+		internal static string SearchCharacterRoutines => ResourceManager.GetString("SearchCharacterRoutines", resourceCulture);
 
 		internal static string SelectImage => ResourceManager.GetString("SelectImage", resourceCulture);
 
@@ -560,6 +626,8 @@ namespace Kenedia.Modules.Characters.Res
 
 		internal static string ShowStatusWindow_Tooltip => ResourceManager.GetString("ShowStatusWindow_Tooltip", resourceCulture);
 
+		internal static string SideMenu => ResourceManager.GetString("SideMenu", resourceCulture);
+
 		internal static string Small => ResourceManager.GetString("Small", resourceCulture);
 
 		internal static string SortBy => ResourceManager.GetString("SortBy", resourceCulture);
@@ -582,6 +650,8 @@ namespace Kenedia.Modules.Characters.Res
 
 		internal static string Switch => ResourceManager.GetString("Switch", resourceCulture);
 
+		internal static string SwitchToFirstIncomplete => ResourceManager.GetString("SwitchToFirstIncomplete", resourceCulture);
+
 		internal static string Tag => ResourceManager.GetString("Tag", resourceCulture);
 
 		internal static string Tag_Placeholder => ResourceManager.GetString("Tag_Placeholder", resourceCulture);
@@ -589,6 +659,28 @@ namespace Kenedia.Modules.Characters.Res
 		internal static string Tags => ResourceManager.GetString("Tags", resourceCulture);
 
 		internal static string Tailor => ResourceManager.GetString("Tailor", resourceCulture);
+
+		internal static string RoutineEntryCharacterNotAssigned => ResourceManager.GetString("RoutineEntryCharacterNotAssigned", resourceCulture);
+
+		internal static string RoutineEntryCharacterNotFound => ResourceManager.GetString("RoutineEntryCharacterNotFound", resourceCulture);
+
+		internal static string RoutineEntryDescriptionPlaceholder => ResourceManager.GetString("RoutineEntryDescriptionPlaceholder", resourceCulture);
+
+		internal static string FreeInventorySlots => ResourceManager.GetString("FreeInventorySlots", resourceCulture);
+
+		internal static string FreeInventorySlotsAmount => ResourceManager.GetString("FreeInventorySlotsAmount", resourceCulture);
+
+		internal static string FullInventory => ResourceManager.GetString("FullInventory", resourceCulture);
+
+		internal static string CharacterRoutineDefaultName => ResourceManager.GetString("CharacterRoutineDefaultName", resourceCulture);
+
+		internal static string CharacterRoutinePlaceholder => ResourceManager.GetString("CharacterRoutinePlaceholder", resourceCulture);
+
+		internal static string CharacterRoutines => ResourceManager.GetString("CharacterRoutines", resourceCulture);
+
+		internal static string RoutineEntries => ResourceManager.GetString("RoutineEntries", resourceCulture);
+
+		internal static string RoutineEntrySwitchFailed => ResourceManager.GetString("RoutineEntrySwitchFailed", resourceCulture);
 
 		internal static string TesseractFailedNotification => ResourceManager.GetString("TesseractFailedNotification", resourceCulture);
 
@@ -606,6 +698,10 @@ namespace Kenedia.Modules.Characters.Res
 
 		internal static string TogglePortraitCapture_Tooltip => ResourceManager.GetString("TogglePortraitCapture_Tooltip", resourceCulture);
 
+		internal static string ToggleCharacterRoutineKey => ResourceManager.GetString("ToggleCharacterRoutineKey", resourceCulture);
+
+		internal static string ToggleCharacterRoutineKey_Tooltip => ResourceManager.GetString("ToggleCharacterRoutineKey_Tooltip", resourceCulture);
+
 		internal static string ToggleVisible => ResourceManager.GetString("ToggleVisible", resourceCulture);
 
 		internal static string TopOffset => ResourceManager.GetString("TopOffset", resourceCulture);
@@ -613,6 +709,12 @@ namespace Kenedia.Modules.Characters.Res
 		internal static string UIScale_Error => ResourceManager.GetString("UIScale_Error", resourceCulture);
 
 		internal static string UISizeDisclaimer => ResourceManager.GetString("UISizeDisclaimer", resourceCulture);
+
+		internal static string Unassigned => ResourceManager.GetString("Unassigned", resourceCulture);
+
+		internal static string UncheckAll => ResourceManager.GetString("UncheckAll", resourceCulture);
+
+		internal static string UnhideComplete => ResourceManager.GetString("UnhideComplete", resourceCulture);
 
 		internal static string Unknown => ResourceManager.GetString("Unknown", resourceCulture);
 
@@ -641,6 +743,38 @@ namespace Kenedia.Modules.Characters.Res
 		internal static string WindowedMode_Tooltip => ResourceManager.GetString("WindowedMode_Tooltip", resourceCulture);
 
 		internal static string Years => ResourceManager.GetString("Years", resourceCulture);
+
+		internal static string AddRoutineStep => AddRoutineEntry;
+
+		internal static string AllRoutineStepsComplete => AllRoutineEntriesComplete;
+
+		internal static string CompletedRoutineStepsBehavior => CompletedRoutineEntriesBehavior;
+
+		internal static string CompletedRoutineStepsBehavior_Hide => CompletedRoutineEntriesBehavior_Hide;
+
+		internal static string CompletedRoutineStepsBehavior_MoveToBottom => CompletedRoutineEntriesBehavior_MoveToBottom;
+
+		internal static string CompletedRoutineStepsBehavior_Nothing => CompletedRoutineEntriesBehavior_Nothing;
+
+		internal static string CompletedRoutineStepsHiddenTooltip => CompletedRoutineEntriesHiddenTooltip;
+
+		internal static string ConfirmCharacterRoutineStepDelete => ConfirmCharacterRoutineEntryDelete;
+
+		internal static string NextCharacterRoutineStepKey => NextCharacterRoutineEntryKey;
+
+		internal static string NextCharacterRoutineStepKey_Tooltip => NextCharacterRoutineEntryKey_Tooltip;
+
+		internal static string RemoveRoutineStep => RemoveRoutineEntry;
+
+		internal static string RoutineStepCharacterNotAssigned => RoutineEntryCharacterNotAssigned;
+
+		internal static string RoutineStepCharacterNotFound => RoutineEntryCharacterNotFound;
+
+		internal static string RoutineStepDescriptionPlaceholder => RoutineEntryDescriptionPlaceholder;
+
+		internal static string RoutineSteps => RoutineEntries;
+
+		internal static string RoutineStepSwitchFailed => RoutineEntrySwitchFailed;
 
 		internal strings()
 		{

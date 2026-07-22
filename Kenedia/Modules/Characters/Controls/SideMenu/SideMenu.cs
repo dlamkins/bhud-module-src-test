@@ -5,6 +5,7 @@ using Blish_HUD;
 using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
+using Gw2Sharp.Models;
 using Kenedia.Modules.Characters.Models;
 using Kenedia.Modules.Characters.Res;
 using Kenedia.Modules.Characters.Services;
@@ -49,13 +50,6 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 
 		public SideMenu(Action toggleOCR, Action togglePotrait, Action refreshAPI, TextureManager textureManager, Settings settings, CharacterSorting characterSorting, Data data)
 		{
-			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0177: Unknown result type (might be due to invalid IL or missing references)
 			_textureManager = textureManager;
 			_toggleOCR = toggleOCR;
 			_togglePotrait = togglePotrait;
@@ -64,19 +58,19 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 			_characterSorting = characterSorting;
 			base.Parent = GameService.Graphics.SpriteScreen;
 			base.BorderWidth = new RectangleDimensions(2);
-			base.BorderColor = Color.get_Black();
-			base.BackgroundColor = Color.get_Black() * 0.4f;
+			base.BorderColor = Color.Black;
+			base.BackgroundColor = Color.Black * 0.4f;
 			base.BackgroundImage = AsyncTexture2D.FromAssetId(156003);
 			ZIndex = 11;
 			_headerPanel = new Kenedia.Modules.Core.Controls.Panel
 			{
 				Parent = this,
-				BackgroundColor = Color.get_Black() * 0.95f,
+				BackgroundColor = Color.Black * 0.95f,
 				Height = 25
 			};
 			TabsButtonPanel.Location = new Point(0, _headerPanel.Bottom);
 			CreateHeaderButtons();
-			int eliteSpecializationsCount = data.Specializations.Values.Where((Specialization x) => (int)x.Profession == 1).Count();
+			int eliteSpecializationsCount = data.Specializations.Values.Where((Specialization x) => x.Profession == ProfessionType.Guardian).Count();
 			int cols = 2 + eliteSpecializationsCount + 1 + 1;
 			base.Width = 250;
 			base.Width = cols * 35 + 5;
@@ -94,16 +88,6 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 
 		private void CreateHeaderButtons()
 		{
-			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0208: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02d5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02e0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ef: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0381: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0392: Unknown result type (might be due to invalid IL or missing references)
 			_ocrButton = new ImageButton
 			{
 				Parent = _headerPanel,
@@ -123,7 +107,7 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 				Texture = AsyncTexture2D.FromAssetId(358353),
 				HoveredTexture = (AsyncTexture2D)_textureManager.GetIcon(TextureManager.Icons.Portrait_Hovered),
 				Size = new Point(20, 20),
-				ColorHovered = Color.get_White(),
+				ColorHovered = Color.White,
 				SetLocalizedTooltip = () => strings.TogglePortraitCapture_Tooltip,
 				ClickAction = delegate
 				{
@@ -204,7 +188,6 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 
 		public override void RecalculateLayout()
 		{
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
 			if (_headerPanel != null)
 			{
@@ -232,18 +215,20 @@ namespace Kenedia.Modules.Characters.Controls.SideMenu
 
 		protected override void OnResized(ResizedEventArgs e)
 		{
-			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
 			base.OnResized(e);
 			if (base.BackgroundImage != null)
 			{
 				base.TextureRectangle = new Rectangle(30, 30, Math.Min(base.BackgroundImage.Width - 100, base.Width), Math.Min(base.BackgroundImage.Height - 100, base.Height));
 			}
-			int gap = (_headerPanel.Width - 7 - _buttons.Count * 20) / (_buttons.Count - 1);
-			for (int i = 0; i < _buttons.Count; i++)
+			int buttonCount = _buttons.Count;
+			if (buttonCount != 0)
 			{
-				Control b = _buttons[i];
-				b.Location = new Point(6 + i * gap + i * b.Width, 3);
+				int gap = ((buttonCount > 1) ? ((_headerPanel.Width - 7 - buttonCount * 20) / (buttonCount - 1)) : 0);
+				for (int i = 0; i < buttonCount; i++)
+				{
+					Control b = _buttons[i];
+					b.Location = new Point(6 + i * gap + i * b.Width, 3);
+				}
 			}
 		}
 	}

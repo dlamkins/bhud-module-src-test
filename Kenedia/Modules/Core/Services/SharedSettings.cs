@@ -63,7 +63,7 @@ namespace Kenedia.Modules.Core.Services
 
 		private async void Save()
 		{
-			string json = JsonConvert.SerializeObject((object)this, SerializerSettings.Default);
+			string json = JsonConvert.SerializeObject(this, SerializerSettings.Default);
 			if (await FileExtension.WaitForFileUnlock(_path))
 			{
 				using StreamWriter writer = new StreamWriter(_path);

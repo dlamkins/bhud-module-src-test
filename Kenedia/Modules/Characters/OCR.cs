@@ -39,9 +39,9 @@ namespace Kenedia.Modules.Characters
 
 		private readonly ObservableCollection<Character_Model> _characterModels;
 
-		private readonly Color _spacingColor = Color.FromArgb(255, 200, 200, 200);
+		private readonly System.Drawing.Color _spacingColor = System.Drawing.Color.FromArgb(255, 200, 200, 200);
 
-		private readonly Color _ignoredColor = Color.FromArgb(255, 100, 100, 100);
+		private readonly System.Drawing.Color _ignoredColor = System.Drawing.Color.FromArgb(255, 100, 100, 100);
 
 		private bool _isDisposed;
 
@@ -131,16 +131,8 @@ namespace Kenedia.Modules.Characters
 				_ocrApi.Dispose();
 				_isDisposed = true;
 				OcrView?.Dispose();
-				Texture2D cleanedTexture = CleanedTexture;
-				if (cleanedTexture != null)
-				{
-					((GraphicsResource)cleanedTexture).Dispose();
-				}
-				Texture2D sourceTexture = SourceTexture;
-				if (sourceTexture != null)
-				{
-					((GraphicsResource)sourceTexture).Dispose();
-				}
+				CleanedTexture?.Dispose();
+				SourceTexture?.Dispose();
 			}
 		}
 
@@ -178,10 +170,9 @@ namespace Kenedia.Modules.Characters
 					await Task.Delay(5);
 					User32Dll.RECT wndBounds = _clientWindowService.WindowBounds;
 					ScreenModeSetting? screenMode = GameService.GameIntegration.GfxSettings.ScreenMode;
-					Point p = (Point)(((screenMode.HasValue ? ((string)screenMode.GetValueOrDefault()) : null) == (string)ScreenModeSetting.Windowed) ? new Point(_sharedSettings.WindowOffset.Left, _sharedSettings.WindowOffset.Top) : Point.get_Zero());
+					Microsoft.Xna.Framework.Point p = (((screenMode.HasValue ? ((string)screenMode.GetValueOrDefault()) : null) == (string)ScreenModeSetting.Windowed) ? new Microsoft.Xna.Framework.Point(_sharedSettings.WindowOffset.Left, _sharedSettings.WindowOffset.Top) : Microsoft.Xna.Framework.Point.Zero);
 					double factor = GameService.Graphics.UIScaleMultiplier;
-					Point size = default(Point);
-					((Point)(ref size))._002Ector((int)((double)Settings.ActiveOCRRegion.Width * factor), (int)((double)Settings.ActiveOCRRegion.Height * factor));
+					Microsoft.Xna.Framework.Point size = new Microsoft.Xna.Framework.Point((int)((double)Settings.ActiveOCRRegion.Width * factor), (int)((double)Settings.ActiveOCRRegion.Height * factor));
 					using (Bitmap bitmap = new Bitmap(size.X, size.Y))
 					{
 						Bitmap spacingVisibleBitmap = new Bitmap(size.X, size.Y);
@@ -189,20 +180,14 @@ namespace Kenedia.Modules.Characters
 						{
 							int left = wndBounds.Left + p.X;
 							int top = wndBounds.Top + p.Y;
-							Rectangle activeOCRRegion = Settings.ActiveOCRRegion;
-							int x = (int)Math.Ceiling((double)((Rectangle)(ref activeOCRRegion)).get_Left() * factor);
-							activeOCRRegion = Settings.ActiveOCRRegion;
-							int y = (int)Math.Ceiling((double)((Rectangle)(ref activeOCRRegion)).get_Top() * factor);
-							g.CopyFromScreen(new Point(left + x, top + y), Point.Empty, new Size(size.X, size.Y));
+							int x = (int)Math.Ceiling((double)Settings.ActiveOCRRegion.Left * factor);
+							int y = (int)Math.Ceiling((double)Settings.ActiveOCRRegion.Top * factor);
+							g.CopyFromScreen(new System.Drawing.Point(left + x, top + y), System.Drawing.Point.Empty, new Size(size.X, size.Y));
 							if (show)
 							{
 								using MemoryStream memoryStream = new MemoryStream();
 								bitmap.Save(memoryStream, ImageFormat.Bmp);
-								Texture2D sourceTexture = SourceTexture;
-								if (sourceTexture != null)
-								{
-									((GraphicsResource)sourceTexture).Dispose();
-								}
+								SourceTexture?.Dispose();
 								SourceTexture = memoryStream.CreateTexture2D();
 							}
 							int emptyPixelRow = 0;
@@ -212,14 +197,14 @@ namespace Kenedia.Modules.Characters
 								bool containsPixel = false;
 								for (int k = 0; k < bitmap.Height; k++)
 								{
-									Color oc = bitmap.GetPixel(i, k);
+									System.Drawing.Color oc = bitmap.GetPixel(i, k);
 									int threshold = Settings.OCR_ColorThreshold.Value;
 									if (oc.R >= threshold && oc.G >= threshold && oc.B >= threshold && emptyPixelRow < CustomThreshold)
 									{
-										bitmap.SetPixel(i, k, Color.Black);
+										bitmap.SetPixel(i, k, System.Drawing.Color.Black);
 										if (show)
 										{
-											spacingVisibleBitmap.SetPixel(i, k, Color.Black);
+											spacingVisibleBitmap.SetPixel(i, k, System.Drawing.Color.Black);
 										}
 										containsPixel = true;
 										stringStarted = true;
@@ -230,15 +215,15 @@ namespace Kenedia.Modules.Characters
 										{
 											spacingVisibleBitmap.SetPixel(i, k, _ignoredColor);
 										}
-										bitmap.SetPixel(i, k, Color.White);
+										bitmap.SetPixel(i, k, System.Drawing.Color.White);
 									}
 									else
 									{
 										if (show)
 										{
-											spacingVisibleBitmap.SetPixel(i, k, Color.White);
+											spacingVisibleBitmap.SetPixel(i, k, System.Drawing.Color.White);
 										}
-										bitmap.SetPixel(i, k, Color.White);
+										bitmap.SetPixel(i, k, System.Drawing.Color.White);
 									}
 								}
 								if (emptyPixelRow >= CustomThreshold)
@@ -268,11 +253,7 @@ namespace Kenedia.Modules.Characters
 							spacingVisibleBitmap.Save(memoryStream2, ImageFormat.Bmp);
 							if (show)
 							{
-								Texture2D cleanedTexture = CleanedTexture;
-								if (cleanedTexture != null)
-								{
-									((GraphicsResource)cleanedTexture).Dispose();
-								}
+								CleanedTexture?.Dispose();
 								CleanedTexture = memoryStream2.CreateTexture2D();
 							}
 						}
@@ -286,11 +267,7 @@ namespace Kenedia.Modules.Characters
 						{
 							using MemoryStream s = new MemoryStream();
 							ocr_bitmap.Save(s, ImageFormat.Bmp);
-							Texture2D scaledTexture = ScaledTexture;
-							if (scaledTexture != null)
-							{
-								((GraphicsResource)scaledTexture).Dispose();
-							}
+							ScaledTexture?.Dispose();
 							ScaledTexture = s.CreateTexture2D();
 						}
 						string[] array = (_ocrApi?.GetTextFromImage(ocr_bitmap)).Split(' ');

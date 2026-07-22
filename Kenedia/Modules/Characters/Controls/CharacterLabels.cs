@@ -43,6 +43,8 @@ namespace Kenedia.Modules.Characters.Controls
 
 		private readonly IconLabel _ageLabel;
 
+		private readonly IconLabel _freeInventorySlotsLabel;
+
 		private readonly IconLabel _customIndex;
 
 		private readonly List<Tag> _tags = new List<Tag>();
@@ -138,14 +140,6 @@ namespace Kenedia.Modules.Characters.Controls
 
 		public CharacterLabels(Kenedia.Modules.Core.Controls.FlowPanel parent)
 		{
-			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0141: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0238: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0269: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b8: Unknown result type (might be due to invalid IL or missing references)
 			Parent = parent;
 			_nameLabel = new IconLabel
 			{
@@ -160,7 +154,7 @@ namespace Kenedia.Modules.Characters.Controls
 				AutoSizeWidth = true,
 				AutoSizeHeight = true,
 				Icon = AsyncTexture2D.FromAssetId(157085),
-				TextureRectangle = new Rectangle(2, 2, 28, 28)
+				TextureRectangle = new Microsoft.Xna.Framework.Rectangle(2, 2, 28, 28)
 			};
 			_genderLabel = new IconLabel
 			{
@@ -186,7 +180,7 @@ namespace Kenedia.Modules.Characters.Controls
 				AutoSizeWidth = true,
 				AutoSizeHeight = true,
 				Icon = AsyncTexture2D.FromAssetId(358406),
-				TextureRectangle = new Rectangle(2, 2, 28, 28)
+				TextureRectangle = new Microsoft.Xna.Framework.Rectangle(2, 2, 28, 28)
 			};
 			_craftingControl = new CraftingControl
 			{
@@ -201,7 +195,7 @@ namespace Kenedia.Modules.Characters.Controls
 				AutoSizeWidth = true,
 				AutoSizeHeight = true,
 				Icon = AsyncTexture2D.FromAssetId(1424243),
-				TextureRectangle = new Rectangle(2, 2, 28, 28)
+				TextureRectangle = new Microsoft.Xna.Framework.Rectangle(2, 2, 28, 28)
 			};
 			_nextBirthdayLabel = new IconLabel
 			{
@@ -209,7 +203,7 @@ namespace Kenedia.Modules.Characters.Controls
 				AutoSizeWidth = true,
 				AutoSizeHeight = true,
 				Icon = AsyncTexture2D.FromAssetId(593864),
-				TextureRectangle = new Rectangle(2, 2, 28, 28)
+				TextureRectangle = new Microsoft.Xna.Framework.Rectangle(2, 2, 28, 28)
 			};
 			_lastLoginLabel = new IconLabel
 			{
@@ -217,14 +211,22 @@ namespace Kenedia.Modules.Characters.Controls
 				AutoSizeWidth = true,
 				AutoSizeHeight = true,
 				Icon = AsyncTexture2D.FromAssetId(155035),
-				TextureRectangle = new Rectangle(10, 10, 44, 44)
+				TextureRectangle = new Microsoft.Xna.Framework.Rectangle(10, 10, 44, 44)
+			};
+			_freeInventorySlotsLabel = new IconLabel
+			{
+				Parent = parent,
+				AutoSizeWidth = true,
+				AutoSizeHeight = true,
+				Icon = AsyncTexture2D.FromAssetId(156670),
+				TextureRectangle = new Microsoft.Xna.Framework.Rectangle(2, 2, 28, 28)
 			};
 			_customIndex = new IconLabel
 			{
 				Parent = parent,
 				AutoSizeWidth = true,
 				AutoSizeHeight = true,
-				TextureRectangle = new Rectangle(2, 2, 28, 28),
+				TextureRectangle = new Microsoft.Xna.Framework.Rectangle(2, 2, 28, 28),
 				Icon = AsyncTexture2D.FromAssetId(156909)
 			};
 			TagPanel = new TagFlowPanel
@@ -236,10 +238,10 @@ namespace Kenedia.Modules.Characters.Controls
 				HeightSizingMode = SizingMode.AutoSize,
 				Visible = false
 			};
-			DataControls = new List<Control>(12)
+			DataControls = new List<Control>(13)
 			{
 				_nameLabel, _customIndex, _levelLabel, _genderLabel, _raceLabel, _professionLabel, _mapLabel, _nextBirthdayLabel, _ageLabel, _lastLoginLabel,
-				_craftingControl, TagPanel
+				_freeInventorySlotsLabel, _craftingControl, TagPanel
 			};
 			LocalizingService.LocaleChanged += new EventHandler<ValueChangedEventArgs<Locale>>(UserLocale_SettingChanged);
 			UserLocale_SettingChanged(null, null);
@@ -288,14 +290,6 @@ namespace Kenedia.Modules.Characters.Controls
 
 		public void UpdateCharacterInfo()
 		{
-			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f3: Invalid comparison between Unknown and I4
-			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f8: Invalid comparison between Unknown and I4
 			if (Character == null)
 			{
 				return;
@@ -311,17 +305,21 @@ namespace Kenedia.Modules.Characters.Controls
 			_professionLabel.Text = Character.SpecializationName;
 			if (_professionLabel.Icon != null)
 			{
-				_professionLabel.TextureRectangle = ((_professionLabel.Icon.Width == 32) ? new Rectangle(2, 2, 28, 28) : new Rectangle(4, 4, 56, 56));
+				_professionLabel.TextureRectangle = ((_professionLabel.Icon.Width == 32) ? new Microsoft.Xna.Framework.Rectangle(2, 2, 28, 28) : new Microsoft.Xna.Framework.Rectangle(4, 4, 56, 56));
 			}
 			IconLabel genderLabel = _genderLabel;
-			Gender gender = Character.Gender;
-			string text2 = (genderLabel.Text = (((int)gender == 1) ? strings.Male : (((int)gender != 2) ? strings.Unknown : strings.Female)));
+			genderLabel.Text = Character.Gender switch
+			{
+				Gender.Male => strings.Male, 
+				Gender.Female => strings.Female, 
+				_ => strings.Unknown, 
+			};
 			_raceLabel.Text = (Data.Races.TryGetValue(Character.Race, out var race) ? race.Name : strings.Unknown);
 			_raceLabel.Icon = (Data.Races.TryGetValue(Character.Race, out race) ? race.Icon : null);
 			_mapLabel.Text = Data.GetMapById(Character.Map).Name;
 			_customIndex.Text = string.Format(strings.CustomIndex + " {0}", Character.Index);
 			IEnumerable<string> tagLlist = _tags.Select((Tag e) => e.Text);
-			List<string> characterTags = Character.Tags.ToList();
+			List<string> characterTags = Character.DisplayTags.ToList();
 			IEnumerable<string> deleteTags = tagLlist.Except(characterTags);
 			IEnumerable<string> addTags = characterTags.Except(tagLlist);
 			if (deleteTags.Any() || addTags.Any())
@@ -358,7 +356,6 @@ namespace Kenedia.Modules.Characters.Controls
 
 		public void UpdateDataControlsVisibility(bool tooltip = false)
 		{
-			//IL_039a: Unknown result type (might be due to invalid IL or missing references)
 			if (Settings != null)
 			{
 				Dictionary<string, ShowCheckPair> settings = Settings.DisplayToggles.Value;
@@ -386,12 +383,14 @@ namespace Kenedia.Modules.Characters.Controls
 				_craftingControl.Font = Font;
 				_customIndex.Visible = !settings.TryGetValue("CustomIndex", out var customindex) || (tooltip ? customindex.ShowTooltip : customindex.Show);
 				_customIndex.Font = Font;
-				TagPanel.Visible = (!settings.TryGetValue("Tags", out var tags) || (tooltip ? tags.ShowTooltip : tags.Show)) && (Character?.Tags.Count ?? 0) > 0;
+				_freeInventorySlotsLabel.Visible = (Character?.HasInventoryData ?? false) && (!settings.TryGetValue("FreeInventorySlots", out var freeInventorySlots) || (tooltip ? freeInventorySlots.ShowTooltip : freeInventorySlots.Show));
+				_freeInventorySlotsLabel.Font = Font;
+				TagPanel.Visible = (!settings.TryGetValue("Tags", out var tags) || (tooltip ? tags.ShowTooltip : tags.Show)) && (Character?.DisplayTags.Any() ?? false);
 				TagPanel.Font = Font;
-				_craftingControl.Height = Font.get_LineHeight() + 2;
+				_craftingControl.Height = Font.LineHeight + 2;
 				if (Parent != null)
 				{
-					Parent.ControlPadding = new Vector2((float)(Font.get_LineHeight() / 10), (float)(Font.get_LineHeight() / 10));
+					Parent.ControlPadding = new Vector2(Font.LineHeight / 10, Font.LineHeight / 10);
 					Parent?.Invalidate();
 				}
 			}
@@ -444,6 +443,10 @@ namespace Kenedia.Modules.Characters.Controls
 			if (Character != null && _ageLabel.Visible)
 			{
 				_ageLabel.Text = string.Format("{1} ({0} {2})", Character.Age, Character.Created.Date.ToString("d"), strings.Years);
+			}
+			if (Character != null && _freeInventorySlotsLabel.Visible)
+			{
+				_freeInventorySlotsLabel.Text = string.Format(strings.FreeInventorySlotsAmount, Character.FreeInventorySlots.GetValueOrDefault());
 			}
 			if (_created && (Parent?.Visible ?? false))
 			{

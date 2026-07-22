@@ -80,13 +80,11 @@ namespace Kenedia.Modules.Core.DataModels
 
 		public BaseSkill(Skill skill)
 		{
-			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-			Id = skill.get_Id();
-			Name = skill.get_Name();
-			AssetId = skill.get_Icon()?.GetAssetIdFromRenderUrl();
-			Professions = skill.get_Professions().ToList();
-			Slot = skill.get_Slot()?.ToEnum();
+			Id = skill.Id;
+			Name = skill.Name;
+			AssetId = skill.Icon?.GetAssetIdFromRenderUrl();
+			Professions = skill.Professions.ToList();
+			Slot = skill.Slot?.ToEnum();
 		}
 	}
 }

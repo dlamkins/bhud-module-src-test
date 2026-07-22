@@ -7,10 +7,7 @@ namespace Kenedia.Modules.Core.Extensions
 	{
 		public static bool IsTwoHanded(this ItemWeaponType itemWeaponType)
 		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0005: Invalid comparison between Unknown and I4
-			if (itemWeaponType - 11 <= 8)
+			if ((uint)(itemWeaponType - 11) <= 8u)
 			{
 				return true;
 			}
@@ -19,10 +16,7 @@ namespace Kenedia.Modules.Core.Extensions
 
 		public static bool IsOneHanded(this ItemWeaponType itemWeaponType)
 		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0004: Invalid comparison between Unknown and I4
-			if (itemWeaponType - 1 <= 5)
+			if ((uint)(itemWeaponType - 1) <= 5u)
 			{
 				return true;
 			}
@@ -31,10 +25,7 @@ namespace Kenedia.Modules.Core.Extensions
 
 		public static bool IsOffHand(this ItemWeaponType itemWeaponType)
 		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0004: Invalid comparison between Unknown and I4
-			if (itemWeaponType - 7 <= 3)
+			if ((uint)(itemWeaponType - 7) <= 3u)
 			{
 				return true;
 			}
@@ -43,17 +34,12 @@ namespace Kenedia.Modules.Core.Extensions
 
 		public static bool IsMainHand(this ItemWeaponType itemWeaponType)
 		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0002: Invalid comparison between Unknown and I4
-			return (int)itemWeaponType == 5;
+			return itemWeaponType == ItemWeaponType.Scepter;
 		}
 
 		public static SkillWeaponType ToSkillWeapon(this ItemWeaponType itemWeaponType)
 		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0003: Invalid comparison between Unknown and I4
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			Enum.TryParse<SkillWeaponType>(((int)itemWeaponType == 17) ? "Spear" : ((object)(ItemWeaponType)(ref itemWeaponType)).ToString(), out SkillWeaponType skillWeaponType);
+			Enum.TryParse<SkillWeaponType>((itemWeaponType == ItemWeaponType.Harpoon) ? "Spear" : itemWeaponType.ToString(), out var skillWeaponType);
 			return skillWeaponType;
 		}
 	}

@@ -31,17 +31,16 @@ namespace Kenedia.Modules.Core.DataModels
 		{
 		}
 
-		public Map(Map map)
+		public Map(Gw2Sharp.WebApi.V2.Models.Map map)
 		{
 			ApplyApiData(map);
 		}
 
-		public void ApplyApiData(Map map)
+		public void ApplyApiData(Gw2Sharp.WebApi.V2.Models.Map map)
 		{
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			Id = map.get_Id();
-			Type = ApiEnum<MapType>.op_Implicit(map.get_Type());
-			Names.Text = map.get_Name();
+			Id = map.Id;
+			Type = map.Type;
+			Names.Text = map.Name;
 		}
 	}
 }

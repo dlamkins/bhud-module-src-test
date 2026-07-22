@@ -103,16 +103,12 @@ namespace Kenedia.Modules.Core.Controls
 
 		public Hotbar()
 		{
-			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
 			WidthSizingMode = SizingMode.AutoSize;
 			HeightSizingMode = SizingMode.AutoSize;
-			base.BorderColor = Color.get_Black();
+			base.BorderColor = Color.Black;
 			base.BorderWidth = new RectangleDimensions(2);
 			base.BackgroundImage = AsyncTexture2D.FromAssetId(155960);
-			base.BackgroundImageColor = Color.get_DarkGray() * 0.8f;
+			base.BackgroundImageColor = Color.DarkGray * 0.8f;
 			_expandDummy = new Dummy
 			{
 				Parent = this,
@@ -147,34 +143,12 @@ namespace Kenedia.Modules.Core.Controls
 
 		private void OnExpandTypeChanged(object sender, Kenedia.Modules.Core.Models.ValueChangedEventArgs<ExpandType> e)
 		{
-			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0143: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0151: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0165: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0200: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0209: Unknown result type (might be due to invalid IL or missing references)
-			//IL_020e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0222: Unknown result type (might be due to invalid IL or missing references)
-			//IL_026f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02bd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02df: Unknown result type (might be due to invalid IL or missing references)
-			//IL_032c: Unknown result type (might be due to invalid IL or missing references)
 			if (ItemsPanel != null)
 			{
 				_resizeBarPending = true;
 				_hasCollapseAnchor = false;
-				ItemsPanel.Size = Point.get_Zero();
-				base.Size = Point.get_Zero();
+				ItemsPanel.Size = Point.Zero;
+				base.Size = Point.Zero;
 				switch (e.NewValue)
 				{
 				case ExpandType?.LeftToRight:
@@ -286,12 +260,9 @@ namespace Kenedia.Modules.Core.Controls
 
 		protected override void OnLeftMouseButtonPressed(MouseEventArgs e)
 		{
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
 			base.OnLeftMouseButtonPressed(e);
 			_dragging = Control.Input.Keyboard.ActiveModifiers == MoveModifier;
-			_dragStart = (_dragging ? base.RelativeMousePosition : Point.get_Zero());
+			_dragStart = (_dragging ? base.RelativeMousePosition : Point.Zero);
 		}
 
 		protected override void OnLeftMouseButtonReleased(MouseEventArgs e)
@@ -326,31 +297,12 @@ namespace Kenedia.Modules.Core.Controls
 
 		public override void RecalculateLayout()
 		{
-			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0110: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0120: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
 			if (ItemsPanel != null)
 			{
 				if (base.BackgroundImage != null)
 				{
-					Rectangle bounds = base.BackgroundImage.Bounds;
-					int num = Math.Min(((Rectangle)(ref bounds)).get_Size().X, base.Width);
-					int height = base.Height;
-					bounds = base.BackgroundImage.Bounds;
-					base.TextureRectangle = new Rectangle(50, 50, num, Math.Min(height, ((Rectangle)(ref bounds)).get_Size().Y));
+					base.TextureRectangle = new Rectangle(50, 50, Math.Min(base.BackgroundImage.Bounds.Size.X, base.Width), Math.Min(base.Height, base.BackgroundImage.Bounds.Size.Y));
 				}
 				SortButtons();
 				switch (ExpandType)
@@ -394,26 +346,9 @@ namespace Kenedia.Modules.Core.Controls
 
 		private void CalculateLeftToRight()
 		{
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0155: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a2: Unknown result type (might be due to invalid IL or missing references)
 			if (base.BackgroundImage != null)
 			{
-				Rectangle bounds = base.BackgroundImage.Bounds;
-				int num = Math.Min(((Rectangle)(ref bounds)).get_Size().X, base.Width);
-				int height = base.Height;
-				bounds = base.BackgroundImage.Bounds;
-				base.TextureRectangle = new Rectangle(50, 50, num, Math.Min(height, ((Rectangle)(ref bounds)).get_Size().Y));
+				base.TextureRectangle = new Rectangle(50, 50, Math.Min(base.BackgroundImage.Bounds.Size.X, base.Width), Math.Min(base.Height, base.BackgroundImage.Bounds.Size.Y));
 			}
 			if (ItemsPanel != null)
 			{
@@ -430,22 +365,6 @@ namespace Kenedia.Modules.Core.Controls
 
 		private void CalculateRightToLeft()
 		{
-			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0188: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b4: Unknown result type (might be due to invalid IL or missing references)
 			bool isAnyVisible = ItemsPanel.Children.Any((Control e) => e.Visible);
 			int expandedItemsWidth = GetItemPanelSize(any: true);
 			int checkedItemsWidth = GetItemPanelSize(any: false, isChecked: true);
@@ -478,27 +397,10 @@ namespace Kenedia.Modules.Core.Controls
 
 		private void CalculateTopToBottom()
 		{
-			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0112: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0124: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01dd: Unknown result type (might be due to invalid IL or missing references)
 			Math.Max(MinButtonSize, Math.Min(base.Width, base.Height) - _itemPadding - 10);
 			if (base.BackgroundImage != null)
 			{
-				Rectangle bounds = base.BackgroundImage.Bounds;
-				int num = Math.Min(((Rectangle)(ref bounds)).get_Size().X, base.Width);
-				int height = base.Height;
-				bounds = base.BackgroundImage.Bounds;
-				base.TextureRectangle = new Rectangle(50, 50, num, Math.Min(height, ((Rectangle)(ref bounds)).get_Size().Y));
+				base.TextureRectangle = new Rectangle(50, 50, Math.Min(base.BackgroundImage.Bounds.Size.X, base.Width), Math.Min(base.Height, base.BackgroundImage.Bounds.Size.Y));
 			}
 			if (ItemsPanel != null)
 			{
@@ -515,23 +417,6 @@ namespace Kenedia.Modules.Core.Controls
 
 		private void CalculateBottomToTop()
 		{
-			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00eb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0137: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0181: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0186: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019d: Unknown result type (might be due to invalid IL or missing references)
 			bool isAnyVisible = ItemsPanel.Children.Any((Control e) => e.Visible);
 			int expandedItemsWidth = GetItemPanelSize(any: true, isChecked: false, vertical: true);
 			int checkedItemsWidth = GetItemPanelSize(any: false, isChecked: true, vertical: true);
@@ -569,62 +454,22 @@ namespace Kenedia.Modules.Core.Controls
 
 		public override void PaintAfterChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0099: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
 			base.PaintAfterChildren(spriteBatch, bounds);
 			base.ClipsBounds = false;
 			if (ExpandType == ExpandType.BottomToTop)
 			{
-				spriteBatch.Draw(ContentService.Textures.Pixel, _expanderBackgroundBounds.Add(new Rectangle(base.Location, Point.get_Zero())), Color.get_Black() * 0.5f);
-				spriteBatch.DrawCenteredRotationOnCtrl(this, (Texture2D)_expander.Texture, _expander.Bounds, _expander.TextureRegion, Color.get_White(), 0f, flipVertically: true, flipHorizontally: false);
+				spriteBatch.Draw(ContentService.Textures.Pixel, _expanderBackgroundBounds.Add(new Rectangle(base.Location, Point.Zero)), Color.Black * 0.5f);
+				spriteBatch.DrawCenteredRotationOnCtrl(this, (Texture2D)_expander.Texture, _expander.Bounds, _expander.TextureRegion, Color.White, 0f, flipVertically: true, flipHorizontally: false);
 			}
 			else
 			{
-				spriteBatch.Draw(ContentService.Textures.Pixel, _expanderBackgroundBounds.Add(new Rectangle(base.Location, Point.get_Zero())), Color.get_Black() * 0.5f);
+				spriteBatch.Draw(ContentService.Textures.Pixel, _expanderBackgroundBounds.Add(new Rectangle(base.Location, Point.Zero)), Color.Black * 0.5f);
 				_expander?.Draw(this, spriteBatch, base.RelativeMousePosition);
 			}
 		}
 
 		private void MoveBar()
 		{
-			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0104: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0151: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0166: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0170: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018e: Unknown result type (might be due to invalid IL or missing references)
 			RecalculateLayout();
 			switch (ExpandType)
 			{
@@ -659,11 +504,6 @@ namespace Kenedia.Modules.Core.Controls
 
 		private Point GetPersistedLocation()
 		{
-			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
 			ExpandType expandType = ExpandType;
 			if ((expandType == ExpandType.RightToLeft || expandType == ExpandType.BottomToTop) && _hasCollapseAnchor)
 			{
@@ -674,36 +514,22 @@ namespace Kenedia.Modules.Core.Controls
 
 		private void ForceOnScreen()
 		{
-			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
 			Rectangle screen = Control.Graphics.SpriteScreen.LocalBounds;
-			if (base.Location.X < ((Rectangle)(ref screen)).get_Left())
+			if (base.Location.X < screen.Left)
 			{
-				base.Location = new Point(((Rectangle)(ref screen)).get_Left(), base.Location.Y);
+				base.Location = new Point(screen.Left, base.Location.Y);
 			}
-			if (base.Location.X + base.Width > ((Rectangle)(ref screen)).get_Right())
+			if (base.Location.X + base.Width > screen.Right)
 			{
-				base.Location = new Point(((Rectangle)(ref screen)).get_Right() - base.Width, base.Location.Y);
+				base.Location = new Point(screen.Right - base.Width, base.Location.Y);
 			}
-			if (base.Location.Y < ((Rectangle)(ref screen)).get_Top())
+			if (base.Location.Y < screen.Top)
 			{
-				base.Location = new Point(base.Location.X, ((Rectangle)(ref screen)).get_Top());
+				base.Location = new Point(base.Location.X, screen.Top);
 			}
-			if (base.Location.Y + base.Height > ((Rectangle)(ref screen)).get_Bottom())
+			if (base.Location.Y + base.Height > screen.Bottom)
 			{
-				base.Location = new Point(base.Location.X, ((Rectangle)(ref screen)).get_Bottom() - base.Height);
+				base.Location = new Point(base.Location.X, screen.Bottom - base.Height);
 			}
 		}
 	}

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using Blish_HUD;
 using Blish_HUD.Input;
@@ -66,6 +65,13 @@ namespace Kenedia.Modules.Characters.Services
 			Custom
 		}
 
+		public enum CompletedRoutineStepsDisplayBehavior
+		{
+			Nothing,
+			HideCompletedRoutineSteps,
+			MoveCompletedRoutineStepsToBottomOfDisplay
+		}
+
 		private readonly ObservableCollection<SettingEntry> _appearanceSettings = new ObservableCollection<SettingEntry>();
 
 		public SettingCollection AccountSettings { get; private set; }
@@ -92,6 +98,8 @@ namespace Kenedia.Modules.Characters.Services
 
 		public SettingEntry<Point> WindowSize { get; private set; }
 
+		public SettingEntry<Point> CharacterRoutineWindowSize { get; private set; }
+
 		public SettingEntry<RectangleDimensions> WindowOffset { get; private set; }
 
 		public SettingEntry<bool> ShowStatusWindow { get; private set; }
@@ -114,10 +122,6 @@ namespace Kenedia.Modules.Characters.Services
 		{
 			get
 			{
-				//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-				//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-				//IL_003a: Unknown result type (might be due to invalid IL or missing references)
 				Point res = GameService.Graphics.Resolution;
 				return "{" + $"X:{Math.Floor((double)res.X / 10.0) * 10.0} Y:{Math.Floor((double)res.Y / 10.0) * 10.0}" + "}";
 			}
@@ -127,11 +131,6 @@ namespace Kenedia.Modules.Characters.Services
 		{
 			get
 			{
-				//IL_0005: Unknown result type (might be due to invalid IL or missing references)
-				//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-				//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0049: Unknown result type (might be due to invalid IL or missing references)
 				Point res = GameService.Graphics.Resolution;
 				Dictionary<string, Rectangle> regions = OCRRegions.Value;
 				if (!regions.ContainsKey(OCRKey))
@@ -204,6 +203,12 @@ namespace Kenedia.Modules.Characters.Services
 
 		public SettingEntry<KeyBinding> MailKey { get; private set; }
 
+		public SettingEntry<KeyBinding> ToggleCharacterRoutineKey { get; private set; }
+
+		public SettingEntry<KeyBinding> NextCharacterRoutineStepKey { get; private set; }
+
+		public SettingEntry<CompletedRoutineStepsDisplayBehavior> CompletedRoutineStepsBehavior { get; private set; }
+
 		public SettingEntry<bool> OnlyEnterOnExact { get; private set; }
 
 		public SettingEntry<bool> EnterOnSwap { get; private set; }
@@ -247,21 +252,17 @@ namespace Kenedia.Modules.Characters.Services
 		{
 			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
 			//IL_002e: Expected O, but got Unknown
-			//IL_01c3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01fd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_040f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0466: Unknown result type (might be due to invalid IL or missing references)
 			base.InitializeSettings(settings);
 			SettingCollection internalSettings = settings.AddSubCollection("Internal", renderInUi: false, lazyLoaded: false);
 			Version = internalSettings.DefineSetting<Version>("Version", new Version("0.0.0", false));
-			LogoutKey = internalSettings.DefineSetting("LogoutKey", new KeyBinding((Keys)123));
-			ShortcutKey = internalSettings.DefineSetting("ShortcutKey", new KeyBinding(ModifierKeys.Shift, (Keys)67));
-			RadialKey = internalSettings.DefineSetting("RadialKey", new KeyBinding((Keys)0));
-			InventoryKey = internalSettings.DefineSetting("InventoryKey", new KeyBinding((Keys)73));
-			MailKey = internalSettings.DefineSetting("MailKey", new KeyBinding((Keys)0));
+			LogoutKey = internalSettings.DefineSetting("LogoutKey", new KeyBinding(Keys.F12));
+			ShortcutKey = internalSettings.DefineSetting("ShortcutKey", new KeyBinding(ModifierKeys.Shift, Keys.C));
+			RadialKey = internalSettings.DefineSetting("RadialKey", new KeyBinding(Keys.None));
+			InventoryKey = internalSettings.DefineSetting("InventoryKey", new KeyBinding(Keys.I));
+			MailKey = internalSettings.DefineSetting("MailKey", new KeyBinding(Keys.None));
+			ToggleCharacterRoutineKey = internalSettings.DefineSetting("ToggleCharacterRoutineKey", new KeyBinding(Keys.None));
+			NextCharacterRoutineStepKey = internalSettings.DefineSetting("NextCharacterRoutineEntryKey", new KeyBinding(Keys.None));
+			CompletedRoutineStepsBehavior = internalSettings.DefineSetting("CompletedRoutineEntriesBehavior", CompletedRoutineStepsDisplayBehavior.Nothing);
 			ShowCornerIcon = internalSettings.DefineSetting("ShowCornerIcon", defaultValue: true);
 			CloseWindowOnSwap = internalSettings.DefineSetting("CloseWindowOnSwap", defaultValue: false);
 			FilterDiacriticsInsensitive = internalSettings.DefineSetting("FilterDiacriticsInsensitive", defaultValue: false);
@@ -275,7 +276,7 @@ namespace Kenedia.Modules.Characters.Services
 			EnableRadialMenu = internalSettings.DefineSetting("EnableRadialMenu", defaultValue: true);
 			Radial_CenterScreen = internalSettings.DefineSetting("Radial_CenterScreen", defaultValue: true);
 			Radial_Scale = internalSettings.DefineSetting("Radial_Scale", 0.66f);
-			Radial_SliceBackground = internalSettings.DefineSetting("Radial_SliceBackground", new ColorGradient(Color.get_Black() * 0.5f));
+			Radial_SliceBackground = internalSettings.DefineSetting("Radial_SliceBackground", new ColorGradient(Color.Black * 0.5f));
 			Radial_SliceHighlight = internalSettings.DefineSetting("Radial_SliceHighlight", new ColorGradient(ContentService.Colors.ColonialWhite * 0.5f));
 			Radial_UseProfessionColor = internalSettings.DefineSetting("Radial_UseProfessionColor", defaultValue: false);
 			Radial_UseProfessionIcons = internalSettings.DefineSetting("Radial_UseProfessionIcons", defaultValue: false);
@@ -297,14 +298,15 @@ namespace Kenedia.Modules.Characters.Services
 			SwapDelay = internalSettings.DefineSetting("SwapDelay", 500);
 			KeyDelay = internalSettings.DefineSetting("KeyDelay", 10);
 			FilterDelay = internalSettings.DefineSetting("FilterDelay", 0);
-			WindowSize = internalSettings.DefineSetting<Point>("CurrentWindowSize", new Point(385, 920));
+			WindowSize = internalSettings.DefineSetting("CurrentWindowSize", new Point(385, 920));
+			CharacterRoutineWindowSize = internalSettings.DefineSetting("CharacterRoutineWindowSize", new Point(750, 700));
 			WindowOffset = internalSettings.DefineSetting("WindowOffset", new RectangleDimensions(8, 31, -8, -8));
 			DisplayToggles = internalSettings.DefineSetting("DisplayToggles", new Dictionary<string, ShowCheckPair>());
 			_ = GameService.Graphics.Resolution;
 			PinSideMenus = internalSettings.DefineSetting("PinSideMenus", defaultValue: false);
 			UseOCR = internalSettings.DefineSetting("UseOCR", defaultValue: false);
 			AutoSortCharacters = internalSettings.DefineSetting("AutoSortCharacters", defaultValue: false);
-			OCRRegion = internalSettings.DefineSetting<Rectangle>("OCRRegion", new Rectangle(50, 550, 530, 50));
+			OCRRegion = internalSettings.DefineSetting("OCRRegion", new Rectangle(50, 550, 530, 50));
 			OCRRegions = internalSettings.DefineSetting("OCRRegions", new Dictionary<string, Rectangle>());
 			OCRNoPixelColumns = internalSettings.DefineSetting("OCRNoPixelColumns", 20);
 			OCR_ColorThreshold = internalSettings.DefineSetting("OCR_ColorThreshold", 181);
@@ -315,46 +317,46 @@ namespace Kenedia.Modules.Characters.Services
 			PanelLayout = internalSettings.DefineSetting("PanelLayout", CharacterPanelLayout.IconAndText);
 			CharacterPanelFixedWidth = internalSettings.DefineSetting("CharacterPanelFixedWidth", defaultValue: false);
 			CharacterPanelWidth = internalSettings.DefineSetting("CharacterPanelWidth", 300);
-			((Collection<SettingEntry>)(object)_appearanceSettings).Add((SettingEntry)DisplayToggles);
-			((Collection<SettingEntry>)(object)_appearanceSettings).Add((SettingEntry)PanelSize);
-			((Collection<SettingEntry>)(object)_appearanceSettings).Add((SettingEntry)CustomCharacterIconSize);
-			((Collection<SettingEntry>)(object)_appearanceSettings).Add((SettingEntry)CustomCharacterFontSize);
-			((Collection<SettingEntry>)(object)_appearanceSettings).Add((SettingEntry)CustomCharacterNameFontSize);
-			((Collection<SettingEntry>)(object)_appearanceSettings).Add((SettingEntry)PanelLayout);
-			((Collection<SettingEntry>)(object)_appearanceSettings).Add((SettingEntry)CharacterPanelFixedWidth);
-			((Collection<SettingEntry>)(object)_appearanceSettings).Add((SettingEntry)CharacterPanelWidth);
+			_appearanceSettings.Add(DisplayToggles);
+			_appearanceSettings.Add(PanelSize);
+			_appearanceSettings.Add(CustomCharacterIconSize);
+			_appearanceSettings.Add(CustomCharacterFontSize);
+			_appearanceSettings.Add(CustomCharacterNameFontSize);
+			_appearanceSettings.Add(PanelLayout);
+			_appearanceSettings.Add(CharacterPanelFixedWidth);
+			_appearanceSettings.Add(CharacterPanelWidth);
 			ShowDetailedTooltip = internalSettings.DefineSetting("ShowDetailedTooltip", defaultValue: true);
 			ResultMatchingBehavior = internalSettings.DefineSetting("ResultMatchingBehavior", MatchingBehavior.MatchAny);
 			ResultFilterBehavior = internalSettings.DefineSetting("ResultFilterBehavior", FilterBehavior.Include);
 			SortType = internalSettings.DefineSetting("SortType", SortBy.TimeSinceLogin);
 			SortOrder = internalSettings.DefineSetting("SortOrder", SortDirection.Ascending);
-			foreach (SettingEntry item in (Collection<SettingEntry>)(object)_appearanceSettings)
+			foreach (SettingEntry appearanceSetting in _appearanceSettings)
 			{
-				item.PropertyChanged += OnAppearanceSettingChanged;
+				appearanceSetting.PropertyChanged += OnAppearanceSettingChanged;
 			}
-			_appearanceSettings.add_ItemAdded((EventHandler<ItemEventArgs<SettingEntry>>)AppearanceSettings_ItemAdded);
-			_appearanceSettings.add_ItemRemoved((EventHandler<ItemEventArgs<SettingEntry>>)AppearanceSettings_ItemRemoved);
+			_appearanceSettings.ItemAdded += AppearanceSettings_ItemAdded;
+			_appearanceSettings.ItemRemoved += AppearanceSettings_ItemRemoved;
 		}
 
 		protected override void OnDispose()
 		{
 			base.OnDispose();
-			foreach (SettingEntry item in (Collection<SettingEntry>)(object)_appearanceSettings)
+			foreach (SettingEntry appearanceSetting in _appearanceSettings)
 			{
-				item.PropertyChanged -= OnAppearanceSettingChanged;
+				appearanceSetting.PropertyChanged -= OnAppearanceSettingChanged;
 			}
-			_appearanceSettings.remove_ItemAdded((EventHandler<ItemEventArgs<SettingEntry>>)AppearanceSettings_ItemAdded);
-			_appearanceSettings.remove_ItemRemoved((EventHandler<ItemEventArgs<SettingEntry>>)AppearanceSettings_ItemRemoved);
+			_appearanceSettings.ItemAdded -= AppearanceSettings_ItemAdded;
+			_appearanceSettings.ItemRemoved -= AppearanceSettings_ItemRemoved;
 		}
 
 		private void AppearanceSettings_ItemRemoved(object sender, ItemEventArgs<SettingEntry> e)
 		{
-			e.get_Item().PropertyChanged -= OnAppearanceSettingChanged;
+			e.Item.PropertyChanged -= OnAppearanceSettingChanged;
 		}
 
 		private void AppearanceSettings_ItemAdded(object sender, ItemEventArgs<SettingEntry> e)
 		{
-			e.get_Item().PropertyChanged += OnAppearanceSettingChanged;
+			e.Item.PropertyChanged += OnAppearanceSettingChanged;
 		}
 
 		private void OnAppearanceSettingChanged(object sender, PropertyChangedEventArgs e)

@@ -61,14 +61,6 @@ namespace Kenedia.Modules.Characters.Controls
 
 		public ImageToggleButton()
 		{
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
 			GameService.Overlay.UserLocale.SettingChanged += UserLocale_SettingChanged;
 			UserLocale_SettingChanged(null, null);
 		}
@@ -89,25 +81,11 @@ namespace Kenedia.Modules.Characters.Controls
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00af: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00da: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0104: Unknown result type (might be due to invalid IL or missing references)
 			if (Texture != null)
 			{
 				AsyncTexture2D texture = ((_clicked && ClickedTexture != null) ? ClickedTexture : ((Active && ActiveTexture != null) ? ActiveTexture : ((base.MouseOver && HoveredTexture != null) ? HoveredTexture : Texture)));
 				_clicked = _clicked && base.MouseOver;
-				spriteBatch.DrawOnCtrl(this, texture, (SizeRectangle != Rectangle.get_Empty()) ? SizeRectangle : bounds, (TextureRectangle == Rectangle.get_Empty()) ? texture.Bounds : TextureRectangle, Active ? ColorActive : (base.MouseOver ? ColorHovered : ((base.MouseOver && _clicked) ? ColorClicked : ColorDefault)), 0f, default(Vector2), (SpriteEffects)0);
+				spriteBatch.DrawOnCtrl(this, texture, (SizeRectangle != Rectangle.Empty) ? SizeRectangle : bounds, (TextureRectangle == Rectangle.Empty) ? texture.Bounds : TextureRectangle, Active ? ColorActive : (base.MouseOver ? ColorHovered : ((base.MouseOver && _clicked) ? ColorClicked : ColorDefault)), 0f, default(Vector2));
 			}
 		}
 

@@ -11,9 +11,9 @@ namespace Kenedia.Modules.Characters.Controls
 
 		public Vector2 IconPos { get; set; }
 
-		public Rectangle Rectangle { get; set; }
+		public Microsoft.Xna.Framework.Rectangle Rectangle { get; set; }
 
-		public Rectangle IconRectangle { get; set; }
+		public Microsoft.Xna.Framework.Rectangle IconRectangle { get; set; }
 
 		public List<PointF> Lines { get; set; }
 

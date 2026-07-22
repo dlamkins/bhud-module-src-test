@@ -35,9 +35,9 @@ namespace Kenedia.Modules.Core.Controls
 		public override void DoUpdate(GameTime gameTime)
 		{
 			base.DoUpdate(gameTime);
-			if (_performFiltering && gameTime.get_TotalGameTime().TotalMilliseconds - _lastFiltering >= FilteringDelay)
+			if (_performFiltering && gameTime.TotalGameTime.TotalMilliseconds - _lastFiltering >= FilteringDelay)
 			{
-				_lastFiltering = gameTime.get_TotalGameTime().TotalMilliseconds;
+				_lastFiltering = gameTime.TotalGameTime.TotalMilliseconds;
 				_performFiltering = false;
 				PerformFiltering?.Invoke(base.Text);
 			}

@@ -46,10 +46,10 @@ namespace Kenedia.Modules.Core.Controls
 
 		public Rectangle SizeRectangle { get; set; }
 
-		public Color ImageColor { get; set; } = Color.get_White();
+		public Color ImageColor { get; set; } = Color.White;
 
 
-		public Color? ActiveColor { get; set; } = Color.get_White();
+		public Color? ActiveColor { get; set; } = Color.White;
 
 
 		public bool ShowX { get; set; }
@@ -85,10 +85,7 @@ namespace Kenedia.Modules.Core.Controls
 
 		public ImageToggle()
 		{
-		}//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-		//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-		//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-
+		}
 
 		public ImageToggle(Action<bool> onChanged)
 			: this()
@@ -120,40 +117,20 @@ namespace Kenedia.Modules.Core.Controls
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
 			AsyncTexture2D texture = GetTexture();
 			if (texture != null)
 			{
 				_clicked = _clicked && base.MouseOver;
-				spriteBatch.DrawOnCtrl(this, texture, (SizeRectangle != Rectangle.get_Empty()) ? SizeRectangle : bounds, (TextureRectangle == Rectangle.get_Empty()) ? texture.Bounds : TextureRectangle, (Color)((!Checked) ? ImageColor : (((_003F?)ActiveColor) ?? ImageColor)), 0f, default(Vector2), (SpriteEffects)0);
+				spriteBatch.DrawOnCtrl(this, texture, (SizeRectangle != Rectangle.Empty) ? SizeRectangle : bounds, (TextureRectangle == Rectangle.Empty) ? texture.Bounds : TextureRectangle, (!Checked) ? ImageColor : (ActiveColor ?? ImageColor), 0f, default(Vector2));
 			}
 			if (ShowX && !Checked)
 			{
-				spriteBatch.DrawOnCtrl(this, _exTexture, _xDrawRectangle, _xTextureRectangle, Color.get_White());
+				spriteBatch.DrawOnCtrl(this, _exTexture, _xDrawRectangle, _xTextureRectangle, Color.White);
 			}
 		}
 
 		public override void RecalculateLayout()
 		{
-			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
 			int size = Math.Min(base.Width / 2, base.Height / 2);
 			_xDrawRectangle = new Rectangle(base.Width - size, base.Height - size, size, size);

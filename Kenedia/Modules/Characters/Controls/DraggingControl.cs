@@ -25,8 +25,6 @@ namespace Kenedia.Modules.Characters.Controls
 			}
 			set
 			{
-				//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0055: Unknown result type (might be due to invalid IL or missing references)
 				if (_characterControl != value)
 				{
 					_characterControl = value;
@@ -39,7 +37,7 @@ namespace Kenedia.Modules.Characters.Controls
 							IsDraggingTarget = true,
 							Enabled = false,
 							Visible = true,
-							BackgroundColor = Color.get_Black() * 0.8f
+							BackgroundColor = Color.Black * 0.8f
 						};
 						_internalCharacterCard.UniformWithAttached(force: true);
 					}
@@ -96,15 +94,12 @@ namespace Kenedia.Modules.Characters.Controls
 
 		public override void UpdateContainer(GameTime gameTime)
 		{
-			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
 			base.UpdateContainer(gameTime);
 			if (_internalCharacterCard != null)
 			{
-				if (!_layoutRefreshed && base.Visible && gameTime.get_TotalGameTime().TotalMilliseconds - _lastlayoutRefreshed >= 0.0)
+				if (!_layoutRefreshed && base.Visible && gameTime.TotalGameTime.TotalMilliseconds - _lastlayoutRefreshed >= 0.0)
 				{
-					_lastlayoutRefreshed = gameTime.get_TotalGameTime().TotalMilliseconds;
+					_lastlayoutRefreshed = gameTime.TotalGameTime.TotalMilliseconds;
 					_layoutRefreshed = true;
 					_internalCharacterCard.UniformWithAttached(force: true);
 				}

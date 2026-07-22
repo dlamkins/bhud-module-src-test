@@ -11,9 +11,9 @@ namespace Kenedia.Modules.Core.Controls
 {
 	public class FlowTab : PanelTab
 	{
-		private Vector2 _outerControlPadding = Vector2.get_Zero();
+		private Vector2 _outerControlPadding = Vector2.Zero;
 
-		private Vector2 _controlPadding = Vector2.get_Zero();
+		private Vector2 _controlPadding = Vector2.Zero;
 
 		public ControlFlowDirection FlowDirection
 		{
@@ -35,12 +35,10 @@ namespace Kenedia.Modules.Core.Controls
 		{
 			get
 			{
-				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 				return _controlPadding;
 			}
 			set
 			{
-				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 				SetProperty(ref _controlPadding, value, invalidateLayout: true, "ControlPadding");
 			}
 		}
@@ -49,12 +47,10 @@ namespace Kenedia.Modules.Core.Controls
 		{
 			get
 			{
-				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 				return _outerControlPadding;
 			}
 			set
 			{
-				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 				SetProperty(ref _outerControlPadding, value, invalidateLayout: true, "OuterControlPadding");
 			}
 		}
@@ -104,8 +100,6 @@ namespace Kenedia.Modules.Core.Controls
 
 		private void ReflowChildLayoutLeftToRight(IEnumerable<Control> allChildren)
 		{
-			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
 			float outerPadX = _outerControlPadding.X;
 			float nextBottom;
 			float currentBottom = (nextBottom = _outerControlPadding.Y);
@@ -125,9 +119,6 @@ namespace Kenedia.Modules.Core.Controls
 
 		private void ReflowChildLayoutRightToLeft(IEnumerable<Control> allChildren)
 		{
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0099: Unknown result type (might be due to invalid IL or missing references)
 			float outerPadX = _outerControlPadding.X;
 			float nextBottom;
 			float currentBottom = (nextBottom = _outerControlPadding.Y);
@@ -147,7 +138,6 @@ namespace Kenedia.Modules.Core.Controls
 
 		private void ReflowChildLayoutTopToBottom(IEnumerable<Control> allChildren)
 		{
-			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
 			float x = _outerControlPadding.X;
 			float outerPadY = _outerControlPadding.Y;
 			float nextRight = x;
@@ -168,7 +158,6 @@ namespace Kenedia.Modules.Core.Controls
 
 		private void ReflowChildLayoutBottomToTop(IEnumerable<Control> allChildren)
 		{
-			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
 			float x = _outerControlPadding.X;
 			float outerPadY = _outerControlPadding.Y;
 			float nextRight = x;
@@ -189,7 +178,6 @@ namespace Kenedia.Modules.Core.Controls
 
 		private void ReflowChildLayoutSingleLeftToRight(IEnumerable<Control> allChildren)
 		{
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
 			float x = _outerControlPadding.X;
 			float outerPadY = _outerControlPadding.Y;
 			float lastLeft = x;
@@ -202,8 +190,6 @@ namespace Kenedia.Modules.Core.Controls
 
 		private void ReflowChildLayoutSingleRightToLeft(IEnumerable<Control> allChildren)
 		{
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
 			float outerPadX = _outerControlPadding.X;
 			float outerPadY = _outerControlPadding.Y;
 			float lastLeft = (float)base.ContentRegion.Width - outerPadX;
@@ -216,7 +202,6 @@ namespace Kenedia.Modules.Core.Controls
 
 		private void ReflowChildLayoutSingleTopToBottom(IEnumerable<Control> allChildren)
 		{
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
 			float outerPadX = _outerControlPadding.X;
 			float lastBottom = _outerControlPadding.Y;
 			foreach (Control allChild in allChildren)
@@ -228,7 +213,6 @@ namespace Kenedia.Modules.Core.Controls
 
 		private void ReflowChildLayoutSingleBottomToTop(IEnumerable<Control> allChildren)
 		{
-			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
 			float outerPadX = _outerControlPadding.X;
 			float outerPadY = _outerControlPadding.Y;
 			float lastTop = (float)base.Height - outerPadY;

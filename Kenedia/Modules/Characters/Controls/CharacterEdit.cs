@@ -87,43 +87,6 @@ namespace Kenedia.Modules.Characters.Controls
 
 		public CharacterEdit(TextureManager tM, Action togglePotrait, Func<string> accountPath, TagList allTags, Settings settings, Action refreshCharacters)
 		{
-			//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0107: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0118: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0149: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ca: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_021d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_024f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_028a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0299: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0307: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0316: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0435: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0447: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04ed: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04fc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_056c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05a7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_064d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_065f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0701: Unknown result type (might be due to invalid IL or missing references)
-			//IL_073c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07c9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07d8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_082f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0844: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0861: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0871: Unknown result type (might be due to invalid IL or missing references)
-			//IL_087b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_089a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08d4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_08f0: Unknown result type (might be due to invalid IL or missing references)
 			AccountImagePath = accountPath;
 			_allTags = allTags;
 			_settings = settings;
@@ -133,7 +96,7 @@ namespace Kenedia.Modules.Characters.Controls
 			base.ContentPadding = new RectangleDimensions(5, 5, 5, 5);
 			base.BackgroundImage = AsyncTexture2D.FromAssetId(156003);
 			base.TextureRectangle = new Rectangle(26, 26, Math.Min(base.BackgroundImage.Width - 100, base.Width), Math.Min(base.BackgroundImage.Height - 100, base.Height));
-			base.BorderColor = Color.get_Black();
+			base.BorderColor = Color.Black;
 			base.BorderWidth = new RectangleDimensions(2);
 			new Dummy
 			{
@@ -160,7 +123,7 @@ namespace Kenedia.Modules.Characters.Controls
 				Parent = this,
 				Texture = AsyncTexture2D.FromAssetId(358353),
 				HoveredTexture = AsyncTexture2D.FromAssetId(358353),
-				BackgroundColor = Color.get_Black() * 0.4f,
+				BackgroundColor = Color.Black * 0.4f,
 				Size = new Point(70, 70),
 				ClickAction = delegate
 				{
@@ -347,8 +310,8 @@ namespace Kenedia.Modules.Characters.Controls
 			_imagePanelParent = new Kenedia.Modules.Core.Controls.Panel
 			{
 				Parent = this,
-				BorderColor = Color.get_Black(),
-				BackgroundColor = Color.get_Black() * 0.4f,
+				BorderColor = Color.Black,
+				BackgroundColor = Color.Black * 0.4f,
 				Location = new Point(0, _buttonContainer.Bottom + 10),
 				BorderWidth = new RectangleDimensions(2),
 				Visible = false
@@ -407,7 +370,6 @@ namespace Kenedia.Modules.Characters.Controls
 
 		protected override void OnResized(ResizedEventArgs e)
 		{
-			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
 			base.OnResized(e);
 			if (base.BackgroundImage != null)
 			{
@@ -431,18 +393,6 @@ namespace Kenedia.Modules.Characters.Controls
 			int imageSize = 80;
 			GameService.Graphics.QueueMainThreadRender(delegate(GraphicsDevice graphicsDevice)
 			{
-				//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
-				//IL_01a5: Unknown result type (might be due to invalid IL or missing references)
-				//IL_022d: Unknown result type (might be due to invalid IL or missing references)
-				//IL_023e: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0248: Unknown result type (might be due to invalid IL or missing references)
-				//IL_026a: Unknown result type (might be due to invalid IL or missing references)
-				//IL_027b: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0285: Unknown result type (might be due to invalid IL or missing references)
-				//IL_02c1: Unknown result type (might be due to invalid IL or missing references)
-				//IL_02dc: Unknown result type (might be due to invalid IL or missing references)
-				//IL_02fe: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0319: Unknown result type (might be due to invalid IL or missing references)
 				AsyncTexture2D asyncTexture2D = null;
 				if (Character == null)
 				{
@@ -495,10 +445,6 @@ namespace Kenedia.Modules.Characters.Controls
 
 		private void AdjustImagePanelHeight(List<string> images)
 		{
-			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
 			int imageSize = 80;
 			int maxHeight = GameService.Graphics.SpriteScreen.Height / 3;
 			int cols = Math.Min(images.Count + 1, Math.Min(640, GameService.Graphics.SpriteScreen.Height / 3) / 80);
@@ -523,11 +469,6 @@ namespace Kenedia.Modules.Characters.Controls
 
 		public void ShowImages(bool toggle = true, bool loadImages = true)
 		{
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
 			if (loadImages && toggle)
 			{
 				LoadImages(null, null);

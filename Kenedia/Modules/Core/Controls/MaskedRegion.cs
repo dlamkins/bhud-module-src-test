@@ -15,7 +15,7 @@ namespace Kenedia.Modules.Core.Controls
 		{
 			ZIndex = int.MaxValue;
 			_batchParameters = base.SpriteBatchParameters;
-			base.SpriteBatchParameters = new SpriteBatchParameters((SpriteSortMode)0, BlendState.Opaque);
+			base.SpriteBatchParameters = new SpriteBatchParameters(SpriteSortMode.Deferred, BlendState.Opaque);
 		}
 
 		protected override CaptureType CapturesInput()
@@ -29,13 +29,7 @@ namespace Kenedia.Modules.Core.Controls
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			Rectangle b = default(Rectangle);
-			((Rectangle)(ref b))._002Ector(base.Location, base.Size);
-			spriteBatch.Draw(ContentService.Textures.TransparentPixel, b, Color.get_Transparent());
+			spriteBatch.Draw(destinationRectangle: new Rectangle(base.Location, base.Size), texture: ContentService.Textures.TransparentPixel, color: Color.Transparent);
 			spriteBatch.End();
 			spriteBatch.Begin(_batchParameters);
 		}

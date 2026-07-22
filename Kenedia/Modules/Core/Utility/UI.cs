@@ -27,10 +27,6 @@ namespace Kenedia.Modules.Core.Utility
 
 		public static void ScrollToChild(this Container panel, Control child)
 		{
-			//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0153: Unknown result type (might be due to invalid IL or missing references)
 			Container panel2 = panel;
 			if (!panel2.Children.Contains(child))
 			{
@@ -71,14 +67,27 @@ namespace Kenedia.Modules.Core.Utility
 			scrollbar.ScrollDistance = Math.Max(0f, Math.Min((float)targetOffset / (float)maxOffset, 1f));
 		}
 
+		public static bool HasVisibleVerticalScrollbar(this Container container)
+		{
+			if (container == null)
+			{
+				return false;
+			}
+			Blish_HUD.Controls.Panel panel = container as Blish_HUD.Controls.Panel;
+			if (panel != null && !panel.CanScroll)
+			{
+				return false;
+			}
+			Control[] visibleChildren = container.Children.Where((Control c) => c.Visible).ToArray();
+			if (visibleChildren.Length == 0)
+			{
+				return false;
+			}
+			return Math.Max(visibleChildren.Max((Control c) => c.Bottom), container.ContentRegion.Height) > container.ContentRegion.Height + 3;
+		}
+
 		public static int GetTextHeight(BitmapFont font, string text, int maxWidth)
 		{
-			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
 			if (string.IsNullOrEmpty(text))
 			{
 				return 0;
@@ -96,16 +105,11 @@ namespace Kenedia.Modules.Core.Utility
 				width = (int)b.Width;
 				height += (int)b.Height;
 			}
-			return height + font.get_LineHeight();
+			return height + font.LineHeight;
 		}
 
 		public static string GetDisplayText(BitmapFont font, string text, int maxWidth, string stringOverflow = "...")
 		{
-			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
 			int width = 0;
 			string lastMatchingString = string.Empty;
 			string overflowedString = string.Empty;
@@ -135,7 +139,6 @@ namespace Kenedia.Modules.Core.Utility
 
 		public static (Kenedia.Modules.Core.Controls.Label, CtrlT) CreateLabeledControl<CtrlT>(Container parent, string text, int labelWidth = 175, int controlWidth = 100, int height = 25) where CtrlT : Control, new()
 		{
-			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
 			Kenedia.Modules.Core.Controls.Panel p = new Kenedia.Modules.Core.Controls.Panel
 			{
 				Parent = parent,
@@ -171,7 +174,6 @@ namespace Kenedia.Modules.Core.Utility
 
 		public static void WrapWithLabel(Func<string> localizedLabelContent, Func<string> localizedTooltip, Container parent, int width, Control ctrl)
 		{
-			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
 			Kenedia.Modules.Core.Controls.FlowPanel flowPanel = new Kenedia.Modules.Core.Controls.FlowPanel
 			{
 				Parent = parent,

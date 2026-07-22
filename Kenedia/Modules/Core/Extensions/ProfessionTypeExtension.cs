@@ -7,30 +7,22 @@ namespace Kenedia.Modules.Core.Extensions
 	{
 		public static ItemWeightType GetArmorType(this ProfessionType prof)
 		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002c: Expected I4, but got Unknown
-			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-			switch (prof - 1)
+			switch (prof)
 			{
-			case 0:
-			case 1:
-			case 8:
-				return (ItemWeightType)1;
-			case 2:
-			case 3:
-			case 4:
-				return (ItemWeightType)2;
-			case 5:
-			case 6:
-			case 7:
-				return (ItemWeightType)3;
+			case ProfessionType.Guardian:
+			case ProfessionType.Warrior:
+			case ProfessionType.Revenant:
+				return ItemWeightType.Heavy;
+			case ProfessionType.Engineer:
+			case ProfessionType.Ranger:
+			case ProfessionType.Thief:
+				return ItemWeightType.Medium;
+			case ProfessionType.Elementalist:
+			case ProfessionType.Mesmer:
+			case ProfessionType.Necromancer:
+				return ItemWeightType.Light;
 			default:
-				return (ItemWeightType)0;
+				return ItemWeightType.Unknown;
 			}
 		}
 	}

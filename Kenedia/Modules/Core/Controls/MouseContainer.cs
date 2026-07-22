@@ -20,8 +20,6 @@ namespace Kenedia.Modules.Core.Controls
 
 		public override void RecalculateLayout()
 		{
-			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
 			if (Background != null)
 			{
@@ -32,16 +30,12 @@ namespace Kenedia.Modules.Core.Controls
 
 		public override void UpdateContainer(GameTime gameTime)
 		{
-			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
 			base.UpdateContainer(gameTime);
 			base.Location = Control.Input.Mouse.Position.Add(MouseOffset);
 		}
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
 			Background?.Draw(this, spriteBatch);
 			base.PaintBeforeChildren(spriteBatch, bounds);
 		}

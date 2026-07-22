@@ -6,18 +6,13 @@ namespace Kenedia.Modules.Core.Extensions
 	{
 		public static Keys GetKey(this ModifierKeys modifier)
 		{
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-			return (Keys)(modifier switch
+			return modifier switch
 			{
-				ModifierKeys.Alt => 164, 
-				ModifierKeys.Ctrl => 162, 
-				ModifierKeys.Shift => 160, 
-				_ => 0, 
-			});
+				ModifierKeys.Alt => Keys.LeftAlt, 
+				ModifierKeys.Ctrl => Keys.LeftControl, 
+				ModifierKeys.Shift => Keys.LeftShift, 
+				_ => Keys.None, 
+			};
 		}
 	}
 }

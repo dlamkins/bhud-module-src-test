@@ -117,16 +117,10 @@ namespace Kenedia.Modules.Core.Controls
 
 		public override void RecalculateLayout()
 		{
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
 			int size = Math.Min(base.Height, base.Width);
-			_addRectangle = (Rectangle)(ShowButtons ? new Rectangle(base.Width - size, (base.Height - size) / 2, size, size) : Rectangle.get_Empty());
-			_minusRectangle = (Rectangle)(ShowButtons ? new Rectangle(base.Width - size * 2, (base.Height - size) / 2, size, size) : Rectangle.get_Empty());
+			_addRectangle = (ShowButtons ? new Rectangle(base.Width - size, (base.Height - size) / 2, size, size) : Rectangle.Empty);
+			_minusRectangle = (ShowButtons ? new Rectangle(base.Width - size * 2, (base.Height - size) / 2, size, size) : Rectangle.Empty);
 			int spacing = (ShowButtons ? 2 : 0);
 			_inputField.Width = Math.Max(0, base.Width - (_addRectangle.Width + _minusRectangle.Width) - spacing);
 			_inputField.Height = base.Height;
@@ -134,43 +128,28 @@ namespace Kenedia.Modules.Core.Controls
 
 		public override void PaintAfterChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
 			base.PaintAfterChildren(spriteBatch, bounds);
 			if (ShowButtons)
 			{
 				if (_addRectangle.Width > 0 && _addRectangle.Height > 0)
 				{
-					spriteBatch.DrawOnCtrl((Control)this, (Texture2D)(((Rectangle)(ref _addRectangle)).Contains(base.RelativeMousePosition) ? _addButtonHovered : _addButton), _addRectangle, (Rectangle?)new Rectangle(6, 6, 20, 20), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
+					spriteBatch.DrawOnCtrl(this, _addRectangle.Contains(base.RelativeMousePosition) ? _addButtonHovered : _addButton, _addRectangle, new Rectangle(6, 6, 20, 20), Color.White, 0f, default(Vector2));
 				}
 				if (_minusRectangle.Width > 0 && _minusRectangle.Height > 0)
 				{
-					spriteBatch.DrawOnCtrl((Control)this, (Texture2D)(((Rectangle)(ref _minusRectangle)).Contains(base.RelativeMousePosition) ? _minusButtonHovered : _minusButton), _minusRectangle, (Rectangle?)new Rectangle(6, 6, 20, 20), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
+					spriteBatch.DrawOnCtrl(this, _minusRectangle.Contains(base.RelativeMousePosition) ? _minusButtonHovered : _minusButton, _minusRectangle, new Rectangle(6, 6, 20, 20), Color.White, 0f, default(Vector2));
 				}
 			}
 		}
 
 		protected override void OnClick(MouseEventArgs e)
 		{
-			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
 			base.OnClick(e);
-			if (((Rectangle)(ref _addRectangle)).Contains(base.RelativeMousePosition))
+			if (_addRectangle.Contains(base.RelativeMousePosition))
 			{
 				Value += Step;
 			}
-			if (((Rectangle)(ref _minusRectangle)).Contains(base.RelativeMousePosition))
+			if (_minusRectangle.Contains(base.RelativeMousePosition))
 			{
 				Value -= Step;
 			}

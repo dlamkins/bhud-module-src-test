@@ -12,22 +12,10 @@ namespace Kenedia.Modules.Characters.Controls
 
 		private Rectangle CalculateTagPanelSize(int? width = null, bool fitLargest = false)
 		{
-			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0137: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01df: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0282: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0290: Unknown result type (might be due to invalid IL or missing references)
-			//IL_029b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ae: Unknown result type (might be due to invalid IL or missing references)
 			List<Tag> tags = Tags;
 			if (tags.Count == 0)
 			{
-				return Rectangle.get_Empty();
+				return Rectangle.Empty;
 			}
 			tags = (from e in tags
 				orderby e.Width descending, e.Text
@@ -84,10 +72,6 @@ namespace Kenedia.Modules.Characters.Controls
 
 		public void FitWidestTag(int? width = null)
 		{
-			//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
 			Rectangle bounds = CalculateTagPanelSize(width);
 			SortChildren((Tag a, Tag b) => a.TagPanelIndex.CompareTo(b.TagPanelIndex));
 			base.Height = bounds.Height;
@@ -101,10 +85,6 @@ namespace Kenedia.Modules.Characters.Controls
 
 		protected override void OnChildAdded(ChildChangedEventArgs e)
 		{
-			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
 			base.OnChildAdded(e);
 			Rectangle bounds = CalculateTagPanelSize();
 			base.Height = bounds.Height;
@@ -113,10 +93,6 @@ namespace Kenedia.Modules.Characters.Controls
 
 		protected override void OnChildRemoved(ChildChangedEventArgs e)
 		{
-			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
 			base.OnChildRemoved(e);
 			Rectangle bounds = CalculateTagPanelSize();
 			base.Height = bounds.Height;
@@ -125,10 +101,6 @@ namespace Kenedia.Modules.Characters.Controls
 
 		protected override void OnFontChanged(object sender = null, EventArgs e = null)
 		{
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
 			base.OnFontChanged(sender, e);
 			Rectangle bounds = CalculateTagPanelSize();
 			base.Height = bounds.Height;

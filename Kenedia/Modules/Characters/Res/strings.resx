@@ -35,9 +35,11 @@
   <data name="PinSideMenus_Tooltip"><value>Prevent the side menus from fading out</value></data>
   <data name="ShowCornerIcon_Tooltip"><value>Show/Hide Corner Icon</value></data>
   <data name="DeletedCharacterNotification_DismissTooltip"><value>Ignore missing data for '{0}' during this session.</value></data>
+  <data name="ToggleCharacterRoutineKey_Tooltip"><value>Key to open or close the character routine window</value></data>
   <data name="DragOverCharacter_Instructions"><value>Drag this control so the yellow frames contain your character portraits</value></data>
   <data name="Armorsmith"><value>Armorsmith</value></data>
   <data name="WindowedMode_Tooltip"><value>Is the game set to Window Mode?</value></data>
+  <data name="CompletedRoutineEntriesHiddenTooltip"><value>Completed steps are hidden based on your settings.</value></data>
   <data name="IncludeBetaCharacters"><value>Include Beta Characters</value></data>
   <data name="LeftOffset"><value>Left Offset</value></data>
   <data name="ModuleBehavior"><value>Module Behavior</value></data>
@@ -45,13 +47,16 @@
   <data name="OpenSidemenuOnSearch"><value>Open side menu on search</value></data>
   <data name="FocusSearchOnShow_Tooltip"><value>When toggling the character window focus the searchbar to directly start typing</value></data>
   <data name="SwapBehavior"><value>Swap Behavior</value></data>
+  <data name="CharacterRoutineCopyName"><value>{0} Copy</value></data>
   <data name="Female"><value>Female</value></data>
   <data name="Filter"><value>Filter</value></data>
+  <data name="Finish"><value>Finish</value></data>
   <data name="PinSideMenus"><value>Pin side menus</value></data>
   <data name="Folder"><value>Folder</value></data>
   <data name="CharacterSwap_Logout"><value>Logging out ...</value></data>
   <data name="CharacterDisplaySize"><value>Character Display Size</value></data>
   <data name="RadialMenuSettings_Tooltip"><value>Radial Menu Settings</value></data>
+  <data name="NewCharacterRoutine"><value>New Character Routine</value></data>
   <data name="ShowCornerIcon"><value>Show Corner Icon</value></data>
   <data name="Gender"><value>Gender</value></data>
   <data name="RightOffset"><value>Right Offset</value></data>
@@ -73,7 +78,9 @@
   <data name="CaptureAll"><value>Capture All</value></data>
   <data name="CharacterSwap_MoveFirst"><value>Move to first character ...</value></data>
   <data name="FixCharacters"><value>Fix Characters</value></data>
+  <data name="NextCharacterRoutineEntryKey"><value>Next Step</value></data>
   <data name="ShortcutToggle"><value>Toggle Menu</value></data>
+  <data name="CopyCharacterName"><value>Copy Character Name</value></data>
   <data name="CharacterSwap_MoveTo"><value>Try to move to {0}</value></data>
   <data name="LoadCachedAccounts_Tooltip"><value>Try to get the account name from cached files.</value></data>
   <data name="ItemSettings"><value>{0} Settings</value></data>
@@ -86,6 +93,7 @@
   <data name="TogglePortraitCapture_Tooltip"><value>Toggle the Potrait Capture control</value></data>
   <data name="Logout"><value>Logout</value></data>
   <data name="DeletedCharacterNotification"><value>{0} created {1} is missing in the latest api data. Delete it?</value></data>
+  <data name="DeleteList"><value>Delete Routine</value></data>
   <data name="DeleteItem"><value>Delete {0}</value></data>
   <data name="OnlyMaxCrafting_Tooltip"><value>Show only crafts that are at a 500 rank (Jeweler &amp; Scribe at 400).</value></data>
   <data name="CoreProfession"><value>Core {0}</value></data>
@@ -96,6 +104,7 @@
   <data name="FilterToggles"><value>Filter Toggles</value></data>
   <data name="EnterToLogin"><value>Press Enter to swap</value></data>
   <data name="Activated"><value>activated</value></data>
+  <data name="FreeInventorySlotsAmount"><value>{0} free inventory slots</value></data>
   <data name="Hidden"><value>Hidden</value></data>
   <data name="CharacterName"><value>Character Name</value></data>
   <data name="OpenSidemenuOnSearch_Tooltip"><value>Open the side menu when clicking the search field</value></data>
@@ -111,10 +120,13 @@
   <data name="SortItem"><value>Sort {0}</value></data>
   <data name="AnyProfession"><value>Any {0}</value></data>
   <data name="EnterOnSwap_Tooltip"><value>Enter the game automatically after selecting the character in the character selection</value></data>
+  <data name="ResetDaily"><value>Daily (00:00 UTC)</value></data>
+  <data name="CharacterRoutineDefaultName"><value>Character Routine {0}</value></data>
   <data name="UISizeDisclaimer"><value>You will have to set the games Interface Size to 'Larger' to get the correct cut outs!</value></data>
   <data name="Tailor"><value>Tailor</value></data>
   <data name="Toggle"><value>Toggle {0}</value></data>
   <data name="ExcludeMatches"><value>Exclude matches</value></data>
+  <data name="CharacterRoutinePlaceholder"><value>Select or create a character routine to get started.</value></data>
   <data name="CancelOnlyOnESC_Tooltip"><value>Cancel character swapping and sorting only if the ESC key is pressed</value></data>
   <data name="Switch"><value>Switch to {0}</value></data>
   <data name="OCRAndImageRecognition"><value>OCR and Image Recoginition</value></data>
@@ -135,14 +147,17 @@
   <data name="EmptyColumnsThreshold_Tooltip"><value>Number of columns</value></data>
   <data name="Unknown"><value>Unknown</value></data>
   <data name="Radial_UseProfessionIcons_Tooltip"><value>Use Profession Icons instead of the character icon you have set in your list.</value></data>
+  <data name="FullInventory"><value>Full Inventory</value></data>
   <data name="CheckDistance_Tooltip"><value>Amount of positions to check left and right from the expected position of a character if that character is not at the expected position</value></data>
   <data name="Deactivated"><value>deactivated</value></data>
   <data name="CharacterSwap_Left"><value>Check left ...</value></data>
   <data name="Radial_IdleBorderColor"><value>Border Color</value></data>
+  <data name="SideMenu"><value>Side Menu</value></data>
   <data name="DebugMode_Name"><value>Enable Debug Mode</value></data>
   <data name="DoubleClickToSwap"><value>Doubleclick to swap to {0}!</value></data>
   <data name="CancelOnlyOnESC"><value>Cancel only on ESC</value></data>
   <data name="AutomaticCharacterDelete"><value>Automatically delete Characters</value></data>
+  <data name="CompleteCharacterRoutine"><value>Complete the character routine.</value></data>
   <data name="FixCharacter_MoveNext"><value>Move to next character ...</value></data>
   <data name="RefreshAPI"><value>Refresh API</value></data>
   <data name="Show_Birthday_Tooltip"><value>Show Characters with Birthday Gifts</value></data>
@@ -174,6 +189,7 @@
 -t CustomTag
 -c Chef; -p Warrior will show all warriors and all chefs</value></data>
   <data name="FocusFilter_Tooltip"><value>When toggling the main menu to show, automatically focus the search field</value></data>
+  <data name="Unassigned"><value>- Unassigned -</value></data>
   <data name="AutoLogin_Tooltip"><value>If enabled on the first load of Blish and beeing in character selection the module enters the game. After entering the game it will wait until the MumbleLink and API Token is fully loaded.
 Once fully loaded it will switch to the character which is set to be the "Login Character".</value></data>
   <data name="Error_FailedAPIFetch"><value>Failed to fetch characters from the API.</value></data>
@@ -191,8 +207,11 @@ Once fully loaded it will switch to the character which is set to be the "Login 
   <data name="Display"><value>Display</value></data>
   <data name="Dismiss"><value>Dismiss</value></data>
   <data name="Radial_UseProfessionIconsColor_Tooltip"><value>Color the profession icons in the profession color</value></data>
+  <data name="RoutineEntrySwitchFailed"><value>Could not switch to '{0}'. Click Next to retry.</value></data>
   <data name="RunStateChange"><value>{0} {1} !</value></data>
   <data name="EnableRadialMenu_Tooltip"><value>Enable radial menu to swap quickly between a collection of characters</value></data>
+  <data name="RemoveRoutineEntry"><value>Remove Step</value></data>
+  <data name="SearchCharacterName"><value>Assign Character ...</value></data>
   <data name="SwapModifier_Tooltip"><value>Only if the Modifier is pressed trigger character swapping. This will prevent accidientally swapping!</value></data>
   <data name="FontSize"><value>Font Size: {0}</value></data>
   <data name="EmptyColumns_Tooltip"><value>Threshold of how many pixel columns are allowed to contain no content</value></data>
@@ -211,6 +230,7 @@ Once fully loaded it will switch to the character which is set to be the "Login 
   <data name="Order"><value>Order</value></data>
   <data name="Large"><value>Large</value></data>
   <data name="Level"><value>Level</value></data>
+  <data name="Retry"><value>Retry</value></data>
   <data name="Small"><value>Small</value></data>
   <data name="Years"><value>Years</value></data>
   <data name="Radial_IdleBackgroundColor"><value>Section Color</value></data>
@@ -218,15 +238,18 @@ Once fully loaded it will switch to the character which is set to be the "Login 
   <data name="IconSize"><value>Icon Size: {0}x{0} px</value></data>
   <data name="ToggleAllItem"><value>Toggle All {0}</value></data>
   <data name="Error_InvalidPermissions"><value>This API key does not have the required permissions.</value></data>
+  <data name="AddRoutineEntry"><value>Add Step</value></data>
   <data name="CharacterSwap_Right"><value>Check right ...</value></data>
   <data name="AddItem"><value>Add {0}</value></data>
   <data name="NoCraftingProfession"><value>No Crafting Profession</value></data>
   <data name="FilterDiacriticsInsensitive"><value>Ignore diacritics</value></data>
   <data name="UseBetaGameState_Tooltip"><value>Use Image Recoginition to detect if you are ingame, watching a cutscene or sit in a loading screen. This feature works well for all common screen ratios with the exception of games in portrait mode.</value></data>
+  <data name="CompletedRoutineEntriesBehavior"><value>Completed Steps Behavior</value></data>
   <data name="CheckItem"><value>Check {0}</value></data>
   <data name="PotraitGap"><value>Potrait Gap</value></data>
   <data name="EditOCR_Tooltip"><value>Toggle the OCR Region edit control</value></data>
   <data name="Radial_HoveredBackgroundColor"><value>Active Section Color</value></data>
+  <data name="FreeInventorySlots"><value>Free Inventory Slots</value></data>
   <data name="CaptureImages"><value>Capture Images</value></data>
   <data name="LastButton_Tooltip"><value>Ignore OCR and log the very last character of your character screen in</value></data>
   <data name="FilterDelay_Tooltip"><value>Average time in milliseconds waited between filtering your characters' panel.
@@ -240,19 +263,25 @@ To get the current value you will have to swap module tabs once to update the se
   <data name="Radial_UseProfessionIconsColor"><value>Use Colored Profession Icons</value></data>
   <data name="SwapModifier"><value>Require Modifier to swap</value></data>
   <data name="RefreshImages"><value>Refresh Images</value></data>
+  <data name="RoutineEntries"><value>Steps</value></data>
   <data name="Weaponsmith"><value>Weaponsmith</value></data>
   <data name="ShowHide_Tooltip"><value>Show/Hides {0} in the character list.</value></data>
   <data name="Artificer"><value>Artificer</value></data>
   <data name="AdjustSettings"><value>Adjust {0} settings and tags!</value></data>
   <data name="AutoLogin"><value>Auto Login to selected Character</value></data>
+  <data name="NextCharacterRoutineEntryKey_Tooltip"><value>Key to swap to the next incomplete character in the active character routine</value></data>
+  <data name="SwitchToFirstIncomplete"><value>Switch to the first incomplete step.</value></data>
   <data name="FixCharacter_FetchName"><value>Fetch the character name ...{0}{1}</value></data>
+  <data name="ConfirmCharacterRoutineEntryDelete"><value>Remove step '{0}'? This cannot be undone.</value></data>
   <data name="TextAndIcon"><value>Text and Icons</value></data>
   <data name="Huntsman"><value>Huntsman</value></data>
   <data name="ShowChoyaSpinner"><value>Show Choya as loading spinner</value></data>
   <data name="SwapDelay_Tooltip"><value>Avg. loading time from ingame to character selection.</value></data>
+  <data name="SearchCharacterRoutines"><value>Search routines...</value></data>
   <data name="Tag_Placeholder"><value>PvE, WvW, Main, ERP ...</value></data>
   <data name="CheckOnlyMaxCrafting"><value>Check Only Max Crafting</value></data>
   <data name="AutoFix"><value>Auto Fix (requires OCR)</value></data>
+  <data name="RoutineEntryCharacterNotFound"><value>Character '{0}' was not found. Update this step to continue.</value></data>
   <data name="InventoryKey"><value>Inventory Dialog</value></data>
   <data name="Radial_UseProfessionIcons"><value>Use Profession Icons</value></data>
   <data name="CharacterSwap_SwitchTo"><value>Switching to {0}</value></data>
@@ -272,10 +301,17 @@ Uu : Üü Ûû Ùù</value></data>
   <data name="RadialMenuKey"><value>Radial Menu Key</value></data>
   <data name="FixCharacter_NoChange"><value>Character name did not change {0}/2 ...</value></data>
   <data name="EmptyColumns"><value>Empty Columns</value></data>
+  <data name="CopyCharacterRoutineTooltip"><value>Copy this character routine</value></data>
+  <data name="DeleteConfirmationTitle"><value>Confirm deletion</value></data>
   <data name="Radial_CenterScreen"><value>Center Menu</value></data>
+  <data name="CompletedRoutineEntriesBehavior_Nothing"><value>Nothing</value></data>
   <data name="NextBirthday"><value>Next Birthday</value></data>
   <data name="Descending"><value>Descending</value></data>
   <data name="Characters"><value>Characters</value></data>
+  <data name="NextClickMarksComplete"><value>Next click marks '{0}' complete.</value></data>
+  <data name="ToggleCharacterRoutineKey"><value>Toggle Character Routine</value></data>
+  <data name="RoutineEntryCharacterNotAssigned"><value>No character is assigned. Assign one to continue.</value></data>
+  <data name="UncheckAll"><value>Uncheck All</value></data>
   <data name="ShowNotifications_Tooltip"><value>Show Notifications on the top of the main window. 
 Notifications in case of:
 - missing api permissions
@@ -283,6 +319,7 @@ Notifications in case of:
 - missing ocr configuration</value></data>
   <data name="OnlyIcons"><value>Only Icons</value></data>
   <data name="EmptyColumn"><value>Empty Column</value></data>
+  <data name="CompletedRoutineEntriesBehavior_MoveToBottom"><value>Move completed to bottom</value></data>
   <data name="FixCharacter_Start"><value>Fixing characters ...</value></data>
   <data name="MailKey_Tooltip"><value>Open or close the Mail dialog</value></data>
   <data name="WindowedMode"><value>Windowed Mode</value></data>
@@ -290,6 +327,7 @@ Notifications in case of:
   <data name="Error_Competivive"><value>Character swapping is disabled in competition mode!</value></data>
   <data name="OnlyEnterOnExact_Tooltip"><value>Only login if the OCR result matches perfectly with the desired character name</value></data>
   <data name="UntilBirthday"><value>until Birthday</value></data>
+  <data name="CopyCharacterRoutine"><value>Copy</value></data>
   <data name="MailKey"><value>Mail Dialog</value></data>
   <data name="ShowOnRadial"><value>Show On Radial</value></data>
   <data name="ShowLastButton_Tooltip"><value>Show a button which will ignore OCR and log the very last character in your character screen in</value></data>
@@ -301,15 +339,20 @@ Notifications in case of:
   <data name="CardWidth_Tooltip"><value>Sets the character card width always to {0} px</value></data>
   <data name="FocusSearchOnShow"><value>Focus search on show</value></data>
   <data name="Radial_Scale"><value>Radial Size Scale</value></data>
+  <data name="CheckAll"><value>Check All</value></data>
   <data name="LevelAmount"><value>Level {0}</value></data>
   <data name="IsBeta_Tooltip"><value>Is this a beta character?</value></data>
   <data name="ShowLastButton"><value>Show Last Button</value></data>
   <data name="DeletedCharacterNotification_DeleteTooltip"><value>Delete '{0}' permanently.</value></data>
+  <data name="AllRoutineEntriesComplete"><value>All steps in this character routine are complete.</value></data>
   <data name="IgnoredPart"><value>Ignored Part</value></data>
   <data name="CapturePotraits"><value>Capture Potraits</value></data>
+  <data name="CharacterRoutines"><value>Character Routines</value></data>
   <data name="TopOffset"><value>Top Offset</value></data>
+  <data name="HideComplete"><value>Hide Complete</value></data>
   <data name="ShowStatusWindow_Name"><value>Show Status Popup</value></data>
   <data name="ToggleVisible"><value>Show/Hide hidden Characters</value></data>
+  <data name="ConfirmCharacterRoutineDelete"><value>Delete character routine '{0}' and all of its steps? This cannot be undone.</value></data>
   <data name="Radial_ShowAdvancedTooltip"><value>Show Advanced Tooltip</value></data>
   <data name="LoginCharacter"><value>Log in character</value></data>
   <data name="ToggleAll"><value>Toggle All</value></data>
@@ -320,21 +363,27 @@ Notifications in case of:
   <data name="UseBetaGameState"><value>Use Gamestate Detection</value></data>
   <data name="SetSpecializationIcon"><value>Use the specialization/profession icon as icon (default)</value></data>
   <data name="AutoFix_Tooltip"><value>When failing to swap to a character automatically go through the characters to fix their order.</value></data>
+  <data name="ResetWeekly"><value>Weekly (Mon 07:30 UTC)</value></data>
   <data name="PotraitFrame"><value>Potrait Frame</value></data>
   <data name="LogoutDescription"><value>Key to Press to open the logout menu. Must be the same as the game keybind for 'Logout'!</value></data>
   <data name="FadeOut_Tooltip"><value>Fade the side menus automatically after 2.5 seconds</value></data>
   <data name="BestResultLargerDisclaimer"><value>Best results with Interface set to 'Larger'!</value></data>
   <data name="NameFontSize"><value>Name Font Size: {0}</value></data>
+  <data name="UnhideComplete"><value>Unhide Complete</value></data>
   <data name="ShowItemOnTooltip"><value>Show {0} on tooltip</value></data>
   <data name="DetailedTooltip"><value>Detailed Tooltip</value></data>
   <data name="Character"><value>Character</value></data>
+  <data name="CompletedRoutineEntriesBehavior_Hide"><value>Hide completed steps</value></data>
   <data name="TogglePortraitCapture"><value>Toggle Potrait Capture</value></data>
   <data name="PotraitSize"><value>Potrait Size</value></data>
   <data name="Profession"><value>Profession</value></data>
+  <data name="AutoResetField"><value>Auto Reset:</value></data>
+  <data name="ResetNone"><value>None</value></data>
   <data name="UIScale_Error"><value>Please set the game to 'WINDOWED' {0} and the UI Scale to 'Larger'!</value></data>
   <data name="CraftingProfession"><value>Crafting Profession</value></data>
   <data name="LoadCachedAccounts"><value>Load from cache</value></data>
   <data name="CharacterSwap_LoginTo"><value>Login to {0}</value></data>
+  <data name="EditEntry"><value>Edit Entry</value></data>
   <data name="CustomTags"><value>Custom Tags</value></data>
   <data name="OCR_Instructions"><value>Move and Size the yellow frame to contain only the character name row in the character selection!</value></data>
   <data name="Birthday_Text"><value>It was {0}'s birthday! They are now {1} years old!</value></data>
@@ -353,10 +402,12 @@ Path to the 'tesseract.dll': {0}</value></data>
   <data name="Male"><value>Male</value></data>
   <data name="Chef"><value>Chef</value></data>
   <data name="Name"><value>Name</value></data>
+  <data name="Next"><value>Next</value></data>
   <data name="Tags"><value>Tags</value></data>
   <data name="Race"><value>Race</value></data>
   <data name="Save"><value>Save</value></data>
   <data name="EnterOnSwap"><value>Login after selecting the character</value></data>
   <data name="MatchAnyFilter"><value>Match any filter</value></data>
+  <data name="RoutineEntryDescriptionPlaceholder"><value>Step description (optional)</value></data>
   <data name="ShowInList"><value>Show in List</value></data>
   </root>

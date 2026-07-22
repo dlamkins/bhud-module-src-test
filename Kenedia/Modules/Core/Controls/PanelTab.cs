@@ -9,7 +9,7 @@ namespace Kenedia.Modules.Core.Controls
 	{
 		private new AsyncTexture2D _icon;
 
-		private Rectangle _textureRectangle = Rectangle.get_Empty();
+		private Rectangle _textureRectangle = Rectangle.Empty;
 
 		public TabButton TabButton { get; private set; }
 
@@ -31,14 +31,10 @@ namespace Kenedia.Modules.Core.Controls
 		{
 			get
 			{
-				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 				return _textureRectangle;
 			}
 			set
 			{
-				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-				//IL_000d: Unknown result type (might be due to invalid IL or missing references)
 				_textureRectangle = value;
 				TabButton.TextureRectangle = value;
 				this.TextureRectangleChanged?.Invoke(this, EventArgs.Empty);
@@ -91,8 +87,6 @@ namespace Kenedia.Modules.Core.Controls
 
 		public PanelTab()
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 			TabButton = new TabButton
 			{
 				BasicTooltipText = Name

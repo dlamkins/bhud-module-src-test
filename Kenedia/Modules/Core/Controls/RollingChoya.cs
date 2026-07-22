@@ -18,9 +18,9 @@ namespace Kenedia.Modules.Core.Controls
 
 		private float _yOffset;
 
-		private Rectangle _movementBounds = Rectangle.get_Empty();
+		private Rectangle _movementBounds = Rectangle.Empty;
 
-		private Point _startPoint = Point.get_Zero();
+		private Point _startPoint = Point.Zero;
 
 		private bool _choyaTargeted;
 
@@ -37,22 +37,17 @@ namespace Kenedia.Modules.Core.Controls
 		public bool CaptureInput { get; set; } = true;
 
 
-		public Color TextureColor { get; set; } = Color.get_White();
+		public Color TextureColor { get; set; } = Color.White;
 
 
 		public Point StartPoint
 		{
 			get
 			{
-				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 				return _startPoint;
 			}
 			set
 			{
-				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-				//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0010: Unknown result type (might be due to invalid IL or missing references)
 				if (_startPoint != value)
 				{
 					_startPoint = value;
@@ -85,13 +80,10 @@ namespace Kenedia.Modules.Core.Controls
 		{
 			get
 			{
-				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 				return _movementBounds;
 			}
 			set
 			{
-				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 				_movementBounds = value;
 			}
 		}
@@ -102,28 +94,12 @@ namespace Kenedia.Modules.Core.Controls
 
 		public RollingChoya()
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
 			_003CCanMove_003Ek__BackingField = true;
 			base._002Ector();
 		}
 
 		public RollingChoya(InputDetectionService inputDetectionService)
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
 			_003CCanMove_003Ek__BackingField = true;
 			base._002Ector();
 			InputDetectionService = inputDetectionService;
@@ -154,12 +130,6 @@ namespace Kenedia.Modules.Core.Controls
 
 		public void ResetPosition()
 		{
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
 			if (CanMove)
 			{
 				_xOffset = ChoyaSize / 2;
@@ -168,67 +138,23 @@ namespace Kenedia.Modules.Core.Controls
 			else
 			{
 				int size = Math.Min(base.Width, base.Height);
-				Rectangle movementBounds = ((base.Parent != null) ? base.Parent.AbsoluteBounds : Rectangle.get_Empty());
+				Rectangle movementBounds = ((base.Parent != null) ? base.Parent.AbsoluteBounds : Rectangle.Empty);
 				base.Location = new Point((movementBounds.Width - size) / 2, (movementBounds.Height - size) / 2);
 			}
 		}
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0109: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0122: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0168: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0187: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0210: Unknown result type (might be due to invalid IL or missing references)
-			//IL_021c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_024c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0266: Unknown result type (might be due to invalid IL or missing references)
-			//IL_026e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_027a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02f3: Unknown result type (might be due to invalid IL or missing references)
 			if (ChoyaTexture != null)
 			{
-				float rotation = (float)((GameService.Overlay.CurrentGameTime.get_TotalGameTime().TotalMilliseconds - _start) / (double)Steps);
-				int choyaTargeted;
-				if (ChoyaHunt)
-				{
-					Rectangle absoluteBounds = base.AbsoluteBounds;
-					choyaTargeted = (((Rectangle)(ref absoluteBounds)).Contains(Control.Input.Mouse.Position) ? 1 : 0);
-				}
-				else
-				{
-					choyaTargeted = 0;
-				}
-				_choyaTargeted = (byte)choyaTargeted != 0;
-				Rectangle movementBounds = ((base.Parent != null) ? base.Parent.ContentRegion : Rectangle.get_Empty());
+				float rotation = (float)((GameService.Overlay.CurrentGameTime.TotalGameTime.TotalMilliseconds - _start) / (double)Steps);
+				_choyaTargeted = ChoyaHunt && base.AbsoluteBounds.Contains(Control.Input.Mouse.Position);
+				Rectangle movementBounds = ((base.Parent != null) ? base.Parent.ContentRegion : Rectangle.Empty);
 				int size = Math.Min(base.Width, base.Height);
 				int choyaSize = Math.Min(ChoyaTexture.Bounds.Width, ChoyaTexture.Bounds.Height);
 				_xOffset += (CanMove ? TravelDistance.X : 0f);
 				_yOffset += (CanMove ? TravelDistance.Y : 0f);
-				Rectangle choyaRect = default(Rectangle);
-				((Rectangle)(ref choyaRect))._002Ector(new Point(size / 2), new Point(size));
+				Rectangle choyaRect = new Rectangle(new Point(size / 2), new Point(size));
 				if (CanMove)
 				{
 					base.Location = new Point(movementBounds.X + (int)(CanMove ? _xOffset : 0f), movementBounds.Y + (int)(CanMove ? _yOffset : 0f));
@@ -236,7 +162,7 @@ namespace Kenedia.Modules.Core.Controls
 				base.Size = new Point(size);
 				if (ChoyaTexture != null)
 				{
-					spriteBatch.DrawOnCtrl(this, ChoyaTexture, choyaRect, ChoyaTexture.Bounds, _choyaTargeted ? Color.get_Red() : TextureColor, rotation, new Vector2((float)(choyaSize / 2)), (SpriteEffects)0);
+					spriteBatch.DrawOnCtrl(this, ChoyaTexture, choyaRect, ChoyaTexture.Bounds, _choyaTargeted ? Color.Red : TextureColor, rotation, new Vector2(choyaSize / 2));
 				}
 				if ((float)movementBounds.Width < (float)base.Location.X + TravelDistance.X + (float)(choyaSize / 20))
 				{
@@ -264,7 +190,7 @@ namespace Kenedia.Modules.Core.Controls
 		protected override void OnShown(EventArgs e)
 		{
 			base.OnShown(e);
-			_start = GameService.Overlay.CurrentGameTime.get_TotalGameTime().TotalMilliseconds;
+			_start = GameService.Overlay.CurrentGameTime.TotalGameTime.TotalMilliseconds;
 		}
 
 		protected override void DisposeControl()

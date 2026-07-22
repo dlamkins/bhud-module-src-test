@@ -8,16 +8,8 @@ namespace Kenedia.Modules.Core.Extensions
 	{
 		public static bool IsCommonMap(this CurrentMap map)
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0009: Invalid comparison between Unknown and I4
-			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000d: Invalid comparison between Unknown and I4
-			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0012: Invalid comparison between Unknown and I4
 			MapType type = map.Type;
-			if (((int)type != 5 && (int)type != 7 && (int)type != 16) || 1 == 0)
+			if ((type != MapType.Public && type != MapType.Tutorial && type != MapType.PublicMini) || 1 == 0)
 			{
 				return map.IsHomesteadMap();
 			}
@@ -26,9 +18,7 @@ namespace Kenedia.Modules.Core.Extensions
 
 		public static bool IsHomesteadMap(this CurrentMap map)
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0007: Invalid comparison between Unknown and I4
-			if ((int)map.Type == 4)
+			if (map.Type == MapType.Instance)
 			{
 				return map.Id == 1558;
 			}

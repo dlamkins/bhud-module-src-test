@@ -37,25 +37,6 @@ namespace Kenedia.Modules.Characters.Controls
 
 		public RunIndicator(CharacterSorting characterSorting, CharacterSwapping characterSwapping, SettingEntry<bool> isEnabled, TextureManager textureManager, SettingEntry<bool> showChoya)
 		{
-			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0112: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0129: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0133: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0153: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_023d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_025c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ca: Unknown result type (might be due to invalid IL or missing references)
-			//IL_032b: Unknown result type (might be due to invalid IL or missing references)
 			_characterSorting = characterSorting;
 			_characterSwapping = characterSwapping;
 			_isEnabled = isEnabled;
@@ -70,7 +51,7 @@ namespace Kenedia.Modules.Characters.Controls
 			base.BackgroundImage = AsyncTexture2D.FromAssetId(1863949);
 			base.TextureRectangle = new Rectangle(30, 0, base.BackgroundImage.Width - 30, base.BackgroundImage.Height);
 			base.Visible = false;
-			base.BackgroundImageColor = Color.get_White() * 0.9f;
+			base.BackgroundImageColor = Color.White * 0.9f;
 			_titleText = new Kenedia.Modules.Core.Controls.Label
 			{
 				Parent = this,
@@ -79,7 +60,7 @@ namespace Kenedia.Modules.Characters.Controls
 				AutoSizeHeight = true,
 				HorizontalAlignment = HorizontalAlignment.Center,
 				Font = GameService.Content.GetFont(ContentService.FontFace.Menomonia, ContentService.FontSize.Size36, ContentService.FontStyle.Regular),
-				TextColor = Color.get_White(),
+				TextColor = Color.White,
 				Width = base.Width
 			};
 			int spinnerSize = Math.Max(_screenPartionSize.Y / 2, 96);
@@ -139,20 +120,6 @@ namespace Kenedia.Modules.Characters.Controls
 
 		private void ShowIndicator(object sender, EventArgs e)
 		{
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0113: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0144: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0163: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0187: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b2: Unknown result type (might be due to invalid IL or missing references)
 			if (_isEnabled.Value)
 			{
 				_screenPartionSize = new Point(Math.Min(640, GameService.Graphics.SpriteScreen.Size.X / 5), Math.Min(360, GameService.Graphics.SpriteScreen.Size.Y / 5));

@@ -25,8 +25,6 @@ namespace Kenedia.Modules.Core.Controls
 
 		private double _lastChecked;
 
-		private bool _deleting;
-
 		private string _message;
 
 		public CaptureType? CaptureInput { get; set; }
@@ -71,7 +69,6 @@ namespace Kenedia.Modules.Core.Controls
 
 		public NotificationBadge()
 		{
-			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
 			_003COpacity_003Ek__BackingField = 1f;
 			base._002Ector();
 			base.Size = new Point(32);
@@ -81,25 +78,31 @@ namespace Kenedia.Modules.Core.Controls
 
 		private void Notifications_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
-			if (!_deleting)
+			e.OldItems?.Cast<ConditionalNotification>().ForEach(delegate(ConditionalNotification n)
 			{
-				e.OldItems?.Cast<ConditionalNotification>().ForEach(delegate(ConditionalNotification n)
-				{
-					n.ConditionMatched -= new EventHandler(Notification_ConditionMatched);
-				});
-				e.NewItems?.Cast<ConditionalNotification>().ForEach(delegate(ConditionalNotification n)
-				{
-					n.ConditionMatched += new EventHandler(Notification_ConditionMatched);
-				});
-				_message = ((Notifications.Count > 0) ? string.Join(Environment.NewLine, Notifications.Select((ConditionalNotification e) => e.NotificationText).Distinct().Enumerate(Environment.NewLine, "[{0}]: ")) : string.Empty);
-				base.BasicTooltipText = _message;
-				base.Visible = Notifications.Count > 0;
-			}
+				n.ConditionMatched -= new EventHandler(Notification_ConditionMatched);
+			});
+			e.NewItems?.Cast<ConditionalNotification>().ForEach(delegate(ConditionalNotification n)
+			{
+				n.ConditionMatched += new EventHandler(Notification_ConditionMatched);
+			});
+			UpdateNotificationState();
+		}
+
+		private void UpdateNotificationState()
+		{
+			_message = ((Notifications.Count > 0) ? string.Join(Environment.NewLine, Notifications.Select((ConditionalNotification e) => e.NotificationText).Distinct().Enumerate(Environment.NewLine, "[{0}]: ")) : string.Empty);
+			base.BasicTooltipText = _message;
+			base.Visible = Notifications.Count > 0;
 		}
 
 		private void Notification_ConditionMatched(object sender, EventArgs e)
 		{
-			_removeNotifications.Add(sender as ConditionalNotification);
+			ConditionalNotification notification = sender as ConditionalNotification;
+			if (notification != null && !_removeNotifications.Contains(notification))
+			{
+				_removeNotifications.Add(notification);
+			}
 		}
 
 		private void OnAnchorChanged(object sender, Kenedia.Modules.Core.Models.ValueChangedEventArgs<Control> e)
@@ -128,17 +131,13 @@ namespace Kenedia.Modules.Core.Controls
 
 		public override void RecalculateLayout()
 		{
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
-			_badge.Bounds = new Rectangle(Point.get_Zero(), base.Size);
+			_badge.Bounds = new Rectangle(Point.Zero, base.Size);
 		}
 
 		public void UserLocale_SettingChanged(object sender = null, Blish_HUD.ValueChangedEventArgs<Locale> e = null)
 		{
-			_message = ((Notifications.Count > 0) ? string.Join(Environment.NewLine, Notifications.Select((ConditionalNotification e) => e.NotificationText).Distinct().Enumerate(Environment.NewLine, "[{0}]: ")) : string.Empty);
-			base.BasicTooltipText = _message;
+			UpdateNotificationState();
 		}
 
 		protected override void OnMouseMoved(MouseEventArgs e)
@@ -191,27 +190,27 @@ namespace Kenedia.Modules.Core.Controls
 		public override void DoUpdate(GameTime gameTime)
 		{
 			base.DoUpdate(gameTime);
-			if (gameTime.get_TotalGameTime().TotalMilliseconds - _lastChecked < 1000.0 || Notifications.Count <= 0)
+			if (gameTime.TotalGameTime.TotalMilliseconds - _lastChecked < 1000.0 || Notifications.Count <= 0)
 			{
 				return;
 			}
-			_lastChecked = gameTime.get_TotalGameTime().TotalMilliseconds;
-			foreach (ConditionalNotification notification in Notifications)
+			_lastChecked = gameTime.TotalGameTime.TotalMilliseconds;
+			foreach (ConditionalNotification notification2 in Notifications)
 			{
-				notification.CheckCondition();
+				notification2.CheckCondition();
 			}
-			for (int i = 0; i < _removeNotifications.Count; i++)
+			foreach (ConditionalNotification notification in _removeNotifications)
 			{
-				_deleting = i < _removeNotifications.Count - 1;
-				Notifications.Remove(_removeNotifications[i]);
+				Notifications.Remove(notification);
 			}
+			_removeNotifications.Clear();
+			UpdateNotificationState();
 		}
 
 		public void AddNotification(ConditionalNotification notification)
 		{
 			if (notification != null)
 			{
-				notification.ConditionMatched += new EventHandler(Notification_ConditionMatched);
 				Notifications.Add(notification);
 			}
 		}

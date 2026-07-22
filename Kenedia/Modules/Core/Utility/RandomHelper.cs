@@ -10,7 +10,6 @@ namespace Kenedia.Modules.Core.Utility
 
 		public static Color RandomColor(Range? r = null, Range? g = null, Range? b = null, Range? a = null)
 		{
-			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
 			Range red = ((!r.HasValue) ? new Range(0, 255) : r.Value);
 			Range green = ((!g.HasValue) ? new Range(0, 255) : g.Value);
 			Range blue = ((!b.HasValue) ? new Range(0, 255) : b.Value);

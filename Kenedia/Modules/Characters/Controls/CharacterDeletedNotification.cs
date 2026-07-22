@@ -42,51 +42,27 @@ namespace Kenedia.Modules.Characters.Controls
 
 		public CharacterDeletedNotification()
 		{
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
 			base.NotificationType = NotificationType.CharacterDeleted;
 		}
 
 		public override void RecalculateLayout()
 		{
-			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00da: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0101: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
-			int height = GameService.Content.DefaultFont14.get_LineHeight() + 4;
+			int height = GameService.Content.DefaultFont14.LineHeight + 4;
 			_dismiss.Bounds = new Rectangle(0, 0, height, height);
-			DetailedTexture delete = _delete;
-			Rectangle bounds = _dismiss.Bounds;
-			delete.Bounds = new Rectangle(((Rectangle)(ref bounds)).get_Right() + 2, 0, height, height);
+			_delete.Bounds = new Rectangle(_dismiss.Bounds.Right + 2, 0, height, height);
 			if (MarkedCharacter != null)
 			{
-				int width2 = base.Width;
-				bounds = _delete.Bounds;
-				int width = width2 - ((Rectangle)(ref bounds)).get_Right() - 6;
+				int width = base.Width - _delete.Bounds.Right - 6;
 				string wrappedText = TextUtil.WrapText(GameService.Content.DefaultFont14, string.Format(strings.DeletedCharacterNotification, MarkedCharacter.Name, MarkedCharacter.Created.ToString("d")), width);
 				RectangleF rect = GameService.Content.DefaultFont14.GetStringRectangle(wrappedText);
-				bounds = _delete.Bounds;
-				_textRectangle = new Rectangle(((Rectangle)(ref bounds)).get_Right() + 6, 0, width, (height > (int)rect.Height) ? height : ((int)rect.Height));
+				_textRectangle = new Rectangle(_delete.Bounds.Right + 6, 0, width, (height > (int)rect.Height) ? height : ((int)rect.Height));
 				base.Height = Math.Max(height, _textRectangle.Height);
 			}
 		}
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0123: Unknown result type (might be due to invalid IL or missing references)
 			string txt = string.Empty;
 			if (MarkedCharacter != null)
 			{
@@ -100,7 +76,7 @@ namespace Kenedia.Modules.Characters.Controls
 				{
 					txt = string.Format(strings.DeletedCharacterNotification_DismissTooltip, MarkedCharacter.Name);
 				}
-				spriteBatch.DrawStringOnCtrl(this, string.Format(strings.DeletedCharacterNotification, MarkedCharacter.Name, MarkedCharacter.Created.ToString("d")), GameService.Content.DefaultFont14, _textRectangle, Color.get_White(), wrap: true);
+				spriteBatch.DrawStringOnCtrl(this, string.Format(strings.DeletedCharacterNotification, MarkedCharacter.Name, MarkedCharacter.Created.ToString("d")), GameService.Content.DefaultFont14, _textRectangle, Color.White, wrap: true);
 			}
 			base.BasicTooltipText = txt;
 		}

@@ -2,13 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
 using Blish_HUD.Modules.Managers;
 using Gw2Sharp.Models;
 using Gw2Sharp.WebApi;
-using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
 using Kenedia.Modules.Characters.Models;
 using Kenedia.Modules.Characters.Views;
@@ -42,15 +40,15 @@ namespace Kenedia.Modules.Characters.Services
 
 		public StaticHosting StaticHosting { get; }
 
-		public DataDictionary<int, Map> Maps { get; private set; }
+		public DataDictionary<int, Kenedia.Modules.Core.DataModels.Map> Maps { get; private set; }
 
 		public DataDictionary<CraftingDisciplineType, CraftingProfession> CraftingProfessions { get; }
 
-		public DataDictionary<Races, Race> Races { get; }
+		public DataDictionary<Races, Kenedia.Modules.Characters.Models.Race> Races { get; }
 
-		public DataDictionary<int, Specialization> Specializations { get; }
+		public DataDictionary<int, Kenedia.Modules.Characters.Models.Specialization> Specializations { get; }
 
-		public DataDictionary<ProfessionType, Profession> Professions { get; }
+		public DataDictionary<ProfessionType, Kenedia.Modules.Characters.Models.Profession> Professions { get; }
 
 		public event EventHandler<bool> Loaded;
 
@@ -65,309 +63,309 @@ namespace Kenedia.Modules.Characters.Services
 			CraftingProfessions = new DataDictionary<CraftingDisciplineType, CraftingProfession>(Path.Combine(paths.ModuleDataPath, "crafting_disciplines.json"))
 			{
 				{
-					(CraftingDisciplineType)0,
+					CraftingDisciplineType.Unknown,
 					new CraftingProfession
 					{
-						Id = (CraftingDisciplineType)0,
+						Id = CraftingDisciplineType.Unknown,
 						IconAssetId = 154983,
 						MaxRating = 0,
 						Names = new LocalizedString
 						{
 							{
-								(Locale)2,
+								Locale.German,
 								"Unbekannt"
 							},
 							{
-								(Locale)0,
+								Locale.English,
 								"Unknown"
 							},
 							{
-								(Locale)1,
+								Locale.Spanish,
 								"Desconocido"
 							},
 							{
-								(Locale)3,
+								Locale.French,
 								"Inconnu"
 							}
 						}
 					}
 				},
 				{
-					(CraftingDisciplineType)1,
+					CraftingDisciplineType.Artificer,
 					new CraftingProfession
 					{
-						Id = (CraftingDisciplineType)1,
+						Id = CraftingDisciplineType.Artificer,
 						IconAssetId = 102463,
 						MaxRating = 500,
 						Names = new LocalizedString
 						{
 							{
-								(Locale)2,
+								Locale.German,
 								"Konstrukteur"
 							},
 							{
-								(Locale)0,
+								Locale.English,
 								"Artificer"
 							},
 							{
-								(Locale)1,
+								Locale.Spanish,
 								"Artificiero"
 							},
 							{
-								(Locale)3,
+								Locale.French,
 								"Artificier"
 							}
 						}
 					}
 				},
 				{
-					(CraftingDisciplineType)2,
+					CraftingDisciplineType.Armorsmith,
 					new CraftingProfession
 					{
-						Id = (CraftingDisciplineType)2,
+						Id = CraftingDisciplineType.Armorsmith,
 						IconAssetId = 102461,
 						MaxRating = 500,
 						Names = new LocalizedString
 						{
 							{
-								(Locale)2,
+								Locale.German,
 								"Rüstungsschmied"
 							},
 							{
-								(Locale)0,
+								Locale.English,
 								"Armorsmith"
 							},
 							{
-								(Locale)1,
+								Locale.Spanish,
 								"Forjador de armaduras"
 							},
 							{
-								(Locale)3,
+								Locale.French,
 								"Forgeron d'armures"
 							}
 						}
 					}
 				},
 				{
-					(CraftingDisciplineType)3,
+					CraftingDisciplineType.Chef,
 					new CraftingProfession
 					{
-						Id = (CraftingDisciplineType)3,
+						Id = CraftingDisciplineType.Chef,
 						IconAssetId = 102465,
 						MaxRating = 500,
 						Names = new LocalizedString
 						{
 							{
-								(Locale)2,
+								Locale.German,
 								"Chefkoch"
 							},
 							{
-								(Locale)0,
+								Locale.English,
 								"Chef"
 							},
 							{
-								(Locale)1,
+								Locale.Spanish,
 								"Cocinero"
 							},
 							{
-								(Locale)3,
+								Locale.French,
 								"Maître-queux"
 							}
 						}
 					}
 				},
 				{
-					(CraftingDisciplineType)4,
+					CraftingDisciplineType.Jeweler,
 					new CraftingProfession
 					{
-						Id = (CraftingDisciplineType)4,
+						Id = CraftingDisciplineType.Jeweler,
 						IconAssetId = 102458,
 						MaxRating = 400,
 						Names = new LocalizedString
 						{
 							{
-								(Locale)2,
+								Locale.German,
 								"Juwelier"
 							},
 							{
-								(Locale)0,
+								Locale.English,
 								"Jeweler"
 							},
 							{
-								(Locale)1,
+								Locale.Spanish,
 								"Joyero"
 							},
 							{
-								(Locale)3,
+								Locale.French,
 								"Bijoutier"
 							}
 						}
 					}
 				},
 				{
-					(CraftingDisciplineType)5,
+					CraftingDisciplineType.Huntsman,
 					new CraftingProfession
 					{
-						Id = (CraftingDisciplineType)5,
+						Id = CraftingDisciplineType.Huntsman,
 						IconAssetId = 102462,
 						MaxRating = 500,
 						Names = new LocalizedString
 						{
 							{
-								(Locale)2,
+								Locale.German,
 								"Waidmann"
 							},
 							{
-								(Locale)0,
+								Locale.English,
 								"Huntsman"
 							},
 							{
-								(Locale)1,
+								Locale.Spanish,
 								"Cazador"
 							},
 							{
-								(Locale)3,
+								Locale.French,
 								"Chasseur"
 							}
 						}
 					}
 				},
 				{
-					(CraftingDisciplineType)6,
+					CraftingDisciplineType.Leatherworker,
 					new CraftingProfession
 					{
-						Id = (CraftingDisciplineType)6,
+						Id = CraftingDisciplineType.Leatherworker,
 						IconAssetId = 102464,
 						MaxRating = 500,
 						Names = new LocalizedString
 						{
 							{
-								(Locale)2,
+								Locale.German,
 								"Lederer"
 							},
 							{
-								(Locale)0,
+								Locale.English,
 								"Leatherworker"
 							},
 							{
-								(Locale)1,
+								Locale.Spanish,
 								"Peletero"
 							},
 							{
-								(Locale)3,
+								Locale.French,
 								"Travailleur du cuir"
 							}
 						}
 					}
 				},
 				{
-					(CraftingDisciplineType)7,
+					CraftingDisciplineType.Scribe,
 					new CraftingProfession
 					{
-						Id = (CraftingDisciplineType)7,
+						Id = CraftingDisciplineType.Scribe,
 						IconAssetId = 1293677,
 						MaxRating = 400,
 						Names = new LocalizedString
 						{
 							{
-								(Locale)2,
+								Locale.German,
 								"Schreiber"
 							},
 							{
-								(Locale)0,
+								Locale.English,
 								"Scribe"
 							},
 							{
-								(Locale)1,
+								Locale.Spanish,
 								"Escriba"
 							},
 							{
-								(Locale)3,
+								Locale.French,
 								"Illustrateur"
 							}
 						}
 					}
 				},
 				{
-					(CraftingDisciplineType)8,
+					CraftingDisciplineType.Tailor,
 					new CraftingProfession
 					{
-						Id = (CraftingDisciplineType)8,
+						Id = CraftingDisciplineType.Tailor,
 						IconAssetId = 102459,
 						MaxRating = 500,
 						Names = new LocalizedString
 						{
 							{
-								(Locale)2,
+								Locale.German,
 								"Schneider"
 							},
 							{
-								(Locale)0,
+								Locale.English,
 								"Tailor"
 							},
 							{
-								(Locale)1,
+								Locale.Spanish,
 								"Sastre"
 							},
 							{
-								(Locale)3,
+								Locale.French,
 								"Tailleur"
 							}
 						}
 					}
 				},
 				{
-					(CraftingDisciplineType)9,
+					CraftingDisciplineType.Weaponsmith,
 					new CraftingProfession
 					{
-						Id = (CraftingDisciplineType)9,
+						Id = CraftingDisciplineType.Weaponsmith,
 						IconAssetId = 102460,
 						MaxRating = 500,
 						Names = new LocalizedString
 						{
 							{
-								(Locale)2,
+								Locale.German,
 								"Waffenschmied"
 							},
 							{
-								(Locale)0,
+								Locale.English,
 								"Weaponsmith"
 							},
 							{
-								(Locale)1,
+								Locale.Spanish,
 								"Armero"
 							},
 							{
-								(Locale)3,
+								Locale.French,
 								"Forgeron d'armes"
 							}
 						}
 					}
 				}
 			};
-			Races = new DataDictionary<Races, Race>(Path.Combine(paths.ModuleDataPath, "races.json"))
+			Races = new DataDictionary<Races, Kenedia.Modules.Characters.Models.Race>(Path.Combine(paths.ModuleDataPath, "races.json"))
 			{
 				{
 					Kenedia.Modules.Core.DataModels.Races.None,
-					new Race
+					new Kenedia.Modules.Characters.Models.Race
 					{
 						Id = Kenedia.Modules.Core.DataModels.Races.None,
 						Names = new LocalizedString
 						{
 							{
-								(Locale)2,
+								Locale.German,
 								"Unbekannt"
 							},
 							{
-								(Locale)0,
+								Locale.English,
 								"Unknown"
 							},
 							{
-								(Locale)1,
+								Locale.Spanish,
 								"Desconocido"
 							},
 							{
-								(Locale)3,
+								Locale.French,
 								"Inconnu"
 							}
 						}
@@ -375,25 +373,25 @@ namespace Kenedia.Modules.Characters.Services
 				},
 				{
 					Kenedia.Modules.Core.DataModels.Races.Asura,
-					new Race
+					new Kenedia.Modules.Characters.Models.Race
 					{
 						Id = Kenedia.Modules.Core.DataModels.Races.Asura,
 						Names = new LocalizedString
 						{
 							{
-								(Locale)2,
+								Locale.German,
 								"Asura"
 							},
 							{
-								(Locale)0,
+								Locale.English,
 								"Asura"
 							},
 							{
-								(Locale)1,
+								Locale.Spanish,
 								"Asura"
 							},
 							{
-								(Locale)3,
+								Locale.French,
 								"Asura"
 							}
 						}
@@ -401,25 +399,25 @@ namespace Kenedia.Modules.Characters.Services
 				},
 				{
 					Kenedia.Modules.Core.DataModels.Races.Charr,
-					new Race
+					new Kenedia.Modules.Characters.Models.Race
 					{
 						Id = Kenedia.Modules.Core.DataModels.Races.Charr,
 						Names = new LocalizedString
 						{
 							{
-								(Locale)2,
+								Locale.German,
 								"Charr"
 							},
 							{
-								(Locale)0,
+								Locale.English,
 								"Charr"
 							},
 							{
-								(Locale)1,
+								Locale.Spanish,
 								"Charr"
 							},
 							{
-								(Locale)3,
+								Locale.French,
 								"Charr"
 							}
 						}
@@ -427,25 +425,25 @@ namespace Kenedia.Modules.Characters.Services
 				},
 				{
 					Kenedia.Modules.Core.DataModels.Races.Human,
-					new Race
+					new Kenedia.Modules.Characters.Models.Race
 					{
 						Id = Kenedia.Modules.Core.DataModels.Races.Human,
 						Names = new LocalizedString
 						{
 							{
-								(Locale)2,
+								Locale.German,
 								"Mensch"
 							},
 							{
-								(Locale)0,
+								Locale.English,
 								"Human"
 							},
 							{
-								(Locale)1,
+								Locale.Spanish,
 								"Humano"
 							},
 							{
-								(Locale)3,
+								Locale.French,
 								"Humain"
 							}
 						}
@@ -453,25 +451,25 @@ namespace Kenedia.Modules.Characters.Services
 				},
 				{
 					Kenedia.Modules.Core.DataModels.Races.Norn,
-					new Race
+					new Kenedia.Modules.Characters.Models.Race
 					{
 						Id = Kenedia.Modules.Core.DataModels.Races.Norn,
 						Names = new LocalizedString
 						{
 							{
-								(Locale)2,
+								Locale.German,
 								"Norn"
 							},
 							{
-								(Locale)0,
+								Locale.English,
 								"Norn"
 							},
 							{
-								(Locale)1,
+								Locale.Spanish,
 								"Norn"
 							},
 							{
-								(Locale)3,
+								Locale.French,
 								"Norn"
 							}
 						}
@@ -479,41 +477,41 @@ namespace Kenedia.Modules.Characters.Services
 				},
 				{
 					Kenedia.Modules.Core.DataModels.Races.Sylvari,
-					new Race
+					new Kenedia.Modules.Characters.Models.Race
 					{
 						Id = Kenedia.Modules.Core.DataModels.Races.Sylvari,
 						Names = new LocalizedString
 						{
 							{
-								(Locale)2,
+								Locale.German,
 								"Sylvari"
 							},
 							{
-								(Locale)0,
+								Locale.English,
 								"Sylvari"
 							},
 							{
-								(Locale)1,
+								Locale.Spanish,
 								"Sylvari"
 							},
 							{
-								(Locale)3,
+								Locale.French,
 								"Sylvaris"
 							}
 						}
 					}
 				}
 			};
-			Maps = new DataDictionary<int, Map>(Path.Combine(paths.ModuleDataPath, "maps.json"), new Func<Task>(UpdateMaps));
-			Professions = new DataDictionary<ProfessionType, Profession>(Path.Combine(paths.ModuleDataPath, "professions.json"), new Func<Task>(UpdateProfessions));
-			Specializations = new DataDictionary<int, Specialization>(Path.Combine(paths.ModuleDataPath, "specializations.json"), new Func<Task>(UpdateSpecializations));
+			Maps = new DataDictionary<int, Kenedia.Modules.Core.DataModels.Map>(Path.Combine(paths.ModuleDataPath, "maps.json"), new Func<Task>(UpdateMaps));
+			Professions = new DataDictionary<ProfessionType, Kenedia.Modules.Characters.Models.Profession>(Path.Combine(paths.ModuleDataPath, "professions.json"), new Func<Task>(UpdateProfessions));
+			Specializations = new DataDictionary<int, Kenedia.Modules.Characters.Models.Specialization>(Path.Combine(paths.ModuleDataPath, "specializations.json"), new Func<Task>(UpdateSpecializations));
 		}
 
-		public Map GetMapById(int id)
+		public Kenedia.Modules.Core.DataModels.Map GetMapById(int id)
 		{
 			if (!Maps.ContainsKey(id))
 			{
-				return new Map
+				return new Kenedia.Modules.Core.DataModels.Map
 				{
 					Name = "Unknown Map",
 					Id = 0
@@ -524,13 +522,13 @@ namespace Kenedia.Modules.Characters.Services
 
 		private async Task UpdateProfessions()
 		{
-			foreach (Profession prof in (IEnumerable<Profession>)(await ((IAllExpandableClient<Profession>)(object)Gw2ApiManager.Gw2ApiClient.get_V2().get_Professions()).AllAsync(default(CancellationToken))))
+			foreach (Gw2Sharp.WebApi.V2.Models.Profession prof in await Gw2ApiManager.Gw2ApiClient.V2.Professions.AllAsync())
 			{
-				if (Enum.TryParse<ProfessionType>(prof.get_Id(), out ProfessionType professionType))
+				if (Enum.TryParse<ProfessionType>(prof.Id, out var professionType))
 				{
 					if (!Professions.ContainsKey(professionType))
 					{
-						Professions[professionType] = new Profession();
+						Professions[professionType] = new Kenedia.Modules.Characters.Models.Profession();
 					}
 					Professions[professionType].ApplyApiData(prof);
 				}
@@ -539,28 +537,28 @@ namespace Kenedia.Modules.Characters.Services
 
 		private async Task UpdateSpecializations()
 		{
-			foreach (Specialization spec in (IEnumerable<Specialization>)(await ((IAllExpandableClient<Specialization>)(object)Gw2ApiManager.Gw2ApiClient.get_V2().get_Specializations()).AllAsync(default(CancellationToken))))
+			foreach (Gw2Sharp.WebApi.V2.Models.Specialization spec in await Gw2ApiManager.Gw2ApiClient.V2.Specializations.AllAsync())
 			{
-				if (spec.get_Elite())
+				if (spec.Elite)
 				{
-					if (!Specializations.ContainsKey(spec.get_Id()))
+					if (!Specializations.ContainsKey(spec.Id))
 					{
-						Specializations[spec.get_Id()] = new Specialization();
+						Specializations[spec.Id] = new Kenedia.Modules.Characters.Models.Specialization();
 					}
-					Specializations[spec.get_Id()].ApplyApiData(spec);
+					Specializations[spec.Id].ApplyApiData(spec);
 				}
 			}
 		}
 
 		private async Task UpdateMaps()
 		{
-			foreach (Map map in (IEnumerable<Map>)(await ((IAllExpandableClient<Map>)(object)Gw2ApiManager.Gw2ApiClient.get_V2().get_Maps()).AllAsync(default(CancellationToken))))
+			foreach (Gw2Sharp.WebApi.V2.Models.Map map in await Gw2ApiManager.Gw2ApiClient.V2.Maps.AllAsync())
 			{
-				if (!Maps.ContainsKey(map.get_Id()))
+				if (!Maps.ContainsKey(map.Id))
 				{
-					Maps[map.get_Id()] = new Map();
+					Maps[map.Id] = new Kenedia.Modules.Core.DataModels.Map();
 				}
-				Maps[map.get_Id()].ApplyApiData(map);
+				Maps[map.Id].ApplyApiData(map);
 			}
 		}
 
@@ -644,25 +642,25 @@ namespace Kenedia.Modules.Characters.Services
 		public async Task UpdateLocale(Blish_HUD.ValueChangedEventArgs<Locale> eventArgs)
 		{
 			Locale newValue = eventArgs.NewValue;
-			if ((newValue - 4 <= 1) ? true : false)
+			if (((uint)(newValue - 4) <= 1u) ? true : false)
 			{
-				newValue = (Locale)0;
+				newValue = Locale.English;
 			}
-			Profession profession = Professions.Values.LastOrDefault();
+			Kenedia.Modules.Characters.Models.Profession profession = Professions.Values.LastOrDefault();
 			if (profession == null || !profession.Names.TryGetValue(newValue, out var professionName) || string.IsNullOrEmpty(professionName))
 			{
 				BaseModule<Characters, MainWindow, Settings, PathCollection, Kenedia.Modules.Characters.Services.StaticHosting>.Logger.Info($"Updating Professions for locale {newValue}.");
 				await Professions.Update();
 				await Professions.Save();
 			}
-			Specialization specialization = Specializations.Values.LastOrDefault();
+			Kenedia.Modules.Characters.Models.Specialization specialization = Specializations.Values.LastOrDefault();
 			if (specialization == null || !specialization.Names.TryGetValue(newValue, out var specializationName) || string.IsNullOrEmpty(specializationName))
 			{
 				BaseModule<Characters, MainWindow, Settings, PathCollection, Kenedia.Modules.Characters.Services.StaticHosting>.Logger.Info($"Updating Specializations for locale {newValue}.");
 				await Specializations.Update();
 				await Specializations.Save();
 			}
-			Map map = Maps.Values.LastOrDefault();
+			Kenedia.Modules.Core.DataModels.Map map = Maps.Values.LastOrDefault();
 			if (map == null || !map.Names.TryGetValue(newValue, out var mapName) || string.IsNullOrEmpty(mapName))
 			{
 				BaseModule<Characters, MainWindow, Settings, PathCollection, Kenedia.Modules.Characters.Services.StaticHosting>.Logger.Info($"Updating Maps for locale {newValue}.");

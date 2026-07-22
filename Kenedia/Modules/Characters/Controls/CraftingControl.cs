@@ -33,7 +33,6 @@ namespace Kenedia.Modules.Characters.Controls
 			}
 			set
 			{
-				//IL_0019: Unknown result type (might be due to invalid IL or missing references)
 				_003CFont_003Ek__BackingField = value;
 				if (value != null)
 				{
@@ -58,40 +57,15 @@ namespace Kenedia.Modules.Characters.Controls
 			Settings = settings;
 		}
 
-		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
+		protected override void Paint(SpriteBatch spriteBatch, Microsoft.Xna.Framework.Rectangle bounds)
 		{
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0121: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0134: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0157: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0169: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0175: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0222: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0231: Unknown result type (might be due to invalid IL or missing references)
-			//IL_023a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0240: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0245: Unknown result type (might be due to invalid IL or missing references)
 			string toolTipText = null;
-			spriteBatch.DrawOnCtrl((Control)this, (Texture2D)_craftingIcon, new Rectangle(4, 4, bounds.Height - 7, bounds.Height - 7), (Rectangle?)new Rectangle(6, 6, 20, 20), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
+			spriteBatch.DrawOnCtrl(this, _craftingIcon, new Microsoft.Xna.Framework.Rectangle(4, 4, bounds.Height - 7, bounds.Height - 7), new Microsoft.Xna.Framework.Rectangle(6, 6, 20, 20), Microsoft.Xna.Framework.Color.White, 0f, default(Vector2));
 			bool craftingDisplayed = false;
 			if (Character != null && Character.Crafting.Count > 0 && Settings != null && Data != null)
 			{
 				DataDictionary<CraftingDisciplineType, CraftingProfession> craftingDictionary = Data.CraftingProfessions;
 				int i = 0;
-				Rectangle craftBounds = default(Rectangle);
 				foreach (CharacterCrafting crafting in Character.Crafting)
 				{
 					craftingDictionary.TryGetValue(crafting.Id, out var craftingProfession);
@@ -104,10 +78,10 @@ namespace Kenedia.Modules.Characters.Controls
 					if (craftingProfession.Icon != null && (!onlyMax || crafting.Rating == craftingProfession.MaxRating))
 					{
 						craftingDisplayed = true;
-						((Rectangle)(ref craftBounds))._002Ector(bounds.Height + 6 + i * bounds.Height, 2, bounds.Height - 4, bounds.Height - 4);
-						spriteBatch.DrawOnCtrl((Control)this, (Texture2D)craftingProfession.Icon, craftBounds, (Rectangle?)new Rectangle(8, 8, 16, 16), Color.get_White(), 0f, default(Vector2), (SpriteEffects)0);
+						Microsoft.Xna.Framework.Rectangle craftBounds = new Microsoft.Xna.Framework.Rectangle(bounds.Height + 6 + i * bounds.Height, 2, bounds.Height - 4, bounds.Height - 4);
+						spriteBatch.DrawOnCtrl(this, craftingProfession.Icon, craftBounds, new Microsoft.Xna.Framework.Rectangle(8, 8, 16, 16), Microsoft.Xna.Framework.Color.White, 0f, default(Vector2));
 						i++;
-						if (((Rectangle)(ref craftBounds)).Contains(base.RelativeMousePosition))
+						if (craftBounds.Contains(base.RelativeMousePosition))
 						{
 							toolTipText = craftingProfession.Name + " (" + crafting.Rating + "/" + craftingProfession.MaxRating + ")";
 						}
@@ -117,7 +91,7 @@ namespace Kenedia.Modules.Characters.Controls
 			if (!craftingDisplayed)
 			{
 				string text = (Text = strings.NoCraftingProfession);
-				spriteBatch.DrawStringOnCtrl(this, text, Font, new Rectangle(bounds.Height + 4, 0, bounds.Width - (bounds.Height + 4), bounds.Height), Color.get_Gray());
+				spriteBatch.DrawStringOnCtrl(this, text, Font, new Microsoft.Xna.Framework.Rectangle(bounds.Height + 4, 0, bounds.Width - (bounds.Height + 4), bounds.Height), Microsoft.Xna.Framework.Color.Gray);
 			}
 			base.BasicTooltipText = toolTipText;
 		}

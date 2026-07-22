@@ -48,7 +48,7 @@ namespace Kenedia.Modules.Characters.Controls
 
 		private bool _dragging;
 
-		private Point _draggingStart;
+		private Microsoft.Xna.Framework.Point _draggingStart;
 
 		private int _characterPotraitSize = 130;
 
@@ -62,48 +62,20 @@ namespace Kenedia.Modules.Characters.Controls
 
 		public PotraitCapture(ClientWindowService clientWindowService, SharedSettings sharedSettings, TextureManager tM)
 		{
-			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0186: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0221: Unknown result type (might be due to invalid IL or missing references)
-			//IL_023b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0276: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0285: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0307: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0316: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0389: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0394: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0432: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0440: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04ca: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0517: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0521: Unknown result type (might be due to invalid IL or missing references)
 			_clientWindowService = clientWindowService;
 			_sharedSettings = sharedSettings;
-			Point res = GameService.Graphics.Resolution;
-			base.Size = new Point(100, 100);
+			Microsoft.Xna.Framework.Point res = GameService.Graphics.Resolution;
+			base.Size = new Microsoft.Xna.Framework.Point(100, 100);
 			WidthSizingMode = SizingMode.AutoSize;
 			HeightSizingMode = SizingMode.AutoSize;
-			base.Location = new Point((res.X - base.Size.X) / 2, res.Y - 125 - base.Size.Y);
+			base.Location = new Microsoft.Xna.Framework.Point((res.X - base.Size.X) / 2, res.Y - 125 - base.Size.Y);
 			_dragButton = new ImageButton
 			{
 				Parent = this,
 				Texture = (AsyncTexture2D)tM.GetControlTexture(TextureManager.ControlTextures.Drag_Button),
 				HoveredTexture = (AsyncTexture2D)tM.GetControlTexture(TextureManager.ControlTextures.Drag_Button_Hovered),
-				Size = new Point(32, 32),
-				Location = new Point(0, 0),
+				Size = new Microsoft.Xna.Framework.Point(32, 32),
+				Location = new Microsoft.Xna.Framework.Point(0, 0),
 				SetLocalizedTooltip = () => strings.DragOverCharacter_Instructions
 			};
 			_dragButton.LeftMouseButtonPressed += DragButton_LeftMouseButtonPressed;
@@ -113,8 +85,8 @@ namespace Kenedia.Modules.Characters.Controls
 				Parent = this,
 				Texture = (AsyncTexture2D)tM.GetControlTexture(TextureManager.ControlTextures.Potrait_Button),
 				HoveredTexture = (AsyncTexture2D)tM.GetControlTexture(TextureManager.ControlTextures.Potrait_Button_Hovered),
-				Size = new Point(32, 32),
-				Location = new Point(_dragButton.Right + 5, 0),
+				Size = new Microsoft.Xna.Framework.Point(32, 32),
+				Location = new Microsoft.Xna.Framework.Point(_dragButton.Right + 5, 0),
 				SetLocalizedTooltip = () => strings.CapturePotraits,
 				ClickAction = delegate
 				{
@@ -124,19 +96,19 @@ namespace Kenedia.Modules.Characters.Controls
 			_disclaimerBackground = new FramedContainer
 			{
 				Parent = this,
-				Location = new Point(_captureButton.Right + 5, 0),
-				BorderColor = Color.get_Black(),
+				Location = new Microsoft.Xna.Framework.Point(_captureButton.Right + 5, 0),
+				BorderColor = Microsoft.Xna.Framework.Color.Black,
 				BackgroundImage = AsyncTexture2D.FromAssetId(156003),
-				TextureRectangle = new Rectangle(50, 50, 500, 500),
+				TextureRectangle = new Microsoft.Xna.Framework.Rectangle(50, 50, 500, 500),
 				WidthSizingMode = SizingMode.AutoSize,
-				AutoSizePadding = new Point(15, 0),
+				AutoSizePadding = new Microsoft.Xna.Framework.Point(15, 0),
 				Height = 32
 			};
 			_sizeBox = new NumberBox
 			{
 				Parent = _disclaimerBackground,
-				Location = new Point(5, (_disclaimerBackground.Height - 25) / 2),
-				Size = new Point(100, 25),
+				Location = new Microsoft.Xna.Framework.Point(5, (_disclaimerBackground.Height - 25) / 2),
+				Size = new Microsoft.Xna.Framework.Point(100, 25),
 				Value = _characterPotraitSize,
 				SetLocalizedTooltip = () => strings.PotraitSize,
 				ValueChangedAction = delegate(int num)
@@ -148,8 +120,8 @@ namespace Kenedia.Modules.Characters.Controls
 			_gapBox = new NumberBox
 			{
 				Parent = _disclaimerBackground,
-				Location = new Point(_sizeBox.Right + 5, (_disclaimerBackground.Height - 25) / 2),
-				Size = new Point(100, 25),
+				Location = new Microsoft.Xna.Framework.Point(_sizeBox.Right + 5, (_disclaimerBackground.Height - 25) / 2),
+				Size = new Microsoft.Xna.Framework.Point(100, 25),
 				Value = _gap,
 				SetLocalizedTooltip = () => strings.PotraitGap,
 				ValueChangedAction = delegate(int value)
@@ -161,7 +133,7 @@ namespace Kenedia.Modules.Characters.Controls
 			_disclaimer = new Kenedia.Modules.Core.Controls.Label
 			{
 				Parent = _disclaimerBackground,
-				Location = new Point(_gapBox.Right + 5, 0),
+				Location = new Microsoft.Xna.Framework.Point(_gapBox.Right + 5, 0),
 				TextColor = ContentService.Colors.ColonialWhite,
 				AutoSizeWidth = true,
 				Height = 32,
@@ -174,8 +146,8 @@ namespace Kenedia.Modules.Characters.Controls
 				Parent = this,
 				Texture = (AsyncTexture2D)tM.GetControlTexture(TextureManager.ControlTextures.Plus_Button),
 				HoveredTexture = (AsyncTexture2D)tM.GetControlTexture(TextureManager.ControlTextures.Plus_Button_Hovered),
-				Size = new Point(32, 32),
-				Location = new Point(0, 35),
+				Size = new Microsoft.Xna.Framework.Point(32, 32),
+				Location = new Microsoft.Xna.Framework.Point(0, 35),
 				SetLocalizedTooltip = () => string.Format(strings.AddItem, strings.PotraitFrame),
 				ClickAction = delegate
 				{
@@ -187,8 +159,8 @@ namespace Kenedia.Modules.Characters.Controls
 				Parent = this,
 				Texture = (AsyncTexture2D)tM.GetControlTexture(TextureManager.ControlTextures.Minus_Button),
 				HoveredTexture = (AsyncTexture2D)tM.GetControlTexture(TextureManager.ControlTextures.Minus_Button_Hovered),
-				Size = new Point(32, 32),
-				Location = new Point(0, 70),
+				Size = new Microsoft.Xna.Framework.Point(32, 32),
+				Location = new Microsoft.Xna.Framework.Point(0, 70),
 				SetLocalizedTooltip = () => string.Format(strings.RemoveItem, strings.PotraitFrame),
 				ClickAction = delegate
 				{
@@ -197,7 +169,7 @@ namespace Kenedia.Modules.Characters.Controls
 			};
 			_characterPotraitsBackground = new Dummy
 			{
-				BackgroundColor = Color.get_Black() * 0.8f,
+				BackgroundColor = Microsoft.Xna.Framework.Color.Black * 0.8f,
 				Parent = Control.Graphics.SpriteScreen,
 				ZIndex = 2147483646
 			};
@@ -207,14 +179,11 @@ namespace Kenedia.Modules.Characters.Controls
 
 		public override void UpdateContainer(GameTime gameTime)
 		{
-			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
 			base.UpdateContainer(gameTime);
 			_dragging = _dragging && base.MouseOver;
 			if (_dragging)
 			{
-				base.Location = Control.Input.Mouse.Position.Add(new Point(-_draggingStart.X, -_draggingStart.Y));
+				base.Location = Control.Input.Mouse.Position.Add(new Microsoft.Xna.Framework.Point(-_draggingStart.X, -_draggingStart.Y));
 			}
 			ForceOnScreen();
 		}
@@ -261,18 +230,9 @@ namespace Kenedia.Modules.Characters.Controls
 
 		private void RepositionPotraitFrames()
 		{
-			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
 			int index = 0;
-			Point pos = default(Point);
-			((Point)(ref pos))._002Ector(_captureButton.AbsoluteBounds.X + 5, _captureButton.AbsoluteBounds.Y + 40);
-			_characterPotraitsBackground.Location = pos.Add(new Point(-5, -5));
+			Microsoft.Xna.Framework.Point pos = new Microsoft.Xna.Framework.Point(_captureButton.AbsoluteBounds.X + 5, _captureButton.AbsoluteBounds.Y + 40);
+			_characterPotraitsBackground.Location = pos.Add(new Microsoft.Xna.Framework.Point(-5, -5));
 			foreach (FramedMaskedRegion characterPotraitFrame in _characterPotraitFrames)
 			{
 				characterPotraitFrame.Width = _characterPotraitSize;
@@ -292,23 +252,12 @@ namespace Kenedia.Modules.Characters.Controls
 
 		private void DragButton_LeftMouseButtonPressed(object sender, MouseEventArgs e)
 		{
-			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
 			_dragging = true;
-			_draggingStart = (_dragging ? base.RelativeMousePosition : Point.get_Zero());
+			_draggingStart = (_dragging ? base.RelativeMousePosition : Microsoft.Xna.Framework.Point.Zero);
 		}
 
 		private void CapturePotraits()
 		{
-			//IL_0140: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01dd: Unknown result type (might be due to invalid IL or missing references)
 			string accountName = AccountName?.Invoke();
 			if (accountName == null || string.IsNullOrEmpty(accountName))
 			{
@@ -348,11 +297,10 @@ namespace Kenedia.Modules.Characters.Controls
 			User32Dll.GetClientRect(hWnd, out var _);
 			User32Dll.GetDpiForWindow(hWnd);
 			double uiScale = GameService.Graphics.UIScaleMultiplier;
-			Rectangle bounds = default(Rectangle);
 			for (int i = 0; i < _characterPotraitFrames.Count; i++)
 			{
 				FramedMaskedRegion c = _characterPotraitFrames[i];
-				((Rectangle)(ref bounds))._002Ector(c.AbsoluteBounds.X + c.BorderWidth.Horizontal / 2, c.AbsoluteBounds.Y + c.BorderWidth.Vertical / 2, c.AbsoluteBounds.Width - c.BorderWidth.Horizontal, c.AbsoluteBounds.Height - c.BorderWidth.Vertical);
+				Microsoft.Xna.Framework.Rectangle bounds = new Microsoft.Xna.Framework.Rectangle(c.AbsoluteBounds.X + c.BorderWidth.Horizontal / 2, c.AbsoluteBounds.Y + c.BorderWidth.Vertical / 2, c.AbsoluteBounds.Width - c.BorderWidth.Horizontal, c.AbsoluteBounds.Height - c.BorderWidth.Vertical);
 				int x = bounds.X;
 				int y = bounds.Y;
 				int width = Math.Max(1, bounds.Width);
@@ -368,7 +316,7 @@ namespace Kenedia.Modules.Characters.Controls
 				using Bitmap bitmap = new Bitmap(scaledWidth, scaledHeight);
 				using (Graphics g = System.Drawing.Graphics.FromImage(bitmap))
 				{
-					g.CopyFromScreen(new Point(captureX, captureY), Point.Empty, new Size(scaledWidth, scaledHeight));
+					g.CopyFromScreen(new System.Drawing.Point(captureX, captureY), System.Drawing.Point.Empty, new Size(scaledWidth, scaledHeight));
 				}
 				bitmap.Save(GetImagePath(images), ImageFormat.Png);
 			}
@@ -413,17 +361,12 @@ namespace Kenedia.Modules.Characters.Controls
 
 		private double GetScaling()
 		{
-			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0026: Expected I4, but got Unknown
-			UiSize uISize = GameService.Gw2Mumble.UI.UISize;
-			return (int)uISize switch
+			return GameService.Gw2Mumble.UI.UISize switch
 			{
-				0 => 0.81f, 
-				1 => 0.897f, 
-				2 => 1f, 
-				3 => 1.103f, 
+				UiSize.Small => 0.81f, 
+				UiSize.Normal => 0.897f, 
+				UiSize.Large => 1f, 
+				UiSize.Larger => 1.103f, 
 				_ => 1f, 
 			};
 		}

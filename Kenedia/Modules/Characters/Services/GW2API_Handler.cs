@@ -11,7 +11,6 @@ using Blish_HUD;
 using Blish_HUD.Modules.Managers;
 using Gw2Sharp.WebApi.Exceptions;
 using Gw2Sharp.WebApi.V2;
-using Gw2Sharp.WebApi.V2.Clients;
 using Gw2Sharp.WebApi.V2.Models;
 using Kenedia.Modules.Characters.Models;
 using Kenedia.Modules.Characters.Res;
@@ -26,11 +25,15 @@ namespace Kenedia.Modules.Characters.Services
 {
 	public class GW2API_Handler
 	{
+		private const int InventoryFetchConcurrency = 8;
+
 		private readonly Logger _logger = Logger.GetLogger(typeof(GW2API_Handler));
 
 		private readonly Gw2ApiManager _gw2ApiManager;
 
 		private readonly Action<IApiV2ObjectList<Character>> _callBack;
+
+		private readonly Action<string, int?> _inventorySlotsCallBack;
 
 		private readonly Data _data;
 
@@ -69,18 +72,18 @@ namespace Kenedia.Modules.Characters.Services
 					_003CAccount_003Ek__BackingField = v;
 				}, this.AccountChanged, triggerOnUpdate: true, "Account"))
 				{
-					_paths.AccountName = ((value != null) ? value.get_Name() : null);
-					BaseModule<Characters, Kenedia.Modules.Characters.Views.MainWindow, Settings, PathCollection, StaticHosting>.Logger.Info("Account changed from " + (((temp != null) ? temp.get_Name() : null) ?? "No Account") + " to " + (((value != null) ? value.get_Name() : null) ?? "No Account") + "!");
+					BaseModule<Characters, Kenedia.Modules.Characters.Views.MainWindow, Settings, PathCollection, StaticHosting>.Logger.Info("Account changed from " + (temp?.Name ?? "No Account") + " to " + (value?.Name ?? "No Account") + "!");
 				}
 			}
 		}
 
 		public event PropertyChangedEventHandler AccountChanged;
 
-		public GW2API_Handler(Gw2ApiManager gw2ApiManager, Action<IApiV2ObjectList<Character>> callBack, Func<LoadingSpinner> getSpinner, PathCollection paths, Data data, Func<NotificationBadge> notificationBadge)
+		public GW2API_Handler(Gw2ApiManager gw2ApiManager, Action<IApiV2ObjectList<Character>> callBack, Action<string, int?> inventorySlotsCallBack, Func<LoadingSpinner> getSpinner, PathCollection paths, Data data, Func<NotificationBadge> notificationBadge)
 		{
 			_gw2ApiManager = gw2ApiManager;
 			_callBack = callBack;
+			_inventorySlotsCallBack = inventorySlotsCallBack;
 			_getSpinner = getSpinner;
 			_paths = paths;
 			_accountFilePath = paths.ModulePath + "\\accounts.json";
@@ -95,17 +98,17 @@ namespace Kenedia.Modules.Characters.Services
 			{
 				List<AccountSummary> accounts = new List<AccountSummary>();
 				AccountSummary accountEntry;
-				if (File.Exists(_accountFilePath))
+				if (System.IO.File.Exists(_accountFilePath))
 				{
-					accounts = JsonConvert.DeserializeObject<List<AccountSummary>>(File.ReadAllText(_accountFilePath), SerializerSettings.Default);
-					accountEntry = accounts.Find((AccountSummary e) => e.AccountName == account2.get_Name());
+					accounts = JsonConvert.DeserializeObject<List<AccountSummary>>(System.IO.File.ReadAllText(_accountFilePath), SerializerSettings.Default);
+					accountEntry = accounts.Find((AccountSummary e) => e.AccountName == account2.Name);
 					if (accountEntry != null)
 					{
-						accountEntry.AccountName = account2.get_Name();
+						accountEntry.AccountName = account2.Name;
 						accountEntry.CharacterNames = new List<string>();
-						((IEnumerable<Character>)characters).ToList().ForEach(delegate(Character c)
+						characters.ToList().ForEach(delegate(Character c)
 						{
-							accountEntry.CharacterNames.Add(c.get_Name());
+							accountEntry.CharacterNames.Add(c.Name);
 						});
 					}
 					else
@@ -113,15 +116,15 @@ namespace Kenedia.Modules.Characters.Services
 						List<AccountSummary> list = accounts;
 						AccountSummary obj = new AccountSummary
 						{
-							AccountName = account2.get_Name(),
+							AccountName = account2.Name,
 							CharacterNames = new List<string>()
 						};
 						AccountSummary item = obj;
 						accountEntry = obj;
 						list.Add(item);
-						((IEnumerable<Character>)characters).ToList().ForEach(delegate(Character c)
+						characters.ToList().ForEach(delegate(Character c)
 						{
-							accountEntry.CharacterNames.Add(c.get_Name());
+							accountEntry.CharacterNames.Add(c.Name);
 						});
 					}
 				}
@@ -130,19 +133,19 @@ namespace Kenedia.Modules.Characters.Services
 					List<AccountSummary> list2 = accounts;
 					AccountSummary obj2 = new AccountSummary
 					{
-						AccountName = account2.get_Name(),
+						AccountName = account2.Name,
 						CharacterNames = new List<string>()
 					};
 					AccountSummary item = obj2;
 					accountEntry = obj2;
 					list2.Add(item);
-					((IEnumerable<Character>)characters).ToList().ForEach(delegate(Character c)
+					characters.ToList().ForEach(delegate(Character c)
 					{
-						accountEntry.CharacterNames.Add(c.get_Name());
+						accountEntry.CharacterNames.Add(c.Name);
 					});
 				}
-				string json = JsonConvert.SerializeObject((object)accounts, SerializerSettings.Default);
-				File.WriteAllText(_accountFilePath, json);
+				string json = JsonConvert.SerializeObject(accounts, SerializerSettings.Default);
+				System.IO.File.WriteAllText(_accountFilePath, json);
 			}
 			catch
 			{
@@ -169,26 +172,24 @@ namespace Kenedia.Modules.Characters.Services
 			CancellationToken cancellationToken = _cancellationTokenSource.Token;
 			_getSpinner?.Invoke()?.Show();
 			NotificationBadge notificationBadge = _notificationBadge();
-			object obj;
-			int num;
 			try
 			{
 				BaseModule<Characters, Kenedia.Modules.Characters.Views.MainWindow, Settings, PathCollection, StaticHosting>.Logger.Info("Fetching new API Data ...");
-				if (_gw2ApiManager.HasPermissions((IEnumerable<TokenPermission>)(object)new TokenPermission[2]
+				if (_gw2ApiManager.HasPermissions(new TokenPermission[2]
 				{
-					(TokenPermission)1,
-					(TokenPermission)3
+					TokenPermission.Account,
+					TokenPermission.Characters
 				}))
 				{
-					Account account = await ((IBlobClient<Account>)(object)_gw2ApiManager.Gw2ApiClient.get_V2().get_Account()).GetAsync(cancellationToken);
+					Account account = await _gw2ApiManager.Gw2ApiClient.V2.Account.GetAsync(cancellationToken);
 					if (cancellationToken.IsCancellationRequested)
 					{
 						Reset(cancellationToken, !cancellationToken.IsCancellationRequested);
 						return false;
 					}
 					Account = account;
-					BaseModule<Characters, Kenedia.Modules.Characters.Views.MainWindow, Settings, PathCollection, StaticHosting>.Logger.Info("Fetching characters for '" + Account.get_Name() + "' ...");
-					IApiV2ObjectList<Character> characters = await ((IAllExpandableClient<Character>)(object)_gw2ApiManager.Gw2ApiClient.get_V2().get_Characters()).AllAsync(cancellationToken);
+					BaseModule<Characters, Kenedia.Modules.Characters.Views.MainWindow, Settings, PathCollection, StaticHosting>.Logger.Info("Fetching characters for '" + Account.Name + "' ...");
+					IApiV2ObjectList<Character> characters = await _gw2ApiManager.Gw2ApiClient.V2.Characters.AllAsync(cancellationToken);
 					if (cancellationToken.IsCancellationRequested)
 					{
 						Reset(cancellationToken, !cancellationToken.IsCancellationRequested);
@@ -196,8 +197,9 @@ namespace Kenedia.Modules.Characters.Services
 					}
 					UpdateAccountsList(account, characters);
 					_callBack?.Invoke(characters);
-					Reset(cancellationToken, !cancellationToken.IsCancellationRequested);
+					_getSpinner?.Invoke()?.Hide();
 					_apiStatus = StatusType.Success;
+					FetchFreeInventorySlots(characters.ToList(), cancellationToken, _cancellationTokenSource);
 					return true;
 				}
 				if (!cancellationToken.IsCancellationRequested)
@@ -211,35 +213,28 @@ namespace Kenedia.Modules.Characters.Services
 				Reset(cancellationToken, !cancellationToken.IsCancellationRequested);
 				return false;
 			}
-			catch (UnexpectedStatusException val)
+			catch (UnexpectedStatusException ex2)
 			{
-				obj = (object)val;
-				num = 1;
+				Task<Func<string>> text2 = HandleAPIExceptions(ex2);
+				MainWindow?.SendAPITimeoutNotification();
+				BaseModule<Characters, Kenedia.Modules.Characters.Views.MainWindow, Settings, PathCollection, StaticHosting>.Logger.Warn(ex2, strings.APITimeoutNotification);
+				Reset(cancellationToken, !cancellationToken.IsCancellationRequested);
+				_apiStatus = StatusType.Error;
+				notificationBadge?.AddNotification(new ConditionalNotification(await text2, () => _apiStatus == StatusType.Success));
+				return false;
 			}
-			catch (Exception ex2)
+			catch (Exception ex)
 			{
 				if (!cancellationToken.IsCancellationRequested)
 				{
-					_logger.Warn(ex2, strings.Error_FailedAPIFetch);
+					_logger.Warn(ex, strings.Error_FailedAPIFetch);
 				}
 				_apiStatus = StatusType.Error;
-				Task<Func<string>> text2 = HandleAPIExceptions(ex2);
-				notificationBadge?.AddNotification(new ConditionalNotification(await text2, () => _apiStatus == StatusType.Success));
-				Reset(cancellationToken, !cancellationToken.IsCancellationRequested);
-				return false;
-			}
-			if (num == 1)
-			{
-				UnexpectedStatusException ex = (UnexpectedStatusException)obj;
-				Task<Func<string>> text = HandleAPIExceptions((Exception)(object)ex);
-				MainWindow?.SendAPITimeoutNotification();
-				BaseModule<Characters, Kenedia.Modules.Characters.Views.MainWindow, Settings, PathCollection, StaticHosting>.Logger.Warn((Exception)(object)ex, strings.APITimeoutNotification);
-				Reset(cancellationToken, !cancellationToken.IsCancellationRequested);
-				_apiStatus = StatusType.Error;
+				Task<Func<string>> text = HandleAPIExceptions(ex);
 				notificationBadge?.AddNotification(new ConditionalNotification(await text, () => _apiStatus == StatusType.Success));
+				Reset(cancellationToken, !cancellationToken.IsCancellationRequested);
 				return false;
 			}
-			throw null;
 		}
 
 		private static string? GetExceptionMessage(Exception ex)
@@ -255,6 +250,87 @@ namespace Kenedia.Modules.Characters.Services
 				return "\n\n" + result;
 			}
 			return null;
+		}
+
+		private async Task FetchFreeInventorySlots(IReadOnlyList<Character> characters, CancellationToken cancellationToken, CancellationTokenSource cancellationTokenSource)
+		{
+			if (!_gw2ApiManager.HasPermissions(new TokenPermission[1] { TokenPermission.Inventories }))
+			{
+				BaseModule<Characters, Kenedia.Modules.Characters.Views.MainWindow, Settings, PathCollection, StaticHosting>.Logger.Info("No permission to fetch inventory data. Skipping free inventory slots fetch.");
+				ClearCompletedCancellationSource(cancellationTokenSource);
+				return;
+			}
+			BaseModule<Characters, Kenedia.Modules.Characters.Views.MainWindow, Settings, PathCollection, StaticHosting>.Logger.Info($"Fetching free inventory slots for {characters.Count} characters with {8} parallel requests.");
+			SemaphoreSlim throttler = new SemaphoreSlim(8);
+			try
+			{
+				List<Task> tasks = characters.Select((Character character) => FetchFreeInventorySlots(character, throttler, cancellationToken)).ToList();
+				try
+				{
+					await Task.WhenAll(tasks);
+				}
+				catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+				{
+					BaseModule<Characters, Kenedia.Modules.Characters.Views.MainWindow, Settings, PathCollection, StaticHosting>.Logger.Info("Canceled inventory data fetch.");
+				}
+				catch (Exception exception) when (!cancellationToken.IsCancellationRequested)
+				{
+					_logger.Warn(exception, "Failed while fetching free inventory slots.");
+				}
+				finally
+				{
+					ClearCompletedCancellationSource(cancellationTokenSource);
+				}
+			}
+			finally
+			{
+				if (throttler != null)
+				{
+					((IDisposable)throttler).Dispose();
+				}
+			}
+		}
+
+		private async Task FetchFreeInventorySlots(Character character, SemaphoreSlim throttler, CancellationToken cancellationToken)
+		{
+			await throttler.WaitAsync(cancellationToken);
+			try
+			{
+				BaseModule<Characters, Kenedia.Modules.Characters.Views.MainWindow, Settings, PathCollection, StaticHosting>.Logger.Info("Fetching inventory for '" + character.Name + "' ...");
+				CharactersInventory inventory = await _gw2ApiManager.Gw2ApiClient.V2.Characters[character.Name].Inventory.GetAsync(cancellationToken);
+				_inventorySlotsCallBack?.Invoke(character.Name, CountFreeInventorySlots(inventory));
+			}
+			catch (Exception exception) when (!cancellationToken.IsCancellationRequested)
+			{
+				_logger.Warn(exception, "Failed to fetch inventory for '" + character.Name + "'.");
+			}
+			finally
+			{
+				throttler.Release();
+			}
+		}
+
+		private void ClearCompletedCancellationSource(CancellationTokenSource cancellationTokenSource)
+		{
+			if (_cancellationTokenSource == cancellationTokenSource)
+			{
+				_cancellationTokenSource = null;
+			}
+		}
+
+		private static int? CountFreeInventorySlots(CharactersInventory inventory)
+		{
+			if (inventory?.Bags == null)
+			{
+				return null;
+			}
+			int freeSlots = 0;
+			foreach (CharacterInventoryBag bag in inventory.Bags.Where((CharacterInventoryBag b) => b != null))
+			{
+				int usedSlots = bag.Inventory?.Count((AccountItem item) => item != null) ?? 0;
+				freeSlots += Math.Max(0, bag.Size - usedSlots);
+			}
+			return freeSlots;
 		}
 
 		private async Task<Func<string>> HandleAPIExceptions(Exception ex)
@@ -274,7 +350,7 @@ namespace Kenedia.Modules.Characters.Services
 			try
 			{
 				_lastApiCheck = Common.Now;
-				await ((IBlobClient<Build>)(object)_gw2ApiManager.Gw2ApiClient.get_V2().get_Build()).GetAsync(default(CancellationToken));
+				await _gw2ApiManager.Gw2ApiClient.V2.Build.GetAsync();
 				return null;
 			}
 			catch (Exception result)

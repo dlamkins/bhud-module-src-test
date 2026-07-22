@@ -20,11 +20,11 @@ public static class AssetIdHelper
 
 	public static int GetAssetIdFromRenderUrl(this RenderUrl url)
 	{
-		if ((object)((RenderUrl)(ref url)).get_Url() == null)
+		if ((object)url.Url == null)
 		{
 			return 0;
 		}
-		string s = ((object)(RenderUrl)(ref url)).ToString();
+		string s = url.ToString();
 		if (s == null)
 		{
 			return 0;

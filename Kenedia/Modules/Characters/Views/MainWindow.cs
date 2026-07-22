@@ -10,7 +10,6 @@ using Blish_HUD.Controls;
 using Blish_HUD.Controls.Extern;
 using Blish_HUD.Controls.Intern;
 using Blish_HUD.Input;
-using Gw2Sharp.WebApi.V2.Models;
 using Kenedia.Modules.Characters.Controls;
 using Kenedia.Modules.Characters.Controls.SideMenu;
 using Kenedia.Modules.Characters.Models;
@@ -54,6 +53,8 @@ namespace Kenedia.Modules.Characters.Views
 
 		private readonly ImageButton _displaySettingsButton;
 
+		private readonly ImageButton _characterRoutinesButton;
+
 		private readonly ImageButton _randomButton;
 
 		private readonly ImageButton _lastButton;
@@ -89,6 +90,8 @@ namespace Kenedia.Modules.Characters.Views
 
 		public SettingsWindow SettingsWindow { get; set; }
 
+		public CharacterRoutineWindow CharacterRoutineWindow { get; set; }
+
 		public SideMenu SideMenu { get; }
 
 		public List<CharacterCard> CharacterCards { get; } = new List<CharacterCard>();
@@ -106,26 +109,6 @@ namespace Kenedia.Modules.Characters.Views
 		public MainWindow(Texture2D background, Rectangle windowRegion, Rectangle contentRegion, Settings settings, TextureManager textureManager, ObservableCollection<Character_Model> characterModels, SearchFilterCollection searchFilters, SearchFilterCollection tagFilters, Action toggleOCR, Action togglePotrait, Action refreshAPI, Func<string> accountImagePath, TagList tags, Func<Character_Model> currentCharacter, Data data, CharacterSorting characterSorting)
 			: base((AsyncTexture2D)background, windowRegion, contentRegion)
 		{
-			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0156: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_020f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02fa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03cc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03dc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0470: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0531: Unknown result type (might be due to invalid IL or missing references)
-			//IL_059e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05b9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0618: Unknown result type (might be due to invalid IL or missing references)
-			//IL_062d: Unknown result type (might be due to invalid IL or missing references)
 			_settings = settings;
 			_textureManager = textureManager;
 			_rawCharacterModels = characterModels;
@@ -220,7 +203,7 @@ namespace Kenedia.Modules.Characters.Views
 				Texture = AsyncTexture2D.FromAssetId(1078535),
 				Size = new Point(25, 25),
 				ImageColor = ContentService.Colors.ColonialWhite,
-				ColorHovered = Color.get_White(),
+				ColorHovered = Color.White,
 				SetLocalizedTooltip = () => strings.LastButton_Tooltip,
 				Visible = _settings.ShowLastButton.Value,
 				ClickAction = delegate
@@ -266,14 +249,27 @@ namespace Kenedia.Modules.Characters.Views
 					SettingsWindow?.ToggleWindow();
 				}
 			};
+			_characterRoutinesButton = new ImageButton
+			{
+				Parent = _buttonPanel,
+				Texture = (AsyncTexture2D)textureManager.GetIcon(TextureManager.Icons.CharacterRoutine),
+				HoveredTexture = (AsyncTexture2D)textureManager.GetIcon(TextureManager.Icons.CharacterRoutine_Hovered),
+				ClickedTexture = (AsyncTexture2D)textureManager.GetIcon(TextureManager.Icons.CharacterRoutine_Active),
+				Size = new Point(25, 25),
+				SetLocalizedTooltip = () => strings.CharacterRoutines,
+				ClickAction = delegate
+				{
+					CharacterRoutineWindow?.ToggleWindow();
+				}
+			};
 			_toggleSideMenuButton = new ImageButton
 			{
 				Parent = _buttonPanel,
 				Texture = AsyncTexture2D.FromAssetId(605018),
 				Size = new Point(25, 25),
 				ImageColor = ContentService.Colors.ColonialWhite,
-				ColorHovered = Color.get_White(),
-				SetLocalizedTooltip = () => string.Format(strings.Toggle, "Side Menu"),
+				ColorHovered = Color.White,
+				SetLocalizedTooltip = () => string.Format(strings.Toggle, strings.SideMenu),
 				ClickAction = delegate
 				{
 					ShowAttached(SideMenu.Visible ? null : SideMenu);
@@ -364,22 +360,19 @@ namespace Kenedia.Modules.Characters.Views
 
 		private void ButtonPanel_Resized(object sender, ResizedEventArgs e)
 		{
-			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
 			_filterBox.Width = _dropdownPanel.Width - _buttonPanel.Width - 2;
-			ImageButton clearButton = _clearButton;
-			Rectangle localBounds = _filterBox.LocalBounds;
-			int num = ((Rectangle)(ref localBounds)).get_Right() - 25;
-			localBounds = _filterBox.LocalBounds;
-			clearButton.Location = new Point(num, ((Rectangle)(ref localBounds)).get_Top() + 8);
+			_clearButton.Location = new Point(_filterBox.LocalBounds.Right - 25, _filterBox.LocalBounds.Top + 8);
 		}
 
 		public void FilterCharacters(object sender = null, EventArgs e = null)
 		{
 			_filterCharacters = true;
+		}
+
+		public void ClearFilterText()
+		{
+			_filterBox.Text = null;
+			_filterBox.ForceFilter();
 		}
 
 		public void PerformFiltering()
@@ -388,7 +381,6 @@ namespace Kenedia.Modules.Characters.Views
 			List<Match> strings = regex.Matches(_filterBox.Text.Trim().ToLower()).Cast<Match>().ToList();
 			new List<string>();
 			List<KeyValuePair<string, SearchFilter<Character_Model>>> stringFilters = new List<KeyValuePair<string, SearchFilter<Character_Model>>>();
-			_003C_003Ec__DisplayClass68_0 CS_0024_003C_003E8__locals0;
 			foreach (Match match in strings)
 			{
 				string string_text = SearchableString(match.ToString().Replace("\"", ""));
@@ -418,14 +410,7 @@ namespace Kenedia.Modules.Characters.Views
 				}
 				if (_settings.DisplayToggles.Value["Gender"].Check)
 				{
-					stringFilters.Add(new KeyValuePair<string, SearchFilter<Character_Model>>("Gender", new SearchFilter<Character_Model>(delegate(Character_Model c)
-					{
-						//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-						//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-						_003C_003Ec__DisplayClass68_0 _003C_003Ec__DisplayClass68_ = CS_0024_003C_003E8__locals0;
-						Gender gender = c.Gender;
-						return SearchableString(((object)(Gender)(ref gender)).ToString()).Contains(string_text);
-					}, enabled: true)));
+					stringFilters.Add(new KeyValuePair<string, SearchFilter<Character_Model>>("Gender", new SearchFilter<Character_Model>((Character_Model c) => SearchableString(c.Gender.ToString()).Contains(string_text), enabled: true)));
 				}
 				if (_settings.DisplayToggles.Value["CraftingProfession"].Check)
 				{
@@ -447,7 +432,7 @@ namespace Kenedia.Modules.Characters.Views
 				}
 				stringFilters.Add(new KeyValuePair<string, SearchFilter<Character_Model>>("Tags", new SearchFilter<Character_Model>(delegate(Character_Model c)
 				{
-					foreach (string current2 in c.Tags)
+					foreach (string current2 in c.DisplayTags)
 					{
 						if (SearchableString(current2).Contains(string_text))
 						{
@@ -614,15 +599,15 @@ namespace Kenedia.Modules.Characters.Views
 		{
 			base.UpdateContainer(gameTime);
 			base.BasicTooltipText = ((base.MouseOverTitleBar && base.Version != null) ? $"v. {base.Version}" : null);
-			if (_filterCharacters && gameTime.get_TotalGameTime().TotalMilliseconds - _filterTick > (double)_settings.FilterDelay.Value)
+			if (_filterCharacters && gameTime.TotalGameTime.TotalMilliseconds - _filterTick > (double)_settings.FilterDelay.Value)
 			{
-				_filterTick = gameTime.get_TotalGameTime().TotalMilliseconds;
+				_filterTick = gameTime.TotalGameTime.TotalMilliseconds;
 				_filterCharacters = false;
 				PerformFiltering();
 			}
-			if (gameTime.get_TotalGameTime().TotalMilliseconds - lastUniform > 1000.0)
+			if (gameTime.TotalGameTime.TotalMilliseconds - lastUniform > 1000.0)
 			{
-				lastUniform = gameTime.get_TotalGameTime().TotalMilliseconds;
+				lastUniform = gameTime.TotalGameTime.TotalMilliseconds;
 				CharacterCards.FirstOrDefault()?.UniformWithAttached();
 			}
 		}
@@ -634,21 +619,18 @@ namespace Kenedia.Modules.Characters.Views
 
 		public override void PaintAfterChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 			base.PaintAfterChildren(spriteBatch, bounds);
 		}
 
 		protected override void OnShown(EventArgs e)
 		{
-			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
 			base.OnShown(e);
 			if (_settings.FocusSearchOnShow.Value)
 			{
 				foreach (Keys item in GameService.Input.Keyboard.KeysDown)
 				{
-					Keyboard.Release((VirtualKeyShort)item);
-					Keyboard.Release((VirtualKeyShort)item, sendToSystem: true);
+					Blish_HUD.Controls.Intern.Keyboard.Release((VirtualKeyShort)item);
+					Blish_HUD.Controls.Intern.Keyboard.Release((VirtualKeyShort)item, sendToSystem: true);
 				}
 				_filterBox.Focused = true;
 			}
@@ -667,42 +649,17 @@ namespace Kenedia.Modules.Characters.Views
 
 		protected override void OnResized(ResizedEventArgs e)
 		{
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
 			base.OnResized(e);
 			if (_created)
 			{
-				Rectangle val;
 				if (ContentPanel != null)
 				{
-					Kenedia.Modules.Core.Controls.FlowPanel contentPanel = ContentPanel;
-					val = base.ContentRegion;
-					int x = ((Rectangle)(ref val)).get_Size().X;
-					val = base.ContentRegion;
-					contentPanel.Size = new Point(x, ((Rectangle)(ref val)).get_Size().Y - 35);
+					ContentPanel.Size = new Point(base.ContentRegion.Size.X, base.ContentRegion.Size.Y - 35);
 				}
 				if (_dropdownPanel != null)
 				{
 					_filterBox.Width = _dropdownPanel.Width - _buttonPanel.Width - 2;
-					ImageButton clearButton = _clearButton;
-					val = _filterBox.LocalBounds;
-					int num = ((Rectangle)(ref val)).get_Right() - 23;
-					val = _filterBox.LocalBounds;
-					clearButton.Location = new Point(num, ((Rectangle)(ref val)).get_Top() + 8);
+					_clearButton.Location = new Point(_filterBox.LocalBounds.Right - 23, _filterBox.LocalBounds.Top + 8);
 				}
 				if (e.CurrentSize.Y < 135)
 				{
@@ -730,6 +687,7 @@ namespace Kenedia.Modules.Characters.Views
 			CharacterEdit?.Dispose();
 			_dropdownPanel?.Dispose();
 			_displaySettingsButton?.Dispose();
+			_characterRoutinesButton?.Dispose();
 			_filterBox?.Dispose();
 			SideMenu?.Dispose();
 		}
@@ -762,6 +720,27 @@ namespace Kenedia.Modules.Characters.Views
 			}
 		}
 
+		public void SwitchToCharacterBySearch(string characterName)
+		{
+			string searchText = characterName?.Trim();
+			if (string.IsNullOrEmpty(searchText))
+			{
+				return;
+			}
+			_filterBox.Text = searchText;
+			_filterBox.ForceFilter();
+			CharacterCard characterCard = CharactersPanel.Children.OfType<CharacterCard>().FirstOrDefault((CharacterCard card) => card.Visible);
+			characterCard?.Character?.Swap();
+			if (characterCard == null)
+			{
+				BaseModule<Characters, MainWindow, Settings, PathCollection, StaticHosting>.Logger.Debug("No character found for character routine switch request '" + searchText + "'.");
+				if (!base.Visible)
+				{
+					Show();
+				}
+			}
+		}
+
 		private void DraggingControl_LeftMouseButtonReleased(object sender, MouseEventArgs e)
 		{
 			SetNewIndex(DraggingControl.CharacterControl);
@@ -770,17 +749,13 @@ namespace Kenedia.Modules.Characters.Views
 
 		private void SetNewIndex(CharacterCard characterControl)
 		{
-			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
 			MouseHandler i = Control.Input.Mouse;
 			IEnumerable<CharacterCard> enumerable = CharactersPanel.Children.Cast<CharacterCard>();
 			int newIndex = -1;
 			int index = 0;
 			foreach (CharacterCard c in enumerable)
 			{
-				Rectangle absoluteBounds = c.AbsoluteBounds;
-				if (((Rectangle)(ref absoluteBounds)).Contains(i.Position) && newIndex == -1)
+				if (c.AbsoluteBounds.Contains(i.Position) && newIndex == -1)
 				{
 					characterControl.Index = c.Index;
 					characterControl.Character.Index = c.Index;
@@ -855,29 +830,20 @@ namespace Kenedia.Modules.Characters.Views
 
 		public void CheckOCRRegion()
 		{
-			//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-			Rectangle defaultRect = default(Rectangle);
-			((Rectangle)(ref defaultRect))._002Ector(50, (GameService.Graphics.Resolution.Y - 350) / 2, 530, 50);
-			if (_settings.UseOCR.Value)
+			Rectangle defaultRect = new Rectangle(50, (GameService.Graphics.Resolution.Y - 350) / 2, 530, 50);
+			if (_settings.UseOCR.Value && _settings.ActiveOCRRegion.Equals(defaultRect))
 			{
-				Rectangle activeOCRRegion = _settings.ActiveOCRRegion;
-				if (((Rectangle)(ref activeOCRRegion)).Equals(defaultRect))
+				new OCRSetupNotification
 				{
-					new OCRSetupNotification
+					Resolution = _settings.OCRKey,
+					Parent = _notifications,
+					Height = 25,
+					ClickAction = delegate
 					{
-						Resolution = _settings.OCRKey,
-						Parent = _notifications,
-						Height = 25,
-						ClickAction = delegate
-						{
-							_toggleOCR?.Invoke();
-							SettingsWindow?.Show();
-						}
-					};
-				}
+						_toggleOCR?.Invoke();
+						SettingsWindow?.Show();
+					}
+				};
 			}
 			if (_settings.ShowNotifications.Value && _notifications.Children.Count > 0 && _notifications.Children.Any((Control e) => e.Visible))
 			{

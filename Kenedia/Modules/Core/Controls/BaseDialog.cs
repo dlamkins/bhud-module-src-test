@@ -92,9 +92,6 @@ namespace Kenedia.Modules.Core.Controls
 
 		public BaseDialog(string title, string message, ButtonDefinition[] buttons = null)
 		{
-			//IL_0143: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019e: Unknown result type (might be due to invalid IL or missing references)
 			Title = title;
 			Message = message;
 			Buttons = buttons;
@@ -109,7 +106,7 @@ namespace Kenedia.Modules.Core.Controls
 			{
 				Parent = GameService.Graphics.SpriteScreen,
 				ZIndex = 2147483646,
-				BackgroundColor = Color.get_White() * 0.2f,
+				BackgroundColor = Color.White * 0.2f,
 				WidthSizingMode = SizingMode.Fill,
 				HeightSizingMode = SizingMode.Fill,
 				Visible = false
@@ -117,7 +114,7 @@ namespace Kenedia.Modules.Core.Controls
 			base.BackgroundImage = _backgroundImage;
 			base.Parent = GameService.Graphics.SpriteScreen;
 			ZIndex = int.MaxValue;
-			base.BorderColor = Color.get_Black();
+			base.BorderColor = Color.Black;
 			base.BorderWidth = new RectangleDimensions(3);
 			base.ContentPadding = new RectangleDimensions(5);
 			base.Height = 115;
@@ -187,50 +184,24 @@ namespace Kenedia.Modules.Core.Controls
 
 		private void Keyboard_KeyPressed(object sender, KeyboardEventArgs e)
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000a: Invalid comparison between Unknown and I4
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000f: Invalid comparison between Unknown and I4
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0014: Invalid comparison between Unknown and I4
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001a: Invalid comparison between Unknown and I4
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001f: Invalid comparison between Unknown and I4
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Invalid comparison between Unknown and I4
-			Keys key = e.Key;
-			if ((int)key <= 27)
+			switch (e.Key)
 			{
-				if ((int)key != 13)
-				{
-					if ((int)key == 27)
-					{
-						_dialogResult = DialogResult.None;
-						_waitHandle.Set();
-					}
-					return;
-				}
+			case Keys.Escape:
+				_dialogResult = DialogResult.None;
+				_waitHandle.Set();
+				break;
+			case Keys.Enter:
+			case Keys.Space:
+				_dialogResult = _buttons[SelectedButtonIndex].Result;
+				_waitHandle.Set();
+				break;
+			case Keys.Left:
+				SelectButton(-1);
+				break;
+			case Keys.Right:
+				SelectButton(1);
+				break;
 			}
-			else if ((int)key != 32)
-			{
-				if ((int)key != 37)
-				{
-					if ((int)key == 39)
-					{
-						SelectButton(1);
-					}
-				}
-				else
-				{
-					SelectButton(-1);
-				}
-				return;
-			}
-			_dialogResult = _buttons[SelectedButtonIndex].Result;
-			_waitHandle.Set();
 		}
 
 		public async Task<DialogResult> ShowDialog(CancellationToken cancellationToken = default(CancellationToken))
@@ -251,44 +222,20 @@ namespace Kenedia.Modules.Core.Controls
 
 		public override void RecalculateLayout()
 		{
-			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0147: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0193: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0252: Unknown result type (might be due to invalid IL or missing references)
-			//IL_026f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0288: Unknown result type (might be due to invalid IL or missing references)
-			//IL_029e: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
 			if (base.Parent != null)
 			{
 				base.Location = new Point((base.Parent.Width - base.Width) / 2, (base.Parent.Height - base.Height) / 2);
 			}
 			base.TextureRectangle = new Rectangle(30, 30, Math.Min(base.Width, _backgroundImage.Width - 60), Math.Min(base.Height, _backgroundImage.Height - 60));
-			Rectangle contentRegion = base.ContentRegion;
-			int left = ((Rectangle)(ref contentRegion)).get_Left();
-			contentRegion = base.ContentRegion;
-			_titleBounds = new Rectangle(left, ((Rectangle)(ref contentRegion)).get_Top(), base.ContentRegion.Width, TitleFont.get_LineHeight() + 2);
-			_alertBounds = new Rectangle(((Rectangle)(ref _titleBounds)).get_Left(), ((Rectangle)(ref _titleBounds)).get_Top(), _titleBounds.Height, _titleBounds.Height);
-			_titleTextBounds = new Rectangle(((Rectangle)(ref _titleBounds)).get_Left() + _alertBounds.Width + 10, ((Rectangle)(ref _alertBounds)).get_Top(), _titleBounds.Width - _alertBounds.Width * 2, _titleBounds.Height);
-			_messageTextBounds = new Rectangle(((Rectangle)(ref _titleBounds)).get_Left(), ((Rectangle)(ref _titleBounds)).get_Bottom() + 5, _titleBounds.Width, _buttonPanel.Top - ((Rectangle)(ref _titleBounds)).get_Bottom() + 5);
+			_titleBounds = new Rectangle(base.ContentRegion.Left, base.ContentRegion.Top, base.ContentRegion.Width, TitleFont.LineHeight + 2);
+			_alertBounds = new Rectangle(_titleBounds.Left, _titleBounds.Top, _titleBounds.Height, _titleBounds.Height);
+			_titleTextBounds = new Rectangle(_titleBounds.Left + _alertBounds.Width + 10, _alertBounds.Top, _titleBounds.Width - _alertBounds.Width * 2, _titleBounds.Height);
+			_messageTextBounds = new Rectangle(_titleBounds.Left, _titleBounds.Bottom + 5, _titleBounds.Width, _buttonPanel.Top - _titleBounds.Bottom + 5);
 			if (AutoSize)
 			{
 				_message = DrawUtil.WrapText(Font, Message, base.ContentRegion.Width);
-				base.Height = base.BorderWidth.Vertical + TitleFont.get_LineHeight() + 2 + 5 + (int)Font.GetStringRectangle(_message).Height + 15 + _buttonPanel.Height + base.ContentPadding.Vertical;
+				base.Height = base.BorderWidth.Vertical + TitleFont.LineHeight + 2 + 5 + (int)Font.GetStringRectangle(_message).Height + 15 + _buttonPanel.Height + base.ContentPadding.Vertical;
 				base.Width = Math.Max(DesiredWidth, base.ContentPadding.Horizontal + _alertBounds.Width * 2 + 10 + (int)TitleFont.GetStringRectangle(Title).Width);
 			}
 			_buttonPanel.Location = new Point((base.ContentRegion.Width - _buttonPanel.Width) / 2, base.ContentRegion.Height - _buttonPanel.Height);
@@ -296,17 +243,10 @@ namespace Kenedia.Modules.Core.Controls
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
 			base.PaintBeforeChildren(spriteBatch, bounds);
 			spriteBatch.DrawStringOnCtrl(this, Title, TitleFont, _titleTextBounds, ContentService.Colors.ColonialWhite, wrap: false, HorizontalAlignment.Center, VerticalAlignment.Top);
-			spriteBatch.DrawStringOnCtrl(this, _message, Font, _messageTextBounds, Color.get_White(), wrap: false, HorizontalAlignment.Center, VerticalAlignment.Top);
-			spriteBatch.DrawOnCtrl((Control)this, (Texture2D)_alertImage, _alertBounds, (Rectangle?)_alertImage.Bounds);
+			spriteBatch.DrawStringOnCtrl(this, _message, Font, _messageTextBounds, Color.White, wrap: false, HorizontalAlignment.Center, VerticalAlignment.Top);
+			spriteBatch.DrawOnCtrl(this, _alertImage, _alertBounds, _alertImage.Bounds);
 		}
 
 		protected override void OnHidden(EventArgs e)

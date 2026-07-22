@@ -77,13 +77,9 @@ namespace Kenedia.Modules.Core.Controls
 		{
 			get
 			{
-				//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-				//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-				//IL_001b: Unknown result type (might be due to invalid IL or missing references)
 				if (!ClipInputToBounds)
 				{
-					Rectangle absoluteBounds = base.AbsoluteBounds;
-					return ((Rectangle)(ref absoluteBounds)).Contains(Control.Input.Mouse.Position);
+					return base.AbsoluteBounds.Contains(Control.Input.Mouse.Position);
 				}
 				return base.MouseOver;
 			}
@@ -128,7 +124,7 @@ namespace Kenedia.Modules.Core.Controls
 
 		public bool ShowRightBorder { get; set; }
 
-		public Color? BackgroundImageColor { get; set; } = Color.get_White();
+		public Color? BackgroundImageColor { get; set; } = Color.White;
 
 
 		public Color? BackgroundImageHoveredColor { get; set; }
@@ -232,7 +228,6 @@ namespace Kenedia.Modules.Core.Controls
 
 		public Panel()
 		{
-			//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
 			_003CTitleBarHeight_003Ek__BackingField = 36;
 			CaptureInput = true;
 			base._002Ector();
@@ -259,37 +254,6 @@ namespace Kenedia.Modules.Core.Controls
 
 		public override void RecalculateLayout()
 		{
-			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0130: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0196: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ed: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0226: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_028c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0291: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02af: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_030a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_031e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0323: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0331: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0374: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0379: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03af: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03b4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03c9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03ec: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03f9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03fe: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0403: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
 			_contentRegion = new Rectangle(_contentPadding.Left + BorderWidth.Left, _contentPadding.Top + BorderWidth.Top, base.Width - _contentPadding.Horizontal - BorderWidth.Horizontal - ((WidthSizingMode == SizingMode.AutoSize) ? base.AutoSizePadding.X : 0), base.Height - _contentPadding.Vertical - BorderWidth.Vertical - ((HeightSizingMode == SizingMode.AutoSize) ? base.AutoSizePadding.Y : 0));
 			_backgroundBounds = new Rectangle(Math.Max(BorderWidth.Left - 2, 0), Math.Max(BorderWidth.Top - 2, 0), base.Width - Math.Max(BorderWidth.Horizontal - 4, 0), base.Height - Math.Max(BorderWidth.Vertical - 4, 0));
@@ -313,116 +277,67 @@ namespace Kenedia.Modules.Core.Controls
 			}
 			base.ContentRegion = new Rectangle(_contentPadding.Left + num4, _contentPadding.Top + num, _size.X - num4 - num2 - _contentPadding.Horizontal, _size.Y - num - num3 - _contentPadding.Vertical);
 			_layoutHeaderBounds = new Rectangle(num4, 0, base.Width, num);
-			_layoutHeaderIconBounds = (Rectangle)((TitleIcon != null) ? new Rectangle(((Rectangle)(ref _layoutHeaderBounds)).get_Left() + _titleIconPadding.Left, _titleIconPadding.Top, num - _titleIconPadding.Vertical, num - _titleIconPadding.Vertical) : Rectangle.get_Empty());
-			_layoutHeaderTextBounds = new Rectangle(((Rectangle)(ref _layoutHeaderIconBounds)).get_Right() + _titleIconPadding.Right, 0, _layoutHeaderBounds.Width - _layoutHeaderIconBounds.Width, num);
+			_layoutHeaderIconBounds = ((TitleIcon != null) ? new Rectangle(_layoutHeaderBounds.Left + _titleIconPadding.Left, _titleIconPadding.Top, num - _titleIconPadding.Vertical, num - _titleIconPadding.Vertical) : Rectangle.Empty);
+			_layoutHeaderTextBounds = new Rectangle(_layoutHeaderIconBounds.Right + _titleIconPadding.Right, 0, _layoutHeaderBounds.Width - _layoutHeaderIconBounds.Width, num);
 			int arrowSize = num - 4;
 			_layoutAccordionArrowOrigin = new Vector2(16f, 16f);
-			_layoutAccordionArrowBounds = RectangleExtension.OffsetBy(new Rectangle(((Rectangle)(ref _layoutHeaderBounds)).get_Right() - arrowSize, (num - arrowSize) / 2, arrowSize, arrowSize), new Point(arrowSize / 2, arrowSize / 2));
+			_layoutAccordionArrowBounds = new Rectangle(_layoutHeaderBounds.Right - arrowSize, (num - arrowSize) / 2, arrowSize, arrowSize).OffsetBy(new Point(arrowSize / 2, arrowSize / 2));
 			CalculateBorders();
 		}
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0110: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0134: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0178: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0196: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ac: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ca: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01df: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_020a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0210: Unknown result type (might be due to invalid IL or missing references)
-			//IL_021a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0225: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0248: Unknown result type (might be due to invalid IL or missing references)
-			//IL_024e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0258: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0263: Unknown result type (might be due to invalid IL or missing references)
-			//IL_026d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0286: Unknown result type (might be due to invalid IL or missing references)
-			//IL_028c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0296: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ab: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ef: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02f4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0300: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0351: Unknown result type (might be due to invalid IL or missing references)
-			//IL_036c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0375: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0381: Unknown result type (might be due to invalid IL or missing references)
-			//IL_038d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0393: Unknown result type (might be due to invalid IL or missing references)
 			_tooltip.Visible = false;
 			if (_backgroundTexture != null)
 			{
-				spriteBatch.DrawOnCtrl((Control)this, (Texture2D)_backgroundTexture, bounds);
+				spriteBatch.DrawOnCtrl(this, _backgroundTexture, bounds);
 			}
 			if (_showTint)
 			{
-				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, base.ContentRegion, Color.get_Black() * 0.4f);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, base.ContentRegion, Color.Black * 0.4f);
 			}
 			if (!string.IsNullOrEmpty(_title))
 			{
-				spriteBatch.DrawOnCtrl((Control)this, (Texture2D)_texturePanelHeader, _layoutHeaderBounds);
+				spriteBatch.DrawOnCtrl(this, _texturePanelHeader, _layoutHeaderBounds);
 				if (_canCollapse && _mouseOver && base.RelativeMousePosition.Y <= 36)
 				{
 					_tooltip.Visible = true;
-					spriteBatch.DrawOnCtrl((Control)this, (Texture2D)_texturePanelHeaderActive, _layoutHeaderBounds);
+					spriteBatch.DrawOnCtrl(this, _texturePanelHeaderActive, _layoutHeaderBounds);
 				}
 				else
 				{
-					spriteBatch.DrawOnCtrl((Control)this, (Texture2D)_texturePanelHeader, _layoutHeaderBounds);
+					spriteBatch.DrawOnCtrl(this, _texturePanelHeader, _layoutHeaderBounds);
 				}
-				spriteBatch.DrawStringOnCtrl(this, _title, Control.Content.DefaultFont16, _layoutHeaderTextBounds, Color.get_White());
+				spriteBatch.DrawStringOnCtrl(this, _title, Control.Content.DefaultFont16, _layoutHeaderTextBounds, Color.White);
 				if (TitleIcon != null)
 				{
-					spriteBatch.DrawOnCtrl(this, TitleIcon, _layoutHeaderIconBounds, (Rectangle)(((_003F?)TitleTextureRegion) ?? TitleIcon.Bounds), Color.get_White());
+					spriteBatch.DrawOnCtrl(this, TitleIcon, _layoutHeaderIconBounds, TitleTextureRegion ?? TitleIcon.Bounds, Color.White);
 				}
 				if (_canCollapse)
 				{
-					spriteBatch.DrawOnCtrl(this, _textureAccordionArrow, _layoutAccordionArrowBounds, null, Color.get_White(), base.ArrowRotation, _layoutAccordionArrowOrigin, (SpriteEffects)0);
+					spriteBatch.DrawOnCtrl(this, _textureAccordionArrow, _layoutAccordionArrowBounds, null, Color.White, base.ArrowRotation, _layoutAccordionArrowOrigin);
 				}
 			}
 			if (base.ShowBorder)
 			{
-				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, base.ContentRegion, Color.get_Black() * (0.1f * base.AccentOpacity));
-				spriteBatch.DrawOnCtrl(this, _textureLeftSideAccent, _layoutLeftAccentBounds, _layoutLeftAccentSrc, Color.get_Black() * base.AccentOpacity, 0f, Vector2.get_Zero(), (SpriteEffects)2);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, base.ContentRegion, Color.Black * (0.1f * base.AccentOpacity));
+				spriteBatch.DrawOnCtrl(this, _textureLeftSideAccent, _layoutLeftAccentBounds, _layoutLeftAccentSrc, Color.Black * base.AccentOpacity, 0f, Vector2.Zero, SpriteEffects.FlipVertically);
 				if (ShowRightBorder)
 				{
-					spriteBatch.DrawOnCtrl(this, _textureLeftSideAccent, _layoutRightAccentBounds, _layoutLeftAccentSrc, Color.get_Black() * base.AccentOpacity, 0f, Vector2.get_Zero(), (SpriteEffects)0);
+					spriteBatch.DrawOnCtrl(this, _textureLeftSideAccent, _layoutRightAccentBounds, _layoutLeftAccentSrc, Color.Black * base.AccentOpacity, 0f, Vector2.Zero);
 				}
-				spriteBatch.DrawOnCtrl(this, _textureCornerAccent, _layoutTopLeftAccentBounds, _layoutCornerAccentSrc, Color.get_White() * base.AccentOpacity, 0f, Vector2.get_Zero(), (SpriteEffects)1);
-				spriteBatch.DrawOnCtrl(this, _textureCornerAccent, _layoutBottomRightAccentBounds, _layoutCornerAccentSrc, Color.get_White() * base.AccentOpacity, 0f, Vector2.get_Zero(), (SpriteEffects)2);
+				spriteBatch.DrawOnCtrl(this, _textureCornerAccent, _layoutTopLeftAccentBounds, _layoutCornerAccentSrc, Color.White * base.AccentOpacity, 0f, Vector2.Zero, SpriteEffects.FlipHorizontally);
+				spriteBatch.DrawOnCtrl(this, _textureCornerAccent, _layoutBottomRightAccentBounds, _layoutCornerAccentSrc, Color.White * base.AccentOpacity, 0f, Vector2.Zero, SpriteEffects.FlipVertically);
 			}
 			Color? backgroundColor = ((BackgroundHoveredColor.HasValue && Hovered) ? BackgroundHoveredColor : BackgroundColor);
 			if (backgroundColor.HasValue)
 			{
-				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, _backgroundBounds, Rectangle.get_Empty(), backgroundColor.Value);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, _backgroundBounds, Rectangle.Empty, backgroundColor.Value);
 			}
 			Color? backgroundImageColor = ((BackgroundImageHoveredColor.HasValue && Hovered) ? BackgroundImageHoveredColor : BackgroundImageColor);
 			if (BackgroundImage != null && backgroundImageColor.HasValue)
 			{
-				spriteBatch.DrawOnCtrl(this, BackgroundImage, _backgroundBounds, (Rectangle)(((_003F?)TextureRectangle) ?? BackgroundImage.Bounds), backgroundImageColor.Value, 0f, default(Vector2), (SpriteEffects)0);
+				spriteBatch.DrawOnCtrl(this, BackgroundImage, _backgroundBounds, TextureRectangle ?? BackgroundImage.Bounds, backgroundImageColor.Value, 0f, default(Vector2));
 			}
 			if (((HoveredBorderColor.HasValue && Hovered) ? HoveredBorderColor : BorderColor).HasValue)
 			{
@@ -455,179 +370,126 @@ namespace Kenedia.Modules.Core.Controls
 
 		private void CalculateBorders()
 		{
-			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0115: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0123: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0156: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ef: Unknown result type (might be due to invalid IL or missing references)
-			//IL_021a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0227: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0254: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0261: Unknown result type (might be due to invalid IL or missing references)
-			//IL_028c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0294: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ff: Unknown result type (might be due to invalid IL or missing references)
-			//IL_032e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_033b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_036a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0377: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03a6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03e0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03e8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0453: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0481: Unknown result type (might be due to invalid IL or missing references)
-			//IL_048f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04f9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0507: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0533: Unknown result type (might be due to invalid IL or missing references)
-			//IL_053c: Unknown result type (might be due to invalid IL or missing references)
 			_topBorders.Clear();
 			_leftBorders.Clear();
 			_bottomBorders.Clear();
 			_rightBorders.Clear();
-			Rectangle r = default(Rectangle);
-			((Rectangle)(ref r))._002Ector(-1, 0, base.Width + 2, 0);
+			Rectangle r = new Rectangle(-1, 0, base.Width + 2, 0);
 			int strength = BorderWidth.Top;
 			int fadeLines = Math.Max(0, Math.Min(strength - 1, 4));
 			if (fadeLines >= 1)
 			{
 				List<(Rectangle, float)> topBorders = _topBorders;
-				((Rectangle)(ref r))._002Ector(0, 0, base.Width, 1);
+				r = new Rectangle(0, 0, base.Width, 1);
 				topBorders.Add((r, 0.5f));
 			}
 			if (fadeLines >= 3)
 			{
 				List<(Rectangle, float)> topBorders2 = _topBorders;
-				((Rectangle)(ref r))._002Ector(((Rectangle)(ref r)).get_Left() + 1, ((Rectangle)(ref r)).get_Bottom(), r.Width - 2, 1);
+				r = new Rectangle(r.Left + 1, r.Bottom, r.Width - 2, 1);
 				topBorders2.Add((r, 0.7f));
 			}
 			List<(Rectangle, float)> topBorders3 = _topBorders;
-			((Rectangle)(ref r))._002Ector(((Rectangle)(ref r)).get_Left() + 1, ((Rectangle)(ref r)).get_Bottom(), r.Width - 1, strength - fadeLines);
+			r = new Rectangle(r.Left + 1, r.Bottom, r.Width - 1, strength - fadeLines);
 			topBorders3.Add((r, 1f));
 			if (fadeLines >= 4)
 			{
 				List<(Rectangle, float)> topBorders4 = _topBorders;
-				((Rectangle)(ref r))._002Ector(((Rectangle)(ref r)).get_Left() + 1, ((Rectangle)(ref r)).get_Bottom(), r.Width - 2, 1);
+				r = new Rectangle(r.Left + 1, r.Bottom, r.Width - 2, 1);
 				topBorders4.Add((r, 0.7f));
 			}
 			if (fadeLines >= 2)
 			{
-				_topBorders.Add((new Rectangle(((Rectangle)(ref r)).get_Left() + 1, ((Rectangle)(ref r)).get_Bottom(), r.Width - 2, 1), 0.5f));
+				_topBorders.Add((new Rectangle(r.Left + 1, r.Bottom, r.Width - 2, 1), 0.5f));
 			}
-			((Rectangle)(ref r))._002Ector(-1, -1, 0, base.Height + 2);
+			r = new Rectangle(-1, -1, 0, base.Height + 2);
 			strength = BorderWidth.Left;
 			fadeLines = Math.Max(0, Math.Min(strength - 1, 4));
 			if (fadeLines >= 1)
 			{
 				List<(Rectangle, float)> leftBorders = _leftBorders;
-				((Rectangle)(ref r))._002Ector(0, 0, 1, base.Height);
+				r = new Rectangle(0, 0, 1, base.Height);
 				leftBorders.Add((r, 0.5f));
 			}
 			if (fadeLines >= 3)
 			{
 				List<(Rectangle, float)> leftBorders2 = _leftBorders;
-				((Rectangle)(ref r))._002Ector(((Rectangle)(ref r)).get_Right(), ((Rectangle)(ref r)).get_Top() + 1, 1, r.Height - 2);
+				r = new Rectangle(r.Right, r.Top + 1, 1, r.Height - 2);
 				leftBorders2.Add((r, 0.7f));
 			}
 			List<(Rectangle, float)> leftBorders3 = _leftBorders;
-			((Rectangle)(ref r))._002Ector(((Rectangle)(ref r)).get_Right(), ((Rectangle)(ref r)).get_Top() + 1, strength - fadeLines, r.Height - 2);
+			r = new Rectangle(r.Right, r.Top + 1, strength - fadeLines, r.Height - 2);
 			leftBorders3.Add((r, 1f));
 			if (fadeLines >= 4)
 			{
 				List<(Rectangle, float)> leftBorders4 = _leftBorders;
-				((Rectangle)(ref r))._002Ector(((Rectangle)(ref r)).get_Right(), ((Rectangle)(ref r)).get_Top() + 1, 1, r.Height - 2);
+				r = new Rectangle(r.Right, r.Top + 1, 1, r.Height - 2);
 				leftBorders4.Add((r, 0.7f));
 			}
 			if (fadeLines >= 2)
 			{
-				_leftBorders.Add((new Rectangle(((Rectangle)(ref r)).get_Right(), ((Rectangle)(ref r)).get_Top() + 1, 1, r.Height - 2), 0.5f));
+				_leftBorders.Add((new Rectangle(r.Right, r.Top + 1, 1, r.Height - 2), 0.5f));
 			}
-			((Rectangle)(ref r))._002Ector(base.Width, -1, 0, base.Height + 2);
+			r = new Rectangle(base.Width, -1, 0, base.Height + 2);
 			strength = BorderWidth.Right;
 			fadeLines = Math.Max(0, Math.Min(strength - 1, 4));
 			if (fadeLines >= 1)
 			{
 				List<(Rectangle, float)> rightBorders = _rightBorders;
-				((Rectangle)(ref r))._002Ector(base.Width - 1, 0, 1, base.Height);
+				r = new Rectangle(base.Width - 1, 0, 1, base.Height);
 				rightBorders.Add((r, 0.5f));
 			}
 			if (fadeLines >= 3)
 			{
 				List<(Rectangle, float)> rightBorders2 = _rightBorders;
-				((Rectangle)(ref r))._002Ector(((Rectangle)(ref r)).get_Left() - 1, ((Rectangle)(ref r)).get_Top() + 1, 1, r.Height - 2);
+				r = new Rectangle(r.Left - 1, r.Top + 1, 1, r.Height - 2);
 				rightBorders2.Add((r, 0.7f));
 			}
 			List<(Rectangle, float)> rightBorders3 = _rightBorders;
-			((Rectangle)(ref r))._002Ector(((Rectangle)(ref r)).get_Left() - (strength - fadeLines), ((Rectangle)(ref r)).get_Top() + 1, strength - fadeLines, r.Height - 2);
+			r = new Rectangle(r.Left - (strength - fadeLines), r.Top + 1, strength - fadeLines, r.Height - 2);
 			rightBorders3.Add((r, 1f));
 			if (fadeLines >= 4)
 			{
 				List<(Rectangle, float)> rightBorders4 = _rightBorders;
-				((Rectangle)(ref r))._002Ector(((Rectangle)(ref r)).get_Left() - 1, ((Rectangle)(ref r)).get_Top() + 1, 1, r.Height - 2);
+				r = new Rectangle(r.Left - 1, r.Top + 1, 1, r.Height - 2);
 				rightBorders4.Add((r, 0.7f));
 			}
 			if (fadeLines >= 2)
 			{
-				_rightBorders.Add((new Rectangle(((Rectangle)(ref r)).get_Left() - 1, ((Rectangle)(ref r)).get_Top() + 1, 1, r.Height - 2), 0.5f));
+				_rightBorders.Add((new Rectangle(r.Left - 1, r.Top + 1, 1, r.Height - 2), 0.5f));
 			}
-			((Rectangle)(ref r))._002Ector(-1, base.Height, base.Width + 2, 2);
+			r = new Rectangle(-1, base.Height, base.Width + 2, 2);
 			strength = BorderWidth.Bottom;
 			fadeLines = Math.Max(0, Math.Min(strength - 1, 4));
 			if (fadeLines >= 1)
 			{
 				List<(Rectangle, float)> bottomBorders = _bottomBorders;
-				((Rectangle)(ref r))._002Ector(0, base.Height - 1, base.Width, 1);
+				r = new Rectangle(0, base.Height - 1, base.Width, 1);
 				bottomBorders.Add((r, 0.5f));
 			}
 			if (fadeLines >= 3)
 			{
 				List<(Rectangle, float)> bottomBorders2 = _bottomBorders;
-				((Rectangle)(ref r))._002Ector(((Rectangle)(ref r)).get_Left() + 1, ((Rectangle)(ref r)).get_Top() - 1, r.Width - 2, 1);
+				r = new Rectangle(r.Left + 1, r.Top - 1, r.Width - 2, 1);
 				bottomBorders2.Add((r, 0.7f));
 			}
 			List<(Rectangle, float)> bottomBorders3 = _bottomBorders;
-			((Rectangle)(ref r))._002Ector(((Rectangle)(ref r)).get_Left() + 1, ((Rectangle)(ref r)).get_Top() - (strength - fadeLines), r.Width - 2, strength - fadeLines);
+			r = new Rectangle(r.Left + 1, r.Top - (strength - fadeLines), r.Width - 2, strength - fadeLines);
 			bottomBorders3.Add((r, 1f));
 			if (fadeLines >= 4)
 			{
 				List<(Rectangle, float)> bottomBorders4 = _bottomBorders;
-				((Rectangle)(ref r))._002Ector(((Rectangle)(ref r)).get_Left() + 1, ((Rectangle)(ref r)).get_Top() - 1, r.Width - 2, 1);
+				r = new Rectangle(r.Left + 1, r.Top - 1, r.Width - 2, 1);
 				bottomBorders4.Add((r, 0.7f));
 			}
 			if (fadeLines >= 2)
 			{
-				_bottomBorders.Add((new Rectangle(((Rectangle)(ref r)).get_Left() + 1, ((Rectangle)(ref r)).get_Top() - 1, r.Width - 2, 1), 0.5f));
+				_bottomBorders.Add((new Rectangle(r.Left + 1, r.Top - 1, r.Width - 2, 1), 0.5f));
 			}
 		}
 
 		private void DrawBorders(SpriteBatch spriteBatch)
 		{
-			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0124: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0130: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0184: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0189: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0195: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a1: Unknown result type (might be due to invalid IL or missing references)
 			Color? borderColor = ((HoveredBorderColor.HasValue && Hovered) ? HoveredBorderColor : BorderColor);
 			if (!borderColor.HasValue)
 			{
@@ -635,19 +497,19 @@ namespace Kenedia.Modules.Core.Controls
 			}
 			foreach (var r4 in new List<(Rectangle, float)>(_topBorders))
 			{
-				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, r4.Item1, Rectangle.get_Empty(), borderColor.Value * r4.Item2);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, r4.Item1, Rectangle.Empty, borderColor.Value * r4.Item2);
 			}
 			foreach (var r3 in new List<(Rectangle, float)>(_leftBorders))
 			{
-				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, r3.Item1, Rectangle.get_Empty(), borderColor.Value * r3.Item2);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, r3.Item1, Rectangle.Empty, borderColor.Value * r3.Item2);
 			}
 			foreach (var r2 in new List<(Rectangle, float)>(_bottomBorders))
 			{
-				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, r2.Item1, Rectangle.get_Empty(), borderColor.Value * r2.Item2);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, r2.Item1, Rectangle.Empty, borderColor.Value * r2.Item2);
 			}
 			foreach (var r in new List<(Rectangle, float)>(_rightBorders))
 			{
-				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, r.Item1, Rectangle.get_Empty(), borderColor.Value * r.Item2);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, r.Item1, Rectangle.Empty, borderColor.Value * r.Item2);
 			}
 		}
 

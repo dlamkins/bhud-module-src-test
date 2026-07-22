@@ -59,14 +59,13 @@ namespace Kenedia.Modules.Characters.Models
 			}
 		}
 
-		public void ApplyApiData(Specialization specialization)
+		public void ApplyApiData(Gw2Sharp.WebApi.V2.Models.Specialization specialization)
 		{
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-			Id = specialization.get_Id();
-			Profession = (ProfessionType)(Enum.TryParse<ProfessionType>(specialization.get_Profession(), out ProfessionType professionType) ? ((int)professionType) : 0);
-			IconAssetId = specialization.get_ProfessionIcon().GetAssetIdFromRenderUrl();
-			IconBigAssetId = specialization.get_ProfessionIconBig().GetAssetIdFromRenderUrl();
-			Name = specialization.get_Name();
+			Id = specialization.Id;
+			Profession = (Enum.TryParse<ProfessionType>(specialization.Profession, out var professionType) ? professionType : ((ProfessionType)0));
+			IconAssetId = specialization.ProfessionIcon.GetAssetIdFromRenderUrl();
+			IconBigAssetId = specialization.ProfessionIconBig.GetAssetIdFromRenderUrl();
+			Name = specialization.Name;
 		}
 	}
 }

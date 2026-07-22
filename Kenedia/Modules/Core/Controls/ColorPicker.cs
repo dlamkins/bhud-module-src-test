@@ -95,12 +95,10 @@ namespace Kenedia.Modules.Core.Controls
 		{
 			get
 			{
-				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 				return _selected_Color;
 			}
 			set
 			{
-				//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 				Common.SetProperty(ref _selected_Color, value, new ValueChangedEventHandler<Color>(ApplyColor));
 			}
 		}
@@ -111,21 +109,13 @@ namespace Kenedia.Modules.Core.Controls
 
 		public ColorPicker()
 		{
-			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0156: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b8: Unknown result type (might be due to invalid IL or missing references)
 			_color_Preview = new Panel
 			{
 				Parent = this,
 				Location = new Point(0, 0),
 				Size = new Point(20),
 				BorderWidth = new RectangleDimensions(2),
-				BorderColor = Color.get_Black(),
+				BorderColor = Color.Black,
 				BackgroundColor = Color.FromNonPremultiplied(R, G, B, A)
 			};
 			_red_box = new NumberBox
@@ -184,22 +174,17 @@ namespace Kenedia.Modules.Core.Controls
 
 		private void ApplyColor(object sender, ValueChangedEventArgs<Color> e)
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
 			Color col = e.NewValue;
-			_r = ((Color)(ref col)).get_R();
-			_g = ((Color)(ref col)).get_G();
-			_b = ((Color)(ref col)).get_B();
-			_a = ((Color)(ref col)).get_A();
+			_r = col.R;
+			_g = col.G;
+			_b = col.B;
+			_a = col.A;
 			_selected_Color = new Color(R, G, B, A);
 			ApplyColorsToControls();
 		}
 
 		private void ApplyColorsToControls()
 		{
-			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
 			_red_box.Value = R;
 			_blue_box.Value = B;
 			_green_box.Value = G;
@@ -209,13 +194,6 @@ namespace Kenedia.Modules.Core.Controls
 
 		private void SetColor(object sender, ValueChangedEventArgs<int> e)
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
 			Color old_color = _selected_Color;
 			_selected_Color = new Color(R, G, B, A);
 			ApplyColorsToControls();
@@ -225,7 +203,6 @@ namespace Kenedia.Modules.Core.Controls
 
 		public override void RecalculateLayout()
 		{
-			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
 			int padding = 5;
 			int preview_width = 20;
@@ -235,16 +212,16 @@ namespace Kenedia.Modules.Core.Controls
 			_color_Preview?.SetSize(preview_width, preview_width);
 			int red_x = (_color_Preview?.Right ?? 0) + padding;
 			_red_box?.SetLocation(red_x, 0);
-			_red_box?.SetSize(input_width, null);
+			_red_box?.SetSize(input_width);
 			int green_x = (_red_box?.Right ?? 0) + padding;
 			_green_box?.SetLocation(green_x, 0);
-			_green_box?.SetSize(input_width, null);
+			_green_box?.SetSize(input_width);
 			int blue_x = (_green_box?.Right ?? 0) + padding;
 			_blue_box?.SetLocation(blue_x, 0);
-			_blue_box?.SetSize(input_width, null);
+			_blue_box?.SetSize(input_width);
 			int alpha_x = (_blue_box?.Right ?? 0) + padding;
 			_alpha_box?.SetLocation(alpha_x, 0);
-			_alpha_box?.SetSize(input_width, null);
+			_alpha_box?.SetSize(input_width);
 		}
 	}
 }

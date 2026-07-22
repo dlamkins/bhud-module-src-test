@@ -75,9 +75,9 @@ namespace Kenedia.Modules.Core.Utility
 
 			public int Y;
 
-			public static implicit operator Point(POINT point)
+			public static implicit operator System.Drawing.Point(POINT point)
 			{
-				return new Point(point.X, point.Y);
+				return new System.Drawing.Point(point.X, point.Y);
 			}
 		}
 
@@ -242,7 +242,7 @@ namespace Kenedia.Modules.Core.Utility
 		{
 			if (xPos == -1 || yPos == -1)
 			{
-				Point pos = GetPosition();
+				System.Drawing.Point pos = GetPosition();
 				xPos = pos.X;
 				yPos = pos.Y;
 			}
@@ -280,7 +280,7 @@ namespace Kenedia.Modules.Core.Utility
 		{
 			if (xPos == -1 || yPos == -1)
 			{
-				Point pos = GetPosition();
+				System.Drawing.Point pos = GetPosition();
 				xPos = pos.X;
 				yPos = pos.Y;
 			}
@@ -321,7 +321,7 @@ namespace Kenedia.Modules.Core.Utility
 			{
 				if (xPos == -1 || yPos == -1)
 				{
-					Point pos = GetPosition();
+					System.Drawing.Point pos = GetPosition();
 					xPos = pos.X;
 					yPos = pos.Y;
 				}
@@ -367,19 +367,17 @@ namespace Kenedia.Modules.Core.Utility
 			PostMessage(GameService.GameIntegration.Gw2Instance.Gw2WindowHandle, 512u, 0u, lParam);
 		}
 
-		public static void SetPosition(Point point, bool sendToSystem = false)
+		public static void SetPosition(Microsoft.Xna.Framework.Point point, bool sendToSystem = false)
 		{
-			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 			SetPosition(point.X, point.Y, sendToSystem);
 		}
 
-		public static Point GetPosition()
+		public static System.Drawing.Point GetPosition()
 		{
 			IntPtr hWnd = GameService.GameIntegration.Gw2Instance.Gw2WindowHandle;
 			if (!GetCursorPos(out var pos) || !ScreenToClient(hWnd, ref pos) || !GetWindowRect(hWnd, out var wndBounds) || !GetClientRect(hWnd, out var clientBounds))
 			{
-				return Point.Empty;
+				return System.Drawing.Point.Empty;
 			}
 			int widthOffset = wndBounds.Right - wndBounds.Left - (clientBounds.Right - clientBounds.Left);
 			int heightOffset = wndBounds.Bottom - wndBounds.Top - (clientBounds.Bottom - clientBounds.Top);
@@ -387,9 +385,9 @@ namespace Kenedia.Modules.Core.Utility
 			pos.Y -= wndBounds.Top + heightOffset;
 			if (ClientToScreen(hWnd, ref pos))
 			{
-				return new Point(pos.X, pos.Y);
+				return new System.Drawing.Point(pos.X, pos.Y);
 			}
-			return Point.Empty;
+			return System.Drawing.Point.Empty;
 		}
 
 		public static void Click(MouseButton button, int xPos = -1, int yPos = -1, bool sendToSystem = false)
@@ -398,10 +396,8 @@ namespace Kenedia.Modules.Core.Utility
 			Release(button, xPos, yPos, sendToSystem);
 		}
 
-		public static void Click(MouseButton button, Point point, bool sendToSystem)
+		public static void Click(MouseButton button, Microsoft.Xna.Framework.Point point, bool sendToSystem)
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 			Click(button, point.X, point.Y, sendToSystem);
 		}
 
@@ -418,7 +414,7 @@ namespace Kenedia.Modules.Core.Utility
 			}
 			if (xPos == -1 || yPos == -1)
 			{
-				Point pos = GetPosition();
+				System.Drawing.Point pos = GetPosition();
 				xPos = pos.X;
 				yPos = pos.Y;
 			}
@@ -432,10 +428,8 @@ namespace Kenedia.Modules.Core.Utility
 			PostMessage(GameService.GameIntegration.Gw2Instance.Gw2WindowHandle, WM_BUTTONUP[button], wParam, lParam);
 		}
 
-		public static void DoubleClick(MouseButton button, Point point, bool sendToSystem)
+		public static void DoubleClick(MouseButton button, Microsoft.Xna.Framework.Point point, bool sendToSystem)
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 			DoubleClick(button, point.X, point.Y, sendToSystem);
 		}
 	}

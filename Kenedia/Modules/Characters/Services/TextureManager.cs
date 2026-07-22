@@ -53,12 +53,29 @@ namespace Kenedia.Modules.Characters.Services
 			Female,
 			Female_Hovered,
 			Male,
-			Male_Hovered
+			Male_Hovered,
+			CharacterRoutine,
+			CharacterRoutine_Hovered,
+			CharacterRoutine_Active
 		}
 
 		public enum Backgrounds
 		{
 			MainWindow
+		}
+
+		public enum Emblems
+		{
+			CharacterRoutine,
+			CharacterRoutine_2,
+			CharacterRoutine_3,
+			CharacterRoutine_4,
+			CharacterRoutine_5,
+			CharacterRoutine_6,
+			CharacterRoutine_7,
+			CharacterRoutine_8,
+			CharacterRoutine_9,
+			CharacterRoutine_10
 		}
 
 		public Texture2D GetBackground(Backgrounds background)
@@ -77,6 +94,12 @@ namespace Kenedia.Modules.Characters.Services
 		{
 			int num = (int)control;
 			return TexturesService.GetTextureFromRef("textures\\controls\\" + num + ".png", $"Control {control}");
+		}
+
+		public Texture2D GetEmblem(Emblems emblem)
+		{
+			int num = (int)emblem;
+			return TexturesService.GetTextureFromRef("textures\\emblems\\" + num + ".png", $"Emblem {emblem}");
 		}
 	}
 }

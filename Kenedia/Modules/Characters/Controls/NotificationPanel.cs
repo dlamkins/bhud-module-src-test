@@ -14,13 +14,11 @@ namespace Kenedia.Modules.Characters.Controls
 
 		private readonly List<(Character_Model character, CharacterDeletedNotification control)> _markedCharacters = new List<(Character_Model, CharacterDeletedNotification)>();
 
-		public Point MaxSize { get; set; } = Point.get_Zero();
+		public Point MaxSize { get; set; } = Point.Zero;
 
 
 		public NotificationPanel(ObservableCollection<Character_Model> characters)
 		{
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 			base.Height = 100;
 			base.Width = 400;
 			base.FlowDirection = ControlFlowDirection.SingleTopToBottom;
@@ -49,9 +47,6 @@ namespace Kenedia.Modules.Characters.Controls
 
 		public override void RecalculateLayout()
 		{
-			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
 			SortChildren(delegate(BaseNotification a, BaseNotification b)
 			{
