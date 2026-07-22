@@ -85,6 +85,12 @@ namespace rp.spark.UI.Controls
 			});
 		}
 
+		protected override void DisposeControl()
+		{
+			AttachWheelSource(null);
+			((TextInputBase)this).DisposeControl();
+		}
+
 		protected override CaptureType CapturesInput()
 		{
 			return (CaptureType)12;
@@ -133,17 +139,10 @@ namespace rp.spark.UI.Controls
 		{
 			//IL_0003: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-			_textRegion = CalculateTextRegion(reserveScrollbar: false);
+			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
+			_textRegion = CalculateTextRegion(reserveScrollbar: true);
 			RebuildDisplayLayout();
-			if (_maxVerticalScrollOffset > 0)
-			{
-				_textRegion = CalculateTextRegion(reserveScrollbar: true);
-				RebuildDisplayLayout();
-			}
 			SetVerticalScrollOffset(_verticalScrollOffset, invalidate: false);
 			((TextInputBase)this).UpdateScrolling();
 			_highlightRegions = CalculateHighlightRegions();
@@ -494,27 +493,32 @@ namespace rp.spark.UI.Controls
 		{
 			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0100: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0106: Unknown result type (might be due to invalid IL or missing references)
-			if (!((TextInputBase)this)._focused && ((TextInputBase)this)._text.Length == 0)
+			//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
+			if (!((TextInputBase)this)._focused && string.IsNullOrEmpty(((TextInputBase)this)._text))
 			{
 				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, ((TextInputBase)this)._placeholderText, ((TextInputBase)this)._font, _textRegion, Color.get_LightGray(), false, false, 0, (HorizontalAlignment)0, (VerticalAlignment)0);
+				return;
 			}
-			else
+			string[] displayLines = _displayLines ?? Array.Empty<string>();
+			if (displayLines.Length == 0)
 			{
-				if (string.IsNullOrEmpty(_displayText))
+				return;
+			}
+			int lineHeight = Math.Max(1, ((TextInputBase)this)._font.get_LineHeight());
+			int firstVisibleLine = Math.Max(0, _verticalScrollOffset / lineHeight);
+			int lastVisibleLine = Math.Min(displayLines.Length - 1, (_verticalScrollOffset + _textRegion.Height) / lineHeight + 1);
+			if (firstVisibleLine > lastVisibleLine)
+			{
+				return;
+			}
+			for (int i = firstVisibleLine; i <= lastVisibleLine; i++)
+			{
+				int lineTop = GetLineTop(i);
+				if (lineTop + lineHeight >= ((Rectangle)(ref _textRegion)).get_Top() && lineTop <= ((Rectangle)(ref _textRegion)).get_Bottom())
 				{
-					return;
-				}
-				int num = Math.Max(0, _verticalScrollOffset / Math.Max(1, ((TextInputBase)this)._font.get_LineHeight()));
-				int lastVisibleLine = Math.Min(_displayLines.Length - 1, (_verticalScrollOffset + _textRegion.Height) / Math.Max(1, ((TextInputBase)this)._font.get_LineHeight()) + 1);
-				for (int i = num; i <= lastVisibleLine; i++)
-				{
-					int lineTop = GetLineTop(i);
-					if (lineTop + ((TextInputBase)this)._font.get_LineHeight() >= ((Rectangle)(ref _textRegion)).get_Top() && lineTop <= ((Rectangle)(ref _textRegion)).get_Bottom())
-					{
-						SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, _displayLines[i], ((TextInputBase)this)._font, new Rectangle(_textRegion.X, lineTop, _textRegion.Width, ((TextInputBase)this)._font.get_LineHeight()), ((TextInputBase)this)._foreColor, false, false, 0, (HorizontalAlignment)0, (VerticalAlignment)0);
-					}
+					string lineText = displayLines[i] ?? string.Empty;
+					SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, lineText, ((TextInputBase)this)._font, new Rectangle(_textRegion.X, lineTop, _textRegion.Width, lineHeight), ((TextInputBase)this)._foreColor, false, false, 0, (HorizontalAlignment)0, (VerticalAlignment)0);
 				}
 			}
 		}
