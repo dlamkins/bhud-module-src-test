@@ -62,7 +62,6 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 		public AmuletSlot(TemplateSlotType gearSlot, Container parent, TemplatePresenter templatePresenter, SelectionPanel selectionPanel, Data data)
 			: base(gearSlot, parent, templatePresenter, selectionPanel, data)
 		{
-			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
 			_enrichmentControl.Placeholder.Texture = (AsyncTexture2D)BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.ModuleInstance.ContentsManager.GetTexture("textures\\infusionslot.png");
 			_enrichmentControl.Parent = this;
 		}
@@ -75,22 +74,9 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 
 		public override void RecalculateLayout()
 		{
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
-			Rectangle localBounds = base.ItemControl.LocalBounds;
-			int infusionSize = (((Rectangle)(ref localBounds)).get_Size().Y - 4) / 3;
-			ItemControl enrichmentControl = _enrichmentControl;
-			localBounds = base.ItemControl.LocalBounds;
-			int num = ((Rectangle)(ref localBounds)).get_Right() + 1;
-			localBounds = base.ItemControl.LocalBounds;
-			enrichmentControl.SetBounds(new Rectangle(num, ((Rectangle)(ref localBounds)).get_Top(), infusionSize, infusionSize));
+			int infusionSize = (base.ItemControl.LocalBounds.Size.Y - 4) / 3;
+			_enrichmentControl.SetBounds(new Rectangle(base.ItemControl.LocalBounds.Right + 1, base.ItemControl.LocalBounds.Top, infusionSize, infusionSize));
 		}
 
 		protected override void SetItemToSlotControl(object sender, TemplateSlotChangedEventArgs e)
@@ -117,29 +103,17 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 
 		protected override void SetAnchor()
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0154: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0159: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0164: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0169: Unknown result type (might be due to invalid IL or missing references)
 			Rectangle a = base.AbsoluteBounds;
 			if (base.ItemControl.MouseOver)
 			{
-				base.SelectionPanel?.SetAnchor(base.ItemControl, Blish_HUD.RectangleExtension.Add(new Rectangle(((Rectangle)(ref a)).get_Location(), Point.get_Zero()), base.ItemControl.LocalBounds), SelectionTypes.Stats, base.Slot, GearSubSlotType.None, delegate(Stat stat)
+				base.SelectionPanel?.SetAnchor(base.ItemControl, new Rectangle(a.Location, Point.Zero).Add(base.ItemControl.LocalBounds), SelectionTypes.Stats, base.Slot, GearSubSlotType.None, delegate(Stat stat)
 				{
 					base.TemplatePresenter?.Template?.SetItem(base.Slot, TemplateSubSlotType.Stat, stat);
 				}, (base.TemplatePresenter?.Template[base.Slot] as AmuletTemplateEntry)?.Amulet?.StatChoices ?? base.Data.Trinkets?[92991]?.StatChoices ?? Array.Empty<int>(), (base.TemplatePresenter?.Template[base.Slot] as AmuletTemplateEntry)?.Amulet?.AttributeAdjustment);
 			}
 			if (_enrichmentControl.MouseOver)
 			{
-				base.SelectionPanel?.SetAnchor(_enrichmentControl, Blish_HUD.RectangleExtension.Add(new Rectangle(((Rectangle)(ref a)).get_Location(), Point.get_Zero()), _enrichmentControl.LocalBounds), SelectionTypes.Items, base.Slot, GearSubSlotType.Enrichment, delegate(Enrichment enrichment)
+				base.SelectionPanel?.SetAnchor(_enrichmentControl, new Rectangle(a.Location, Point.Zero).Add(_enrichmentControl.LocalBounds), SelectionTypes.Items, base.Slot, GearSubSlotType.Enrichment, delegate(Enrichment enrichment)
 				{
 					base.TemplatePresenter?.Template?.SetItem(base.Slot, TemplateSubSlotType.Enrichment, enrichment);
 				});

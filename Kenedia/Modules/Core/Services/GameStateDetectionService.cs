@@ -78,7 +78,7 @@ namespace Kenedia.Modules.Core.Services
 			Visible = false,
 			Parent = GameService.Graphics.SpriteScreen,
 			ZIndex = int.MaxValue,
-			BorderColor = Color.get_Transparent()
+			BorderColor = Microsoft.Xna.Framework.Color.Transparent
 		};
 
 		private readonly FramedMaskedRegion _topRightMask = new FramedMaskedRegion
@@ -86,7 +86,7 @@ namespace Kenedia.Modules.Core.Services
 			Visible = false,
 			Parent = GameService.Graphics.SpriteScreen,
 			ZIndex = int.MaxValue,
-			BorderColor = Color.get_Red(),
+			BorderColor = Microsoft.Xna.Framework.Color.Red,
 			BorderWidth = new RectangleDimensions(2)
 		};
 
@@ -95,7 +95,7 @@ namespace Kenedia.Modules.Core.Services
 			Visible = false,
 			Parent = GameService.Graphics.SpriteScreen,
 			ZIndex = int.MaxValue,
-			BorderColor = Color.get_Red(),
+			BorderColor = Microsoft.Xna.Framework.Color.Red,
 			BorderWidth = new RectangleDimensions(2)
 		};
 
@@ -104,7 +104,7 @@ namespace Kenedia.Modules.Core.Services
 			Visible = false,
 			Parent = GameService.Graphics.SpriteScreen,
 			ZIndex = int.MaxValue,
-			BorderColor = Color.get_Red(),
+			BorderColor = Microsoft.Xna.Framework.Color.Red,
 			BorderWidth = new RectangleDimensions(2)
 		};
 
@@ -113,7 +113,7 @@ namespace Kenedia.Modules.Core.Services
 			Visible = false,
 			Parent = GameService.Graphics.SpriteScreen,
 			ZIndex = int.MaxValue,
-			BorderColor = Color.get_Red(),
+			BorderColor = Microsoft.Xna.Framework.Color.Red,
 			BorderWidth = new RectangleDimensions(2)
 		};
 
@@ -122,7 +122,7 @@ namespace Kenedia.Modules.Core.Services
 			Visible = false,
 			Parent = GameService.Graphics.SpriteScreen,
 			ZIndex = int.MaxValue,
-			BorderColor = Color.get_Red(),
+			BorderColor = Microsoft.Xna.Framework.Color.Red,
 			BorderWidth = new RectangleDimensions(2)
 		};
 
@@ -210,12 +210,6 @@ namespace Kenedia.Modules.Core.Services
 
 		public GameStateDetectionService(ClientWindowService clientWindowService, SharedSettings sharedSettings)
 		{
-			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0182: Unknown result type (might be due to invalid IL or missing references)
 			_003CGameStatus_003Ek__BackingField = GameStatusType.None;
 			base._002Ector();
 			ClientWindowService = clientWindowService;
@@ -244,7 +238,7 @@ namespace Kenedia.Modules.Core.Services
 				{
 					return;
 				}
-				if (GameService.GameIntegration.Gw2Instance.Gw2HasFocus && gameTime.get_TotalGameTime().TotalMilliseconds - _lastTick > 250.0)
+				if (GameService.GameIntegration.Gw2Instance.Gw2HasFocus && gameTime.TotalGameTime.TotalMilliseconds - _lastTick > 250.0)
 				{
 					ScreenChanging sC = IsScreenChanging();
 					_topLeftMask.Show();
@@ -252,7 +246,7 @@ namespace Kenedia.Modules.Core.Services
 					_bottomLeftMask.Show();
 					_bottomRightMask.Show();
 					_spinnerMask.Show();
-					_lastTick = gameTime.get_TotalGameTime().TotalMilliseconds;
+					_lastTick = gameTime.TotalGameTime.TotalMilliseconds;
 					bool vista = sC.AreAllChanging;
 					bool cutscene = !sC.AreCornersChanging && sC.IsCenterChanging && !sC.IsSpinnerChanging;
 					bool characterSelection = sC.NoneChanging || (!sC.AreCornersChanging && sC.IsCenterChanging && sC.IsSpinnerChanging);
@@ -300,89 +294,30 @@ namespace Kenedia.Modules.Core.Services
 
 		private (Bitmap lastImage, Bitmap newImage) CaptureRegion((Bitmap lastImage, Bitmap newImage) images, FramedMaskedRegion region, ScreenRegionType t)
 		{
-			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0052: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0103: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0110: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0121: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0136: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0140: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0149: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0151: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0157: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0164: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0173: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0176: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0191: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0234: Unknown result type (might be due to invalid IL or missing references)
-			//IL_024f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0265: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0270: Unknown result type (might be due to invalid IL or missing references)
 			images.lastImage?.Dispose();
 			images.lastImage = images.newImage;
-			Rectangle b = GameService.Graphics.SpriteScreen.LocalBounds;
-			Point maskSize = (Point)(t switch
+			Microsoft.Xna.Framework.Rectangle b = GameService.Graphics.SpriteScreen.LocalBounds;
+			Microsoft.Xna.Framework.Point maskSize = t switch
 			{
-				ScreenRegionType.TopLeft => new Point(100, 25), 
-				ScreenRegionType.TopRight => new Point(100, 25), 
-				ScreenRegionType.BottomLeft => new Point(100, 25), 
-				ScreenRegionType.BottomRight => new Point(100, 25), 
-				ScreenRegionType.Center => new Point(100, 100), 
-				ScreenRegionType.LoadingSpinner => new Point(100, 100), 
-				_ => Point.get_Zero(), 
-			});
-			Point maskPos = (Point)(t switch
+				ScreenRegionType.TopLeft => new Microsoft.Xna.Framework.Point(100, 25), 
+				ScreenRegionType.TopRight => new Microsoft.Xna.Framework.Point(100, 25), 
+				ScreenRegionType.BottomLeft => new Microsoft.Xna.Framework.Point(100, 25), 
+				ScreenRegionType.BottomRight => new Microsoft.Xna.Framework.Point(100, 25), 
+				ScreenRegionType.Center => new Microsoft.Xna.Framework.Point(100, 100), 
+				ScreenRegionType.LoadingSpinner => new Microsoft.Xna.Framework.Point(100, 100), 
+				_ => Microsoft.Xna.Framework.Point.Zero, 
+			};
+			Microsoft.Xna.Framework.Point maskPos = t switch
 			{
-				ScreenRegionType.TopLeft => new Point(0, 0), 
-				ScreenRegionType.TopRight => new Point(b.Width - maskSize.X, 0), 
-				ScreenRegionType.BottomLeft => new Point(0, b.Height - maskSize.Y), 
-				ScreenRegionType.BottomRight => new Point(b.Width - maskSize.X, b.Height - maskSize.Y), 
-				ScreenRegionType.Center => new Point(((Rectangle)(ref b)).get_Center().X - maskSize.X / 2, ((Rectangle)(ref b)).get_Center().Y - maskSize.Y / 2), 
-				ScreenRegionType.LoadingSpinner => new Point(b.Width - maskSize.X, b.Height - maskSize.Y - 50), 
-				_ => Point.get_Zero(), 
-			});
-			region.BorderColor = Color.get_Transparent();
+				ScreenRegionType.TopLeft => new Microsoft.Xna.Framework.Point(0, 0), 
+				ScreenRegionType.TopRight => new Microsoft.Xna.Framework.Point(b.Width - maskSize.X, 0), 
+				ScreenRegionType.BottomLeft => new Microsoft.Xna.Framework.Point(0, b.Height - maskSize.Y), 
+				ScreenRegionType.BottomRight => new Microsoft.Xna.Framework.Point(b.Width - maskSize.X, b.Height - maskSize.Y), 
+				ScreenRegionType.Center => new Microsoft.Xna.Framework.Point(b.Center.X - maskSize.X / 2, b.Center.Y - maskSize.Y / 2), 
+				ScreenRegionType.LoadingSpinner => new Microsoft.Xna.Framework.Point(b.Width - maskSize.X, b.Height - maskSize.Y - 50), 
+				_ => Microsoft.Xna.Framework.Point.Zero, 
+			};
+			region.BorderColor = Microsoft.Xna.Framework.Color.Transparent;
 			region.Location = maskPos;
 			region.Size = maskSize;
 			try
@@ -395,7 +330,7 @@ namespace Kenedia.Modules.Core.Services
 				using (new MemoryStream())
 				{
 					double factor = GameService.Graphics.UIScaleMultiplier;
-					g.CopyFromScreen(new Point(wndBounds.Left + offset.Left + (int)((double)maskPos.X * factor), wndBounds.Top + offset.Top + (int)((double)maskPos.Y * factor)), Point.Empty, new Size((int)((double)maskSize.X * factor), (int)((double)maskSize.Y * factor)));
+					g.CopyFromScreen(new System.Drawing.Point(wndBounds.Left + offset.Left + (int)((double)maskPos.X * factor), wndBounds.Top + offset.Top + (int)((double)maskPos.Y * factor)), System.Drawing.Point.Empty, new Size((int)((double)maskSize.X * factor), (int)((double)maskSize.Y * factor)));
 					images.newImage = bitmap;
 					return images;
 				}
@@ -440,8 +375,8 @@ namespace Kenedia.Modules.Core.Services
 			{
 				for (int x = 0; x < image1.Width; x++)
 				{
-					Color color1 = image1.GetPixel(x, y);
-					Color color2 = image2.GetPixel(x, y);
+					System.Drawing.Color color1 = image1.GetPixel(x, y);
+					System.Drawing.Color color2 = image2.GetPixel(x, y);
 					int diffR = color1.R - color2.R;
 					int diffG = color1.G - color2.G;
 					int diffB = color1.B - color2.B;

@@ -27,17 +27,17 @@ namespace Kenedia.Modules.Core.Extensions
 			{
 				if (mod2 != 0 && mods.HasFlag(mod2))
 				{
-					Keyboard.Press(ModKeyMapping[(int)mod2]);
+					Blish_HUD.Controls.Intern.Keyboard.Press(ModKeyMapping[(int)mod2]);
 					if (cancellationToken.HasValue && cancellationToken.Value.IsCancellationRequested)
 					{
 						return false;
 					}
 				}
 			}
-			Keyboard.Stroke((VirtualKeyShort)keybinding.PrimaryKey);
+			Blish_HUD.Controls.Intern.Keyboard.Stroke((VirtualKeyShort)keybinding.PrimaryKey);
 			if (triggerSystem)
 			{
-				Keyboard.Stroke((VirtualKeyShort)keybinding.PrimaryKey, sendToSystem: true);
+				Blish_HUD.Controls.Intern.Keyboard.Stroke((VirtualKeyShort)keybinding.PrimaryKey, sendToSystem: true);
 			}
 			if (cancellationToken.HasValue)
 			{
@@ -47,7 +47,7 @@ namespace Kenedia.Modules.Core.Extensions
 			{
 				if (mod != 0 && mods.HasFlag(mod))
 				{
-					Keyboard.Release(ModKeyMapping[(int)mod]);
+					Blish_HUD.Controls.Intern.Keyboard.Release(ModKeyMapping[(int)mod]);
 					if (cancellationToken.HasValue && cancellationToken.Value.IsCancellationRequested)
 					{
 						return false;

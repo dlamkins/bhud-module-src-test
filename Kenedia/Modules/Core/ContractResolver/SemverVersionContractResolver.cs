@@ -11,18 +11,12 @@ namespace Kenedia.Modules.Core.ContractResolver
 	{
 		protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			JsonProperty property = ((DefaultContractResolver)this).CreateProperty(member, memberSerialization);
+			JsonProperty property = base.CreateProperty(member, memberSerialization);
 			if (Attribute.IsDefined(member, typeof(JsonSemverVersionAttribute)))
 			{
-				property.set_Converter((JsonConverter)(object)new SemverVersionConverter());
+				property.Converter = new SemverVersionConverter();
 			}
 			return property;
-		}
-
-		public SemverVersionContractResolver()
-			: this()
-		{
 		}
 	}
 }

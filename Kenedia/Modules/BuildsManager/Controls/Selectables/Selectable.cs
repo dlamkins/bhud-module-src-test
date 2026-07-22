@@ -52,15 +52,11 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selectables
 
 		public Selectable()
 		{
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 			base.Size = new Point(64);
 		}
 
 		protected virtual void ApplyData(object sender, Kenedia.Modules.Core.Models.ValueChangedEventArgs<IBaseApiData> e)
 		{
-			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0123: Unknown result type (might be due to invalid IL or missing references)
 			if (Data == null)
 			{
 				return;
@@ -85,7 +81,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selectables
 				}
 				else
 				{
-					AsyncTexture2D skillIcon = TexturesService.GetAsyncTexture(skill.IconAssetId);
+					AsyncTexture2D skillIcon = TexturesService.GetAsyncTexture(skill.IconAssetId) ?? ((AsyncTexture2D)ContentService.Textures.Error);
 					Type = SelectableType.Skill;
 					int sPadding = (int)((double)skillIcon.Width * (7.0 / 64.0));
 					TextureRegion = new Rectangle(sPadding, sPadding, skillIcon.Width - sPadding * 2, skillIcon.Height - sPadding * 2);
@@ -95,7 +91,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selectables
 			}
 			else
 			{
-				AsyncTexture2D legendIcon = TexturesService.GetAsyncTexture(legend.Swap.IconAssetId);
+				AsyncTexture2D legendIcon = TexturesService.GetAsyncTexture(legend.Swap.IconAssetId) ?? ((AsyncTexture2D)ContentService.Textures.Error);
 				Type = SelectableType.Legend;
 				int lPadding = (int)((double)legendIcon.Width * (7.0 / 64.0));
 				TextureRegion = new Rectangle(lPadding, lPadding, legendIcon.Width - lPadding * 2, legendIcon.Height - lPadding * 2);
@@ -106,11 +102,6 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selectables
 
 		public override void RecalculateLayout()
 		{
-			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
 			if (Data != null)
 			{
@@ -121,25 +112,13 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selectables
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
 			if (Data != null)
 			{
 				int pad = 16;
 				_textureBounds = ((!(Data is Pet)) ? bounds : bounds.Add(new Rectangle(-pad, -pad, pad * 2, pad * 2)));
 				if (Texture != null)
 				{
-					spriteBatch.DrawOnCtrl(this, Texture, _textureBounds, TextureRegion, Color.get_White());
+					spriteBatch.DrawOnCtrl(this, Texture, _textureBounds, TextureRegion, Color.White);
 				}
 				if (HighlightSelected && IsSelected)
 				{

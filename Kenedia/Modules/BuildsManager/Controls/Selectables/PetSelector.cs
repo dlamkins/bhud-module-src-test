@@ -25,10 +25,6 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selectables
 
 		public PetSelector()
 		{
-			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00af: Unknown result type (might be due to invalid IL or missing references)
 			ContentPanel.BorderWidth = new RectangleDimensions(2, 0, 2, 2);
 			base.SelectableSize = new Point(64);
 			base.SelectablePerRow = 9;
@@ -38,27 +34,17 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selectables
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 			base.PaintBeforeChildren(spriteBatch, bounds);
 		}
 
 		public override void PaintAfterChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
 			base.PaintAfterChildren(spriteBatch, bounds);
 			ContentPanel.BorderWidth = new RectangleDimensions(2);
 			HeaderPanel.BorderWidth = new RectangleDimensions(0, 0, 0, 2);
-			spriteBatch.DrawCenteredRotationOnCtrl(this, (Texture2D)_selectingFrame.Texture, _selectingFrame.Bounds, _selectingFrame.TextureRegion, Color.get_White(), 0f, flipVertically: true, flipHorizontally: true);
-			_selectedPet.Draw(this, spriteBatch, null, Color.get_White());
-			Rectangle bounds2 = _highlight.Bounds;
-			if (((Rectangle)(ref bounds2)).Contains(base.RelativeMousePosition))
+			spriteBatch.DrawCenteredRotationOnCtrl(this, (Texture2D)_selectingFrame.Texture, _selectingFrame.Bounds, _selectingFrame.TextureRegion, Color.White, 0f, flipVertically: true, flipHorizontally: true);
+			_selectedPet.Draw(this, spriteBatch, null, Color.White);
+			if (_highlight.Bounds.Contains(base.RelativeMousePosition))
 			{
 				_highlight.Draw(this, spriteBatch);
 			}
@@ -71,42 +57,19 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selectables
 
 		public override void RecalculateLayout()
 		{
-			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00da: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00df: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0104: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0109: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0121: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0129: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0133: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0143: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0153: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016d: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
 			if (ContentPanel != null && HeaderPanel != null)
 			{
 				ContentPanel.ContentPadding = new RectangleDimensions(8);
 				int p = 4;
-				Rectangle r = default(Rectangle);
-				((Rectangle)(ref r))._002Ector(Point.get_Zero(), new Point(ContentPanel.Width - p * 4, base.SelectableSize.Y + 20));
-				HeaderPanel.SetBounds(r);
+				ControlExtensions.SetBounds(bounds: new Rectangle(Point.Zero, new Point(ContentPanel.Width - p * 4, base.SelectableSize.Y + 20)), c: HeaderPanel);
 				int pad = 40;
 				_selectingFrame.Bounds = new Rectangle(-pad - pad / 5, 0, HeaderPanel.Width + pad * 3, HeaderPanel.Height + pad / 10);
 				int selectorWidth = (int)(27.0 / 128.0 * (double)HeaderPanel.Width);
 				pad = 7;
-				BlockInputRegion = Blish_HUD.RectangleExtension.Add(new Rectangle(HeaderPanel.Location.Add(new Point((HeaderPanel.Width - selectorWidth) / 2 + pad, pad)), new Point(selectorWidth, HeaderPanel.Height)), new Rectangle(-pad, -pad, pad * 4, pad * 4));
+				BlockInputRegion = new Rectangle(HeaderPanel.Location.Add(new Point((HeaderPanel.Width - selectorWidth) / 2 + pad, pad)), new Point(selectorWidth, HeaderPanel.Height)).Add(new Rectangle(-pad, -pad, pad * 4, pad * 4));
 				pad = 16;
-				Point pos = ((Rectangle)(ref BlockInputRegion)).get_Center();
+				Point pos = BlockInputRegion.Center;
 				_selectedPet.Bounds = new Rectangle(pos.X - 64, pos.Y - 60 - pad, 120, 120);
 				_highlight.Bounds = new Rectangle(pos.X - 64, pos.Y - 60 - pad, 120, 120);
 			}
@@ -133,7 +96,6 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selectables
 
 		protected override Selectable<Pet> CreateSelectable(Pet item)
 		{
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
 			base.Type = SelectableType.Pet;
 			base.Visible = true;
 			return new PetSelectable
@@ -148,12 +110,10 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selectables
 
 		protected override void SetCapture()
 		{
-			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
 			if (HeaderPanel != null)
 			{
-				base.CaptureInput = !HeaderPanel.MouseOver || ((Rectangle)(ref BlockInputRegion)).Contains(base.RelativeMousePosition);
-				HeaderPanel.CaptureInput = !HeaderPanel.MouseOver || ((Rectangle)(ref BlockInputRegion)).Contains(base.RelativeMousePosition);
+				base.CaptureInput = !HeaderPanel.MouseOver || BlockInputRegion.Contains(base.RelativeMousePosition);
+				HeaderPanel.CaptureInput = !HeaderPanel.MouseOver || BlockInputRegion.Contains(base.RelativeMousePosition);
 			}
 		}
 	}

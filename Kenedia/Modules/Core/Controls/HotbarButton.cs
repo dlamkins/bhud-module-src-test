@@ -58,9 +58,6 @@ namespace Kenedia.Modules.Core.Controls
 
 		public override void RecalculateLayout()
 		{
-			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
 			if (Icon != null)
 			{
@@ -73,7 +70,6 @@ namespace Kenedia.Modules.Core.Controls
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
 			Icon?.Draw(this, spriteBatch, base.RelativeMousePosition);
 			(Checked ? _active : _inactive).Draw(this, spriteBatch);
 		}

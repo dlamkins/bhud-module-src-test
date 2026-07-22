@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -26,7 +25,7 @@ namespace Kenedia.Modules.Core.Services
 		{
 			if (s_loadedTextures.Count > 0)
 			{
-				((IEnumerable<IDisposable>)s_loadedTextures.Select<KeyValuePair<string, Texture2D>, Texture2D>((KeyValuePair<string, Texture2D> e) => e.Value)).DisposeAll();
+				s_loadedTextures.Select<KeyValuePair<string, Texture2D>, Texture2D>((KeyValuePair<string, Texture2D> e) => e.Value).DisposeAll();
 			}
 			s_loadedTextures.Clear();
 		}

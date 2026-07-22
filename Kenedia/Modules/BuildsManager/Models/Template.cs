@@ -855,7 +855,7 @@ namespace Kenedia.Modules.BuildsManager.Models
 					{
 						Directory.CreateDirectory(path);
 					}
-					string json = JsonConvert.SerializeObject((object)this, SerializerSettings.Default);
+					string json = JsonConvert.SerializeObject(this, SerializerSettings.Default);
 					string filePath = path + "\\" + Common.MakeValidFileName(Name.Trim(), '_') + ".json";
 					System.IO.File.WriteAllText(filePath, json);
 					BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug("Saved " + Name + " in " + filePath);

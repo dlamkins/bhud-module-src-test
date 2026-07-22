@@ -58,24 +58,6 @@ namespace Kenedia.Modules.Core.Views
 
 		public override void CreateLayout(Blish_HUD.Controls.Container p, int? width = null)
 		{
-			//IL_00d3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0185: Unknown result type (might be due to invalid IL or missing references)
-			//IL_026b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0351: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0437: Unknown result type (might be due to invalid IL or missing references)
-			//IL_050c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0546: Unknown result type (might be due to invalid IL or missing references)
-			//IL_059d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05b7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0637: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0651: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_070a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0724: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07be: Unknown result type (might be due to invalid IL or missing references)
 			base.ContentContainer = p;
 			Kenedia.Modules.Core.Controls.FlowPanel mcFP = new Kenedia.Modules.Core.Controls.FlowPanel
 			{
@@ -120,7 +102,7 @@ namespace Kenedia.Modules.Core.Views
 			{
 				Parent = pp,
 				Width = 165,
-				Location = new Point(35, 0),
+				Location = new Microsoft.Xna.Framework.Point(35, 0),
 				Height = 20,
 				SetLocalizedText = () => strings_common.TopOffset
 			};
@@ -147,7 +129,7 @@ namespace Kenedia.Modules.Core.Views
 			{
 				Parent = pp,
 				Width = 165,
-				Location = new Point(35, 0),
+				Location = new Microsoft.Xna.Framework.Point(35, 0),
 				Height = 20,
 				SetLocalizedText = () => strings_common.LeftOffset
 			};
@@ -174,7 +156,7 @@ namespace Kenedia.Modules.Core.Views
 			{
 				Parent = pp,
 				Width = 165,
-				Location = new Point(35, 0),
+				Location = new Microsoft.Xna.Framework.Point(35, 0),
 				Height = 20,
 				SetLocalizedText = () => strings_common.BottomOffset
 			};
@@ -201,7 +183,7 @@ namespace Kenedia.Modules.Core.Views
 			{
 				Parent = pp,
 				Width = 165,
-				Location = new Point(35, 0),
+				Location = new Microsoft.Xna.Framework.Point(35, 0),
 				Height = 20,
 				SetLocalizedText = () => strings_common.RightOffset
 			};
@@ -243,8 +225,8 @@ namespace Kenedia.Modules.Core.Views
 			_topLeftImage = new Kenedia.Modules.Core.Controls.Image
 			{
 				Parent = cP,
-				BackgroundColor = Color.get_White(),
-				Size = new Point(100, _rightOffsetBox.Height * 2),
+				BackgroundColor = Microsoft.Xna.Framework.Color.White,
+				Size = new Microsoft.Xna.Framework.Point(100, _rightOffsetBox.Height * 2),
 				SetLocalizedTooltip = () => strings_common.TopLeftCorner
 			};
 			new Kenedia.Modules.Core.Controls.Label
@@ -257,8 +239,8 @@ namespace Kenedia.Modules.Core.Views
 			_bottomLeftImage = new Kenedia.Modules.Core.Controls.Image
 			{
 				Parent = cP,
-				BackgroundColor = Color.get_White(),
-				Size = new Point(100, _rightOffsetBox.Height * 2),
+				BackgroundColor = Microsoft.Xna.Framework.Color.White,
+				Size = new Microsoft.Xna.Framework.Point(100, _rightOffsetBox.Height * 2),
 				SetLocalizedTooltip = () => strings_common.BottomLeftCorner
 			};
 			cP = new Kenedia.Modules.Core.Controls.FlowPanel
@@ -279,8 +261,8 @@ namespace Kenedia.Modules.Core.Views
 			_topRightImage = new Kenedia.Modules.Core.Controls.Image
 			{
 				Parent = cP,
-				BackgroundColor = Color.get_White(),
-				Size = new Point(100, _rightOffsetBox.Height * 2),
+				BackgroundColor = Microsoft.Xna.Framework.Color.White,
+				Size = new Microsoft.Xna.Framework.Point(100, _rightOffsetBox.Height * 2),
 				SetLocalizedTooltip = () => strings_common.TopRightCorner
 			};
 			new Kenedia.Modules.Core.Controls.Label
@@ -293,8 +275,8 @@ namespace Kenedia.Modules.Core.Views
 			_bottomRightImage = new Kenedia.Modules.Core.Controls.Image
 			{
 				Parent = cP,
-				BackgroundColor = Color.get_White(),
-				Size = new Point(100, _rightOffsetBox.Height * 2),
+				BackgroundColor = Microsoft.Xna.Framework.Color.White,
+				Size = new Microsoft.Xna.Framework.Point(100, _rightOffsetBox.Height * 2),
 				SetLocalizedTooltip = () => strings_common.BottomRightCorner
 			};
 		}
@@ -333,72 +315,52 @@ namespace Kenedia.Modules.Core.Views
 
 		private void SetTopLeftImage()
 		{
-			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
 			User32Dll.RECT wndBounds = ClientWindowService.WindowBounds;
 			ScreenModeSetting? screenMode = GameService.GameIntegration.GfxSettings.ScreenMode;
-			Point p = (Point)(((screenMode.HasValue ? ((string)screenMode.GetValueOrDefault()) : null) == (string)ScreenModeSetting.Windowed) ? new Point(SharedSettings.WindowOffset.Left, SharedSettings.WindowOffset.Top) : Point.get_Zero());
+			Microsoft.Xna.Framework.Point p = (((screenMode.HasValue ? ((string)screenMode.GetValueOrDefault()) : null) == (string)ScreenModeSetting.Windowed) ? new Microsoft.Xna.Framework.Point(SharedSettings.WindowOffset.Left, SharedSettings.WindowOffset.Top) : Microsoft.Xna.Framework.Point.Zero);
 			using Bitmap bitmap = new Bitmap(_topLeftImage.Width, _topLeftImage.Height);
 			using Graphics g = Graphics.FromImage(bitmap);
 			using MemoryStream s = new MemoryStream();
-			g.CopyFromScreen(new Point(wndBounds.Left + p.X, wndBounds.Top + p.Y), Point.Empty, new Size(_topLeftImage.Width, _topLeftImage.Height));
+			g.CopyFromScreen(new System.Drawing.Point(wndBounds.Left + p.X, wndBounds.Top + p.Y), System.Drawing.Point.Empty, new Size(_topLeftImage.Width, _topLeftImage.Height));
 			bitmap.Save(s, ImageFormat.Bmp);
 			_topLeftImage.Texture = s.CreateTexture2D();
 		}
 
 		private void SetBottomLeftImage()
 		{
-			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
 			User32Dll.RECT wndBounds = ClientWindowService.WindowBounds;
 			ScreenModeSetting? screenMode = GameService.GameIntegration.GfxSettings.ScreenMode;
-			Point p = (Point)(((screenMode.HasValue ? ((string)screenMode.GetValueOrDefault()) : null) == (string)ScreenModeSetting.Windowed) ? new Point(SharedSettings.WindowOffset.Left, SharedSettings.WindowOffset.Bottom) : Point.get_Zero());
+			Microsoft.Xna.Framework.Point p = (((screenMode.HasValue ? ((string)screenMode.GetValueOrDefault()) : null) == (string)ScreenModeSetting.Windowed) ? new Microsoft.Xna.Framework.Point(SharedSettings.WindowOffset.Left, SharedSettings.WindowOffset.Bottom) : Microsoft.Xna.Framework.Point.Zero);
 			using Bitmap bitmap = new Bitmap(_bottomLeftImage.Width, _bottomLeftImage.Height);
 			using Graphics g = Graphics.FromImage(bitmap);
 			using MemoryStream s = new MemoryStream();
-			g.CopyFromScreen(new Point(wndBounds.Left + p.X, wndBounds.Bottom - _bottomLeftImage.Height + p.Y), Point.Empty, new Size(_bottomLeftImage.Width, _bottomLeftImage.Height));
+			g.CopyFromScreen(new System.Drawing.Point(wndBounds.Left + p.X, wndBounds.Bottom - _bottomLeftImage.Height + p.Y), System.Drawing.Point.Empty, new Size(_bottomLeftImage.Width, _bottomLeftImage.Height));
 			bitmap.Save(s, ImageFormat.Bmp);
 			_bottomLeftImage.Texture = s.CreateTexture2D();
 		}
 
 		private void SetTopRightImage()
 		{
-			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
 			User32Dll.RECT wndBounds = ClientWindowService.WindowBounds;
 			ScreenModeSetting? screenMode = GameService.GameIntegration.GfxSettings.ScreenMode;
-			Point p = (Point)(((screenMode.HasValue ? ((string)screenMode.GetValueOrDefault()) : null) == (string)ScreenModeSetting.Windowed) ? new Point(SharedSettings.WindowOffset.Right, SharedSettings.WindowOffset.Top) : Point.get_Zero());
+			Microsoft.Xna.Framework.Point p = (((screenMode.HasValue ? ((string)screenMode.GetValueOrDefault()) : null) == (string)ScreenModeSetting.Windowed) ? new Microsoft.Xna.Framework.Point(SharedSettings.WindowOffset.Right, SharedSettings.WindowOffset.Top) : Microsoft.Xna.Framework.Point.Zero);
 			using Bitmap bitmap = new Bitmap(_topRightImage.Width, _topRightImage.Height);
 			using Graphics g = Graphics.FromImage(bitmap);
 			using MemoryStream s = new MemoryStream();
-			g.CopyFromScreen(new Point(wndBounds.Right - _topRightImage.Width + p.X, wndBounds.Top + p.Y), Point.Empty, new Size(_topRightImage.Width, _topRightImage.Height));
+			g.CopyFromScreen(new System.Drawing.Point(wndBounds.Right - _topRightImage.Width + p.X, wndBounds.Top + p.Y), System.Drawing.Point.Empty, new Size(_topRightImage.Width, _topRightImage.Height));
 			bitmap.Save(s, ImageFormat.Bmp);
 			_topRightImage.Texture = s.CreateTexture2D();
 		}
 
 		private void SetBottomRightImage()
 		{
-			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
 			User32Dll.RECT wndBounds = ClientWindowService.WindowBounds;
 			ScreenModeSetting? screenMode = GameService.GameIntegration.GfxSettings.ScreenMode;
-			Point p = (Point)(((screenMode.HasValue ? ((string)screenMode.GetValueOrDefault()) : null) == (string)ScreenModeSetting.Windowed) ? new Point(SharedSettings.WindowOffset.Right, SharedSettings.WindowOffset.Bottom) : Point.get_Zero());
+			Microsoft.Xna.Framework.Point p = (((screenMode.HasValue ? ((string)screenMode.GetValueOrDefault()) : null) == (string)ScreenModeSetting.Windowed) ? new Microsoft.Xna.Framework.Point(SharedSettings.WindowOffset.Right, SharedSettings.WindowOffset.Bottom) : Microsoft.Xna.Framework.Point.Zero);
 			using Bitmap bitmap = new Bitmap(_bottomLeftImage.Width, _bottomLeftImage.Height);
 			using Graphics g = Graphics.FromImage(bitmap);
 			using MemoryStream s = new MemoryStream();
-			g.CopyFromScreen(new Point(wndBounds.Right - _bottomRightImage.Width + p.X, wndBounds.Bottom - _bottomRightImage.Height + p.Y), Point.Empty, new Size(_bottomRightImage.Width, _bottomRightImage.Height));
+			g.CopyFromScreen(new System.Drawing.Point(wndBounds.Right - _bottomRightImage.Width + p.X, wndBounds.Bottom - _bottomRightImage.Height + p.Y), System.Drawing.Point.Empty, new Size(_bottomRightImage.Width, _bottomRightImage.Height));
 			bitmap.Save(s, ImageFormat.Bmp);
 			_bottomRightImage.Texture = s.CreateTexture2D();
 		}

@@ -100,7 +100,6 @@ namespace Kenedia.Modules.BuildsManager.Models
 
 		public TemplateTag()
 		{
-			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
 			_003CGroup_003Ek__BackingField = string.Empty;
 			_003CPriority_003Ek__BackingField = 1;
 			_003CName_003Ek__BackingField = DefaultName;
@@ -114,7 +113,6 @@ namespace Kenedia.Modules.BuildsManager.Models
 
 		public TemplateTag(string name)
 		{
-			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
 			_003CGroup_003Ek__BackingField = string.Empty;
 			_003CPriority_003Ek__BackingField = 1;
 			_003CName_003Ek__BackingField = DefaultName;
@@ -132,24 +130,18 @@ namespace Kenedia.Modules.BuildsManager.Models
 
 		private void OnAssetIdChanged(object sender, ValueChangedEventArgs<int> e)
 		{
-			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
 			Icon = new DetailedTexture(e.NewValue);
-			Icon.TextureRegion = (Rectangle)(((_003F?)TextureRegion) ?? Icon.Texture?.Bounds ?? Rectangle.get_Empty());
+			Icon.TextureRegion = TextureRegion ?? Icon.Texture?.Bounds ?? Rectangle.Empty;
 			this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("AssetId"));
 			this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Icon"));
 		}
 
 		private void OnTextureRegionChanged(object sender, ValueChangedEventArgs<Rectangle?> e)
 		{
-			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
 			DetailedTexture icon = Icon;
 			if (icon != null)
 			{
-				icon.TextureRegion = (Rectangle)(((_003F?)e.NewValue) ?? Icon.Texture?.Bounds ?? Rectangle.get_Empty());
+				icon.TextureRegion = e.NewValue ?? Icon.Texture?.Bounds ?? Rectangle.Empty;
 			}
 			this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("TextureRegion"));
 		}
@@ -173,7 +165,7 @@ namespace Kenedia.Modules.BuildsManager.Models
 		{
 			try
 			{
-				return JsonConvert.SerializeObject((object)this);
+				return JsonConvert.SerializeObject(this);
 			}
 			catch (Exception)
 			{

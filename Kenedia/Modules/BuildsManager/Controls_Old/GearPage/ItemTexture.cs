@@ -45,55 +45,24 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage
 
 		private void ApplyItem()
 		{
-			//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-			_frameColor = ((Item != null) ? (Item?.Rarity.GetColor()).Value : (Color.get_White() * 0.5f));
+			_frameColor = ((Item != null) ? (Item?.Rarity.GetColor()).Value : (Color.White * 0.5f));
 			base.Texture = TexturesService.GetAsyncTexture(Item?.AssetId);
 		}
 
 		public void Draw(Control ctrl, SpriteBatch spriteBatch, Point? mousePos = null, Color? color = null)
 		{
-			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
 			if (base.FallBackTexture != null || base.Texture != null)
 			{
-				int hovered;
-				if (mousePos.HasValue)
-				{
-					Rectangle bounds = base.Bounds;
-					hovered = (((Rectangle)(ref bounds)).Contains(mousePos.Value) ? 1 : 0);
-				}
-				else
-				{
-					hovered = 0;
-				}
-				base.Hovered = (byte)hovered != 0;
+				base.Hovered = mousePos.HasValue && base.Bounds.Contains(mousePos.Value);
 				Color valueOrDefault = color.GetValueOrDefault();
 				if (!color.HasValue)
 				{
-					valueOrDefault = (Color)(((_003F?)((base.Hovered && base.HoverDrawColor.HasValue) ? base.HoverDrawColor : base.DrawColor)) ?? Color.get_White());
+					valueOrDefault = ((base.Hovered && base.HoverDrawColor.HasValue) ? base.HoverDrawColor : base.DrawColor) ?? Color.White;
 					color = valueOrDefault;
 				}
 				if (base.Texture != null)
 				{
-					spriteBatch.DrawOnCtrl(ctrl, base.Texture, base.Bounds.Add(2, 2, -4, -4), base.TextureRegion, color.Value, 0f, Vector2.get_Zero(), (SpriteEffects)0);
+					spriteBatch.DrawOnCtrl(ctrl, base.Texture, base.Bounds.Add(2, 2, -4, -4), base.TextureRegion, color.Value, 0f, Vector2.Zero);
 				}
 				spriteBatch.DrawFrame(ctrl, base.Bounds, _frameColor, 2);
 			}

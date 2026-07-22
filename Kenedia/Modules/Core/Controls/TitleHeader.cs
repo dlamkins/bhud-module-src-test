@@ -15,7 +15,7 @@ namespace Kenedia.Modules.Core.Controls
 	{
 		private readonly AsyncTexture2D _texturePanelHeader = AsyncTexture2D.FromAssetId(1032325);
 
-		private Rectangle _titleBounds = Rectangle.get_Empty();
+		private Rectangle _titleBounds = Rectangle.Empty;
 
 		public BitmapFont Font { get; set; } = Control.Content.DefaultFont16;
 
@@ -52,8 +52,6 @@ namespace Kenedia.Modules.Core.Controls
 
 		public override void RecalculateLayout()
 		{
-			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
 			_titleBounds = new Rectangle(5, 0, base.Width - 10, base.Height);
 		}
@@ -72,14 +70,10 @@ namespace Kenedia.Modules.Core.Controls
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003f: Unknown result type (might be due to invalid IL or missing references)
-			spriteBatch.DrawOnCtrl((Control)this, (Texture2D)_texturePanelHeader, bounds, (Rectangle?)_texturePanelHeader.Bounds);
+			spriteBatch.DrawOnCtrl(this, _texturePanelHeader, bounds, _texturePanelHeader.Bounds);
 			if (Title != null)
 			{
-				spriteBatch.DrawStringOnCtrl(this, Title, Font, _titleBounds, Color.get_White());
+				spriteBatch.DrawStringOnCtrl(this, Title, Font, _titleBounds, Color.White);
 			}
 		}
 	}

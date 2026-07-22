@@ -46,12 +46,10 @@ namespace Kenedia.Modules.Core.Controls
 		{
 			get
 			{
-				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 				return _textColor;
 			}
 			set
 			{
-				//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 				Common.SetProperty(ref _textColor, value);
 			}
 		}

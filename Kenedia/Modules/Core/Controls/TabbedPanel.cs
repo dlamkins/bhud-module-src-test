@@ -40,18 +40,14 @@ namespace Kenedia.Modules.Core.Controls
 
 		public TabbedPanel()
 		{
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
 			TabsButtonPanel.Parent = this;
 			TabsButtonPanel.Resized += OnTabButtonPanelResized;
 			HeightSizingMode = SizingMode.AutoSize;
-			base.BackgroundImageColor = Color.get_Honeydew() * 0.95f;
+			base.BackgroundImageColor = Color.Honeydew * 0.95f;
 		}
 
 		public void AddTab(PanelTab tab)
 		{
-			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
 			PanelTab tab2 = tab;
 			tab2.Parent = this;
 			tab2.Disposed += OnTabDisposed;
@@ -87,7 +83,6 @@ namespace Kenedia.Modules.Core.Controls
 
 		public override void RecalculateLayout()
 		{
-			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
 			int button_amount = Math.Max(1, TabsButtonPanel.Children.Count);
 			int width = (TabsButtonPanel.Width - (button_amount - 1) * (int)TabsButtonPanel.ControlPadding.X) / button_amount;
@@ -99,7 +94,6 @@ namespace Kenedia.Modules.Core.Controls
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 			base.PaintBeforeChildren(spriteBatch, bounds);
 		}
 

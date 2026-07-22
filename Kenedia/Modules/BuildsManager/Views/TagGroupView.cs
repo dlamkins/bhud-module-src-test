@@ -45,19 +45,6 @@ namespace Kenedia.Modules.BuildsManager.Views
 
 		private void BuildGroupView(Container buildPanel)
 		{
-			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ed: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0108: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0170: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ee: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0224: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0242: Unknown result type (might be due to invalid IL or missing references)
-			//IL_025e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0268: Unknown result type (might be due to invalid IL or missing references)
 			BuildPanel = buildPanel;
 			_filterBox = new FilterBox
 			{
@@ -89,9 +76,9 @@ namespace Kenedia.Modules.BuildsManager.Views
 				Location = new Point(50, _filterBox.Bottom + 5),
 				ContentPadding = new RectangleDimensions(5, 5, 0, 0),
 				Width = (BuildPanel.Width - 75) / 3,
-				BorderColor = Color.get_Black(),
+				BorderColor = Color.Black,
 				BorderWidth = new RectangleDimensions(2),
-				BackgroundColor = Color.get_Black() * 0.5f,
+				BackgroundColor = Color.Black * 0.5f,
 				CanScroll = true,
 				HeightSizingMode = SizingMode.Fill,
 				ControlPadding = new Vector2(0f, 2f)
@@ -101,9 +88,9 @@ namespace Kenedia.Modules.BuildsManager.Views
 				Location = new Point(_groupsPanel.Right + 5, _filterBox.Bottom + 5),
 				CanScroll = true,
 				Parent = BuildPanel,
-				BorderColor = Color.get_Black(),
+				BorderColor = Color.Black,
 				BorderWidth = new RectangleDimensions(2),
-				BackgroundColor = Color.get_Black() * 0.5f,
+				BackgroundColor = Color.Black * 0.5f,
 				Width = BuildPanel.Width - 75 - (_groupsPanel.Width + 5),
 				HeightSizingMode = SizingMode.Fill
 			};
@@ -119,11 +106,6 @@ namespace Kenedia.Modules.BuildsManager.Views
 
 		private void BuildPanel_Resized(object sender, ResizedEventArgs e)
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
 			Point b = e.CurrentSize;
 			if (_filterBox != null)
 			{

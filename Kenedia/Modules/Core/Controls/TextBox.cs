@@ -100,7 +100,7 @@ namespace Kenedia.Modules.Core.Controls
 			GameService.Overlay.UserLocale.SettingChanged -= UserLocale_SettingChanged;
 		}
 
-		private void OnTextChanged(object sender, EventArgs e)
+		protected virtual void OnTextChanged(object sender, EventArgs e)
 		{
 			TextChangedAction?.Invoke(base.Text);
 		}

@@ -88,7 +88,7 @@ namespace Kenedia.Modules.BuildsManager.Models
 
 		public void SaveToJson(string path)
 		{
-			string json = JsonConvert.SerializeObject((object)this, SerializerSettings.Default);
+			string json = JsonConvert.SerializeObject(this, SerializerSettings.Default);
 			File.WriteAllText(path, json);
 		}
 	}

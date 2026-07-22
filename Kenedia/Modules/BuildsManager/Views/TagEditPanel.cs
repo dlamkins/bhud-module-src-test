@@ -73,14 +73,6 @@ namespace Kenedia.Modules.BuildsManager.Views
 
 		public TagEditPanel(TagGroups tagGroups)
 		{
-			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0100: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0179: Unknown result type (might be due to invalid IL or missing references)
-			//IL_021d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02be: Unknown result type (might be due to invalid IL or missing references)
 			TagGroups = tagGroups;
 			base.ContentPadding = new RectangleDimensions(5);
 			_name = (new Kenedia.Modules.Core.Controls.Label
@@ -93,7 +85,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 				Width = 200,
 				Height = 32,
 				SetLocalizedPlaceholder = () => strings.TagName,
-				Location = new Point(0, Control.Content.DefaultFont14.get_LineHeight() + 2),
+				Location = new Point(0, Control.Content.DefaultFont14.LineHeight + 2),
 				TextChangedAction = delegate(string txt)
 				{
 					if (!string.IsNullOrEmpty(txt) && Tag != null)
@@ -106,8 +98,8 @@ namespace Kenedia.Modules.BuildsManager.Views
 			{
 				Parent = this,
 				Size = new Point(32),
-				Location = new Point(0, Control.Content.DefaultFont14.get_LineHeight() + 2),
-				BackgroundColor = Color.get_Black() * 0.4f
+				Location = new Point(0, Control.Content.DefaultFont14.LineHeight + 2),
+				BackgroundColor = Color.Black * 0.4f
 			};
 			_iconId = (new Kenedia.Modules.Core.Controls.Label
 			{
@@ -118,7 +110,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 				Parent = this,
 				Width = 100,
 				ShowButtons = false,
-				Location = new Point(0, Control.Content.DefaultFont14.get_LineHeight() + 2),
+				Location = new Point(0, Control.Content.DefaultFont14.LineHeight + 2),
 				Height = 32,
 				ValueChangedAction = delegate
 				{
@@ -135,7 +127,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 				Width = 100,
 				ShowButtons = true,
 				MinValue = 0,
-				Location = new Point(0, _icon.Bottom + 25 + Control.Content.DefaultFont14.get_LineHeight() + 2),
+				Location = new Point(0, _icon.Bottom + 25 + Control.Content.DefaultFont14.LineHeight + 2),
 				Height = 32,
 				ValueChangedAction = delegate
 				{
@@ -151,7 +143,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 				Parent = this,
 				Width = 200,
 				Height = 32,
-				Location = new Point(0, _icon.Bottom + 25 + Control.Content.DefaultFont14.get_LineHeight() + 2),
+				Location = new Point(0, _icon.Bottom + 25 + Control.Content.DefaultFont14.LineHeight + 2),
 				ValueChangedAction = new Action<string>(SetGroup)
 			});
 			_x = (new Kenedia.Modules.Core.Controls.Label
@@ -284,7 +276,6 @@ namespace Kenedia.Modules.BuildsManager.Views
 
 		private void SetTextureRegion()
 		{
-			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
 			if (!_loading && Tag != null)
 			{
 				Tag.TextureRegion = new Rectangle(_x.numberBox.Value, _y.numberBox.Value, _width.numberBox.Value, _height.numberBox.Value);
@@ -330,19 +321,9 @@ namespace Kenedia.Modules.BuildsManager.Views
 
 		private void ApplyTag(TemplateTag? tag = null)
 		{
-			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0075: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0169: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0190: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01de: Unknown result type (might be due to invalid IL or missing references)
 			_loading = true;
 			bool hasTag = tag != null;
-			Rectangle r = (Rectangle)(((_003F?)tag?.TextureRegion) ?? ((_003F?)tag?.Icon?.Bounds) ?? Rectangle.get_Empty());
+			Rectangle r = tag?.TextureRegion ?? tag?.Icon?.Bounds ?? Rectangle.Empty;
 			_icon.SourceRectangle = r;
 			_priority.numberBox.Value = tag?.Priority ?? 1;
 			_priority.numberBox.Enabled = hasTag;
@@ -377,8 +358,6 @@ namespace Kenedia.Modules.BuildsManager.Views
 
 		private void SetIcon()
 		{
-			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
 			if (_loading || Tag == null)
 			{
 				return;
@@ -399,25 +378,6 @@ namespace Kenedia.Modules.BuildsManager.Views
 
 		public override void RecalculateLayout()
 		{
-			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0118: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0200: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0278: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0306: Unknown result type (might be due to invalid IL or missing references)
-			//IL_034c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0394: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03da: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0422: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0468: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04ab: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04e9: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
 			if (_created)
 			{
@@ -463,33 +423,14 @@ namespace Kenedia.Modules.BuildsManager.Views
 
 		public override void Draw(SpriteBatch spriteBatch, Rectangle drawBounds, Rectangle scissor)
 		{
-			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00af: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
 			if (Tag == null)
 			{
 				Rectangle scissorRectangle = Rectangle.Intersect(scissor, base.AbsoluteBounds.WithPadding(_padding)).ScaleBy(Control.Graphics.UIScaleMultiplier);
-				((GraphicsResource)spriteBatch).get_GraphicsDevice().set_ScissorRectangle(scissorRectangle);
+				spriteBatch.GraphicsDevice.ScissorRectangle = scissorRectangle;
 				base.EffectBehind?.Draw(spriteBatch, drawBounds);
 				spriteBatch.Begin(base.SpriteBatchParameters);
-				ShapeExtensions.FillRectangle(spriteBatch, RectangleF.op_Implicit(base.AbsoluteBounds), (Color)(((_003F?)base.BackgroundColor) ?? (Color.get_Black() * 0.5f)), 0f);
-				spriteBatch.DrawStringOnCtrl(this, strings.SelectTagToEdit, Control.Content.DefaultFont18, drawBounds, Color.get_White(), wrap: false, HorizontalAlignment.Center);
+				spriteBatch.FillRectangle(base.AbsoluteBounds, base.BackgroundColor ?? (Color.Black * 0.5f));
+				spriteBatch.DrawStringOnCtrl(this, strings.SelectTagToEdit, Control.Content.DefaultFont18, drawBounds, Color.White, wrap: false, HorizontalAlignment.Center);
 				spriteBatch.End();
 			}
 			else
@@ -500,7 +441,6 @@ namespace Kenedia.Modules.BuildsManager.Views
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 			base.PaintBeforeChildren(spriteBatch, bounds);
 		}
 	}

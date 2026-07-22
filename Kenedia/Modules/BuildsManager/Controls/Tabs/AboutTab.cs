@@ -51,7 +51,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 
 		private bool _changeBuild = true;
 
-		private Color _disabledColor = Color.get_Gray();
+		private Color _disabledColor = Color.Gray;
 
 		private Dictionary<Kenedia.Modules.Core.Controls.FlowPanel, List<TagControl>> _tagControls = new Dictionary<Kenedia.Modules.Core.Controls.FlowPanel, List<TagControl>>();
 
@@ -67,24 +67,6 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 
 		public AboutTab(TemplatePresenter templatePresenter, TemplateTags templateTags, TagGroups tagGroups)
 		{
-			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0097: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0143: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0206: Unknown result type (might be due to invalid IL or missing references)
-			//IL_029f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02e0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_037b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_038c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0450: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0461: Unknown result type (might be due to invalid IL or missing references)
-			//IL_049e: Unknown result type (might be due to invalid IL or missing references)
 			TemplatePresenter = templatePresenter;
 			TemplateTags = templateTags;
 			TagGroups = tagGroups;
@@ -96,7 +78,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 			{
 				Parent = this,
 				CoveredControl = this,
-				BackgroundColor = Color.get_Black() * 0.5f,
+				BackgroundColor = Color.Black * 0.5f,
 				BorderWidth = 3,
 				Text = "Select a Template to view its details."
 			};
@@ -170,9 +152,9 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 				Width = _tagSectionWidth,
 				HeightSizingMode = SizingMode.Fill,
 				ShowBorder = false,
-				BorderColor = Color.get_Black(),
+				BorderColor = Color.Black,
 				BorderWidth = new RectangleDimensions(2),
-				BackgroundColor = Color.get_Black() * 0.4f,
+				BackgroundColor = Color.Black * 0.4f,
 				ShowRightBorder = true,
 				FlowDirection = ControlFlowDirection.SingleTopToBottom,
 				ContentPadding = new RectangleDimensions(5),
@@ -274,14 +256,11 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 
 		public override void Draw(SpriteBatch spriteBatch, Rectangle drawBounds, Rectangle scissor)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0003: Unknown result type (might be due to invalid IL or missing references)
 			base.Draw(spriteBatch, drawBounds, scissor);
 		}
 
 		public override void PaintAfterChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 			base.PaintAfterChildren(spriteBatch, bounds);
 		}
 
@@ -364,10 +343,6 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 
 		public Kenedia.Modules.Core.Controls.FlowPanel GetPanel(string title)
 		{
-			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0111: Unknown result type (might be due to invalid IL or missing references)
 			string title2 = title;
 			Kenedia.Modules.Core.Controls.FlowPanel panel = null;
 			if (!string.IsNullOrEmpty(title2))
@@ -563,17 +538,13 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 
 		public override void RecalculateLayout()
 		{
-			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00df: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
 			if (_created && _noteField != null)
 			{
 				_noteField.Size = new Point(base.Width - _tagPanel.Right - 15, base.Height - _noteField.Top - _modifiedField.Height - 5);
 				_modifiedLabel.Location = new Point(_tagPanel.Right + 18, _noteField.Bottom);
 				_modifiedField.Location = new Point(_modifiedLabel.Right + 10, _modifiedLabel.Top + 5);
-				_modifiedField.Size = new Point(base.Width - _modifiedField.Left - 5, _modifiedField.Font.get_LineHeight() + 5);
+				_modifiedField.Size = new Point(base.Width - _modifiedField.Left - 5, _modifiedField.Font.LineHeight + 5);
 			}
 		}
 

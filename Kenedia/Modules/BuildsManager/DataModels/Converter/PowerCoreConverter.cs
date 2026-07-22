@@ -16,12 +16,12 @@ namespace Kenedia.Modules.BuildsManager.DataModels.Converter
 			ItemRarity rarity;
 			return new PowerCore
 			{
-				Name = (string)jObject.get_Item("name"),
-				Description = (string)jObject.get_Item("description"),
-				Type = (Enum.TryParse<Kenedia.Modules.Core.DataModels.ItemType>((string)jObject.get_Item("type"), out type) ? type : Kenedia.Modules.Core.DataModels.ItemType.Unknown),
-				Rarity = (Enum.TryParse<ItemRarity>((string)jObject.get_Item("rarity"), out rarity) ? rarity : ItemRarity.Unknown),
-				Id = (int)jObject.get_Item("id"),
-				AssetId = ((string)jObject.get_Item("icon")).GetAssetIdFromRenderUrl()
+				Name = (string?)jObject["name"],
+				Description = (string?)jObject["description"],
+				Type = (Enum.TryParse<Kenedia.Modules.Core.DataModels.ItemType>((string?)jObject["type"], out type) ? type : Kenedia.Modules.Core.DataModels.ItemType.Unknown),
+				Rarity = (Enum.TryParse<ItemRarity>((string?)jObject["rarity"], out rarity) ? rarity : ItemRarity.Unknown),
+				Id = (int)jObject["id"],
+				AssetId = ((string?)jObject["icon"]).GetAssetIdFromRenderUrl()
 			};
 		}
 

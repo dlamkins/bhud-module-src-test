@@ -67,8 +67,6 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 		public RevenantSpecifics(TemplatePresenter template, Data data)
 			: base(template, data)
 		{
-			//IL_0120: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0164: Unknown result type (might be due to invalid IL or missing references)
 			_legendSelector = new LegendSelector
 			{
 				Parent = Control.Graphics.SpriteScreen,
@@ -150,7 +148,6 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 
 		private void SetSelector(LegendIcon icon)
 		{
-			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
 			_selectorAnchor = icon;
 			_legendSelector.Anchor = icon;
 			_legendSelector.ZIndex = ZIndex + 1000;
@@ -171,8 +168,6 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 
 		public override void RecalculateLayout()
 		{
-			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010f: Unknown result type (might be due to invalid IL or missing references)
 			if (TerrestrialSwapButton != null)
 			{
 				base.RecalculateLayout();
@@ -208,22 +203,11 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 
 		public override void PaintAfterChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
 			base.PaintAfterChildren(spriteBatch, bounds);
 			Rectangle r = _legends[LegendSlotType.TerrestrialActive].LocalBounds;
-			spriteBatch.DrawStringOnCtrl(this, (base.TemplatePresenter.LegendSlot == LegendSlotType.TerrestrialActive) ? strings.ActiveLegend : strings.InactiveLegend, Control.Content.DefaultFont16, new Rectangle(((Rectangle)(ref r)).get_Right() + 5, ((Rectangle)(ref r)).get_Center().Y - Control.Content.DefaultFont14.get_LineHeight() / 2, 100, Control.Content.DefaultFont16.get_LineHeight()), Color.get_White());
+			spriteBatch.DrawStringOnCtrl(this, (base.TemplatePresenter.LegendSlot == LegendSlotType.TerrestrialActive) ? strings.ActiveLegend : strings.InactiveLegend, Control.Content.DefaultFont16, new Rectangle(r.Right + 5, r.Center.Y - Control.Content.DefaultFont14.LineHeight / 2, 100, Control.Content.DefaultFont16.LineHeight), Color.White);
 			r = _legends[LegendSlotType.AquaticActive].LocalBounds;
-			spriteBatch.DrawStringOnCtrl(this, (base.TemplatePresenter.LegendSlot == LegendSlotType.TerrestrialActive) ? strings.ActiveLegend : strings.InactiveLegend, Control.Content.DefaultFont16, new Rectangle(((Rectangle)(ref r)).get_Right() + 5, ((Rectangle)(ref r)).get_Center().Y - Control.Content.DefaultFont14.get_LineHeight() / 2, 100, Control.Content.DefaultFont16.get_LineHeight()), Color.get_White());
+			spriteBatch.DrawStringOnCtrl(this, (base.TemplatePresenter.LegendSlot == LegendSlotType.TerrestrialActive) ? strings.ActiveLegend : strings.InactiveLegend, Control.Content.DefaultFont16, new Rectangle(r.Right + 5, r.Center.Y - Control.Content.DefaultFont14.LineHeight / 2, 100, Control.Content.DefaultFont16.LineHeight), Color.White);
 		}
 
 		protected override void DisposeControl()

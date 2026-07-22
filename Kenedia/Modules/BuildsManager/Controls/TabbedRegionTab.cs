@@ -51,15 +51,10 @@ namespace Kenedia.Modules.BuildsManager.Controls
 		{
 			get
 			{
-				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 				return _bounds;
 			}
 			set
 			{
-				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-				//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0019: Unknown result type (might be due to invalid IL or missing references)
 				_bounds = value;
 				_inactiveHeader.Bounds = value;
 				_activeHeader.Bounds = value;
@@ -86,57 +81,27 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		public bool IsHovered(Point p)
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-			Rectangle bounds = Bounds;
-			return ((Rectangle)(ref bounds)).Contains(p);
+			return Bounds.Contains(p);
 		}
 
 		public void DrawHeader(Control ctrl, SpriteBatch spriteBatch, Point mousePos)
 		{
-			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0099: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-			Color color = (IsActive ? Color.get_White() : (Color.get_White() * (IsHovered(mousePos) ? 0.9f : 0.6f)));
+			Color color = (IsActive ? Color.White : (Color.White * (IsHovered(mousePos) ? 0.9f : 0.6f)));
 			((!IsActive) ? _activeHeader : _inactiveHeader).Draw(ctrl, spriteBatch, mousePos, color);
 			if (!string.IsNullOrEmpty(_title))
 			{
-				spriteBatch.DrawStringOnCtrl(ctrl, _title, Font, _textBounds, Color.get_White());
+				spriteBatch.DrawStringOnCtrl(ctrl, _title, Font, _textBounds, Color.White);
 			}
 			if (Icon != null)
 			{
-				spriteBatch.DrawOnCtrl(ctrl, (Texture2D)Icon, _iconBounds, Color.get_White());
+				spriteBatch.DrawOnCtrl(ctrl, Icon, _iconBounds, Color.White);
 			}
 		}
 
 		private void RecalculateLayout()
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
-			Rectangle bounds = Bounds;
-			int num = ((Rectangle)(ref bounds)).get_Left() + _padding.Left;
-			bounds = Bounds;
-			_iconBounds = new Rectangle(num, ((Rectangle)(ref bounds)).get_Top() + _padding.Top, Bounds.Height - _padding.Vertical, Bounds.Height - _padding.Vertical);
-			_textBounds = new Rectangle(((Rectangle)(ref _iconBounds)).get_Right() + 10, _padding.Top, Bounds.Width - _iconBounds.Width - 10 - _padding.Right, Bounds.Height - _padding.Vertical);
+			_iconBounds = new Rectangle(Bounds.Left + _padding.Left, Bounds.Top + _padding.Top, Bounds.Height - _padding.Vertical, Bounds.Height - _padding.Vertical);
+			_textBounds = new Rectangle(_iconBounds.Right + 10, _padding.Top, Bounds.Width - _iconBounds.Width - 10 - _padding.Right, Bounds.Height - _padding.Vertical);
 		}
 	}
 }

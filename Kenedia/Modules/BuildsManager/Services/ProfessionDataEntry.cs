@@ -154,7 +154,7 @@ namespace Kenedia.Modules.BuildsManager.Services
 					}
 					base.Version = base.Map.Version;
 					BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.Logger.Debug($"Saving updated {name} data with {missing.Count()} updated entries. Version {base.Version}");
-					string json = JsonConvert.SerializeObject((object)this, SerializerSettings.Default);
+					string json = JsonConvert.SerializeObject(this, SerializerSettings.Default);
 					System.IO.File.WriteAllText(path, json);
 					DataLoaded = true;
 					return true;

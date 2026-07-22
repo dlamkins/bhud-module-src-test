@@ -21,31 +21,31 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 		{
 			new DetailedTexture(3680130)
 			{
-				TextureRegion = new Rectangle(14, 14, 100, 100)
+				TextureRegion = new Microsoft.Xna.Framework.Rectangle(14, 14, 100, 100)
 			},
 			new DetailedTexture(3680134)
 			{
-				TextureRegion = new Rectangle(14, 14, 100, 100)
+				TextureRegion = new Microsoft.Xna.Framework.Rectangle(14, 14, 100, 100)
 			},
 			new DetailedTexture(3680128)
 			{
-				TextureRegion = new Rectangle(14, 14, 100, 100)
+				TextureRegion = new Microsoft.Xna.Framework.Rectangle(14, 14, 100, 100)
 			},
 			new DetailedTexture(3680132)
 			{
-				TextureRegion = new Rectangle(14, 14, 100, 100)
+				TextureRegion = new Microsoft.Xna.Framework.Rectangle(14, 14, 100, 100)
 			},
 			new DetailedTexture(3680127)
 			{
-				TextureRegion = new Rectangle(14, 14, 100, 100)
+				TextureRegion = new Microsoft.Xna.Framework.Rectangle(14, 14, 100, 100)
 			},
 			new DetailedTexture(3680135)
 			{
-				TextureRegion = new Rectangle(14, 14, 100, 100)
+				TextureRegion = new Microsoft.Xna.Framework.Rectangle(14, 14, 100, 100)
 			},
 			new DetailedTexture(3680131)
 			{
-				TextureRegion = new Rectangle(14, 14, 100, 100)
+				TextureRegion = new Microsoft.Xna.Framework.Rectangle(14, 14, 100, 100)
 			}
 		};
 
@@ -62,9 +62,9 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 			new DetailedTexture(157138, 157140)
 		};
 
-		private Color _healthColor = new Color(162, 17, 11);
+		private Microsoft.Xna.Framework.Color _healthColor = new Microsoft.Xna.Framework.Color(162, 17, 11);
 
-		private Rectangle _healthRectangle;
+		private Microsoft.Xna.Framework.Rectangle _healthRectangle;
 
 		private Enviroment Enviroment = Enviroment.Terrestrial;
 
@@ -74,7 +74,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 
 		private readonly DetailedTexture _overheat = new DetailedTexture(1636720);
 
-		private Rectangle _separatorBounds;
+		private Microsoft.Xna.Framework.Rectangle _separatorBounds;
 
 		protected override SkillIcon[] Skills { get; } = new SkillIcon[6]
 		{
@@ -90,15 +90,6 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 		public EngineerSpecifics(TemplatePresenter template, Data data)
 			: base(template, data)
 		{
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0168: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016d: Unknown result type (might be due to invalid IL or missing references)
 			template.SkillChanged += new SkillChangedEventHandler(Template_SkillChanged);
 		}
 
@@ -109,62 +100,34 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 
 		public override void RecalculateLayout()
 		{
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0126: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0142: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0178: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0201: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0206: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0267: Unknown result type (might be due to invalid IL or missing references)
-			//IL_028f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0294: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ab: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_032f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0341: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0346: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0351: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0358: Unknown result type (might be due to invalid IL or missing references)
-			//IL_035e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0363: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
 			int xOffset = 90;
-			Skills[0].TextureRegion = new Rectangle(14, 14, 100, 100);
+			Skills[0].TextureRegion = new Microsoft.Xna.Framework.Rectangle(14, 14, 100, 100);
 			switch (base.TemplatePresenter.Template?.EliteSpecialization?.Id)
 			{
 			case 57:
 			{
 				for (int i = 0; i < 5; i++)
 				{
-					Skills[i].Bounds = new Rectangle(xOffset + 20 + i * 44 + ((i == 4) ? 10 : 0), 36, 42, 42);
+					Skills[i].Bounds = new Microsoft.Xna.Framework.Rectangle(xOffset + 20 + i * 44 + ((i == 4) ? 10 : 0), 36, 42, 42);
 				}
-				_energyBg.Bounds = new Rectangle(xOffset + 5, 83, 250, 12);
-				_overheat.Bounds = new Rectangle(xOffset + 5, 83, 250, 12);
-				_energy.TextureRegion = new Rectangle(0, 0, _energy.Texture.Width / 3 * 2, _energy.Texture.Height);
-				_energy.Bounds = new Rectangle(xOffset + 5, 83, 205, 12);
-				_energy.TextureRegion = new Rectangle(0, 0, _energy.Texture.Width / 3 * 2, _energy.Texture.Height);
+				_energyBg.Bounds = new Microsoft.Xna.Framework.Rectangle(xOffset + 5, 83, 250, 12);
+				_overheat.Bounds = new Microsoft.Xna.Framework.Rectangle(xOffset + 5, 83, 250, 12);
+				_energy.TextureRegion = new Microsoft.Xna.Framework.Rectangle(0, 0, _energy.Texture.Width / 3 * 2, _energy.Texture.Height);
+				_energy.Bounds = new Microsoft.Xna.Framework.Rectangle(xOffset + 5, 83, 205, 12);
+				_energy.TextureRegion = new Microsoft.Xna.Framework.Rectangle(0, 0, _energy.Texture.Width / 3 * 2, _energy.Texture.Height);
 				break;
 			}
 			case 70:
 			{
-				Skills[0].Bounds = new Rectangle(xOffset + 175, 40, 56, 56);
-				_target.Bounds = new Rectangle(xOffset + 5, 5, 32, 32);
-				_return.Bounds = new Rectangle(xOffset + 5 + 34, 5, 32, 32);
-				_combatState.Bounds = new Rectangle(xOffset + 5 + 68, 5, 32, 32);
-				_healthRectangle = new Rectangle(xOffset + 5, 81, 170, 14);
+				Skills[0].Bounds = new Microsoft.Xna.Framework.Rectangle(xOffset + 175, 40, 56, 56);
+				_target.Bounds = new Microsoft.Xna.Framework.Rectangle(xOffset + 5, 5, 32, 32);
+				_return.Bounds = new Microsoft.Xna.Framework.Rectangle(xOffset + 5 + 34, 5, 32, 32);
+				_combatState.Bounds = new Microsoft.Xna.Framework.Rectangle(xOffset + 5 + 68, 5, 32, 32);
+				_healthRectangle = new Microsoft.Xna.Framework.Rectangle(xOffset + 5, 81, 170, 14);
 				for (int j = 1; j < 4; j++)
 				{
-					Skills[j].Bounds = new Rectangle(xOffset + 15 - 44 + j * 34, 40, 32, 32);
+					Skills[j].Bounds = new Microsoft.Xna.Framework.Rectangle(xOffset + 15 - 44 + j * 34, 40, 32, 32);
 				}
 				break;
 			}
@@ -172,14 +135,10 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 			{
 				for (int k = 0; k < 5; k++)
 				{
-					Skills[k].Bounds = new Rectangle(xOffset + 30 + k * 44, 55, 42, 42);
+					Skills[k].Bounds = new Microsoft.Xna.Framework.Rectangle(xOffset + 30 + k * 44, 55, 42, 42);
 					if (k > 0 && k < 4)
 					{
-						DetailedTexture obj = _selectors[k - 1];
-						Rectangle bounds = Skills[k].Bounds;
-						int left = ((Rectangle)(ref bounds)).get_Left();
-						bounds = Skills[k].Bounds;
-						obj.Bounds = new Rectangle(left, ((Rectangle)(ref bounds)).get_Top() - 8, Skills[k].Bounds.Width, 10);
+						_selectors[k - 1].Bounds = new Microsoft.Xna.Framework.Rectangle(Skills[k].Bounds.Left, Skills[k].Bounds.Top - 8, Skills[k].Bounds.Width, 10);
 					}
 				}
 				break;
@@ -188,51 +147,14 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 			Template template = base.TemplatePresenter.Template;
 			if (template != null && (template.EliteSpecialization?.Id).GetValueOrDefault() == 43)
 			{
-				Skills[4].TextureRegion = new Rectangle(6, 6, 51, 51);
+				Skills[4].TextureRegion = new Microsoft.Xna.Framework.Rectangle(6, 6, 51, 51);
 			}
-			Rectangle p = Skills[3].Bounds;
-			_separatorBounds = new Rectangle(((Rectangle)(ref p)).get_Right() + 6, p.Y, 2, p.Height);
+			Microsoft.Xna.Framework.Rectangle p = Skills[3].Bounds;
+			_separatorBounds = new Microsoft.Xna.Framework.Rectangle(p.Right + 6, p.Y, 2, p.Height);
 		}
 
-		public override void PaintAfterChildren(SpriteBatch spriteBatch, Rectangle bounds)
+		public override void PaintAfterChildren(SpriteBatch spriteBatch, Microsoft.Xna.Framework.Rectangle bounds)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02f9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02fe: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0300: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0305: Unknown result type (might be due to invalid IL or missing references)
-			//IL_030e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0313: Unknown result type (might be due to invalid IL or missing references)
-			//IL_031e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_033d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0344: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0349: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0353: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0359: Unknown result type (might be due to invalid IL or missing references)
-			//IL_037a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0381: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0386: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0390: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0396: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03d1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03f3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03f9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03fe: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0408: Unknown result type (might be due to invalid IL or missing references)
-			//IL_040e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_042a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_042f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_044e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04af: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0510: Unknown result type (might be due to invalid IL or missing references)
 			base.PaintAfterChildren(spriteBatch, bounds);
 			switch (base.TemplatePresenter.Template?.EliteSpecialization?.Id)
 			{
@@ -245,7 +167,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 				_energyBg.Draw(this, spriteBatch);
 				_overheat.Draw(this, spriteBatch);
 				_energy.Draw(this, spriteBatch);
-				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, _separatorBounds, Color.get_Black());
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, _separatorBounds, Microsoft.Xna.Framework.Color.Black);
 				break;
 			}
 			case 70:
@@ -257,14 +179,14 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 				{
 					Skills[k].Draw(this, spriteBatch, base.RelativeMousePosition);
 				}
-				Color borderColor = Color.get_Black();
-				Rectangle b = _healthRectangle;
-				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, _healthRectangle, Rectangle.get_Empty(), _healthColor);
-				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref b)).get_Left(), ((Rectangle)(ref b)).get_Top(), b.Width, 1), Rectangle.get_Empty(), borderColor * 0.6f);
-				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref b)).get_Left(), ((Rectangle)(ref b)).get_Bottom() - 1, b.Width, 1), Rectangle.get_Empty(), borderColor * 0.6f);
-				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref b)).get_Left(), ((Rectangle)(ref b)).get_Top(), 1, b.Height), Rectangle.get_Empty(), borderColor * 0.6f);
-				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Rectangle(((Rectangle)(ref b)).get_Right() - 1, ((Rectangle)(ref b)).get_Top(), 1, b.Height), Rectangle.get_Empty(), borderColor * 0.6f);
-				spriteBatch.DrawStringOnCtrl(this, "100%", GameService.Content.DefaultFont14, _healthRectangle, Color.get_White(), wrap: false, HorizontalAlignment.Center);
+				Microsoft.Xna.Framework.Color borderColor = Microsoft.Xna.Framework.Color.Black;
+				Microsoft.Xna.Framework.Rectangle b = _healthRectangle;
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, _healthRectangle, Microsoft.Xna.Framework.Rectangle.Empty, _healthColor);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Microsoft.Xna.Framework.Rectangle(b.Left, b.Top, b.Width, 1), Microsoft.Xna.Framework.Rectangle.Empty, borderColor * 0.6f);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Microsoft.Xna.Framework.Rectangle(b.Left, b.Bottom - 1, b.Width, 1), Microsoft.Xna.Framework.Rectangle.Empty, borderColor * 0.6f);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Microsoft.Xna.Framework.Rectangle(b.Left, b.Top, 1, b.Height), Microsoft.Xna.Framework.Rectangle.Empty, borderColor * 0.6f);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Microsoft.Xna.Framework.Rectangle(b.Right - 1, b.Top, 1, b.Height), Microsoft.Xna.Framework.Rectangle.Empty, borderColor * 0.6f);
+				spriteBatch.DrawStringOnCtrl(this, "100%", GameService.Content.DefaultFont14, _healthRectangle, Microsoft.Xna.Framework.Color.White, wrap: false, HorizontalAlignment.Center);
 				break;
 			}
 			case 75:

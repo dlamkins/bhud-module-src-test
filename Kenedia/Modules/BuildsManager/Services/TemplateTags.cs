@@ -201,7 +201,7 @@ namespace Kenedia.Modules.BuildsManager.Services
 				_tokenSource?.Cancel();
 				_tokenSource = new CancellationTokenSource();
 				await Task.Delay(1000, _tokenSource.Token);
-				string json = JsonConvert.SerializeObject((object)_tags, SerializerSettings.Default);
+				string json = JsonConvert.SerializeObject(_tags, SerializerSettings.Default);
 				if (!_tokenSource.IsCancellationRequested)
 				{
 					File.WriteAllText(_paths.ModulePath + "TemplateTags.json", json);

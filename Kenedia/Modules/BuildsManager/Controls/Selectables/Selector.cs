@@ -93,12 +93,10 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selectables
 		{
 			get
 			{
-				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 				return _selectableSize;
 			}
 			set
 			{
-				//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 				Common.SetProperty(ref _selectableSize, value, new ValueChangedEventHandler<Point>(Recalculate));
 			}
 		}
@@ -123,12 +121,10 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selectables
 		{
 			get
 			{
-				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 				return _anchorOffset;
 			}
 			set
 			{
-				//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 				Common.SetProperty(ref _anchorOffset, value, new Action(RecalculateLayout));
 			}
 		}
@@ -151,13 +147,6 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selectables
 
 		public Selector()
 		{
-			//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012e: Unknown result type (might be due to invalid IL or missing references)
 			_003CSelectablePerRow_003Ek__BackingField = 4;
 			PassSelected = true;
 			base._002Ector();
@@ -174,7 +163,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selectables
 				HeightSizingMode = SizingMode.AutoSize,
 				BackgroundColor = new Color(16, 16, 16) * 0.9f,
 				ContentPadding = new RectangleDimensions(8),
-				BorderColor = Color.get_Black(),
+				BorderColor = Color.Black,
 				BorderWidth = new RectangleDimensions(2),
 				Parent = this
 			};
@@ -190,7 +179,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selectables
 				Parent = ContentPanel,
 				Font = Control.Content.GetFont(ContentService.FontFace.Menomonia, ContentService.FontSize.Size18, ContentService.FontStyle.Regular),
 				AutoSizeHeight = true,
-				TextColor = Color.get_White(),
+				TextColor = Color.White,
 				HorizontalAlignment = HorizontalAlignment.Center,
 				VerticalAlignment = VerticalAlignment.Middle
 			};
@@ -200,10 +189,9 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selectables
 
 		private void Mouse_RightMouseButtonPressed(object sender, MouseEventArgs e)
 		{
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
 			if (base.Visible)
 			{
-				if ((HeaderPanel?.MouseOver ?? false) && !((Rectangle)(ref BlockInputRegion)).Contains(base.RelativeMousePosition))
+				if ((HeaderPanel?.MouseOver ?? false) && !BlockInputRegion.Contains(base.RelativeMousePosition))
 				{
 					base.Visible = false;
 				}
@@ -216,10 +204,9 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selectables
 
 		private void Mouse_LeftMouseButtonPressed(object sender, MouseEventArgs e)
 		{
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
 			if (base.Visible)
 			{
-				if ((HeaderPanel?.MouseOver ?? false) && !((Rectangle)(ref BlockInputRegion)).Contains(base.RelativeMousePosition))
+				if ((HeaderPanel?.MouseOver ?? false) && !BlockInputRegion.Contains(base.RelativeMousePosition))
 				{
 					base.Visible = false;
 				}
@@ -251,7 +238,6 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selectables
 		{
 			Controls.ForEach(delegate(Selectable<T> c)
 			{
-				//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 				c.Size = SelectableSize;
 			});
 			RecalculateLayout();
@@ -259,7 +245,6 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selectables
 
 		protected virtual Selectable<T> CreateSelectable(T item)
 		{
-			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
 			SelectableType selectableType2 = (Type = ((item is Skill) ? SelectableType.Skill : ((item is Pet) ? SelectableType.Pet : SelectableType.None)));
 			base.Visible = true;
 			Selectable<T> obj = new Selectable<T>
@@ -351,27 +336,12 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selectables
 
 		public override void RecalculateLayout()
 		{
-			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0049: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0174: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
 			FlowPanel?.Invalidate();
 			ContentPanel?.Invalidate();
 			if (FlowPanel != null)
 			{
-				Point size = FlowPanel.Size;
-				Rectangle contentRegion = FlowPanel.ContentRegion;
-				Point p = size.Substract(((Rectangle)(ref contentRegion)).get_Size());
+				Point p = FlowPanel.Size.Substract(FlowPanel.ContentRegion.Size);
 				FlowPanel.Width = p.X + SelectableSize.X * SelectablePerRow + (int)FlowPanel.ControlPadding.X * (SelectablePerRow - 1);
 				FlowPanel.Height = p.Y + SelectableSize.Y * Math.Max(1, (int)Math.Ceiling((decimal)Items.Count / (decimal)SelectablePerRow)) + (int)FlowPanel.ControlPadding.Y * Math.Max(1, (int)Math.Ceiling((decimal)Items.Count / ((decimal)SelectablePerRow - 1m)));
 				FlowPanel.RecalculateLayout();
@@ -385,8 +355,6 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selectables
 
 		public override void Draw(SpriteBatch spriteBatch, Rectangle drawBounds, Rectangle scissor)
 		{
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
 			Control anchor = Anchor;
 			if (anchor == null || !anchor.IsDrawn())
 			{
@@ -397,7 +365,6 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selectables
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 			base.PaintBeforeChildren(spriteBatch, bounds);
 		}
 
@@ -431,20 +398,9 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selectables
 
 		protected virtual void MoveToAnchor()
 		{
-			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
 			if (Anchor != null)
 			{
-				Rectangle absoluteBounds = Anchor.AbsoluteBounds;
-				int num = ((Rectangle)(ref absoluteBounds)).get_Center().X - base.Width / 2 + AnchorOffset.X;
-				absoluteBounds = Anchor.AbsoluteBounds;
-				base.Location = new Point(num, ((Rectangle)(ref absoluteBounds)).get_Top() + AnchorOffset.Y);
+				base.Location = new Point(Anchor.AbsoluteBounds.Center.X - base.Width / 2 + AnchorOffset.X, Anchor.AbsoluteBounds.Top + AnchorOffset.Y);
 			}
 		}
 

@@ -30,7 +30,6 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		private void ApplyTrait()
 		{
-			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
 			base.Texture = TexturesService.GetAsyncTexture(Trait?.IconAssetId);
 			if (Trait != null && base.Texture != null)
 			{

@@ -68,8 +68,6 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 		public RangerSpecifics(TemplatePresenter template, Data data)
 			: base(template, data)
 		{
-			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
 			foreach (KeyValuePair<PetSlotType, PetControl> pet2 in _pets)
 			{
 				pet2.Value.Parent = this;
@@ -110,10 +108,6 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 
 		public override void RecalculateLayout()
 		{
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
 			int xOffset = 60;
 			_pets[PetSlotType.Terrestrial_1].SetBounds(new Rectangle(xOffset, 0, _petSize.X, _petSize.Y));
@@ -130,7 +124,6 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 
 		private void SetSelector(PetControl skillIcon)
 		{
-			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
 			_selectorAnchor = skillIcon;
 			_petSelector.Anchor = skillIcon;
 			_petSelector.ZIndex = ZIndex + 1000;

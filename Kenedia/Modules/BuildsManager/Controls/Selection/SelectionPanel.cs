@@ -234,34 +234,17 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 
 		public override void RecalculateLayout()
 		{
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0128: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
 			_backBounds = new Rectangle(10, 5, base.Width - 32, 55);
-			_backButton.Bounds = new Rectangle(((Rectangle)(ref _backBounds)).get_Left() + 10, ((Rectangle)(ref _backBounds)).get_Top() + 10, _backBounds.Height - 20, _backBounds.Height - 20);
-			Rectangle bounds = _backButton.Bounds;
-			int num = ((Rectangle)(ref bounds)).get_Right() + 10;
-			int num2 = ((Rectangle)(ref _backBounds)).get_Top() + 10;
-			int width = _backBounds.Width;
-			bounds = _backButton.Bounds;
-			_backTextBounds = new Rectangle(num, num2, width - (((Rectangle)(ref bounds)).get_Right() + 10), _backBounds.Height - 20);
+			_backButton.Bounds = new Rectangle(_backBounds.Left + 10, _backBounds.Top + 10, _backBounds.Height - 20, _backBounds.Height - 20);
+			_backTextBounds = new Rectangle(_backButton.Bounds.Right + 10, _backBounds.Top + 10, _backBounds.Width - (_backButton.Bounds.Right + 10), _backBounds.Height - 20);
 			if (_gearSelection != null)
 			{
-				_gearSelection.Location = new Point(10, ((Rectangle)(ref _backBounds)).get_Bottom() + 10);
+				_gearSelection.Location = new Point(10, _backBounds.Bottom + 10);
 			}
 			if (_statSelection != null)
 			{
-				_statSelection.Location = new Point(10, ((Rectangle)(ref _backBounds)).get_Bottom() + 10);
+				_statSelection.Location = new Point(10, _backBounds.Bottom + 10);
 			}
 			if (BuildSelection != null)
 			{
@@ -271,28 +254,13 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 			base.PaintBeforeChildren(spriteBatch, bounds);
 		}
 
 		public override void PaintAfterChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
 			base.PaintAfterChildren(spriteBatch, bounds);
-			if (Anchor == null || !Anchor.Visible || Anchor.Parent == null)
-			{
-				return;
-			}
-			Rectangle absoluteBounds = Anchor.Parent.AbsoluteBounds;
-			Rectangle absoluteBounds2 = Anchor.AbsoluteBounds;
-			if (((Rectangle)(ref absoluteBounds)).Contains(((Rectangle)(ref absoluteBounds2)).get_Center()))
+			if (Anchor != null && Anchor.Visible && Anchor.Parent != null && Anchor.Parent.AbsoluteBounds.Contains(Anchor.AbsoluteBounds.Center))
 			{
 				if (SelectionType == SelectionTypes.Items)
 				{
@@ -312,13 +280,12 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 
 		protected override void OnClick(MouseEventArgs e)
 		{
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
 			base.OnClick(e);
 			if (Anchor != null)
 			{
 				SelectionTypes selectionType = SelectionType;
 				bool flag = (((uint)(selectionType - 2) <= 1u) ? true : false);
-				if (flag && ((Rectangle)(ref _backBounds)).Contains(base.RelativeMousePosition))
+				if (flag && _backBounds.Contains(base.RelativeMousePosition))
 				{
 					ResetAnchor();
 				}
@@ -327,38 +294,22 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 
 		private void DrawGearSelection(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-			if (((Rectangle)(ref _backBounds)).Contains(base.RelativeMousePosition))
+			if (_backBounds.Contains(base.RelativeMousePosition))
 			{
 				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, _backBounds, ContentService.Colors.ColonialWhite * 0.3f);
 			}
-			_backButton.Draw(this, spriteBatch, base.RelativeMousePosition, Color.get_White());
-			spriteBatch.DrawStringOnCtrl(this, Title, Control.Content.DefaultFont18, _backTextBounds, Color.get_White());
+			_backButton.Draw(this, spriteBatch, base.RelativeMousePosition, Color.White);
+			spriteBatch.DrawStringOnCtrl(this, Title, Control.Content.DefaultFont18, _backTextBounds, Color.White);
 		}
 
 		private void DrawStatSelection(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-			if (((Rectangle)(ref _backBounds)).Contains(base.RelativeMousePosition))
+			if (_backBounds.Contains(base.RelativeMousePosition))
 			{
 				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, _backBounds, ContentService.Colors.ColonialWhite * 0.3f);
 			}
-			_backButton.Draw(this, spriteBatch, base.RelativeMousePosition, Color.get_White());
-			spriteBatch.DrawStringOnCtrl(this, Title, Control.Content.DefaultFont18, _backTextBounds, Color.get_White());
+			_backButton.Draw(this, spriteBatch, base.RelativeMousePosition, Color.White);
+			spriteBatch.DrawStringOnCtrl(this, Title, Control.Content.DefaultFont18, _backTextBounds, Color.White);
 		}
 
 		protected override void DisposeControl()

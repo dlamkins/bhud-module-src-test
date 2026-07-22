@@ -48,21 +48,19 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 
 		public ProfessionRaceSelection(Data data)
 		{
-			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
 			_003CType_003Ek__BackingField = SelectionType.Race;
 			base._002Ector();
 			Data = data;
 			Search.Dispose();
 			base.BackgroundImage = AsyncTexture2D.FromAssetId(155963);
-			SelectionContent.Location = Point.get_Zero();
+			SelectionContent.Location = Point.Zero;
 			SelectionContent.HeightSizingMode = SizingMode.Fill;
 			SelectionContent.ShowBorder = false;
 			SelectionContent.ContentPadding = new RectangleDimensions(0);
 			HeightSizingMode = SizingMode.Standard;
 			WidthSizingMode = SizingMode.Standard;
 			base.Width = 225;
-			base.BorderColor = Color.get_Black();
+			base.BorderColor = Color.Black;
 			base.BorderWidth = new RectangleDimensions(2);
 			base.ContentPadding = new RectangleDimensions(5);
 			foreach (Races race in Enum.GetValues(typeof(Races)))
@@ -104,7 +102,6 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 
 		private void OnTypeChanged(object sender, PropertyChangedEventArgs e)
 		{
-			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
 			SelectionContent.FilterChildren((ProfessionRaceSelectable e) => e.SelectionType == Type);
 			Control ctrl = SelectionContent.Children.FirstOrDefault();
 			base.Height = base.ContentPadding.Vertical + SelectionContent.Children.Where((Control e) => e.Visible).Count() * (Math.Max(ctrl.Height, 48) + (int)SelectionContent.ControlPadding.Y);
@@ -113,7 +110,6 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 
 		public override void RecalculateLayout()
 		{
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
 			base.TextureRectangle = new Rectangle(25, 25, base.Width, base.Height);
 		}

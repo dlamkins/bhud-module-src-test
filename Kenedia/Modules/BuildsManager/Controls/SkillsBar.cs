@@ -119,39 +119,13 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		public override void RecalculateLayout()
 		{
-			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
 			_terrestrialTexture.Bounds = new Rectangle(5, 2, 42, 42);
-			DetailedTexture aquaticTexture = _aquaticTexture;
-			Rectangle bounds = _terrestrialTexture.Bounds;
-			aquaticTexture.Bounds = new Rectangle(((Rectangle)(ref bounds)).get_Right() + _skillSize * 5 + 20, 2, 42, 42);
-			Point size = default(Point);
-			((Point)(ref size))._002Ector(_skillSize, _skillSize + 15);
+			_aquaticTexture.Bounds = new Rectangle(_terrestrialTexture.Bounds.Right + _skillSize * 5 + 20, 2, 42, 42);
+			Point size = new Point(_skillSize, _skillSize + 15);
 			foreach (KeyValuePair<SkillSlotType, SkillSlotControl> spair in Skills)
 			{
-				int right;
-				if (!spair.Key.IsTerrestrial())
-				{
-					bounds = _aquaticTexture.Bounds;
-					right = ((Rectangle)(ref bounds)).get_Right();
-				}
-				else
-				{
-					bounds = _terrestrialTexture.Bounds;
-					right = ((Rectangle)(ref bounds)).get_Right();
-				}
-				int left = right + 5;
+				int left = (spair.Key.IsTerrestrial() ? _terrestrialTexture.Bounds.Right : _aquaticTexture.Bounds.Right) + 5;
 				int xOffset = spair.Key.GetSlotPosition() * size.X;
 				Skills[spair.Key].SetBounds(new Rectangle(left + xOffset, 0, size.X, size.Y));
 			}
@@ -159,14 +133,9 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
 			base.PaintBeforeChildren(spriteBatch, bounds);
-			_terrestrialTexture.Draw(this, spriteBatch, base.RelativeMousePosition, Color.get_White());
-			_aquaticTexture.Draw(this, spriteBatch, base.RelativeMousePosition, Color.get_White());
+			_terrestrialTexture.Draw(this, spriteBatch, base.RelativeMousePosition, Color.White);
+			_aquaticTexture.Draw(this, spriteBatch, base.RelativeMousePosition, Color.White);
 		}
 
 		public override void UpdateContainer(GameTime gameTime)

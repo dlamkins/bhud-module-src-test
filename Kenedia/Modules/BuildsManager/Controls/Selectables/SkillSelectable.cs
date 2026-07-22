@@ -18,7 +18,6 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selectables
 
 		public SkillSelectable()
 		{
-			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 			base.Tooltip = new SkillTooltip();
 		}
 
@@ -34,14 +33,12 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selectables
 
 		public override void RecalculateLayout()
 		{
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
 			_noAquaticFlagTexture.Bounds = new Rectangle(0, 0, base.Width, base.Height);
 		}
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 			base.Paint(spriteBatch, bounds);
 			Skill skill = base.Data;
 			if (skill != null && skill.Flags.HasFlag(SkillFlag.NoUnderwater) && Enviroment == Enviroment.Aquatic)

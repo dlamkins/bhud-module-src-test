@@ -69,21 +69,14 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 
 		public ProfessionRaceSelectable(Data data)
 		{
-			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d1: Unknown result type (might be due to invalid IL or missing references)
 			_003CValue_003Ek__BackingField = ProfessionType.Guardian;
 			_003CSelectionType_003Ek__BackingField = ProfessionRaceSelection.SelectionType.Profession;
 			base._002Ector();
 			Data = data;
 			HeightSizingMode = SizingMode.AutoSize;
 			base.BorderWidth = new RectangleDimensions(2);
-			base.BorderColor = Color.get_Black();
-			base.BackgroundColor = Color.get_Black() * 0.4f;
+			base.BorderColor = Color.Black;
+			base.BackgroundColor = Color.Black * 0.4f;
 			base.HoveredBorderColor = ContentService.Colors.ColonialWhite;
 			base.ContentPadding = new RectangleDimensions(5);
 			base.ClipInputToBounds = false;
@@ -91,7 +84,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 			{
 				Parent = this,
 				Font = Control.Content.DefaultFont18,
-				TextColor = Color.get_White(),
+				TextColor = Color.White,
 				VerticalAlignment = VerticalAlignment.Middle
 			};
 			_icon = new Kenedia.Modules.Core.Controls.Image

@@ -55,9 +55,6 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		public PetControl()
 		{
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
 			base.Tooltip = new PetTooltip();
 		}
 
@@ -84,28 +81,11 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		public override void RecalculateLayout()
 		{
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
 			_petTexture.Bounds = new Rectangle(0, 0, base.Width, base.Height);
 			_highlight.Bounds = _petTexture.Bounds;
-			Point p = default(Point);
-			((Point)(ref p))._002Ector(base.Width / 2, base.Height / 2);
-			Point s = default(Point);
-			((Point)(ref s))._002Ector(64, 15);
+			Point p = new Point(base.Width / 2, base.Height / 2);
+			Point s = new Point(64, 15);
 			_selector.Bounds = new Rectangle(p.X - s.X / 2 + 4, p.Y - 36, s.X, s.Y);
 			_emptySlotTexture.Bounds = new Rectangle(p.X - s.X / 2 + 4, p.Y - 36 + _selector.Bounds.Height, s.X, s.X);
 		}

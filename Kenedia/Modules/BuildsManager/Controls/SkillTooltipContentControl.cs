@@ -60,10 +60,6 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		public SkillTooltipContentControl()
 		{
-			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
 			_image.Bounds = new Rectangle(4, 4, 48, 48);
 			LocalizingService.LocaleChanged += new EventHandler<Blish_HUD.ValueChangedEventArgs<Locale>>(UserLocale_SettingChanged);
 			UserLocale_SettingChanged(null, null);
@@ -83,21 +79,16 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		private void SetSkill(Skill skill)
 		{
-			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
 			Title = skill?.Name;
 			Id = $"{strings.SkillId}: {skill?.Id}";
 			Description = skill?.Description.InterpretItemDescription();
 			_image.Texture = TexturesService.GetAsyncTexture(skill?.IconAssetId);
-			Rectangle bounds = _image.Bounds;
-			base.Height = ((Rectangle)(ref bounds)).get_Bottom() + 10 + UI.GetTextHeight(Control.Content.DefaultFont14, Description, base.Width);
+			base.Height = _image.Bounds.Bottom + 10 + UI.GetTextHeight(Control.Content.DefaultFont14, Description, base.Width);
 			RecalculateLayout();
 		}
 
 		public override void Draw(SpriteBatch spriteBatch, Rectangle drawBounds, Rectangle scissor)
 		{
-			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
 			if (!string.IsNullOrEmpty(Title) && !string.IsNullOrEmpty(Id))
 			{
 				base.Draw(spriteBatch, drawBounds, scissor);
@@ -106,50 +97,10 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		public override void RecalculateLayout()
 		{
-			//IL_000d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fe: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0103: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010f: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
-			Rectangle val = _image.Bounds;
-			int num = ((Rectangle)(ref val)).get_Right() + 5;
-			val = _image.Bounds;
-			int top = ((Rectangle)(ref val)).get_Top();
-			int width = base.Width;
-			val = _image.Bounds;
-			TitleBounds = new Rectangle(num, top, width - ((Rectangle)(ref val)).get_Right() - 5, Control.Content.DefaultFont18.get_LineHeight());
-			val = _image.Bounds;
-			int num2 = ((Rectangle)(ref val)).get_Right() + 5;
-			val = TitleBounds;
-			int num3 = ((Rectangle)(ref val)).get_Bottom() + 8;
-			int width2 = base.Width;
-			val = _image.Bounds;
-			IdBounds = new Rectangle(num2, num3, width2 - ((Rectangle)(ref val)).get_Right() - 5, Control.Content.DefaultFont12.get_LineHeight());
-			val = _image.Bounds;
-			int left = ((Rectangle)(ref val)).get_Left();
-			val = _image.Bounds;
-			int num4 = ((Rectangle)(ref val)).get_Bottom() + 10;
-			int num5 = base.Width - 10;
-			int height = base.Height;
-			val = _image.Bounds;
-			DescriptionBounds = new Rectangle(left, num4, num5, height - ((Rectangle)(ref val)).get_Bottom() - 10);
+			TitleBounds = new Rectangle(_image.Bounds.Right + 5, _image.Bounds.Top, base.Width - _image.Bounds.Right - 5, Control.Content.DefaultFont18.LineHeight);
+			IdBounds = new Rectangle(_image.Bounds.Right + 5, TitleBounds.Bottom + 8, base.Width - _image.Bounds.Right - 5, Control.Content.DefaultFont12.LineHeight);
+			DescriptionBounds = new Rectangle(_image.Bounds.Left, _image.Bounds.Bottom + 10, base.Width - 10, base.Height - _image.Bounds.Bottom - 10);
 		}
 
 		protected override void DisposeControl()
@@ -161,16 +112,10 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a7: Unknown result type (might be due to invalid IL or missing references)
 			_image.Draw(this, spriteBatch);
 			spriteBatch.DrawStringOnCtrl(this, Title, Control.Content.DefaultFont18, TitleBounds, TitleColor);
-			spriteBatch.DrawStringOnCtrl(this, Id, Control.Content.DefaultFont12, IdBounds, Color.get_White());
-			spriteBatch.DrawStringOnCtrl(this, Description, Control.Content.DefaultFont14, DescriptionBounds, Color.get_White(), wrap: true, HorizontalAlignment.Left, VerticalAlignment.Top);
+			spriteBatch.DrawStringOnCtrl(this, Id, Control.Content.DefaultFont12, IdBounds, Color.White);
+			spriteBatch.DrawStringOnCtrl(this, Description, Control.Content.DefaultFont14, DescriptionBounds, Color.White, wrap: true, HorizontalAlignment.Left, VerticalAlignment.Top);
 		}
 
 		public void UserLocale_SettingChanged(object sender, Blish_HUD.ValueChangedEventArgs<Locale> e)

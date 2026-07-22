@@ -78,30 +78,22 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		public TagControl()
 		{
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
 			_003CFont_003Ek__BackingField = Control.Content.DefaultFont14;
-			HoverColor = Color.get_White() * 0.2f;
-			DisabledColor = Color.get_Transparent();
-			ActiveColor = Color.get_Lime() * 0.2f;
+			HoverColor = Color.White * 0.2f;
+			DisabledColor = Color.Transparent;
+			ActiveColor = Color.Lime * 0.2f;
 			FontPadding = 4;
 			base._002Ector();
-			base.Height = Font.get_LineHeight() + FontPadding * 2;
+			base.Height = Font.LineHeight + FontPadding * 2;
 		}
 
 		private void OnFontChanged(object sender, Kenedia.Modules.Core.Models.ValueChangedEventArgs<BitmapFont> e)
 		{
 			if (Font == null)
 			{
-				BitmapFont val = (Font = Control.Content.DefaultFont14);
+				BitmapFont bitmapFont = (Font = Control.Content.DefaultFont14);
 			}
-			base.Height = Font.get_LineHeight() + FontPadding * 2;
+			base.Height = Font.LineHeight + FontPadding * 2;
 			ApplyTag();
 		}
 
@@ -125,49 +117,26 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		private void ApplyTag(TemplateTag tag = null)
 		{
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0099: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0106: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0111: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011b: Unknown result type (might be due to invalid IL or missing references)
-			int height = Font.get_LineHeight();
+			int height = Font.LineHeight;
 			_iconBounds = new Rectangle(FontPadding, FontPadding, height, height);
 			_editIconBounds = new Rectangle(base.Width - height - FontPadding, FontPadding, height, height);
 			_editIconTextureRegion = new Rectangle(2, 2, 28, 28);
-			_textBounds = new Rectangle(((Rectangle)(ref _iconBounds)).get_Right() + 5, ((Rectangle)(ref _iconBounds)).get_Top(), base.Width - _iconBounds.Width - 5 - _editIconBounds.Width - 5, height);
+			_textBounds = new Rectangle(_iconBounds.Right + 5, _iconBounds.Top, base.Width - _iconBounds.Width - 5 - _editIconBounds.Width - 5, height);
 			_displayText = UI.GetDisplayText(Font, Tag?.Name ?? string.Empty, _textBounds.Width);
 			base.BasicTooltipText = Tag?.Name ?? string.Empty;
-			ActiveColor = Color.get_Lime() * 0.2f;
-			HoverColor = Color.get_Lime() * 0.3f;
+			ActiveColor = Color.Lime * 0.2f;
+			HoverColor = Color.Lime * 0.3f;
 		}
 
 		public override void RecalculateLayout()
 		{
 			base.RecalculateLayout();
-			base.Height = Font.get_LineHeight() + FontPadding * 2;
+			base.Height = Font.LineHeight + FontPadding * 2;
 			ApplyTag();
 		}
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
 			if (base.Enabled)
 			{
 				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, bounds, base.MouseOver ? HoverColor : (Selected ? ActiveColor : DisabledColor));
@@ -175,13 +144,13 @@ namespace Kenedia.Modules.BuildsManager.Controls
 			AsyncTexture2D texture = Tag?.Icon?.Texture;
 			if (texture != null)
 			{
-				spriteBatch.DrawOnCtrl(this, texture, _iconBounds, Tag.TextureRegion, Color.get_White());
+				spriteBatch.DrawOnCtrl(this, texture, _iconBounds, Tag.TextureRegion, Color.White);
 			}
 			if (base.MouseOver && base.Enabled)
 			{
-				spriteBatch.DrawOnCtrl(this, _editIcon, _editIconBounds, _editIconTextureRegion, Color.get_White());
+				spriteBatch.DrawOnCtrl(this, _editIcon, _editIconBounds, _editIconTextureRegion, Color.White);
 			}
-			spriteBatch.DrawStringOnCtrl(this, _displayText, Font, _textBounds, Color.get_White());
+			spriteBatch.DrawStringOnCtrl(this, _displayText, Font, _textBounds, Color.White);
 		}
 
 		public void SetSelected(bool selected)
@@ -192,9 +161,8 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		protected override void OnClick(MouseEventArgs e)
 		{
-			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
 			base.OnClick(e);
-			if (((Rectangle)(ref _editIconBounds)).Contains(base.RelativeMousePosition))
+			if (_editIconBounds.Contains(base.RelativeMousePosition))
 			{
 				OnEditClicked?.Invoke();
 				return;

@@ -17,29 +17,10 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 
 		public Kenedia.Modules.Core.Controls.FlowPanel SelectionContainer => SelectionContent;
 
-		public Rectangle SelectionBounds
-		{
-			get
-			{
-				//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-				//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-				//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-				//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-				Rectangle val = SelectionContent.LocalBounds;
-				Point location = ((Rectangle)(ref val)).get_Location();
-				val = SelectionContent.ContentRegion;
-				return new Rectangle(location, ((Rectangle)(ref val)).get_Size());
-			}
-		}
+		public Rectangle SelectionBounds => new Rectangle(SelectionContent.LocalBounds.Location, SelectionContent.ContentRegion.Size);
 
 		public BaseSelection()
 		{
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
 			HeightSizingMode = SizingMode.Fill;
 			WidthSizingMode = SizingMode.Fill;
 			Search = new FilterBox

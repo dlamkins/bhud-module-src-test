@@ -64,16 +64,10 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 
 		public StatSelectable()
 		{
-			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
 			HeightSizingMode = SizingMode.AutoSize;
 			base.BorderWidth = new RectangleDimensions(2);
-			base.BorderColor = Color.get_Black();
-			base.BackgroundColor = Color.get_Black() * 0.4f;
+			base.BorderColor = Color.Black;
+			base.BackgroundColor = Color.Black * 0.4f;
 			base.ContentPadding = new RectangleDimensions(5);
 			_name = new Kenedia.Modules.Core.Controls.Label
 			{
@@ -106,15 +100,10 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 
 		public override void RecalculateLayout()
 		{
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0108: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010d: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
 			if (_created)
 			{
-				_name?.SetSize(base.ContentRegion.Width - _icon.Width - 10, _name.Font.get_LineHeight());
+				_name?.SetSize(base.ContentRegion.Width - _icon.Width - 10, _name.Font.LineHeight);
 				_name?.SetLocation(_icon.Right + 10, _icon.Top);
 				_statSummary?.SetLocation(_name.Left, _name.Bottom);
 				_statSummary?.SetSize(_name.Width, base.ContentRegion.Height - _name.Height);
@@ -124,29 +113,17 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
 			base.PaintBeforeChildren(spriteBatch, bounds);
-			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, _vignetteBounds, Rectangle.get_Empty(), Color.get_Gray() * 0.3f, 0f, Vector2.get_Zero(), (SpriteEffects)0);
-			spriteBatch.DrawOnCtrl(this, _textureVignette, _vignetteBounds, _textureVignette.Bounds, Color.get_Black(), 0f, Vector2.get_Zero(), (SpriteEffects)0);
+			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, _vignetteBounds, Rectangle.Empty, Color.Gray * 0.3f, 0f, Vector2.Zero);
+			spriteBatch.DrawOnCtrl(this, _textureVignette, _vignetteBounds, _textureVignette.Bounds, Color.Black, 0f, Vector2.Zero);
 		}
 
 		private void OnStatChanged()
 		{
-			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
 			_name.SetLocalizedText = () => Stat?.Name;
 			_statSummary.SetLocalizedText = () => Stat?.Attributes.ToString(AttributeAdjustment);
 			_icon.Texture = Stat?.Icon.Texture;
-			_icon.SourceRectangle = Stat?.Icon.TextureRegion ?? Rectangle.get_Empty();
+			_icon.SourceRectangle = Stat?.Icon.TextureRegion ?? Rectangle.Empty;
 		}
 
 		private void OnMultiplierChanged()

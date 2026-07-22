@@ -44,24 +44,24 @@ namespace Kenedia.Modules.BuildsManager.Controls
 		public AsyncTexture2D NoAquaticFlagTexture { get; } = AsyncTexture2D.FromAssetId(157145);
 
 
-		public Rectangle TextureRegion { get; } = new Rectangle(14, 14, 100, 100);
+		public Microsoft.Xna.Framework.Rectangle TextureRegion { get; } = new Microsoft.Xna.Framework.Rectangle(14, 14, 100, 100);
 
 
-		public Rectangle NoAquaticFlagTextureRegion { get; } = new Rectangle(16, 16, 96, 96);
+		public Microsoft.Xna.Framework.Rectangle NoAquaticFlagTextureRegion { get; } = new Microsoft.Xna.Framework.Rectangle(16, 16, 96, 96);
 
 
-		public Rectangle FallbackRegion { get; }
+		public Microsoft.Xna.Framework.Rectangle FallbackRegion { get; }
 
-		public Rectangle FallbackBounds { get; private set; }
+		public Microsoft.Xna.Framework.Rectangle FallbackBounds { get; private set; }
 
-		public Rectangle SkillBounds { get; private set; }
+		public Microsoft.Xna.Framework.Rectangle SkillBounds { get; private set; }
 
-		public Rectangle SelectorBounds { get; private set; }
+		public Microsoft.Xna.Framework.Rectangle SelectorBounds { get; private set; }
 
-		public Rectangle HoveredFrameTextureRegion { get; } = new Rectangle(8, 8, 112, 112);
+		public Microsoft.Xna.Framework.Rectangle HoveredFrameTextureRegion { get; } = new Microsoft.Xna.Framework.Rectangle(8, 8, 112, 112);
 
 
-		public Rectangle AutoCastTextureRegion { get; } = new Rectangle(6, 6, 52, 52);
+		public Microsoft.Xna.Framework.Rectangle AutoCastTextureRegion { get; } = new Microsoft.Xna.Framework.Rectangle(6, 6, 52, 52);
 
 
 		public SkillTooltip SkillTooltip { get; }
@@ -74,18 +74,18 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		public SkillSelector SkillSelector { get; }
 
-		public Vector2 Origin { get; private set; } = Vector2.get_Zero();
+		public Vector2 Origin { get; private set; } = Vector2.Zero;
 
 
 		public float Rotation { get; private set; }
 
-		public Color? BackgroundDrawColor { get; private set; }
+		public Microsoft.Xna.Framework.Color? BackgroundDrawColor { get; private set; }
 
-		public Color Color { get; private set; }
+		public Microsoft.Xna.Framework.Color Color { get; private set; }
 
-		public Color? HoverDrawColor { get; private set; }
+		public Microsoft.Xna.Framework.Color? HoverDrawColor { get; private set; }
 
-		public Color? DrawColor { get; private set; }
+		public Microsoft.Xna.Framework.Color? DrawColor { get; private set; }
 
 		public bool ShowSelector { get; set; }
 
@@ -93,13 +93,9 @@ namespace Kenedia.Modules.BuildsManager.Controls
 		{
 			get
 			{
-				//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-				//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0012: Unknown result type (might be due to invalid IL or missing references)
 				if (ShowSelector)
 				{
-					Rectangle selectorBounds = SelectorBounds;
-					return ((Rectangle)(ref selectorBounds)).Contains(base.RelativeMousePosition);
+					return SelectorBounds.Contains(base.RelativeMousePosition);
 				}
 				return false;
 			}
@@ -123,17 +119,6 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		public SkillSlotControl(SkillSlotType skillSlot, TemplatePresenter templatePresenter, Data data, SkillSelector skillSelector)
 		{
-			//IL_005e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
 			SkillSlot = skillSlot;
 			TemplatePresenter = templatePresenter;
 			Data = data;
@@ -160,150 +145,49 @@ namespace Kenedia.Modules.BuildsManager.Controls
 			SkillTooltip.Skill = e.NewValue;
 		}
 
-		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
+		protected override void Paint(SpriteBatch spriteBatch, Microsoft.Xna.Framework.Rectangle bounds)
 		{
-			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0060: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0107: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0128: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0139: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0145: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0160: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0165: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0172: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0180: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0197: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ee: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0200: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0205: Unknown result type (might be due to invalid IL or missing references)
-			//IL_020f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0214: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0220: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0230: Unknown result type (might be due to invalid IL or missing references)
-			//IL_023a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0240: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0252: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0257: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0261: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0266: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0271: Unknown result type (might be due to invalid IL or missing references)
-			//IL_027b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0280: Unknown result type (might be due to invalid IL or missing references)
-			//IL_028a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0290: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02dc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02e2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0320: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0326: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0331: Unknown result type (might be due to invalid IL or missing references)
-			//IL_033e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0364: Unknown result type (might be due to invalid IL or missing references)
-			//IL_036a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0375: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0382: Unknown result type (might be due to invalid IL or missing references)
-			//IL_039e: Unknown result type (might be due to invalid IL or missing references)
 			bool num = SkillSlot.IsTerrestrial();
-			Color? backgroundDrawColor = BackgroundDrawColor;
+			Microsoft.Xna.Framework.Color? backgroundDrawColor = BackgroundDrawColor;
 			if (backgroundDrawColor.HasValue)
 			{
-				SpriteBatchExtensions.DrawOnCtrl(color: backgroundDrawColor.GetValueOrDefault(), spriteBatch: spriteBatch, ctrl: this, texture: ContentService.Textures.Pixel, destinationRectangle: SkillBounds, sourceRectangle: Rectangle.get_Empty(), rotation: Rotation, origin: Origin, effects: (SpriteEffects)0);
+				SpriteBatchExtensions.DrawOnCtrl(color: backgroundDrawColor.GetValueOrDefault(), spriteBatch: spriteBatch, ctrl: this, texture: ContentService.Textures.Pixel, destinationRectangle: SkillBounds, sourceRectangle: Microsoft.Xna.Framework.Rectangle.Empty, rotation: Rotation, origin: Origin);
 			}
-			Rectangle skillBounds;
-			int num2;
-			if (base.MouseOver)
-			{
-				skillBounds = SkillBounds;
-				num2 = (((Rectangle)(ref skillBounds)).Contains(base.RelativeMousePosition) ? 1 : 0);
-			}
-			else
-			{
-				num2 = 0;
-			}
-			bool hovered = (byte)num2 != 0;
+			bool hovered = base.MouseOver && SkillBounds.Contains(base.RelativeMousePosition);
 			if (FallBackTexture != null || Texture != null)
 			{
-				Color = (Color)(((_003F?)((hovered && HoverDrawColor.HasValue) ? HoverDrawColor : DrawColor)) ?? Color.get_White());
-				Color = Color.get_White();
+				Color = ((hovered && HoverDrawColor.HasValue) ? HoverDrawColor : DrawColor) ?? Microsoft.Xna.Framework.Color.White;
+				Color = Microsoft.Xna.Framework.Color.White;
 				if (HoveredTexture != null && hovered)
 				{
-					spriteBatch.DrawOnCtrl(this, HoveredTexture, SkillBounds, TextureRegion, Color, Rotation, Origin, (SpriteEffects)0);
+					spriteBatch.DrawOnCtrl(this, HoveredTexture, SkillBounds, TextureRegion, Color, Rotation, Origin);
 				}
 				if (Texture != null)
 				{
-					spriteBatch.DrawOnCtrl(this, Texture, SkillBounds, TextureRegion, Color, Rotation, Origin, (SpriteEffects)0);
+					spriteBatch.DrawOnCtrl(this, Texture, SkillBounds, TextureRegion, Color, Rotation, Origin);
 				}
 				else
 				{
-					spriteBatch.DrawOnCtrl(this, FallBackTexture, (FallbackBounds == Rectangle.get_Empty()) ? SkillBounds : FallbackBounds, SkillBounds, Color, Rotation, Origin, (SpriteEffects)0);
+					spriteBatch.DrawOnCtrl(this, FallBackTexture, (FallbackBounds == Microsoft.Xna.Framework.Rectangle.Empty) ? SkillBounds : FallbackBounds, SkillBounds, Color, Rotation, Origin);
 				}
 			}
-			Color borderColor = Color.get_Black();
-			Texture2D pixel = ContentService.Textures.Pixel;
-			skillBounds = SkillBounds;
-			int left = ((Rectangle)(ref skillBounds)).get_Left();
-			skillBounds = SkillBounds;
-			spriteBatch.DrawOnCtrl(this, pixel, new Rectangle(left, ((Rectangle)(ref skillBounds)).get_Top(), SkillBounds.Width, 1), Rectangle.get_Empty(), borderColor * 0.6f);
-			Texture2D pixel2 = ContentService.Textures.Pixel;
-			skillBounds = SkillBounds;
-			int left2 = ((Rectangle)(ref skillBounds)).get_Left();
-			skillBounds = SkillBounds;
-			spriteBatch.DrawOnCtrl(this, pixel2, new Rectangle(left2, ((Rectangle)(ref skillBounds)).get_Bottom() - 1, SkillBounds.Width, 1), Rectangle.get_Empty(), borderColor * 0.6f);
-			Texture2D pixel3 = ContentService.Textures.Pixel;
-			skillBounds = SkillBounds;
-			int left3 = ((Rectangle)(ref skillBounds)).get_Left();
-			skillBounds = SkillBounds;
-			spriteBatch.DrawOnCtrl(this, pixel3, new Rectangle(left3, ((Rectangle)(ref skillBounds)).get_Top(), 1, SkillBounds.Height), Rectangle.get_Empty(), borderColor * 0.6f);
-			Texture2D pixel4 = ContentService.Textures.Pixel;
-			skillBounds = SkillBounds;
-			int num3 = ((Rectangle)(ref skillBounds)).get_Right() - 1;
-			skillBounds = SkillBounds;
-			spriteBatch.DrawOnCtrl(this, pixel4, new Rectangle(num3, ((Rectangle)(ref skillBounds)).get_Top(), 1, SkillBounds.Height), Rectangle.get_Empty(), borderColor * 0.6f);
+			Microsoft.Xna.Framework.Color borderColor = Microsoft.Xna.Framework.Color.Black;
+			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Microsoft.Xna.Framework.Rectangle(SkillBounds.Left, SkillBounds.Top, SkillBounds.Width, 1), Microsoft.Xna.Framework.Rectangle.Empty, borderColor * 0.6f);
+			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Microsoft.Xna.Framework.Rectangle(SkillBounds.Left, SkillBounds.Bottom - 1, SkillBounds.Width, 1), Microsoft.Xna.Framework.Rectangle.Empty, borderColor * 0.6f);
+			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Microsoft.Xna.Framework.Rectangle(SkillBounds.Left, SkillBounds.Top, 1, SkillBounds.Height), Microsoft.Xna.Framework.Rectangle.Empty, borderColor * 0.6f);
+			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, new Microsoft.Xna.Framework.Rectangle(SkillBounds.Right - 1, SkillBounds.Top, 1, SkillBounds.Height), Microsoft.Xna.Framework.Rectangle.Empty, borderColor * 0.6f);
 			if (!num)
 			{
 				Kenedia.Modules.BuildsManager.DataModels.Professions.Skill? skill = Skill;
 				if (skill != null && skill!.Flags.HasFlag(SkillFlag.NoUnderwater))
 				{
-					spriteBatch.DrawOnCtrl(this, NoAquaticFlagTexture, SkillBounds, NoAquaticFlagTextureRegion, Color, Rotation, Origin, (SpriteEffects)0);
+					spriteBatch.DrawOnCtrl(this, NoAquaticFlagTexture, SkillBounds, NoAquaticFlagTextureRegion, Color, Rotation, Origin);
 					goto IL_038d;
 				}
 			}
 			if (hovered && HoveredFrameTexture != null)
 			{
-				spriteBatch.DrawOnCtrl(this, HoveredFrameTexture, SkillBounds, HoveredFrameTextureRegion, Color, Rotation, Origin, (SpriteEffects)0);
+				spriteBatch.DrawOnCtrl(this, HoveredFrameTexture, SkillBounds, HoveredFrameTextureRegion, Color, Rotation, Origin);
 			}
 			goto IL_038d;
 			IL_038d:
@@ -315,12 +199,9 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		public override void RecalculateLayout()
 		{
-			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
 			int selectorHeight = 15;
-			SkillBounds = new Rectangle(new Point(0, selectorHeight - 2), new Point(base.Width, base.Height - selectorHeight));
+			SkillBounds = new Microsoft.Xna.Framework.Rectangle(new Point(0, selectorHeight - 2), new Point(base.Width, base.Height - selectorHeight));
 		}
 
 		protected override void DisposeControl()
@@ -343,7 +224,6 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		private void SetSelector()
 		{
-			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
 			SkillSelector.Anchor = this;
 			SkillSelector.AnchorOffset = new Point(-2, 10);
 			SkillSelector.ZIndex = Selector<Kenedia.Modules.BuildsManager.DataModels.Professions.Skill>.GetAnchorRootZIndex(this) + 1000;

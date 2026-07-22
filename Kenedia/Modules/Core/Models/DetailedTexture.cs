@@ -82,21 +82,11 @@ namespace Kenedia.Modules.Core.Models
 		{
 			get
 			{
-				//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-				Rectangle bounds = Bounds;
-				return ((Rectangle)(ref bounds)).get_Size();
+				return Bounds.Size;
 			}
 			set
 			{
-				//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-				//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-				//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-				Rectangle bounds = Bounds;
-				Bounds = new Rectangle(((Rectangle)(ref bounds)).get_Location(), value);
+				Bounds = new Rectangle(Bounds.Location, value);
 			}
 		}
 
@@ -128,41 +118,12 @@ namespace Kenedia.Modules.Core.Models
 
 		public virtual void Draw(Control ctrl, SpriteBatch spriteBatch, Point? mousePos = null, Color? color = null, Color? bgColor = null, bool? forceHover = null, float? rotation = null, Vector2? origin = null)
 		{
-			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0125: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0137: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0146: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0161: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0166: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0173: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0181: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01bd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d8: Unknown result type (might be due to invalid IL or missing references)
 			if (!_isDisposed && (FallBackTexture != null || Texture != null))
 			{
 				Vector2 valueOrDefault = origin.GetValueOrDefault();
 				if (!origin.HasValue)
 				{
-					valueOrDefault = Vector2.get_Zero();
+					valueOrDefault = Vector2.Zero;
 					origin = valueOrDefault;
 				}
 				float valueOrDefault2 = rotation.GetValueOrDefault();
@@ -171,88 +132,42 @@ namespace Kenedia.Modules.Core.Models
 					valueOrDefault2 = 0f;
 					rotation = valueOrDefault2;
 				}
-				int hovered;
-				if (mousePos.HasValue)
-				{
-					Rectangle bounds = Bounds;
-					hovered = (((Rectangle)(ref bounds)).Contains(mousePos.Value) ? 1 : 0);
-				}
-				else
-				{
-					hovered = 0;
-				}
-				Hovered = (byte)hovered != 0;
+				Hovered = mousePos.HasValue && Bounds.Contains(mousePos.Value);
 				Color valueOrDefault3 = color.GetValueOrDefault();
 				if (!color.HasValue)
 				{
-					valueOrDefault3 = (Color)(((_003F?)(((forceHover.GetValueOrDefault() || Hovered) && HoverDrawColor.HasValue) ? HoverDrawColor : DrawColor)) ?? Color.get_White());
+					valueOrDefault3 = (((forceHover.GetValueOrDefault() || Hovered) && HoverDrawColor.HasValue) ? HoverDrawColor : DrawColor) ?? Color.White;
 					color = valueOrDefault3;
 				}
 				if (Texture != null)
 				{
-					spriteBatch.DrawOnCtrl(ctrl, ((forceHover.GetValueOrDefault() || Hovered) && HoveredTexture != null) ? HoveredTexture : (Texture ?? FallBackTexture), Bounds, TextureRegion, color.Value, rotation.Value, origin.Value, (SpriteEffects)0);
+					spriteBatch.DrawOnCtrl(ctrl, ((forceHover.GetValueOrDefault() || Hovered) && HoveredTexture != null) ? HoveredTexture : (Texture ?? FallBackTexture), Bounds, TextureRegion, color.Value, rotation.Value, origin.Value);
 				}
 				else
 				{
-					spriteBatch.DrawOnCtrl(ctrl, FallBackTexture, (FallbackBounds == Rectangle.get_Empty()) ? Bounds : FallbackBounds, FallbackRegion, color.Value, rotation.Value, origin.Value, (SpriteEffects)0);
+					spriteBatch.DrawOnCtrl(ctrl, FallBackTexture, (FallbackBounds == Rectangle.Empty) ? Bounds : FallbackBounds, FallbackRegion, color.Value, rotation.Value, origin.Value);
 				}
 				if (bgColor.HasValue)
 				{
-					spriteBatch.DrawOnCtrl(ctrl, ContentService.Textures.Pixel, Bounds, Rectangle.get_Empty(), bgColor.Value, rotation.Value, origin.Value, (SpriteEffects)0);
+					spriteBatch.DrawOnCtrl(ctrl, ContentService.Textures.Pixel, Bounds, Rectangle.Empty, bgColor.Value, rotation.Value, origin.Value);
 				}
 			}
 		}
 
 		public virtual void Draw(Control ctrl, SpriteBatch spriteBatch, SpriteEffects? effect, Point? mousePos = null, Color? color = null, Color? bgColor = null, bool? forceHover = null, float? rotation = null, Vector2? origin = null)
 		{
-			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ee: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0140: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0162: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0181: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0196: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0200: Unknown result type (might be due to invalid IL or missing references)
 			if (!_isDisposed && (FallBackTexture != null || Texture != null))
 			{
 				SpriteEffects valueOrDefault = effect.GetValueOrDefault();
 				if (!effect.HasValue)
 				{
-					valueOrDefault = (SpriteEffects)1;
+					valueOrDefault = SpriteEffects.FlipHorizontally;
 					effect = valueOrDefault;
 				}
 				Vector2 valueOrDefault2 = origin.GetValueOrDefault();
 				if (!origin.HasValue)
 				{
-					valueOrDefault2 = Vector2.get_Zero();
+					valueOrDefault2 = Vector2.Zero;
 					origin = valueOrDefault2;
 				}
 				float valueOrDefault3 = rotation.GetValueOrDefault();
@@ -261,21 +176,11 @@ namespace Kenedia.Modules.Core.Models
 					valueOrDefault3 = 0f;
 					rotation = valueOrDefault3;
 				}
-				int hovered;
-				if (mousePos.HasValue)
-				{
-					Rectangle bounds = Bounds;
-					hovered = (((Rectangle)(ref bounds)).Contains(mousePos.Value) ? 1 : 0);
-				}
-				else
-				{
-					hovered = 0;
-				}
-				Hovered = (byte)hovered != 0;
+				Hovered = mousePos.HasValue && Bounds.Contains(mousePos.Value);
 				Color valueOrDefault4 = color.GetValueOrDefault();
 				if (!color.HasValue)
 				{
-					valueOrDefault4 = (Color)(((_003F?)((Hovered && HoverDrawColor.HasValue) ? HoverDrawColor : DrawColor)) ?? Color.get_White());
+					valueOrDefault4 = ((Hovered && HoverDrawColor.HasValue) ? HoverDrawColor : DrawColor) ?? Color.White;
 					color = valueOrDefault4;
 				}
 				if (Texture != null)
@@ -284,35 +189,26 @@ namespace Kenedia.Modules.Core.Models
 				}
 				else
 				{
-					spriteBatch.DrawOnCtrl(ctrl, FallBackTexture, (FallbackBounds == Rectangle.get_Empty()) ? Bounds : FallbackBounds, FallbackRegion, color.Value, rotation.Value, origin.Value, effect.Value);
+					spriteBatch.DrawOnCtrl(ctrl, FallBackTexture, (FallbackBounds == Rectangle.Empty) ? Bounds : FallbackBounds, FallbackRegion, color.Value, rotation.Value, origin.Value, effect.Value);
 				}
 				if (bgColor.HasValue)
 				{
-					spriteBatch.DrawOnCtrl(ctrl, ContentService.Textures.Pixel, Bounds, Rectangle.get_Empty(), bgColor.Value, rotation.Value, origin.Value, effect.Value);
+					spriteBatch.DrawOnCtrl(ctrl, ContentService.Textures.Pixel, Bounds, Rectangle.Empty, bgColor.Value, rotation.Value, origin.Value, effect.Value);
 				}
 			}
 		}
 
 		private void ApplyBounds(bool force = false)
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-			if (TextureRegion == Rectangle.get_Empty() || force)
+			if (TextureRegion == Rectangle.Empty || force)
 			{
 				TextureRegion = (Texture ?? FallBackTexture).Bounds;
 			}
-			if (FallbackRegion == Rectangle.get_Empty() || force)
+			if (FallbackRegion == Rectangle.Empty || force)
 			{
 				FallbackRegion = (Texture ?? FallBackTexture).Bounds;
 			}
-			if (Bounds == Rectangle.get_Empty() || force)
+			if (Bounds == Rectangle.Empty || force)
 			{
 				Bounds = (Texture ?? FallBackTexture).Bounds;
 			}

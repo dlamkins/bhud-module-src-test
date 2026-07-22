@@ -24,8 +24,8 @@ namespace Kenedia.Modules.BuildsManager.Views
 	{
 		private DetailedTexture _quickFilterToggle = new DetailedTexture(440021)
 		{
-			HoverDrawColor = Color.get_White(),
-			DrawColor = Color.get_White() * 0.5f
+			HoverDrawColor = Color.White,
+			DrawColor = Color.White * 0.5f
 		};
 
 		private readonly TabbedRegion _tabbedRegion;
@@ -60,12 +60,6 @@ namespace Kenedia.Modules.BuildsManager.Views
 
 		public MainWindow(Module module, MainWindowPresenter mainWindowPresenter, TemplatePresenter templatePresenter, TemplateTags templateTags, TagGroups tagGroups, SelectionPanel selectionPanel, AboutTab aboutTab, BuildTab buildTab, GearTab gearTab, QuickFiltersPanel quickFiltersPanel, Settings settings, Data data)
 		{
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b8: Unknown result type (might be due to invalid IL or missing references)
 			SelectionPanel selectionPanel2 = selectionPanel;
 			AboutTab aboutTab2 = aboutTab;
 			BuildTab buildTab2 = buildTab;
@@ -157,7 +151,6 @@ namespace Kenedia.Modules.BuildsManager.Views
 
 		protected override void OnMoved(MovedEventArgs e)
 		{
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
 			base.OnMoved(e);
 			if (base.Visible && base.ViewState == ViewState.Loaded)
 			{
@@ -167,7 +160,6 @@ namespace Kenedia.Modules.BuildsManager.Views
 
 		protected override void OnShown(EventArgs e)
 		{
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 			base.OnShown(e);
 			base.Location = Settings.MainWindowLocation.Value;
 			if (Settings.ShowQuickFilterPanelOnWindowOpen.Value && base.Visible)
@@ -178,17 +170,12 @@ namespace Kenedia.Modules.BuildsManager.Views
 
 		protected override void OnClick(MouseEventArgs e)
 		{
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
 			int index = 1;
 			int TAB_VERTICALOFFSET = 80;
 			int TAB_HEIGHT = 50;
 			int TAB_Width = 84;
 			new Rectangle(0, TAB_VERTICALOFFSET + TAB_HEIGHT * index, TAB_Width, TAB_HEIGHT);
-			Rectangle bounds = _quickFilterToggle.Bounds;
-			if (((Rectangle)(ref bounds)).Contains(base.RelativeMousePosition))
+			if (_quickFilterToggle.Bounds.Contains(base.RelativeMousePosition))
 			{
 				QuickFiltersPanel.ToggleVisibility();
 			}
@@ -213,15 +200,12 @@ namespace Kenedia.Modules.BuildsManager.Views
 
 		public override void RecalculateLayout()
 		{
-			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
 			_quickFilterToggle.Bounds = new Rectangle(8, 45, 32, 32);
 		}
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
 			base.PaintBeforeChildren(spriteBatch, bounds);
 			_quickFilterToggle.Draw(this, spriteBatch, base.RelativeMousePosition, null, null, QuickFiltersPanel.Visible);
 			if (_quickFilterToggle.Hovered)

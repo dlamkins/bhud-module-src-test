@@ -358,7 +358,7 @@ namespace Kenedia.Modules.BuildsManager.Services
 					BaseModule<BuildsManager, MainWindow, Settings, Kenedia.Modules.BuildsManager.Models.Paths, Kenedia.Modules.BuildsManager.Services.StaticHosting>.Logger.Info("Loading remote data...");
 					if (localStats == null || localStats.Version < StatsMap!.Version)
 					{
-						File.WriteAllText(Path.Combine(Paths.ModuleDataPath, "static_stats.json"), JsonConvert.SerializeObject((object)StatsMap, (Formatting)1));
+						File.WriteAllText(Path.Combine(Paths.ModuleDataPath, "static_stats.json"), JsonConvert.SerializeObject(StatsMap, Formatting.Indented));
 						string url = StatsMap!.ImageUrl;
 						HttpClient client = new HttpClient();
 						try

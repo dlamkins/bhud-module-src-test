@@ -64,21 +64,6 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 
 		public BuildTab(TemplatePresenter templatePresenter, Data data)
 		{
-			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0108: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0146: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_021c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0248: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0285: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02cd: Unknown result type (might be due to invalid IL or missing references)
 			TemplatePresenter = templatePresenter;
 			Data = data;
 			base.ClipsBounds = false;
@@ -86,7 +71,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 			{
 				Parent = this,
 				CoveredControl = this,
-				BackgroundColor = Color.get_Black() * 0.5f,
+				BackgroundColor = Color.Black * 0.5f,
 				BorderWidth = 3,
 				Text = "Select a Template to view its details."
 			};
@@ -167,7 +152,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 				Width = 800,
 				HeightSizingMode = SizingMode.AutoSize,
 				ControlPadding = new Vector2(1f),
-				BackgroundColor = Color.get_Black() * 0.8f,
+				BackgroundColor = Color.Black * 0.8f,
 				AutoSizePadding = new Point(1),
 				ZIndex = 10
 			};
@@ -204,59 +189,24 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 
 		public override void Draw(SpriteBatch spriteBatch, Rectangle drawBounds, Rectangle scissor)
 		{
-			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
 			if (Data.IsLoaded)
 			{
 				base.Draw(spriteBatch, drawBounds, scissor);
 				return;
 			}
 			Rectangle scissorRectangle = Rectangle.Intersect(scissor, base.AbsoluteBounds.WithPadding(_padding)).ScaleBy(Control.Graphics.UIScaleMultiplier);
-			((GraphicsResource)spriteBatch).get_GraphicsDevice().set_ScissorRectangle(scissorRectangle);
+			spriteBatch.GraphicsDevice.ScissorRectangle = scissorRectangle;
 			base.EffectBehind?.Draw(spriteBatch, drawBounds);
 			spriteBatch.Begin(base.SpriteBatchParameters);
-			Rectangle r = default(Rectangle);
-			((Rectangle)(ref r))._002Ector(((Rectangle)(ref drawBounds)).get_Center().X - 32, ((Rectangle)(ref drawBounds)).get_Center().Y, 64, 64);
-			Rectangle tR = default(Rectangle);
-			((Rectangle)(ref tR))._002Ector(drawBounds.X, ((Rectangle)(ref r)).get_Bottom() + 10, drawBounds.Width, Control.Content.DefaultFont16.get_LineHeight());
+			Rectangle r = new Rectangle(drawBounds.Center.X - 32, drawBounds.Center.Y, 64, 64);
+			Rectangle tR = new Rectangle(drawBounds.X, r.Bottom + 10, drawBounds.Width, Control.Content.DefaultFont16.LineHeight);
 			LoadingSpinnerUtil.DrawLoadingSpinner(this, spriteBatch, r);
-			spriteBatch.DrawStringOnCtrl(this, "Loading Data. Please wait.", Control.Content.DefaultFont16, tR, Color.get_White(), wrap: false, HorizontalAlignment.Center);
+			spriteBatch.DrawStringOnCtrl(this, "Loading Data. Please wait.", Control.Content.DefaultFont16, tR, Color.White, wrap: false, HorizontalAlignment.Center);
 			spriteBatch.End();
 		}
 
 		public override void RecalculateLayout()
 		{
-			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0103: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0139: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0157: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0179: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0194: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01fc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0201: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0213: Unknown result type (might be due to invalid IL or missing references)
-			//IL_024c: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
 			if (_buildCodeBox != null)
 			{
@@ -273,15 +223,9 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 				_raceIcon.Location = new Point(_specializationsPanel.Width - _raceIcon.Width - 8, _specIcon.Bottom + 4);
 				_skillsBackground.Bounds = new Rectangle(0, 40, base.Width, 230);
 				_skillsBackground.TextureRegion = new Rectangle(20, 20, base.Width - 100, 220);
-				DetailedTexture skillsBackgroundTopBorder = _skillsBackgroundTopBorder;
-				Rectangle bounds = _skillsBackground.Bounds;
-				int num = ((Rectangle)(ref bounds)).get_Left() - 5;
-				bounds = _skillsBackground.Bounds;
-				skillsBackgroundTopBorder.Bounds = new Rectangle(num, ((Rectangle)(ref bounds)).get_Top() - 20, _professionSpecificsContainer.Width / 2, 22);
+				_skillsBackgroundTopBorder.Bounds = new Rectangle(_skillsBackground.Bounds.Left - 5, _skillsBackground.Bounds.Top - 20, _professionSpecificsContainer.Width / 2, 22);
 				_skillsBackgroundTopBorder.TextureRegion = new Rectangle(35, 5, _professionSpecificsContainer.Width / 2, 22);
-				DetailedTexture skillsBackgroundBottomBorder = _skillsBackgroundBottomBorder;
-				bounds = _skillsBackground.Bounds;
-				skillsBackgroundBottomBorder.Bounds = new Rectangle(0, ((Rectangle)(ref bounds)).get_Bottom() - 4, base.Width, 22);
+				_skillsBackgroundBottomBorder.Bounds = new Rectangle(0, _skillsBackground.Bounds.Bottom - 4, base.Width, 22);
 				_skillsBackgroundBottomBorder.TextureRegion = new Rectangle(0, _skillsBackgroundBottomBorder.Texture.Height - 26, _skillsBackgroundBottomBorder.Texture.Width - 36, 22);
 				if (_professionSpecifics != null)
 				{
@@ -298,7 +242,6 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 			base.PaintBeforeChildren(spriteBatch, bounds);
 			_skillsBackground?.Draw(this, spriteBatch);
 			_skillsBackgroundBottomBorder?.Draw(this, spriteBatch);
@@ -316,8 +259,6 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 
 		protected override void OnClick(MouseEventArgs e)
 		{
-			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
 			base.OnClick(e);
 			if (_specIcon?.MouseOver ?? false)
 			{

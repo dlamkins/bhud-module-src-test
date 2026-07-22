@@ -137,45 +137,33 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		public override void RecalculateLayout()
 		{
-			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0110: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
-			_headerRegion = new Rectangle(0, 0, base.Width, HeaderFont.get_LineHeight() + _headerPading.Vertical);
-			_contentRegion = new Rectangle(_contentPadding.Left, ((Rectangle)(ref _headerRegion)).get_Bottom() + _contentPadding.Top, base.Width - _contentPadding.Horizontal, base.Height - ((Rectangle)(ref _headerRegion)).get_Bottom() - _contentPadding.Vertical);
+			_headerRegion = new Rectangle(0, 0, base.Width, HeaderFont.LineHeight + _headerPading.Vertical);
+			_contentRegion = new Rectangle(_contentPadding.Left, _headerRegion.Bottom + _contentPadding.Top, base.Width - _contentPadding.Horizontal, base.Height - _headerRegion.Bottom - _contentPadding.Vertical);
 			if (_contentPanel != null)
 			{
-				_contentPanel.Location = ((Rectangle)(ref _contentRegion)).get_Location();
-				_contentPanel.Size = ((Rectangle)(ref _contentRegion)).get_Size();
+				_contentPanel.Location = _contentRegion.Location;
+				_contentPanel.Size = _contentRegion.Size;
 			}
 			int tabHeaderWidth = base.Width / Math.Max(1, Tabs.Count);
 			for (int i = 0; i < Tabs.Count; i++)
 			{
-				Tabs[i].Bounds = new Rectangle(((Rectangle)(ref _headerRegion)).get_Left() + i * tabHeaderWidth, ((Rectangle)(ref _headerRegion)).get_Top(), tabHeaderWidth, _headerRegion.Height);
+				Tabs[i].Bounds = new Rectangle(_headerRegion.Left + i * tabHeaderWidth, _headerRegion.Top, tabHeaderWidth, _headerRegion.Height);
 			}
 		}
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
 			base.PaintBeforeChildren(spriteBatch, bounds);
 			for (int i = 0; i < Tabs.Count; i++)
 			{
 				Tabs[i].DrawHeader(this, spriteBatch, base.RelativeMousePosition);
 			}
-			spriteBatch.DrawOnCtrl((Control)this, (Texture2D)_separator, new Rectangle(((Rectangle)(ref _headerRegion)).get_Left(), ((Rectangle)(ref _headerRegion)).get_Bottom() - 9, _headerRegion.Width, 16), Color.get_Black());
+			spriteBatch.DrawOnCtrl(this, _separator, new Rectangle(_headerRegion.Left, _headerRegion.Bottom - 9, _headerRegion.Width, 16), Color.Black);
 		}
 
 		protected override void OnClick(MouseEventArgs e)
 		{
-			//IL_0018: Unknown result type (might be due to invalid IL or missing references)
 			base.OnClick(e);
 			for (int i = 0; i < Tabs.Count; i++)
 			{

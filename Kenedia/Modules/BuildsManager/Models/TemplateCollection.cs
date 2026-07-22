@@ -156,8 +156,10 @@ namespace Kenedia.Modules.BuildsManager.Models
 			{
 				string[] templateFiles = Directory.GetFiles(Paths.TemplatesPath);
 				Clear();
-				JsonSerializerSettings settings = new JsonSerializerSettings();
-				settings.get_Converters().Add((JsonConverter)(object)TemplateConverter);
+				JsonSerializerSettings settings = new JsonSerializerSettings
+				{
+					Converters = { (JsonConverter)TemplateConverter }
+				};
 				Logger.Info($"Loading {templateFiles.Length} Templates ...");
 				string[] array = templateFiles;
 				foreach (string file in array)

@@ -47,10 +47,9 @@ namespace Kenedia.Modules.BuildsManager.Services
 
 		protected override void InitializeSettings(SettingCollection settings)
 		{
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
 			base.InitializeSettings(settings);
 			SettingCollection internalSettings = settings.AddSubCollection("Internal", renderInUi: false, lazyLoaded: false);
-			MainWindowLocation = internalSettings.DefineSetting<Point>("MainWindowLocation", new Point(100, 100));
+			MainWindowLocation = internalSettings.DefineSetting("MainWindowLocation", new Point(100, 100));
 			SortBehavior = internalSettings.DefineSetting("SortBehavior", TemplateSortBehavior.ByProfession);
 			ShowQuickFilterPanelOnWindowOpen = internalSettings.DefineSetting("ShowQuickFilterPanelOnWindowOpen", defaultValue: false);
 			ShowQuickFilterPanelOnTabOpen = internalSettings.DefineSetting("ShowQuickFilterPanelOnTabOpen", defaultValue: true);
@@ -63,7 +62,7 @@ namespace Kenedia.Modules.BuildsManager.Services
 			QuickFiltersPanelFadeDelay = internalSettings.DefineSetting("QuickFiltersPanelFadeDelay", 5000.0);
 			AutoSetFilterProfession = internalSettings.DefineSetting("AutoSetFilterProfession", defaultValue: false, () => strings.AutoSetProfession_Name, () => strings.AutoSetProfession_Tooltip);
 			AutoSetFilterSpecialization = internalSettings.DefineSetting("AutoSetFilterSpecialization", defaultValue: false, () => strings.AutoSetFilterSpecialization_Name, () => strings.AutoSetFilterSpecialization_Tooltip);
-			ToggleWindowKey = internalSettings.DefineSetting("ToggleWindowKey", new KeyBinding(ModifierKeys.Shift, (Keys)66), () => string.Format(strings_common.ToggleItem, BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.ModuleName), () => string.Format(strings_common.ToggleItem, BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.ModuleName));
+			ToggleWindowKey = internalSettings.DefineSetting("ToggleWindowKey", new KeyBinding(ModifierKeys.Shift, Keys.B), () => string.Format(strings_common.ToggleItem, BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.ModuleName), () => string.Format(strings_common.ToggleItem, BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.ModuleName));
 		}
 	}
 }

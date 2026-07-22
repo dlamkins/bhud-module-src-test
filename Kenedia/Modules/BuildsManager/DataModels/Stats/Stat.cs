@@ -30,22 +30,14 @@ namespace Kenedia.Modules.BuildsManager.DataModels.Stats
 			public int Position { get; }
 
 			[JsonIgnore]
-			public Rectangle TextureRectangle { get; }
+			public Microsoft.Xna.Framework.Rectangle TextureRectangle { get; }
 
 			public StatTextureMapInfo(string name, List<int> ids, int position)
 			{
-				//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0012: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0097: Unknown result type (might be due to invalid IL or missing references)
 				Name = name;
 				Ids = ids;
 				Position = position;
-				TextureRectangle = new Rectangle(_startOffset.X + _textureShift.X * (position - 1), _startOffset.Y + _textureShift.Y * (position - 1), _textureSize.X, _textureSize.Y);
+				TextureRectangle = new Microsoft.Xna.Framework.Rectangle(_startOffset.X + _textureShift.X * (position - 1), _startOffset.Y + _textureShift.Y * (position - 1), _textureSize.X, _textureSize.Y);
 			}
 
 			public bool MatchesId(int id)
@@ -93,7 +85,6 @@ namespace Kenedia.Modules.BuildsManager.DataModels.Stats
 		{
 			get
 			{
-				//IL_0041: Unknown result type (might be due to invalid IL or missing references)
 				if (TextureInfo == null)
 				{
 					return s_placeHolder;

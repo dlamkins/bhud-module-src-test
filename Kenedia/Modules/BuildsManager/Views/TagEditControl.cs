@@ -67,14 +67,6 @@ namespace Kenedia.Modules.BuildsManager.Views
 
 		public TagEditControl()
 		{
-			//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0107: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0112: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02f3: Unknown result type (might be due to invalid IL or missing references)
 			base.Height = 200;
 			base.CanCollapse = true;
 			base.Collapsed = true;
@@ -89,7 +81,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 				Width = 200,
 				Height = 32,
 				SetLocalizedPlaceholder = () => strings.TagName,
-				Location = new Point(0, Control.Content.DefaultFont14.get_LineHeight() + 2),
+				Location = new Point(0, Control.Content.DefaultFont14.LineHeight + 2),
 				TextChangedAction = delegate(string txt)
 				{
 					if (!string.IsNullOrEmpty(txt))
@@ -103,8 +95,8 @@ namespace Kenedia.Modules.BuildsManager.Views
 			{
 				Parent = this,
 				Size = new Point(32),
-				Location = new Point(0, Control.Content.DefaultFont14.get_LineHeight() + 2),
-				BackgroundColor = Color.get_Black() * 0.4f
+				Location = new Point(0, Control.Content.DefaultFont14.LineHeight + 2),
+				BackgroundColor = Color.Black * 0.4f
 			};
 			_iconId = (new Kenedia.Modules.Core.Controls.Label
 			{
@@ -115,7 +107,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 				Parent = this,
 				Width = 100,
 				ShowButtons = false,
-				Location = new Point(0, Control.Content.DefaultFont14.get_LineHeight() + 2),
+				Location = new Point(0, Control.Content.DefaultFont14.LineHeight + 2),
 				Height = 32,
 				ValueChangedAction = delegate
 				{
@@ -132,7 +124,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 				Width = 100,
 				ShowButtons = true,
 				MinValue = 0,
-				Location = new Point(0, _icon.Bottom + 5 + Control.Content.DefaultFont14.get_LineHeight() + 2),
+				Location = new Point(0, _icon.Bottom + 5 + Control.Content.DefaultFont14.LineHeight + 2),
 				Height = 32,
 				ValueChangedAction = delegate
 				{
@@ -149,7 +141,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 				Width = 200,
 				Height = 32,
 				SetLocalizedPlaceholder = () => strings.Group,
-				Location = new Point(0, _icon.Bottom + 5 + Control.Content.DefaultFont14.get_LineHeight() + 2),
+				Location = new Point(0, _icon.Bottom + 5 + Control.Content.DefaultFont14.LineHeight + 2),
 				TextChangedAction = delegate(string txt)
 				{
 					if (!string.IsNullOrEmpty(txt))
@@ -279,20 +271,9 @@ namespace Kenedia.Modules.BuildsManager.Views
 
 		private void ApplyTag(TemplateTag tag)
 		{
-			//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0187: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c9: Unknown result type (might be due to invalid IL or missing references)
 			base.Title = tag?.Name + $" [{strings.Priority}: {tag?.Priority}]";
 			base.TitleIcon = tag?.Icon?.Texture;
-			Rectangle r = (Rectangle)(((_003F?)tag?.TextureRegion) ?? ((_003F?)tag?.Icon?.Bounds) ?? Rectangle.get_Empty());
+			Rectangle r = tag?.TextureRegion ?? tag?.Icon?.Bounds ?? Rectangle.Empty;
 			_icon.SourceRectangle = r;
 			base.TitleTextureRegion = r;
 			_priority.numberBox.Value = tag?.Priority ?? 1;
@@ -319,9 +300,6 @@ namespace Kenedia.Modules.BuildsManager.Views
 
 		private void SetIcon()
 		{
-			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
 			AsyncTexture2D icon = AsyncTexture2D.FromAssetId(_iconId.numberBox.Value);
 			if (icon != null)
 			{
@@ -334,31 +312,12 @@ namespace Kenedia.Modules.BuildsManager.Views
 				base.TitleIcon = icon;
 				Tag.AssetId = _iconId.numberBox.Value;
 				Tag.Icon.Texture = icon;
-				Rectangle? val3 = (base.TitleTextureRegion = (Tag.TextureRegion = _icon.SourceRectangle));
+				Rectangle? rectangle3 = (base.TitleTextureRegion = (Tag.TextureRegion = _icon.SourceRectangle));
 			}
 		}
 
 		public override void RecalculateLayout()
 		{
-			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0118: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ff: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0276: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0304: Unknown result type (might be due to invalid IL or missing references)
-			//IL_034a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0392: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03d8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0420: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0466: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04e7: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
 			if (_created)
 			{
@@ -404,9 +363,6 @@ namespace Kenedia.Modules.BuildsManager.Views
 
 		public override void UpdateContainer(GameTime gameTime)
 		{
-			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
 			base.UpdateContainer(gameTime);
 			_dragging = _dragging && base.MouseOver;
 			if (_dragging)
@@ -431,20 +387,11 @@ namespace Kenedia.Modules.BuildsManager.Views
 
 		private void StartDrag()
 		{
-			//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-			Rectangle contentRegion = base.ContentRegion;
-			Rectangle iconBounds = default(Rectangle);
-			((Rectangle)(ref iconBounds))._002Ector(((Rectangle)(ref contentRegion)).get_Left(), 0, 36, 36);
-			if (((Rectangle)(ref iconBounds)).Contains(base.RelativeMousePosition))
+			Rectangle iconBounds = new Rectangle(base.ContentRegion.Left, 0, 36, 36);
+			if (iconBounds.Contains(base.RelativeMousePosition))
 			{
 				_dragging = true;
-				_draggingStart = (_dragging ? base.RelativeMousePosition : Point.get_Zero());
+				_draggingStart = (_dragging ? base.RelativeMousePosition : Point.Zero);
 				if (_draggingStartParent == null)
 				{
 					_draggingStartParent = base.Parent;

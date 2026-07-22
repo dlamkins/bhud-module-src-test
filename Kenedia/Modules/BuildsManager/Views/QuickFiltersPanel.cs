@@ -27,7 +27,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 	{
 		private int _specializationHeight = 270;
 
-		private Rectangle _textBounds = Rectangle.get_Empty();
+		private Rectangle _textBounds = Rectangle.Empty;
 
 		private readonly DetailedTexture _headerSeparator = new DetailedTexture(605022);
 
@@ -57,12 +57,6 @@ namespace Kenedia.Modules.BuildsManager.Views
 
 		public QuickFiltersPanel(TemplateCollection templates, TemplateTags templateTags, TagGroups tagGroups, SelectionPanel selectionPanel, Settings settings, Data data)
 		{
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0161: Unknown result type (might be due to invalid IL or missing references)
 			Templates = templates;
 			TemplateTags = templateTags;
 			TagGroups = tagGroups;
@@ -78,7 +72,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 			{
 				base.TextureRectangle = new Rectangle(430, 30, 250, 600);
 			}
-			base.BorderColor = Color.get_Black();
+			base.BorderColor = Color.Black;
 			base.BorderWidth = new RectangleDimensions(2);
 			base.Visible = false;
 			Kenedia.Modules.Core.Controls.FlowPanel fp = new Kenedia.Modules.Core.Controls.FlowPanel
@@ -318,35 +312,24 @@ namespace Kenedia.Modules.BuildsManager.Views
 
 		public override void RecalculateLayout()
 		{
-			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0067: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006c: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
 			int width = base.Width - 50;
 			int w = width / 2;
 			_ = width / 512;
 			int padding = (base.Width - width) / 2;
 			_headerSeparator.Bounds = new Rectangle(padding + w, -w + 30, 16, width);
-			_textBounds = new Rectangle(0, base.ContentPadding.Top, base.Width, Control.Content.DefaultFont18.get_LineHeight());
+			_textBounds = new Rectangle(0, base.ContentPadding.Top, base.Width, Control.Content.DefaultFont18.LineHeight);
 		}
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
 			base.PaintBeforeChildren(spriteBatch, bounds);
-			spriteBatch.DrawStringOnCtrl(this, "Filter Templates", Control.Content.DefaultFont18, _textBounds, Color.get_White(), wrap: false, HorizontalAlignment.Center);
-			spriteBatch.DrawCenteredRotationOnCtrl(this, (Texture2D)_headerSeparator.Texture, _headerSeparator.Bounds, _headerSeparator.TextureRegion, Color.get_White(), 1.56f, flipVertically: false, flipHorizontally: false);
+			spriteBatch.DrawStringOnCtrl(this, "Filter Templates", Control.Content.DefaultFont18, _textBounds, Color.White, wrap: false, HorizontalAlignment.Center);
+			spriteBatch.DrawCenteredRotationOnCtrl(this, (Texture2D)_headerSeparator.Texture, _headerSeparator.Bounds, _headerSeparator.TextureRegion, Color.White, 1.56f, flipVertically: false, flipHorizontally: false);
 		}
 
 		public TagGroupPanel GetPanel(string groupName)
 		{
-			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
 			string groupName2 = groupName;
 			TagGroupPanel panel = null;
 			if (!string.IsNullOrEmpty(groupName2))
@@ -500,8 +483,6 @@ namespace Kenedia.Modules.BuildsManager.Views
 
 		private void SetHeightToTags()
 		{
-			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ab: Unknown result type (might be due to invalid IL or missing references)
 			int height = _specializationHeight + 15;
 			foreach (KeyValuePair<TagGroupPanel, List<TagToggle>> t in _tagControls)
 			{
@@ -575,8 +556,6 @@ namespace Kenedia.Modules.BuildsManager.Views
 
 		private void CreateSpecToggles()
 		{
-			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0071: Unknown result type (might be due to invalid IL or missing references)
 			_specPanel?.ClearChildren();
 			_specPanel?.Dispose();
 			_specPanel = new TagGroupPanel(new TagGroup(strings.Specializations), _tagPanel)

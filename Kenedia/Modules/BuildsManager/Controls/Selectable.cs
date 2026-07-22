@@ -55,20 +55,11 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		private void OnSelectedChanged(object sender, Kenedia.Modules.Core.Models.ValueChangedEventArgs<bool> e)
 		{
-			//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			base.BackgroundColor = (Selected ? (ContentService.Colors.ColonialWhite * 0.1f) : Color.get_Transparent());
+			base.BackgroundColor = (Selected ? (ContentService.Colors.ColonialWhite * 0.1f) : Color.Transparent);
 		}
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0020: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
 			if (base.MouseOver)
 			{
 				spriteBatch.DrawFrame(this, bounds, ContentService.Colors.ColonialWhite, 2);
@@ -91,16 +82,10 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		public override void RecalculateLayout()
 		{
-			//IL_001a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009d: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
 			ContentBounds = new Rectangle(5, 2, base.Width - 30, base.Height - 4);
-			IconBounds = new Rectangle(((Rectangle)(ref ContentBounds)).get_Left(), ((Rectangle)(ref ContentBounds)).get_Top(), ContentBounds.Height, ContentBounds.Height);
-			TextBounds = new Rectangle(((Rectangle)(ref IconBounds)).get_Right() + 5, ((Rectangle)(ref ContentBounds)).get_Top(), ContentBounds.Width - IconBounds.Width - 5, ContentBounds.Height);
+			IconBounds = new Rectangle(ContentBounds.Left, ContentBounds.Top, ContentBounds.Height, ContentBounds.Height);
+			TextBounds = new Rectangle(IconBounds.Right + 5, ContentBounds.Top, ContentBounds.Width - IconBounds.Width - 5, ContentBounds.Height);
 		}
 
 		protected abstract void DrawItem(SpriteBatch spriteBatch, Rectangle bounds);

@@ -109,7 +109,6 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 
 		public GearSelection(TemplatePresenter templatePresenter, Data data)
 		{
-			//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
 			TemplatePresenter = templatePresenter;
 			Data = data;
 			Search.TextChangedAction = delegate(string txt)
@@ -628,7 +627,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 		public override void RecalculateLayout()
 		{
 			base.RecalculateLayout();
-			Search?.SetSize(base.Width - Search.Left, null);
+			Search?.SetSize(base.Width - Search.Left);
 		}
 	}
 }

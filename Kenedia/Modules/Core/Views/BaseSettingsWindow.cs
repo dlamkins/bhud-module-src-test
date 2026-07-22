@@ -15,11 +15,6 @@ namespace Kenedia.Modules.Core.Views
 		public BaseSettingsWindow(AsyncTexture2D background, Rectangle windowRegion, Rectangle contentRegion)
 			: base(background, windowRegion, contentRegion)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0003: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
 			ContentPanel = new Kenedia.Modules.Core.Controls.FlowPanel
 			{
 				Parent = this,
@@ -40,7 +35,6 @@ namespace Kenedia.Modules.Core.Views
 
 		public override void PaintAfterChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 			base.PaintAfterChildren(spriteBatch, bounds);
 		}
 
@@ -55,14 +49,11 @@ namespace Kenedia.Modules.Core.Views
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 			base.PaintBeforeChildren(spriteBatch, bounds);
 		}
 
 		protected (Kenedia.Modules.Core.Controls.Panel, Kenedia.Modules.Core.Controls.Label, Kenedia.Modules.Core.Controls.TrackBar) LabeledTrackbar(Container parent, Func<string> setLocalizedText, Func<string> setLocalizedTooltip)
 		{
-			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
 			Kenedia.Modules.Core.Controls.Panel subP = new Kenedia.Modules.Core.Controls.Panel
 			{
 				Parent = parent,

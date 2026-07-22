@@ -23,13 +23,13 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 	{
 		protected int MaxTextLength = 52;
 
-		protected Color StatColor = Color.get_White();
+		protected Color StatColor = Color.White;
 
-		protected Color UpgradeColor = Color.get_Orange();
+		protected Color UpgradeColor = Color.Orange;
 
 		protected Color InfusionColor = new Color(153, 238, 221);
 
-		protected Color ItemColor = Color.get_Gray();
+		protected Color ItemColor = Color.Gray;
 
 		protected BitmapFont StatFont = Control.Content.DefaultFont16;
 
@@ -96,15 +96,6 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 
 		public GearSlot(TemplateSlotType gearSlot, Container parent, TemplatePresenter templatePresenter, SelectionPanel selectionPanel, Data data)
 		{
-			//IL_0009: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0039: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
 			_003CSlot_003Ek__BackingField = TemplateSlotType.None;
 			base._002Ector();
 			TemplatePresenter = templatePresenter;
@@ -174,7 +165,6 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 			base.PaintBeforeChildren(spriteBatch, bounds);
 		}
 
@@ -191,8 +181,6 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 
 		protected virtual void ApplySlot()
 		{
-			//IL_0138: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016f: Unknown result type (might be due to invalid IL or missing references)
 			if (new Dictionary<TemplateSlotType, int>
 			{
 				{
@@ -282,7 +270,7 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 			}
 			if (Slot.IsArmor() || Slot.IsWeapon() || Slot.IsJewellery())
 			{
-				ItemControl.TextureColor = Color.get_Gray();
+				ItemControl.TextureColor = Color.Gray;
 			}
 			RecalculateLayout();
 		}
@@ -298,15 +286,9 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 
 		public override void RecalculateLayout()
 		{
-			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
 			int size = Math.Min(base.Width, base.Height);
-			ItemControl itemControl = ItemControl;
-			Rectangle absoluteBounds = base.AbsoluteBounds;
-			itemControl.Location = ((Rectangle)(ref absoluteBounds)).get_Location();
+			ItemControl.Location = base.AbsoluteBounds.Location;
 			ItemControl.Size = new Point(size);
 		}
 

@@ -29,7 +29,7 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage
 
 		private readonly Kenedia.Modules.Core.Controls.Label _commentLabel;
 
-		private Color _frameColor = Color.get_Transparent();
+		private Color _frameColor = Color.Transparent;
 
 		public BaseItem? Item
 		{
@@ -97,18 +97,6 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage
 
 		public ItemTooltip()
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0099: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0116: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0120: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0168: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e2: Unknown result type (might be due to invalid IL or missing references)
 			WidthSizingMode = SizingMode.AutoSize;
 			HeightSizingMode = SizingMode.AutoSize;
 			base.AutoSizePadding = new Point(5);
@@ -121,7 +109,7 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage
 			_title = new Kenedia.Modules.Core.Controls.Label
 			{
 				Parent = this,
-				Height = Control.Content.DefaultFont16.get_LineHeight(),
+				Height = Control.Content.DefaultFont16.LineHeight,
 				AutoSizeWidth = true,
 				Location = new Point(_image.Right + 10, _image.Top),
 				Font = Control.Content.DefaultFont16
@@ -129,11 +117,11 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage
 			_id = new Kenedia.Modules.Core.Controls.Label
 			{
 				Parent = this,
-				Height = Control.Content.DefaultFont12.get_LineHeight(),
+				Height = Control.Content.DefaultFont12.LineHeight,
 				AutoSizeWidth = true,
 				Location = new Point(_image.Right + 10, _title.Bottom),
 				Font = Control.Content.DefaultFont12,
-				TextColor = Color.get_White() * 0.8f
+				TextColor = Color.White * 0.8f
 			};
 			_description = new Kenedia.Modules.Core.Controls.Label
 			{
@@ -151,7 +139,7 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage
 				AutoSizeHeight = true,
 				Location = new Point(_description.Left, _description.Bottom + 10),
 				Font = Control.Content.DefaultFont12,
-				TextColor = Color.get_DarkGray(),
+				TextColor = Color.DarkGray,
 				WrapText = true,
 				Visible = false
 			};
@@ -177,9 +165,6 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage
 
 		private void ApplyStat(object sender, Kenedia.Modules.Core.Models.ValueChangedEventArgs<Stat> e)
 		{
-			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0135: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0199: Unknown result type (might be due to invalid IL or missing references)
 			if (Stat == null)
 			{
 				_description.Text = string.Empty;
@@ -198,7 +183,7 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage
 				if (armor != null)
 				{
 					_description.Text = Stat?.Name + Environment.NewLine + Stat?.Attributes.ToString(armor.AttributeAdjustment);
-					_description.TextColor = Color.get_Lime();
+					_description.TextColor = Color.Lime;
 				}
 				break;
 			}
@@ -208,7 +193,7 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage
 				if (weapon != null)
 				{
 					_description.Text = Stat?.Name + Environment.NewLine + Stat?.Attributes.ToString(weapon.AttributeAdjustment);
-					_description.TextColor = Color.get_Lime();
+					_description.TextColor = Color.Lime;
 				}
 				break;
 			}
@@ -219,7 +204,7 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage
 				if (trinket != null)
 				{
 					_description.Text = Stat?.Name + Environment.NewLine + Stat?.Attributes.ToString(trinket.AttributeAdjustment);
-					_description.TextColor = Color.get_Lime();
+					_description.TextColor = Color.Lime;
 				}
 				break;
 			}
@@ -228,18 +213,11 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage
 
 		private void ApplyItem(object sender, Kenedia.Modules.Core.Models.ValueChangedEventArgs<BaseItem> e)
 		{
-			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0122: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0321: Unknown result type (might be due to invalid IL or missing references)
 			_image.Texture = TexturesService.GetAsyncTexture(Item?.AssetId);
-			_frameColor = Item?.Rarity.GetColor() ?? Color.get_Transparent();
+			_frameColor = Item?.Rarity.GetColor() ?? Color.Transparent;
 			_title.Text = Item?.Name;
 			_id.Text = $"{strings.ItemId}: {Item?.Id}";
-			_title.TextColor = Item?.Rarity.GetColor() ?? Color.get_White();
+			_title.TextColor = Item?.Rarity.GetColor() ?? Color.White;
 			if (_image.Texture != null)
 			{
 				int padding = _image.Texture.Width / 16;
@@ -310,7 +288,7 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage
 				if (pvpAmulet != null)
 				{
 					_description.Text = pvpAmulet?.AttributesString;
-					_description.TextColor = Color.get_Lime();
+					_description.TextColor = Color.Lime;
 				}
 				break;
 			}
@@ -319,15 +297,12 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage
 
 		public override void RecalculateLayout()
 		{
-			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
 			_commentLabel?.SetLocation(new Point(_description?.Left ?? 0, (_description?.Bottom ?? 0) + 2));
 		}
 
 		public override void Draw(SpriteBatch spriteBatch, Rectangle drawBounds, Rectangle scissor)
 		{
-			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 			if (Item != null)
 			{
 				base.Draw(spriteBatch, drawBounds, scissor);
@@ -336,10 +311,6 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
 			base.PaintBeforeChildren(spriteBatch, bounds);
 			if (_image?.Texture != null)
 			{

@@ -62,10 +62,6 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		public LegendIcon()
 		{
-			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
 			base.Tooltip = (SkillTooltip = new SkillTooltip());
 			base.Size = new Point(48, 62);
 		}
@@ -78,11 +74,6 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		public override void RecalculateLayout()
 		{
-			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
 			int selectorHeight = (int)(0.189873417721519 * (double)base.Height);
 			_selector.Bounds = new Rectangle(0, 0, base.Width, selectorHeight);
@@ -95,27 +86,17 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0148: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0189: Unknown result type (might be due to invalid IL or missing references)
 			if (Legend != null)
 			{
-				_texture.Draw(this, spriteBatch, base.RelativeMousePosition, IsActive ? Color.get_White() : Color.get_Gray());
+				_texture.Draw(this, spriteBatch, base.RelativeMousePosition, IsActive ? Color.White : Color.Gray);
 			}
 			else
 			{
-				_fallBackTexture.Draw(this, spriteBatch, base.RelativeMousePosition, Color.get_White());
+				_fallBackTexture.Draw(this, spriteBatch, base.RelativeMousePosition, Color.White);
 			}
 			if (base.MouseOver)
 			{
-				_hoveredFrameTexture.Draw(this, spriteBatch, base.RelativeMousePosition, Color.get_White());
+				_hoveredFrameTexture.Draw(this, spriteBatch, base.RelativeMousePosition, Color.White);
 			}
 			LegendSlotType legendSlot = LegendSlot;
 			if (((uint)legendSlot <= 1u) ? true : false)
@@ -123,7 +104,7 @@ namespace Kenedia.Modules.BuildsManager.Controls
 				Legend? legend = Legend;
 				if (legend != null && legend!.Swap.Flags.HasFlag(SkillFlag.NoUnderwater))
 				{
-					_noAquaticFlagTexture.Draw(this, spriteBatch, base.RelativeMousePosition, Color.get_White());
+					_noAquaticFlagTexture.Draw(this, spriteBatch, base.RelativeMousePosition, Color.White);
 				}
 			}
 			_selector?.Draw(this, spriteBatch, base.RelativeMousePosition);

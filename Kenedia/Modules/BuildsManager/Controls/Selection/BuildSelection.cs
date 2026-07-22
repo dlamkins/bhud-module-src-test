@@ -71,12 +71,6 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 
 		public BuildSelection(TemplateCollection templates, TemplateTags templateTags, Data data, TemplatePresenter templatePresenter, TemplateFactory templateFactory, Settings settings)
 		{
-			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0108: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016b: Unknown result type (might be due to invalid IL or missing references)
 			Data = data;
 			Templates = templates;
 			TemplateTags = templateTags;
@@ -388,7 +382,6 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 
 		public override void PaintAfterChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 			base.PaintAfterChildren(spriteBatch, bounds);
 		}
 
@@ -496,9 +489,6 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 
 		private bool TryGetTemplateBounds(TemplateSelectable selectable, out int top, out int bottom, out int contentHeight)
 		{
-			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
 			top = 0;
 			bottom = 0;
 			contentHeight = SelectionContent.ContentRegion.Height;
@@ -526,9 +516,6 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 
 		private void BringTemplateIntoView(TemplateSelectable selectable)
 		{
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0082: Unknown result type (might be due to invalid IL or missing references)
 			if (!TryGetTemplateBounds(selectable, out var childTop, out var childBottom, out var contentHeight))
 			{
 				return;
@@ -558,7 +545,6 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 
 		private bool IsTemplateInView(TemplateSelectable selectable)
 		{
-			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
 			if (!TryGetTemplateBounds(selectable, out var childTop, out var childBottom, out var _))
 			{
 				return false;
@@ -592,11 +578,11 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 		public override void RecalculateLayout()
 		{
 			base.RecalculateLayout();
-			Search?.SetSize(base.Width - Search.Left - Search.Height - 2, null);
+			Search?.SetSize(base.Width - Search.Left - Search.Height - 2);
 			_addBuildsButton?.SetLocation(Search.Right, Search.Top);
 			_addBuildsButton?.SetSize(Search.Height, Search.Height);
-			_sortBehavior?.SetLocation(Search.Left, null);
-			_sortBehavior?.SetSize((_addBuildsButton?.Right ?? 0) - Search.Left, null);
+			_sortBehavior?.SetLocation(Search.Left);
+			_sortBehavior?.SetSize((_addBuildsButton?.Right ?? 0) - Search.Left);
 		}
 
 		protected override void OnSelectionContent_Resized(object sender, ResizedEventArgs e)

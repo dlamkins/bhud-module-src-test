@@ -86,7 +86,6 @@ namespace Kenedia.Modules.BuildsManager.Models
 
 		public TagGroup()
 		{
-			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
 			_003CPriority_003Ek__BackingField = 1;
 			_003CName_003Ek__BackingField = DefaultName;
 			Icon = new DetailedTexture(156025)
@@ -108,22 +107,16 @@ namespace Kenedia.Modules.BuildsManager.Models
 
 		private void OnAssetIdChanged(object sender, ValueChangedEventArgs<int> e)
 		{
-			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
 			Icon = new DetailedTexture(e.NewValue);
-			Icon.TextureRegion = (Rectangle)(((_003F?)TextureRegion) ?? Icon.Texture?.Bounds ?? Rectangle.get_Empty());
+			Icon.TextureRegion = TextureRegion ?? Icon.Texture?.Bounds ?? Rectangle.Empty;
 			this.PropertyChanged?.Invoke(this, new PropertyAndValueChangedEventArgs("AssetId", e.OldValue, e.NewValue));
 		}
 
 		private void OnTextureRegionChanged(object sender, ValueChangedEventArgs<Rectangle?> e)
 		{
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0034: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
 			if (Icon != null)
 			{
-				Icon.TextureRegion = (Rectangle)(((_003F?)e.NewValue) ?? Icon.Texture?.Bounds ?? Rectangle.get_Empty());
+				Icon.TextureRegion = e.NewValue ?? Icon.Texture?.Bounds ?? Rectangle.Empty;
 			}
 			this.PropertyChanged?.Invoke(this, new PropertyAndValueChangedEventArgs("TextureRegion", e.OldValue, e.NewValue));
 		}

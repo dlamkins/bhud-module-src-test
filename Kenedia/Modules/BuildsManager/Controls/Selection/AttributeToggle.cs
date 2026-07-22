@@ -28,13 +28,9 @@ namespace Kenedia.Modules.BuildsManager.Controls.Selection
 
 		public AttributeToggle()
 		{
-			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			base.ImageColor = Color.get_Gray() * 0.5f;
-			base.ActiveColor = Color.get_White();
-			base.TextureRectangle = new Rectangle(4, 4, 24, 24);
+			base.ImageColor = Microsoft.Xna.Framework.Color.Gray * 0.5f;
+			base.ActiveColor = Microsoft.Xna.Framework.Color.White;
+			base.TextureRectangle = new Microsoft.Xna.Framework.Rectangle(4, 4, 24, 24);
 		}
 
 		private void OnAttributeChanged()

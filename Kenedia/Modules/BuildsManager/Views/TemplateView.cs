@@ -47,11 +47,6 @@ namespace Kenedia.Modules.BuildsManager.Views
 
 		protected override void Build(Container buildPanel)
 		{
-			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0050: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0274: Unknown result type (might be due to invalid IL or missing references)
 			base.Build(buildPanel);
 			SelectionPanel.Parent = buildPanel;
 			SelectionPanel.Location = new Point(35, 0);

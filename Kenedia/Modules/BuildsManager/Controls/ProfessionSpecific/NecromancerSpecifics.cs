@@ -42,94 +42,51 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 
 		public override void RecalculateLayout()
 		{
-			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ec: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0138: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0156: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0173: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0192: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0206: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0251: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0256: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0267: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0285: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02fa: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
 			int xOffset = 80;
 			switch (base.TemplatePresenter.Template.EliteSpecialization?.Id)
 			{
 			case 60:
 			{
-				_shades.Bounds = new Rectangle(xOffset + 10 + 46, 28, 36, 36);
-				_shades.TextureRegion = new Rectangle(0, 2, _shades.Texture.Width, _shades.Texture.Height - 4);
-				Skills[0].Bounds = new Rectangle(xOffset + 10, 25, 42, 42);
+				_shades.Bounds = new Microsoft.Xna.Framework.Rectangle(xOffset + 10 + 46, 28, 36, 36);
+				_shades.TextureRegion = new Microsoft.Xna.Framework.Rectangle(0, 2, _shades.Texture.Width, _shades.Texture.Height - 4);
+				Skills[0].Bounds = new Microsoft.Xna.Framework.Rectangle(xOffset + 10, 25, 42, 42);
 				for (int i = 1; i < Skills.Length; i++)
 				{
-					Skills[i].Bounds = new Rectangle(xOffset + 54 + i * 39, 28, 36, 36);
+					Skills[i].Bounds = new Microsoft.Xna.Framework.Rectangle(xOffset + 54 + i * 39, 28, 36, 36);
 				}
-				_lifeForceBarBackground.Bounds = new Rectangle(xOffset + 10, 75, 250, 20);
-				_lifeForceScourge.Bounds = new Rectangle(xOffset + 11, 76, 247, 18);
+				_lifeForceBarBackground.Bounds = new Microsoft.Xna.Framework.Rectangle(xOffset + 10, 75, 250, 20);
+				_lifeForceScourge.Bounds = new Microsoft.Xna.Framework.Rectangle(xOffset + 11, 76, 247, 18);
 				break;
 			}
 			case 64:
-				_lifeForceBarBackground.Bounds = new Rectangle(xOffset + 10, 70, 205, 20);
-				_lifeForceBar.Bounds = new Rectangle(xOffset + 11, 71, 203, 18);
-				Skills[0].Bounds = new Rectangle(xOffset + 215, 55, 42, 42);
+				_lifeForceBarBackground.Bounds = new Microsoft.Xna.Framework.Rectangle(xOffset + 10, 70, 205, 20);
+				_lifeForceBar.Bounds = new Microsoft.Xna.Framework.Rectangle(xOffset + 11, 71, 203, 18);
+				Skills[0].Bounds = new Microsoft.Xna.Framework.Rectangle(xOffset + 215, 55, 42, 42);
 				break;
 			case 76:
 			{
-				_lifeForceBarBackground.Bounds = new Rectangle(xOffset - 10, 75, 255, 20);
-				_lifeForce.Bounds = new Rectangle(xOffset - 10, 75, 255, 20);
-				_lifeForce.TextureRegion = new Rectangle(1, 42, _lifeForce.Texture.Width - 30, _lifeForce.Texture.Height - 49);
+				_lifeForceBarBackground.Bounds = new Microsoft.Xna.Framework.Rectangle(xOffset - 10, 75, 255, 20);
+				_lifeForce.Bounds = new Microsoft.Xna.Framework.Rectangle(xOffset - 10, 75, 255, 20);
+				_lifeForce.TextureRegion = new Microsoft.Xna.Framework.Rectangle(1, 42, _lifeForce.Texture.Width - 30, _lifeForce.Texture.Height - 49);
 				for (int j = 1; j < 4; j++)
 				{
-					Skills[j].Bounds = new Rectangle(xOffset + 54 + j * 39, 28, 36, 36);
+					Skills[j].Bounds = new Microsoft.Xna.Framework.Rectangle(xOffset + 54 + j * 39, 28, 36, 36);
 				}
-				SkillIcon obj = Skills[0];
-				Rectangle bounds = _lifeForce.Bounds;
-				obj.Bounds = new Rectangle(((Rectangle)(ref bounds)).get_Left() - 1, 22, 48, 48);
+				Skills[0].Bounds = new Microsoft.Xna.Framework.Rectangle(_lifeForce.Bounds.Left - 1, 22, 48, 48);
 				break;
 			}
 			default:
-				_lifeForceBarBackground.Bounds = new Rectangle(xOffset + 10, 70, 205, 20);
-				_lifeForce.Bounds = new Rectangle(xOffset + 10, 70, 205, 20);
-				_lifeForce.TextureRegion = new Rectangle(1, 42, _lifeForce.Texture.Width - 30, _lifeForce.Texture.Height - 49);
-				Skills[0].Bounds = new Rectangle(xOffset + 215, 55, 42, 42);
+				_lifeForceBarBackground.Bounds = new Microsoft.Xna.Framework.Rectangle(xOffset + 10, 70, 205, 20);
+				_lifeForce.Bounds = new Microsoft.Xna.Framework.Rectangle(xOffset + 10, 70, 205, 20);
+				_lifeForce.TextureRegion = new Microsoft.Xna.Framework.Rectangle(1, 42, _lifeForce.Texture.Width - 30, _lifeForce.Texture.Height - 49);
+				Skills[0].Bounds = new Microsoft.Xna.Framework.Rectangle(xOffset + 215, 55, 42, 42);
 				break;
 			}
 		}
 
-		public override void PaintAfterChildren(SpriteBatch spriteBatch, Rectangle bounds)
+		public override void PaintAfterChildren(SpriteBatch spriteBatch, Microsoft.Xna.Framework.Rectangle bounds)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0101: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0153: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01bd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0229: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0233: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0275: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0339: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0343: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0391: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0396: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03b4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_045a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0464: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04a6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04fe: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0503: Unknown result type (might be due to invalid IL or missing references)
 			base.PaintAfterChildren(spriteBatch, bounds);
 			switch (base.TemplatePresenter.Template.EliteSpecialization?.Id)
 			{
@@ -137,25 +94,25 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 			{
 				_shades.Draw(this, spriteBatch);
 				_lifeForceBarBackground.Draw(this, spriteBatch);
-				_lifeForceScourge.Draw(this, spriteBatch, null, Color.get_LightGray() * 0.7f);
+				_lifeForceScourge.Draw(this, spriteBatch, null, Microsoft.Xna.Framework.Color.LightGray * 0.7f);
 				for (int j = 0; j < Skills.Length; j++)
 				{
 					Skills[j].Draw(this, spriteBatch, base.RelativeMousePosition);
 				}
-				spriteBatch.DrawStringOnCtrl(this, "100%", Control.Content.DefaultFont12, _lifeForceScourge.Bounds, Color.get_White(), wrap: false, HorizontalAlignment.Center);
+				spriteBatch.DrawStringOnCtrl(this, "100%", Control.Content.DefaultFont12, _lifeForceScourge.Bounds, Microsoft.Xna.Framework.Color.White, wrap: false, HorizontalAlignment.Center);
 				break;
 			}
 			case 64:
 				_lifeForceBarBackground.Draw(this, spriteBatch);
-				_lifeForceBar.Draw(this, spriteBatch, null, Color.get_LightGray() * 0.7f);
+				_lifeForceBar.Draw(this, spriteBatch, null, Microsoft.Xna.Framework.Color.LightGray * 0.7f);
 				Skills[0].Draw(this, spriteBatch, base.RelativeMousePosition);
-				spriteBatch.DrawStringOnCtrl(this, "100%", Control.Content.DefaultFont12, _lifeForceBar.Bounds, Color.get_White(), wrap: false, HorizontalAlignment.Center);
+				spriteBatch.DrawStringOnCtrl(this, "100%", Control.Content.DefaultFont12, _lifeForceBar.Bounds, Microsoft.Xna.Framework.Color.White, wrap: false, HorizontalAlignment.Center);
 				break;
 			case 76:
 			{
 				_lifeForceBarBackground.Draw(this, spriteBatch);
-				_lifeForce.Draw(this, spriteBatch, null, Color.get_LightGray() * 0.7f);
-				spriteBatch.DrawStringOnCtrl(this, "100%", Control.Content.DefaultFont12, _lifeForce.Bounds, Color.get_White(), wrap: false, HorizontalAlignment.Center);
+				_lifeForce.Draw(this, spriteBatch, null, Microsoft.Xna.Framework.Color.LightGray * 0.7f);
+				spriteBatch.DrawStringOnCtrl(this, "100%", Control.Content.DefaultFont12, _lifeForce.Bounds, Microsoft.Xna.Framework.Color.White, wrap: false, HorizontalAlignment.Center);
 				for (int i = 0; i < 4; i++)
 				{
 					Skills[i].Draw(this, spriteBatch, base.RelativeMousePosition);
@@ -164,9 +121,9 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 			}
 			default:
 				_lifeForceBarBackground.Draw(this, spriteBatch);
-				_lifeForce.Draw(this, spriteBatch, null, Color.get_LightGray() * 0.7f);
+				_lifeForce.Draw(this, spriteBatch, null, Microsoft.Xna.Framework.Color.LightGray * 0.7f);
 				Skills[0].Draw(this, spriteBatch, base.RelativeMousePosition);
-				spriteBatch.DrawStringOnCtrl(this, "100%", Control.Content.DefaultFont12, _lifeForce.Bounds, Color.get_White(), wrap: false, HorizontalAlignment.Center);
+				spriteBatch.DrawStringOnCtrl(this, "100%", Control.Content.DefaultFont12, _lifeForce.Bounds, Microsoft.Xna.Framework.Color.White, wrap: false, HorizontalAlignment.Center);
 				break;
 			}
 		}

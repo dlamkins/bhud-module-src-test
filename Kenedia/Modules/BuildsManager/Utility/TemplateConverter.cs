@@ -16,7 +16,6 @@ namespace Kenedia.Modules.BuildsManager.Utility
 		public TemplateFactory TemplateFactory { get; }
 
 		public TemplateConverter(TemplateFactory templateFactory)
-			: this()
 		{
 			TemplateFactory = templateFactory;
 		}
@@ -32,8 +31,7 @@ namespace Kenedia.Modules.BuildsManager.Utility
 			UniqueObservableCollection<string> tags = new UniqueObservableCollection<string>();
 			try
 			{
-				JToken tagToken = default(JToken);
-				if (jo.TryGetValue("Tags", StringComparison.OrdinalIgnoreCase, ref tagToken) && tagToken != null)
+				if (jo.TryGetValue("Tags", StringComparison.OrdinalIgnoreCase, out var tagToken) && tagToken != null)
 				{
 					tags = tagToken.ToObject<UniqueObservableCollection<string>>(serializer);
 				}
@@ -42,14 +40,14 @@ namespace Kenedia.Modules.BuildsManager.Utility
 			{
 				tags = new UniqueObservableCollection<string>();
 			}
-			string name = (string)jo.get_Item("Name");
-			string buildCode = (string)jo.get_Item("BuildCode");
-			string gearCode = (string)jo.get_Item("GearCode");
-			string description = (string)jo.get_Item("Description");
-			int? race = (int?)jo.get_Item("Race");
-			int? profession = (int?)jo.get_Item("Profession");
-			int elitespecId = ((int?)jo.get_Item("EliteSpecializationId")).GetValueOrDefault();
-			string lastModified = (string)jo.get_Item("LastModified");
+			string name = (string?)jo["Name"];
+			string buildCode = (string?)jo["BuildCode"];
+			string gearCode = (string?)jo["GearCode"];
+			string description = (string?)jo["Description"];
+			int? race = (int?)jo["Race"];
+			int? profession = (int?)jo["Profession"];
+			int elitespecId = ((int?)jo["EliteSpecializationId"]).GetValueOrDefault();
+			string lastModified = (string?)jo["LastModified"];
 			return TemplateFactory.CreateTemplate(name, buildCode, gearCode, description, tags, (Races)race.GetValueOrDefault(-1), (ProfessionType)profession.GetValueOrDefault(1), elitespecId, lastModified);
 		}
 

@@ -48,43 +48,25 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 		public PvpAmuletSlot(TemplateSlotType gearSlot, Container parent, TemplatePresenter templatePresenter, SelectionPanel selectionPanel, Data data)
 			: base(gearSlot, parent, templatePresenter, selectionPanel, data)
 		{
-			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
 			_runeControl.Parent = this;
 			base.ClipsBounds = false;
 		}
 
 		public override void RecalculateLayout()
 		{
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0014: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
-			Rectangle localBounds = base.ItemControl.LocalBounds;
-			int upgradeSize = (((Rectangle)(ref localBounds)).get_Size().Y - 4) / 2;
+			int upgradeSize = (base.ItemControl.LocalBounds.Size.Y - 4) / 2;
 			int iconPadding = 0;
 			_ = base.Slot;
 			_ = 6;
 			int pvpUpgradeSize = 48;
-			ItemControl runeControl = _runeControl;
-			localBounds = base.ItemControl.LocalBounds;
-			runeControl.SetBounds(new Rectangle(((Rectangle)(ref localBounds)).get_Right() + 2 + 5 + iconPadding, (base.ItemControl.LocalBounds.Height - pvpUpgradeSize) / 2, pvpUpgradeSize, pvpUpgradeSize));
+			_runeControl.SetBounds(new Rectangle(base.ItemControl.LocalBounds.Right + 2 + 5 + iconPadding, (base.ItemControl.LocalBounds.Height - pvpUpgradeSize) / 2, pvpUpgradeSize, pvpUpgradeSize));
 			_runeBounds = new Rectangle(_runeControl.Right + 10, _runeControl.Top, base.Width - (_runeControl.Right + 2), _runeControl.Height);
-			_titleBounds = new Rectangle(((Rectangle)(ref _runeBounds)).get_Left(), ((Rectangle)(ref _runeBounds)).get_Top() - (Control.Content.DefaultFont16.get_LineHeight() + 2), _runeBounds.Width, Control.Content.DefaultFont16.get_LineHeight());
+			_titleBounds = new Rectangle(_runeBounds.Left, _runeBounds.Top - (Control.Content.DefaultFont16.LineHeight + 2), _runeBounds.Width, Control.Content.DefaultFont16.LineHeight);
 		}
 
 		public override void PaintAfterChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
 			base.PaintAfterChildren(spriteBatch, bounds);
 			spriteBatch.DrawStringOnCtrl(this, GetDisplayString(Rune?.DisplayText ?? string.Empty), UpgradeFont, _runeBounds, UpgradeColor);
 		}
@@ -108,29 +90,17 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 
 		protected override void SetAnchor()
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00af: Unknown result type (might be due to invalid IL or missing references)
 			Rectangle a = base.AbsoluteBounds;
 			if (base.ItemControl.MouseOver)
 			{
-				base.SelectionPanel?.SetAnchor(base.ItemControl, Blish_HUD.RectangleExtension.Add(new Rectangle(((Rectangle)(ref a)).get_Location(), Point.get_Zero()), base.ItemControl.LocalBounds), SelectionTypes.Items, base.Slot, GearSubSlotType.Item, delegate(PvpAmulet pvpAmulet)
+				base.SelectionPanel?.SetAnchor(base.ItemControl, new Rectangle(a.Location, Point.Zero).Add(base.ItemControl.LocalBounds), SelectionTypes.Items, base.Slot, GearSubSlotType.Item, delegate(PvpAmulet pvpAmulet)
 				{
 					base.TemplatePresenter.Template?.SetItem(base.Slot, TemplateSubSlotType.Item, pvpAmulet);
 				});
 			}
 			if (_runeControl.MouseOver)
 			{
-				base.SelectionPanel?.SetAnchor(_runeControl, Blish_HUD.RectangleExtension.Add(new Rectangle(((Rectangle)(ref a)).get_Location(), Point.get_Zero()), _runeControl.LocalBounds), SelectionTypes.Items, base.Slot, GearSubSlotType.Rune, delegate(Rune rune)
+				base.SelectionPanel?.SetAnchor(_runeControl, new Rectangle(a.Location, Point.Zero).Add(_runeControl.LocalBounds), SelectionTypes.Items, base.Slot, GearSubSlotType.Rune, delegate(Rune rune)
 				{
 					base.TemplatePresenter.Template?.SetItem(base.Slot, TemplateSubSlotType.Rune, rune);
 				});

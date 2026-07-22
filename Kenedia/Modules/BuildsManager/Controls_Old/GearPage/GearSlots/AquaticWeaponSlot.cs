@@ -47,8 +47,8 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 		private readonly DetailedTexture _changeWeaponTexture = new DetailedTexture(2338896, 2338895)
 		{
 			TextureRegion = new Rectangle(4, 4, 24, 24),
-			DrawColor = Color.get_White() * 0.5f,
-			HoverDrawColor = Color.get_White()
+			DrawColor = Color.White * 0.5f,
+			HoverDrawColor = Color.White
 		};
 
 		private Rectangle _sigil1Bounds;
@@ -142,14 +142,6 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 		public AquaticWeaponSlot(TemplateSlotType gearSlot, Container parent, TemplatePresenter templatePresenter, SelectionPanel selectionPanel, Data data)
 			: base(gearSlot, parent, templatePresenter, selectionPanel, data)
 		{
-			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0082: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
 			_infusion1Control.Placeholder.Texture = (AsyncTexture2D)BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.ModuleInstance.ContentsManager.GetTexture("textures\\infusionslot.png");
 			_infusion2Control.Placeholder.Texture = (AsyncTexture2D)BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.ModuleInstance.ContentsManager.GetTexture("textures\\infusionslot.png");
 			_sigil1Control.Parent = this;
@@ -180,35 +172,12 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 
 		public override void RecalculateLayout()
 		{
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0120: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0173: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0196: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e8: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
-			Rectangle localBounds = base.ItemControl.LocalBounds;
-			int upgradeSize = (((Rectangle)(ref localBounds)).get_Size().Y - 4) / 2;
+			int upgradeSize = (base.ItemControl.LocalBounds.Size.Y - 4) / 2;
 			int textPadding = ((base.Slot == TemplateSlotType.AquaBreather) ? (upgradeSize + 5) : 5);
 			int size = Math.Min(base.Width, base.Height);
 			int padding = 2;
-			DetailedTexture changeWeaponTexture = _changeWeaponTexture;
-			localBounds = base.ItemControl.LocalBounds;
-			changeWeaponTexture.Bounds = new Rectangle(new Point(((Rectangle)(ref localBounds)).get_Left() + padding, padding), new Point((int)((double)(size - padding * 2) / 2.5)));
+			_changeWeaponTexture.Bounds = new Rectangle(new Point(base.ItemControl.LocalBounds.Left + padding, padding), new Point((int)((double)(size - padding * 2) / 2.5)));
 			_sigil1Control.SetBounds(new Rectangle(base.ItemControl.Right + padding, 0, upgradeSize, upgradeSize));
 			_sigil2Control.SetBounds(new Rectangle(base.ItemControl.Right + padding + upgradeSize + padding, 0, upgradeSize, upgradeSize));
 			_infusion1Control.SetBounds(new Rectangle(base.ItemControl.Right + padding, base.ItemControl.Bottom - upgradeSize, upgradeSize, upgradeSize));
@@ -223,16 +192,6 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 
 		public override void PaintAfterChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0101: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0107: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0144: Unknown result type (might be due to invalid IL or missing references)
 			base.PaintAfterChildren(spriteBatch, bounds);
 			if (base.TemplatePresenter.IsPve)
 			{
@@ -276,77 +235,45 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 
 		protected override void SetAnchor()
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0133: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0138: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0148: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ab: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_020f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0214: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0219: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0224: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0229: Unknown result type (might be due to invalid IL or missing references)
-			//IL_027d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0282: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0287: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0292: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0297: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02e5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ef: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02fa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ff: Unknown result type (might be due to invalid IL or missing references)
 			Rectangle a = base.AbsoluteBounds;
 			if (base.ItemControl.MouseOver)
 			{
-				base.SelectionPanel?.SetAnchor(base.ItemControl, Blish_HUD.RectangleExtension.Add(new Rectangle(((Rectangle)(ref a)).get_Location(), Point.get_Zero()), base.ItemControl.LocalBounds), SelectionTypes.Stats, base.Slot, GearSubSlotType.None, delegate(Stat stat)
+				base.SelectionPanel?.SetAnchor(base.ItemControl, new Rectangle(a.Location, Point.Zero).Add(base.ItemControl.LocalBounds), SelectionTypes.Stats, base.Slot, GearSubSlotType.None, delegate(Stat stat)
 				{
 					base.TemplatePresenter?.Template?.SetItem(base.Slot, TemplateSubSlotType.Stat, stat);
 				}, (base.TemplatePresenter?.Template[base.Slot] as AquaticWeaponTemplateEntry).Weapon?.StatChoices ?? base.Data.Weapons.Values.FirstOrDefault()?.StatChoices ?? Array.Empty<int>(), (base.TemplatePresenter?.Template[base.Slot] as AquaticWeaponTemplateEntry).Weapon?.AttributeAdjustment);
 			}
 			if (_sigil1Control.MouseOver)
 			{
-				base.SelectionPanel?.SetAnchor(_sigil1Control, Blish_HUD.RectangleExtension.Add(new Rectangle(((Rectangle)(ref a)).get_Location(), Point.get_Zero()), _sigil1Control.LocalBounds), SelectionTypes.Items, base.Slot, GearSubSlotType.Sigil, delegate(Sigil sigil)
+				base.SelectionPanel?.SetAnchor(_sigil1Control, new Rectangle(a.Location, Point.Zero).Add(_sigil1Control.LocalBounds), SelectionTypes.Items, base.Slot, GearSubSlotType.Sigil, delegate(Sigil sigil)
 				{
 					base.TemplatePresenter.Template?.SetItem(base.Slot, TemplateSubSlotType.Sigil1, sigil);
 				});
 			}
 			if (_sigil2Control.MouseOver)
 			{
-				base.SelectionPanel?.SetAnchor(_sigil2Control, Blish_HUD.RectangleExtension.Add(new Rectangle(((Rectangle)(ref a)).get_Location(), Point.get_Zero()), _sigil2Control.LocalBounds), SelectionTypes.Items, base.Slot, GearSubSlotType.Sigil, delegate(Sigil sigil)
+				base.SelectionPanel?.SetAnchor(_sigil2Control, new Rectangle(a.Location, Point.Zero).Add(_sigil2Control.LocalBounds), SelectionTypes.Items, base.Slot, GearSubSlotType.Sigil, delegate(Sigil sigil)
 				{
 					base.TemplatePresenter.Template?.SetItem(base.Slot, TemplateSubSlotType.Sigil2, sigil);
 				});
 			}
 			if (_infusion1Control.MouseOver)
 			{
-				base.SelectionPanel?.SetAnchor(_infusion1Control, Blish_HUD.RectangleExtension.Add(new Rectangle(((Rectangle)(ref a)).get_Location(), Point.get_Zero()), _infusion1Control.LocalBounds), SelectionTypes.Items, base.Slot, GearSubSlotType.Infusion, delegate(Infusion infusion)
+				base.SelectionPanel?.SetAnchor(_infusion1Control, new Rectangle(a.Location, Point.Zero).Add(_infusion1Control.LocalBounds), SelectionTypes.Items, base.Slot, GearSubSlotType.Infusion, delegate(Infusion infusion)
 				{
 					base.TemplatePresenter.Template?.SetItem(base.Slot, TemplateSubSlotType.Infusion1, infusion);
 				});
 			}
 			if (_infusion2Control.MouseOver)
 			{
-				base.SelectionPanel?.SetAnchor(_infusion2Control, Blish_HUD.RectangleExtension.Add(new Rectangle(((Rectangle)(ref a)).get_Location(), Point.get_Zero()), _infusion2Control.LocalBounds), SelectionTypes.Items, base.Slot, GearSubSlotType.Infusion, delegate(Infusion infusion)
+				base.SelectionPanel?.SetAnchor(_infusion2Control, new Rectangle(a.Location, Point.Zero).Add(_infusion2Control.LocalBounds), SelectionTypes.Items, base.Slot, GearSubSlotType.Infusion, delegate(Infusion infusion)
 				{
 					base.TemplatePresenter.Template?.SetItem(base.Slot, TemplateSubSlotType.Infusion2, infusion);
 				});
 			}
 			if (_changeWeaponTexture.Hovered)
 			{
-				base.SelectionPanel?.SetAnchor(this, Blish_HUD.RectangleExtension.Add(new Rectangle(((Rectangle)(ref a)).get_Location(), Point.get_Zero()), base.ItemControl.LocalBounds), SelectionTypes.Items, base.Slot, GearSubSlotType.Item, delegate(Weapon item)
+				base.SelectionPanel?.SetAnchor(this, new Rectangle(a.Location, Point.Zero).Add(base.ItemControl.LocalBounds), SelectionTypes.Items, base.Slot, GearSubSlotType.Item, delegate(Weapon item)
 				{
 					base.TemplatePresenter.Template?.SetItem(base.Slot, TemplateSubSlotType.Item, item);
 				});

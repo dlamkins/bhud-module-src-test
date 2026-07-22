@@ -63,10 +63,6 @@ namespace Kenedia.Modules.BuildsManager.Views
 
 		protected override void Build(Blish_HUD.Controls.Container buildPanel)
 		{
-			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0077: Unknown result type (might be due to invalid IL or missing references)
 			base.Build(buildPanel);
 			int width = buildPanel.Size.X;
 			_tagsParent = new Kenedia.Modules.Core.Controls.Panel
@@ -80,7 +76,7 @@ namespace Kenedia.Modules.BuildsManager.Views
 				Parent = buildPanel,
 				HeightSizingMode = SizingMode.Fill,
 				Width = width / 3,
-				Location = Kenedia.Modules.Core.Extensions.PointExtensions.Add(new Point(_tagsParent.Right, _tagsParent.Top), new Point(0, 0))
+				Location = new Point(_tagsParent.Right, _tagsParent.Top).Add(new Point(0, 0))
 			};
 			BuildTagView(_tagsParent);
 			BuildGroupView(_groupParent);
@@ -89,71 +85,37 @@ namespace Kenedia.Modules.BuildsManager.Views
 
 		private void BuildPanel_Resized(object sender, ResizedEventArgs e)
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
 			int width = e.CurrentSize.X;
 		}
 
 		private void BuildGroupView(Blish_HUD.Controls.Container buildPanel)
 		{
-			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0104: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0109: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0253: Unknown result type (might be due to invalid IL or missing references)
-			//IL_027b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0297: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ff: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0318: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0334: Unknown result type (might be due to invalid IL or missing references)
-			//IL_033e: Unknown result type (might be due to invalid IL or missing references)
 			Kenedia.Modules.Core.Controls.Label lbl = new Kenedia.Modules.Core.Controls.Label
 			{
 				Parent = buildPanel,
 				Location = new Point(0, 0),
 				SetLocalizedText = () => strings.Groups,
 				Font = GameService.Content.DefaultFont18,
-				Height = GameService.Content.DefaultFont18.get_LineHeight() + 2,
+				Height = GameService.Content.DefaultFont18.LineHeight + 2,
 				AutoSizeWidth = true
 			};
-			Separator obj = new Separator
+			Separator sep = new Separator
 			{
-				Parent = buildPanel
+				Parent = buildPanel,
+				Location = new Point(lbl.LocalBounds.X, lbl.LocalBounds.Bottom).Add(new Point(0, 2)),
+				Width = buildPanel.Width - 25,
+				Height = 2,
+				Color = Color.White * 0.8f
 			};
-			int x2 = lbl.LocalBounds.X;
-			Rectangle localBounds = lbl.LocalBounds;
-			obj.Location = Kenedia.Modules.Core.Extensions.PointExtensions.Add(new Point(x2, ((Rectangle)(ref localBounds)).get_Bottom()), new Point(0, 2));
-			obj.Width = buildPanel.Width - 25;
-			obj.Height = 2;
-			obj.Color = Color.get_White() * 0.8f;
-			Separator sep = obj;
-			FilterBox obj2 = new FilterBox
+			_groupFilterBox = new FilterBox
 			{
-				Parent = buildPanel
+				Parent = buildPanel,
+				Location = new Point(sep.LocalBounds.X, sep.LocalBounds.Bottom).Add(new Point(0, 10)),
+				Width = buildPanel.Width - 50,
+				SetLocalizedPlaceholder = () => strings_common.Search,
+				FilteringOnTextChange = true,
+				PerformFiltering = new Action<string>(FilterGroups)
 			};
-			int x3 = sep.LocalBounds.X;
-			localBounds = sep.LocalBounds;
-			obj2.Location = Kenedia.Modules.Core.Extensions.PointExtensions.Add(new Point(x3, ((Rectangle)(ref localBounds)).get_Bottom()), new Point(0, 10));
-			obj2.Width = buildPanel.Width - 50;
-			obj2.SetLocalizedPlaceholder = () => strings_common.Search;
-			obj2.FilteringOnTextChange = true;
-			obj2.PerformFiltering = new Action<string>(FilterGroups);
-			_groupFilterBox = obj2;
 			_groupAddButton = new ImageButton
 			{
 				Parent = buildPanel,
@@ -175,9 +137,9 @@ namespace Kenedia.Modules.BuildsManager.Views
 				Location = new Point(_groupFilterBox.Left, _groupFilterBox.Bottom + 5),
 				ContentPadding = new RectangleDimensions(5, 5, 0, 0),
 				Width = buildPanel.Width / 2,
-				BorderColor = Color.get_Black(),
+				BorderColor = Color.Black,
 				BorderWidth = new RectangleDimensions(2),
-				BackgroundColor = Color.get_Black() * 0.5f,
+				BackgroundColor = Color.Black * 0.5f,
 				CanScroll = true,
 				HeightSizingMode = SizingMode.Fill,
 				ControlPadding = new Vector2(0f, 2f)
@@ -187,9 +149,9 @@ namespace Kenedia.Modules.BuildsManager.Views
 				Location = new Point(_groupsPanel.Right + 5, _groupFilterBox.Bottom + 5),
 				CanScroll = true,
 				Parent = buildPanel,
-				BorderColor = Color.get_Black(),
+				BorderColor = Color.Black,
 				BorderWidth = new RectangleDimensions(2),
-				BackgroundColor = Color.get_Black() * 0.5f,
+				BackgroundColor = Color.Black * 0.5f,
 				Width = buildPanel.Width - (_groupsPanel.Right + 27),
 				HeightSizingMode = SizingMode.Fill
 			};
@@ -225,65 +187,32 @@ namespace Kenedia.Modules.BuildsManager.Views
 
 		private void BuildTagView(Blish_HUD.Controls.Container buildPanel)
 		{
-			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0094: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0105: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01eb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_024e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0279: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0295: Unknown result type (might be due to invalid IL or missing references)
-			//IL_029f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02fd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0316: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0332: Unknown result type (might be due to invalid IL or missing references)
-			//IL_033c: Unknown result type (might be due to invalid IL or missing references)
 			Kenedia.Modules.Core.Controls.Label lbl = new Kenedia.Modules.Core.Controls.Label
 			{
 				Parent = buildPanel,
 				Location = new Point(50, 0),
 				SetLocalizedText = () => strings.Tags,
 				Font = GameService.Content.DefaultFont18,
-				Height = GameService.Content.DefaultFont18.get_LineHeight() + 2,
+				Height = GameService.Content.DefaultFont18.LineHeight + 2,
 				AutoSizeWidth = true
 			};
-			Separator obj = new Separator
+			Separator sep = new Separator
 			{
-				Parent = buildPanel
+				Parent = buildPanel,
+				Location = new Point(lbl.LocalBounds.X, lbl.LocalBounds.Bottom).Add(new Point(0, 2)),
+				Width = buildPanel.Width - 75,
+				Height = 2,
+				Color = Color.White * 0.8f
 			};
-			int x2 = lbl.LocalBounds.X;
-			Rectangle localBounds = lbl.LocalBounds;
-			obj.Location = Kenedia.Modules.Core.Extensions.PointExtensions.Add(new Point(x2, ((Rectangle)(ref localBounds)).get_Bottom()), new Point(0, 2));
-			obj.Width = buildPanel.Width - 75;
-			obj.Height = 2;
-			obj.Color = Color.get_White() * 0.8f;
-			Separator sep = obj;
-			FilterBox obj2 = new FilterBox
+			_tagFilterBox = new FilterBox
 			{
-				Parent = buildPanel
+				Parent = buildPanel,
+				Location = new Point(sep.LocalBounds.X, sep.LocalBounds.Bottom).Add(new Point(0, 10)),
+				Width = buildPanel.Width - 75 - 27,
+				SetLocalizedPlaceholder = () => strings_common.Search,
+				FilteringOnTextChange = true,
+				PerformFiltering = new Action<string>(FilterTags)
 			};
-			int x3 = sep.LocalBounds.X;
-			localBounds = sep.LocalBounds;
-			obj2.Location = Kenedia.Modules.Core.Extensions.PointExtensions.Add(new Point(x3, ((Rectangle)(ref localBounds)).get_Bottom()), new Point(0, 10));
-			obj2.Width = buildPanel.Width - 75 - 27;
-			obj2.SetLocalizedPlaceholder = () => strings_common.Search;
-			obj2.FilteringOnTextChange = true;
-			obj2.PerformFiltering = new Action<string>(FilterTags);
-			_tagFilterBox = obj2;
 			_tagAddButton = new ImageButton
 			{
 				Parent = buildPanel,
@@ -305,9 +234,9 @@ namespace Kenedia.Modules.BuildsManager.Views
 				Location = new Point(50, _tagFilterBox.Bottom + 5),
 				ContentPadding = new RectangleDimensions(5, 5, 0, 0),
 				Width = (buildPanel.Width - 75) / 3,
-				BorderColor = Color.get_Black(),
+				BorderColor = Color.Black,
 				BorderWidth = new RectangleDimensions(2),
-				BackgroundColor = Color.get_Black() * 0.5f,
+				BackgroundColor = Color.Black * 0.5f,
 				CanScroll = true,
 				HeightSizingMode = SizingMode.Fill,
 				ControlPadding = new Vector2(0f, 2f)
@@ -317,9 +246,9 @@ namespace Kenedia.Modules.BuildsManager.Views
 				Location = new Point(_tagsPanel.Right + 5, _tagFilterBox.Bottom + 5),
 				CanScroll = true,
 				Parent = buildPanel,
-				BorderColor = Color.get_Black(),
+				BorderColor = Color.Black,
 				BorderWidth = new RectangleDimensions(2),
-				BackgroundColor = Color.get_Black() * 0.5f,
+				BackgroundColor = Color.Black * 0.5f,
 				Width = buildPanel.Width - 75 - (_tagsPanel.Width + 5),
 				HeightSizingMode = SizingMode.Fill
 			};
@@ -337,15 +266,11 @@ namespace Kenedia.Modules.BuildsManager.Views
 
 		private void GroupBuildPanel_Resized(object sender, ResizedEventArgs e)
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 			Point b = e.CurrentSize;
 		}
 
 		private void TagBuildPanel_Resized(object sender, ResizedEventArgs e)
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 			Point b = e.CurrentSize;
 		}
 

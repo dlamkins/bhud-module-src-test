@@ -19,7 +19,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 
 		private readonly DetailedTexture _specterBar = new DetailedTexture(2468316);
 
-		private Rectangle _separatorBounds;
+		private Microsoft.Xna.Framework.Rectangle _separatorBounds;
 
 		private int _initiativeCount;
 
@@ -65,28 +65,6 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 
 		public override void RecalculateLayout()
 		{
-			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0111: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0191: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0225: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0243: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0260: Unknown result type (might be due to invalid IL or missing references)
-			//IL_027d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02d3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02fe: Unknown result type (might be due to invalid IL or missing references)
-			//IL_031c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0339: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0356: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03ac: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03d7: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
 			int xOffset = 90;
 			switch (base.TemplatePresenter?.Template?.EliteSpecialization?.Id)
@@ -94,79 +72,68 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 			case 77:
 			{
 				xOffset = 55;
-				Skills[0].Bounds = new Rectangle(xOffset + 3, 50, 42, 42);
-				Rectangle bounds = Skills[0].Bounds;
-				int num = ((Rectangle)(ref bounds)).get_Right() + 6;
-				bounds = Skills[0].Bounds;
-				_separatorBounds = new Rectangle(num, ((Rectangle)(ref bounds)).get_Top(), 2, Skills[0].Bounds.Height + 2);
+				Skills[0].Bounds = new Microsoft.Xna.Framework.Rectangle(xOffset + 3, 50, 42, 42);
+				_separatorBounds = new Microsoft.Xna.Framework.Rectangle(Skills[0].Bounds.Right + 6, Skills[0].Bounds.Top, 2, Skills[0].Bounds.Height + 2);
 				for (int j = 1; j < 3; j++)
 				{
-					Skills[j].Bounds = new Rectangle(((Rectangle)(ref _separatorBounds)).get_Right() + (j - 1) * 44 + 6, 50, 42, 42);
+					Skills[j].Bounds = new Microsoft.Xna.Framework.Rectangle(_separatorBounds.Right + (j - 1) * 44 + 6, 50, 42, 42);
 				}
 				for (int i = 0; i < _initiativeCount; i++)
 				{
 					DetailedTexture initiative = ((i < _initiative.Length) ? _initiative[i] : null);
 					if (initiative != null)
 					{
-						initiative.Bounds = new Rectangle(xOffset + 200 + i / 3 * ((_initiativeCount == 12) ? 26 : 20) + ((i % 3 == 1) ? ((_initiativeCount == 12) ? 13 : 10) : 0), 40 + i % 3 * 15, 26, 26);
+						initiative.Bounds = new Microsoft.Xna.Framework.Rectangle(xOffset + 200 + i / 3 * ((_initiativeCount == 12) ? 26 : 20) + ((i % 3 == 1) ? ((_initiativeCount == 12) ? 13 : 10) : 0), 40 + i % 3 * 15, 26, 26);
 					}
 				}
 				return;
 			}
 			case 7:
 			{
-				for (int k = 0; k < _initiativeCount; k++)
+				for (int l = 0; l < _initiativeCount; l++)
 				{
-					DetailedTexture initiative2 = ((k < _initiative.Length) ? _initiative[k] : null);
+					DetailedTexture initiative2 = ((l < _initiative.Length) ? _initiative[l] : null);
 					if (initiative2 != null)
 					{
-						initiative2.Bounds = new Rectangle(xOffset + ((_initiativeCount == 12) ? 100 : 80) + k * 13, 55 - k % 2 * 15, 26, 26);
+						initiative2.Bounds = new Microsoft.Xna.Framework.Rectangle(xOffset + ((_initiativeCount == 12) ? 100 : 80) + l * 13, 55 - l % 2 * 15, 26, 26);
 					}
 				}
-				Skills[0].Bounds = new Rectangle(xOffset - 20 + 3, 50, 42, 42);
-				Skills[1].Bounds = new Rectangle(xOffset + 3 + 45, 50, 42, 42);
-				_barBackground.Bounds = new Rectangle(xOffset + 90, 80, 170, 12);
-				_specterBar.Bounds = new Rectangle(xOffset + 91, 81, 168, 10);
+				Skills[0].Bounds = new Microsoft.Xna.Framework.Rectangle(xOffset - 20 + 3, 50, 42, 42);
+				Skills[1].Bounds = new Microsoft.Xna.Framework.Rectangle(xOffset + 3 + 45, 50, 42, 42);
+				_barBackground.Bounds = new Microsoft.Xna.Framework.Rectangle(xOffset + 90, 80, 170, 12);
+				_specterBar.Bounds = new Microsoft.Xna.Framework.Rectangle(xOffset + 91, 81, 168, 10);
 				return;
 			}
 			case 71:
 			{
-				for (int l = 0; l < _initiativeCount; l++)
+				for (int m = 0; m < _initiativeCount; m++)
 				{
-					DetailedTexture initiative3 = ((l < _initiative.Length) ? _initiative[l] : null);
+					DetailedTexture initiative3 = ((m < _initiative.Length) ? _initiative[m] : null);
 					if (initiative3 != null)
 					{
-						initiative3.Bounds = new Rectangle(xOffset + 90 + l * ((_initiativeCount == 12) ? 13 : 10), 55 - l % 2 * 13, 26, 26);
+						initiative3.Bounds = new Microsoft.Xna.Framework.Rectangle(xOffset + 90 + m * ((_initiativeCount == 12) ? 13 : 10), 55 - m % 2 * 13, 26, 26);
 					}
 				}
-				Skills[0].Bounds = new Rectangle(xOffset + 3, 50, 42, 42);
-				Skills[1].Bounds = new Rectangle(xOffset + 3 + 45, 50, 42, 42);
-				_barBackground.Bounds = new Rectangle(xOffset + 90, 80, 170, 12);
-				_specterBar.Bounds = new Rectangle(xOffset + 91, 81, 168, 10);
+				Skills[0].Bounds = new Microsoft.Xna.Framework.Rectangle(xOffset + 3, 50, 42, 42);
+				Skills[1].Bounds = new Microsoft.Xna.Framework.Rectangle(xOffset + 3 + 45, 50, 42, 42);
+				_barBackground.Bounds = new Microsoft.Xna.Framework.Rectangle(xOffset + 90, 80, 170, 12);
+				_specterBar.Bounds = new Microsoft.Xna.Framework.Rectangle(xOffset + 91, 81, 168, 10);
 				return;
 			}
 			}
-			for (int m = 0; m < _initiativeCount; m++)
+			for (int k = 0; k < _initiativeCount; k++)
 			{
-				DetailedTexture initiative4 = ((m < _initiative.Length) ? _initiative[m] : null);
+				DetailedTexture initiative4 = ((k < _initiative.Length) ? _initiative[k] : null);
 				if (initiative4 != null)
 				{
-					initiative4.Bounds = new Rectangle(xOffset + ((_initiativeCount == 12) ? 100 : 80) + m * 13, 55 - m % 2 * 15, 26, 26);
+					initiative4.Bounds = new Microsoft.Xna.Framework.Rectangle(xOffset + ((_initiativeCount == 12) ? 100 : 80) + k * 13, 55 - k % 2 * 15, 26, 26);
 				}
 			}
-			Skills[0].Bounds = new Rectangle(xOffset + 3, 50, 42, 42);
+			Skills[0].Bounds = new Microsoft.Xna.Framework.Rectangle(xOffset + 3, 50, 42, 42);
 		}
 
-		public override void PaintAfterChildren(SpriteBatch spriteBatch, Rectangle bounds)
+		public override void PaintAfterChildren(SpriteBatch spriteBatch, Microsoft.Xna.Framework.Rectangle bounds)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0133: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02af: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0346: Unknown result type (might be due to invalid IL or missing references)
 			base.PaintAfterChildren(spriteBatch, bounds);
 			switch (base.TemplatePresenter.Template.EliteSpecialization?.Id)
 			{
@@ -180,7 +147,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 				{
 					((l < _initiative.Length) ? _initiative[l] : null)?.Draw(this, spriteBatch);
 				}
-				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, _separatorBounds, Color.get_Black());
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, _separatorBounds, Microsoft.Xna.Framework.Color.Black);
 				break;
 			}
 			case 71:
@@ -192,7 +159,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 				{
 					((j < _initiative.Length) ? _initiative[j] : null)?.Draw(this, spriteBatch);
 				}
-				spriteBatch.DrawStringOnCtrl(this, "100%", Control.Content.DefaultFont12, _specterBar.Bounds, Color.get_White(), wrap: false, HorizontalAlignment.Center, VerticalAlignment.Bottom);
+				spriteBatch.DrawStringOnCtrl(this, "100%", Control.Content.DefaultFont12, _specterBar.Bounds, Microsoft.Xna.Framework.Color.White, wrap: false, HorizontalAlignment.Center, VerticalAlignment.Bottom);
 				break;
 			}
 			default:

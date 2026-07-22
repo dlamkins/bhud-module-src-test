@@ -9,7 +9,7 @@ using System.Runtime.CompilerServices;
 
 namespace Kenedia.Modules.Core.Res
 {
-	[GeneratedCode("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
+	[GeneratedCode("System.Resources.Tools.StronglyTypedResourceBuilder", "18.0.0.0")]
 	[DebuggerNonUserCode]
 	[CompilerGenerated]
 	internal class textures_common
@@ -44,11 +44,35 @@ namespace Kenedia.Modules.Core.Res
 			}
 		}
 
+		internal static Bitmap Cancel => (Bitmap)ResourceManager.GetObject("Cancel", resourceCulture);
+
+		internal static Bitmap Cancel_Active => (Bitmap)ResourceManager.GetObject("Cancel_Active", resourceCulture);
+
+		internal static Bitmap Cancel_Hovered => (Bitmap)ResourceManager.GetObject("Cancel_Hovered", resourceCulture);
+
+		internal static Bitmap Copy => (Bitmap)ResourceManager.GetObject("Copy", resourceCulture);
+
+		internal static Bitmap Copy_Active => (Bitmap)ResourceManager.GetObject("Copy_Active", resourceCulture);
+
+		internal static Bitmap Copy_Hovered => (Bitmap)ResourceManager.GetObject("Copy_Hovered", resourceCulture);
+
+		internal static Bitmap Delete => (Bitmap)ResourceManager.GetObject("Delete", resourceCulture);
+
+		internal static Bitmap Delete_Active => (Bitmap)ResourceManager.GetObject("Delete_Active", resourceCulture);
+
+		internal static Bitmap Delete_Hovered => (Bitmap)ResourceManager.GetObject("Delete_Hovered", resourceCulture);
+
 		internal static Bitmap ImageButtonBackground => (Bitmap)ResourceManager.GetObject("ImageButtonBackground", resourceCulture);
 
 		internal static Bitmap ImageButtonBackground_Hovered => (Bitmap)ResourceManager.GetObject("ImageButtonBackground_Hovered", resourceCulture);
 
 		internal static Bitmap RollingChoya => (Bitmap)ResourceManager.GetObject("RollingChoya", resourceCulture);
+
+		internal static Bitmap Save => (Bitmap)ResourceManager.GetObject("Save", resourceCulture);
+
+		internal static Bitmap Save_Active => (Bitmap)ResourceManager.GetObject("Save_Active", resourceCulture);
+
+		internal static Bitmap Save_Hovered => (Bitmap)ResourceManager.GetObject("Save_Hovered", resourceCulture);
 
 		internal static Bitmap Tag => (Bitmap)ResourceManager.GetObject("Tag", resourceCulture);
 

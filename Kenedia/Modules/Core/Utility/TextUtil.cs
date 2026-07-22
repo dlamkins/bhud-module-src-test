@@ -1,7 +1,6 @@
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
-using MonoGame.Extended;
 using MonoGame.Extended.BitmapFonts;
 
 namespace Kenedia.Modules.Core.Utility
@@ -10,13 +9,6 @@ namespace Kenedia.Modules.Core.Utility
 	{
 		private static string WrapTextSegment(BitmapFont spriteFont, string text, float maxLineWidth)
 		{
-			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0042: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0047: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0069: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
 			string[] array = text.Split(' ');
 			StringBuilder sb = new StringBuilder();
 			float lineWidth = 0f;
@@ -24,7 +16,7 @@ namespace Kenedia.Modules.Core.Utility
 			string[] array2 = array;
 			foreach (string word in array2)
 			{
-				Vector2 size = Size2.op_Implicit(spriteFont.MeasureString(word));
+				Vector2 size = spriteFont.MeasureString(word);
 				if (lineWidth + size.X < maxLineWidth)
 				{
 					sb.Append(word + " ");

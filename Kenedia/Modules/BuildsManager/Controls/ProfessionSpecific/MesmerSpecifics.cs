@@ -40,9 +40,9 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 			new DetailedTexture(3680691)
 		};
 
-		private Color _notesColor = new Color(198, 100, 231);
+		private Microsoft.Xna.Framework.Color _notesColor = new Microsoft.Xna.Framework.Color(198, 100, 231);
 
-		private Rectangle _separatorBounds;
+		private Microsoft.Xna.Framework.Rectangle _separatorBounds;
 
 		protected override SkillIcon[] Skills { get; } = new SkillIcon[5]
 		{
@@ -57,46 +57,28 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 		public MesmerSpecifics(TemplatePresenter template, Data data)
 			: base(template, data)
 		{
-		}//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
-		//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
-
+		}
 
 		public override void RecalculateLayout()
 		{
-			//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00db: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0135: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01fd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0202: Unknown result type (might be due to invalid IL or missing references)
-			//IL_020d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0214: Unknown result type (might be due to invalid IL or missing references)
-			//IL_021a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_021f: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
 			int xOffset = 70;
 			switch (base.TemplatePresenter?.Template?.EliteSpecialization?.Id)
 			{
 			case 73:
-				_notesRegionBackground.Bounds = new Rectangle(xOffset + 85, 0, 125, 42);
-				_notesBackground[0].Bounds = new Rectangle(xOffset + 95, 6, 36, 36);
-				_notes[0].Bounds = new Rectangle(xOffset + 95, 6, 36, 36);
-				_notesBackground[1].Bounds = new Rectangle(xOffset + 135, 0, 36, 36);
-				_notes[1].Bounds = new Rectangle(xOffset + 135, 0, 36, 36);
-				_notesBackground[2].Bounds = new Rectangle(xOffset + 165, 2, 36, 36);
-				_notes[2].Bounds = new Rectangle(xOffset + 165, 2, 36, 36);
+				_notesRegionBackground.Bounds = new Microsoft.Xna.Framework.Rectangle(xOffset + 85, 0, 125, 42);
+				_notesBackground[0].Bounds = new Microsoft.Xna.Framework.Rectangle(xOffset + 95, 6, 36, 36);
+				_notes[0].Bounds = new Microsoft.Xna.Framework.Rectangle(xOffset + 95, 6, 36, 36);
+				_notesBackground[1].Bounds = new Microsoft.Xna.Framework.Rectangle(xOffset + 135, 0, 36, 36);
+				_notes[1].Bounds = new Microsoft.Xna.Framework.Rectangle(xOffset + 135, 0, 36, 36);
+				_notesBackground[2].Bounds = new Microsoft.Xna.Framework.Rectangle(xOffset + 165, 2, 36, 36);
+				_notes[2].Bounds = new Microsoft.Xna.Framework.Rectangle(xOffset + 165, 2, 36, 36);
 				break;
 			case 66:
 			{
 				for (int j = 0; j < _clones.Length; j++)
 				{
-					_clones[j].Bounds = new Rectangle(xOffset + 90 + j * 24, 24, 30, 30);
+					_clones[j].Bounds = new Microsoft.Xna.Framework.Rectangle(xOffset + 90 + j * 24, 24, 30, 30);
 				}
 				break;
 			}
@@ -104,34 +86,21 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 			{
 				for (int k = 0; k < 3; k++)
 				{
-					_clones[k].Bounds = new Rectangle(xOffset + 80 + k * 32, 12, 42, 42);
+					_clones[k].Bounds = new Microsoft.Xna.Framework.Rectangle(xOffset + 80 + k * 32, 12, 42, 42);
 				}
 				break;
 			}
 			}
 			for (int i = 0; i < Skills.Length; i++)
 			{
-				Skills[i].Bounds = new Rectangle(xOffset + ((i == 4) ? 10 : 0) + 42 + i * 46, 52, 42, 42);
+				Skills[i].Bounds = new Microsoft.Xna.Framework.Rectangle(xOffset + ((i == 4) ? 10 : 0) + 42 + i * 46, 52, 42, 42);
 			}
-			Rectangle p = Skills[3].Bounds;
-			_separatorBounds = new Rectangle(((Rectangle)(ref p)).get_Right() + 6, p.Y, 2, p.Height);
+			Microsoft.Xna.Framework.Rectangle p = Skills[3].Bounds;
+			_separatorBounds = new Microsoft.Xna.Framework.Rectangle(p.Right + 6, p.Y, 2, p.Height);
 		}
 
-		public override void PaintAfterChildren(SpriteBatch spriteBatch, Rectangle bounds)
+		public override void PaintAfterChildren(SpriteBatch spriteBatch, Microsoft.Xna.Framework.Rectangle bounds)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0123: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0184: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01dd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_025b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02af: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_032b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_037f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0384: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03fb: Unknown result type (might be due to invalid IL or missing references)
 			base.PaintAfterChildren(spriteBatch, bounds);
 			switch (base.TemplatePresenter.Template.EliteSpecialization?.Id)
 			{
@@ -141,20 +110,20 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 				DetailedTexture[] notesBackground = _notesBackground;
 				foreach (DetailedTexture obj in notesBackground)
 				{
-					Color? color = Color.get_Black();
+					Microsoft.Xna.Framework.Color? color = Microsoft.Xna.Framework.Color.Black;
 					obj.Draw(this, spriteBatch, null, color);
 				}
 				notesBackground = _notes;
 				foreach (DetailedTexture obj2 in notesBackground)
 				{
-					Color? color = _notesColor;
+					Microsoft.Xna.Framework.Color? color = _notesColor;
 					obj2.Draw(this, spriteBatch, null, color);
 				}
 				for (int i2 = 0; i2 < 5; i2++)
 				{
 					Skills[i2].Draw(this, spriteBatch, base.RelativeMousePosition);
 				}
-				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, _separatorBounds, Color.get_Black());
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, _separatorBounds, Microsoft.Xna.Framework.Color.Black);
 				break;
 			}
 			case 66:
@@ -167,7 +136,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 				{
 					Skills[n].Draw(this, spriteBatch, base.RelativeMousePosition);
 				}
-				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, _separatorBounds, Color.get_Black());
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, _separatorBounds, Microsoft.Xna.Framework.Color.Black);
 				break;
 			}
 			case 40:
@@ -180,7 +149,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 				{
 					Skills[l].Draw(this, spriteBatch, base.RelativeMousePosition);
 				}
-				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, _separatorBounds, Color.get_Black());
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, _separatorBounds, Microsoft.Xna.Framework.Color.Black);
 				break;
 			}
 			default:

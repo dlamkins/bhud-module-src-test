@@ -46,44 +46,33 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		public PetTooltip()
 		{
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0115: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0155: Unknown result type (might be due to invalid IL or missing references)
 			WidthSizingMode = SizingMode.AutoSize;
 			HeightSizingMode = SizingMode.AutoSize;
 			base.AutoSizePadding = new Point(5);
-			DetailedTexture image = _image;
-			Rectangle imageBounds = default(Rectangle);
-			((Rectangle)(ref imageBounds))._002Ector(4, 4, 48, 48);
-			image.Bounds = imageBounds;
+			Rectangle imageBounds = (_image.Bounds = new Rectangle(4, 4, 48, 48));
 			_title = new Kenedia.Modules.Core.Controls.Label
 			{
 				Parent = this,
-				Height = Control.Content.DefaultFont16.get_LineHeight(),
+				Height = Control.Content.DefaultFont16.LineHeight,
 				AutoSizeWidth = true,
-				Location = new Point(((Rectangle)(ref imageBounds)).get_Right(), ((Rectangle)(ref imageBounds)).get_Top()),
+				Location = new Point(imageBounds.Right, imageBounds.Top),
 				Font = Control.Content.DefaultFont16
 			};
 			_id = new Kenedia.Modules.Core.Controls.Label
 			{
 				Parent = this,
-				Height = Control.Content.DefaultFont12.get_LineHeight(),
+				Height = Control.Content.DefaultFont12.LineHeight,
 				AutoSizeWidth = true,
-				Location = new Point(((Rectangle)(ref imageBounds)).get_Right(), _title.Bottom),
+				Location = new Point(imageBounds.Right, _title.Bottom),
 				Font = Control.Content.DefaultFont12,
-				TextColor = Color.get_White() * 0.8f
+				TextColor = Color.White * 0.8f
 			};
 			_description = new Kenedia.Modules.Core.Controls.Label
 			{
 				Parent = this,
 				Width = 300,
 				AutoSizeHeight = true,
-				Location = new Point(((Rectangle)(ref imageBounds)).get_Left(), ((Rectangle)(ref imageBounds)).get_Bottom() + 10),
+				Location = new Point(imageBounds.Left, imageBounds.Bottom + 10),
 				Font = Control.Content.DefaultFont14,
 				WrapText = true
 			};
@@ -92,7 +81,6 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		private void ApplyPet(object sender, Kenedia.Modules.Core.Models.ValueChangedEventArgs<Pet> e)
 		{
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 			_title.TextColor = ContentService.Colors.Chardonnay;
 			_title.Text = Pet?.Name;
 			_id.Text = $"{strings.PetId}: {Pet?.Id}";
@@ -107,8 +95,6 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		public override void Draw(SpriteBatch spriteBatch, Rectangle drawBounds, Rectangle scissor)
 		{
-			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 			if (Pet != null)
 			{
 				base.Draw(spriteBatch, drawBounds, scissor);
@@ -117,7 +103,6 @@ namespace Kenedia.Modules.BuildsManager.Controls
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 			base.PaintBeforeChildren(spriteBatch, bounds);
 			_image.Draw(this, spriteBatch);
 		}

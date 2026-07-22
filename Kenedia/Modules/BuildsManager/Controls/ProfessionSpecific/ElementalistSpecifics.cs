@@ -25,18 +25,18 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 
 		private readonly DetailedTexture _evokerRing = new DetailedTexture(3680672);
 
-		private readonly (Rectangle bounds, Color color)[] _backgrounds = new(Rectangle, Color)[5]
+		private readonly (Microsoft.Xna.Framework.Rectangle bounds, Microsoft.Xna.Framework.Color color)[] _backgrounds = new(Microsoft.Xna.Framework.Rectangle, Microsoft.Xna.Framework.Color)[5]
 		{
-			(Rectangle.get_Empty(), new Color(255, 125, 0)),
-			(Rectangle.get_Empty(), new Color(0, 170, 255)),
-			(Rectangle.get_Empty(), new Color(165, 101, 255)),
-			(Rectangle.get_Empty(), new Color(231, 195, 22)),
-			(Rectangle.get_Empty(), Color.get_Transparent())
+			(Microsoft.Xna.Framework.Rectangle.Empty, new Microsoft.Xna.Framework.Color(255, 125, 0)),
+			(Microsoft.Xna.Framework.Rectangle.Empty, new Microsoft.Xna.Framework.Color(0, 170, 255)),
+			(Microsoft.Xna.Framework.Rectangle.Empty, new Microsoft.Xna.Framework.Color(165, 101, 255)),
+			(Microsoft.Xna.Framework.Rectangle.Empty, new Microsoft.Xna.Framework.Color(231, 195, 22)),
+			(Microsoft.Xna.Framework.Rectangle.Empty, Microsoft.Xna.Framework.Color.Transparent)
 		};
 
-		private Rectangle _catalystEnergy;
+		private Microsoft.Xna.Framework.Rectangle _catalystEnergy;
 
-		private Color _catalystEnergyColor;
+		private Microsoft.Xna.Framework.Color _catalystEnergyColor;
 
 		public DetailedTexture Selector { get; } = new DetailedTexture(157138, 157140);
 
@@ -54,16 +54,6 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 		public ElementalistSpecifics(TemplatePresenter template, Data data)
 			: base(template, data)
 		{
-			//IL_00a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00af: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0103: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0114: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0125: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012a: Unknown result type (might be due to invalid IL or missing references)
 			template.AttunementChanged += new AttunementChangedEventHandler(AttunementChanged);
 		}
 
@@ -80,65 +70,30 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 
 		private void CalculateSkillBounds()
 		{
-			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0113: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0152: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0168: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0193: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0220: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0231: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0236: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0240: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0245: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0251: Unknown result type (might be due to invalid IL or missing references)
-			//IL_025d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_027c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_029b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ba: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ca: Unknown result type (might be due to invalid IL or missing references)
 			int xOffset = 70;
-			Rectangle lastRect = default(Rectangle);
-			((Rectangle)(ref lastRect))._002Ector(xOffset + 25, 52, 0, 0);
+			Microsoft.Xna.Framework.Rectangle lastRect = new Microsoft.Xna.Framework.Rectangle(xOffset + 25, 52, 0, 0);
 			for (int i = 0; i < Skills.Length; i++)
 			{
 				SkillIcon skill = Skills[i];
 				bool main = (i == 0 && base.TemplatePresenter.MainAttunement == AttunementType.Fire) || (i == 1 && base.TemplatePresenter.MainAttunement == AttunementType.Water) || (i == 2 && base.TemplatePresenter.MainAttunement == AttunementType.Air) || (i == 3 && base.TemplatePresenter.MainAttunement == AttunementType.Earth);
 				bool secondary = (i == 0 && base.TemplatePresenter.AltAttunement == AttunementType.Fire) || (i == 1 && base.TemplatePresenter.AltAttunement == AttunementType.Water) || (i == 2 && base.TemplatePresenter.AltAttunement == AttunementType.Air) || (i == 3 && base.TemplatePresenter.AltAttunement == AttunementType.Earth);
-				_backgrounds[i].bounds = (main ? new Rectangle(((Rectangle)(ref lastRect)).get_Right() + 4, 47, 44, 44) : (secondary ? new Rectangle(((Rectangle)(ref lastRect)).get_Right() + 4, 49, 39, 39) : new Rectangle(((Rectangle)(ref lastRect)).get_Right() + 4, 54, 34, 0)));
-				skill.Bounds = (main ? new Rectangle(((Rectangle)(ref lastRect)).get_Right() + 6, 49, 40, 40) : (secondary ? new Rectangle(((Rectangle)(ref lastRect)).get_Right() + 6, 51, 35, 35) : new Rectangle(((Rectangle)(ref lastRect)).get_Right() + 4 + ((i == 4) ? 20 : 0), (i == 4) ? 52 : 54, (i == 4) ? 38 : 34, (i == 4) ? 38 : 34)));
-				Rectangle bounds;
+				_backgrounds[i].bounds = (main ? new Microsoft.Xna.Framework.Rectangle(lastRect.Right + 4, 47, 44, 44) : (secondary ? new Microsoft.Xna.Framework.Rectangle(lastRect.Right + 4, 49, 39, 39) : new Microsoft.Xna.Framework.Rectangle(lastRect.Right + 4, 54, 34, 0)));
+				skill.Bounds = (main ? new Microsoft.Xna.Framework.Rectangle(lastRect.Right + 6, 49, 40, 40) : (secondary ? new Microsoft.Xna.Framework.Rectangle(lastRect.Right + 6, 51, 35, 35) : new Microsoft.Xna.Framework.Rectangle(lastRect.Right + 4 + ((i == 4) ? 20 : 0), (i == 4) ? 52 : 54, (i == 4) ? 38 : 34, (i == 4) ? 38 : 34)));
 				if (i == 4)
 				{
-					bounds = skill.Bounds;
-					int left = ((Rectangle)(ref bounds)).get_Left();
-					bounds = skill.Bounds;
-					_catalystEnergy = new Rectangle(left, ((Rectangle)(ref bounds)).get_Top() - 4, skill.Bounds.Width, 4);
+					_catalystEnergy = new Microsoft.Xna.Framework.Rectangle(skill.Bounds.Left, skill.Bounds.Top - 4, skill.Bounds.Width, 4);
 				}
 				int? num = base.TemplatePresenter.Template.EliteSpecialization?.Id;
 				if (num.HasValue && num.GetValueOrDefault() == 80)
 				{
 					if (i == 4)
 					{
-						skill.Bounds = new Rectangle(((Rectangle)(ref lastRect)).get_Right() + 4 + 20, 55, 34, 34);
-						DetailedTexture selector = Selector;
-						bounds = skill.Bounds;
-						int left2 = ((Rectangle)(ref bounds)).get_Left();
-						bounds = skill.Bounds;
-						selector.Bounds = new Rectangle(left2, ((Rectangle)(ref bounds)).get_Top() - 8, skill.Bounds.Width, 10);
+						skill.Bounds = new Microsoft.Xna.Framework.Rectangle(lastRect.Right + 4 + 20, 55, 34, 34);
+						Selector.Bounds = new Microsoft.Xna.Framework.Rectangle(skill.Bounds.Left, skill.Bounds.Top - 8, skill.Bounds.Width, 10);
 					}
-					_evokerBackground.Bounds = new Rectangle(((Rectangle)(ref lastRect)).get_Right() + 4, 40, 116, 58);
-					_evokerRingBackground.Bounds = new Rectangle(((Rectangle)(ref lastRect)).get_Right() + 4, 40, 116, 58);
-					_evokerRing.Bounds = new Rectangle(((Rectangle)(ref lastRect)).get_Right() + 4, 40, 116, 58);
+					_evokerBackground.Bounds = new Microsoft.Xna.Framework.Rectangle(lastRect.Right + 4, 40, 116, 58);
+					_evokerRingBackground.Bounds = new Microsoft.Xna.Framework.Rectangle(lastRect.Right + 4, 40, 116, 58);
+					_evokerRing.Bounds = new Microsoft.Xna.Framework.Rectangle(lastRect.Right + 4, 40, 116, 58);
 				}
 				lastRect = skill.Bounds;
 			}
@@ -175,20 +130,8 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 			return AttunementType.Fire;
 		}
 
-		public override void PaintAfterChildren(SpriteBatch spriteBatch, Rectangle bounds)
+		public override void PaintAfterChildren(SpriteBatch spriteBatch, Microsoft.Xna.Framework.Rectangle bounds)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0204: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0216: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0233: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0239: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0258: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02da: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02f0: Unknown result type (might be due to invalid IL or missing references)
 			base.PaintAfterChildren(spriteBatch, bounds);
 			RecalculateLayout();
 			switch (base.TemplatePresenter.Template.EliteSpecialization?.Id)
@@ -197,7 +140,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 			{
 				_evokerBackground.Draw(this, spriteBatch);
 				DetailedTexture evokerRingBackground = _evokerRingBackground;
-				Color? color = Color.get_Orange();
+				Microsoft.Xna.Framework.Color? color = Microsoft.Xna.Framework.Color.Orange;
 				evokerRingBackground.Draw(this, spriteBatch, null, color);
 				_evokerRing.Draw(this, spriteBatch);
 				SkillIcon[] skills = Skills;
@@ -237,12 +180,6 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 
 		protected override void ApplyTemplate()
 		{
-			//IL_038d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03d9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03de: Unknown result type (might be due to invalid IL or missing references)
 			if (base.TemplatePresenter?.Template == null || !base.Data.IsLoaded)
 			{
 				return;
@@ -275,7 +212,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.ProfessionSpecific
 					Skills[4].Skill = null;
 					break;
 				}
-				_catalystEnergyColor = ((base.TemplatePresenter.MainAttunement == AttunementType.Fire) ? _backgrounds[0].color : ((base.TemplatePresenter.MainAttunement == AttunementType.Water) ? _backgrounds[1].color : ((base.TemplatePresenter.MainAttunement == AttunementType.Air) ? _backgrounds[2].color : ((base.TemplatePresenter.MainAttunement == AttunementType.Earth) ? _backgrounds[3].color : Color.get_Black()))));
+				_catalystEnergyColor = ((base.TemplatePresenter.MainAttunement == AttunementType.Fire) ? _backgrounds[0].color : ((base.TemplatePresenter.MainAttunement == AttunementType.Water) ? _backgrounds[1].color : ((base.TemplatePresenter.MainAttunement == AttunementType.Air) ? _backgrounds[2].color : ((base.TemplatePresenter.MainAttunement == AttunementType.Earth) ? _backgrounds[3].color : Microsoft.Xna.Framework.Color.Black))));
 				RecalculateLayout();
 			}
 			Kenedia.Modules.BuildsManager.DataModels.Professions.Skill? GetSkill(SkillSlot slot)

@@ -27,7 +27,7 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage
 
 		private int _frameThickness = 2;
 
-		private Color _frameColor = Color.get_White() * 0.15f;
+		private Color _frameColor = Color.White * 0.15f;
 
 		public bool ShowStat { get; set; } = true;
 
@@ -68,13 +68,10 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage
 		{
 			get
 			{
-				//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-				//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-				return (Color)(((_003F?)_texture.DrawColor) ?? Color.get_White());
+				return _texture.DrawColor ?? Color.White;
 			}
 			set
 			{
-				//IL_0006: Unknown result type (might be due to invalid IL or missing references)
 				_texture.DrawColor = value;
 			}
 		}
@@ -99,9 +96,6 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage
 
 		public ItemControl()
 		{
-			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
 			_003CPlaceholder_003Ek__BackingField = new DetailedTexture();
 			CaptureInput = true;
 			base._002Ector();
@@ -123,10 +117,8 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage
 
 		private void ApplyStat(object sender, Kenedia.Modules.Core.Models.ValueChangedEventArgs<Stat> e)
 		{
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
 			_statTexture.Texture = Stat?.Icon.Texture;
-			_statTexture.TextureRegion = Stat?.Icon.TextureRegion ?? Rectangle.get_Empty();
+			_statTexture.TextureRegion = Stat?.Icon.TextureRegion ?? Rectangle.Empty;
 			ItemTooltip itemTooltip = base.Tooltip as ItemTooltip;
 			if (itemTooltip != null)
 			{
@@ -136,12 +128,7 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage
 
 		private void ApplyItem(object sender, Kenedia.Modules.Core.Models.ValueChangedEventArgs<BaseItem> e)
 		{
-			//IL_000b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a8: Unknown result type (might be due to invalid IL or missing references)
-			_frameColor = Item?.Rarity.GetColor() ?? (Color.get_White() * 0.15f);
+			_frameColor = Item?.Rarity.GetColor() ?? (Color.White * 0.15f);
 			_texture.Texture = TexturesService.GetAsyncTexture(Item?.AssetId);
 			AsyncTexture2D icon = TexturesService.GetAsyncTexture(Item?.AssetId);
 			if (icon != null)
@@ -174,35 +161,17 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage
 
 		public override void RecalculateLayout()
 		{
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0043: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0054: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0059: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cd: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
 			int size = Math.Min(base.Width, base.Height);
 			int padding = 3;
 			_frameThickness = CalculateFrameThickness();
-			DetailedTexture statTexture = _statTexture;
-			Rectangle bounds = _texture.Bounds;
-			statTexture.Bounds = new Rectangle(((Rectangle)(ref bounds)).get_Center().Add(new Point(-padding, -padding)), new Point((size - padding * 2) / 2));
+			_statTexture.Bounds = new Rectangle(_texture.Bounds.Center.Add(new Point(-padding, -padding)), new Point((size - padding * 2) / 2));
 			_texture.Bounds = new Rectangle(_frameThickness, _frameThickness, base.Width - _frameThickness * 2, base.Height - _frameThickness * 2);
 			Placeholder.Bounds = new Rectangle(_frameThickness, _frameThickness, base.Width - _frameThickness * 2, base.Height - _frameThickness * 2);
 		}
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
 			if (Item == null)
 			{
 				Placeholder.Draw(this, spriteBatch, base.RelativeMousePosition, TextureColor);
@@ -227,7 +196,7 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage
 		protected override async void OnClick(MouseEventArgs e)
 		{
 			base.OnClick(e);
-			if (Control.Input.Keyboard.KeysDown.Contains((Keys)162))
+			if (Control.Input.Keyboard.KeysDown.Contains(Keys.LeftControl))
 			{
 				string s = ((!_statTexture.Hovered) ? Item?.Name : Stat?.Name);
 				if (!string.IsNullOrEmpty(s))

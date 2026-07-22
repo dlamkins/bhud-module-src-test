@@ -251,29 +251,19 @@ namespace Kenedia.Modules.Core.Controls
 
 		public CollapseContainer()
 		{
-			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
 			_003CTitleBarHeight_003Ek__BackingField = 36;
-			MaxSize = Point.get_Zero();
+			MaxSize = Point.Zero;
 			base._002Ector();
 		}
 
 		public void Expand()
 		{
-			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0053: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
 			if (_collapsed)
 			{
 				_collapseAnim?.CancelAndComplete();
 				SetProperty(ref _collapsed, newValue: false, invalidateLayout: false, "Expand");
-				Point bounds = ((SizeDeterminingChild != null) ? ControlUtil.GetControlBounds(new Control[1] { SizeDeterminingChild }) : Point.get_Zero());
-				int height = ((MaxSize != Point.get_Zero()) ? Math.Min(MaxSize.Y, bounds.Y + ContentPadding.Vertical + TitleBarHeight) : (bounds.Y + ContentPadding.Vertical + TitleBarHeight));
+				Point bounds = ((SizeDeterminingChild != null) ? ControlUtil.GetControlBounds(new Control[1] { SizeDeterminingChild }) : Point.Zero);
+				int height = ((MaxSize != Point.Zero) ? Math.Min(MaxSize.Y, bounds.Y + ContentPadding.Vertical + TitleBarHeight) : (bounds.Y + ContentPadding.Vertical + TitleBarHeight));
 				_collapseAnim = Control.Animation.Tweener.Tween(this, new
 				{
 					Height = height,
@@ -323,23 +313,14 @@ namespace Kenedia.Modules.Core.Controls
 
 		private void SetHeight()
 		{
-			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0023: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005f: Unknown result type (might be due to invalid IL or missing references)
-			Point bounds = ((_sizeDeterminingChild != null) ? ControlUtil.GetControlBounds(new Control[1] { _sizeDeterminingChild }) : Point.get_Zero());
-			int height = ((MaxSize != Point.get_Zero()) ? Math.Min(MaxSize.Y, bounds.Y + ContentPadding.Vertical + TitleBarHeight) : (bounds.Y + ContentPadding.Vertical + TitleBarHeight));
+			Point bounds = ((_sizeDeterminingChild != null) ? ControlUtil.GetControlBounds(new Control[1] { _sizeDeterminingChild }) : Point.Zero);
+			int height = ((MaxSize != Point.Zero) ? Math.Min(MaxSize.Y, bounds.Y + ContentPadding.Vertical + TitleBarHeight) : (bounds.Y + ContentPadding.Vertical + TitleBarHeight));
 			base.Height = (Collapsed ? TitleBarHeight : height);
 		}
 
 		protected override void OnClick(MouseEventArgs e)
 		{
-			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-			if (_canCollapse && ((Rectangle)(ref _layoutHeaderBounds)).Contains(base.RelativeMousePosition))
+			if (_canCollapse && _layoutHeaderBounds.Contains(base.RelativeMousePosition))
 			{
 				ToggleAccordionState();
 			}
@@ -354,32 +335,6 @@ namespace Kenedia.Modules.Core.Controls
 
 		public override void RecalculateLayout()
 		{
-			//IL_006f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0074: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00aa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0104: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0122: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0127: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0152: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01cc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01df: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0222: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0227: Unknown result type (might be due to invalid IL or missing references)
-			//IL_025d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0262: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0277: Unknown result type (might be due to invalid IL or missing references)
-			//IL_027c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_029a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ac: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b1: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
 			int num = ((!string.IsNullOrEmpty(Title) || TitleIcon != null) ? TitleBarHeight : 0);
 			int num2 = 0;
@@ -401,79 +356,46 @@ namespace Kenedia.Modules.Core.Controls
 			_panelBounds = new Rectangle(num4, num, _size.X - num4 - num2, _size.Y - num - num3);
 			base.ContentRegion = new Rectangle(num4 + ContentPadding.Left, num + ContentPadding.Top, _size.X - num4 - num2 - ContentPadding.Horizontal, _size.Y - num - num3 - ContentPadding.Vertical);
 			_layoutHeaderBounds = new Rectangle(0, 0, base.Width, num);
-			_layoutHeaderIconBounds = (Rectangle)((TitleIcon != null) ? new Rectangle(((Rectangle)(ref _layoutHeaderBounds)).get_Left() + _titleIconPadding.Left, _titleIconPadding.Top, num - _titleIconPadding.Vertical, num - _titleIconPadding.Vertical) : Rectangle.get_Empty());
-			_layoutHeaderTextBounds = new Rectangle(((Rectangle)(ref _layoutHeaderIconBounds)).get_Right() + _titleIconPadding.Right, 0, _layoutHeaderBounds.Width - _layoutHeaderIconBounds.Width, num);
+			_layoutHeaderIconBounds = ((TitleIcon != null) ? new Rectangle(_layoutHeaderBounds.Left + _titleIconPadding.Left, _titleIconPadding.Top, num - _titleIconPadding.Vertical, num - _titleIconPadding.Vertical) : Rectangle.Empty);
+			_layoutHeaderTextBounds = new Rectangle(_layoutHeaderIconBounds.Right + _titleIconPadding.Right, 0, _layoutHeaderBounds.Width - _layoutHeaderIconBounds.Width, num);
 			int arrowSize = num - 4;
 			_layoutAccordionArrowOrigin = new Vector2(16f, 16f);
-			_layoutAccordionArrowBounds = RectangleExtension.OffsetBy(new Rectangle(((Rectangle)(ref _layoutHeaderBounds)).get_Right() - arrowSize, (num - arrowSize) / 2, arrowSize, arrowSize), new Point(arrowSize / 2, arrowSize / 2));
+			_layoutAccordionArrowBounds = new Rectangle(_layoutHeaderBounds.Right - arrowSize, (num - arrowSize) / 2, arrowSize, arrowSize).OffsetBy(new Point(arrowSize / 2, arrowSize / 2));
 		}
 
 		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0101: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0139: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0167: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0177: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0182: Unknown result type (might be due to invalid IL or missing references)
-			//IL_018c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ab: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ca: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01fe: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0208: Unknown result type (might be due to invalid IL or missing references)
-			//IL_021b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0220: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0231: Unknown result type (might be due to invalid IL or missing references)
 			_tooltip.Visible = false;
 			if (!string.IsNullOrEmpty(Title))
 			{
-				spriteBatch.DrawOnCtrl((Control)this, (Texture2D)_texturePanelHeader, _layoutHeaderBounds);
+				spriteBatch.DrawOnCtrl(this, _texturePanelHeader, _layoutHeaderBounds);
 				if (_canCollapse && _mouseOver && base.RelativeMousePosition.Y <= 36)
 				{
 					_tooltip.Visible = true;
-					spriteBatch.DrawOnCtrl((Control)this, (Texture2D)_texturePanelHeaderActive, _layoutHeaderBounds);
+					spriteBatch.DrawOnCtrl(this, _texturePanelHeaderActive, _layoutHeaderBounds);
 				}
 				else
 				{
-					spriteBatch.DrawOnCtrl((Control)this, (Texture2D)_texturePanelHeader, _layoutHeaderBounds);
+					spriteBatch.DrawOnCtrl(this, _texturePanelHeader, _layoutHeaderBounds);
 				}
-				spriteBatch.DrawStringOnCtrl(this, Title, Control.Content.DefaultFont16, _layoutHeaderTextBounds, Color.get_White());
+				spriteBatch.DrawStringOnCtrl(this, Title, Control.Content.DefaultFont16, _layoutHeaderTextBounds, Color.White);
 				if (TitleIcon != null)
 				{
-					spriteBatch.DrawOnCtrl(this, TitleIcon, _layoutHeaderIconBounds, TitleIcon.Bounds, Color.get_White());
+					spriteBatch.DrawOnCtrl(this, TitleIcon, _layoutHeaderIconBounds, TitleIcon.Bounds, Color.White);
 				}
 				if (_canCollapse)
 				{
-					spriteBatch.DrawOnCtrl(this, _textureAccordionArrow, _layoutAccordionArrowBounds, null, Color.get_White(), ArrowRotation, _layoutAccordionArrowOrigin, (SpriteEffects)0);
+					spriteBatch.DrawOnCtrl(this, _textureAccordionArrow, _layoutAccordionArrowBounds, null, Color.White, ArrowRotation, _layoutAccordionArrowOrigin);
 				}
 			}
 			if (ShowBorder)
 			{
-				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, _panelBounds, Color.get_Black() * (0.1f * AccentOpacity));
-				spriteBatch.DrawOnCtrl(this, _textureCornerAccent, _layoutTopLeftAccentBounds, _layoutCornerAccentSrc, Color.get_White() * AccentOpacity, 0f, Vector2.get_Zero(), (SpriteEffects)1);
-				spriteBatch.DrawOnCtrl(this, _textureCornerAccent, _layoutBottomRightAccentBounds, _layoutCornerAccentSrc, Color.get_White() * AccentOpacity, 0f, Vector2.get_Zero(), (SpriteEffects)2);
-				spriteBatch.DrawOnCtrl(this, _textureLeftSideAccent, _layoutLeftAccentBounds, _layoutLeftAccentSrc, Color.get_Black() * AccentOpacity, 0f, Vector2.get_Zero(), (SpriteEffects)2);
+				spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, _panelBounds, Color.Black * (0.1f * AccentOpacity));
+				spriteBatch.DrawOnCtrl(this, _textureCornerAccent, _layoutTopLeftAccentBounds, _layoutCornerAccentSrc, Color.White * AccentOpacity, 0f, Vector2.Zero, SpriteEffects.FlipHorizontally);
+				spriteBatch.DrawOnCtrl(this, _textureCornerAccent, _layoutBottomRightAccentBounds, _layoutCornerAccentSrc, Color.White * AccentOpacity, 0f, Vector2.Zero, SpriteEffects.FlipVertically);
+				spriteBatch.DrawOnCtrl(this, _textureLeftSideAccent, _layoutLeftAccentBounds, _layoutLeftAccentSrc, Color.Black * AccentOpacity, 0f, Vector2.Zero, SpriteEffects.FlipVertically);
 			}
-			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, _panelBounds, Color.get_Black() * (0.3f * AccentOpacity));
+			spriteBatch.DrawOnCtrl(this, ContentService.Textures.Pixel, _panelBounds, Color.Black * (0.3f * AccentOpacity));
 		}
 
 		protected override void DisposeControl()

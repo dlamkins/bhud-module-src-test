@@ -159,7 +159,7 @@ namespace Kenedia.Modules.BuildsManager.Services
 				_tokenSource?.Cancel();
 				_tokenSource = new CancellationTokenSource();
 				await Task.Delay(1000, _tokenSource.Token);
-				string json = JsonConvert.SerializeObject((object)_groups, SerializerSettings.Default);
+				string json = JsonConvert.SerializeObject(_groups, SerializerSettings.Default);
 				if (!_tokenSource.IsCancellationRequested)
 				{
 					File.WriteAllText(_paths.ModulePath + "TagGroups.json", json);

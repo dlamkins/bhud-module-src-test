@@ -28,8 +28,8 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 		private readonly DetailedTexture _changeWeaponTexture = new DetailedTexture(2338896, 2338895)
 		{
 			TextureRegion = new Rectangle(4, 4, 24, 24),
-			DrawColor = Color.get_White() * 0.5f,
-			HoverDrawColor = Color.get_White()
+			DrawColor = Color.White * 0.5f,
+			HoverDrawColor = Color.White
 		};
 
 		private readonly ItemControl _sigilControl = new ItemControl(new DetailedTexture(784324)
@@ -123,13 +123,6 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 		public WeaponSlot(TemplateSlotType gearSlot, Container parent, TemplatePresenter templatePresenter, SelectionPanel selectionPanel, Data data)
 			: base(gearSlot, parent, templatePresenter, selectionPanel, data)
 		{
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-			//IL_002c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0064: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b6: Unknown result type (might be due to invalid IL or missing references)
 			_infusionControl.Placeholder.Texture = (AsyncTexture2D)BaseModule<BuildsManager, MainWindow, Settings, Paths, StaticHosting>.ModuleInstance.ContentsManager.GetTexture("textures\\infusionslot.png");
 			_sigilControl.Parent = this;
 			_pvpSigilControl.Parent = this;
@@ -154,20 +147,6 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 
 		protected override void GameModeChanged(object sender, Kenedia.Modules.Core.Models.ValueChangedEventArgs<GameModeType> e)
 		{
-			//IL_0065: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0093: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0133: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0147: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0151: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0161: Unknown result type (might be due to invalid IL or missing references)
 			if (e.NewValue == GameModeType?.PvP)
 			{
 				_sigilControl.Visible = false;
@@ -177,7 +156,7 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 				if (base.SelectionPanel?.Anchor == _sigilControl && base.SelectionPanel.SubSlotType == GearSubSlotType.Sigil)
 				{
 					Rectangle b = base.AbsoluteBounds;
-					base.SelectionPanel?.SetAnchor(_pvpSigilControl, Blish_HUD.RectangleExtension.Add(new Rectangle(((Rectangle)(ref b)).get_Location(), Point.get_Zero()), _pvpSigilControl.LocalBounds), SelectionTypes.Items, base.Slot, GearSubSlotType.Sigil, delegate(Sigil sigil)
+					base.SelectionPanel?.SetAnchor(_pvpSigilControl, new Rectangle(b.Location, Point.Zero).Add(_pvpSigilControl.LocalBounds), SelectionTypes.Items, base.Slot, GearSubSlotType.Sigil, delegate(Sigil sigil)
 					{
 						PvpSigil = sigil;
 					});
@@ -195,7 +174,7 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 			if (base.SelectionPanel?.Anchor == _pvpSigilControl && base.SelectionPanel.SubSlotType == GearSubSlotType.Sigil)
 			{
 				Rectangle b2 = base.AbsoluteBounds;
-				base.SelectionPanel?.SetAnchor(_sigilControl, Blish_HUD.RectangleExtension.Add(new Rectangle(((Rectangle)(ref b2)).get_Location(), Point.get_Zero()), _pvpSigilControl.LocalBounds), SelectionTypes.Items, base.Slot, GearSubSlotType.Sigil, delegate(Sigil sigil)
+				base.SelectionPanel?.SetAnchor(_sigilControl, new Rectangle(b2.Location, Point.Zero).Add(_pvpSigilControl.LocalBounds), SelectionTypes.Items, base.Slot, GearSubSlotType.Sigil, delegate(Sigil sigil)
 				{
 					Sigil = sigil;
 				});
@@ -233,29 +212,8 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 
 		public override void RecalculateLayout()
 		{
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0096: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0125: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0192: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0197: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01fd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0202: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
-			Rectangle localBounds = base.ItemControl.LocalBounds;
-			int upgradeSize = (((Rectangle)(ref localBounds)).get_Size().Y - 4) / 2;
+			int upgradeSize = (base.ItemControl.LocalBounds.Size.Y - 4) / 2;
 			TemplateSlotType slot = base.Slot;
 			bool flag = ((slot == TemplateSlotType.OffHand || slot == TemplateSlotType.AltOffHand) ? true : false);
 			int iconPadding = (flag ? 7 : 0);
@@ -265,14 +223,10 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 			int pvpUpgradeSize = 48;
 			int size = Math.Min(base.Width, base.Height);
 			int padding = 2;
-			DetailedTexture changeWeaponTexture = _changeWeaponTexture;
-			localBounds = base.ItemControl.LocalBounds;
-			changeWeaponTexture.Bounds = new Rectangle(new Point(((Rectangle)(ref localBounds)).get_Left() + padding, padding), new Point((int)((double)(size - padding * 2) / 2.5)));
+			_changeWeaponTexture.Bounds = new Rectangle(new Point(base.ItemControl.LocalBounds.Left + padding, padding), new Point((int)((double)(size - padding * 2) / 2.5)));
 			_sigilControl.SetBounds(new Rectangle(base.ItemControl.Right + padding, 0, upgradeSize, upgradeSize));
 			_infusionControl.SetBounds(new Rectangle(base.ItemControl.Right + padding, base.ItemControl.Bottom - upgradeSize, upgradeSize, upgradeSize));
-			ItemControl pvpSigilControl = _pvpSigilControl;
-			localBounds = base.ItemControl.LocalBounds;
-			pvpSigilControl.SetBounds(new Rectangle(((Rectangle)(ref localBounds)).get_Right() + 2 + 5 + iconPadding, (base.ItemControl.LocalBounds.Height - pvpUpgradeSize) / 2, pvpUpgradeSize, pvpUpgradeSize));
+			_pvpSigilControl.SetBounds(new Rectangle(base.ItemControl.LocalBounds.Right + 2 + 5 + iconPadding, (base.ItemControl.LocalBounds.Height - pvpUpgradeSize) / 2, pvpUpgradeSize, pvpUpgradeSize));
 			_pvpSigilBounds = new Rectangle(_pvpSigilControl.Right + 10, _pvpSigilControl.Top, base.Width - (_pvpSigilControl.Right + 2), _pvpSigilControl.Height);
 			int x = _sigilControl.Right + textPadding + 4;
 			_sigilBounds = new Rectangle(x, _sigilControl.Top - 1, base.Width - x, _sigilControl.Height);
@@ -281,14 +235,6 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 
 		public override void PaintAfterChildren(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0021: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0087: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
-			//IL_010f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0115: Unknown result type (might be due to invalid IL or missing references)
 			base.PaintAfterChildren(spriteBatch, bounds);
 			if (base.TemplatePresenter.IsPve)
 			{
@@ -333,33 +279,6 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 
 		protected override void SetAnchor()
 		{
-			//IL_0001: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0006: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00df: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ec: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01fc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0201: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0256: Unknown result type (might be due to invalid IL or missing references)
-			//IL_025b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0260: Unknown result type (might be due to invalid IL or missing references)
-			//IL_026b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0270: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ca: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02da: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02df: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0348: Unknown result type (might be due to invalid IL or missing references)
-			//IL_034d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0352: Unknown result type (might be due to invalid IL or missing references)
-			//IL_035d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0362: Unknown result type (might be due to invalid IL or missing references)
 			Rectangle a = base.AbsoluteBounds;
 			object obj;
 			if (!base.Slot.IsOffhand())
@@ -374,35 +293,35 @@ namespace Kenedia.Modules.BuildsManager.Controls_Old.GearPage.GearSlots
 			WeaponTemplateEntry entry = (WeaponTemplateEntry)obj;
 			if (base.ItemControl.MouseOver && base.TemplatePresenter.IsPve && ((!(entry?.Weapon?.WeaponType.IsTwoHanded())) ?? true))
 			{
-				base.SelectionPanel?.SetAnchor(base.ItemControl, Blish_HUD.RectangleExtension.Add(new Rectangle(((Rectangle)(ref a)).get_Location(), Point.get_Zero()), base.ItemControl.LocalBounds), SelectionTypes.Stats, base.Slot, GearSubSlotType.None, delegate(Stat stat)
+				base.SelectionPanel?.SetAnchor(base.ItemControl, new Rectangle(a.Location, Point.Zero).Add(base.ItemControl.LocalBounds), SelectionTypes.Stats, base.Slot, GearSubSlotType.None, delegate(Stat stat)
 				{
 					base.TemplatePresenter?.Template?.SetItem(base.Slot, TemplateSubSlotType.Stat, stat);
 				}, (base.TemplatePresenter?.Template[base.Slot] as WeaponTemplateEntry)?.Weapon?.StatChoices ?? base.Data.Weapons.Values.FirstOrDefault()?.StatChoices ?? Array.Empty<int>(), (base.TemplatePresenter?.Template[base.Slot] as WeaponTemplateEntry)?.Weapon?.AttributeAdjustment);
 			}
 			if (_pvpSigilControl.MouseOver)
 			{
-				base.SelectionPanel?.SetAnchor(_pvpSigilControl, Blish_HUD.RectangleExtension.Add(new Rectangle(((Rectangle)(ref a)).get_Location(), Point.get_Zero()), _pvpSigilControl.LocalBounds), SelectionTypes.Items, base.Slot, GearSubSlotType.Sigil, delegate(Sigil sigil)
+				base.SelectionPanel?.SetAnchor(_pvpSigilControl, new Rectangle(a.Location, Point.Zero).Add(_pvpSigilControl.LocalBounds), SelectionTypes.Items, base.Slot, GearSubSlotType.Sigil, delegate(Sigil sigil)
 				{
 					base.TemplatePresenter?.Template?.SetItem(base.Slot, TemplateSubSlotType.PvpSigil, sigil);
 				});
 			}
 			if (_sigilControl.MouseOver)
 			{
-				base.SelectionPanel?.SetAnchor(_sigilControl, Blish_HUD.RectangleExtension.Add(new Rectangle(((Rectangle)(ref a)).get_Location(), Point.get_Zero()), _sigilControl.LocalBounds), SelectionTypes.Items, base.Slot, GearSubSlotType.Sigil, delegate(Sigil sigil)
+				base.SelectionPanel?.SetAnchor(_sigilControl, new Rectangle(a.Location, Point.Zero).Add(_sigilControl.LocalBounds), SelectionTypes.Items, base.Slot, GearSubSlotType.Sigil, delegate(Sigil sigil)
 				{
 					base.TemplatePresenter.Template?.SetItem(base.Slot, TemplateSubSlotType.Sigil1, sigil);
 				});
 			}
 			if (_infusionControl.MouseOver)
 			{
-				base.SelectionPanel?.SetAnchor(_infusionControl, Blish_HUD.RectangleExtension.Add(new Rectangle(((Rectangle)(ref a)).get_Location(), Point.get_Zero()), _infusionControl.LocalBounds), SelectionTypes.Items, base.Slot, GearSubSlotType.Infusion, delegate(Infusion infusion)
+				base.SelectionPanel?.SetAnchor(_infusionControl, new Rectangle(a.Location, Point.Zero).Add(_infusionControl.LocalBounds), SelectionTypes.Items, base.Slot, GearSubSlotType.Infusion, delegate(Infusion infusion)
 				{
 					base.TemplatePresenter.Template?.SetItem(base.Slot, TemplateSubSlotType.Infusion1, infusion);
 				});
 			}
 			if (_changeWeaponTexture.Hovered || (base.ItemControl.MouseOver && base.TemplatePresenter.IsPvp))
 			{
-				base.SelectionPanel?.SetAnchor(this, Blish_HUD.RectangleExtension.Add(new Rectangle(((Rectangle)(ref a)).get_Location(), Point.get_Zero()), base.ItemControl.LocalBounds), SelectionTypes.Items, base.Slot, GearSubSlotType.Item, delegate(Weapon weapon)
+				base.SelectionPanel?.SetAnchor(this, new Rectangle(a.Location, Point.Zero).Add(base.ItemControl.LocalBounds), SelectionTypes.Items, base.Slot, GearSubSlotType.Item, delegate(Weapon weapon)
 				{
 					base.TemplatePresenter.Template?.SetItem(base.Slot, TemplateSubSlotType.Item, weapon);
 				});

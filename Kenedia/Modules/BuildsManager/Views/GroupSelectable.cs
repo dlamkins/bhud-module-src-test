@@ -31,27 +31,17 @@ namespace Kenedia.Modules.BuildsManager.Views
 
 		protected override void DrawItem(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0070: Unknown result type (might be due to invalid IL or missing references)
-			spriteBatch.DrawStringOnCtrl(this, string.Format("{1}", Group.Priority, Group.Name), Control.Content.DefaultFont14, TextBounds, Color.get_White());
-			spriteBatch.DrawStringOnCtrl(this, $"{Group.Priority}", Control.Content.DefaultFont12, PriorityTextBounds, Color.get_Gray(), wrap: false, HorizontalAlignment.Right);
+			spriteBatch.DrawStringOnCtrl(this, string.Format("{1}", Group.Priority, Group.Name), Control.Content.DefaultFont14, TextBounds, Color.White);
+			spriteBatch.DrawStringOnCtrl(this, $"{Group.Priority}", Control.Content.DefaultFont12, PriorityTextBounds, Color.Gray, wrap: false, HorizontalAlignment.Right);
 		}
 
 		public override void RecalculateLayout()
 		{
-			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ca: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
-			int padding = base.Height - (Control.Content.DefaultFont14.get_LineHeight() + 3 + Control.Content.DefaultFont12.get_LineHeight());
+			int padding = base.Height - (Control.Content.DefaultFont14.LineHeight + 3 + Control.Content.DefaultFont12.LineHeight);
 			ContentBounds = new Rectangle(5, padding / 2, base.Width - 30, base.Height - padding);
-			PriorityTextBounds = new Rectangle(base.Width - 5, ((Rectangle)(ref ContentBounds)).get_Top() + 5, Control.Content.DefaultFont12.get_LetterSpacing() * 2, Control.Content.DefaultFont12.get_LineHeight());
-			TextBounds = new Rectangle(((Rectangle)(ref ContentBounds)).get_Left(), ((Rectangle)(ref ContentBounds)).get_Top(), ContentBounds.Width - 5 - PriorityTextBounds.Width, ContentBounds.Height);
+			PriorityTextBounds = new Rectangle(base.Width - 5, ContentBounds.Top + 5, Control.Content.DefaultFont12.LetterSpacing * 2, Control.Content.DefaultFont12.LineHeight);
+			TextBounds = new Rectangle(ContentBounds.Left, ContentBounds.Top, ContentBounds.Width - 5 - PriorityTextBounds.Width, ContentBounds.Height);
 		}
 
 		private void RemoveTag(TagGroup group)

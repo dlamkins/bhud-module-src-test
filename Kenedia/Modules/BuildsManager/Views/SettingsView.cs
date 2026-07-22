@@ -26,17 +26,6 @@ namespace Kenedia.Modules.BuildsManager.Views
 
 		protected override void Build(Container buildPanel)
 		{
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0467: Unknown result type (might be due to invalid IL or missing references)
-			//IL_048b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0599: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0683: Unknown result type (might be due to invalid IL or missing references)
-			//IL_081d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0841: Unknown result type (might be due to invalid IL or missing references)
 			base.Build(buildPanel);
 			Kenedia.Modules.Core.Controls.FlowPanel p = new Kenedia.Modules.Core.Controls.FlowPanel
 			{
@@ -141,7 +130,6 @@ namespace Kenedia.Modules.BuildsManager.Views
 				KeyBinding = Settings.ToggleWindowKey.Value,
 				KeybindChangedAction = delegate(KeyBinding kb)
 				{
-					//IL_0023: Unknown result type (might be due to invalid IL or missing references)
 					Settings.ToggleWindowKey.Value = new KeyBinding
 					{
 						ModifierKeys = kb.ModifierKeys,

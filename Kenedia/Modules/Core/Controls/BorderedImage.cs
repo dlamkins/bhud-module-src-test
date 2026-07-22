@@ -16,9 +16,6 @@ namespace Kenedia.Modules.Core.Controls
 
 		protected override void Paint(SpriteBatch spriteBatch, Rectangle bounds)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
 			base.Paint(spriteBatch, bounds);
 			spriteBatch.DrawFrame(this, bounds, BorderColor, 2);
 		}

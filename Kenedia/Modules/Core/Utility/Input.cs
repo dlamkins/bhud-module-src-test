@@ -26,8 +26,6 @@ namespace Kenedia.Modules.Core.Utility
 
 		public static async Task ClickMouse(MouseButton mouseButton, Point pos, int clicks = 1, bool sendToSystem = false, bool moveMouse = false)
 		{
-			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 			await ClickMouse(mouseButton, pos.X, pos.Y, clicks, sendToSystem, moveMouse);
 		}
 
@@ -35,21 +33,19 @@ namespace Kenedia.Modules.Core.Utility
 		{
 			if (moveMouse)
 			{
-				Mouse.SetPosition(xPos, yPos, sendToSystem);
+				Blish_HUD.Controls.Intern.Mouse.SetPosition(xPos, yPos, sendToSystem);
 				await Task.Delay(25);
 			}
 			for (int i = 0; i < clicks; i++)
 			{
-				Mouse.Press(mouseButton, xPos, yPos, sendToSystem);
+				Blish_HUD.Controls.Intern.Mouse.Press(mouseButton, xPos, yPos, sendToSystem);
 				await Task.Delay(25);
 			}
 		}
 
 		public static async Task SendKey(Keys key, bool sendToSystem = false)
 		{
-			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-			Keyboard.Stroke((VirtualKeyShort)key, sendToSystem);
+			Blish_HUD.Controls.Intern.Keyboard.Stroke((VirtualKeyShort)key, sendToSystem);
 		}
 
 		public static async Task SendKey(KeyBinding keybinding, bool sendToSystem = false, int delay = 25)
@@ -59,45 +55,39 @@ namespace Kenedia.Modules.Core.Utility
 
 		public static async Task SendKey(ModifierKeys modifier, Keys key, bool sendToSystem = false, int delay = 25)
 		{
-			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 			await SendKey(key, modifier, sendToSystem, delay);
 		}
 
 		public static async Task SendKey(Keys key, ModifierKeys modifier, bool sendToSystem = false, int delay = 25)
 		{
-			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
 			IEnumerable<Enum> modifiers = modifier.GetFlags();
 			foreach (ModifierKeys mod2 in modifiers.Select((Enum v) => (ModifierKeys)(object)v))
 			{
-				Keyboard.Press(ModKeyMapping[(int)mod2], sendToSystem);
+				Blish_HUD.Controls.Intern.Keyboard.Press(ModKeyMapping[(int)mod2], sendToSystem);
 			}
 			await Task.Delay(delay);
-			Keyboard.Stroke((VirtualKeyShort)key, sendToSystem);
+			Blish_HUD.Controls.Intern.Keyboard.Stroke((VirtualKeyShort)key, sendToSystem);
 			await Task.Delay(delay);
 			foreach (ModifierKeys mod in modifiers.Select((Enum v) => (ModifierKeys)(object)v))
 			{
-				Keyboard.Release(ModKeyMapping[(int)mod], sendToSystem);
+				Blish_HUD.Controls.Intern.Keyboard.Release(ModKeyMapping[(int)mod], sendToSystem);
 			}
 		}
 
 		public static async Task SendKey(Keys[] modifiers, Keys key, bool sendToSystem = false, int delay = 25)
 		{
-			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
 			Keys[] array = modifiers;
 			for (int i = 0; i < array.Length; i++)
 			{
-				Keyboard.Press((VirtualKeyShort)array[i], sendToSystem);
+				Blish_HUD.Controls.Intern.Keyboard.Press((VirtualKeyShort)array[i], sendToSystem);
 			}
 			await Task.Delay(delay);
-			Keyboard.Stroke((VirtualKeyShort)key, sendToSystem);
+			Blish_HUD.Controls.Intern.Keyboard.Stroke((VirtualKeyShort)key, sendToSystem);
 			await Task.Delay(delay);
 			array = modifiers;
 			for (int i = 0; i < array.Length; i++)
 			{
-				Keyboard.Release((VirtualKeyShort)array[i], sendToSystem);
+				Blish_HUD.Controls.Intern.Keyboard.Release((VirtualKeyShort)array[i], sendToSystem);
 			}
 		}
 

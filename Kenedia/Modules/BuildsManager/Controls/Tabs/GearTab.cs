@@ -38,7 +38,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 
 		private readonly ButtonImage _raceIcon;
 
-		private Rectangle _headerBounds;
+		private Microsoft.Xna.Framework.Rectangle _headerBounds;
 
 		private Dictionary<TemplateSlotType, GearSlot> _templateSlots = new Dictionary<TemplateSlotType, GearSlot>();
 
@@ -80,13 +80,6 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 
 		public GearTab(TemplatePresenter templatePresenter, SelectionPanel selectionPanel, Data data)
 		{
-			//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0218: Unknown result type (might be due to invalid IL or missing references)
 			TemplatePresenter = templatePresenter;
 			SelectionPanel = selectionPanel;
 			Data = data;
@@ -96,7 +89,7 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 			{
 				Parent = this,
 				CoveredControl = this,
-				BackgroundColor = Color.get_Black() * 0.5f,
+				BackgroundColor = Microsoft.Xna.Framework.Color.Black * 0.5f,
 				BorderWidth = 3,
 				Text = "Select a Template to view its details."
 			};
@@ -372,73 +365,6 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 
 		public override void RecalculateLayout()
 		{
-			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0080: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0092: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0120: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01da: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0214: Unknown result type (might be due to invalid IL or missing references)
-			//IL_024e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0288: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02e0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02e5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02f1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_031d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_034a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0376: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03ec: Unknown result type (might be due to invalid IL or missing references)
-			//IL_042e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0435: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0437: Unknown result type (might be due to invalid IL or missing references)
-			//IL_046a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0480: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0485: Unknown result type (might be due to invalid IL or missing references)
-			//IL_048d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0493: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04a1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04a7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04b7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04fa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0501: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0503: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0539: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0550: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0555: Unknown result type (might be due to invalid IL or missing references)
-			//IL_055d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0563: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0571: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0577: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0587: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05b4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05f1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_062e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_066b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06e5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0722: Unknown result type (might be due to invalid IL or missing references)
-			//IL_075e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0775: Unknown result type (might be due to invalid IL or missing references)
-			//IL_077a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0789: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07e2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07f9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07fe: Unknown result type (might be due to invalid IL or missing references)
-			//IL_080d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0828: Unknown result type (might be due to invalid IL or missing references)
 			base.RecalculateLayout();
 			if (_gearCodeBox != null)
 			{
@@ -449,44 +375,37 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 				int secondColumn = _templateSlots[TemplateSlotType.AquaBreather].Width + 10;
 				int gearSpacing = 8;
 				int setSize = 36;
-				Point p = Point.get_Zero();
-				Point s = Point.get_Zero();
-				_headerBounds = new Rectangle(0, _copyButton.Top, 300, _copyButton.Height);
+				Point p = Point.Zero;
+				Point s = Point.Zero;
+				_headerBounds = new Microsoft.Xna.Framework.Rectangle(0, _copyButton.Top, 300, _copyButton.Height);
 				_framedSpecIcon.Size = new Point(40);
-				_framedSpecIcon.Location = new Point(base.Right - _framedSpecIcon.Width - 13, ((Rectangle)(ref _headerBounds)).get_Bottom() + 26);
+				_framedSpecIcon.Location = new Point(base.Right - _framedSpecIcon.Width - 13, _headerBounds.Bottom + 26);
 				_raceIcon.Size = new Point(40);
 				_raceIcon.Location = new Point(_framedSpecIcon.Left, _framedSpecIcon.Bottom + 4);
-				_pve.Bounds = new Rectangle(_framedSpecIcon.Left - _pve.Size.X - 10, _framedSpecIcon.Top, 64, 64);
-				_pvp.Bounds = new Rectangle(_framedSpecIcon.Left - _pve.Size.X - 10, _framedSpecIcon.Top, 64, 64);
+				_pve.Bounds = new Microsoft.Xna.Framework.Rectangle(_framedSpecIcon.Left - _pve.Size.X - 10, _framedSpecIcon.Top, 64, 64);
+				_pvp.Bounds = new Microsoft.Xna.Framework.Rectangle(_framedSpecIcon.Left - _pve.Size.X - 10, _framedSpecIcon.Top, 64, 64);
 				_templateSlots[TemplateSlotType.Head].Location = new Point(0, _gearCodeBox.Bottom + 25);
 				_templateSlots[TemplateSlotType.Shoulder].Location = new Point(_templateSlots[TemplateSlotType.Head].Left, _templateSlots[TemplateSlotType.Head].Bottom + gearSpacing);
 				_templateSlots[TemplateSlotType.Chest].Location = new Point(_templateSlots[TemplateSlotType.Shoulder].Left, _templateSlots[TemplateSlotType.Shoulder].Bottom + gearSpacing);
 				_templateSlots[TemplateSlotType.Hand].Location = new Point(_templateSlots[TemplateSlotType.Chest].Left, _templateSlots[TemplateSlotType.Chest].Bottom + gearSpacing);
 				_templateSlots[TemplateSlotType.Leg].Location = new Point(_templateSlots[TemplateSlotType.Hand].Left, _templateSlots[TemplateSlotType.Hand].Bottom + gearSpacing);
 				_templateSlots[TemplateSlotType.Foot].Location = new Point(_templateSlots[TemplateSlotType.Leg].Left, _templateSlots[TemplateSlotType.Leg].Bottom + gearSpacing);
-				GearSlot gearSlot = _templateSlots[TemplateSlotType.Nourishment];
-				Rectangle bounds = _pve.Bounds;
-				gearSlot.Location = new Point(secondColumn, ((Rectangle)(ref bounds)).get_Bottom() + 20);
+				_templateSlots[TemplateSlotType.Nourishment].Location = new Point(secondColumn, _pve.Bounds.Bottom + 20);
 				_templateSlots[TemplateSlotType.Enhancement].Location = new Point(secondColumn, _templateSlots[TemplateSlotType.Nourishment].Bottom + 5);
 				_templateSlots[TemplateSlotType.PowerCore].Location = new Point(secondColumn, _templateSlots[TemplateSlotType.Enhancement].Bottom + 20);
 				_templateSlots[TemplateSlotType.PveRelic].Location = new Point(secondColumn, _templateSlots[TemplateSlotType.PowerCore].Bottom + 5);
 				_templateSlots[TemplateSlotType.PvpAmulet].Location = new Point(_templateSlots[TemplateSlotType.Leg].Left, _templateSlots[TemplateSlotType.Leg].Bottom + gearSpacing);
 				_templateSlots[TemplateSlotType.PvpRelic].Location = new Point(_templateSlots[TemplateSlotType.Hand].Left, _templateSlots[TemplateSlotType.Hand].Bottom + gearSpacing);
-				GearSlot gearSlot2 = _templateSlots[TemplateSlotType.MainHand];
-				Point val = default(Point);
-				((Point)(ref val))._002Ector(_templateSlots[TemplateSlotType.Foot].Left, _templateSlots[TemplateSlotType.Foot].Bottom + 15);
-				gearSlot2.Location = val;
-				p = val;
+				Point point2 = (_templateSlots[TemplateSlotType.MainHand].Location = new Point(_templateSlots[TemplateSlotType.Foot].Left, _templateSlots[TemplateSlotType.Foot].Bottom + 15));
+				p = point2;
 				_templateSlots[TemplateSlotType.OffHand].Location = new Point(_templateSlots[TemplateSlotType.MainHand].Left + 4, _templateSlots[TemplateSlotType.MainHand].Bottom + 4);
 				s = _templateSlots[TemplateSlotType.MainHand].Size;
-				_terrestrialSet.Bounds = new Rectangle(p.X + s.Y / 2 - setSize / 2, p.Y + s.Y - setSize / 2 + 4, setSize, setSize);
-				GearSlot gearSlot3 = _templateSlots[TemplateSlotType.AltMainHand];
-				((Point)(ref val))._002Ector(_templateSlots[TemplateSlotType.OffHand].Left, _templateSlots[TemplateSlotType.OffHand].Bottom + 35);
-				gearSlot3.Location = val;
-				p = val;
+				_terrestrialSet.Bounds = new Microsoft.Xna.Framework.Rectangle(p.X + s.Y / 2 - setSize / 2, p.Y + s.Y - setSize / 2 + 4, setSize, setSize);
+				point2 = (_templateSlots[TemplateSlotType.AltMainHand].Location = new Point(_templateSlots[TemplateSlotType.OffHand].Left, _templateSlots[TemplateSlotType.OffHand].Bottom + 35));
+				p = point2;
 				_templateSlots[TemplateSlotType.AltOffHand].Location = new Point(_templateSlots[TemplateSlotType.AltMainHand].Left + 4, _templateSlots[TemplateSlotType.AltMainHand].Bottom + 4);
 				s = _templateSlots[TemplateSlotType.AltMainHand].Size;
-				_alternateTerrestrialSet.Bounds = new Rectangle(p.X + s.Y / 2 - setSize / 2, p.Y + s.Y - setSize / 2 + 4, setSize, setSize);
+				_alternateTerrestrialSet.Bounds = new Microsoft.Xna.Framework.Rectangle(p.X + s.Y / 2 - setSize / 2, p.Y + s.Y - setSize / 2 + 4, setSize, setSize);
 				_templateSlots[TemplateSlotType.Back].Location = new Point(secondColumn, _templateSlots[TemplateSlotType.PveRelic].Bottom + 20);
 				_templateSlots[TemplateSlotType.Accessory_1].Location = new Point(_templateSlots[TemplateSlotType.Back].Right + 3, _templateSlots[TemplateSlotType.Back].Top);
 				_templateSlots[TemplateSlotType.Accessory_2].Location = new Point(_templateSlots[TemplateSlotType.Accessory_1].Right + 3, _templateSlots[TemplateSlotType.Back].Top);
@@ -495,11 +414,11 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 				_templateSlots[TemplateSlotType.Ring_2].Location = new Point(_templateSlots[TemplateSlotType.Ring_1].Right + 3, _templateSlots[TemplateSlotType.Amulet].Top);
 				_templateSlots[TemplateSlotType.AquaBreather].Location = new Point(_templateSlots[TemplateSlotType.Back].Left, _templateSlots[TemplateSlotType.Amulet].Bottom + 20);
 				_templateSlots[TemplateSlotType.Aquatic].Location = new Point(_templateSlots[TemplateSlotType.AquaBreather].Left, _templateSlots[TemplateSlotType.AquaBreather].Bottom + 15);
-				Rectangle b = _templateSlots[TemplateSlotType.Aquatic].LocalBounds;
-				_aquaticSet.Bounds = new Rectangle(((Rectangle)(ref b)).get_Left() + b.Height / 2 - setSize / 2, ((Rectangle)(ref b)).get_Bottom() - setSize / 2, setSize, setSize);
+				Microsoft.Xna.Framework.Rectangle b = _templateSlots[TemplateSlotType.Aquatic].LocalBounds;
+				_aquaticSet.Bounds = new Microsoft.Xna.Framework.Rectangle(b.Left + b.Height / 2 - setSize / 2, b.Bottom - setSize / 2, setSize, setSize);
 				_templateSlots[TemplateSlotType.AltAquatic].Location = new Point(_templateSlots[TemplateSlotType.Aquatic].Left, _templateSlots[TemplateSlotType.Aquatic].Bottom + 12);
 				b = _templateSlots[TemplateSlotType.AltAquatic].LocalBounds;
-				_alternateAquaticSet.Bounds = new Rectangle(((Rectangle)(ref b)).get_Left() + b.Height / 2 - setSize / 2, ((Rectangle)(ref b)).get_Bottom() - setSize / 2, setSize, setSize);
+				_alternateAquaticSet.Bounds = new Microsoft.Xna.Framework.Rectangle(b.Left + b.Height / 2 - setSize / 2, b.Bottom - setSize / 2, setSize, setSize);
 			}
 		}
 
@@ -622,47 +541,26 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 			}
 		}
 
-		public override void Draw(SpriteBatch spriteBatch, Rectangle drawBounds, Rectangle scissor)
+		public override void Draw(SpriteBatch spriteBatch, Microsoft.Xna.Framework.Rectangle drawBounds, Microsoft.Xna.Framework.Rectangle scissor)
 		{
-			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0010: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0024: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0029: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0038: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e9: Unknown result type (might be due to invalid IL or missing references)
 			if (Data.IsLoaded)
 			{
 				base.Draw(spriteBatch, drawBounds, scissor);
 				return;
 			}
-			Rectangle scissorRectangle = Rectangle.Intersect(scissor, base.AbsoluteBounds.WithPadding(_padding)).ScaleBy(Control.Graphics.UIScaleMultiplier);
-			((GraphicsResource)spriteBatch).get_GraphicsDevice().set_ScissorRectangle(scissorRectangle);
+			Microsoft.Xna.Framework.Rectangle scissorRectangle = Microsoft.Xna.Framework.Rectangle.Intersect(scissor, base.AbsoluteBounds.WithPadding(_padding)).ScaleBy(Control.Graphics.UIScaleMultiplier);
+			spriteBatch.GraphicsDevice.ScissorRectangle = scissorRectangle;
 			base.EffectBehind?.Draw(spriteBatch, drawBounds);
 			spriteBatch.Begin(base.SpriteBatchParameters);
-			Rectangle r = default(Rectangle);
-			((Rectangle)(ref r))._002Ector(((Rectangle)(ref drawBounds)).get_Center().X - 32, ((Rectangle)(ref drawBounds)).get_Center().Y, 64, 64);
-			Rectangle tR = default(Rectangle);
-			((Rectangle)(ref tR))._002Ector(drawBounds.X, ((Rectangle)(ref r)).get_Bottom() + 10, drawBounds.Width, Control.Content.DefaultFont16.get_LineHeight());
+			Microsoft.Xna.Framework.Rectangle r = new Microsoft.Xna.Framework.Rectangle(drawBounds.Center.X - 32, drawBounds.Center.Y, 64, 64);
+			Microsoft.Xna.Framework.Rectangle tR = new Microsoft.Xna.Framework.Rectangle(drawBounds.X, r.Bottom + 10, drawBounds.Width, Control.Content.DefaultFont16.LineHeight);
 			LoadingSpinnerUtil.DrawLoadingSpinner(this, spriteBatch, r);
-			spriteBatch.DrawStringOnCtrl(this, (!Data.IsLoaded) ? "Loading Data. Please wait." : "Select or create a template", Control.Content.DefaultFont16, tR, Color.get_White(), wrap: false, HorizontalAlignment.Center);
+			spriteBatch.DrawStringOnCtrl(this, (!Data.IsLoaded) ? "Loading Data. Please wait." : "Select or create a template", Control.Content.DefaultFont16, tR, Microsoft.Xna.Framework.Color.White, wrap: false, HorizontalAlignment.Center);
 			spriteBatch.End();
 		}
 
-		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Rectangle bounds)
+		public override void PaintBeforeChildren(SpriteBatch spriteBatch, Microsoft.Xna.Framework.Rectangle bounds)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0033: Unknown result type (might be due to invalid IL or missing references)
 			base.PaintBeforeChildren(spriteBatch, bounds);
 			if (TemplatePresenter.Template != null)
 			{
@@ -670,9 +568,8 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 			}
 		}
 
-		public override void PaintAfterChildren(SpriteBatch spriteBatch, Rectangle bounds)
+		public override void PaintAfterChildren(SpriteBatch spriteBatch, Microsoft.Xna.Framework.Rectangle bounds)
 		{
-			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
 			base.PaintAfterChildren(spriteBatch, bounds);
 			if (TemplatePresenter.Template == null)
 			{
@@ -692,8 +589,6 @@ namespace Kenedia.Modules.BuildsManager.Controls.Tabs
 
 		protected override void OnClick(MouseEventArgs e)
 		{
-			//IL_0085: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
 			if (((TemplatePresenter.Template != null && TemplatePresenter.IsPve) ? _pve : _pvp).Hovered)
 			{
 				TemplatePresenter.GameMode = (TemplatePresenter.IsPve ? GameModeType.PvP : GameModeType.PvE);

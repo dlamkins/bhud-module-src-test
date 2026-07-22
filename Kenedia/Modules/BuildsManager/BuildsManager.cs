@@ -183,9 +183,9 @@ namespace Kenedia.Modules.BuildsManager
 		protected override void Update(GameTime gameTime)
 		{
 			base.Update(gameTime);
-			if (gameTime.get_TotalGameTime().TotalMilliseconds - _tick > 500.0)
+			if (gameTime.TotalGameTime.TotalMilliseconds - _tick > 500.0)
 			{
-				_tick = gameTime.get_TotalGameTime().TotalMilliseconds;
+				_tick = gameTime.TotalGameTime.TotalMilliseconds;
 				Data data = Data;
 				if (data != null && !data.IsLoaded)
 				{
@@ -242,10 +242,6 @@ namespace Kenedia.Modules.BuildsManager
 
 		private void CreateCornerIcons()
 		{
-			//IL_014b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0164: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0207: Unknown result type (might be due to invalid IL or missing references)
 			DeleteCornerIcons();
 			if (CornerIcon == null)
 			{
