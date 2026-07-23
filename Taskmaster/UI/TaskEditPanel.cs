@@ -132,21 +132,21 @@ namespace Taskmaster.UI
 			//IL_0128: Unknown result type (might be due to invalid IL or missing references)
 			//IL_013e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0156: Expected O, but got Unknown
-			//IL_03a6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03ab: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03d4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03e0: Expected O, but got Unknown
-			//IL_03e1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03c4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03d0: Unknown result type (might be due to invalid IL or missing references)
 			//IL_03e6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03ed: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03f9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_040f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0422: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0433: Unknown result type (might be due to invalid IL or missing references)
-			//IL_043e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0460: Expected O, but got Unknown
+			//IL_03f2: Expected O, but got Unknown
+			//IL_03f3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03f8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03ff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_040b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0421: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0434: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0445: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0450: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0472: Expected O, but got Unknown
 			_task = task;
 			_sizing = sizing ?? new TaskmasterSizing(1f, 1f);
 			_workingSubtasks = (draft?.Subtasks ?? task.Subtasks).OrderBy((TodoTask subtask) => subtask.Order).Select(CloneForEditing).ToList();
@@ -166,11 +166,15 @@ namespace Taskmaster.UI
 			((Control)val).set_Width(_sizing.Px(220));
 			((Control)val).set_Height(_sizing.Px(27));
 			_scheduleDropdown = val;
-			foreach (string name in ScheduleNames.Values)
+			ResetScheduleType selectedSchedule = draft?.Schedule ?? task.Schedule;
+			foreach (KeyValuePair<ResetScheduleType, string> schedule in ScheduleNames)
 			{
-				_scheduleDropdown.get_Items().Add(name);
+				if (schedule.Key != ResetScheduleType.Psna || selectedSchedule == ResetScheduleType.Psna)
+				{
+					_scheduleDropdown.get_Items().Add(schedule.Value);
+				}
 			}
-			_scheduleDropdown.set_SelectedItem(ScheduleNames[draft?.Schedule ?? task.Schedule]);
+			_scheduleDropdown.set_SelectedItem(ScheduleNames[selectedSchedule]);
 			y = (_dynamicRowsStartY = y + RowH);
 			DateTime nowLocal = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.Local);
 			_localTimeBox = AddDynamicField("Local time", draft?.LocalTime ?? (task.LocalResetTime.HasValue ? $"{task.LocalResetTime.Value.Hours:00}:{task.LocalResetTime.Value.Minutes:00}" : $"{nowLocal.Hour:00}:{nowLocal.Minute:00}"), () => SelectedSchedule == ResetScheduleType.LocalTime);

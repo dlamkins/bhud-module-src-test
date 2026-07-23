@@ -4,6 +4,7 @@ namespace Taskmaster.Services
 	{
 		Success,
 		NotATabExport,
-		VersionTooNew
+		VersionTooNew,
+		InvalidPresetData
 	}
 }

@@ -8,7 +8,7 @@ namespace Taskmaster.Services
 	{
 		private static readonly TimeSpan DailyAt = TimeSpan.Zero;
 
-		private static readonly TimeSpan PsnaAt = new TimeSpan(8, 0, 0);
+		public static readonly TimeSpan PsnaResetAtUtc = new TimeSpan(8, 0, 0);
 
 		private static readonly TimeSpan WeeklyAt = new TimeSpan(7, 30, 0);
 
@@ -25,7 +25,7 @@ namespace Taskmaster.Services
 			case ResetScheduleType.DailyServer:
 				return LastDaily(nowUtc, DailyAt);
 			case ResetScheduleType.Psna:
-				return LastDaily(nowUtc, PsnaAt);
+				return LastDaily(nowUtc, PsnaResetAtUtc);
 			case ResetScheduleType.WeeklyServer:
 				return LastWeekly(nowUtc, DayOfWeek.Monday, WeeklyAt);
 			case ResetScheduleType.MapBonus:
@@ -57,7 +57,7 @@ namespace Taskmaster.Services
 			case ResetScheduleType.DailyServer:
 				return LastDaily(nowUtc, DailyAt).AddDays(1.0);
 			case ResetScheduleType.Psna:
-				return LastDaily(nowUtc, PsnaAt).AddDays(1.0);
+				return LastDaily(nowUtc, PsnaResetAtUtc).AddDays(1.0);
 			case ResetScheduleType.WeeklyServer:
 				return LastWeekly(nowUtc, DayOfWeek.Monday, WeeklyAt).AddDays(7.0);
 			case ResetScheduleType.MapBonus:

@@ -124,7 +124,17 @@ namespace Taskmaster.UI
 				}
 				foreach (TaskRow row in _rows)
 				{
-					row.DragReorderingEnabled = value;
+					int dragReorderingEnabled;
+					if (value)
+					{
+						TodoTask parentTask = row.ParentTask;
+						dragReorderingEnabled = ((parentTask == null || !parentTask.IsManagedPresetParent) ? 1 : 0);
+					}
+					else
+					{
+						dragReorderingEnabled = 0;
+					}
+					row.DragReorderingEnabled = (byte)dragReorderingEnabled != 0;
 				}
 			}
 		}
@@ -202,11 +212,14 @@ namespace Taskmaster.UI
 
 		public void BeginEdit(TodoTask task)
 		{
-			PreserveScrollDistance();
-			_editingTaskId = task.Id;
-			_newTaskId = null;
-			_editingDraft = null;
-			Rebuild();
+			if (task != null && !task.IsManagedPreset)
+			{
+				PreserveScrollDistance();
+				_editingTaskId = task.Id;
+				_newTaskId = null;
+				_editingDraft = null;
+				Rebuild();
+			}
 		}
 
 		public void AddNewTask(TodoTask task)
@@ -217,6 +230,19 @@ namespace Taskmaster.UI
 			_pendingScrollTaskId = task.Id;
 			_scrollApplyFrames = 5;
 			Rebuild();
+		}
+
+		public void ExpandTask(TodoTask task)
+		{
+			if (task != null && task.HasSubtasks)
+			{
+				_expanded.Add(task.Id);
+				_pendingScrollTaskId = task.Id;
+				_scrollApplyFrames = 5;
+				Rebuild();
+				_selection.Select(task.Id, _selectableTaskIds, extendRange: false, toggle: false);
+				ApplySelectionToRows();
+			}
 		}
 
 		public void RefreshCountdowns(DateTime nowUtc)
@@ -323,7 +349,9 @@ namespace Taskmaster.UI
 			((Control)taskRow).set_Width(((Container)this).get_ContentRegion().Width);
 			taskRow.IsExpanded = _expanded.Contains(task.Id);
 			taskRow.Locked = _locked;
-			taskRow.DragReorderingEnabled = _dragReorderingEnabled;
+			taskRow.CanEdit = !task.IsManagedPreset;
+			taskRow.CanOpenContextMenu = !isSubtask || !(parent?.IsManagedPresetParent ?? false);
+			taskRow.DragReorderingEnabled = _dragReorderingEnabled && (!isSubtask || !(parent?.IsManagedPresetParent ?? false));
 			taskRow.ParentTask = parent;
 			taskRow.IsSelected = !isSubtask && _selection.IsSelected(task.Id);
 			Guid id = task.Id;
@@ -406,19 +434,22 @@ namespace Taskmaster.UI
 
 		private void AddEditPanel(TodoTask task, bool isNew = false)
 		{
-			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
-			TaskEditPanel taskEditPanel = new TaskEditPanel(task, isNew, _sizing, _editingDraft);
-			((Control)taskEditPanel).set_Parent((Container)(object)this);
-			((Control)taskEditPanel).set_Width(((Container)this).get_ContentRegion().Width);
-			TaskEditPanel edit = (_activeEditPanel = taskEditPanel);
-			edit.ContentHeightChanging += PreserveScrollDistance;
-			edit.Saved += delegate
+			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+			if (!task.IsManagedPreset)
 			{
-				_editingTaskId = null;
-				_newTaskId = null;
-				_editingDraft = null;
-				AfterMutation();
-			};
+				TaskEditPanel taskEditPanel = new TaskEditPanel(task, isNew, _sizing, _editingDraft);
+				((Control)taskEditPanel).set_Parent((Container)(object)this);
+				((Control)taskEditPanel).set_Width(((Container)this).get_ContentRegion().Width);
+				TaskEditPanel edit = (_activeEditPanel = taskEditPanel);
+				edit.ContentHeightChanging += PreserveScrollDistance;
+				edit.Saved += delegate
+				{
+					_editingTaskId = null;
+					_newTaskId = null;
+					_editingDraft = null;
+					AfterMutation();
+				};
+			}
 		}
 
 		private void AfterMutation()

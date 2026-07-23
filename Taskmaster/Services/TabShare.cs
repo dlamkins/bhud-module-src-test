@@ -16,13 +16,13 @@ namespace Taskmaster.Services
 			public List<TodoTask> Tasks;
 		}
 
-		public const int PayloadVersion = 1;
+		public const int PayloadVersion = 2;
 
 		public static string Export(TodoTab tab)
 		{
 			return JsonConvert.SerializeObject((object)new Payload
 			{
-				Taskmaster = 1,
+				Taskmaster = 2,
 				Tab = tab.Name,
 				Tasks = tab.Tasks
 			}, (Formatting)1);
@@ -51,7 +51,7 @@ namespace Taskmaster.Services
 			{
 				return fail;
 			}
-			if (payload.Taskmaster > 1)
+			if (payload.Taskmaster > 2)
 			{
 				return new TabShareImportResult
 				{
@@ -64,9 +64,23 @@ namespace Taskmaster.Services
 				Name = (payload.Tab ?? "Imported")
 			};
 			tab.Tasks.AddRange(payload.Tasks);
+			if (!TaskPresetService.ValidateTab(tab))
+			{
+				return new TabShareImportResult
+				{
+					Outcome = TabShareImportOutcome.InvalidPresetData
+				};
+			}
 			foreach (TodoTask task in tab.Tasks)
 			{
 				Sanitize(task);
+			}
+			if (!TaskPresetService.ValidateTab(tab))
+			{
+				return new TabShareImportResult
+				{
+					Outcome = TabShareImportOutcome.InvalidPresetData
+				};
 			}
 			return new TabShareImportResult
 			{

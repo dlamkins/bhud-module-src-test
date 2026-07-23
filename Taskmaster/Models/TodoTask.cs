@@ -18,6 +18,10 @@ namespace Taskmaster.Models
 		public ResetScheduleType Schedule { get; set; } = ResetScheduleType.DailyServer;
 
 
+		public TaskPresetType PresetType { get; set; }
+
+		public TaskPresetSlot PresetSlot { get; set; }
+
 		public TimeSpan? LocalResetTime { get; set; }
 
 		public TimeSpan? ResetDuration { get; set; }
@@ -46,6 +50,35 @@ namespace Taskmaster.Models
 				if (Subtasks != null)
 				{
 					return Subtasks.Count > 0;
+				}
+				return false;
+			}
+		}
+
+		[JsonIgnore]
+		public bool IsManagedPreset => PresetType != TaskPresetType.None;
+
+		[JsonIgnore]
+		public bool IsManagedPresetParent
+		{
+			get
+			{
+				if (IsManagedPreset)
+				{
+					return PresetSlot == TaskPresetSlot.None;
+				}
+				return false;
+			}
+		}
+
+		[JsonIgnore]
+		public bool IsManagedPresetChild
+		{
+			get
+			{
+				if (IsManagedPreset)
+				{
+					return PresetSlot != TaskPresetSlot.None;
 				}
 				return false;
 			}

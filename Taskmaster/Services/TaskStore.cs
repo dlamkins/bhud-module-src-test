@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Blish_HUD;
 using Newtonsoft.Json;
 using Taskmaster.Models;
@@ -11,14 +12,14 @@ namespace Taskmaster.Services
 	{
 		private class Envelope
 		{
-			public int Version = 1;
+			public int Version = 2;
 
 			public List<TodoTab> Tabs = new List<TodoTab>();
 		}
 
 		private static readonly Logger Logger = Logger.GetLogger<TaskStore>();
 
-		public const int CurrentVersion = 1;
+		public const int CurrentVersion = 2;
 
 		private static readonly TimeSpan DebounceDelay = TimeSpan.FromSeconds(2.0);
 
@@ -49,9 +50,9 @@ namespace Taskmaster.Services
 			Envelope primary = TryParse(_filePath);
 			if (primary != null)
 			{
-				if (primary.Version > 1)
+				if (primary.Version > 2)
 				{
-					Logger.Warn($"tasks.json is version {primary.Version}, newer than supported {1}; read-only mode");
+					Logger.Warn($"tasks.json is version {primary.Version}, newer than supported {2}; read-only mode");
 					ReadOnly = true;
 					result.Outcome = TaskStoreLoadOutcome.VersionTooNew;
 					return result;
@@ -67,7 +68,7 @@ namespace Taskmaster.Services
 			if (File.Exists(bakPath))
 			{
 				Envelope backup = TryParse(bakPath);
-				if (backup != null && backup.Version <= 1)
+				if (backup != null && backup.Version <= 2)
 				{
 					Tabs = backup.Tabs ?? new List<TodoTab>();
 					result.Outcome = TaskStoreLoadOutcome.LoadedBackup;
@@ -80,9 +81,15 @@ namespace Taskmaster.Services
 
 		private static Envelope TryParse(string path)
 		{
+			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
 			try
 			{
-				return JsonConvert.DeserializeObject<Envelope>(File.ReadAllText(path));
+				Envelope envelope = JsonConvert.DeserializeObject<Envelope>(File.ReadAllText(path));
+				if (envelope != null && envelope.Version <= 2 && envelope.Tabs != null && !envelope.Tabs.All(TaskPresetService.ValidateTab))
+				{
+					throw new JsonSerializationException("Task data contains invalid managed preset structure.");
+				}
+				return envelope;
 			}
 			catch (Exception ex)
 			{
@@ -115,7 +122,7 @@ namespace Taskmaster.Services
 			{
 				string json = JsonConvert.SerializeObject((object)new Envelope
 				{
-					Version = 1,
+					Version = 2,
 					Tabs = Tabs
 				}, (Formatting)1);
 				string tmp = _filePath + ".tmp";

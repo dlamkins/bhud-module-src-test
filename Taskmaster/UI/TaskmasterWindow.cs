@@ -49,9 +49,13 @@ namespace Taskmaster.UI
 
 		private readonly IconButton _lockBtn;
 
+		private readonly IconButton _checkAllBtn;
+
 		private readonly Panel _actionBar;
 
 		private readonly Panel _actionBarSeparator;
+
+		private readonly IconButton _addPresetBtn;
 
 		private readonly StandardButton _addTaskBtn;
 
@@ -138,19 +142,21 @@ namespace Taskmaster.UI
 			//IL_0114: Expected O, but got Unknown
 			//IL_011a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0152: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0185: Unknown result type (might be due to invalid IL or missing references)
 			//IL_018a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0196: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a6: Expected O, but got Unknown
-			//IL_0223: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0228: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_023a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_023b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0245: Unknown result type (might be due to invalid IL or missing references)
-			//IL_024c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0253: Unknown result type (might be due to invalid IL or missing references)
-			//IL_025f: Expected O, but got Unknown
+			//IL_01b1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d2: Expected O, but got Unknown
+			//IL_01d8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_027b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0280: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0287: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0292: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0293: Unknown result type (might be due to invalid IL or missing references)
+			//IL_029d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ab: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b7: Expected O, but got Unknown
 			_store = store;
 			_settings = settings;
 			_sizing = new TaskmasterSizing(_settings.InterfaceScale.get_Value(), _settings.TextScale.get_Value());
@@ -181,10 +187,18 @@ namespace Taskmaster.UI
 			iconButton2.Selected = _locked;
 			((Control)iconButton2).set_BasicTooltipText("Lock tasks (checking still works)");
 			_lockBtn = iconButton2;
+			IconButton iconButton3 = new IconButton(TaskmasterIcons.Check, TaskmasterTheme.IconGlyph);
+			((Control)iconButton3).set_Parent((Container)(object)_actionBar);
+			((Control)iconButton3).set_BasicTooltipText("Check all tasks in this tab");
+			_checkAllBtn = iconButton3;
 			StandardButton val3 = new StandardButton();
 			((Control)val3).set_Parent((Container)(object)_actionBar);
 			val3.set_Text("+  Add task");
 			_addTaskBtn = val3;
+			IconButton iconButton4 = new IconButton(TaskmasterIcons.ChevronDown, TaskmasterTheme.IconGlyph);
+			((Control)iconButton4).set_Parent((Container)(object)_actionBar);
+			((Control)iconButton4).set_BasicTooltipText("Add preset");
+			_addPresetBtn = iconButton4;
 			UpdateAddTaskButtonState();
 			TabStrip tabStrip = new TabStrip();
 			((Control)tabStrip).set_Parent((Container)(object)this);
@@ -248,12 +262,16 @@ namespace Taskmaster.UI
 		{
 			//IL_002f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011c: Unknown result type (might be due to invalid IL or missing references)
 			int padding = _sizing.Px(6);
 			int controlY = (((Control)_actionBar).get_Height() - ((Control)_hideDoneBtn).get_Height()) / 2;
 			((Control)_hideDoneBtn).set_Location(new Point(padding, controlY));
 			((Control)_lockBtn).set_Location(new Point(((Control)_hideDoneBtn).get_Right() + _sizing.Px(4), controlY));
+			((Control)_checkAllBtn).set_Location(new Point(((Control)_lockBtn).get_Right() + _sizing.Px(4), controlY));
 			((Control)_addTaskBtn).set_Location(new Point(Math.Max(padding, ((Control)_actionBar).get_Width() - ((Control)_addTaskBtn).get_Width() - padding), (((Control)_actionBar).get_Height() - ((Control)_addTaskBtn).get_Height()) / 2));
+			((Control)_addPresetBtn).set_Location(new Point(Math.Max(padding, ((Control)_addTaskBtn).get_Left() - _sizing.Px(4) - ((Control)_addPresetBtn).get_Width()), (((Control)_actionBar).get_Height() - ((Control)_addPresetBtn).get_Height()) / 2));
 		}
 
 		private void RelayoutTabRenameBox()
@@ -336,6 +354,14 @@ namespace Taskmaster.UI
 			{
 				AddTaskToActiveTab();
 			});
+			((Control)_addPresetBtn).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				ShowPresetMenu();
+			});
+			((Control)_checkAllBtn).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				ToggleAllTasksInActiveTab();
+			});
 			_tabStrip.TabClicked += delegate(TodoTab tab)
 			{
 				_activeTabId = tab.Id;
@@ -357,7 +383,7 @@ namespace Taskmaster.UI
 			_listPanel.TaskContextMenuRequested += ShowTaskMenu;
 			_listPanel.CopyToClipboardRequested += delegate(TodoTask task)
 			{
-				ClipboardUtil.get_WindowsClipboardService().SetTextAsync(task.ClipboardContent);
+				ClipboardUtil.get_WindowsClipboardService().SetTextAsync(TaskPresetService.ResolveClipboardContent(task, DateTime.UtcNow));
 			};
 		}
 
@@ -431,9 +457,41 @@ namespace Taskmaster.UI
 
 		private void UpdateAddTaskButtonState()
 		{
-			bool hasActiveTab = ActiveTab != null;
+			TodoTab activeTab = ActiveTab;
+			bool hasActiveTab = activeTab != null;
+			bool hasTasks = activeTab != null && activeTab.Tasks.Count > 0;
+			bool allTasksComplete = hasTasks && activeTab.Tasks.All((TodoTask task) => task.IsDone);
 			((Control)_addTaskBtn).set_Enabled(!_locked && hasActiveTab);
+			((Control)_addPresetBtn).set_Enabled(!_locked && hasActiveTab);
+			((Control)_checkAllBtn).set_Enabled(hasTasks);
+			_checkAllBtn.Selected = allTasksComplete;
 			((Control)_addTaskBtn).set_BasicTooltipText(_locked ? "Locked - unlock to add tasks" : (hasActiveTab ? null : "Add a tab first"));
+			((Control)_addPresetBtn).set_BasicTooltipText(_locked ? "Locked - unlock to add presets" : (hasActiveTab ? "Add preset" : "Add a tab first"));
+			((Control)_checkAllBtn).set_BasicTooltipText((!hasActiveTab) ? "Add a tab first" : ((!hasTasks) ? "Add a task first" : (allTasksComplete ? "Uncheck all tasks in this tab" : "Check all tasks in this tab")));
+		}
+
+		private void ToggleAllTasksInActiveTab()
+		{
+			TodoTab tab = ActiveTab;
+			if (tab == null || tab.Tasks.Count == 0)
+			{
+				return;
+			}
+			DateTime nowUtc = DateTime.UtcNow;
+			bool allTasksComplete = tab.Tasks.All((TodoTask task) => task.IsDone);
+			foreach (TodoTask task2 in tab.Tasks)
+			{
+				if (allTasksComplete)
+				{
+					task2.UncheckAll();
+				}
+				else if (!task2.IsDone)
+				{
+					task2.CompleteAll(nowUtc);
+				}
+				task2.SyncGroupAnchor(nowUtc);
+			}
+			MarkDirtyAndRefresh();
 		}
 
 		private void AddTaskToActiveTab()
@@ -454,6 +512,38 @@ namespace Taskmaster.UI
 				tab.Tasks.Add(t);
 				_listPanel.AddNewTask(t);
 				MarkDirtyAndRefresh();
+			}
+		}
+
+		private void ShowPresetMenu()
+		{
+			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+			TodoTab tab = ActiveTab;
+			if (!_locked && tab != null)
+			{
+				ContextMenuStrip val = new ContextMenuStrip();
+				bool alreadyAdded = TaskPresetService.ContainsPreset(tab, TaskPresetType.PactSupplyNetworkAgents);
+				ContextMenuStripItem obj = val.AddMenuItem(alreadyAdded ? "Pact Supply Network Agents (already added)" : "Pact Supply Network Agents");
+				((Control)obj).set_Enabled(!alreadyAdded);
+				((Control)obj).add_Click((EventHandler<MouseEventArgs>)delegate
+				{
+					AddPsnaPreset(tab);
+				});
+				val.Show(GameService.Input.get_Mouse().get_Position());
+			}
+		}
+
+		private void AddPsnaPreset(TodoTab tab)
+		{
+			if (!_locked && tab != null && !TaskPresetService.ContainsPreset(tab, TaskPresetType.PactSupplyNetworkAgents))
+			{
+				TodoTask preset = TaskPresetService.CreatePsna(tab.Tasks.Count);
+				tab.Tasks.Add(preset);
+				_activeTabId = tab.Id;
+				MarkDirtyAndRefresh();
+				_listPanel.ExpandTask(preset);
 			}
 		}
 
@@ -526,9 +616,11 @@ namespace Taskmaster.UI
 		{
 			//IL_005d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_007b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0099: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021e: Unknown result type (might be due to invalid IL or missing references)
 			_sizing = new TaskmasterSizing(_settings.InterfaceScale.get_Value(), _settings.TextScale.get_Value());
 			int compactButtonHeight = _sizing.Px(26);
 			int iconButtonWidth = _sizing.Px(30);
@@ -537,9 +629,13 @@ namespace Taskmaster.UI
 			_hideDoneBtn.GlyphSize = glyphSize;
 			((Control)_lockBtn).set_Size(new Point(iconButtonWidth, compactButtonHeight));
 			_lockBtn.GlyphSize = glyphSize;
+			((Control)_checkAllBtn).set_Size(new Point(iconButtonWidth, compactButtonHeight));
+			_checkAllBtn.GlyphSize = glyphSize;
 			((Control)_addTaskBtn).set_Height(compactButtonHeight);
 			int addTaskTextWidth = (int)Math.Max(GameService.Content.get_DefaultFont14().MeasureString(_addTaskBtn.get_Text()).Width, _sizing.BodyFont.MeasureString(_addTaskBtn.get_Text()).Width);
 			((Control)_addTaskBtn).set_Width(addTaskTextWidth + _sizing.Px(24));
+			((Control)_addPresetBtn).set_Size(new Point(_sizing.Px(28), compactButtonHeight));
+			_addPresetBtn.GlyphSize = _sizing.Px(14);
 			_tabStrip.Sizing = _sizing;
 			_listPanel.Sizing = _sizing;
 			((Control)_emptyLabel).set_Height(_sizing.Px(28));
@@ -615,6 +711,9 @@ namespace Taskmaster.UI
 				case TabShareImportOutcome.VersionTooNew:
 					ScreenNotification.ShowNotification("Tab export is from a newer Taskmaster version", (NotificationType)2, (Texture2D)null, 4);
 					break;
+				case TabShareImportOutcome.InvalidPresetData:
+					ScreenNotification.ShowNotification("Tab export contains invalid or duplicate preset data", (NotificationType)2, (Texture2D)null, 4);
+					break;
 				default:
 					ScreenNotification.ShowNotification("Not a Taskmaster tab export", (NotificationType)2, (Texture2D)null, 4);
 					break;
@@ -666,9 +765,9 @@ namespace Taskmaster.UI
 			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0036: Expected O, but got Unknown
 			//IL_0145: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0353: Unknown result type (might be due to invalid IL or missing references)
-			//IL_035a: Expected O, but got Unknown
-			//IL_042f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_033c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0343: Expected O, but got Unknown
+			//IL_042b: Unknown result type (might be due to invalid IL or missing references)
 			TodoTab tab = ActiveTab;
 			if (tab == null)
 			{
@@ -717,23 +816,26 @@ namespace Taskmaster.UI
 				orderby candidate.Order
 				select candidate).ToList();
 			int taskIndex = visibleTasks.IndexOf(task);
-			((Control)menu.AddMenuItem("Edit")).add_Click((EventHandler<MouseEventArgs>)delegate
+			if (!task.IsManagedPresetParent)
 			{
-				_listPanel.BeginEdit(task);
-			});
-			((Control)menu.AddMenuItem("Duplicate")).add_Click((EventHandler<MouseEventArgs>)delegate
-			{
-				TodoTask todoTask = TabShare.TryImport(TabShare.Export(new TodoTab
+				((Control)menu.AddMenuItem("Edit")).add_Click((EventHandler<MouseEventArgs>)delegate
 				{
-					Name = "x",
-					Tasks = { task }
-				})).Tab.Tasks[0];
-				todoTask.Name = task.Name + " (copy)";
-				todoTask.Order = task.Order + 1;
-				tab.Tasks.Insert(Math.Min(tab.Tasks.IndexOf(task) + 1, tab.Tasks.Count), todoTask);
-				_listPanel.ClearSelection();
-				MarkDirtyAndRefresh();
-			});
+					_listPanel.BeginEdit(task);
+				});
+				((Control)menu.AddMenuItem("Duplicate")).add_Click((EventHandler<MouseEventArgs>)delegate
+				{
+					TodoTask todoTask = TabShare.TryImport(TabShare.Export(new TodoTab
+					{
+						Name = "x",
+						Tasks = { task }
+					})).Tab.Tasks[0];
+					todoTask.Name = task.Name + " (copy)";
+					todoTask.Order = task.Order + 1;
+					tab.Tasks.Insert(Math.Min(tab.Tasks.IndexOf(task) + 1, tab.Tasks.Count), todoTask);
+					_listPanel.ClearSelection();
+					MarkDirtyAndRefresh();
+				});
+			}
 			if (taskIndex > 0)
 			{
 				((Control)menu.AddMenuItem("Move up")).add_Click((EventHandler<MouseEventArgs>)delegate
@@ -756,23 +858,23 @@ namespace Taskmaster.UI
 					MoveTaskToEdge(tab, task, toStart: false);
 				});
 			}
-			List<TodoTab> otherTabs = (from t in _store.Tabs
-				where t.Id != tab.Id
-				orderby t.Order
-				select t).ToList();
+			IReadOnlyList<TodoTask> readOnlyList2;
+			if (selectedTasks.Count <= 1)
+			{
+				IReadOnlyList<TodoTask> readOnlyList = new List<TodoTask> { task };
+				readOnlyList2 = readOnlyList;
+			}
+			else
+			{
+				readOnlyList2 = selectedTasks;
+			}
+			IReadOnlyList<TodoTask> tasksToMove = readOnlyList2;
+			List<TodoTab> otherTabs = (from candidate in _store.Tabs
+				where candidate.Id != tab.Id && TaskPresetService.CanMoveTo(tasksToMove, candidate)
+				orderby candidate.Order
+				select candidate).ToList();
 			if (otherTabs.Count > 0)
 			{
-				IReadOnlyList<TodoTask> readOnlyList2;
-				if (selectedTasks.Count <= 1)
-				{
-					IReadOnlyList<TodoTask> readOnlyList = new List<TodoTask> { task };
-					readOnlyList2 = readOnlyList;
-				}
-				else
-				{
-					readOnlyList2 = selectedTasks;
-				}
-				IReadOnlyList<TodoTask> tasksToMove = readOnlyList2;
 				string moveToLabel = ((tasksToMove.Count > 1) ? $"Move selected ({tasksToMove.Count}) to" : "Move to");
 				ContextMenuStripItem moveTo = menu.AddMenuItem(moveToLabel);
 				ContextMenuStrip moveMenu = new ContextMenuStrip();
@@ -786,7 +888,7 @@ namespace Taskmaster.UI
 				}
 				moveTo.set_Submenu(moveMenu);
 			}
-			((Control)menu.AddMenuItem("Delete")).add_Click((EventHandler<MouseEventArgs>)delegate
+			((Control)menu.AddMenuItem(task.IsManagedPresetParent ? "Remove preset" : "Delete")).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				tab.Tasks.Remove(task);
 				NormalizeTaskOrder(tab);

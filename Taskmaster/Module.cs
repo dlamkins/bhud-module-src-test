@@ -30,6 +30,8 @@ namespace Taskmaster
 
 		private CornerIcon _cornerIcon;
 
+		private readonly MapWindowVisibilityController _windowVisibility = new MapWindowVisibilityController();
+
 		private double _minuteAccumulator;
 
 		internal static Module Instance { get; private set; }
@@ -107,14 +109,7 @@ namespace Taskmaster
 		{
 			if (_window != null)
 			{
-				if (((Control)_window).get_Visible())
-				{
-					((Control)_window).Hide();
-				}
-				else
-				{
-					((Control)_window).Show();
-				}
+				ApplyWindowVisibility(_windowVisibility.Toggle(((Control)_window).get_Visible(), IsWindowHiddenByMap()));
 			}
 		}
 
@@ -134,10 +129,32 @@ namespace Taskmaster
 					_minuteAccumulator = 0.0;
 					_window?.OnMinuteTick(DateTime.UtcNow);
 				}
-				if (_window != null && ((Control)_window).get_Visible() && !_settings.ShowOnMap.get_Value() && GameService.Gw2Mumble.get_IsAvailable() && GameService.Gw2Mumble.get_UI().get_IsMapOpen())
+				if (_window != null)
 				{
-					((Control)_window).Hide();
+					ApplyWindowVisibility(_windowVisibility.Update(((Control)_window).get_Visible(), IsWindowHiddenByMap()));
 				}
+			}
+		}
+
+		private bool IsWindowHiddenByMap()
+		{
+			if (!_settings.ShowOnMap.get_Value() && GameService.Gw2Mumble.get_IsAvailable())
+			{
+				return GameService.Gw2Mumble.get_UI().get_IsMapOpen();
+			}
+			return false;
+		}
+
+		private void ApplyWindowVisibility(WindowVisibilityAction action)
+		{
+			switch (action)
+			{
+			case WindowVisibilityAction.Show:
+				((Control)_window).Show();
+				break;
+			case WindowVisibilityAction.Hide:
+				((Control)_window).Hide();
+				break;
 			}
 		}
 
