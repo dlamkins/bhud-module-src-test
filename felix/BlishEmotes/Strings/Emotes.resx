@@ -35,6 +35,7 @@
   <data name="breakdance"><value>Breakdance</value></data>
   <data name="poseshy"><value>Pose shy</value></data>
   <data name="readbook"><value>Read book</value></data>
+  <data name="masterpiece"><value>Masterpiece</value></data>
   <data name="shuffle"><value>Shuffle</value></data>
   <data name="crossarms"><value>Crossarms</value></data>
   <data name="shocked"><value>Shocked</value></data>
@@ -67,6 +68,7 @@
   <data name="serve"><value>Serve</value></data>
   <data name="sleep"><value>Sleep</value></data>
   <data name="shrug"><value>Shrug</value></data>
+  <data name="transform"><value>Transform</value></data>
   <data name="barbecue"><value>Barbecue</value></data>
   <data name="scissors"><value>Scissors</value></data>
   <data name="thumbsdown"><value>Thumbs down</value></data>
@@ -76,6 +78,7 @@
   <data name="beckon"><value>Beckon</value></data>
   <data name="boogie"><value>Bloodstone Boogie</value></data>
   <data name="heroic"><value>Heroic</value></data>
+  <data name="happydance"><value>Happy Dance</value></data>
   <data name="facepalm"><value>Facepalm</value></data>
   <data name="playdead"><value>Playdead</value></data>
   <data name="thanks"><value>Thanks</value></data>

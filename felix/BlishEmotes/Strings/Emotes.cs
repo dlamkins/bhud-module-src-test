@@ -164,6 +164,12 @@ namespace felix.BlishEmotes.Strings
 
 		internal static string posesassy => ResourceManager.GetString("posesassy", resourceCulture);
 
+		internal static string transform => ResourceManager.GetString("transform", resourceCulture);
+
+		internal static string happydance => ResourceManager.GetString("happydance", resourceCulture);
+
+		internal static string masterpiece => ResourceManager.GetString("masterpiece", resourceCulture);
+
 		internal Emotes()
 		{
 		}

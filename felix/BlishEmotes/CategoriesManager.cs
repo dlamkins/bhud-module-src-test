@@ -285,16 +285,17 @@ namespace felix.BlishEmotes
 			CreateCategory("Greeting", null, new List<string> { "beckon", "bow", "salute", "wave" }, null, isFavourite: false, saveToFile: false);
 			CreateCategory("Reaction", null, new List<string>
 			{
-				"cower", "cry", "facepalm", "hiss", "no", "sad", "shiver", "shiverplus", "shocked", "shrug",
-				"surprised", "thanks", "thumbsdown", "thumbsup", "yes"
+				"cower", "cry", "facepalm", "hiss", "masterpiece", "no", "sad", "shiver", "shiverplus", "shocked",
+				"shrug", "surprised", "thanks", "thumbsdown", "thumbsup", "yes"
 			}, null, isFavourite: false, saveToFile: false);
 			CreateCategory("Fun", null, new List<string> { "cheer", "laugh", "paper", "rock", "rockout", "scissors" }, null, isFavourite: false, saveToFile: false);
 			CreateCategory("Pose", null, new List<string>
 			{
 				"bless", "blowkiss", "channel", "crossarms", "heroic", "kneel", "magicjuggle", "magictrick", "playdead", "point",
-				"poseheart", "posepeace", "posesassy", "poseshy", "serve", "sit", "sleep", "stretch", "threaten", "unleash"
+				"poseheart", "posepeace", "posesassy", "poseshy", "serve", "sit", "sleep", "stretch", "threaten", "transform",
+				"unleash"
 			}, null, isFavourite: false, saveToFile: false);
-			CreateCategory("Dance", null, new List<string> { "boogie", "breakdance", "crabdance", "dance", "geargrind", "shuffle", "step" }, null, isFavourite: false, saveToFile: false);
+			CreateCategory("Dance", null, new List<string> { "boogie", "breakdance", "crabdance", "dance", "geargrind", "happydance", "shuffle", "step" }, null, isFavourite: false, saveToFile: false);
 			CreateCategory("Miscellaneous", null, new List<string> { "barbecue", "drink", "petalthrow", "ponder", "possessed", "rank", "readbook", "sipcoffee", "talk" }, null, isFavourite: false, saveToFile: false);
 			PersistenceManager.SaveCategories(categories.Values.ToList());
 		}
