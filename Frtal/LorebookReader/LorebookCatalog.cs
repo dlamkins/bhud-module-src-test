@@ -293,36 +293,64 @@ namespace Frtal.LorebookReader
 
 		private void Load()
 		{
+			List<LorebookEntry> loaded;
 			if (!File.Exists(_filePath))
 			{
-				return;
+				string[] array = new string[2]
+				{
+					_filePath + ".bak",
+					_filePath + ".tmp"
+				};
+				foreach (string candidate in array)
+				{
+					if (File.Exists(candidate) && TryLoadFile(candidate, out var rescued) && rescued.Count > 0)
+					{
+						AdoptEntries(rescued);
+						LoadWarning = "catalog.json was missing — restored " + rescued.Count + " books from " + Path.GetFileName(candidate) + ".";
+						Save();
+						break;
+					}
+				}
 			}
-			if (TryLoadFile(_filePath, out var loaded))
+			else if (TryLoadFile(_filePath, out loaded))
 			{
+				if (loaded.Count == 0)
+				{
+					string bak2 = _filePath + ".bak";
+					if (File.Exists(bak2) && TryLoadFile(bak2, out var prev) && prev.Count > 0)
+					{
+						AdoptEntries(prev);
+						LoadWarning = "catalog.json was empty — restored " + prev.Count + " books from catalog.json.bak.";
+						Save();
+						return;
+					}
+				}
 				AdoptEntries(loaded);
-				return;
-			}
-			string quarantine = Path.Combine(Path.GetDirectoryName(_filePath) ?? "", "catalog.corrupt-" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".json");
-			try
-			{
-				File.Move(_filePath, quarantine);
-			}
-			catch
-			{
-				_saveBlocked = true;
-				LoadWarning = "catalog.json is corrupt and could not be quarantined — saving is disabled to protect it. Check the lorebook_reader folder manually.";
-				return;
-			}
-			string bak = _filePath + ".bak";
-			if (File.Exists(bak) && TryLoadFile(bak, out var fromBak))
-			{
-				AdoptEntries(fromBak);
-				LoadWarning = "catalog.json was corrupt — restored from backup. Corrupt file kept as " + Path.GetFileName(quarantine) + ".";
-				Save();
 			}
 			else
 			{
-				LoadWarning = "catalog.json was corrupt and no usable backup was found — starting empty. Corrupt file kept as " + Path.GetFileName(quarantine) + ".";
+				string quarantine = Path.Combine(Path.GetDirectoryName(_filePath) ?? "", "catalog.corrupt-" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".json");
+				try
+				{
+					File.Move(_filePath, quarantine);
+				}
+				catch
+				{
+					_saveBlocked = true;
+					LoadWarning = "catalog.json is corrupt and could not be quarantined — saving is disabled to protect it. Check the lorebook_reader folder manually.";
+					return;
+				}
+				string bak = _filePath + ".bak";
+				if (File.Exists(bak) && TryLoadFile(bak, out var fromBak))
+				{
+					AdoptEntries(fromBak);
+					LoadWarning = "catalog.json was corrupt — restored from backup. Corrupt file kept as " + Path.GetFileName(quarantine) + ".";
+					Save();
+				}
+				else
+				{
+					LoadWarning = "catalog.json was corrupt and no usable backup was found — starting empty. Corrupt file kept as " + Path.GetFileName(quarantine) + ".";
+				}
 			}
 		}
 

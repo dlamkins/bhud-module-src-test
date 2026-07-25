@@ -55,6 +55,7 @@ namespace Frtal.LorebookReader
 				return "";
 			}
 			string[] array = Regex.Split(raw, "\\n[ \\t]*\\n");
+			bool verse = LooksLikeVerse(raw);
 			List<string> outParas = new List<string>();
 			string[] array2 = array;
 			for (int i = 0; i < array2.Length; i++)
@@ -63,7 +64,9 @@ namespace Frtal.LorebookReader
 					select l.Trim() into l
 					where l.Length > 0
 					select l;
-				string joined = CleanInline(string.Join(" ", plines));
+				string joined = (verse ? string.Join("\n", from l in plines.Select(CleanInline)
+					where l.Length > 0
+					select l) : CleanInline(string.Join(" ", plines)));
 				if (joined.Length > 0)
 				{
 					outParas.Add(joined);
@@ -74,6 +77,28 @@ namespace Frtal.LorebookReader
 				outParas.RemoveAt(outParas.Count - 1);
 			}
 			return string.Join("\n\n", outParas).Trim();
+		}
+
+		private static bool LooksLikeVerse(string raw)
+		{
+			List<string> lines = (from l in raw.Split('\n')
+				select l.Trim() into l
+				where l.Length > 0
+				select l).ToList();
+			if (lines.Count < 3)
+			{
+				return false;
+			}
+			if (lines.Count((string l) => Regex.IsMatch(l, "^([•·●○◦▪‣*\\-–—]|\\d{1,3}[.)])\\s")) >= 2)
+			{
+				return true;
+			}
+			int maxLen = lines.Max((string l) => l.Length);
+			if (maxLen < 12)
+			{
+				return false;
+			}
+			return (double)lines.Count((string l) => (double)l.Length < (double)maxLen * 0.75) >= (double)lines.Count * 0.5;
 		}
 
 		private static string CleanInline(string text)

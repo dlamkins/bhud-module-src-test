@@ -399,9 +399,18 @@ namespace Frtal.LorebookReader
 					continue;
 				}
 				bool head = IsHeading(para);
-				List<string> list = _tr.WrapText(para.Replace('\n', ' '), head ? (_fontSize + 2f) : _fontSize, wrapW, head);
+				List<string> lines = new List<string>();
+				string[] array2 = para.Split('\n');
+				for (int j = 0; j < array2.Length; j++)
+				{
+					string ln2 = array2[j].Trim();
+					if (ln2.Length != 0)
+					{
+						lines.AddRange(_tr.WrapText(ln2, head ? (_fontSize + 2f) : _fontSize, wrapW, head));
+					}
+				}
 				bool first = true;
-				foreach (string ln in list)
+				foreach (string ln in lines)
 				{
 					float lh = (head ? headH : lineH);
 					float need = lh + ((first && cur.Count > 0) ? gapH : 0f);

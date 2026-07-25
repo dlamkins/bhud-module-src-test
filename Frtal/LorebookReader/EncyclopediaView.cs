@@ -1233,7 +1233,16 @@ namespace Frtal.LorebookReader
 			((TextInputBase)textEdit).add_TextChanged((EventHandler<EventArgs>)delegate
 			{
 				entry.Text = UnwrapFromEdit(((TextInputBase)textEdit).get_Text());
-				((Control)textEdit).set_Height(EditContentHeight(((TextInputBase)textEdit).get_Text()));
+				if (EditContentHeight(((TextInputBase)textEdit).get_Text()) != ((Control)textEdit).get_Height())
+				{
+					_module.RunOnMainThread(delegate
+					{
+						if (((Control)textEdit).get_Parent() != null)
+						{
+							((Control)textEdit).set_Height(EditContentHeight(((TextInputBase)textEdit).get_Text()));
+						}
+					});
+				}
 				ScheduleEditFlush();
 			});
 			Label val12 = new Label();

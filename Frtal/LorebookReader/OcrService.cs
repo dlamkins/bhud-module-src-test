@@ -101,10 +101,30 @@ namespace Frtal.LorebookReader
 			}
 			double pitch = Median(deltas);
 			double medWidth = Median(widths);
+			double colW = 0.0;
+			foreach (double wd2 in widths)
+			{
+				if (wd2 > colW)
+				{
+					colW = wd2;
+				}
+			}
+			int shortVsCol = 0;
+			if (colW > 0.0)
+			{
+				foreach (double wd in widths)
+				{
+					if (wd > 0.0 && wd < colW * 0.75)
+					{
+						shortVsCol++;
+					}
+				}
+			}
+			bool verseDoc = n >= 3 && (double)shortVsCol >= (double)n * 0.5;
 			bool[] shortLine = new bool[n];
 			for (int k = 0; k < n; k++)
 			{
-				shortLine[k] = medWidth > 0.0 && widths[k] > 0.0 && widths[k] < medWidth * 0.8;
+				shortLine[k] = !verseDoc && medWidth > 0.0 && widths[k] > 0.0 && widths[k] < medWidth * 0.8;
 			}
 			StringBuilder sb = new StringBuilder();
 			for (int j = 0; j < n; j++)
@@ -120,7 +140,7 @@ namespace Frtal.LorebookReader
 			return sb.ToString();
 			bool IsHeading(int i)
 			{
-				if (pitch > 0.0 && medWidth > 0.0 && n >= 3 && widths[i] < medWidth * 0.62 && i + 1 < n)
+				if (!verseDoc && pitch > 0.0 && medWidth > 0.0 && n >= 3 && widths[i] < medWidth * 0.62 && i + 1 < n)
 				{
 					return tops[i + 1] - tops[i] <= pitch * 1.5;
 				}
