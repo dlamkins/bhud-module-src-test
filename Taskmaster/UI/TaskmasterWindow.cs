@@ -391,7 +391,7 @@ namespace Taskmaster.UI
 		{
 			if (_hideDone && tab.TotalCount > 0)
 			{
-				return tab.DoneCount == tab.TotalCount;
+				return tab.Tasks.All((TodoTask task) => task.IsFullyDone);
 			}
 			return false;
 		}
@@ -460,7 +460,7 @@ namespace Taskmaster.UI
 			TodoTab activeTab = ActiveTab;
 			bool hasActiveTab = activeTab != null;
 			bool hasTasks = activeTab != null && activeTab.Tasks.Count > 0;
-			bool allTasksComplete = hasTasks && activeTab.Tasks.All((TodoTask task) => task.IsDone);
+			bool allTasksComplete = hasTasks && activeTab.Tasks.All((TodoTask task) => task.IsFullyDone);
 			((Control)_addTaskBtn).set_Enabled(!_locked && hasActiveTab);
 			((Control)_addPresetBtn).set_Enabled(!_locked && hasActiveTab);
 			((Control)_checkAllBtn).set_Enabled(hasTasks);
@@ -478,14 +478,14 @@ namespace Taskmaster.UI
 				return;
 			}
 			DateTime nowUtc = DateTime.UtcNow;
-			bool allTasksComplete = tab.Tasks.All((TodoTask task) => task.IsDone);
+			bool allTasksComplete = tab.Tasks.All((TodoTask task) => task.IsFullyDone);
 			foreach (TodoTask task2 in tab.Tasks)
 			{
 				if (allTasksComplete)
 				{
 					task2.UncheckAll();
 				}
-				else if (!task2.IsDone)
+				else if (!task2.IsFullyDone)
 				{
 					task2.CompleteAll(nowUtc);
 				}
@@ -777,7 +777,7 @@ namespace Taskmaster.UI
 			if (parent != null)
 			{
 				List<TodoTask> visibleSubtasks = (from candidate in parent.Subtasks
-					where !_hideDone || !candidate.IsDone || candidate == task
+					where !_hideDone || !candidate.IsFullyDone || candidate == task
 					orderby candidate.Order
 					select candidate).ToList();
 				int subtaskIndex = visibleSubtasks.IndexOf(task);
@@ -785,7 +785,7 @@ namespace Taskmaster.UI
 				{
 					((Control)menu.AddMenuItem("Move up")).add_Click((EventHandler<MouseEventArgs>)delegate
 					{
-						ReorderSubtask(parent, task, () => TaskOrdering.MoveByVisible(parent.Subtasks, task, -1, (TodoTask candidate) => !_hideDone || !candidate.IsDone));
+						ReorderSubtask(parent, task, () => TaskOrdering.MoveByVisible(parent.Subtasks, task, -1, (TodoTask candidate) => !_hideDone || !candidate.IsFullyDone));
 					});
 					((Control)menu.AddMenuItem("Move to top")).add_Click((EventHandler<MouseEventArgs>)delegate
 					{
@@ -796,7 +796,7 @@ namespace Taskmaster.UI
 				{
 					((Control)menu.AddMenuItem("Move down")).add_Click((EventHandler<MouseEventArgs>)delegate
 					{
-						ReorderSubtask(parent, task, () => TaskOrdering.MoveByVisible(parent.Subtasks, task, 1, (TodoTask candidate) => !_hideDone || !candidate.IsDone));
+						ReorderSubtask(parent, task, () => TaskOrdering.MoveByVisible(parent.Subtasks, task, 1, (TodoTask candidate) => !_hideDone || !candidate.IsFullyDone));
 					});
 					((Control)menu.AddMenuItem("Move to bottom")).add_Click((EventHandler<MouseEventArgs>)delegate
 					{
@@ -812,7 +812,7 @@ namespace Taskmaster.UI
 			}
 			IReadOnlyList<TodoTask> selectedTasks = _listPanel.GetSelectedTasks();
 			List<TodoTask> visibleTasks = (from candidate in tab.Tasks
-				where !_hideDone || !candidate.IsDone || candidate == task
+				where !_hideDone || !candidate.IsFullyDone || candidate == task
 				orderby candidate.Order
 				select candidate).ToList();
 			int taskIndex = visibleTasks.IndexOf(task);
@@ -937,7 +937,7 @@ namespace Taskmaster.UI
 		private void MoveTask(TodoTab tab, TodoTask task, int delta)
 		{
 			_listPanel.PreserveScrollPosition();
-			if (TaskOrdering.MoveByVisible(tab.Tasks, task, delta, (TodoTask candidate) => !_hideDone || !candidate.IsDone))
+			if (TaskOrdering.MoveByVisible(tab.Tasks, task, delta, (TodoTask candidate) => !_hideDone || !candidate.IsFullyDone))
 			{
 				MarkDirtyAndRefresh();
 			}

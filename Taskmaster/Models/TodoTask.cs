@@ -39,6 +39,8 @@ namespace Taskmaster.Models
 
 		public DateTime? LastActivityUtc { get; set; }
 
+		public bool IsOptional { get; set; }
+
 		public List<TodoTask> Subtasks { get; set; } = new List<TodoTask>();
 
 
@@ -50,6 +52,19 @@ namespace Taskmaster.Models
 				if (Subtasks != null)
 				{
 					return Subtasks.Count > 0;
+				}
+				return false;
+			}
+		}
+
+		[JsonIgnore]
+		public bool HasRequiredSubtasks
+		{
+			get
+			{
+				if (HasSubtasks)
+				{
+					return Subtasks.Any((TodoTask s) => !s.IsOptional);
 				}
 				return false;
 			}
@@ -93,13 +108,34 @@ namespace Taskmaster.Models
 				{
 					return CurrentCount >= TargetCount;
 				}
-				return Subtasks.All((TodoTask s) => s.IsDone);
+				if (!HasRequiredSubtasks)
+				{
+					return CurrentCount >= TargetCount;
+				}
+				return Subtasks.Where((TodoTask s) => !s.IsOptional).All((TodoTask s) => s.IsDone);
+			}
+		}
+
+		[JsonIgnore]
+		public bool IsFullyDone
+		{
+			get
+			{
+				if (!HasSubtasks)
+				{
+					return CurrentCount >= TargetCount;
+				}
+				if (HasRequiredSubtasks || CurrentCount >= TargetCount)
+				{
+					return Subtasks.All((TodoTask s) => s.IsFullyDone);
+				}
+				return false;
 			}
 		}
 
 		public void Increment(DateTime nowUtc)
 		{
-			if (HasSubtasks)
+			if (HasRequiredSubtasks)
 			{
 				CompleteAll(nowUtc);
 			}
@@ -116,7 +152,7 @@ namespace Taskmaster.Models
 
 		public void Decrement()
 		{
-			if (HasSubtasks)
+			if (HasRequiredSubtasks)
 			{
 				UncheckAll();
 			}
@@ -138,6 +174,12 @@ namespace Taskmaster.Models
 				{
 					subtask.CompleteAll(nowUtc);
 				}
+				if (!HasRequiredSubtasks && CurrentCount < TargetCount)
+				{
+					CurrentCount = TargetCount;
+					LastActivityUtc = nowUtc;
+					LastCompletedUtc = nowUtc;
+				}
 			}
 			else if (CurrentCount < TargetCount)
 			{
@@ -156,19 +198,61 @@ namespace Taskmaster.Models
 					subtask.UncheckAll();
 				}
 			}
-			else
-			{
-				CurrentCount = 0;
-				LastCompletedUtc = null;
-			}
+			CurrentCount = 0;
+			LastCompletedUtc = null;
 		}
 
 		public void SyncGroupAnchor(DateTime nowUtc)
 		{
+			if (!HasRequiredSubtasks)
+			{
+				return;
+			}
+			LastActivityUtc = nowUtc;
+			if (IsDone)
+			{
+				if (!LastCompletedUtc.HasValue)
+				{
+					LastCompletedUtc = nowUtc;
+				}
+			}
+			else
+			{
+				LastCompletedUtc = null;
+			}
+		}
+
+		public void ReconcileSubtaskStructure(bool wasDone, bool hadSubtasks, bool hadRequiredSubtasks, DateTime nowUtc)
+		{
 			if (HasSubtasks)
 			{
-				LastActivityUtc = nowUtc;
-				LastCompletedUtc = (IsDone ? new DateTime?(nowUtc) : null);
+				TargetCount = 1;
+			}
+			if (HasRequiredSubtasks)
+			{
+				CurrentCount = 0;
+				SyncGroupAnchor(nowUtc);
+				return;
+			}
+			if (hadRequiredSubtasks || !hadSubtasks)
+			{
+				TargetCount = 1;
+				CurrentCount = (wasDone ? 1 : 0);
+				if (wasDone)
+				{
+					if (!LastCompletedUtc.HasValue)
+					{
+						LastCompletedUtc = nowUtc;
+					}
+				}
+				else
+				{
+					LastCompletedUtc = null;
+				}
+			}
+			if (!HasSubtasks)
+			{
+				EnsureDurationAnchor(nowUtc);
 			}
 		}
 

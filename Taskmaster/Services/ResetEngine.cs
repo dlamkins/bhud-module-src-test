@@ -105,19 +105,93 @@ namespace Taskmaster.Services
 			{
 				task.LastActivityUtc = nowUtc;
 			}
+			if (task.HasSubtasks && task.Schedule == ResetScheduleType.Duration)
+			{
+				return ApplyDurationGroupReset(task, nowUtc);
+			}
 			if (task.HasSubtasks)
 			{
 				int applied = 0;
-				foreach (TodoTask s in task.Subtasks)
+				bool requiredChildReset = false;
+				foreach (TodoTask subtask in task.Subtasks)
 				{
-					applied += ApplyResetRecursive(s, nowUtc, localTz);
+					int childApplied = ApplyResetRecursive(subtask, nowUtc, localTz);
+					applied += childApplied;
+					if (!subtask.IsOptional && childApplied > 0)
+					{
+						requiredChildReset = true;
+					}
 				}
-				if (applied > 0)
+				if (requiredChildReset)
 				{
 					task.SyncGroupAnchor(nowUtc);
 				}
+				if (!task.HasRequiredSubtasks)
+				{
+					applied += ApplyResetToOwnState(task, nowUtc, localTz);
+				}
 				return applied;
 			}
+			return ApplyResetToOwnState(task, nowUtc, localTz);
+		}
+
+		private static int ApplyDurationGroupReset(TodoTask task, DateTime nowUtc)
+		{
+			DateTime? boundary = LastBoundary(task, nowUtc);
+			if (!boundary.HasValue || nowUtc < boundary.Value)
+			{
+				return 0;
+			}
+			int resetCount = CountProgressedLeaves(task);
+			if (!task.HasRequiredSubtasks && task.CurrentCount > 0)
+			{
+				resetCount++;
+			}
+			if (resetCount == 0)
+			{
+				return 0;
+			}
+			ClearProgressRecursive(task);
+			return resetCount;
+		}
+
+		private static int CountProgressedLeaves(TodoTask task)
+		{
+			if (task.HasSubtasks)
+			{
+				int count = 0;
+				{
+					foreach (TodoTask subtask in task.Subtasks)
+					{
+						count += CountProgressedLeaves(subtask);
+					}
+					return count;
+				}
+			}
+			if (task.CurrentCount <= 0 && !task.LastCompletedUtc.HasValue)
+			{
+				return 0;
+			}
+			return 1;
+		}
+
+		private static void ClearProgressRecursive(TodoTask task)
+		{
+			task.CurrentCount = 0;
+			task.LastCompletedUtc = null;
+			task.LastActivityUtc = null;
+			if (!task.HasSubtasks)
+			{
+				return;
+			}
+			foreach (TodoTask subtask in task.Subtasks)
+			{
+				ClearProgressRecursive(subtask);
+			}
+		}
+
+		private static int ApplyResetToOwnState(TodoTask task, DateTime nowUtc, TimeZoneInfo localTz)
+		{
 			DateTime? boundary = LastBoundary(task, nowUtc, localTz);
 			if (!boundary.HasValue)
 			{

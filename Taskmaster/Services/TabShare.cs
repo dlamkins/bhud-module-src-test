@@ -16,13 +16,13 @@ namespace Taskmaster.Services
 			public List<TodoTask> Tasks;
 		}
 
-		public const int PayloadVersion = 2;
+		public const int PayloadVersion = 3;
 
 		public static string Export(TodoTab tab)
 		{
 			return JsonConvert.SerializeObject((object)new Payload
 			{
-				Taskmaster = 2,
+				Taskmaster = 3,
 				Tab = tab.Name,
 				Tasks = tab.Tasks
 			}, (Formatting)1);
@@ -51,7 +51,7 @@ namespace Taskmaster.Services
 			{
 				return fail;
 			}
-			if (payload.Taskmaster > 2)
+			if (payload.Taskmaster > 3)
 			{
 				return new TabShareImportResult
 				{

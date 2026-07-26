@@ -12,14 +12,14 @@ namespace Taskmaster.Services
 	{
 		private class Envelope
 		{
-			public int Version = 2;
+			public int Version = 3;
 
 			public List<TodoTab> Tabs = new List<TodoTab>();
 		}
 
 		private static readonly Logger Logger = Logger.GetLogger<TaskStore>();
 
-		public const int CurrentVersion = 2;
+		public const int CurrentVersion = 3;
 
 		private static readonly TimeSpan DebounceDelay = TimeSpan.FromSeconds(2.0);
 
@@ -50,9 +50,9 @@ namespace Taskmaster.Services
 			Envelope primary = TryParse(_filePath);
 			if (primary != null)
 			{
-				if (primary.Version > 2)
+				if (primary.Version > 3)
 				{
-					Logger.Warn($"tasks.json is version {primary.Version}, newer than supported {2}; read-only mode");
+					Logger.Warn($"tasks.json is version {primary.Version}, newer than supported {3}; read-only mode");
 					ReadOnly = true;
 					result.Outcome = TaskStoreLoadOutcome.VersionTooNew;
 					return result;
@@ -68,7 +68,7 @@ namespace Taskmaster.Services
 			if (File.Exists(bakPath))
 			{
 				Envelope backup = TryParse(bakPath);
-				if (backup != null && backup.Version <= 2)
+				if (backup != null && backup.Version <= 3)
 				{
 					Tabs = backup.Tabs ?? new List<TodoTab>();
 					result.Outcome = TaskStoreLoadOutcome.LoadedBackup;
@@ -85,7 +85,7 @@ namespace Taskmaster.Services
 			try
 			{
 				Envelope envelope = JsonConvert.DeserializeObject<Envelope>(File.ReadAllText(path));
-				if (envelope != null && envelope.Version <= 2 && envelope.Tabs != null && !envelope.Tabs.All(TaskPresetService.ValidateTab))
+				if (envelope != null && envelope.Version <= 3 && envelope.Tabs != null && !envelope.Tabs.All(TaskPresetService.ValidateTab))
 				{
 					throw new JsonSerializationException("Task data contains invalid managed preset structure.");
 				}
@@ -122,7 +122,7 @@ namespace Taskmaster.Services
 			{
 				string json = JsonConvert.SerializeObject((object)new Envelope
 				{
-					Version = 2,
+					Version = 3,
 					Tabs = Tabs
 				}, (Formatting)1);
 				string tmp = _filePath + ".tmp";

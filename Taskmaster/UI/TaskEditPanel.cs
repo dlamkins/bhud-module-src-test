@@ -186,7 +186,7 @@ namespace Taskmaster.UI
 			Panel val2 = new Panel();
 			((Control)val2).set_Parent((Container)(object)this);
 			((Control)val2).set_Left(FieldX);
-			((Control)val2).set_Width(_sizing.Px(300));
+			((Control)val2).set_Width(_sizing.Px(340));
 			((Container)val2).set_HeightSizingMode((SizingMode)1);
 			_subtaskPanel = val2;
 			TextBox val3 = new TextBox();
@@ -385,7 +385,16 @@ namespace Taskmaster.UI
 			//IL_0148: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0159: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0169: Expected O, but got Unknown
+			//IL_0169: Unknown result type (might be due to invalid IL or missing references)
 			//IL_016e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0190: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0197: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ce: Expected O, but got Unknown
+			//IL_01d3: Unknown result type (might be due to invalid IL or missing references)
 			foreach (Control item in ((Container)_subtaskPanel).get_Children().ToList())
 			{
 				item.Dispose();
@@ -397,7 +406,7 @@ namespace Taskmaster.UI
 				((Control)val).set_Parent((Container)(object)_subtaskPanel);
 				((Control)val).set_Left(0);
 				((Control)val).set_Top(y);
-				((Control)val).set_Width(_sizing.Px(118));
+				((Control)val).set_Width(_sizing.Px(110));
 				((Control)val).set_Height(_sizing.Px(26));
 				((TextInputBase)val).set_Text(sub.Name);
 				((TextInputBase)val).set_Font(_sizing.BodyFont);
@@ -405,17 +414,26 @@ namespace Taskmaster.UI
 				TextBox nameBox = val;
 				TextBox val2 = new TextBox();
 				((Control)val2).set_Parent((Container)(object)_subtaskPanel);
-				((Control)val2).set_Left(_sizing.Px(122));
+				((Control)val2).set_Left(_sizing.Px(114));
 				((Control)val2).set_Top(y);
-				((Control)val2).set_Width(_sizing.Px(126));
+				((Control)val2).set_Width(_sizing.Px(115));
 				((Control)val2).set_Height(_sizing.Px(26));
 				((TextInputBase)val2).set_Text(sub.ClipboardContent ?? "");
 				((TextInputBase)val2).set_Font(_sizing.BodyFont);
 				((TextInputBase)val2).set_PlaceholderText("waypoint / chat code");
 				TextBox clipboardBox = val2;
+				Checkbox val3 = new Checkbox();
+				((Control)val3).set_Parent((Container)(object)_subtaskPanel);
+				((Control)val3).set_Left(_sizing.Px(233));
+				((Control)val3).set_Top(y);
+				((Control)val3).set_Height(_sizing.Px(26));
+				val3.set_Text("Optional");
+				val3.set_Checked(sub.IsOptional);
+				((Control)val3).set_BasicTooltipText("Optional subtasks do not affect parent completion");
+				Checkbox optional = val3;
 				IconButton iconButton = new IconButton(TaskmasterIcons.Cancel, TaskmasterTheme.IconGlyph);
 				((Control)iconButton).set_Parent((Container)(object)_subtaskPanel);
-				((Control)iconButton).set_Left(_sizing.Px(252));
+				((Control)iconButton).set_Left(_sizing.Px(314));
 				((Control)iconButton).set_Top(y);
 				((Control)iconButton).set_Width(_sizing.Px(26));
 				((Control)iconButton).set_Height(_sizing.Px(26));
@@ -428,6 +446,10 @@ namespace Taskmaster.UI
 				((TextInputBase)clipboardBox).add_TextChanged((EventHandler<EventArgs>)delegate
 				{
 					captured.ClipboardContent = ((TextInputBase)clipboardBox).get_Text();
+				});
+				optional.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate(object s, CheckChangedEvent e)
+				{
+					captured.IsOptional = e.get_Checked();
 				});
 				((Control)iconButton).add_Click((EventHandler<MouseEventArgs>)delegate
 				{
@@ -442,6 +464,9 @@ namespace Taskmaster.UI
 
 		public void Apply()
 		{
+			bool wasDone = _task.IsDone;
+			bool hadSubtasks = _task.HasSubtasks;
+			bool hadRequiredSubtasks = _task.HasRequiredSubtasks;
 			_task.Name = (string.IsNullOrWhiteSpace(((TextInputBase)_nameBox).get_Text()) ? _task.Name : ((TextInputBase)_nameBox).get_Text().Trim());
 			_task.Schedule = SelectedSchedule;
 			if (_task.Schedule == ResetScheduleType.LocalTime && TimeSpan.TryParse(((TextInputBase)_localTimeBox).get_Text(), out var localAt) && localAt >= TimeSpan.Zero && localAt < TimeSpan.FromDays(1.0))
@@ -469,16 +494,11 @@ namespace Taskmaster.UI
 				s.LocalResetTime = _task.LocalResetTime;
 				s.ResetDuration = _task.ResetDuration;
 			}
-			if (_task.HasSubtasks)
-			{
-				_task.TargetCount = 1;
-				_task.CurrentCount = 0;
-			}
+			_task.ReconcileSubtaskStructure(wasDone, hadSubtasks, hadRequiredSubtasks, DateTime.UtcNow);
 			if (_task.CurrentCount > _task.TargetCount)
 			{
 				_task.CurrentCount = _task.TargetCount;
 			}
-			_task.SyncGroupAnchor(DateTime.UtcNow);
 			this.Saved?.Invoke();
 		}
 
@@ -498,6 +518,7 @@ namespace Taskmaster.UI
 				CurrentCount = source.CurrentCount,
 				LastCompletedUtc = source.LastCompletedUtc,
 				LastActivityUtc = source.LastActivityUtc,
+				IsOptional = source.IsOptional,
 				Subtasks = (source.Subtasks?.Select(CloneForEditing).ToList() ?? new List<TodoTask>())
 			};
 		}

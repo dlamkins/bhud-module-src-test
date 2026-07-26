@@ -193,19 +193,12 @@ namespace Taskmaster.UI
 			if (parent?.Subtasks != null && parent.Subtasks.Contains(subtask))
 			{
 				PreserveScrollDistance();
+				bool wasDone = parent.IsDone;
+				bool hadSubtasks = parent.HasSubtasks;
+				bool hadRequiredSubtasks = parent.HasRequiredSubtasks;
 				parent.Subtasks.Remove(subtask);
 				DateTime nowUtc = DateTime.UtcNow;
-				if (parent.HasSubtasks)
-				{
-					parent.SyncGroupAnchor(nowUtc);
-				}
-				else
-				{
-					parent.CurrentCount = 0;
-					parent.LastCompletedUtc = null;
-					parent.LastActivityUtc = null;
-					parent.EnsureDurationAnchor(nowUtc);
-				}
+				parent.ReconcileSubtaskStructure(wasDone, hadSubtasks, hadRequiredSubtasks, nowUtc);
 				AfterMutation();
 			}
 		}
@@ -276,7 +269,7 @@ namespace Taskmaster.UI
 			{
 				Guid id;
 				Guid? editingTaskId;
-				if (_hideDone && task.IsDone)
+				if (_hideDone && task.IsFullyDone)
 				{
 					id = task.Id;
 					editingTaskId = _editingTaskId;
@@ -365,13 +358,23 @@ namespace Taskmaster.UI
 			{
 				if (task.IsDone)
 				{
-					task.UncheckAll();
+					if (task.HasSubtasks && !task.HasRequiredSubtasks)
+					{
+						task.Decrement();
+					}
+					else
+					{
+						task.UncheckAll();
+					}
 				}
 				else
 				{
 					task.Increment(DateTime.UtcNow);
 				}
-				(parent ?? task).SyncGroupAnchor(DateTime.UtcNow);
+				if (parent == null || !task.IsOptional)
+				{
+					(parent ?? task).SyncGroupAnchor(DateTime.UtcNow);
+				}
 				AfterMutation();
 			};
 			row.ExpandToggled += delegate

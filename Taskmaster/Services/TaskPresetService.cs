@@ -143,7 +143,7 @@ namespace Taskmaster.Services
 			for (int index = 0; index < children.Count; index++)
 			{
 				TodoTask child2 = children[index];
-				if (child2.PresetType != parent.PresetType || child2.PresetSlot != PsnaRotation.Slots[index] || child2.Schedule != ResetScheduleType.Psna || child2.TargetCount != 1 || child2.LocalResetTime.HasValue || child2.ResetDuration.HasValue || child2.HasSubtasks || child2.Order != index)
+				if (child2.PresetType != parent.PresetType || child2.PresetSlot != PsnaRotation.Slots[index] || child2.Schedule != ResetScheduleType.Psna || child2.TargetCount != 1 || child2.LocalResetTime.HasValue || child2.ResetDuration.HasValue || child2.IsOptional || child2.HasSubtasks || child2.Order != index)
 				{
 					return false;
 				}
