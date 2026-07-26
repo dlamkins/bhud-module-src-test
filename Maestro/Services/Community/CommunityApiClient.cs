@@ -51,7 +51,8 @@ namespace Maestro.Services.Community
 			_ = 1;
 			try
 			{
-				string url = "https://bhm.blishhud.com/Aex.Maestro/" + NamespaceSegment(ns) + "/manifest.json";
+				long cacheBuster = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+				string url = string.Format("{0}/{1}/manifest.json?t={2}", "https://bhm.blishhud.com/Aex.Maestro", NamespaceSegment(ns), cacheBuster);
 				Logger.Info($"Fetching {ns} manifest from {url}");
 				HttpResponseMessage obj = await _httpClient.GetAsync(url, cancellationToken);
 				obj.EnsureSuccessStatusCode();
