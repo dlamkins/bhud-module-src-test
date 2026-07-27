@@ -74,6 +74,10 @@ namespace Frtal.LorebookReader
 
 		private SettingEntry<bool> _encRailCollapsed;
 
+		private SettingEntry<KeyBinding> _pauseKeybind;
+
+		private volatile bool _speechPaused;
+
 		private TtsService _tts;
 
 		private EdgeTtsService _edgeTts;
@@ -161,6 +165,8 @@ namespace Frtal.LorebookReader
 		private Rectangle _bookCalibBox;
 
 		private readonly Dictionary<string, Texture2D> _xpIconCache = new Dictionary<string, Texture2D>(StringComparer.OrdinalIgnoreCase);
+
+		private bool _unloaded;
 
 		internal SettingEntry<KeyBinding> ReadKeybindSetting => _readKeybind;
 
@@ -254,6 +260,10 @@ namespace Frtal.LorebookReader
 
 		internal LorebookCatalog Catalog => _catalog;
 
+		internal string StoryImageDirectory { get; private set; }
+
+		internal bool SpeechPaused => _speechPaused;
+
 		[ImportingConstructor]
 		public LorebookReaderModule([Import("ModuleParameters")] ModuleParameters moduleParameters)
 			: this(moduleParameters)
@@ -271,16 +281,19 @@ namespace Frtal.LorebookReader
 			//IL_0052: Expected O, but got Unknown
 			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00a9: Expected O, but got Unknown
-			//IL_0595: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05dd: Expected O, but got Unknown
+			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0100: Expected O, but got Unknown
 			//IL_05ec: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0634: Expected O, but got Unknown
-			//IL_0697: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06df: Expected O, but got Unknown
-			//IL_0742: Unknown result type (might be due to invalid IL or missing references)
-			//IL_078a: Expected O, but got Unknown
+			//IL_0643: Unknown result type (might be due to invalid IL or missing references)
+			//IL_068b: Expected O, but got Unknown
+			//IL_06ee: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0736: Expected O, but got Unknown
+			//IL_0799: Unknown result type (might be due to invalid IL or missing references)
+			//IL_07e1: Expected O, but got Unknown
 			_readKeybind = settings.DefineSetting<KeyBinding>("ReadKeybind", new KeyBinding((ModifierKeys)3, (Keys)82), (Func<string>)(() => "Read lorebook"), (Func<string>)(() => "Reads the currently open lorebook aloud."));
 			_stopKeybind = settings.DefineSetting<KeyBinding>("StopKeybind", new KeyBinding((ModifierKeys)3, (Keys)83), (Func<string>)(() => "Stop reading"), (Func<string>)(() => "Stops the current text-to-speech playback."));
+			_pauseKeybind = settings.DefineSetting<KeyBinding>("PauseKeybind", new KeyBinding((ModifierKeys)3, (Keys)80), (Func<string>)(() => "Pause / resume reading"), (Func<string>)(() => "Pauses the narration and picks it up where it stopped."));
 			_showSpeakerButton = settings.DefineSetting<bool>("ShowSpeakerButton", true, (Func<string>)(() => "Show speaker icon on open books"), (Func<string>)(() => "Displays a clickable speaker icon next to a detected lorebook."));
 			_voiceName = settings.DefineSetting<string>("VoiceName", "", (Func<string>)(() => "Voice (part of name)"), (Func<string>)(() => "Leave empty for default. Available voices are listed in the log on module start."));
 			_speakingRate = settings.DefineSetting<float>("SpeakingRate", 1f, (Func<string>)(() => "Speaking rate"), (Func<string>)(() => "1.0 = normal speed."));
@@ -319,6 +332,8 @@ namespace Frtal.LorebookReader
 			{
 				_catalogDirty = true;
 			};
+			StoryImageDirectory = Path.Combine(dir, "images");
+			BookReaderPanel.ImageDirectory = StoryImageDirectory;
 			Logger.Info("Available TTS voices: " + string.Join(", ", from v in TtsService.InstalledVoices()
 				select v.Name + " [" + v.Lang + "]"));
 			await Task.CompletedTask;
@@ -326,32 +341,35 @@ namespace Frtal.LorebookReader
 
 		protected override void OnModuleLoaded(EventArgs e)
 		{
-			//IL_02b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02bc: Expected O, but got Unknown
-			//IL_02f9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0322: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0331: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0336: Unknown result type (might be due to invalid IL or missing references)
-			//IL_033b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_034b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0356: Unknown result type (might be due to invalid IL or missing references)
-			//IL_035d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0364: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0374: Expected O, but got Unknown
-			//IL_039c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03af: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03c3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03c8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03d8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03e3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03f1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0401: Expected O, but got Unknown
+			//IL_02df: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02e9: Expected O, but got Unknown
+			//IL_0326: Unknown result type (might be due to invalid IL or missing references)
+			//IL_034f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_036a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_036f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0374: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0384: Unknown result type (might be due to invalid IL or missing references)
+			//IL_038f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0396: Unknown result type (might be due to invalid IL or missing references)
+			//IL_039d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03a4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03b4: Expected O, but got Unknown
+			//IL_03dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03fe: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0403: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0408: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0418: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0423: Unknown result type (might be due to invalid IL or missing references)
+			//IL_042a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0431: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0441: Expected O, but got Unknown
 			_readKeybind.get_Value().set_Enabled(true);
 			_readKeybind.get_Value().add_Activated((EventHandler<EventArgs>)OnReadActivated);
 			_stopKeybind.get_Value().set_Enabled(true);
 			_stopKeybind.get_Value().add_Activated((EventHandler<EventArgs>)OnStopActivated);
+			_pauseKeybind.get_Value().set_Enabled(true);
+			_pauseKeybind.get_Value().add_Activated((EventHandler<EventArgs>)OnPauseActivated);
 			_convToggleKeybind.get_Value().set_Enabled(true);
 			_convToggleKeybind.get_Value().add_Activated((EventHandler<EventArgs>)OnConvToggleActivated);
 			_debugDumpKeybind.get_Value().set_Enabled(true);
@@ -423,10 +441,11 @@ namespace Frtal.LorebookReader
 			{
 				int tw = winTex.get_Width();
 				int th = winTex.get_Height();
-				StandardWindow val = new StandardWindow(winTex, new Rectangle(0, 0, tw, th), new Rectangle((int)((float)tw * 0.03f), (int)((float)th * 0.078f), (int)((float)tw * 0.94f), (int)((float)th * 0.88f)), new Point(1120, 800));
+				StandardWindow val = new StandardWindow(winTex, new Rectangle(0, 0, tw, th), new Rectangle((int)((float)tw * 0.03f), (int)((float)th * 0.078f), (int)((float)tw * 0.94f), (int)((float)th * 0.88f)), new Point(Math.Min(1120, tw), Math.Min(800, th)));
 				((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 				((WindowBase2)val).set_Title("Lorebook Codex");
 				((WindowBase2)val).set_SavesPosition(true);
+				((WindowBase2)val).set_SavesSize(true);
 				((WindowBase2)val).set_CanResize(true);
 				((WindowBase2)val).set_Id("frtal_lorebook_reader_encyclopedia_v2");
 				_historyWindow = val;
@@ -466,6 +485,12 @@ namespace Frtal.LorebookReader
 		{
 			_tts.Stop();
 			_edgeTts?.Stop();
+			_speechPaused = false;
+		}
+
+		private void OnPauseActivated(object sender, EventArgs e)
+		{
+			TogglePauseSpeaking();
 		}
 
 		private void OnDebugDumpActivated(object sender, EventArgs e)
@@ -1144,6 +1169,12 @@ namespace Frtal.LorebookReader
 							break;
 						}
 						return "xp_jw.png";
+					case 's':
+						if (!(text == "short stories"))
+						{
+							break;
+						}
+						return "xp_shortstories.png";
 					}
 					break;
 				case 4:
@@ -1331,6 +1362,24 @@ namespace Frtal.LorebookReader
 		{
 			_tts?.Stop();
 			_edgeTts?.Stop();
+			_speechPaused = false;
+		}
+
+		internal bool TogglePauseSpeaking()
+		{
+			bool pause = !_speechPaused;
+			if (pause)
+			{
+				_tts?.Pause();
+				_edgeTts?.Pause();
+			}
+			else
+			{
+				_tts?.Resume();
+				_edgeTts?.Resume();
+			}
+			_speechPaused = pause;
+			return pause;
 		}
 
 		internal void ExportCatalogDialog()
@@ -1385,23 +1434,23 @@ namespace Frtal.LorebookReader
 		protected override void Update(GameTime gameTime)
 		{
 			//IL_0188: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0491: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0496: Unknown result type (might be due to invalid IL or missing references)
-			//IL_049a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0500: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0522: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0548: Unknown result type (might be due to invalid IL or missing references)
-			//IL_055f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_056d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0587: Unknown result type (might be due to invalid IL or missing references)
-			//IL_060d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0612: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0614: Unknown result type (might be due to invalid IL or missing references)
-			//IL_062b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0683: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06ca: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06e7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_049e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04a3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_050d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_052f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0555: Unknown result type (might be due to invalid IL or missing references)
+			//IL_056c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_057a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0594: Unknown result type (might be due to invalid IL or missing references)
+			//IL_061a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_061f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0621: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0638: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0690: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06ba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06f4: Unknown result type (might be due to invalid IL or missing references)
 			Action act;
 			while (_mainThreadQueue.TryDequeue(out act))
 			{
@@ -1476,7 +1525,7 @@ namespace Frtal.LorebookReader
 								_subtitleDirty = true;
 							}
 						}
-						else if (_cueIndex < _cues.Count)
+						else if (_cueIndex < _cues.Count && !_speechPaused)
 						{
 							_cueElapsedMs += gameTime.get_ElapsedGameTime().TotalMilliseconds;
 							double cps = 17.0 * Math.Max(0.5, _speakingRate.get_Value());
@@ -1612,61 +1661,136 @@ namespace Frtal.LorebookReader
 			}
 		}
 
+		private static void Safe(Action step)
+		{
+			try
+			{
+				step();
+			}
+			catch
+			{
+			}
+		}
+
 		protected override void Unload()
 		{
-			_encyclopediaView?.FlushEdits();
-			_readKeybind.get_Value().remove_Activated((EventHandler<EventArgs>)OnReadActivated);
-			_stopKeybind.get_Value().remove_Activated((EventHandler<EventArgs>)OnStopActivated);
-			_convToggleKeybind.get_Value().remove_Activated((EventHandler<EventArgs>)OnConvToggleActivated);
-			_debugDumpKeybind.get_Value().remove_Activated((EventHandler<EventArgs>)OnDebugDumpActivated);
-			_calibrateKeybind.get_Value().remove_Activated((EventHandler<EventArgs>)OnCalibrateActivated);
-			_bookCalibrateKeybind.get_Value().remove_Activated((EventHandler<EventArgs>)OnBookCalibrateActivated);
-			DialogZoneCalibrator calibrator = _calibrator;
-			if (calibrator != null)
+			if (_unloaded)
 			{
-				((Control)calibrator).Dispose();
+				return;
 			}
-			BookActionButton speakerButton = _speakerButton;
-			if (speakerButton != null)
+			_unloaded = true;
+			Safe(delegate
 			{
-				((Control)speakerButton).Dispose();
-			}
-			BookActionButton saveButton = _saveButton;
-			if (saveButton != null)
+				_encyclopediaView?.FlushEdits();
+			});
+			Safe(delegate
 			{
-				((Control)saveButton).Dispose();
-			}
-			BookActionButton appendButton = _appendButton;
-			if (appendButton != null)
+				_readKeybind.get_Value().remove_Activated((EventHandler<EventArgs>)OnReadActivated);
+			});
+			Safe(delegate
 			{
-				((Control)appendButton).Dispose();
-			}
-			SubtitleOverlay subtitleLabel = _subtitleLabel;
-			if (subtitleLabel != null)
+				_stopKeybind.get_Value().remove_Activated((EventHandler<EventArgs>)OnStopActivated);
+			});
+			Safe(delegate
 			{
-				((Control)subtitleLabel).Dispose();
-			}
-			CornerIcon cornerIcon = _cornerIcon;
-			if (cornerIcon != null)
+				_pauseKeybind.get_Value().remove_Activated((EventHandler<EventArgs>)OnPauseActivated);
+			});
+			Safe(delegate
 			{
-				((Control)cornerIcon).Dispose();
-			}
-			_textRenderer?.Dispose();
-			StandardWindow historyWindow = _historyWindow;
-			if (historyWindow != null)
+				_convToggleKeybind.get_Value().remove_Activated((EventHandler<EventArgs>)OnConvToggleActivated);
+			});
+			Safe(delegate
 			{
-				((Control)historyWindow).Dispose();
-			}
-			_tts?.Dispose();
-			_edgeTts?.Dispose();
-			foreach (Texture2D value in _xpIconCache.Values)
+				_debugDumpKeybind.get_Value().remove_Activated((EventHandler<EventArgs>)OnDebugDumpActivated);
+			});
+			Safe(delegate
 			{
-				if (value != null)
+				_calibrateKeybind.get_Value().remove_Activated((EventHandler<EventArgs>)OnCalibrateActivated);
+			});
+			Safe(delegate
+			{
+				_bookCalibrateKeybind.get_Value().remove_Activated((EventHandler<EventArgs>)OnBookCalibrateActivated);
+			});
+			Safe(delegate
+			{
+				DialogZoneCalibrator calibrator = _calibrator;
+				if (calibrator != null)
 				{
-					((GraphicsResource)value).Dispose();
+					((Control)calibrator).Dispose();
 				}
-			}
-			_xpIconCache.Clear();
+			});
+			Safe(delegate
+			{
+				BookActionButton speakerButton = _speakerButton;
+				if (speakerButton != null)
+				{
+					((Control)speakerButton).Dispose();
+				}
+			});
+			Safe(delegate
+			{
+				BookActionButton saveButton = _saveButton;
+				if (saveButton != null)
+				{
+					((Control)saveButton).Dispose();
+				}
+			});
+			Safe(delegate
+			{
+				BookActionButton appendButton = _appendButton;
+				if (appendButton != null)
+				{
+					((Control)appendButton).Dispose();
+				}
+			});
+			Safe(delegate
+			{
+				SubtitleOverlay subtitleLabel = _subtitleLabel;
+				if (subtitleLabel != null)
+				{
+					((Control)subtitleLabel).Dispose();
+				}
+			});
+			Safe(delegate
+			{
+				CornerIcon cornerIcon = _cornerIcon;
+				if (cornerIcon != null)
+				{
+					((Control)cornerIcon).Dispose();
+				}
+			});
+			Safe(delegate
+			{
+				_textRenderer?.Dispose();
+			});
+			Safe(delegate
+			{
+				StandardWindow historyWindow = _historyWindow;
+				if (historyWindow != null)
+				{
+					((Control)historyWindow).Dispose();
+				}
+			});
+			Safe(delegate
+			{
+				_tts?.Dispose();
+			});
+			Safe(delegate
+			{
+				_edgeTts?.Dispose();
+			});
+			Safe(delegate
+			{
+				foreach (Texture2D value in _xpIconCache.Values)
+				{
+					if (value != null)
+					{
+						((GraphicsResource)value).Dispose();
+					}
+				}
+				_xpIconCache.Clear();
+			});
+			Safe(BookReaderPanel.ClearImageCache);
 		}
 	}
 }

@@ -30,6 +30,10 @@ namespace Frtal.LorebookReader
 
 		private WaveOutEvent _currentOut;
 
+		private Stopwatch _currentClock;
+
+		public bool IsPaused { get; private set; }
+
 		public static string VoiceForLanguage(string lang)
 		{
 			string text = (lang ?? "").ToLowerInvariant();
@@ -111,6 +115,44 @@ namespace Frtal.LorebookReader
 			return null;
 		}
 
+		public void Pause()
+		{
+			try
+			{
+				_currentOut?.Pause();
+			}
+			catch
+			{
+			}
+			try
+			{
+				_currentClock?.Stop();
+			}
+			catch
+			{
+			}
+			IsPaused = true;
+		}
+
+		public void Resume()
+		{
+			try
+			{
+				_currentOut?.Play();
+			}
+			catch
+			{
+			}
+			try
+			{
+				_currentClock?.Start();
+			}
+			catch
+			{
+			}
+			IsPaused = false;
+		}
+
 		static EdgeTtsService()
 		{
 			CuratedVoices = new string[13]
@@ -158,6 +200,7 @@ namespace Frtal.LorebookReader
 
 		public void Stop()
 		{
+			IsPaused = false;
 			try
 			{
 				_cts?.Cancel();
@@ -176,8 +219,20 @@ namespace Frtal.LorebookReader
 
 		public void Dispose()
 		{
-			Stop();
-			_currentOut?.Dispose();
+			try
+			{
+				Stop();
+			}
+			catch
+			{
+			}
+			try
+			{
+				_currentOut?.Dispose();
+			}
+			catch
+			{
+			}
 		}
 
 		private static async Task<(byte[] mp3, List<TimeSpan> words)> SynthesizeChunkAsync(string text, string voice, string prosodyRate, CancellationToken outerCt)
@@ -266,7 +321,12 @@ namespace Frtal.LorebookReader
 				};
 				output.Init(reader);
 				output.Play();
-				Stopwatch sw = Stopwatch.StartNew();
+				Stopwatch sw = (_currentClock = Stopwatch.StartNew());
+				if (IsPaused)
+				{
+					output.Pause();
+					sw.Stop();
+				}
 				int wi = 0;
 				using (ct.Register(delegate
 				{
@@ -299,6 +359,7 @@ namespace Frtal.LorebookReader
 					}
 				}
 				_currentOut = null;
+				_currentClock = null;
 			}
 			finally
 			{

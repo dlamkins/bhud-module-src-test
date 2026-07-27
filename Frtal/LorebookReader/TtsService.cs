@@ -21,6 +21,48 @@ namespace Frtal.LorebookReader
 
 		private WaveOutEvent _currentOut;
 
+		private Stopwatch _currentClock;
+
+		public bool IsPaused { get; private set; }
+
+		public void Pause()
+		{
+			try
+			{
+				_currentOut?.Pause();
+			}
+			catch
+			{
+			}
+			try
+			{
+				_currentClock?.Stop();
+			}
+			catch
+			{
+			}
+			IsPaused = true;
+		}
+
+		public void Resume()
+		{
+			try
+			{
+				_currentOut?.Play();
+			}
+			catch
+			{
+			}
+			try
+			{
+				_currentClock?.Start();
+			}
+			catch
+			{
+			}
+			IsPaused = false;
+		}
+
 		public static IEnumerable<(string Name, string Lang)> InstalledVoices()
 		{
 			return from v in SpeechSynthesizer.AllVoices
@@ -69,6 +111,7 @@ namespace Frtal.LorebookReader
 
 		public void Stop()
 		{
+			IsPaused = false;
 			try
 			{
 				_cts?.Cancel();
@@ -87,9 +130,27 @@ namespace Frtal.LorebookReader
 
 		public void Dispose()
 		{
-			Stop();
-			_currentOut?.Dispose();
-			_synth.Dispose();
+			try
+			{
+				Stop();
+			}
+			catch
+			{
+			}
+			try
+			{
+				_currentOut?.Dispose();
+			}
+			catch
+			{
+			}
+			try
+			{
+				_synth?.Dispose();
+			}
+			catch
+			{
+			}
 		}
 
 		private string SelectVoice(string voiceName, string languageTag)
@@ -167,7 +228,12 @@ namespace Frtal.LorebookReader
 				};
 				output.Init(reader);
 				output.Play();
-				Stopwatch sw = Stopwatch.StartNew();
+				Stopwatch sw = (_currentClock = Stopwatch.StartNew());
+				if (IsPaused)
+				{
+					output.Pause();
+					sw.Stop();
+				}
 				int wi = 0;
 				using (ct.Register(delegate
 				{
@@ -200,6 +266,7 @@ namespace Frtal.LorebookReader
 					}
 				}
 				_currentOut = null;
+				_currentClock = null;
 			}
 			finally
 			{

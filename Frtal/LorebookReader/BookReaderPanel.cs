@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
@@ -17,6 +18,10 @@ namespace Frtal.LorebookReader
 			public bool Head;
 
 			public bool Gap;
+
+			public Texture2D Img;
+
+			public int ImgH;
 		}
 
 		private sealed class FullscreenButton : Control
@@ -232,6 +237,10 @@ namespace Frtal.LorebookReader
 
 		private float _fontSize = 18f;
 
+		public static string ImageDirectory;
+
+		private static readonly Dictionary<string, Texture2D> ImgCache = new Dictionary<string, Texture2D>();
+
 		private readonly List<List<Line>> _pages = new List<List<Line>>();
 
 		private int _page;
@@ -290,6 +299,46 @@ namespace Frtal.LorebookReader
 		}
 
 		public event EventHandler FullscreenToggled;
+
+		private static Texture2D LoadImage(string fileName)
+		{
+			if (string.IsNullOrEmpty(ImageDirectory))
+			{
+				return null;
+			}
+			if (ImgCache.TryGetValue(fileName, out var cached))
+			{
+				return cached;
+			}
+			Texture2D tex = null;
+			try
+			{
+				string path = Path.Combine(ImageDirectory, fileName);
+				if (File.Exists(path))
+				{
+					using FileStream fs = File.OpenRead(path);
+					tex = TextureUtil.FromStreamPremultiplied((Stream)fs);
+				}
+			}
+			catch (Exception ex)
+			{
+				Logger.Warn(ex, "Story illustration could not be loaded.");
+			}
+			ImgCache[fileName] = tex;
+			return tex;
+		}
+
+		public static void ClearImageCache()
+		{
+			foreach (Texture2D value in ImgCache.Values)
+			{
+				if (value != null)
+				{
+					((GraphicsResource)value).Dispose();
+				}
+			}
+			ImgCache.Clear();
+		}
 
 		public BookReaderPanel(TextRenderer tr, Texture2D parchment, Texture2D arrowLeft = null, Texture2D arrowRight = null, Texture2D ornament = null, Texture2D seal = null, Texture2D expandIcon = null, Texture2D collapseIcon = null)
 			: this()
@@ -398,6 +447,37 @@ namespace Frtal.LorebookReader
 				{
 					continue;
 				}
+				Line item;
+				if (para.StartsWith("⟦IMG:", StringComparison.Ordinal) && para.EndsWith("⟧", StringComparison.Ordinal))
+				{
+					Texture2D tex = LoadImage(para.Substring("⟦IMG:".Length, para.Length - "⟦IMG:".Length - "⟧".Length));
+					if (tex != null)
+					{
+						float scale = Math.Min((float)wrapW / (float)tex.get_Width(), availH * 0.55f / (float)tex.get_Height());
+						if (scale > 1f)
+						{
+							scale = 1f;
+						}
+						int ih = Math.Max(1, (int)((float)tex.get_Height() * scale));
+						if (used + (float)ih + gapH > availH && cur.Count > 0)
+						{
+							_pages.Add(cur);
+							cur = new List<Line>();
+							used = 0f;
+						}
+						List<Line> list = cur;
+						item = new Line
+						{
+							Text = "",
+							Img = tex,
+							ImgH = ih,
+							Gap = (cur.Count > 0)
+						};
+						list.Add(item);
+						used += (float)ih + gapH;
+					}
+					continue;
+				}
 				bool head = IsHeading(para);
 				List<string> lines = new List<string>();
 				string[] array2 = para.Split('\n');
@@ -422,12 +502,14 @@ namespace Frtal.LorebookReader
 						need = lh;
 						first = false;
 					}
-					cur.Add(new Line
+					List<Line> list2 = cur;
+					item = new Line
 					{
 						Text = ln,
 						Head = head,
 						Gap = (first && cur.Count > 0)
-					});
+					};
+					list2.Add(item);
 					used += need;
 					first = false;
 				}
@@ -657,16 +739,35 @@ namespace Frtal.LorebookReader
 		private void PaintPage(SpriteBatch sb, Rectangle bounds, Rectangle page, float f, bool anchorLeft)
 		{
 			//IL_0013: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ef: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00f5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0121: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0174: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01de: Unknown result type (might be due to invalid IL or missing references)
 			List<Line> list = _pages[_page - 1];
 			float y = bounds.Y + 64;
 			foreach (Line ln in list)
 			{
+				if (ln.Img != null)
+				{
+					if (ln.Gap)
+					{
+						y += _tr.LineHeight(_fontSize) * 0.55f;
+					}
+					int iw = (int)((float)ln.Img.get_Width() * ((float)ln.ImgH / (float)ln.Img.get_Height()));
+					float cx = (float)bounds.X + (float)(bounds.Width - iw) / 2f;
+					int dx2 = SqueezeX(bounds, page, f, anchorLeft, cx);
+					SpriteBatchExtensions.DrawOnCtrl(sb, (Control)(object)this, ln.Img, new Rectangle(dx2, (int)y, (int)((float)iw * f), ln.ImgH), (Rectangle?)null, Color.get_White());
+					y += (float)ln.ImgH;
+					continue;
+				}
 				float lh = (ln.Head ? _tr.LineHeight(_fontSize + 2f, bold: true) : _tr.LineHeight(_fontSize));
 				if (ln.Gap)
 				{
@@ -847,7 +948,7 @@ namespace Frtal.LorebookReader
 				float scale = Math.Min((float)maxS / (float)_xpIcon.get_Width(), (float)maxS / (float)_xpIcon.get_Height());
 				int w2 = (int)((float)_xpIcon.get_Width() * scale);
 				int h2 = (int)((float)_xpIcon.get_Height() * scale);
-				SpriteBatchExtensions.DrawOnCtrl(sb, (Control)(object)this, _xpIcon, new Rectangle((int)center.X, (int)center.Y, (int)((float)w2 * f), h2), (Rectangle?)null, Color.get_White() * 0.85f, -0.14f, new Vector2((float)_xpIcon.get_Width() / 2f, (float)_xpIcon.get_Height() / 2f), (SpriteEffects)0);
+				SpriteBatchExtensions.DrawOnCtrl(sb, (Control)(object)this, _xpIcon, new Rectangle((int)center.X, (int)center.Y, (int)((float)w2 * f), h2), (Rectangle?)null, Color.get_White() * 0.85f, 0f, new Vector2((float)_xpIcon.get_Width() / 2f, (float)_xpIcon.get_Height() / 2f), (SpriteEffects)0);
 				return;
 			}
 			string name = _entry.Expansion.Trim();
@@ -879,9 +980,9 @@ namespace Frtal.LorebookReader
 				//IL_0043: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0051: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-				Vector2 o = Vector2.Transform(offset, Matrix.CreateRotationZ(-0.14f));
+				Vector2 o = Vector2.Transform(offset, Matrix.CreateRotationZ(0f));
 				Vector2 pos = center + o;
-				SpriteBatchExtensions.DrawOnCtrl(sb, (Control)(object)this, tex, new Rectangle((int)pos.X, (int)pos.Y, (int)((float)w * f), h), (Rectangle?)null, c, -0.14f, new Vector2((float)tex.get_Width() / 2f, (float)tex.get_Height() / 2f), (SpriteEffects)0);
+				SpriteBatchExtensions.DrawOnCtrl(sb, (Control)(object)this, tex, new Rectangle((int)pos.X, (int)pos.Y, (int)((float)w * f), h), (Rectangle?)null, c, 0f, new Vector2((float)tex.get_Width() / 2f, (float)tex.get_Height() / 2f), (SpriteEffects)0);
 			}
 		}
 	}

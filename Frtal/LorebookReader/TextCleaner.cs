@@ -101,6 +101,23 @@ namespace Frtal.LorebookReader
 			return (double)lines.Count((string l) => (double)l.Length < (double)maxLen * 0.75) >= (double)lines.Count * 0.5;
 		}
 
+		private static string StripNonSpeech(string text)
+		{
+			text = Regex.Replace(text, "⟦IMG:[^⟧]*⟧", " ");
+			text = Regex.Replace(text, "https?://\\S+", " ");
+			List<string> keep = new List<string>();
+			string[] array = text.Replace("\r", "").Split('\n');
+			foreach (string line in array)
+			{
+				string t = line.Trim();
+				if (t.Length <= 0 || Regex.IsMatch(t, "[\\p{L}\\p{Nd}]"))
+				{
+					keep.Add(line);
+				}
+			}
+			return string.Join("\n", keep);
+		}
+
 		private static string CleanInline(string text)
 		{
 			text = Regex.Replace(text, "\\s+", " ");
@@ -318,6 +335,11 @@ namespace Frtal.LorebookReader
 
 		public static List<string> SplitChunks(string text, int maxLen = 200)
 		{
+			if (string.IsNullOrWhiteSpace(text))
+			{
+				return new List<string>();
+			}
+			text = StripNonSpeech(text);
 			if (string.IsNullOrWhiteSpace(text))
 			{
 				return new List<string>();
