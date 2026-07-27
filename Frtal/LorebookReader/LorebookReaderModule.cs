@@ -346,24 +346,9 @@ namespace Frtal.LorebookReader
 			//IL_0326: Unknown result type (might be due to invalid IL or missing references)
 			//IL_034f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_036a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_036f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0374: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0384: Unknown result type (might be due to invalid IL or missing references)
-			//IL_038f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0396: Unknown result type (might be due to invalid IL or missing references)
-			//IL_039d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03a4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03b4: Expected O, but got Unknown
-			//IL_03dc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03ef: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03fe: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03e1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03f4: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0403: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0408: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0418: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0423: Unknown result type (might be due to invalid IL or missing references)
-			//IL_042a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0431: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0441: Expected O, but got Unknown
 			_readKeybind.get_Value().set_Enabled(true);
 			_readKeybind.get_Value().add_Activated((EventHandler<EventArgs>)OnReadActivated);
 			_stopKeybind.get_Value().set_Enabled(true);
@@ -416,10 +401,10 @@ namespace Frtal.LorebookReader
 				Point size = ((Control)GameService.Graphics.get_SpriteScreen()).get_Size();
 				if (size.X > 0 && size.Y > 0)
 				{
-					float val3 = ((float)((Control)_subtitleLabel).get_Location().X + (float)((Control)_subtitleLabel).get_Width() / 2f) / (float)size.X * 100f;
-					float val4 = (float)((Control)_subtitleLabel).get_Location().Y / (float)size.Y * 100f;
-					_subtitleX.set_Value(Math.Max(0f, Math.Min(100f, val3)));
-					_subtitleY.set_Value(Math.Max(0f, Math.Min(100f, val4)));
+					float val = ((float)((Control)_subtitleLabel).get_Location().X + (float)((Control)_subtitleLabel).get_Width() / 2f) / (float)size.X * 100f;
+					float val2 = (float)((Control)_subtitleLabel).get_Location().Y / (float)size.Y * 100f;
+					_subtitleX.set_Value(Math.Max(0f, Math.Min(100f, val)));
+					_subtitleY.set_Value(Math.Max(0f, Math.Min(100f, val2)));
 				}
 			};
 			_parchmentTexture = base.ModuleParameters.get_ContentsManager().GetTexture("parchment.png");
@@ -441,24 +426,24 @@ namespace Frtal.LorebookReader
 			{
 				int tw = winTex.get_Width();
 				int th = winTex.get_Height();
-				StandardWindow val = new StandardWindow(winTex, new Rectangle(0, 0, tw, th), new Rectangle((int)((float)tw * 0.03f), (int)((float)th * 0.078f), (int)((float)tw * 0.94f), (int)((float)th * 0.88f)), new Point(Math.Min(1120, tw), Math.Min(800, th)));
-				((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-				((WindowBase2)val).set_Title("Lorebook Codex");
-				((WindowBase2)val).set_SavesPosition(true);
-				((WindowBase2)val).set_SavesSize(true);
-				((WindowBase2)val).set_CanResize(true);
-				((WindowBase2)val).set_Id("frtal_lorebook_reader_encyclopedia_v2");
-				_historyWindow = val;
+				CodexWindow codexWindow = new CodexWindow(winTex, new Rectangle(0, 0, tw, th), new Rectangle((int)((float)tw * 0.03f), (int)((float)th * 0.078f), (int)((float)tw * 0.94f), (int)((float)th * 0.88f)), new Point(Math.Min(1120, tw), Math.Min(800, th)));
+				((Control)codexWindow).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+				((WindowBase2)codexWindow).set_Title("Lorebook Codex");
+				((WindowBase2)codexWindow).set_SavesPosition(true);
+				((WindowBase2)codexWindow).set_SavesSize(true);
+				((WindowBase2)codexWindow).set_CanResize(true);
+				((WindowBase2)codexWindow).set_Id("frtal_lorebook_reader_encyclopedia_v2");
+				_historyWindow = (StandardWindow)(object)codexWindow;
 			}
 			else
 			{
-				StandardWindow val2 = new StandardWindow(GameService.Content.get_DatAssetCache().GetTextureFromAssetId(155985), new Rectangle(40, 26, 913, 691), new Rectangle(70, 71, 839, 605), new Point(1120, 800));
-				((Control)val2).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
-				((WindowBase2)val2).set_Title("Lorebook Codex");
-				((WindowBase2)val2).set_SavesPosition(true);
-				((WindowBase2)val2).set_CanResize(true);
-				((WindowBase2)val2).set_Id("frtal_lorebook_reader_encyclopedia_v2");
-				_historyWindow = val2;
+				CodexWindow codexWindow2 = new CodexWindow(AsyncTexture2D.op_Implicit(GameService.Content.get_DatAssetCache().GetTextureFromAssetId(155985)), new Rectangle(40, 26, 913, 691), new Rectangle(70, 71, 839, 605), new Point(1120, 800));
+				((Control)codexWindow2).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
+				((WindowBase2)codexWindow2).set_Title("Lorebook Codex");
+				((WindowBase2)codexWindow2).set_SavesPosition(true);
+				((WindowBase2)codexWindow2).set_CanResize(true);
+				((WindowBase2)codexWindow2).set_Id("frtal_lorebook_reader_encyclopedia_v2");
+				_historyWindow = (StandardWindow)(object)codexWindow2;
 			}
 			((Control)_historyWindow).add_Hidden((EventHandler<EventArgs>)delegate
 			{
