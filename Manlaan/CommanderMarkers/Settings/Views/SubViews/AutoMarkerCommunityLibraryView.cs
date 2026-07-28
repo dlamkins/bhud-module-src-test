@@ -294,22 +294,22 @@ namespace Manlaan.CommanderMarkers.Settings.Views.SubViews
 			//IL_0056: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
 			//IL_006d: Expected O, but got Unknown
-			//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0103: Expected O, but got Unknown
-			//IL_01cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0308: Unknown result type (might be due to invalid IL or missing references)
-			//IL_030d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0315: Unknown result type (might be due to invalid IL or missing references)
-			//IL_032a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0335: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0367: Unknown result type (might be due to invalid IL or missing references)
-			//IL_036c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0381: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0397: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0114: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011b: Expected O, but got Unknown
+			//IL_0200: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0207: Unknown result type (might be due to invalid IL or missing references)
+			//IL_034c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0395: Unknown result type (might be due to invalid IL or missing references)
+			//IL_039a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_03a2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03c2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0403: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0408: Unknown result type (might be due to invalid IL or missing references)
+			//IL_041d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0433: Unknown result type (might be due to invalid IL or missing references)
+			//IL_043e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0449: Unknown result type (might be due to invalid IL or missing references)
 			if (panel == null)
 			{
 				return;
@@ -372,16 +372,30 @@ namespace Manlaan.CommanderMarkers.Settings.Views.SubViews
 					iconButton.Icon = Service.Textures!.IconEye;
 					((Control)iconButton).set_BasicTooltipText("Hover to preview markers on the map");
 					((Control)iconButton).set_Size(new Point(30, 30));
-					((Control)iconButton).add_MouseEntered((EventHandler<MouseEventArgs>)delegate
+					IconButton preview = iconButton;
+					int previewHoverGeneration = 0;
+					((Control)preview).add_MouseEntered((EventHandler<MouseEventArgs>)delegate
 					{
-						MarkerSet markerSet3 = Service.CommunityCatalog.FetchSetDetail(summary.Id);
-						if (markerSet3 != null)
+						int generation = ++previewHoverGeneration;
+						string setId = summary.Id;
+						Task.Run(delegate
 						{
-							Service.MapWatch.PreviewMarkerSet(markerSet3);
-						}
+							MarkerSet markerSet3 = Service.CommunityCatalog.FetchSetDetail(setId);
+							if (markerSet3 != null)
+							{
+								GameThreadUtil.Enqueue(delegate
+								{
+									if (generation == previewHoverGeneration && ((Control)preview).get_Parent() != null)
+									{
+										Service.MapWatch.PreviewMarkerSet(markerSet3);
+									}
+								});
+							}
+						});
 					});
-					((Control)iconButton).add_MouseLeft((EventHandler<MouseEventArgs>)delegate
+					((Control)preview).add_MouseLeft((EventHandler<MouseEventArgs>)delegate
 					{
+						previewHoverGeneration++;
 						Service.MapWatch.RemovePreviewMarkerSet();
 					});
 					StandardButton val3 = new StandardButton();

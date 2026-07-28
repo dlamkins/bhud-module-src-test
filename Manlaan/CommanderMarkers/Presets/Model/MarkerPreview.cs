@@ -1,9 +1,7 @@
-using Blish_HUD;
 using Blish_HUD.Controls;
 using Manlaan.CommanderMarkers.Library.Enums;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Extended.BitmapFonts;
 
 namespace Manlaan.CommanderMarkers.Presets.Model
 {
@@ -15,12 +13,14 @@ namespace Manlaan.CommanderMarkers.Presets.Model
 
 		private MarkerSet _markerSet;
 
-		private BitmapFont _bitmapFont = GameService.Content.get_DefaultFont16();
-
 		public MarkerPreview(MapData mapData, MarkerSet markerSet)
 		{
+			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0026: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
 			_mapData = mapData;
 			_markerSet = markerSet;
+			_trigger = markerSet.trigger?.ToVector3() ?? Vector3.get_Zero();
 		}
 
 		public float DistanceFrom(Vector3 playerPosition)

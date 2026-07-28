@@ -1,8 +1,11 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
 using Manlaan.CommanderMarkers.Library.Models;
 using Manlaan.CommanderMarkers.Presets.Model;
 using Newtonsoft.Json;
@@ -24,6 +27,8 @@ namespace Manlaan.CommanderMarkers.Library.Services
 
 		public const string IndexFileName = "community_index.json";
 
+		private const int MaxDetailCacheEntries = 100;
+
 		private readonly CommanderMarkersManifestService _manifestService;
 
 		private readonly string _moduleDirectory;
@@ -31,6 +36,14 @@ namespace Manlaan.CommanderMarkers.Library.Services
 		private readonly List<CommunitySetSummary> _sets = new List<CommunitySetSummary>();
 
 		private readonly List<CommunityCategoryEntry> _categories = new List<CommunityCategoryEntry>();
+
+		private readonly ConcurrentDictionary<string, (MarkerSet Set, long Version)> _detailCache = new ConcurrentDictionary<string, (MarkerSet, long)>();
+
+		private readonly ConcurrentDictionary<string, Task<MarkerSet?>> _detailInflight = new ConcurrentDictionary<string, Task<MarkerSet>>();
+
+		private readonly ConcurrentQueue<(string SetId, long Version)> _detailCacheOrder = new ConcurrentQueue<(string, long)>();
+
+		private long _detailCacheVersion;
 
 		private string _lastEdit = "";
 
@@ -82,13 +95,14 @@ namespace Manlaan.CommanderMarkers.Library.Services
 			CommanderMarkersManifest manifest = _manifestService.Manifest;
 			try
 			{
-				using WebClient client = new WebClient();
+				using WebClient client = ModuleHttp.CreateClient();
 				string checkUrl = manifest.Absolute(manifest.CommunityCheckUrl);
 				string remoteLastEdit = JObject.Parse(client.DownloadString(checkUrl)).Value<string>("lastEdit") ?? "";
 				if (!string.IsNullOrEmpty(remoteLastEdit) && remoteLastEdit == _lastEdit && _sets.Count > 0)
 				{
 					return false;
 				}
+				string previousLastEdit = _lastEdit;
 				List<CommunitySetSummary> fetched = new List<CommunitySetSummary>();
 				int offset = 0;
 				int total = -1;
@@ -121,6 +135,10 @@ namespace Manlaan.CommanderMarkers.Library.Services
 				_sets.Clear();
 				_sets.AddRange(fetched);
 				_lastEdit = remoteLastEdit;
+				if (previousLastEdit != remoteLastEdit)
+				{
+					ClearDetailCache();
+				}
 				SaveIndex();
 				this.CatalogUpdated?.Invoke(this, EventArgs.Empty);
 				return true;
@@ -133,14 +151,42 @@ namespace Manlaan.CommanderMarkers.Library.Services
 
 		public MarkerSet? FetchSetDetail(string setId)
 		{
-			string setId2 = setId;
-			if (string.IsNullOrWhiteSpace(setId2))
+			if (string.IsNullOrWhiteSpace(setId))
 			{
 				return null;
 			}
+			if (_detailCache.TryGetValue(setId, out var cached))
+			{
+				TouchDetailCache(setId, cached);
+				return CloneMarkerSet(cached.Item1);
+			}
+			Task<MarkerSet> task = _detailInflight.GetOrAdd(setId, delegate(string id)
+			{
+				string id2 = id;
+				return Task.Run(() => DownloadSetDetail(id2));
+			});
 			try
 			{
-				using WebClient client = new WebClient();
+				MarkerSet result = task.GetAwaiter().GetResult();
+				return (result == null) ? null : CloneMarkerSet(result);
+			}
+			finally
+			{
+				_detailInflight.TryRemove(setId, out var _);
+			}
+		}
+
+		private MarkerSet? DownloadSetDetail(string setId)
+		{
+			string setId2 = setId;
+			if (_detailCache.TryGetValue(setId2, out var cached))
+			{
+				TouchDetailCache(setId2, cached);
+				return cached.Item1;
+			}
+			try
+			{
+				using WebClient client = ModuleHttp.CreateClient();
 				string url = _manifestService.Manifest.Resolve(_manifestService.Manifest.SetDetailUrl, setId2);
 				string value = client.DownloadString(url);
 				CommunitySetSummary summary = _sets.FirstOrDefault((CommunitySetSummary s) => s.Id == setId2);
@@ -157,12 +203,57 @@ namespace Manlaan.CommanderMarkers.Library.Services
 				markerSet.syncDetached = false;
 				markerSet.localModifiedAt = null;
 				markerSet.syncBaselineHash = SyncBaselineHash.Compute(markerSet);
+				StoreDetailCache(setId2, markerSet);
 				return markerSet;
 			}
 			catch (Exception)
 			{
 				return null;
 			}
+		}
+
+		private void StoreDetailCache(string setId, MarkerSet markerSet)
+		{
+			MarkerSet stored = CloneMarkerSet(markerSet);
+			long version = Interlocked.Increment(ref _detailCacheVersion);
+			_detailCache[setId] = (stored, version);
+			_detailCacheOrder.Enqueue((setId, version));
+			TrimDetailCache();
+		}
+
+		private void TouchDetailCache(string setId, (MarkerSet Set, long Version) current)
+		{
+			long version = Interlocked.Increment(ref _detailCacheVersion);
+			if (_detailCache.TryUpdate(setId, (current.Set, version), current))
+			{
+				_detailCacheOrder.Enqueue((setId, version));
+			}
+		}
+
+		private void TrimDetailCache()
+		{
+			(string, long) oldest;
+			while (_detailCache.Count > 100 && _detailCacheOrder.TryDequeue(out oldest))
+			{
+				if (_detailCache.TryGetValue(oldest.Item1, out var current) && current.Item2 == oldest.Item2 && _detailCache.TryRemove(oldest.Item1, out var removed) && removed.Item2 != oldest.Item2)
+				{
+					_detailCache.TryAdd(oldest.Item1, removed);
+				}
+			}
+		}
+
+		private void ClearDetailCache()
+		{
+			_detailCache.Clear();
+			(string, long) result;
+			while (_detailCacheOrder.TryDequeue(out result))
+			{
+			}
+		}
+
+		private static MarkerSet CloneMarkerSet(MarkerSet source)
+		{
+			return JsonConvert.DeserializeObject<MarkerSet>(JsonConvert.SerializeObject(source)) ?? new MarkerSet();
 		}
 
 		private void SaveIndex()

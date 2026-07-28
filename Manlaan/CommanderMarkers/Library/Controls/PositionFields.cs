@@ -53,51 +53,51 @@ namespace Manlaan.CommanderMarkers.Library.Controls
 			//IL_00f0: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00fb: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0117: Expected O, but got Unknown
-			//IL_0144: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0149: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0150: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0153: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0162: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0179: Unknown result type (might be due to invalid IL or missing references)
-			//IL_017e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0157: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0164: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0169: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0173: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0180: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0185: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c2: Expected O, but got Unknown
-			//IL_01c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01c7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c9: Expected O, but got Unknown
+			//IL_01c9: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01ce: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ed: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01fa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0201: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0206: Unknown result type (might be due to invalid IL or missing references)
-			//IL_021f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0224: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0234: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0243: Expected O, but got Unknown
-			//IL_0243: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0248: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0226: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0235: Unknown result type (might be due to invalid IL or missing references)
+			//IL_023b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_024a: Expected O, but got Unknown
+			//IL_024a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_024f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0258: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0262: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0267: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0271: Unknown result type (might be due to invalid IL or missing references)
-			//IL_027e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0283: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0256: Unknown result type (might be due to invalid IL or missing references)
+			//IL_025f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0269: Unknown result type (might be due to invalid IL or missing references)
+			//IL_026e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0278: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0285: Unknown result type (might be due to invalid IL or missing references)
 			//IL_028a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02bb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ca: Expected O, but got Unknown
+			//IL_0291: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02c2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d1: Expected O, but got Unknown
 			_getRtApiSlotIndex = getRtApiSlotIndex;
 			((Control)this).set_Size((_getRtApiSlotIndex != null) ? new Point(510, 30) : new Point(400, 30));
 			_worldCoord = marker ?? new WorldCoord();
@@ -121,7 +121,10 @@ namespace Manlaan.CommanderMarkers.Library.Controls
 				((Control)val2).set_Enabled(Service.RtApiConnection?.IsActive ?? false);
 				_importBtn = val2;
 				((Control)_importBtn).add_Click((EventHandler<MouseEventArgs>)ImportBtn_Click);
-				Service.RtApiConnection!.ConnectionStateChanged += new EventHandler<RtApiConnectionState>(OnRtApiConnectionStateChanged);
+				if (Service.RtApiConnection != null)
+				{
+					Service.RtApiConnection!.ConnectionStateChanged += new EventHandler<RtApiConnectionState>(OnRtApiConnectionStateChanged);
+				}
 			}
 			Label val3 = new Label();
 			((Control)val3).set_Parent((Container)(object)this);

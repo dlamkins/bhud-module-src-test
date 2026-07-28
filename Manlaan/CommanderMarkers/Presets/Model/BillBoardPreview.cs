@@ -28,10 +28,14 @@ namespace Manlaan.CommanderMarkers.Presets.Model
 
 		public BillBoardPreview(MapData mapData, MarkerSet markerSet)
 		{
-			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0087: Unknown result type (might be due to invalid IL or missing references)
 			_markerSet = markerSet;
 			_mapData = mapData;
+			_trigger = markerSet.trigger?.ToVector3() ?? Vector3.get_Zero();
 			markerSet.marks.ForEach(delegate(MarkerCoord mark)
 			{
 				//IL_0014: Unknown result type (might be due to invalid IL or missing references)

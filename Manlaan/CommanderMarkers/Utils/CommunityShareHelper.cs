@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using Manlaan.CommanderMarkers.Library.Models;
+using Manlaan.CommanderMarkers.Library.Services;
 using Manlaan.CommanderMarkers.Presets.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -73,7 +74,7 @@ namespace Manlaan.CommanderMarkers.Utils
 					};
 				}
 				JObject payload = MarkerSetSubmission.ToSubmissionPayload(markerSet, category);
-				using WebClient client = new WebClient();
+				using WebClient client = ModuleHttp.CreateClient();
 				client.Headers[HttpRequestHeader.Authorization] = "Bearer " + subtoken;
 				client.Headers[HttpRequestHeader.ContentType] = "application/json";
 				string url = Service.ManifestService.Manifest.Absolute(Service.ManifestService.Manifest.SubmissionsUrl);

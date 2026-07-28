@@ -38,8 +38,6 @@ namespace Manlaan.CommanderMarkers.Pathing.Entities
 
 		private DynamicVertexBuffer _vertexBuffer;
 
-		private bool _mouseOver;
-
 		public bool AutoResize
 		{
 			get
@@ -185,6 +183,7 @@ namespace Manlaan.CommanderMarkers.Pathing.Entities
 		static MarkerPathable()
 		{
 			Logger = Logger.GetLogger<MarkerPathable>();
+			_fadeTexture = null;
 			_sharedMarkerEffect = new MarkerEffect(GameService.Content.get_ContentManager().Load<Effect>("effects\\marker"));
 		}
 

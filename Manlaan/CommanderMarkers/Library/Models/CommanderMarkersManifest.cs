@@ -4,7 +4,7 @@ namespace Manlaan.CommanderMarkers.Library.Models
 {
 	public class CommanderMarkersManifest
 	{
-		public string ServerUrl { get; set; } = "https://gw2geoguesser.fly.dev";
+		public string ServerUrl { get; set; } = "https://addons.soeed.com";
 
 
 		public string CommunityCheckUrl { get; set; } = "/commander-markers/v1/community/check";

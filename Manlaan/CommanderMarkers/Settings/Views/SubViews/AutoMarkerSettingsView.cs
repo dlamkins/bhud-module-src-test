@@ -84,7 +84,11 @@ namespace Manlaan.CommanderMarkers.Settings.Views.SubViews
 			_settings.AutoMarker_PlacementDelay.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)delegate
 			{
 				Control obj = delayLabel;
-				((Label)((obj is Label) ? obj : null)).set_Text($"  Delay Time: {_settings.AutoMarker_PlacementDelay.get_Value()} ms");
+				Label val4 = (Label)(object)((obj is Label) ? obj : null);
+				if (val4 != null)
+				{
+					val4.set_Text($"  Delay Time: {_settings.AutoMarker_PlacementDelay.get_Value()} ms");
+				}
 			});
 		}
 

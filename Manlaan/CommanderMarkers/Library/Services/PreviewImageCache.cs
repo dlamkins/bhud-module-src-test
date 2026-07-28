@@ -253,7 +253,7 @@ namespace Manlaan.CommanderMarkers.Library.Services
 		{
 			try
 			{
-				using WebClient client = new WebClient();
+				using WebClient client = ModuleHttp.CreateClient();
 				byte[] bytes = client.DownloadData(url);
 				if (bytes.Length == 0)
 				{
@@ -273,7 +273,7 @@ namespace Manlaan.CommanderMarkers.Library.Services
 		{
 			try
 			{
-				using WebClient client = new WebClient();
+				using WebClient client = ModuleHttp.CreateClient();
 				byte[] bytes = client.DownloadData(url);
 				if (bytes.Length == 0)
 				{

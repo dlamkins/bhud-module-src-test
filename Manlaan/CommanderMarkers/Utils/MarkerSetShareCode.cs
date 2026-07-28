@@ -93,7 +93,8 @@ namespace Manlaan.CommanderMarkers.Utils
 			{
 				return false;
 			}
-			bool hasMapPayload = j["mapId"] != null && j["mapId"]!.Type != JTokenType.Null;
+			JToken mapIdToken = j["mapId"];
+			bool hasMapPayload = mapIdToken != null && mapIdToken.Type != JTokenType.Null;
 			if (!hasMapPayload)
 			{
 				JArray markers = j["markers"] as JArray;

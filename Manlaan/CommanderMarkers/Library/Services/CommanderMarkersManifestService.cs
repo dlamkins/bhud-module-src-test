@@ -11,7 +11,7 @@ namespace Manlaan.CommanderMarkers.Library.Services
 
 		private bool _loaded;
 
-		public static string ManifestUrl => "https://gw2geoguesser.fly.dev/commander_markers_v1.json";
+		public static string ManifestUrl => "https://addons.soeed.com/commander_markers_v1.json";
 
 		public CommanderMarkersManifest Manifest => _manifest;
 
@@ -21,7 +21,7 @@ namespace Manlaan.CommanderMarkers.Library.Services
 		{
 			try
 			{
-				using WebClient client = new WebClient();
+				using WebClient client = ModuleHttp.CreateClient();
 				JObject i = JObject.Parse(client.DownloadString(ManifestUrl));
 				_manifest.ServerUrl = i.Value<string>("server_url") ?? _manifest.ServerUrl;
 				_manifest.CommunityCheckUrl = i.Value<string>("community_check_url") ?? _manifest.CommunityCheckUrl;

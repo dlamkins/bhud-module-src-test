@@ -29,7 +29,7 @@ namespace Manlaan.CommanderMarkers.Library.Services
 		{
 			try
 			{
-				using WebClient webClient = new WebClient();
+				using WebClient webClient = ModuleHttp.CreateClient();
 				CommunitySets sets = JsonConvert.DeserializeObject<CommunitySets>(webClient.DownloadString(FileUrl));
 				if (sets == null)
 				{
