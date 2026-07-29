@@ -134,6 +134,12 @@ namespace rp.spark.Services
 			QueueSync();
 		}
 
+		public void InvalidateProfileUpload()
+		{
+			_lastUploadedProfileId = string.Empty;
+			_lastProfileUpdatedAt = DateTime.MinValue;
+		}
+
 		public void SyncSoon()
 		{
 			_nextSyncAttempt = DateTime.MinValue;
@@ -452,7 +458,7 @@ namespace rp.spark.Services
 			{
 				return true;
 			}
-			if (SameTrimmed(previous.AccountName, current.AccountName) && SameTrimmed(previous.OfficialCharacterName, current.OfficialCharacterName) && SameTrimmed(previous.DisplayCharacterName, current.DisplayCharacterName) && SameTrimmed(previous.Race, current.Race) && SameTrimmed(previous.CustomRace, current.CustomRace) && SameTrimmed(previous.Profession, current.Profession) && SameTrimmed(previous.CustomProfession, current.CustomProfession) && SameTrimmed(previous.ActiveProfileId, current.ActiveProfileId) && previous.IsMature == current.IsMature && previous.Experience == current.Experience && SameTrimmed(previous.ActiveProfileName, current.ActiveProfileName) && !(previous.ProfileUpdatedAtTime != current.ProfileUpdatedAtTime) && previous.Status == current.Status && SameTrimmed(previous.Currently, current.Currently) && SameTrimmed(previous.OutOfCharacterInfo, current.OutOfCharacterInfo) && SameTrimmed(previous.LocationName, current.LocationName) && previous.IsLocationHidden == current.IsLocationHidden && previous.Region == current.Region && previous.IsVerified == current.IsVerified && previous.IsInGame == current.IsInGame && previous.HasActiveProfile == current.HasActiveProfile && previous.ShareEnabled == current.ShareEnabled && previous.CanShare == current.CanShare && SameTrimmed(previous.ShareBlockReason, current.ShareBlockReason))
+			if (SameTrimmed(previous.AccountName, current.AccountName) && SameTrimmed(previous.OfficialCharacterName, current.OfficialCharacterName) && SameTrimmed(previous.DisplayCharacterName, current.DisplayCharacterName) && SameTrimmed(previous.Race, current.Race) && SameTrimmed(previous.CustomRace, current.CustomRace) && SameTrimmed(previous.Profession, current.Profession) && SameTrimmed(previous.CustomProfession, current.CustomProfession) && SameTrimmed(previous.ActiveProfileId, current.ActiveProfileId) && previous.IsMature == current.IsMature && previous.Experience == current.Experience && SameTrimmed(previous.ActiveProfileName, current.ActiveProfileName) && !(previous.ProfileUpdatedAtTime != current.ProfileUpdatedAtTime) && previous.Status == current.Status && SameTrimmed(previous.KnownFor, current.KnownFor) && SameTrimmed(previous.Currently, current.Currently) && SameTrimmed(previous.OutOfCharacterInfo, current.OutOfCharacterInfo) && SameTrimmed(previous.LocationName, current.LocationName) && previous.IsLocationHidden == current.IsLocationHidden && previous.Region == current.Region && previous.IsVerified == current.IsVerified && previous.IsInGame == current.IsInGame && previous.HasActiveProfile == current.HasActiveProfile && previous.ShareEnabled == current.ShareEnabled && previous.CanShare == current.CanShare && SameTrimmed(previous.ShareBlockReason, current.ShareBlockReason))
 			{
 				return !ProfileDiscoveryMapper.AreEqual(previous.DiscoveryTags, current.DiscoveryTags);
 			}

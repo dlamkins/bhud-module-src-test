@@ -38,6 +38,8 @@ namespace rp.spark.UI
 
 		private readonly PlayerStateService _playerState;
 
+		private readonly GlobalOocInfoStore _globalOocInfo;
+
 		private readonly IconIndexService _iconIndexService;
 
 		private readonly SparkSettings _settings;
@@ -47,6 +49,8 @@ namespace rp.spark.UI
 		private readonly ProfileActions _profileActions;
 
 		private readonly NearbyPresenceService _nearbyPresenceService;
+
+		private readonly RollGroupService _rollGroups;
 
 		private readonly Action _requestServerSync;
 
@@ -74,6 +78,8 @@ namespace rp.spark.UI
 
 		private StandardWindow _blocklistWindow;
 
+		private StandardWindow _rollGroupWindow;
+
 		private CharacterProfile _viewedProfile;
 
 		private PlayerPresence _viewedPresence;
@@ -100,18 +106,20 @@ namespace rp.spark.UI
 			}
 		}
 
-		public SparkWindows(WindowBuilder windowBuilder, ProfileRepository profileRepository, ProfileCache profileCache, ProfileNotes notes, PlayerStateService playerState, IconIndexService iconIndexService, SparkSettings settings, ProfileLoader profileLoader, ProfileActions profileActions, NearbyPresenceService nearbyPresenceService, Action requestServerSync, Action<bool> setNearbySharing)
+		public SparkWindows(WindowBuilder windowBuilder, ProfileRepository profileRepository, ProfileCache profileCache, ProfileNotes notes, PlayerStateService playerState, GlobalOocInfoStore globalOocInfo, IconIndexService iconIndexService, SparkSettings settings, ProfileLoader profileLoader, ProfileActions profileActions, NearbyPresenceService nearbyPresenceService, RollGroupService rollGroups, Action requestServerSync, Action<bool> setNearbySharing)
 		{
 			_windowBuilder = windowBuilder;
 			_profileRepository = profileRepository;
 			_profileCache = profileCache;
 			_notes = notes;
 			_playerState = playerState;
+			_globalOocInfo = globalOocInfo;
 			_iconIndexService = iconIndexService;
 			_settings = settings;
 			_profileLoader = profileLoader;
 			_profileActions = profileActions;
 			_nearbyPresenceService = nearbyPresenceService;
+			_rollGroups = rollGroups;
 			_requestServerSync = requestServerSync;
 			_setNearbySharing = setNearbySharing;
 		}
@@ -158,7 +166,7 @@ namespace rp.spark.UI
 					((WindowBase2)_profileWindow).BringWindowToFront();
 					return;
 				}
-				_profileEditorSession = new ProfileEditorSession(_profileRepository, _playerState, state);
+				_profileEditorSession = new ProfileEditorSession(_profileRepository, _playerState, _globalOocInfo, state);
 				CreateProfileWindow();
 				((Control)_profileWindow).Show();
 			}
@@ -183,7 +191,7 @@ namespace rp.spark.UI
 				_onlineListWindow.Show((IView)(object)new OnlineProfilesView((CancellationToken cancellationToken) => _profileLoader.LoadOnlineAsync(cancellationToken), _profileLoader.LoadCachedOnlineRows, OpenPresence, _profileActions.IsPresenceBookmarked, _profileActions.WatchSavedProfiles, _profileActions.UnwatchSavedProfiles, () => _settings.AutoRefreshOnlineProfiles.get_Value(), delegate(bool value)
 				{
 					_settings.AutoRefreshOnlineProfiles.set_Value(value);
-				}));
+				}, _settings));
 			}
 		}
 
@@ -246,6 +254,24 @@ namespace rp.spark.UI
 				CreateBlocklistWindow();
 			}
 			_blocklistWindow.Show((IView)(object)new SparkBlocklistView(_settings, _profileActions.BlockAccount, _profileActions.UnblockAccount, _profileActions.WatchBlockedAccounts, _profileActions.UnwatchBlockedAccounts));
+		}
+
+		public void OpenRollGroup()
+		{
+			if (!CanShowGameplayWindow())
+			{
+				return;
+			}
+			if (_rollGroupWindow != null && ((Control)_rollGroupWindow).get_Visible())
+			{
+				((WindowBase2)_rollGroupWindow).BringWindowToFront();
+				return;
+			}
+			if (_rollGroupWindow == null)
+			{
+				CreateRollGroupWindow();
+			}
+			_rollGroupWindow.Show((IView)(object)new RollGroupView(_rollGroups));
 		}
 
 		public void OpenSettings()
@@ -418,8 +444,8 @@ namespace rp.spark.UI
 			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0095: Expected O, but got Unknown
 			_savedProfilesWindow = _windowBuilder.MakeTabbedWindow("Saved Profiles", "rp.spark.saved-profiles-window");
-			_savedProfilesWindow.get_Tabs().Add(new Tab(_windowBuilder.IconFromAsset(156680), (Func<IView>)(() => (IView)(object)new SavedProfilesView(_profileCache.ListRecent, OpenSavedProfile, SavedProfilesMode.Recent, _settings.IsBlockedAccount, null, _profileActions.WatchSavedProfiles, _profileActions.UnwatchSavedProfiles, () => _settings.ShowMatureProfiles.get_Value())), "Recent", (int?)100));
-			_savedProfilesWindow.get_Tabs().Add(new Tab(_windowBuilder.IconFromAsset(156722), (Func<IView>)(() => (IView)(object)new SavedProfilesView(_profileCache.ListBookmarked, OpenSavedProfile, SavedProfilesMode.Bookmarks, _settings.IsBlockedAccount, _profileActions.RemoveBookmark, _profileActions.WatchSavedProfiles, _profileActions.UnwatchSavedProfiles, () => _settings.ShowMatureProfiles.get_Value())), "Bookmarks", (int?)110));
+			_savedProfilesWindow.get_Tabs().Add(new Tab(_windowBuilder.IconFromAsset(156680), (Func<IView>)(() => (IView)(object)new SavedProfilesView(_profileCache.ListRecent, OpenSavedProfile, SavedProfilesMode.Recent, _settings, _settings.IsBlockedAccount, null, _profileActions.WatchSavedProfiles, _profileActions.UnwatchSavedProfiles, () => _settings.ShowMatureProfiles.get_Value())), "Recent", (int?)100));
+			_savedProfilesWindow.get_Tabs().Add(new Tab(_windowBuilder.IconFromAsset(156722), (Func<IView>)(() => (IView)(object)new SavedProfilesView(_profileCache.ListBookmarked, OpenSavedProfile, SavedProfilesMode.Bookmarks, _settings, _settings.IsBlockedAccount, _profileActions.RemoveBookmark, _profileActions.WatchSavedProfiles, _profileActions.UnwatchSavedProfiles, () => _settings.ShowMatureProfiles.get_Value())), "Bookmarks", (int?)110));
 		}
 
 		private async void OpenPresence(PlayerPresence presence)
@@ -499,6 +525,24 @@ namespace rp.spark.UI
 			_blocklistWindow = _windowBuilder.MakeWindow("Blocked Accounts", "rp.spark.blocklist-window", new Rectangle(70, 60, 760, 610));
 		}
 
+		private void CreateRollGroupWindow()
+		{
+			//IL_001f: Unknown result type (might be due to invalid IL or missing references)
+			_rollGroupWindow = _windowBuilder.MakeWindow("Roll Group", "rp.spark.roll-group-window", new Rectangle(70, 60, 760, 610));
+			((Control)_rollGroupWindow).add_Shown((EventHandler<EventArgs>)HandleRollGroupWindowShown);
+			((Control)_rollGroupWindow).add_Hidden((EventHandler<EventArgs>)HandleRollGroupWindowHidden);
+		}
+
+		private void HandleRollGroupWindowShown(object sender, EventArgs e)
+		{
+			_rollGroups.SetPollingEnabled(enabled: true);
+		}
+
+		private void HandleRollGroupWindowHidden(object sender, EventArgs e)
+		{
+			_rollGroups.SetPollingEnabled(enabled: false);
+		}
+
 		private void CreateSettingsWindow()
 		{
 			//IL_004e: Unknown result type (might be due to invalid IL or missing references)
@@ -548,6 +592,9 @@ namespace rp.spark.UI
 			_profileNotesView = null;
 			_windowBuilder.DisposeWindow((WindowBase2)(object)_onlineListWindow);
 			_onlineListWindow = null;
+			_rollGroups.SetPollingEnabled(enabled: false);
+			_windowBuilder.DisposeWindow((WindowBase2)(object)_rollGroupWindow);
+			_rollGroupWindow = null;
 			SparkCompactWindow nearbyWindow = _nearbyWindow;
 			if (nearbyWindow != null)
 			{

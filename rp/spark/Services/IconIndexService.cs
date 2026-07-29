@@ -223,11 +223,12 @@ namespace rp.spark.Services
 						{
 							continue;
 						}
-						if (ContainsAllTerms(entry.Name, terms))
+						string matchingName = FindMatchingName(entry, terms);
+						if (matchingName != null)
 						{
 							if (nameAssetIds.Add(entry.AssetId))
 							{
-								nameResults.Add(ToResult(entry));
+								nameResults.Add(ToResult(entry, matchingName));
 								if (nameResults.Count >= limit)
 								{
 									break;
@@ -236,7 +237,7 @@ namespace rp.spark.Services
 						}
 						else if (fallbackResults.Count < limit * 4 && EntryContainsAllTerms(entry, terms) && fallbackAssetIds.Add(entry.AssetId))
 						{
-							fallbackResults.Add(ToResult(entry));
+							fallbackResults.Add(ToResult(entry, entry.Name));
 						}
 					}
 				}
@@ -259,13 +260,33 @@ namespace rp.spark.Services
 			}
 		}
 
-		private static Gw2IconSearchResult ToResult(Gw2IconIndexEntry entry)
+		private static Gw2IconSearchResult ToResult(Gw2IconIndexEntry entry, string matchingName)
 		{
 			return new Gw2IconSearchResult
 			{
 				AssetId = entry.AssetId,
-				Name = (entry.Name ?? string.Empty)
+				Name = (matchingName ?? entry.Name ?? string.Empty)
 			};
+		}
+
+		private static string FindMatchingName(Gw2IconIndexEntry entry, IReadOnlyList<string> terms)
+		{
+			if (ContainsAllTerms(entry.Name, terms))
+			{
+				return entry.Name;
+			}
+			if (entry.Aliases == null)
+			{
+				return null;
+			}
+			foreach (string alias in entry.Aliases)
+			{
+				if (ContainsAllTerms(alias, terms))
+				{
+					return alias;
+				}
+			}
+			return null;
 		}
 
 		private static bool EntryContainsAllTerms(Gw2IconIndexEntry entry, IReadOnlyList<string> terms)
@@ -283,6 +304,10 @@ namespace rp.spark.Services
 		private static bool EntryContainsTerm(Gw2IconIndexEntry entry, string term)
 		{
 			if (ContainsTerm(entry.Name, term) || ContainsTerm(entry.Description, term) || ContainsTerm(entry.Source, term))
+			{
+				return true;
+			}
+			if (entry.Aliases != null && entry.Aliases.Any((string alias) => ContainsTerm(alias, term)))
 			{
 				return true;
 			}

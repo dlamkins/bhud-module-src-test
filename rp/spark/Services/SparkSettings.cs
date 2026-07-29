@@ -44,6 +44,16 @@ namespace rp.spark.Services
 
 		private const string ShowCornerIconKey = "ShowCornerIcon";
 
+		private const string ShowKnownForInProfileTooltipsKey = "ShowKnownForInProfileTooltips";
+
+		private const string ShowCurrentlyInProfileTooltipsKey = "ShowCurrentlyInProfileTooltips";
+
+		private const string ShowOocInfoInProfileTooltipsKey = "ShowOocInfoInProfileTooltips";
+
+		private const string TrimLongProfileTooltipsKey = "TrimLongProfileTooltips";
+
+		private const string ProfileTooltipLinesPerSectionKey = "ProfileTooltipLinesPerSection";
+
 		private static readonly Regex AccountNameRegex = new Regex("^[^.\\r\\n]+\\.\\d{4}$", RegexOptions.Compiled);
 
 		public SettingCollection SharingSettings { get; }
@@ -80,6 +90,16 @@ namespace rp.spark.Services
 
 		public SettingEntry<bool> ShowCornerIcon { get; }
 
+		public SettingEntry<bool> ShowKnownForInProfileTooltips { get; }
+
+		public SettingEntry<bool> ShowCurrentlyInProfileTooltips { get; }
+
+		public SettingEntry<bool> ShowOocInfoInProfileTooltips { get; }
+
+		public SettingEntry<bool> TrimLongProfileTooltips { get; }
+
+		public SettingEntry<int> ProfileTooltipLinesPerSection { get; }
+
 		public SparkSettings(SettingCollection settings)
 		{
 			SharingSettings = settings.AddSubCollection("profile-sharing", true, (Func<string>)(() => "Profile sharing"));
@@ -99,6 +119,11 @@ namespace rp.spark.Services
 			NearbyWindowLocation = UiSettings.DefineSetting<string>("NearbyWindowLocation", string.Empty, (Func<string>)(() => "Nearby Players window location"), (Func<string>)(() => "Stores the last screen position of the Nearby Players window."));
 			NearbyWindowLock = UiSettings.DefineSetting<bool>("NearbyWindowLock", false, (Func<string>)(() => "Lock Nearby Players window"), (Func<string>)(() => "Prevents dragging the Nearby Players window while still allowing profile clicks, refresh, and scrolling."));
 			ShowCornerIcon = UiSettings.DefineSetting<bool>("ShowCornerIcon", true, (Func<string>)(() => "Show corner icon"), (Func<string>)(() => "Shows the SPARK shortcut menu in the Blish HUD corner icon area."));
+			ShowKnownForInProfileTooltips = UiSettings.DefineSetting<bool>("ShowKnownForInProfileTooltips", true, (Func<string>)(() => "Show Known For in profile tooltips"), (Func<string>)(() => "Shows the Known For section when it is available."));
+			ShowCurrentlyInProfileTooltips = UiSettings.DefineSetting<bool>("ShowCurrentlyInProfileTooltips", true, (Func<string>)(() => "Show Currently in profile tooltips"), (Func<string>)(() => "Shows the Currently section when it is available."));
+			ShowOocInfoInProfileTooltips = UiSettings.DefineSetting<bool>("ShowOocInfoInProfileTooltips", true, (Func<string>)(() => "Show OOC info in profile tooltips"), (Func<string>)(() => "Shows the Out of Character section when it is available."));
+			TrimLongProfileTooltips = UiSettings.DefineSetting<bool>("TrimLongProfileTooltips", true, (Func<string>)(() => "Trim long profile tooltips"), (Func<string>)(() => "Limits each enabled profile-tooltip section to the configured number of wrapped lines."));
+			ProfileTooltipLinesPerSection = UiSettings.DefineSetting<int>("ProfileTooltipLinesPerSection", 12, (Func<string>)(() => "Profile tooltip lines per section"), (Func<string>)(() => "The maximum number of wrapped lines shown for each enabled profile-tooltip section when trimming is enabled."));
 		}
 
 		public IReadOnlyCollection<string> GetBlockedAccountNames()
@@ -197,6 +222,26 @@ namespace rp.spark.Services
 				return AccountNameRegex.IsMatch(accountName.Trim());
 			}
 			return false;
+		}
+
+		public static int ProfileTooltipLimit(int value)
+		{
+			switch (value)
+			{
+			case 2:
+			case 4:
+			case 6:
+			case 8:
+			case 10:
+			case 12:
+			case 14:
+			case 16:
+			case 18:
+			case 20:
+				return value;
+			default:
+				return 12;
+			}
 		}
 	}
 }

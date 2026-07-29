@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
+using Blish_HUD.Common.UI.Views;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Microsoft.Xna.Framework;
@@ -126,11 +127,21 @@ namespace rp.spark.UI.Views
 		private void WatchSettings()
 		{
 			_settings.ShowNearbyPresence.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnShowNearbyPresenceChanged);
+			_settings.ShowKnownForInProfileTooltips.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnTooltipVisibilityChanged);
+			_settings.ShowCurrentlyInProfileTooltips.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnTooltipVisibilityChanged);
+			_settings.ShowOocInfoInProfileTooltips.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnTooltipVisibilityChanged);
+			_settings.TrimLongProfileTooltips.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnTooltipVisibilityChanged);
+			_settings.ProfileTooltipLinesPerSection.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)OnTooltipLineLimitChanged);
 		}
 
 		private void UnwatchSettings()
 		{
 			_settings.ShowNearbyPresence.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnShowNearbyPresenceChanged);
+			_settings.ShowKnownForInProfileTooltips.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnTooltipVisibilityChanged);
+			_settings.ShowCurrentlyInProfileTooltips.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnTooltipVisibilityChanged);
+			_settings.ShowOocInfoInProfileTooltips.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnTooltipVisibilityChanged);
+			_settings.TrimLongProfileTooltips.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnTooltipVisibilityChanged);
+			_settings.ProfileTooltipLinesPerSection.remove_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)OnTooltipLineLimitChanged);
 		}
 
 		private void OnShowNearbyPresenceChanged(object sender, ValueChangedEventArgs<bool> e)
@@ -140,6 +151,27 @@ namespace rp.spark.UI.Views
 				if (!_isUnloaded)
 				{
 					SyncShowNearbyCheckboxFromSettings();
+				}
+			});
+		}
+
+		private void OnTooltipVisibilityChanged(object sender, ValueChangedEventArgs<bool> e)
+		{
+			RefreshNearbyTooltips();
+		}
+
+		private void OnTooltipLineLimitChanged(object sender, ValueChangedEventArgs<int> e)
+		{
+			RefreshNearbyTooltips();
+		}
+
+		private void RefreshNearbyTooltips()
+		{
+			SparkUiThread.Queue(delegate
+			{
+				if (!_isUnloaded && _nearbyList != null)
+				{
+					RefreshAsync(resetScroll: false);
 				}
 			});
 		}
@@ -333,33 +365,44 @@ namespace rp.spark.UI.Views
 
 		private void AddRow(NearbyPresence nearby, int index)
 		{
-			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0041: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00fc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011b: Unknown result type (might be due to invalid IL or missing references)
-			PlayerPresence presence = nearby.Presence;
-			string tooltipText = TooltipText(nearby);
-			Panel row = _nearbyList.AddRow(index, tooltipText);
+			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ce: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_012a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0142: Unknown result type (might be due to invalid IL or missing references)
+			PlayerPresence presence = nearby?.Presence ?? new PlayerPresence();
+			Panel row = _nearbyList.AddRow(index, string.Empty);
 			bool num = _nearby.IsCurrentMapIp(nearby);
-			Color mapIpColor = (Color)(num ? new Color(140, 220, 140) : SparkViewUI.SecondaryTextColor);
-			string distanceText = (num ? DistanceText(nearby.DistanceMeters) : "-");
-			MakeClickable((Control)(object)_nearbyList.AddCell((Container)(object)row, presence.VisibleName(), 8, 5, 170, Color.get_White()), presence, tooltipText);
-			MakeClickable((Control)(object)_nearbyList.AddCell((Container)(object)row, ProfileText.PresenceRace(presence), 186, 5, 70, SparkViewUI.SecondaryTextColor), presence, tooltipText);
-			MakeClickable((Control)(object)_nearbyList.AddCell((Container)(object)row, ProfileLabels.StatusLabel(presence.Status), 264, 5, 110, ProfileStatusColors.Get(presence.Status)), presence, tooltipText);
-			MakeClickable((Control)(object)_nearbyList.AddCell((Container)(object)row, MapIpText(nearby.ServerAddress), 382, 5, 70, mapIpColor), presence, tooltipText);
-			MakeClickable((Control)(object)_nearbyList.AddCell((Container)(object)row, distanceText, 460, 5, 80, SparkViewUI.SecondaryTextColor), presence, tooltipText);
-		}
-
-		private void MakeClickable(Control control, PlayerPresence presence, string tooltipText)
-		{
-			ProfileScrollList.WireInteraction(control, tooltipText, delegate
+			Color secondary = SparkViewUI.SecondaryTextColor;
+			Color mapIpColor = (Color)(num ? new Color(140, 220, 140) : secondary);
+			string distanceText = (num ? DistanceText(nearby?.DistanceMeters ?? (-1.0)) : "-");
+			_nearbyList.AddCell((Container)(object)row, presence.VisibleName(), 8, 5, 170, Color.get_White());
+			_nearbyList.AddCell((Container)(object)row, ProfileText.PresenceRace(presence), 186, 5, 70, secondary);
+			_nearbyList.AddCell((Container)(object)row, ProfileLabels.StatusLabel(presence.Status), 264, 5, 110, ProfileStatusColors.Get(presence.Status));
+			_nearbyList.AddCell((Container)(object)row, MapIpText(nearby?.ServerAddress), 382, 5, 70, mapIpColor);
+			_nearbyList.AddCell((Container)(object)row, distanceText, 460, 5, 80, secondary);
+			ProfileScrollList.AddInteractionLayer((Container)(object)row, MakeTooltip(nearby), delegate
 			{
 				_openProfile?.Invoke(presence);
 			});
+		}
+
+		private Tooltip MakeTooltip(NearbyPresence nearby)
+		{
+			//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0100: Expected O, but got Unknown
+			PlayerPresence presence = nearby?.Presence ?? new PlayerPresence();
+			bool showKnownFor = _settings?.ShowKnownForInProfileTooltips.get_Value() ?? true;
+			bool showCurrently = _settings?.ShowCurrentlyInProfileTooltips.get_Value() ?? true;
+			bool showOutOfCharacter = _settings?.ShowOocInfoInProfileTooltips.get_Value() ?? true;
+			bool trimLongTooltips = _settings?.TrimLongProfileTooltips.get_Value() ?? true;
+			int maximumLinesPerSection = _settings?.ProfileTooltipLinesPerSection.get_Value() ?? 12;
+			return new Tooltip((ITooltipView)(object)new ProfilePresenceTooltipView(presence.VisibleName(), ProfileText.PresenceCharacterDetails(presence), ProfileLabels.StatusLabel(presence.Status), ProfileText.PresenceLocation(presence), presence.KnownFor, presence.Currently, presence.OutOfCharacterInfo, showKnownFor, showCurrently, showOutOfCharacter, trimLongTooltips, maximumLinesPerSection, new string[1] { "Distance: " + DistanceText(nearby?.DistanceMeters ?? (-1.0)) }));
 		}
 
 		private static string DistanceText(double meters)
@@ -373,23 +416,6 @@ namespace rp.spark.UI.Views
 				return $"{meters / 1000.0:0.0}km";
 			}
 			return $"{Math.Round(meters):0}m";
-		}
-
-		private static string TooltipText(NearbyPresence nearby)
-		{
-			PlayerPresence presence = nearby?.Presence ?? new PlayerPresence();
-			List<string> lines = new List<string>
-			{
-				presence.VisibleName(),
-				ProfileText.PresenceCharacterDetails(presence),
-				"Status: " + ProfileLabels.StatusLabel(presence.Status),
-				"Distance: " + DistanceText(nearby?.DistanceMeters ?? (-1.0))
-			};
-			if (!string.IsNullOrWhiteSpace(presence.Currently))
-			{
-				lines.Add("Currently: " + presence.Currently.Trim());
-			}
-			return string.Join(Environment.NewLine, lines.Where((string line) => !string.IsNullOrWhiteSpace(line)));
 		}
 
 		private static string MapIpText(string serverAddress)

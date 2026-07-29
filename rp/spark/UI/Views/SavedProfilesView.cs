@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Blish_HUD;
+using Blish_HUD.Common.UI.Views;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Blish_HUD.Input;
 using Microsoft.Xna.Framework;
 using rp.spark.Models;
+using rp.spark.Services;
 using rp.spark.UI.Controls;
 
 namespace rp.spark.UI.Views
@@ -36,6 +39,8 @@ namespace rp.spark.UI.Views
 
 		private readonly SavedProfilesMode _mode;
 
+		private readonly SparkSettings _settings;
+
 		private readonly PageList _page = new PageList();
 
 		private PageListControls _pageControls;
@@ -56,12 +61,13 @@ namespace rp.spark.UI.Views
 
 		private string _statusOverride = string.Empty;
 
-		public SavedProfilesView(Func<IReadOnlyList<SavedProfileSummary>> getSavedProfiles, Action<SavedProfileSummary, Action<string>> openProfile, SavedProfilesMode mode, Func<string, bool> isBlockedAccount = null, Action<SavedProfileSummary> removeBookmark = null, Action<Action> watchSavedProfilesChanged = null, Action<Action> unwatchSavedProfilesChanged = null, Func<bool> showMatureProfiles = null)
+		public SavedProfilesView(Func<IReadOnlyList<SavedProfileSummary>> getSavedProfiles, Action<SavedProfileSummary, Action<string>> openProfile, SavedProfilesMode mode, SparkSettings settings, Func<string, bool> isBlockedAccount = null, Action<SavedProfileSummary> removeBookmark = null, Action<Action> watchSavedProfilesChanged = null, Action<Action> unwatchSavedProfilesChanged = null, Func<bool> showMatureProfiles = null)
 			: this()
 		{
 			_loadSavedProfiles = getSavedProfiles;
 			_openProfile = openProfile;
 			_mode = mode;
+			_settings = settings;
 			_isBlockedAccount = isBlockedAccount;
 			_showMatureProfiles = showMatureProfiles;
 			_removeBookmark = removeBookmark;
@@ -71,8 +77,8 @@ namespace rp.spark.UI.Views
 
 		protected override void Build(Container buildPanel)
 		{
-			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c4: Unknown result type (might be due to invalid IL or missing references)
 			_isUnloaded = false;
 			ProfileListViewUI.AddTitle(buildPanel, (_mode == SavedProfilesMode.Bookmarks) ? "Bookmarked Profiles" : "Recent Profiles", 320);
 			((Control)ProfileListViewUI.AddRefreshButton(buildPanel)).add_Click((EventHandler<MouseEventArgs>)delegate
@@ -82,6 +88,7 @@ namespace rp.spark.UI.Views
 			BuildSearchControls(buildPanel);
 			BuildHeader(buildPanel);
 			_watchSavedProfiles?.Invoke(HandleSavedProfilesChanged);
+			WatchTooltipSettings();
 			ProfileScrollList profileScrollList = new ProfileScrollList(760, 400, 40);
 			((Control)profileScrollList).set_Location(new Point(0, 128));
 			((Control)profileScrollList).set_Parent(buildPanel);
@@ -143,6 +150,51 @@ namespace rp.spark.UI.Views
 			});
 		}
 
+		private void WatchTooltipSettings()
+		{
+			if (_settings != null)
+			{
+				_settings.ShowKnownForInProfileTooltips.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnTooltipVisibilityChanged);
+				_settings.ShowCurrentlyInProfileTooltips.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnTooltipVisibilityChanged);
+				_settings.ShowOocInfoInProfileTooltips.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnTooltipVisibilityChanged);
+				_settings.TrimLongProfileTooltips.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnTooltipVisibilityChanged);
+				_settings.ProfileTooltipLinesPerSection.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)OnTooltipLineLimitChanged);
+			}
+		}
+
+		private void UnwatchTooltipSettings()
+		{
+			if (_settings != null)
+			{
+				_settings.ShowKnownForInProfileTooltips.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnTooltipVisibilityChanged);
+				_settings.ShowCurrentlyInProfileTooltips.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnTooltipVisibilityChanged);
+				_settings.ShowOocInfoInProfileTooltips.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnTooltipVisibilityChanged);
+				_settings.TrimLongProfileTooltips.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnTooltipVisibilityChanged);
+				_settings.ProfileTooltipLinesPerSection.remove_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)OnTooltipLineLimitChanged);
+			}
+		}
+
+		private void OnTooltipVisibilityChanged(object sender, ValueChangedEventArgs<bool> e)
+		{
+			RebuildTooltips();
+		}
+
+		private void OnTooltipLineLimitChanged(object sender, ValueChangedEventArgs<int> e)
+		{
+			RebuildTooltips();
+		}
+
+		private void RebuildTooltips()
+		{
+			SparkUiThread.Queue(delegate
+			{
+				if (!_isUnloaded && _profileList != null)
+				{
+					RefreshRows(resetPage: false, resetScroll: false);
+				}
+			});
+		}
+
 		private void RefreshRows(bool resetPage, bool resetScroll = true)
 		{
 			if (_isUnloaded || _profileList == null)
@@ -181,41 +233,44 @@ namespace rp.spark.UI.Views
 
 		private void AddRow(SavedProfileSummary savedProfile, int index)
 		{
-			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0167: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01df: Unknown result type (might be due to invalid IL or missing references)
-			string tooltipText = TooltipText(savedProfile);
-			Panel row = _profileList.AddRow(index, tooltipText);
+			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0118: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0142: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0190: Unknown result type (might be due to invalid IL or missing references)
+			Panel row = _profileList.AddRow(index, string.Empty);
+			Color secondary = default(Color);
+			((Color)(ref secondary))._002Ector(220, 220, 220);
 			if (_mode == SavedProfilesMode.Bookmarks)
 			{
-				MakeClickable((Control)(object)_profileList.AddCell((Container)(object)row, ProfileText.SavedCharacterName(savedProfile), 8, 8, 210, Color.get_White()), savedProfile, tooltipText);
-				MakeClickable((Control)(object)_profileList.AddCell((Container)(object)row, ProfileText.SavedRace(savedProfile), 225, 8, 95, new Color(220, 220, 220)), savedProfile, tooltipText);
-				MakeClickable((Control)(object)_profileList.AddCell((Container)(object)row, ProfileText.SavedAccountName(savedProfile), 330, 8, 160, new Color(220, 220, 220)), savedProfile, tooltipText);
-				MakeClickable((Control)(object)_profileList.AddCell((Container)(object)row, GetSavedTime(savedProfile), 500, 8, 135, new Color(220, 220, 220)), savedProfile, tooltipText);
+				_profileList.AddCell((Container)(object)row, ProfileText.SavedCharacterName(savedProfile), 8, 8, 210, Color.get_White());
+				_profileList.AddCell((Container)(object)row, ProfileText.SavedRace(savedProfile), 225, 8, 95, secondary);
+				_profileList.AddCell((Container)(object)row, ProfileText.SavedAccountName(savedProfile), 330, 8, 160, secondary);
+				_profileList.AddCell((Container)(object)row, GetSavedTime(savedProfile), 500, 8, 135, secondary);
 				AddRemoveButton((Container)(object)row, savedProfile);
 			}
 			else
 			{
-				MakeClickable((Control)(object)row, savedProfile, tooltipText);
-				AddBookmarkMarker((Container)(object)row, savedProfile, tooltipText);
-				MakeClickable((Control)(object)_profileList.AddCell((Container)(object)row, ProfileText.SavedCharacterName(savedProfile), 30, 8, 210, Color.get_White()), savedProfile, tooltipText);
-				MakeClickable((Control)(object)_profileList.AddCell((Container)(object)row, ProfileText.SavedRace(savedProfile), 250, 8, 110, new Color(220, 220, 220)), savedProfile, tooltipText);
-				MakeClickable((Control)(object)_profileList.AddCell((Container)(object)row, ProfileText.SavedAccountName(savedProfile), 370, 8, 170, new Color(220, 220, 220)), savedProfile, tooltipText);
-				MakeClickable((Control)(object)_profileList.AddCell((Container)(object)row, GetSavedTime(savedProfile), 550, 8, 205, new Color(220, 220, 220)), savedProfile, tooltipText);
+				AddBookmarkMarker((Container)(object)row, savedProfile);
+				_profileList.AddCell((Container)(object)row, ProfileText.SavedCharacterName(savedProfile), 30, 8, 210, Color.get_White());
+				_profileList.AddCell((Container)(object)row, ProfileText.SavedRace(savedProfile), 250, 8, 110, secondary);
+				_profileList.AddCell((Container)(object)row, ProfileText.SavedAccountName(savedProfile), 370, 8, 170, secondary);
+				_profileList.AddCell((Container)(object)row, GetSavedTime(savedProfile), 550, 8, 205, secondary);
 			}
+			ProfileScrollList.AddInteractionLayer((Container)(object)row, MakeTooltip(savedProfile), delegate
+			{
+				_openProfile?.Invoke(savedProfile, ShowStatusOverride);
+			}, (_mode == SavedProfilesMode.Bookmarks) ? 110 : 0);
 		}
 
-		private void AddBookmarkMarker(Container row, SavedProfileSummary savedProfile, string tooltipText)
+		private static void AddBookmarkMarker(Container row, SavedProfileSummary savedProfile)
 		{
 			if (savedProfile != null && savedProfile.IsBookmarked)
 			{
-				AssetIcon marker = ProfileListViewUI.AddBookmarkMarker(row);
-				MakeClickable((Control)(object)marker, savedProfile, tooltipText);
+				ProfileListViewUI.AddBookmarkMarker(row);
 			}
 		}
 
@@ -228,11 +283,13 @@ namespace rp.spark.UI.Views
 			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
 			//IL_003a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004b: Unknown result type (might be due to invalid IL or missing references)
 			StandardButton val = new StandardButton();
 			val.set_Text("Remove");
 			((Control)val).set_Location(new Point(650, 5));
 			((Control)val).set_Size(new Point(90, 30));
 			((Control)val).set_Parent(row);
+			((Control)val).set_ZIndex(101);
 			((Control)val).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				if (_removeBookmark == null)
@@ -340,28 +397,21 @@ namespace rp.spark.UI.Views
 			return "No recently viewed profiles yet.";
 		}
 
-		private string TooltipText(SavedProfileSummary savedProfile)
+		private Tooltip MakeTooltip(SavedProfileSummary savedProfile)
 		{
-			List<string> lines = new List<string>
+			//IL_0141: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0147: Expected O, but got Unknown
+			bool showKnownFor = _settings?.ShowKnownForInProfileTooltips.get_Value() ?? true;
+			bool showCurrently = _settings?.ShowCurrentlyInProfileTooltips.get_Value() ?? true;
+			bool showOutOfCharacter = _settings?.ShowOocInfoInProfileTooltips.get_Value() ?? true;
+			bool trimLongTooltips = _settings?.TrimLongProfileTooltips.get_Value() ?? true;
+			int maximumLinesPerSection = _settings?.ProfileTooltipLinesPerSection.get_Value() ?? 12;
+			string savedTimeLabel = ((_mode == SavedProfilesMode.Bookmarks) ? ("Bookmarked: " + ProfileText.FormatShortTime(savedProfile.BookmarkedAt ?? savedProfile.CachedAt, "-")) : ("Viewed: " + ProfileText.FormatShortTime(savedProfile.CachedAt, "-")));
+			return new Tooltip((ITooltipView)(object)new ProfilePresenceTooltipView(ProfileText.SavedCharacterName(savedProfile), ProfileText.SavedCharacterDetails(savedProfile), GetCachedStatusText(savedProfile), GetCachedLocationText(savedProfile), savedProfile?.KnownFor, savedProfile?.Currently, savedProfile?.OutOfCharacterInfo, showKnownFor, showCurrently, showOutOfCharacter, trimLongTooltips, maximumLinesPerSection, new string[2]
 			{
-				ProfileText.SavedCharacterName(savedProfile),
-				ProfileText.SavedCharacterDetails(savedProfile),
 				"Account: " + ProfileText.SavedAccountName(savedProfile),
-				"Status: " + GetCachedStatusText(savedProfile),
-				"Location: " + GetCachedLocationText(savedProfile),
-				(_mode == SavedProfilesMode.Bookmarks) ? ("Bookmarked: " + ProfileText.FormatShortTime(savedProfile.BookmarkedAt ?? savedProfile.CachedAt, "-")) : ("Viewed: " + ProfileText.FormatShortTime(savedProfile.CachedAt, "-"))
-			};
-			if (!string.IsNullOrWhiteSpace(savedProfile.Currently))
-			{
-				lines.Add("----------------");
-				lines.Add("Currently: " + savedProfile.Currently.Trim());
-			}
-			if (!string.IsNullOrWhiteSpace(savedProfile.OutOfCharacterInfo))
-			{
-				lines.Add("----------------");
-				lines.Add(savedProfile.OutOfCharacterInfo.Trim());
-			}
-			return string.Join(Environment.NewLine, lines.Where((string line) => !string.IsNullOrWhiteSpace(line)));
+				savedTimeLabel
+			}));
 		}
 
 		private string GetSavedTime(SavedProfileSummary savedProfile)
@@ -403,6 +453,7 @@ namespace rp.spark.UI.Views
 		protected override void Unload()
 		{
 			_isUnloaded = true;
+			UnwatchTooltipSettings();
 			_unwatchSavedProfiles?.Invoke(HandleSavedProfilesChanged);
 			_discoveryFilters?.Dispose();
 			_discoveryFilters = null;

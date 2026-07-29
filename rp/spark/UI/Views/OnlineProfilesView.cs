@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Blish_HUD;
+using Blish_HUD.Common.UI.Views;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Microsoft.Xna.Framework;
 using rp.spark.Models;
+using rp.spark.Services;
 using rp.spark.UI.Controls;
 
 namespace rp.spark.UI.Views
@@ -30,6 +33,8 @@ namespace rp.spark.UI.Views
 		private readonly Func<bool> _isAutoRefreshEnabled;
 
 		private readonly Action<bool> _setAutoRefreshEnabled;
+
+		private readonly SparkSettings _settings;
 
 		private readonly PageList _page = new PageList();
 
@@ -67,7 +72,7 @@ namespace rp.spark.UI.Views
 
 		private Label _status;
 
-		public OnlineProfilesView(Func<CancellationToken, Task<IReadOnlyList<PlayerPresence>>> getPresenceRows, Func<IReadOnlyList<PlayerPresence>> getCachedPresenceRows, Action<PlayerPresence> openProfile, Func<PlayerPresence, bool> isBookmarked = null, Action<Action> watchBookmarksChanged = null, Action<Action> unwatchBookmarksChanged = null, Func<bool> isAutoRefreshEnabled = null, Action<bool> setAutoRefreshEnabled = null)
+		public OnlineProfilesView(Func<CancellationToken, Task<IReadOnlyList<PlayerPresence>>> getPresenceRows, Func<IReadOnlyList<PlayerPresence>> getCachedPresenceRows, Action<PlayerPresence> openProfile, Func<PlayerPresence, bool> isBookmarked = null, Action<Action> watchBookmarksChanged = null, Action<Action> unwatchBookmarksChanged = null, Func<bool> isAutoRefreshEnabled = null, Action<bool> setAutoRefreshEnabled = null, SparkSettings settings = null)
 			: this()
 		{
 			_loadRows = getPresenceRows;
@@ -78,22 +83,24 @@ namespace rp.spark.UI.Views
 			_unwatchBookmarks = unwatchBookmarksChanged;
 			_isAutoRefreshEnabled = isAutoRefreshEnabled;
 			_setAutoRefreshEnabled = setAutoRefreshEnabled;
+			_settings = settings;
 		}
 
 		protected override void Build(Container buildPanel)
 		{
-			//IL_0073: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_008f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d5: Expected O, but got Unknown
-			//IL_0111: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0079: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0090: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ac: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00db: Expected O, but got Unknown
+			//IL_0117: Unknown result type (might be due to invalid IL or missing references)
 			_isUnloaded = false;
+			WatchTooltipSettings();
 			ProfileListViewUI.AddTitle(buildPanel, "Online Profiles", 300);
 			SparkUiActions.BindClick(ProfileListViewUI.AddRefreshButton(buildPanel), () => RefreshAsync(resetPage: false), SetStatusText, "Couldn't refresh online profiles.");
 			BuildSearchControls(buildPanel);
@@ -356,38 +363,33 @@ namespace rp.spark.UI.Views
 
 		private void AddRow(PlayerPresence presence, int index)
 		{
-			//IL_003d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0078: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011c: Unknown result type (might be due to invalid IL or missing references)
-			string tooltipText = TooltipText(presence);
-			Panel row = _profileList.AddRow(index, tooltipText);
-			MakeClickable((Control)(object)row, presence, tooltipText);
-			AddBookmarkMarker((Container)(object)row, presence, tooltipText);
-			MakeClickable((Control)(object)_profileList.AddCell((Container)(object)row, presence.VisibleName(), 30, 7, 163, Color.get_White()), presence, tooltipText);
-			MakeClickable((Control)(object)_profileList.AddCell((Container)(object)row, ProfileText.PresenceRace(presence), 200, 7, 95, new Color(220, 220, 220)), presence, tooltipText);
-			MakeClickable((Control)(object)_profileList.AddCell((Container)(object)row, presence.AccountName, 305, 7, 140, new Color(220, 220, 220)), presence, tooltipText);
-			MakeClickable((Control)(object)_profileList.AddCell((Container)(object)row, ProfileLabels.StatusLabel(presence.Status), 455, 7, 105, ProfileStatusColors.Get(presence.Status)), presence, tooltipText);
-			MakeClickable((Control)(object)_profileList.AddCell((Container)(object)row, ProfileText.PresenceLocation(presence), 570, 7, 180, new Color(220, 220, 220)), presence, tooltipText);
+			//IL_0063: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00df: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0107: Unknown result type (might be due to invalid IL or missing references)
+			Panel row = _profileList.AddRow(index, string.Empty);
+			Color secondary = default(Color);
+			((Color)(ref secondary))._002Ector(220, 220, 220);
+			AddBookmarkMarker((Container)(object)row, presence);
+			_profileList.AddCell((Container)(object)row, presence.VisibleName(), 30, 7, 210, Color.get_White());
+			_profileList.AddCell((Container)(object)row, ProfileText.PresenceRace(presence), 250, 7, 90, secondary);
+			_profileList.AddCell((Container)(object)row, presence.AccountName, 350, 7, 95, secondary);
+			_profileList.AddCell((Container)(object)row, ProfileLabels.StatusLabel(presence.Status), 455, 7, 105, ProfileStatusColors.Get(presence.Status));
+			_profileList.AddCell((Container)(object)row, ProfileText.PresenceLocation(presence), 570, 7, 180, secondary);
+			ProfileScrollList.AddInteractionLayer((Container)(object)row, MakeTooltip(presence), delegate
+			{
+				_openProfile?.Invoke(presence);
+			});
 		}
 
-		private void AddBookmarkMarker(Container row, PlayerPresence presence, string tooltipText)
+		private void AddBookmarkMarker(Container row, PlayerPresence presence)
 		{
 			Func<PlayerPresence, bool> isBookmarked = _isBookmarked;
 			if (isBookmarked != null && isBookmarked(presence))
 			{
-				AssetIcon marker = ProfileListViewUI.AddBookmarkMarker(row);
-				MakeClickable((Control)(object)marker, presence, tooltipText);
+				ProfileListViewUI.AddBookmarkMarker(row);
 			}
-		}
-
-		private void MakeClickable(Control control, PlayerPresence presence, string tooltipText)
-		{
-			ProfileScrollList.WireInteraction(control, tooltipText, delegate
-			{
-				_openProfile?.Invoke(presence);
-			});
 		}
 
 		private bool MatchesSearch(PlayerPresence presence)
@@ -445,31 +447,67 @@ namespace rp.spark.UI.Views
 			return "No visible profiles yet.";
 		}
 
-		private static string TooltipText(PlayerPresence presence)
+		private Tooltip MakeTooltip(PlayerPresence presence)
 		{
-			List<string> lines = new List<string>
+			//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bd: Expected O, but got Unknown
+			bool showKnownFor = _settings?.ShowKnownForInProfileTooltips.get_Value() ?? true;
+			bool showCurrently = _settings?.ShowCurrentlyInProfileTooltips.get_Value() ?? true;
+			bool showOutOfCharacter = _settings?.ShowOocInfoInProfileTooltips.get_Value() ?? true;
+			bool trimLongTooltips = _settings?.TrimLongProfileTooltips.get_Value() ?? true;
+			int maximumLinesPerSection = _settings?.ProfileTooltipLinesPerSection.get_Value() ?? 12;
+			return new Tooltip((ITooltipView)(object)new ProfilePresenceTooltipView(presence.VisibleName(), ProfileText.PresenceCharacterDetails(presence), ProfileLabels.StatusLabel(presence.Status), ProfileText.PresenceLocation(presence), presence.KnownFor, presence.Currently, presence.OutOfCharacterInfo, showKnownFor, showCurrently, showOutOfCharacter, trimLongTooltips, maximumLinesPerSection));
+		}
+
+		private void WatchTooltipSettings()
+		{
+			if (_settings != null)
 			{
-				presence.VisibleName(),
-				ProfileText.PresenceCharacterDetails(presence),
-				"Status: " + ProfileLabels.StatusLabel(presence.Status),
-				"Location: " + ProfileText.PresenceLocation(presence)
-			};
-			if (!string.IsNullOrWhiteSpace(presence.Currently))
-			{
-				lines.Add("----------------");
-				lines.Add("Currently: " + presence.Currently.Trim());
+				_settings.ShowKnownForInProfileTooltips.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnTooltipVisibilityChanged);
+				_settings.ShowCurrentlyInProfileTooltips.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnTooltipVisibilityChanged);
+				_settings.ShowOocInfoInProfileTooltips.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnTooltipVisibilityChanged);
+				_settings.TrimLongProfileTooltips.add_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnTooltipVisibilityChanged);
+				_settings.ProfileTooltipLinesPerSection.add_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)OnTooltipLineLimitChanged);
 			}
-			if (!string.IsNullOrWhiteSpace(presence.OutOfCharacterInfo))
+		}
+
+		private void UnwatchTooltipSettings()
+		{
+			if (_settings != null)
 			{
-				lines.Add("----------------");
-				lines.Add(presence.OutOfCharacterInfo.Trim());
+				_settings.ShowKnownForInProfileTooltips.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnTooltipVisibilityChanged);
+				_settings.ShowCurrentlyInProfileTooltips.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnTooltipVisibilityChanged);
+				_settings.ShowOocInfoInProfileTooltips.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnTooltipVisibilityChanged);
+				_settings.TrimLongProfileTooltips.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnTooltipVisibilityChanged);
+				_settings.ProfileTooltipLinesPerSection.remove_SettingChanged((EventHandler<ValueChangedEventArgs<int>>)OnTooltipLineLimitChanged);
 			}
-			return string.Join(Environment.NewLine, lines.Where((string line) => !string.IsNullOrWhiteSpace(line)));
+		}
+
+		private void OnTooltipVisibilityChanged(object sender, ValueChangedEventArgs<bool> e)
+		{
+			QueueTooltipRefresh();
+		}
+
+		private void OnTooltipLineLimitChanged(object sender, ValueChangedEventArgs<int> e)
+		{
+			QueueTooltipRefresh();
+		}
+
+		private void QueueTooltipRefresh()
+		{
+			SparkUiThread.Queue(delegate
+			{
+				if (!_isUnloaded && _profileList != null)
+				{
+					RefreshVisibleRows(resetScroll: false);
+				}
+			});
 		}
 
 		protected override void Unload()
 		{
 			_isUnloaded = true;
+			UnwatchTooltipSettings();
 			_unwatchBookmarks?.Invoke(HandleBookmarksChanged);
 			StopRefresh();
 			_discoveryFilters?.Dispose();

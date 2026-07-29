@@ -1,13 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using Blish_HUD;
 using Blish_HUD.Common.UI.Views;
 using Blish_HUD.Controls;
 using Blish_HUD.Graphics.UI;
 using Microsoft.Xna.Framework;
-using MonoGame.Extended.BitmapFonts;
 
 namespace rp.spark.UI.Views
 {
@@ -79,7 +77,7 @@ namespace rp.spark.UI.Views
 			bool num = !string.IsNullOrWhiteSpace(_description);
 			int tooltipWidth = GetTooltipWidth(_title);
 			int contentWidth = tooltipWidth - 14;
-			List<string> descriptionLines = (num ? WrapTextLines(_description, contentWidth - 14, GameService.Content.get_DefaultFont16()).Take(12).ToList() : new List<string>());
+			List<string> descriptionLines = (num ? TooltipTextLayout.WrapLines(_description, contentWidth - 14, GameService.Content.get_DefaultFont16()).Take(12).ToList() : new List<string>());
 			int descriptionHeight = descriptionLines.Count * 22;
 			int height = 7;
 			if (hasTitle)
@@ -150,17 +148,6 @@ namespace rp.spark.UI.Views
 			int maxWidth = Math.Max(270, Math.Min(390, screenWidth - 16));
 			int titleWidth = (int)Math.Ceiling(GameService.Content.get_DefaultFont16().MeasureString(title ?? string.Empty).Width) + 14;
 			return Math.Max(270, Math.Min(maxWidth, titleWidth));
-		}
-
-		[IteratorStateMachine(typeof(_003CWrapTextLines_003Ed__16))]
-		private static IEnumerable<string> WrapTextLines(string text, float maxWidth, BitmapFont font)
-		{
-			return new _003CWrapTextLines_003Ed__16(-2)
-			{
-				_003C_003E3__text = text,
-				_003C_003E3__maxWidth = maxWidth,
-				_003C_003E3__font = font
-			};
 		}
 	}
 }

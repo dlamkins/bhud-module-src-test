@@ -38,6 +38,8 @@ namespace rp.spark
 
 		private ProfileRepository _profileRepository;
 
+		private GlobalOocInfoStore _globalOocInfo;
+
 		private ProfileCache _profileCache;
 
 		private ProfileNotes _notes;
@@ -47,6 +49,8 @@ namespace rp.spark
 		private PresenceService _presenceService;
 
 		private NearbyPresenceService _nearbyPresenceService;
+
+		private RollGroupService _rollGroups;
 
 		private PresenceLoop _presenceLoop;
 
@@ -101,15 +105,18 @@ namespace rp.spark
 			_profileRepository = new ProfileRepository(DirectoriesManager, _profileValidator);
 			_profileRepository.ProfileSaved += ProfileSaved;
 			_profileRepository.ActiveProfileChanged += ActiveProfileChanged;
+			_globalOocInfo = new GlobalOocInfoStore(DirectoriesManager);
+			_globalOocInfo.GlobalOocInfoChanged += GlobalOocInfoChanged;
 			_profileCache = new ProfileCache(DirectoriesManager, _profileValidator);
 			_notes = new ProfileNotes(DirectoriesManager);
 			_playerState = new PlayerStateService(Gw2ApiManager, _sparkSettings);
-			_presenceService = new PresenceService(_profileRepository, _playerState, _sparkSettings);
+			_presenceService = new PresenceService(_profileRepository, _playerState, _sparkSettings, _globalOocInfo);
 			_sparkClient = new SparkClient(_sparkSettings.GetServerBaseUrl());
 			_iconIndex = new IconIndexService(ContentsManager);
 			_presenceLoop = new PresenceLoop(_presenceService);
 			_tokens = new GW2TokenVerification(Gw2ApiManager);
 			_nearbyPresenceService = new NearbyPresenceService(_sparkClient, _sparkSettings, _presenceLoop, _tokens);
+			_rollGroups = new RollGroupService(_sparkClient, _playerState, _profileRepository, _tokens);
 			_sync = new ServerSync(_sparkClient, _sparkSettings, _presenceLoop, _profileRepository, _tokens);
 			_profileActions = new ProfileActions(_profileCache, _sparkSettings, _playerState, _sparkClient, _tokens, _sync);
 			_sync.SetPrivacyCheck(_profileActions.EnsureBlocksSyncedAsync);
@@ -132,8 +139,12 @@ namespace rp.spark
 			{
 				service.Start();
 			});
-			_windows = new SparkWindows(new WindowBuilder(), _profileRepository, _profileCache, _notes, _playerState, _iconIndex, _sparkSettings, _profileLoader, _profileActions, _nearbyPresenceService, RefreshPresenceSoon, SetNearbySharing);
-			_cornerIcon = new SparkCornerIcon(_sparkSettings, ContentsManager, _windows.OpenMyProfile, _windows.OpenProfileManager, _windows.OpenOnlineList, _windows.OpenNearby, _windows.OpenSavedProfiles, _windows.OpenBlocklist, _windows.OpenSettings, RefreshPresenceSoon, SetNearbySharing);
+			_serviceHost.Add(_rollGroups, delegate(RollGroupService service)
+			{
+				service.Start();
+			});
+			_windows = new SparkWindows(new WindowBuilder(), _profileRepository, _profileCache, _notes, _playerState, _globalOocInfo, _iconIndex, _sparkSettings, _profileLoader, _profileActions, _nearbyPresenceService, _rollGroups, RefreshPresenceSoon, SetNearbySharing);
+			_cornerIcon = new SparkCornerIcon(_sparkSettings, ContentsManager, _windows.OpenMyProfile, _windows.OpenProfileManager, _windows.OpenOnlineList, _windows.OpenNearby, _windows.OpenRollGroup, _windows.OpenSavedProfiles, _windows.OpenBlocklist, _windows.OpenSettings, RefreshPresenceSoon, SetNearbySharing, GetServerSyncStatus, GetImportantSettingsNotice, WatchServerSyncStatus, UnwatchServerSyncStatus);
 		}
 
 		protected override Task LoadAsync()
@@ -196,6 +207,29 @@ namespace rp.spark
 			return (IView)(object)new SparkSettingsView(_windows.OpenProfileManager, _windows.OpenMyProfile, _windows.OpenOnlineList, _windows.OpenNearby, _windows.OpenSavedProfiles, _windows.OpenAbout, _windows.OpenSettings, _windows.OpenBlocklist, WaitForPlayerStateAsync, GetPlayerStateMessage, ReloadPlayerState, _sparkSettings, GetServerSyncStatus, WatchServerSyncStatus, UnwatchServerSyncStatus, RefreshPresenceSoon, GetImportantSettingsNotice, _windows.ShouldHideGameplayWindows, _profileActions.WatchBlockedAccounts, _profileActions.UnwatchBlockedAccounts, _windows.HandleMaturePreferenceChanged);
 		}
 
+		private void GlobalOocInfoChanged(string accountName)
+		{
+			_sync?.InvalidateProfileUpload();
+			try
+			{
+				PlayerState state = _playerState?.GetCached();
+				if (state != null && !string.IsNullOrWhiteSpace(state.AccountName) && string.Equals(state.AccountName.Trim(), accountName?.Trim(), StringComparison.OrdinalIgnoreCase))
+				{
+					CharacterProfile activeProfile = _profileRepository?.LoadActiveForCharacter(state.AccountName, state.OfficialCharacterName);
+					if (activeProfile != null && activeProfile.UseGlobalOutOfCharacterInfo)
+					{
+						_profileRepository.Save(activeProfile);
+						return;
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Logger.Warn(ex, "Failed to update the active profile after global OOC info changed.");
+			}
+			RefreshPresenceSoon();
+		}
+
 		private void ProfileSaved(CharacterProfile savedProfile)
 		{
 			RefreshPresenceSoon();
@@ -211,6 +245,7 @@ namespace rp.spark
 
 		private void ActiveProfileChanged(string accountName, string officialCharacterName, string profileId)
 		{
+			RefreshRollGroupSoon();
 			RefreshPresenceSoon();
 			SparkUiThread.Queue(delegate
 			{
@@ -251,6 +286,24 @@ namespace rp.spark
 				catch (Exception ex)
 				{
 					Logger.Warn(ex, "Failed to refresh SPARK data after a profile change.");
+				}
+			}
+		}
+
+		private async void RefreshRollGroupSoon()
+		{
+			if (_rollGroups != null)
+			{
+				try
+				{
+					await _rollGroups.RefreshAsync();
+				}
+				catch (OperationCanceledException)
+				{
+				}
+				catch (Exception ex)
+				{
+					Logger.Warn(ex, "Failed to refresh the roll group after a profile change.");
 				}
 			}
 		}
@@ -322,6 +375,7 @@ namespace rp.spark
 
 		private async void HandleSubtokenUpdated(object sender, ValueEventArgs<IEnumerable<TokenPermission>> e)
 		{
+			_ = 1;
 			try
 			{
 				_tokens?.Clear();
@@ -331,6 +385,10 @@ namespace rp.spark
 				if (stateTask != null)
 				{
 					await stateTask;
+				}
+				if (_rollGroups != null)
+				{
+					await _rollGroups.RefreshAsync();
 				}
 			}
 			catch (OperationCanceledException)
@@ -623,6 +681,10 @@ namespace rp.spark
 				_profileRepository.ProfileSaved -= ProfileSaved;
 				_profileRepository.ActiveProfileChanged -= ActiveProfileChanged;
 			}
+			if (_globalOocInfo != null)
+			{
+				_globalOocInfo.GlobalOocInfoChanged -= GlobalOocInfoChanged;
+			}
 			_profileLoader = null;
 			_profileActions = null;
 			_sync = null;
@@ -636,6 +698,7 @@ namespace rp.spark
 			_notes = null;
 			_profileCache = null;
 			_profileRepository = null;
+			_globalOocInfo = null;
 			_profileValidator = null;
 		}
 	}

@@ -71,6 +71,9 @@ namespace rp.spark.Services
 
 			public ProfileRegion Region { get; set; }
 
+			public string KnownFor { get; set; } = string.Empty;
+
+
 			public string Currently { get; set; } = string.Empty;
 
 
@@ -121,6 +124,9 @@ namespace rp.spark.Services
 			public ProfileExperience Experience { get; set; }
 
 			public RPStatus Status { get; set; }
+
+			public string KnownFor { get; set; } = string.Empty;
+
 
 			public string Currently { get; set; } = string.Empty;
 
@@ -614,6 +620,7 @@ namespace rp.spark.Services
 			savedProfileSummary.ActiveProfileId = Clean(TextUtil.FirstNonEmpty(record.Presence?.ActiveProfileId, record.Profile?.ProfileId));
 			savedProfileSummary.ActiveProfileName = Clean(TextUtil.FirstNonEmpty(record.Presence?.ActiveProfileName, record.Profile?.ProfileName));
 			savedProfileSummary.Status = record.Presence?.Status ?? RPStatus.Online;
+			savedProfileSummary.KnownFor = Clean(TextUtil.FirstNonEmpty(record.Presence?.KnownFor, record.Profile?.KnownFor));
 			savedProfileSummary.Currently = Clean(TextUtil.FirstNonEmpty(record.Presence?.Currently, record.Profile?.Currently));
 			savedProfileSummary.OutOfCharacterInfo = Clean(TextUtil.FirstNonEmpty(record.Presence?.OutOfCharacterInfo, record.Profile?.OutOfCharacterInfo));
 			savedProfileSummary.LocationName = Clean(record.Presence?.LocationName);
@@ -648,6 +655,7 @@ namespace rp.spark.Services
 			savedProfileSummary.ActiveProfileId = Clean(TextUtil.FirstNonEmpty(snapshot.Presence?.ActiveProfileId, snapshot.Profile?.ProfileId));
 			savedProfileSummary.ActiveProfileName = Clean(TextUtil.FirstNonEmpty(snapshot.Presence?.ActiveProfileName, snapshot.Profile?.ProfileName));
 			savedProfileSummary.Status = snapshot.Presence?.Status ?? RPStatus.Online;
+			savedProfileSummary.KnownFor = Clean(TextUtil.FirstNonEmpty(snapshot.Presence?.KnownFor, snapshot.Profile?.KnownFor));
 			savedProfileSummary.Currently = Clean(TextUtil.FirstNonEmpty(snapshot.Presence?.Currently, snapshot.Profile?.Currently));
 			savedProfileSummary.OutOfCharacterInfo = Clean(TextUtil.FirstNonEmpty(snapshot.Presence?.OutOfCharacterInfo, snapshot.Profile?.OutOfCharacterInfo));
 			savedProfileSummary.LocationName = Clean(snapshot.Presence?.LocationName);
@@ -688,6 +696,7 @@ namespace rp.spark.Services
 				ActiveProfileId = summary.ActiveProfileId,
 				ActiveProfileName = summary.ActiveProfileName,
 				Status = summary.Status,
+				KnownFor = summary.KnownFor,
 				Currently = summary.Currently,
 				OutOfCharacterInfo = summary.OutOfCharacterInfo,
 				LocationName = summary.LocationName,

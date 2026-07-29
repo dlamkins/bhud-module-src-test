@@ -46,6 +46,9 @@ namespace rp.spark.Models
 
 		public RPStatus Status { get; set; }
 
+		public string KnownFor { get; set; } = string.Empty;
+
+
 		public string Currently { get; set; } = string.Empty;
 
 

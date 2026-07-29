@@ -143,6 +143,12 @@ namespace rp.spark.UI.Views
 			}
 		}
 
+		private const string OfficialDeveloperAccount = "Bat.8570";
+
+		private const int DeveloperBadgeAssetId = 3307061;
+
+		private const int DeveloperBadgeSlot = 5;
+
 		private readonly Func<CharacterProfile, PlayerPresence, string> _toggleBookmark;
 
 		private readonly Func<CharacterProfile, PlayerPresence, bool> _isBookmarked;
@@ -516,21 +522,22 @@ namespace rp.spark.UI.Views
 			return true;
 		}
 
+		private bool IsOfficialDeveloper()
+		{
+			return string.Equals(_presence?.AccountName?.Trim(), "Bat.8570", StringComparison.OrdinalIgnoreCase);
+		}
+
 		private void BuildGlance(Container buildPanel)
 		{
-			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0036: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0040: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0028: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0044: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0061: Unknown result type (might be due to invalid IL or missing references)
 			Layout layout = _layout;
-			if (buildPanel == null || layout == null)
+			if (buildPanel != null && layout != null)
 			{
-				return;
-			}
-			List<AtAGlanceEntry> entries = GetGlanceEntries().ToList();
-			if (entries.Any())
-			{
+				List<AtAGlanceEntry> entries = GetGlanceEntries().ToList();
 				for (int i = 0; i < entries.Count; i++)
 				{
 					AtAGlanceEntry entry = entries[i];
@@ -543,7 +550,52 @@ namespace rp.spark.UI.Views
 					((Control)assetIcon).set_Tooltip(MakeGlanceTooltip(entry));
 					assetIcon.SetAssetId(entry.AssetId);
 				}
+				if (IsOfficialDeveloper())
+				{
+					AddDeveloperBadge(buildPanel, layout);
+				}
 			}
+		}
+
+		private static void AddDeveloperBadge(Container parent, Layout layout)
+		{
+			//IL_0002: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0022: Expected O, but got Unknown
+			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0027: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0048: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006e: Expected O, but got Unknown
+			//IL_0076: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0089: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0091: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00ae: Unknown result type (might be due to invalid IL or missing references)
+			Rectangle bounds = layout.GlanceIconBounds(5);
+			Tooltip tooltip = new Tooltip((ITooltipView)(object)new ProfileTooltipView("Official SPARK Developer", "This account belongs to an official developer of SPARK.", "At A Glance"));
+			Panel val = new Panel();
+			val.set_ShowBorder(false);
+			((Control)val).set_Location(((Rectangle)(ref bounds)).get_Location());
+			((Control)val).set_Size(((Rectangle)(ref bounds)).get_Size());
+			((Control)val).set_Parent(parent);
+			((Control)val).set_BackgroundColor(new Color(255, 194, 55));
+			((Control)val).set_Tooltip(tooltip);
+			Panel border = val;
+			AssetIcon assetIcon = new AssetIcon();
+			((Control)assetIcon).set_Location(new Point(2, 2));
+			((Control)assetIcon).set_Size(new Point(bounds.Width - 4, bounds.Height - 4));
+			((Control)assetIcon).set_Parent((Container)(object)border);
+			((Control)assetIcon).set_BackgroundColor(new Color(20, 20, 20, 180));
+			((Control)assetIcon).set_Tooltip(tooltip);
+			assetIcon.SetAssetId(3307061);
 		}
 
 		private void BuildStatus(Container buildPanel)
@@ -1196,17 +1248,18 @@ namespace rp.spark.UI.Views
 
 		private string GetOtherInfoText()
 		{
-			if (!string.IsNullOrWhiteSpace(_profile.OutOfCharacterInfo))
+			string outOfCharacterInfo = ((!_profile.UseGlobalOutOfCharacterInfo) ? _profile.OutOfCharacterInfo : _presence?.OutOfCharacterInfo);
+			if (!string.IsNullOrWhiteSpace(outOfCharacterInfo))
 			{
-				return _profile.OutOfCharacterInfo.Trim();
+				return outOfCharacterInfo.Trim();
 			}
 			return string.Empty;
 		}
 
-		[IteratorStateMachine(typeof(_003CWrapTextLines_003Ed__60))]
+		[IteratorStateMachine(typeof(_003CWrapTextLines_003Ed__65))]
 		private static IEnumerable<string> WrapTextLines(string text, float maxWidth, BitmapFont font)
 		{
-			return new _003CWrapTextLines_003Ed__60(-2)
+			return new _003CWrapTextLines_003Ed__65(-2)
 			{
 				_003C_003E3__text = text,
 				_003C_003E3__maxWidth = maxWidth,
@@ -1214,10 +1267,10 @@ namespace rp.spark.UI.Views
 			};
 		}
 
-		[IteratorStateMachine(typeof(_003CBreakLongWord_003Ed__61))]
+		[IteratorStateMachine(typeof(_003CBreakLongWord_003Ed__66))]
 		private static IEnumerable<string> BreakLongWord(string word, float maxWidth, BitmapFont font)
 		{
-			return new _003CBreakLongWord_003Ed__61(-2)
+			return new _003CBreakLongWord_003Ed__66(-2)
 			{
 				_003C_003E3__word = word,
 				_003C_003E3__maxWidth = maxWidth,

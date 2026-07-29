@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Blish_HUD;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Linq;
 using rp.spark.Models;
 using rp.spark.Models.Api;
 
@@ -59,6 +60,8 @@ namespace rp.spark.Services
 		private const int ResponseReadBufferSize = 8192;
 
 		private static readonly TimeSpan RequestTimeout = TimeSpan.FromSeconds(10.0);
+
+		private static readonly TimeSpan LongPollTimeout = TimeSpan.FromSeconds(30.0);
 
 		private static readonly HttpClient SharedHttpClient;
 
@@ -127,12 +130,69 @@ namespace rp.spark.Services
 			}, cancellationToken, gw2Subtoken);
 		}
 
+		public Task<ApiResult<RollGroupResponse>> GetCurrentRollGroupResultAsync(string gw2Subtoken, CancellationToken cancellationToken = default(CancellationToken))
+		{
+			return GetAsync<RollGroupResponse>("roll-groups/current/", cancellationToken, gw2Subtoken);
+		}
+
+		public Task<ApiResult<RollGroupResponse>> CreateRollGroupResultAsync(CreateRollGroupRequest request, string gw2Subtoken, CancellationToken cancellationToken = default(CancellationToken))
+		{
+			return PostAsync<CreateRollGroupRequest, RollGroupResponse>("roll-groups/", request, cancellationToken, gw2Subtoken);
+		}
+
+		public Task<ApiResult<RollGroupResponse>> JoinRollGroupResultAsync(JoinRollGroupRequest request, string gw2Subtoken, CancellationToken cancellationToken = default(CancellationToken))
+		{
+			return PostAsync<JoinRollGroupRequest, RollGroupResponse>("roll-groups/join/", request, cancellationToken, gw2Subtoken);
+		}
+
+		public Task<ApiResult<bool>> LeaveRollGroupResultAsync(string gw2Subtoken, CancellationToken cancellationToken = default(CancellationToken))
+		{
+			return PostAsync("roll-groups/leave/", new RollGroupActionRequest(), cancellationToken, gw2Subtoken);
+		}
+
+		public Task<ApiResult<bool>> DisbandRollGroupResultAsync(string gw2Subtoken, CancellationToken cancellationToken = default(CancellationToken))
+		{
+			return DeleteAsync("roll-groups/current/", cancellationToken, gw2Subtoken);
+		}
+
+		public Task<ApiResult<RollGroupResponse>> UpdateRollGroupResultAsync(RollGroupSettingsRequest request, string gw2Subtoken, CancellationToken cancellationToken = default(CancellationToken))
+		{
+			return PutAsync<RollGroupSettingsRequest, RollGroupResponse>("roll-groups/current/", request, cancellationToken, gw2Subtoken);
+		}
+
+		public Task<ApiResult<RollGroupResponse>> UpdateRollMemberResultAsync(RollMemberUpdateRequest request, string gw2Subtoken, CancellationToken cancellationToken = default(CancellationToken))
+		{
+			return PutAsync<RollMemberUpdateRequest, RollGroupResponse>("roll-groups/member/", request, cancellationToken, gw2Subtoken);
+		}
+
+		public Task<ApiResult<bool>> KickRollGroupMemberResultAsync(string accountName, string gw2Subtoken, CancellationToken cancellationToken = default(CancellationToken))
+		{
+			string path = "roll-groups/members/?account=" + Uri.EscapeDataString(accountName ?? string.Empty);
+			return DeleteAsync(path, cancellationToken, gw2Subtoken);
+		}
+
+		public Task<ApiResult<RollEventResponse>> SubmitRollResultAsync(RollRequest request, string gw2Subtoken, CancellationToken cancellationToken = default(CancellationToken))
+		{
+			return PostAsync<RollRequest, RollEventResponse>("roll-groups/rolls/", request, cancellationToken, gw2Subtoken);
+		}
+
+		public Task<ApiResult<RollEventResponse>> SubmitRollHeaderResultAsync(RollHeaderRequest request, string gw2Subtoken, CancellationToken cancellationToken = default(CancellationToken))
+		{
+			return PostAsync<RollHeaderRequest, RollEventResponse>("roll-groups/headers/", request, cancellationToken, gw2Subtoken);
+		}
+
+		public Task<ApiResult<RollEventListResponse>> ListenRollEventsResultAsync(string groupId, long after, long revision, string gw2Subtoken, CancellationToken cancellationToken = default(CancellationToken))
+		{
+			string path = "roll-groups/events/?groupId=" + Uri.EscapeDataString(groupId ?? string.Empty) + $"&after={Math.Max(0L, after)}" + $"&revision={Math.Max(0L, revision)}";
+			return GetAsync<RollEventListResponse>(path, cancellationToken, gw2Subtoken, LongPollTimeout);
+		}
+
 		public Task<ApiResult<ProfileReportResponse>> ReportProfileResultAsync(ProfileReportRequest report, string gw2Subtoken, CancellationToken cancellationToken = default(CancellationToken))
 		{
 			return PostAsync<ProfileReportRequest, ProfileReportResponse>("reports/", report, cancellationToken, gw2Subtoken);
 		}
 
-		private async Task<ApiResult<T>> GetAsync<T>(string relativePath, CancellationToken cancellationToken, string gw2Subtoken) where T : class
+		private async Task<ApiResult<T>> GetAsync<T>(string relativePath, CancellationToken cancellationToken, string gw2Subtoken, TimeSpan? timeout = null) where T : class
 		{
 			if (!IsConfigured)
 			{
@@ -158,7 +218,7 @@ namespace rp.spark.Services
 				{
 					((IDisposable)request)?.Dispose();
 				}
-			});
+			}, timeout);
 		}
 
 		private async Task<ApiResult<bool>> PostAsync<T>(string relativePath, T payload, CancellationToken cancellationToken, string gw2Subtoken)
@@ -290,6 +350,49 @@ namespace rp.spark.Services
 			});
 		}
 
+		private async Task<ApiResult<TResponse>> PutAsync<TPayload, TResponse>(string relativePath, TPayload payload, CancellationToken cancellationToken, string gw2Subtoken) where TResponse : class
+		{
+			if (!IsConfigured)
+			{
+				return ApiResult<TResponse>.Failure("SPARK webserver is not configured.", null, ApiFailure.NotConfigured);
+			}
+			if (payload == null)
+			{
+				return ApiResult<TResponse>.Failure("SPARK request is empty.", null, ApiFailure.InvalidRequest);
+			}
+			return await ExecuteRequestAsync(HttpMethod.get_Put(), relativePath, cancellationToken, async delegate(CancellationToken requestToken)
+			{
+				string json = JsonConvert.SerializeObject((object)payload, (Formatting)0, JsonSettings);
+				HttpRequestMessage request = new HttpRequestMessage(HttpMethod.get_Put(), GetUri(relativePath));
+				try
+				{
+					StringContent content = new StringContent(json, Encoding.UTF8, "application/json");
+					try
+					{
+						request.set_Content((HttpContent)(object)content);
+						AddSubtokenHeader(request, gw2Subtoken);
+						HttpResponseMessage response = await SharedHttpClient.SendAsync(request, (HttpCompletionOption)1, requestToken);
+						try
+						{
+							return await ReadJsonResponseAsync<TResponse>(HttpMethod.get_Put(), relativePath, response, requestToken);
+						}
+						finally
+						{
+							((IDisposable)response)?.Dispose();
+						}
+					}
+					finally
+					{
+						((IDisposable)content)?.Dispose();
+					}
+				}
+				finally
+				{
+					((IDisposable)request)?.Dispose();
+				}
+			});
+		}
+
 		private async Task<ApiResult<bool>> DeleteAsync(string relativePath, CancellationToken cancellationToken, string gw2Subtoken)
 		{
 			if (!IsConfigured)
@@ -319,11 +422,11 @@ namespace rp.spark.Services
 			});
 		}
 
-		private static async Task<ApiResult<T>> ExecuteRequestAsync<T>(HttpMethod method, string relativePath, CancellationToken cancellationToken, Func<CancellationToken, Task<ApiResult<T>>> requestAsync)
+		private static async Task<ApiResult<T>> ExecuteRequestAsync<T>(HttpMethod method, string relativePath, CancellationToken cancellationToken, Func<CancellationToken, Task<ApiResult<T>>> requestAsync, TimeSpan? timeout = null)
 		{
 			string logPath = GetEndpointPathForLog(relativePath);
 			using CancellationTokenSource requestTimeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-			requestTimeout.CancelAfter(RequestTimeout);
+			requestTimeout.CancelAfter(timeout ?? RequestTimeout);
 			try
 			{
 				return await requestAsync(requestTimeout.Token);
@@ -510,19 +613,42 @@ namespace rp.spark.Services
 
 		private static string GetServerDetail(string responseBody)
 		{
+			//IL_002b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0031: Invalid comparison between Unknown and I4
 			if (string.IsNullOrWhiteSpace(responseBody))
 			{
 				return string.Empty;
 			}
 			try
 			{
-				Dictionary<string, object> payload = JsonConvert.DeserializeObject<Dictionary<string, object>>(responseBody, JsonSettings);
-				if (payload == null || !payload.TryGetValue("detail", out var detail))
+				JToken detail = JObject.Parse(responseBody).get_Item("detail");
+				JArray errors = (JArray)(object)((detail is JArray) ? detail : null);
+				string text;
+				if (detail != null && (int)detail.get_Type() == 8)
 				{
-					return string.Empty;
+					text = Extensions.Value<string>((IEnumerable<JToken>)detail);
 				}
-				string detailText = detail?.ToString()?.Trim() ?? string.Empty;
-				return (detailText.Length <= 160) ? detailText : string.Empty;
+				else
+				{
+					if (errors == null || ((JContainer)errors).get_Count() <= 0)
+					{
+						return string.Empty;
+					}
+					JToken obj = errors.get_Item(0);
+					object obj2;
+					if (obj == null)
+					{
+						obj2 = null;
+					}
+					else
+					{
+						JToken obj3 = obj.get_Item((object)"msg");
+						obj2 = ((obj3 != null) ? Extensions.Value<string>((IEnumerable<JToken>)obj3) : null);
+					}
+					text = (string)obj2;
+				}
+				text = (text ?? string.Empty).Replace("Value error, ", string.Empty).Trim();
+				return (text.Length <= 100) ? text : string.Empty;
 			}
 			catch
 			{
@@ -532,15 +658,15 @@ namespace rp.spark.Services
 
 		static SparkClient()
 		{
-			//IL_001d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0022: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0032: Expected O, but got Unknown
-			//IL_0032: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0037: Unknown result type (might be due to invalid IL or missing references)
-			//IL_003e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0030: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0035: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0045: Expected O, but got Unknown
 			//IL_0045: Unknown result type (might be due to invalid IL or missing references)
-			//IL_004f: Expected O, but got Unknown
-			//IL_0059: Expected O, but got Unknown
+			//IL_004a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0062: Expected O, but got Unknown
+			//IL_006c: Expected O, but got Unknown
 			HttpClient val = new HttpClient();
 			val.set_Timeout(Timeout.InfiniteTimeSpan);
 			SharedHttpClient = val;

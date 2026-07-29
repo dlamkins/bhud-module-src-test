@@ -120,7 +120,9 @@ namespace rp.spark.UI.Controls
 					_pageChanged?.Invoke();
 				}
 			});
-			Update(0);
+			((Control)_previousButton).set_Enabled(false);
+			((Control)_nextButton).set_Enabled(false);
+			_pageLabel.set_Text("Page 1 of 1.");
 		}
 
 		public void Update(int itemCount)

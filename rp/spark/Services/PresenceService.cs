@@ -17,11 +17,14 @@ namespace rp.spark.Services
 
 		private readonly SparkSettings _settings;
 
-		public PresenceService(ProfileRepository profileRepository, PlayerStateService playerState, SparkSettings settings)
+		private readonly GlobalOocInfoStore _globalOocInfo;
+
+		public PresenceService(ProfileRepository profileRepository, PlayerStateService playerState, SparkSettings settings, GlobalOocInfoStore globalOocInfo)
 		{
 			_profileRepository = profileRepository;
 			_playerState = playerState;
 			_settings = settings;
+			_globalOocInfo = globalOocInfo;
 		}
 
 		public PlayerPresence GetCurrentPresence()
@@ -64,8 +67,9 @@ namespace rp.spark.Services
 			playerPresence.Experience = (hasActiveProfile ? activeProfile.Experience : ProfileExperience.Hidden);
 			playerPresence.ProfileUpdatedAtTime = (hasActiveProfile ? activeProfile.UpdatedAt : default(DateTime));
 			playerPresence.Status = status;
+			playerPresence.KnownFor = ((!hasActiveProfile) ? string.Empty : (activeProfile.KnownFor?.Trim() ?? string.Empty));
 			playerPresence.Currently = ((!hasActiveProfile) ? string.Empty : (activeProfile.Currently?.Trim() ?? string.Empty));
-			playerPresence.OutOfCharacterInfo = ((!hasActiveProfile) ? string.Empty : (activeProfile.OutOfCharacterInfo?.Trim() ?? string.Empty));
+			playerPresence.OutOfCharacterInfo = (hasActiveProfile ? _globalOocInfo.GetEffective(activeProfile) : string.Empty);
 			playerPresence.LocationName = GetLocationName(state, locationHidden, locationResolved);
 			playerPresence.IsLocationHidden = locationHidden;
 			playerPresence.Region = (_settings?.RegionFilter?.get_Value()).GetValueOrDefault();

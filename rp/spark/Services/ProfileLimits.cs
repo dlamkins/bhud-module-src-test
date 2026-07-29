@@ -35,5 +35,21 @@ namespace rp.spark.Services
 		public const int MaxCustomRaceLength = 16;
 
 		public const int MaxProfessionLength = 40;
+
+		public const int MaxRollGroupMembers = 50;
+
+		public const int MaxRollInputLength = 96;
+
+		public const int MaxRollTagLength = 40;
+
+		public const int MaxRollHeaderLength = 40;
+
+		public const int MaxRollDice = 100;
+
+		public const int MaxRollSides = 1000;
+
+		public const int MaxRollPasswordLength = 64;
+
+		public const int MaxRollHistory = 500;
 	}
 }

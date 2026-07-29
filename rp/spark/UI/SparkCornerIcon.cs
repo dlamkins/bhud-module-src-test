@@ -6,6 +6,7 @@ using Blish_HUD.Content;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Blish_HUD.Modules.Managers;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using rp.spark.Models;
 using rp.spark.Services;
@@ -36,6 +37,8 @@ namespace rp.spark.UI
 
 		private readonly Action _openNearby;
 
+		private readonly Action _openRollGroup;
+
 		private readonly Action _openSavedProfiles;
 
 		private readonly Action _openBlocklist;
@@ -45,6 +48,14 @@ namespace rp.spark.UI
 		private readonly Action _requestServerSync;
 
 		private readonly Action<bool> _setNearbySharing;
+
+		private readonly Func<ServerSyncStatus> _getServerSyncStatus;
+
+		private readonly Action<Action<ServerSyncStatus>> _watchServerSyncStatus;
+
+		private readonly Action<Action<ServerSyncStatus>> _unwatchServerSyncStatus;
+
+		private readonly Func<string> _getImportantNotice;
 
 		private CornerIcon _cornerIcon;
 
@@ -58,9 +69,15 @@ namespace rp.spark.UI
 
 		private ContextMenuStripItem _nearbyPlayersItem;
 
+		private ContextMenuStripItem _rollGroupItem;
+
 		private ContextMenuStripItem _savedProfilesItem;
 
 		private ContextMenuStripItem _statusMenuItem;
+
+		private ContextMenuColours _readinessMenuItem;
+
+		private ContextMenuColours _serverStatusMenuItem;
 
 		private readonly Dictionary<RPStatus, ContextMenuStripItem> _statusMenuItems = new Dictionary<RPStatus, ContextMenuStripItem>();
 
@@ -68,22 +85,28 @@ namespace rp.spark.UI
 
 		private bool _isDisposed;
 
-		public SparkCornerIcon(SparkSettings settings, ContentsManager contentsManager, Action openMyProfile, Action openProfileManager, Action openOnlineList, Action openNearby, Action openSavedProfiles, Action openBlocklist, Action openSettings, Action requestServerSync, Action<bool> setNearbySharing)
+		public SparkCornerIcon(SparkSettings settings, ContentsManager contentsManager, Action openMyProfile, Action openProfileManager, Action openOnlineList, Action openNearby, Action openRollGroup, Action openSavedProfiles, Action openBlocklist, Action openSettings, Action requestServerSync, Action<bool> setNearbySharing, Func<ServerSyncStatus> getServerSyncStatus, Func<string> getImportantNotice, Action<Action<ServerSyncStatus>> watchServerSyncStatus, Action<Action<ServerSyncStatus>> unwatchServerSyncStatus)
 		{
-			//IL_007a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0084: Expected O, but got Unknown
-			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00a2: Expected O, but got Unknown
+			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c9: Expected O, but got Unknown
+			//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e7: Expected O, but got Unknown
 			_settings = settings;
 			_openMyProfile = openMyProfile;
 			_openProfileManager = openProfileManager;
 			_openOnlineList = openOnlineList;
 			_openNearby = openNearby;
+			_openRollGroup = openRollGroup;
 			_openSavedProfiles = openSavedProfiles;
 			_openBlocklist = openBlocklist;
 			_openSettings = openSettings;
 			_requestServerSync = requestServerSync;
 			_setNearbySharing = setNearbySharing;
+			_getServerSyncStatus = getServerSyncStatus;
+			_getImportantNotice = getImportantNotice;
+			_watchServerSyncStatus = watchServerSyncStatus;
+			_unwatchServerSyncStatus = unwatchServerSyncStatus;
+			_watchServerSyncStatus?.Invoke(OnServerStatusChanged);
 			Texture2D iconTexture = contentsManager.GetTexture("spark-corner-icon.png");
 			Texture2D hoverTexture = contentsManager.GetTexture("spark-corner-icon-hover.png", iconTexture);
 			_icon = new AsyncTexture2D(iconTexture);
@@ -144,9 +167,12 @@ namespace rp.spark.UI
 			AddSectionHeader(menu, "Players");
 			_onlineListItem = AddMenuItem(menu, "Online List", _openOnlineList);
 			_nearbyPlayersItem = AddMenuItem(menu, "Nearby Players", _openNearby);
+			_rollGroupItem = AddMenuItem(menu, "Dice Roll Groups", _openRollGroup);
 			_savedProfilesItem = AddMenuItem(menu, "Saved Profiles", _openSavedProfiles);
+			AddSectionHeader(menu, "SPARK Status");
+			AddSparkStatusItems(menu);
 			AddSectionHeader(menu, "Config");
-			AddMenuItem(menu, "Settings", _openSettings);
+			AddMenuItem(menu, "Options", _openSettings);
 			AddMenuItem(menu, "Manage Blocks", _openBlocklist);
 			AddPrivacySubmenu(menu);
 			RefreshMenuState();
@@ -159,6 +185,7 @@ namespace rp.spark.UI
 			width = Math.Max(width, MenuItemWidth("My Profile"));
 			width = Math.Max(width, MenuItemWidth("Profile Editor"));
 			width = Math.Max(width, MenuItemWidth("Nearby Players"));
+			width = Math.Max(width, MenuItemWidth("Dice Roll Groups"));
 			width = Math.Max(width, MenuItemWidth("Saved Profiles"));
 			width = Math.Max(width, MenuItemWidth("Manage Blocks"));
 			string[] rpStatusOptions = ProfileLabels.RpStatusOptions;
@@ -166,7 +193,9 @@ namespace rp.spark.UI
 			{
 				width = Math.Max(width, MenuItemWidth("Status: " + label));
 			}
-			return Math.Max(width, MenuItemWidth("Status: " + CurrentStatusLabel()));
+			width = Math.Max(width, MenuItemWidth("Status: " + CurrentStatusLabel()));
+			width = Math.Max(width, MenuItemWidth("SPARK needs attention"));
+			return Math.Max(width, MenuItemWidth("Server: SPARK webserver unavailable"));
 		}
 
 		private static int MenuItemWidth(string text)
@@ -193,6 +222,52 @@ namespace rp.spark.UI
 			menu.AddMenuItem((ContextMenuStripItem)(object)new ContextMenuHeader(text));
 		}
 
+		private void AddSparkStatusItems(ContextMenuStrip menu)
+		{
+			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+			_readinessMenuItem = new ContextMenuColours("SPARK ready", new Color(140, 220, 140));
+			_serverStatusMenuItem = new ContextMenuColours("Server: Disconnected", SparkViewUI.SecondaryTextColor);
+			((Control)_readinessMenuItem).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				_openSettings?.Invoke();
+			});
+			((Control)_serverStatusMenuItem).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				_openSettings?.Invoke();
+			});
+			menu.AddMenuItem((ContextMenuStripItem)(object)_readinessMenuItem);
+			menu.AddMenuItem((ContextMenuStripItem)(object)_serverStatusMenuItem);
+			RefreshSparkStatusItems();
+		}
+
+		private void OnServerStatusChanged(ServerSyncStatus status)
+		{
+			SparkUiThread.Queue(delegate
+			{
+				if (!_isDisposed && _menu != null)
+				{
+					RefreshSparkStatusItems();
+				}
+			});
+		}
+
+		private void RefreshSparkStatusItems()
+		{
+			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
+			if (_readinessMenuItem != null && _serverStatusMenuItem != null)
+			{
+				SparkStatusDisplay display = SparkStatusDisplay.Create(_getImportantNotice, _getServerSyncStatus);
+				((ContextMenuStripItem)_readinessMenuItem).set_Text(display.ReadinessText);
+				_readinessMenuItem.TextColor = display.ReadinessColor;
+				((Control)_readinessMenuItem).set_BasicTooltipText(display.ReadinessTooltip);
+				((ContextMenuStripItem)_serverStatusMenuItem).set_Text(display.ServerText);
+				_serverStatusMenuItem.TextColor = display.ServerColor;
+				((Control)_serverStatusMenuItem).set_BasicTooltipText(display.ServerTooltip);
+			}
+		}
+
 		private void AddPrivacySubmenu(ContextMenuStrip menu)
 		{
 			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
@@ -200,10 +275,10 @@ namespace rp.spark.UI
 			menu.AddMenuItem("Privacy").set_Submenu(new ContextMenuStrip((Func<IEnumerable<ContextMenuStripItem>>)GetPrivacyMenuItems));
 		}
 
-		[IteratorStateMachine(typeof(_003CGetPrivacyMenuItems_003Ed__35))]
+		[IteratorStateMachine(typeof(_003CGetPrivacyMenuItems_003Ed__46))]
 		private IEnumerable<ContextMenuStripItem> GetPrivacyMenuItems()
 		{
-			return new _003CGetPrivacyMenuItems_003Ed__35(-2)
+			return new _003CGetPrivacyMenuItems_003Ed__46(-2)
 			{
 				_003C_003E4__this = this
 			};
@@ -284,10 +359,10 @@ namespace rp.spark.UI
 			return contextMenuColours;
 		}
 
-		[IteratorStateMachine(typeof(_003CGetStatusMenuItems_003Ed__42))]
+		[IteratorStateMachine(typeof(_003CGetStatusMenuItems_003Ed__53))]
 		private IEnumerable<ContextMenuStripItem> GetStatusMenuItems()
 		{
-			return new _003CGetStatusMenuItems_003Ed__42(-2)
+			return new _003CGetStatusMenuItems_003Ed__53(-2)
 			{
 				_003C_003E4__this = this
 			};
@@ -370,6 +445,7 @@ namespace rp.spark.UI
 			SetMenuItemState(_myProfileItem, enabled, tooltip);
 			SetMenuItemState(_profileEditorItem, enabled, tooltip);
 			SetMenuItemState(_onlineListItem, enabled, tooltip);
+			SetMenuItemState(_rollGroupItem, enabled, tooltip);
 			SetMenuItemState(_nearbyPlayersItem, enabled, tooltip);
 			SetMenuItemState(_savedProfilesItem, enabled, tooltip);
 		}
@@ -385,10 +461,7 @@ namespace rp.spark.UI
 				if (!_isDisposed && _menu != null)
 				{
 					RefreshMenuState();
-					if (((Control)_menu).get_Visible())
-					{
-						((Control)_menu).Hide();
-					}
+					RefreshSparkStatusItems();
 				}
 			});
 		}
@@ -432,6 +505,7 @@ namespace rp.spark.UI
 		private void OnCornerIconClick(object sender, MouseEventArgs e)
 		{
 			RefreshMenuState();
+			RefreshSparkStatusItems();
 			ContextMenuStrip menu = _menu;
 			if (menu != null)
 			{
@@ -464,6 +538,8 @@ namespace rp.spark.UI
 			_nearbyPlayersItem = null;
 			_savedProfilesItem = null;
 			_statusMenuItem = null;
+			_readinessMenuItem = null;
+			_serverStatusMenuItem = null;
 			_statusMenuItems.Clear();
 		}
 
@@ -476,6 +552,7 @@ namespace rp.spark.UI
 			_isDisposed = true;
 			_settings.ShowCornerIcon.remove_SettingChanged((EventHandler<ValueChangedEventArgs<bool>>)OnShowCornerIconChanged);
 			_settings.CurrentStatus.remove_SettingChanged((EventHandler<ValueChangedEventArgs<RPStatus>>)OnCurrentStatusChanged);
+			_unwatchServerSyncStatus?.Invoke(OnServerStatusChanged);
 			Clear();
 			AsyncTexture2D icon = _icon;
 			if (icon != null)

@@ -72,6 +72,16 @@ namespace rp.spark.UI.Controls
 
 		public Panel AddRow(int index, string tooltipText)
 		{
+			return AddRow(index, null, tooltipText);
+		}
+
+		public Panel AddRow(int index, Tooltip tooltip)
+		{
+			return AddRow(index, tooltip, string.Empty);
+		}
+
+		private Panel AddRow(int index, Tooltip tooltip, string tooltipText)
+		{
 			//IL_0000: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
 			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
@@ -83,14 +93,16 @@ namespace rp.spark.UI.Controls
 			//IL_0058: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0062: Unknown result type (might be due to invalid IL or missing references)
 			//IL_006e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007f: Expected O, but got Unknown
+			//IL_0084: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008c: Expected O, but got Unknown
 			Panel val = new Panel();
 			val.set_ShowBorder(false);
 			((Control)val).set_Location(new Point(0, index * (_rowHeight + _rowGap)));
 			((Control)val).set_Size(new Point(_listWidth, _rowHeight));
 			((Control)val).set_BackgroundColor((index % 2 == 0) ? new Color(0, 0, 0, 70) : new Color(20, 20, 20, 70));
 			((Control)val).set_Parent((Container)(object)_rowsPanel);
-			((Control)val).set_BasicTooltipText(tooltipText ?? string.Empty);
+			((Control)val).set_BasicTooltipText((tooltip == null) ? (tooltipText ?? string.Empty) : null);
+			((Control)val).set_Tooltip(tooltip);
 			return val;
 		}
 
@@ -188,9 +200,49 @@ namespace rp.spark.UI.Controls
 			}
 		}
 
+		public static Panel AddInteractionLayer(Container row, Tooltip tooltip, Action click, int rightInset = 0)
+		{
+			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0012: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0031: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0055: Unknown result type (might be due to invalid IL or missing references)
+			//IL_005d: Expected O, but got Unknown
+			//IL_005e: Expected O, but got Unknown
+			if (row == null)
+			{
+				return null;
+			}
+			Panel val = new Panel();
+			val.set_ShowBorder(false);
+			((Control)val).set_Location(Point.get_Zero());
+			((Control)val).set_Size(new Point(Math.Max(0, ((Control)row).get_Width() - rightInset), ((Control)row).get_Height()));
+			((Control)val).set_BackgroundColor(Color.get_Transparent());
+			((Control)val).set_Parent(row);
+			((Control)val).set_ZIndex(100);
+			WireInteraction((Control)val, tooltip, click);
+			return val;
+		}
+
 		public static void WireInteraction(Control control, string tooltipText, Action click)
 		{
 			control.set_BasicTooltipText(tooltipText ?? string.Empty);
+			control.add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				click?.Invoke();
+			});
+		}
+
+		public static void WireInteraction(Control control, Tooltip tooltip, Action click)
+		{
+			control.set_BasicTooltipText((string)null);
+			control.set_Tooltip(tooltip);
 			control.add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				click?.Invoke();

@@ -53,6 +53,8 @@ namespace rp.spark.Models
 		public string OutOfCharacterInfo { get; set; } = string.Empty;
 
 
+		public bool UseGlobalOutOfCharacterInfo { get; set; }
+
 		public List<AtAGlanceEntry> AtAGlance { get; set; } = new List<AtAGlanceEntry>();
 
 
