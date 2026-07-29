@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using BhModule.Community.Pathing.Content;
 using BhModule.Community.Pathing.Entity;
@@ -22,7 +23,7 @@ namespace BhModule.Community.Pathing
 
 		private bool _initialized;
 
-		private bool _loadingPack;
+		private readonly SemaphoreSlim _loadingPackSemaphore = new SemaphoreSlim(1, 1);
 
 		private bool _loadingState;
 
@@ -119,15 +120,17 @@ namespace BhModule.Community.Pathing
 
 		public async Task LoadPackCollection(IPackCollection collection)
 		{
-			while (_loadingPack)
+			await _loadingPackSemaphore.WaitAsync();
+			try
 			{
-				await Task.Delay(100);
+				RootCategory = collection.Categories;
+				await ReloadStates();
+				await InitPointsOfInterest(collection.PointsOfInterest);
 			}
-			_loadingPack = true;
-			RootCategory = collection.Categories;
-			await ReloadStates();
-			await InitPointsOfInterest(collection.PointsOfInterest);
-			_loadingPack = false;
+			finally
+			{
+				_loadingPackSemaphore.Release();
+			}
 		}
 
 		private static async Task PreloadTextures(IPointOfInterest pointOfInterest)

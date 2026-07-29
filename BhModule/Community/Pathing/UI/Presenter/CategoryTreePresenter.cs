@@ -86,7 +86,7 @@ namespace BhModule.Community.Pathing.UI.Presenter
 			if (!_module.PackInitiator.IsLoading)
 			{
 				base.get_View().SetLoading(loading: true);
-				((Presenter<CategoryTreeView, PackInitiator>)this).UpdateView();
+				ThreadUtil.RunOnMainThread(((Presenter<CategoryTreeView, PackInitiator>)this).UpdateView);
 				base.get_View().SetLoading(loading: false);
 			}
 		}
@@ -118,7 +118,7 @@ namespace BhModule.Community.Pathing.UI.Presenter
 
 		private void PackInitiatorOnLoadMapFromEachPackFinished(object sender, EventArgs e)
 		{
-			((Presenter<CategoryTreeView, PackInitiator>)this).UpdateView();
+			ThreadUtil.RunOnMainThread(((Presenter<CategoryTreeView, PackInitiator>)this).UpdateView);
 			base.get_View().SetLoading(loading: false);
 		}
 

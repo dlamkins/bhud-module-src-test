@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Threading;
 using System.Threading.Tasks;
 using BhModule.Community.Pathing.State;
 using Blish_HUD;
@@ -205,12 +204,7 @@ namespace BhModule.Community.Pathing
 				}
 				_lastMap = mapId;
 			}
-			Thread thread = new Thread((ThreadStart)async delegate
-			{
-				await LoadMapFromEachPack(mapId);
-			});
-			thread.IsBackground = true;
-			thread.Start();
+			Task.Run(() => LoadMapFromEachPack(mapId));
 		}
 
 		private async Task LoadMapFromEachPack(int mapId)

@@ -587,6 +587,7 @@ namespace BhModule.Community.Pathing.Entity
 					}
 					else
 					{
+						Texture = _packState.UserResourceStates.Textures.DefaultTrailTexture;
 						Logger.Warn("Trail failed to load texture '{trailTexture}'", new object[1] { attribute });
 					}
 				});

@@ -33,17 +33,20 @@ namespace BhModule.Community.Pathing.UI.Controls
 
 		private readonly PathingCategory _pathingCategory;
 
+		private readonly HashSet<PathingCategory> _activeCategories;
+
 		private readonly bool _forceShowAll;
 
 		private readonly List<(Texture2D, string, Action)> _contexts;
 
-		public CategoryContextMenuStripItem(IPackState packState, PathingCategory pathingCategory, bool forceShowAll)
+		public CategoryContextMenuStripItem(IPackState packState, PathingCategory pathingCategory, bool forceShowAll, HashSet<PathingCategory> activeCategories)
 			: this()
 		{
 			_packState = packState;
 			_pathingCategory = pathingCategory;
 			_contexts = new List<(Texture2D, string, Action)>();
 			_forceShowAll = forceShowAll;
+			_activeCategories = activeCategories;
 			BuildCategoryMenu();
 			DetectAndBuildContexts();
 		}
@@ -75,15 +78,24 @@ namespace BhModule.Community.Pathing.UI.Controls
 				}
 				((ContextMenuStripItem)this).set_Text((text == _pathingCategory.DisplayName) ? text : (text.Trim() + "..."));
 			}
-			if (_packState.CategoryStates != null)
+			if (_packState.CategoryStates == null)
 			{
-				if ((_forceShowAll && _pathingCategory.Any()) || _pathingCategory.Any((PathingCategory c) => CategoryUtil.UiCategoryIsNotFiltered(c, _packState)))
-				{
-					((ContextMenuStripItem)this).set_Submenu((ContextMenuStrip)(object)new CategoryContextMenuStrip(_packState, _pathingCategory, _forceShowAll));
-				}
-				((ContextMenuStripItem)this).set_CanCheck(true);
-				((ContextMenuStripItem)this).set_Checked(!_packState.CategoryStates.GetCategoryInactive(_pathingCategory));
+				return;
 			}
+			if (_pathingCategory.Any())
+			{
+				bool shouldShowSubmenu = _forceShowAll || !_packState.UserConfiguration.PackEnableSmartCategoryFilter.get_Value();
+				if (!shouldShowSubmenu && _activeCategories != null)
+				{
+					shouldShowSubmenu = _pathingCategory.Any((PathingCategory c) => !string.IsNullOrWhiteSpace(c.DisplayName) && _activeCategories.Contains(c));
+				}
+				if (shouldShowSubmenu)
+				{
+					((ContextMenuStripItem)this).set_Submenu((ContextMenuStrip)(object)new CategoryContextMenuStrip(_packState, _pathingCategory, _forceShowAll, _activeCategories));
+				}
+			}
+			((ContextMenuStripItem)this).set_CanCheck(true);
+			((ContextMenuStripItem)this).set_Checked(!_packState.CategoryStates.GetCategoryInactive(_pathingCategory));
 		}
 
 		protected override void OnMouseEntered(MouseEventArgs e)

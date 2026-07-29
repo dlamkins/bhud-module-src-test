@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using BhModule.Community.Pathing.Entity;
 using BhModule.Community.Pathing.State;
-using BhModule.Community.Pathing.Utility;
 using Blish_HUD;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
@@ -19,6 +19,8 @@ namespace BhModule.Community.Pathing.UI.Controls
 
 		private readonly PathingCategory _pathingCategory;
 
+		private HashSet<PathingCategory> _activeCategories;
+
 		private static readonly Texture2D _textureContinueMenu = Control.get_Content().GetTexture("156057");
 
 		private readonly Color _backColor = Color.FromNonPremultiplied(37, 36, 37, 255);
@@ -27,7 +29,7 @@ namespace BhModule.Community.Pathing.UI.Controls
 
 		private const int SCROLLHINT_HEIGHT = 20;
 
-		public CategoryContextMenuStrip(IPackState packState, PathingCategory pathingCategory, bool forceShowAll)
+		public CategoryContextMenuStrip(IPackState packState, PathingCategory pathingCategory, bool forceShowAll, HashSet<PathingCategory> activeCategories = null)
 			: this()
 		{
 			//IL_000c: Unknown result type (might be due to invalid IL or missing references)
@@ -35,6 +37,29 @@ namespace BhModule.Community.Pathing.UI.Controls
 			_packState = packState;
 			_pathingCategory = pathingCategory;
 			_forceShowAll = forceShowAll;
+			_activeCategories = activeCategories;
+		}
+
+		private void EnsureActiveCategoriesPopulated()
+		{
+			if (_activeCategories != null)
+			{
+				return;
+			}
+			_activeCategories = new HashSet<PathingCategory>();
+			int currentMapId = GameService.Gw2Mumble.get_CurrentMap().get_Id();
+			IPathingEntity[] array = _packState.Entities.ToArray();
+			foreach (IPathingEntity entity in array)
+			{
+				if (entity.MapId == currentMapId && entity.Category != null)
+				{
+					PathingCategory cat = entity.Category;
+					while (cat != null && _activeCategories.Add(cat))
+					{
+						cat = cat.Parent;
+					}
+				}
+			}
 		}
 
 		private (IEnumerable<PathingCategory> SubCategories, int Skipped) GetSubCategories(bool forceShowAll = false)
@@ -44,6 +69,7 @@ namespace BhModule.Community.Pathing.UI.Controls
 			{
 				return (subCategories, 0);
 			}
+			EnsureActiveCategoriesPopulated();
 			List<PathingCategory> filteredSubCategories = new List<PathingCategory>();
 			PathingCategory lastCategory = null;
 			bool lastIsSeparator = false;
@@ -57,7 +83,7 @@ namespace BhModule.Community.Pathing.UI.Controls
 				}
 				else
 				{
-					if (!CategoryUtil.UiCategoryIsNotFiltered(subCategory, _packState))
+					if (string.IsNullOrWhiteSpace(subCategory.DisplayName) || !_activeCategories.Contains(subCategory))
 					{
 						lastIsSeparator = false;
 						if (!subCategory.IsSeparator)
@@ -122,12 +148,12 @@ namespace BhModule.Community.Pathing.UI.Controls
 			//IL_0046: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0051: Unknown result type (might be due to invalid IL or missing references)
 			//IL_005d: Expected O, but got Unknown
-			//IL_00b4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00b9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00dd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0104: Expected O, but got Unknown
+			//IL_00ba: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00e3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010a: Expected O, but got Unknown
 			((Container)this).ClearChildren();
 			var (subCategories, skipped) = GetSubCategories(showAll);
 			if (_pathingCategory != null && _pathingCategory.Root)
@@ -143,7 +169,7 @@ namespace BhModule.Community.Pathing.UI.Controls
 			}
 			foreach (PathingCategory subCategory in subCategories)
 			{
-				((ContextMenuStrip)this).AddMenuItem((ContextMenuStripItem)(object)new CategoryContextMenuStripItem(_packState, subCategory, showAll));
+				((ContextMenuStrip)this).AddMenuItem((ContextMenuStripItem)(object)new CategoryContextMenuStripItem(_packState, subCategory, showAll, _activeCategories));
 			}
 			if (skipped > 0 && _packState.UserConfiguration.PackShowWhenCategoriesAreFiltered.get_Value())
 			{
