@@ -8,6 +8,10 @@ namespace TurtleMyWaypoint
 
 		public readonly string[] Codes;
 
+		public readonly string[] WaypointNamesEn;
+
+		public readonly string[] WaypointNamesFr;
+
 		public string Name
 		{
 			get
@@ -20,11 +24,22 @@ namespace TurtleMyWaypoint
 			}
 		}
 
-		public MapEntry(string nameEn, string nameFr, string[] codes)
+		public MapEntry(string nameEn, string nameFr, string[] codes, string[] waypointNamesEn, string[] waypointNamesFr)
 		{
 			NameEn = nameEn;
 			NameFr = nameFr;
 			Codes = codes;
+			WaypointNamesEn = waypointNamesEn;
+			WaypointNamesFr = waypointNamesFr;
+		}
+
+		public string WaypointName(int index)
+		{
+			if (!Strings.IsFrench)
+			{
+				return WaypointNamesEn[index];
+			}
+			return WaypointNamesFr[index];
 		}
 	}
 }

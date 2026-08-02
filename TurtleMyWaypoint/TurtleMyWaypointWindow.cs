@@ -21,6 +21,8 @@ namespace TurtleMyWaypoint
 
 		private const int ContentHeight = 636;
 
+		private readonly Tab _searchTab;
+
 		private readonly Tab _coreTyriaTab;
 
 		private readonly Tab _heartOfThornsTab;
@@ -58,27 +60,32 @@ namespace TurtleMyWaypoint
 			//IL_00ef: Expected O, but got Unknown
 			//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0101: Expected O, but got Unknown
-			//IL_012d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0137: Expected O, but got Unknown
-			//IL_0164: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016e: Expected O, but got Unknown
-			//IL_019b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a5: Expected O, but got Unknown
-			//IL_01d2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01dc: Expected O, but got Unknown
-			//IL_020a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0214: Expected O, but got Unknown
-			//IL_0242: Unknown result type (might be due to invalid IL or missing references)
-			//IL_024c: Expected O, but got Unknown
-			//IL_027a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0284: Expected O, but got Unknown
-			//IL_02b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02bc: Expected O, but got Unknown
+			//IL_010c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0113: Expected O, but got Unknown
+			//IL_013f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0149: Expected O, but got Unknown
+			//IL_0176: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0180: Expected O, but got Unknown
+			//IL_01ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b7: Expected O, but got Unknown
+			//IL_01e4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ee: Expected O, but got Unknown
+			//IL_021c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0226: Expected O, but got Unknown
+			//IL_0254: Unknown result type (might be due to invalid IL or missing references)
+			//IL_025e: Expected O, but got Unknown
+			//IL_028c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0296: Expected O, but got Unknown
+			//IL_02c4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ce: Expected O, but got Unknown
+			//IL_02fc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0306: Expected O, but got Unknown
 			((Control)this).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			((WindowBase2)this).set_Title("Turtle My Waypoint");
 			((WindowBase2)this).set_Emblem(contentsManager.GetTexture("window_emblem.png"));
 			((WindowBase2)this).set_SavesPosition(true);
 			((WindowBase2)this).set_Id("TurtleMyWaypointWindow_com.floraaubry.turtlemywaypoint_9e2a1d3c-6b7f-4a3e-8c1a-1f9d2e5b7a44");
+			AsyncTexture2D searchIcon = new AsyncTexture2D(contentsManager.GetTexture("search.png"));
 			AsyncTexture2D coreIcon = new AsyncTexture2D(contentsManager.GetTexture("core.png"));
 			AsyncTexture2D hotIcon = new AsyncTexture2D(contentsManager.GetTexture("hot.png"));
 			AsyncTexture2D pofIcon = new AsyncTexture2D(contentsManager.GetTexture("pof.png"));
@@ -87,14 +94,16 @@ namespace TurtleMyWaypoint
 			AsyncTexture2D janthirIcon = new AsyncTexture2D(contentsManager.GetTexture("janthir.png"));
 			AsyncTexture2D voeIcon = new AsyncTexture2D(contentsManager.GetTexture("voe.png"));
 			AsyncTexture2D lwIcon = new AsyncTexture2D(contentsManager.GetTexture("lw.png"));
-			_coreTyriaTab = new Tab(coreIcon, (Func<IView>)(() => (IView)(object)new CoreTyriaView(835, 636)), Strings.Tab_CoreTyria, (int?)0);
-			_heartOfThornsTab = new Tab(hotIcon, (Func<IView>)(() => (IView)(object)new MapWaypointsView(WaypointData.HeartOfThorns, "Maguuma Jungle", "Jungle de Maguuma", 835, 636)), Strings.Tab_HeartOfThorns, (int?)10);
-			_pathOfFireTab = new Tab(pofIcon, (Func<IView>)(() => (IView)(object)new MapWaypointsView(WaypointData.PathOfFire, "Crystal Desert", "Désert de cristal", 835, 636)), Strings.Tab_PathOfFire, (int?)20);
-			_endOfDragonsTab = new Tab(eodIcon, (Func<IView>)(() => (IView)(object)new MapWaypointsView(WaypointData.EndOfDragons, "Cantha", "Cantha", 835, 636)), Strings.Tab_EndOfDragons, (int?)30);
-			_secretsOfTheObscureTab = new Tab(sotoIcon, (Func<IView>)(() => (IView)(object)new MapWaypointsView(WaypointData.SecretsOfTheObscure, "Horn of Maguuma", "Corne de Maguuma", 835, 636)), Strings.Tab_SecretsOfTheObscure, (int?)40);
-			_janthirWildsTab = new Tab(janthirIcon, (Func<IView>)(() => (IView)(object)new MapWaypointsView(WaypointData.JanthirWilds, "Janthir Bay", "Baie de Janthir", 835, 636)), Strings.Tab_JanthirWilds, (int?)50);
-			_visionsOfEternityTab = new Tab(voeIcon, (Func<IView>)(() => (IView)(object)new MapWaypointsView(WaypointData.VisionsOfEternity, "Castora", "Castora", 835, 636)), Strings.Tab_VisionsOfEternity, (int?)60);
-			_livingWorldTab = new Tab(lwIcon, (Func<IView>)(() => (IView)(object)new LivingWorldView(835, 636)), Strings.Tab_LivingWorld, (int?)70);
+			_searchTab = new Tab(searchIcon, (Func<IView>)(() => (IView)(object)new SearchView(835, 636)), Strings.Tab_Search, (int?)0);
+			_coreTyriaTab = new Tab(coreIcon, (Func<IView>)(() => (IView)(object)new CoreTyriaView(835, 636)), Strings.Tab_CoreTyria, (int?)10);
+			_heartOfThornsTab = new Tab(hotIcon, (Func<IView>)(() => (IView)(object)new MapWaypointsView(WaypointData.HeartOfThorns, "Maguuma Jungle", "Jungle de Maguuma", 835, 636)), Strings.Tab_HeartOfThorns, (int?)20);
+			_pathOfFireTab = new Tab(pofIcon, (Func<IView>)(() => (IView)(object)new MapWaypointsView(WaypointData.PathOfFire, "Crystal Desert", "Désert de cristal", 835, 636)), Strings.Tab_PathOfFire, (int?)30);
+			_endOfDragonsTab = new Tab(eodIcon, (Func<IView>)(() => (IView)(object)new MapWaypointsView(WaypointData.EndOfDragons, "Cantha", "Cantha", 835, 636)), Strings.Tab_EndOfDragons, (int?)40);
+			_secretsOfTheObscureTab = new Tab(sotoIcon, (Func<IView>)(() => (IView)(object)new MapWaypointsView(WaypointData.SecretsOfTheObscure, "Horn of Maguuma", "Corne de Maguuma", 835, 636)), Strings.Tab_SecretsOfTheObscure, (int?)50);
+			_janthirWildsTab = new Tab(janthirIcon, (Func<IView>)(() => (IView)(object)new MapWaypointsView(WaypointData.JanthirWilds, "Janthir Bay", "Baie de Janthir", 835, 636)), Strings.Tab_JanthirWilds, (int?)60);
+			_visionsOfEternityTab = new Tab(voeIcon, (Func<IView>)(() => (IView)(object)new MapWaypointsView(WaypointData.VisionsOfEternity, "Castora", "Castora", 835, 636)), Strings.Tab_VisionsOfEternity, (int?)70);
+			_livingWorldTab = new Tab(lwIcon, (Func<IView>)(() => (IView)(object)new LivingWorldView(835, 636)), Strings.Tab_LivingWorld, (int?)80);
+			((TabbedWindow2)this).get_Tabs().Add(_searchTab);
 			((TabbedWindow2)this).get_Tabs().Add(_coreTyriaTab);
 			((TabbedWindow2)this).get_Tabs().Add(_heartOfThornsTab);
 			((TabbedWindow2)this).get_Tabs().Add(_pathOfFireTab);
@@ -115,6 +124,7 @@ namespace TurtleMyWaypoint
 
 		private void OnUserLocaleChanged(object sender, ValueEventArgs<CultureInfo> e)
 		{
+			_searchTab.set_Name(Strings.Tab_Search);
 			_coreTyriaTab.set_Name(Strings.Tab_CoreTyria);
 			_heartOfThornsTab.set_Name(Strings.Tab_HeartOfThorns);
 			_pathOfFireTab.set_Name(Strings.Tab_PathOfFire);

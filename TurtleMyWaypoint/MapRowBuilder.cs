@@ -129,7 +129,7 @@ namespace TurtleMyWaypoint
 			return sb.ToString();
 		}
 
-		private static void TrySetClipboardText(string text)
+		internal static void TrySetClipboardText(string text)
 		{
 			try
 			{

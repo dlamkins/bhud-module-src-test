@@ -54,6 +54,66 @@ namespace TurtleMyWaypoint
 			}
 		}
 
+		public static string SearchPlaceholder
+		{
+			get
+			{
+				if (!IsFrench)
+				{
+					return "Search for a waypoint...";
+				}
+				return "Rechercher un point de passage...";
+			}
+		}
+
+		public static string SearchHint
+		{
+			get
+			{
+				if (!IsFrench)
+				{
+					return "Type a waypoint name to find it";
+				}
+				return "Tapez le nom d'un point de passage pour le retrouver";
+			}
+		}
+
+		public static string NoResults
+		{
+			get
+			{
+				if (!IsFrench)
+				{
+					return "No results";
+				}
+				return "Aucun résultat";
+			}
+		}
+
+		public static string SearchResults
+		{
+			get
+			{
+				if (!IsFrench)
+				{
+					return "Results";
+				}
+				return "Résultats";
+			}
+		}
+
+		public static string Tab_Search
+		{
+			get
+			{
+				if (!IsFrench)
+				{
+					return "Search";
+				}
+				return "Recherche";
+			}
+		}
+
 		public static string Tab_CoreTyria
 		{
 			get
