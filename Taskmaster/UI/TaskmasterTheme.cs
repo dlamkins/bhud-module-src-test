@@ -50,6 +50,10 @@ namespace Taskmaster.UI
 
 		public static readonly Color ActionBarFill = new Color(25, 24, 29, 235);
 
+		public static readonly Color EditorFill = new Color(29, 28, 34, 245);
+
+		public static readonly Color EditorBorder = new Color(83, 70, 57);
+
 		public static readonly Color IconGlyph = new Color(57, 50, 38);
 
 		public static readonly Color ToggleActiveFill = new Color(46, 34, 28);

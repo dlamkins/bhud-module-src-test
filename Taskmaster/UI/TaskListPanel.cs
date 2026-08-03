@@ -386,25 +386,9 @@ namespace Taskmaster.UI
 				}
 				Rebuild();
 			};
-			row.SaveRequested += delegate
-			{
-				PreserveScrollDistance();
-				_activeEditPanel?.Apply();
-			};
 			row.EditRequested += delegate
 			{
-				if (_editingTaskId == task.Id)
-				{
-					PreserveScrollDistance();
-					_editingTaskId = null;
-					_newTaskId = null;
-					_editingDraft = null;
-					Rebuild();
-				}
-				else
-				{
-					BeginEdit(task);
-				}
+				BeginEdit(task);
 			};
 			row.SelectionRequested += delegate(bool extendRange, bool toggle)
 			{
@@ -437,22 +421,42 @@ namespace Taskmaster.UI
 
 		private void AddEditPanel(TodoTask task, bool isNew = false)
 		{
-			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
-			if (!task.IsManagedPreset)
+			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+			if (task.IsManagedPreset)
 			{
-				TaskEditPanel taskEditPanel = new TaskEditPanel(task, isNew, _sizing, _editingDraft);
-				((Control)taskEditPanel).set_Parent((Container)(object)this);
-				((Control)taskEditPanel).set_Width(((Container)this).get_ContentRegion().Width);
-				TaskEditPanel edit = (_activeEditPanel = taskEditPanel);
-				edit.ContentHeightChanging += PreserveScrollDistance;
-				edit.Saved += delegate
+				return;
+			}
+			TaskEditPanel taskEditPanel = new TaskEditPanel(task, isNew, _sizing, _editingDraft);
+			((Control)taskEditPanel).set_Parent((Container)(object)this);
+			((Control)taskEditPanel).set_Width(((Container)this).get_ContentRegion().Width);
+			TaskEditPanel edit = (_activeEditPanel = taskEditPanel);
+			edit.ContentHeightChanging += PreserveScrollDistance;
+			edit.Saved += delegate
+			{
+				_editingTaskId = null;
+				_newTaskId = null;
+				_editingDraft = null;
+				AfterMutation();
+			};
+			edit.Cancelled += delegate
+			{
+				PreserveScrollDistance();
+				if (isNew)
 				{
+					_tab.Tasks.Remove(task);
+					TaskOrdering.Normalize(_tab.Tasks);
 					_editingTaskId = null;
 					_newTaskId = null;
 					_editingDraft = null;
 					AfterMutation();
-				};
-			}
+				}
+				else
+				{
+					_editingTaskId = null;
+					_editingDraft = null;
+					Rebuild();
+				}
+			};
 		}
 
 		private void AfterMutation()

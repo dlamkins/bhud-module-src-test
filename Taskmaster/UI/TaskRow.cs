@@ -47,8 +47,6 @@ namespace Taskmaster.UI
 
 		private Rectangle _pencilBounds;
 
-		private Rectangle _saveBounds;
-
 		public TodoTask Task => _task;
 
 		public TodoTask ParentTask { get; set; }
@@ -119,8 +117,6 @@ namespace Taskmaster.UI
 
 		private int EditIconSize => _sizing.Px(24);
 
-		private int EditActionIconSize => _sizing.Px(28);
-
 		private int Pad => _sizing.Px(6);
 
 		private int LeftOffset => Pad + (_isSubtask ? SubtaskIndent : 0);
@@ -164,8 +160,6 @@ namespace Taskmaster.UI
 		public event Action ToggleRequested;
 
 		public event Action EditRequested;
-
-		public event Action SaveRequested;
 
 		public event Action ContextMenuRequested;
 
@@ -267,14 +261,11 @@ namespace Taskmaster.UI
 			//IL_0081: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0086: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0098: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_00d9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0100: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0135: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_013b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00bf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00f9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_010d: Unknown result type (might be due to invalid IL or missing references)
 			((Control)this).OnLeftMouseButtonPressed(e);
 			Point p = ((Control)this).get_RelativeMousePosition();
 			Rectangle val;
@@ -291,11 +282,6 @@ namespace Taskmaster.UI
 			if (((Rectangle)(ref val)).Contains(p) || InChipZone(p))
 			{
 				this.ToggleRequested?.Invoke();
-				return;
-			}
-			if (!Locked && CanEdit && _saveBounds != Rectangle.get_Empty() && ((Rectangle)(ref _saveBounds)).Contains(p))
-			{
-				this.SaveRequested?.Invoke();
 				return;
 			}
 			if (!Locked && CanEdit && _pencilBounds != Rectangle.get_Empty() && ((Rectangle)(ref _pencilBounds)).Contains(p))
@@ -426,24 +412,12 @@ namespace Taskmaster.UI
 			//IL_05c2: Unknown result type (might be due to invalid IL or missing references)
 			//IL_05c9: Unknown result type (might be due to invalid IL or missing references)
 			//IL_05d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0642: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0647: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0694: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0696: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06b7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_06bc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0709: Unknown result type (might be due to invalid IL or missing references)
-			//IL_070b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0733: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0738: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0785: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0787: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0792: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0797: Unknown result type (might be due to invalid IL or missing references)
-			//IL_079e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07a3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07a9: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07ae: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0633: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0638: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0685: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0687: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0693: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0698: Unknown result type (might be due to invalid IL or missing references)
 			Texture2D pixel = Textures.get_Pixel();
 			BitmapFont font = _sizing.BodyFont;
 			BitmapFont smallFont = _sizing.SmallFont;
@@ -567,35 +541,17 @@ namespace Taskmaster.UI
 				SpriteBatchExtensions.DrawStringOnCtrl(spriteBatch, (Control)(object)this, _countdownText, smallFont, cdRect, _dueSoon ? TaskmasterTheme.DueSoon : TaskmasterTheme.DimText, false, (HorizontalAlignment)2, (VerticalAlignment)1);
 				rightX = cdRect.X - itemGap;
 			}
-			if (!_isSubtask && CanEdit && (_hover || IsEditing) && !Locked)
+			if (!_isSubtask && CanEdit && _hover && !IsEditing && !Locked)
 			{
-				if (IsEditing)
-				{
-					int hitSize2 = RowHeight;
-					int actionGap = _sizing.Px(2);
-					_pencilBounds = new Rectangle(rightX - hitSize2, 0, hitSize2, hitSize2);
-					Rectangle closeGlyphBounds = default(Rectangle);
-					((Rectangle)(ref closeGlyphBounds))._002Ector(_pencilBounds.X + (hitSize2 - EditActionIconSize) / 2, _pencilBounds.Y + (hitSize2 - EditActionIconSize) / 2, EditActionIconSize, EditActionIconSize);
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, TaskmasterIcons.Cancel, closeGlyphBounds, TaskmasterTheme.CreamWhite);
-					_saveBounds = new Rectangle(_pencilBounds.X - actionGap - hitSize2, 0, hitSize2, hitSize2);
-					Rectangle saveGlyphBounds = default(Rectangle);
-					((Rectangle)(ref saveGlyphBounds))._002Ector(_saveBounds.X + (hitSize2 - EditActionIconSize) / 2, _saveBounds.Y + (hitSize2 - EditActionIconSize) / 2, EditActionIconSize, EditActionIconSize);
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, TaskmasterIcons.Check, saveGlyphBounds, TaskmasterTheme.Success);
-				}
-				else
-				{
-					int hitSize = RowHeight;
-					_pencilBounds = new Rectangle(rightX - hitSize, (((Control)this).get_Height() - hitSize) / 2, hitSize, hitSize);
-					Rectangle pencilGlyphBounds = default(Rectangle);
-					((Rectangle)(ref pencilGlyphBounds))._002Ector(_pencilBounds.X + (hitSize - EditIconSize) / 2, _pencilBounds.Y + (hitSize - EditIconSize) / 2, EditIconSize, EditIconSize);
-					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, TaskmasterIcons.Pencil, pencilGlyphBounds, TaskmasterTheme.CreamWhite);
-					_saveBounds = Rectangle.get_Empty();
-				}
+				int hitSize = RowHeight;
+				_pencilBounds = new Rectangle(rightX - hitSize, (((Control)this).get_Height() - hitSize) / 2, hitSize, hitSize);
+				Rectangle pencilGlyphBounds = default(Rectangle);
+				((Rectangle)(ref pencilGlyphBounds))._002Ector(_pencilBounds.X + (hitSize - EditIconSize) / 2, _pencilBounds.Y + (hitSize - EditIconSize) / 2, EditIconSize, EditIconSize);
+				SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, TaskmasterIcons.Pencil, pencilGlyphBounds, TaskmasterTheme.CreamWhite);
 			}
 			else
 			{
 				_pencilBounds = Rectangle.get_Empty();
-				_saveBounds = Rectangle.get_Empty();
 			}
 		}
 
