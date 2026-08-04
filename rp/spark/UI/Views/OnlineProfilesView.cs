@@ -372,9 +372,9 @@ namespace rp.spark.UI.Views
 			Color secondary = default(Color);
 			((Color)(ref secondary))._002Ector(220, 220, 220);
 			AddBookmarkMarker((Container)(object)row, presence);
-			_profileList.AddCell((Container)(object)row, presence.VisibleName(), 30, 7, 210, Color.get_White());
-			_profileList.AddCell((Container)(object)row, ProfileText.PresenceRace(presence), 250, 7, 90, secondary);
-			_profileList.AddCell((Container)(object)row, presence.AccountName, 350, 7, 95, secondary);
+			_profileList.AddCell((Container)(object)row, presence.VisibleName(), 30, 7, 163, Color.get_White());
+			_profileList.AddCell((Container)(object)row, ProfileText.PresenceRace(presence), 200, 7, 90, secondary);
+			_profileList.AddCell((Container)(object)row, presence.AccountName, 305, 7, 95, secondary);
 			_profileList.AddCell((Container)(object)row, ProfileLabels.StatusLabel(presence.Status), 455, 7, 105, ProfileStatusColors.Get(presence.Status));
 			_profileList.AddCell((Container)(object)row, ProfileText.PresenceLocation(presence), 570, 7, 180, secondary);
 			ProfileScrollList.AddInteractionLayer((Container)(object)row, MakeTooltip(presence), delegate
