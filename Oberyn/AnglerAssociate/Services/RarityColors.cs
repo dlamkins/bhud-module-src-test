@@ -1,0 +1,56 @@
+using System.Collections.Generic;
+using Microsoft.Xna.Framework;
+using Oberyn.AnglerAssociate.Models;
+
+namespace Oberyn.AnglerAssociate.Services
+{
+	public static class RarityColors
+	{
+		private static readonly Dictionary<Rarity, Color> Colors = new Dictionary<Rarity, Color>
+		{
+			{
+				Rarity.Junk,
+				new Color(170, 170, 170)
+			},
+			{
+				Rarity.Basic,
+				new Color(255, 255, 255)
+			},
+			{
+				Rarity.Fine,
+				new Color(98, 164, 218)
+			},
+			{
+				Rarity.Masterwork,
+				new Color(26, 147, 6)
+			},
+			{
+				Rarity.Rare,
+				new Color(252, 208, 11)
+			},
+			{
+				Rarity.Exotic,
+				new Color(255, 164, 5)
+			},
+			{
+				Rarity.Ascended,
+				new Color(251, 62, 141)
+			},
+			{
+				Rarity.Legendary,
+				new Color(136, 71, 255)
+			}
+		};
+
+		public static Color Get(Rarity rarity)
+		{
+			//IL_000f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0015: Unknown result type (might be due to invalid IL or missing references)
+			if (!Colors.TryGetValue(rarity, out var color))
+			{
+				return Color.get_White();
+			}
+			return color;
+		}
+	}
+}
