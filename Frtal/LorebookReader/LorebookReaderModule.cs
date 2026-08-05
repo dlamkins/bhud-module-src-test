@@ -76,6 +76,8 @@ namespace Frtal.LorebookReader
 
 		private SettingEntry<KeyBinding> _pauseKeybind;
 
+		private SettingEntry<KeyBinding> _bookToggleKeybind;
+
 		private volatile bool _speechPaused;
 
 		private TtsService _tts;
@@ -171,6 +173,10 @@ namespace Frtal.LorebookReader
 		internal SettingEntry<KeyBinding> ReadKeybindSetting => _readKeybind;
 
 		internal SettingEntry<KeyBinding> StopKeybindSetting => _stopKeybind;
+
+		internal SettingEntry<KeyBinding> PauseKeybindSetting => _pauseKeybind;
+
+		internal SettingEntry<KeyBinding> BookToggleKeybindSetting => _bookToggleKeybind;
 
 		internal SettingEntry<bool> ShowSpeakerButtonSetting => _showSpeakerButton;
 
@@ -283,17 +289,20 @@ namespace Frtal.LorebookReader
 			//IL_00a9: Expected O, but got Unknown
 			//IL_00b8: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0100: Expected O, but got Unknown
-			//IL_05ec: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0634: Expected O, but got Unknown
+			//IL_010f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0157: Expected O, but got Unknown
 			//IL_0643: Unknown result type (might be due to invalid IL or missing references)
 			//IL_068b: Expected O, but got Unknown
-			//IL_06ee: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0736: Expected O, but got Unknown
-			//IL_0799: Unknown result type (might be due to invalid IL or missing references)
-			//IL_07e1: Expected O, but got Unknown
+			//IL_069a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06e2: Expected O, but got Unknown
+			//IL_0745: Unknown result type (might be due to invalid IL or missing references)
+			//IL_078d: Expected O, but got Unknown
+			//IL_07f0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0838: Expected O, but got Unknown
 			_readKeybind = settings.DefineSetting<KeyBinding>("ReadKeybind", new KeyBinding((ModifierKeys)3, (Keys)82), (Func<string>)(() => "Read lorebook"), (Func<string>)(() => "Reads the currently open lorebook aloud."));
 			_stopKeybind = settings.DefineSetting<KeyBinding>("StopKeybind", new KeyBinding((ModifierKeys)3, (Keys)83), (Func<string>)(() => "Stop reading"), (Func<string>)(() => "Stops the current text-to-speech playback."));
 			_pauseKeybind = settings.DefineSetting<KeyBinding>("PauseKeybind", new KeyBinding((ModifierKeys)3, (Keys)80), (Func<string>)(() => "Pause / resume reading"), (Func<string>)(() => "Pauses the narration and picks it up where it stopped."));
+			_bookToggleKeybind = settings.DefineSetting<KeyBinding>("BookToggleKeybind", new KeyBinding((ModifierKeys)3, (Keys)76), (Func<string>)(() => "Toggle lorebook detection"), (Func<string>)(() => "Turns the buttons on open lorebooks on and off, the same way Ctrl+Alt+C toggles NPC dialogue capture."));
 			_showSpeakerButton = settings.DefineSetting<bool>("ShowSpeakerButton", true, (Func<string>)(() => "Show speaker icon on open books"), (Func<string>)(() => "Displays a clickable speaker icon next to a detected lorebook."));
 			_voiceName = settings.DefineSetting<string>("VoiceName", "", (Func<string>)(() => "Voice (part of name)"), (Func<string>)(() => "Leave empty for default. Available voices are listed in the log on module start."));
 			_speakingRate = settings.DefineSetting<float>("SpeakingRate", 1f, (Func<string>)(() => "Speaking rate"), (Func<string>)(() => "1.0 = normal speed."));
@@ -341,20 +350,22 @@ namespace Frtal.LorebookReader
 
 		protected override void OnModuleLoaded(EventArgs e)
 		{
-			//IL_02df: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02e9: Expected O, but got Unknown
-			//IL_0326: Unknown result type (might be due to invalid IL or missing references)
-			//IL_034f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_036a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03e1: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03f4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0403: Unknown result type (might be due to invalid IL or missing references)
+			//IL_030c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0316: Expected O, but got Unknown
+			//IL_0353: Unknown result type (might be due to invalid IL or missing references)
+			//IL_037c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0397: Unknown result type (might be due to invalid IL or missing references)
+			//IL_040e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0421: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0430: Unknown result type (might be due to invalid IL or missing references)
 			_readKeybind.get_Value().set_Enabled(true);
 			_readKeybind.get_Value().add_Activated((EventHandler<EventArgs>)OnReadActivated);
 			_stopKeybind.get_Value().set_Enabled(true);
 			_stopKeybind.get_Value().add_Activated((EventHandler<EventArgs>)OnStopActivated);
 			_pauseKeybind.get_Value().set_Enabled(true);
 			_pauseKeybind.get_Value().add_Activated((EventHandler<EventArgs>)OnPauseActivated);
+			_bookToggleKeybind.get_Value().set_Enabled(true);
+			_bookToggleKeybind.get_Value().add_Activated((EventHandler<EventArgs>)OnBookToggleActivated);
 			_convToggleKeybind.get_Value().set_Enabled(true);
 			_convToggleKeybind.get_Value().add_Activated((EventHandler<EventArgs>)OnConvToggleActivated);
 			_debugDumpKeybind.get_Value().set_Enabled(true);
@@ -476,6 +487,17 @@ namespace Frtal.LorebookReader
 		private void OnPauseActivated(object sender, EventArgs e)
 		{
 			TogglePauseSpeaking();
+		}
+
+		private void OnBookToggleActivated(object sender, EventArgs e)
+		{
+			bool on = !_showSpeakerButton.get_Value();
+			_showSpeakerButton.set_Value(on);
+			if (!on)
+			{
+				_bookVisible = false;
+			}
+			ScreenNotification.ShowNotification(on ? "Lorebook detection on" : "Lorebook detection off", (NotificationType)0, (Texture2D)null, 4);
 		}
 
 		private void OnDebugDumpActivated(object sender, EventArgs e)
@@ -1679,6 +1701,10 @@ namespace Frtal.LorebookReader
 			Safe(delegate
 			{
 				_pauseKeybind.get_Value().remove_Activated((EventHandler<EventArgs>)OnPauseActivated);
+			});
+			Safe(delegate
+			{
+				_bookToggleKeybind.get_Value().remove_Activated((EventHandler<EventArgs>)OnBookToggleActivated);
 			});
 			Safe(delegate
 			{

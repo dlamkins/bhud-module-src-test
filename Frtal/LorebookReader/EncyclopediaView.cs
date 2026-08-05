@@ -60,6 +60,8 @@ namespace Frtal.LorebookReader
 
 		private bool _readerFullscreen;
 
+		private string _lastSearch;
+
 		private Timer _editFlushTimer;
 
 		private volatile bool _editDirty;
@@ -79,6 +81,8 @@ namespace Frtal.LorebookReader
 			("Janthir Wilds", "JW"),
 			("Visions of Eternity", "VoE")
 		};
+
+		private const int ListRowH = 58;
 
 		internal static readonly string[] ExpansionPresets = new string[9] { "(none)", "Core", "Heart of Thorns", "Path of Fire", "Icebrood Saga", "End of Dragons", "Secrets of the Obscure", "Janthir Wilds", "Visions of Eternity" };
 
@@ -183,7 +187,7 @@ namespace Frtal.LorebookReader
 				ShowEditor(_selected, totalW, totalH);
 				return;
 			}
-			int railW = (_module.EncyclopediaRailCollapsedSetting.get_Value() ? 54 : 236);
+			int railW = (_module.EncyclopediaRailCollapsedSetting.get_Value() ? 64 : 268);
 			int listX = 8 + railW + 8;
 			int leftW = Math.Max(250, (int)((float)(totalW - railW) * 0.4f));
 			Panel val = new Panel();
@@ -389,24 +393,24 @@ namespace Frtal.LorebookReader
 			//IL_019c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01a0: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01aa: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01be: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01d5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01da: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01e6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ed: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ff: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0207: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0214: Unknown result type (might be due to invalid IL or missing references)
-			//IL_021b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01fb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0203: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0218: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022f: Unknown result type (might be due to invalid IL or missing references)
 			bool active = _filterXp == value;
 			Panel val = new Panel();
 			((Control)val).set_Parent((Container)(object)_railPanel);
 			((Control)val).set_Location(new Point(4, y));
 			((Control)val).set_Width(rowW);
-			((Control)val).set_Height(38);
+			((Control)val).set_Height(46);
 			((Control)val).set_BackgroundColor((Color)(active ? new Color(60, 70, 90) : Color.get_Transparent()));
 			((Control)val).set_BasicTooltipText($"{label} ({count})");
 			Panel row = val;
@@ -420,40 +424,40 @@ namespace Frtal.LorebookReader
 			{
 				Image val2 = new Image(AsyncTexture2D.op_Implicit(icon));
 				((Control)val2).set_Parent((Container)(object)row);
-				((Control)val2).set_Location(new Point(mini ? ((rowW - 26) / 2) : 6, 6));
-				((Control)val2).set_Size(new Point(26, 26));
-				tx = 38;
+				((Control)val2).set_Location(new Point(mini ? ((rowW - 34) / 2) : 6, 6));
+				((Control)val2).set_Size(new Point(34, 34));
+				tx = 46;
 			}
 			else
 			{
 				Label val3 = new Label();
 				((Control)val3).set_Parent((Container)(object)row);
-				((Control)val3).set_Location(new Point((!mini) ? 5 : 0, 10));
-				((Control)val3).set_Width(mini ? rowW : 32);
-				((Control)val3).set_Height(18);
+				((Control)val3).set_Location(new Point((!mini) ? 6 : 0, 12));
+				((Control)val3).set_Width(mini ? rowW : 36);
+				((Control)val3).set_Height(22);
 				val3.set_Text(code);
 				val3.set_HorizontalAlignment((HorizontalAlignment)(mini ? 1 : 0));
-				val3.set_Font(GameService.Content.get_DefaultFont14());
-				tx = 40;
+				val3.set_Font(GameService.Content.get_DefaultFont16());
+				tx = 48;
 			}
 			if (!mini)
 			{
 				Label val4 = new Label();
 				((Control)val4).set_Parent((Container)(object)row);
-				((Control)val4).set_Location(new Point(tx, 10));
-				((Control)val4).set_Width(rowW - tx - 28);
-				((Control)val4).set_Height(18);
+				((Control)val4).set_Location(new Point(tx, 12));
+				((Control)val4).set_Width(rowW - tx - 46 - 6);
+				((Control)val4).set_Height(22);
 				val4.set_Text(label);
-				val4.set_Font(GameService.Content.get_DefaultFont14());
+				val4.set_Font(GameService.Content.get_DefaultFont16());
 				Label val5 = new Label();
 				((Control)val5).set_Parent((Container)(object)row);
-				((Control)val5).set_Location(new Point(rowW - 28, 10));
-				((Control)val5).set_Width(26);
-				((Control)val5).set_Height(18);
+				((Control)val5).set_Location(new Point(rowW - 46 - 4, 12));
+				((Control)val5).set_Width(46);
+				((Control)val5).set_Height(22);
 				val5.set_Text(count.ToString());
 				val5.set_HorizontalAlignment((HorizontalAlignment)2);
-				val5.set_TextColor(new Color(160, 160, 160));
-				val5.set_Font(GameService.Content.get_DefaultFont14());
+				val5.set_TextColor(new Color(170, 170, 170));
+				val5.set_Font(GameService.Content.get_DefaultFont16());
 			}
 			((Control)row).add_MouseEntered((EventHandler<MouseEventArgs>)delegate
 			{
@@ -477,7 +481,7 @@ namespace Frtal.LorebookReader
 				FillRail();
 				RefreshList();
 			});
-			return y + 42;
+			return y + 46 + 4;
 		}
 
 		private SortMode CurrentSort()
@@ -494,13 +498,17 @@ namespace Frtal.LorebookReader
 
 		public void RefreshList()
 		{
-			//IL_0145: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0156: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0161: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0188: Unknown result type (might be due to invalid IL or missing references)
+			//IL_018d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0199: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a4: Unknown result type (might be due to invalid IL or missing references)
 			if (_listPanel == null || _mode == DetailMode.Edit)
 			{
 				return;
+			}
+			foreach (Control item in ((Container)_listPanel).get_Children().ToList())
+			{
+				item.Dispose();
 			}
 			((Container)_listPanel).ClearChildren();
 			LorebookCatalog catalog = _catalog;
@@ -633,11 +641,12 @@ namespace Frtal.LorebookReader
 			//IL_0360: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0376: Unknown result type (might be due to invalid IL or missing references)
 			//IL_037e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03aa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03ba: Unknown result type (might be due to invalid IL or missing references)
 			Panel val = new Panel();
 			((Control)val).set_Parent((Container)(object)_listPanel);
 			((Control)val).set_Width(((Control)_listPanel).get_Width() - 20);
-			((Control)val).set_Height(46);
+			((Control)val).set_Height(58);
 			val.set_ShowBorder(false);
 			((Control)val).set_BackgroundColor((Color)((_selected != null && _selected.Id == entry.Id) ? new Color(60, 70, 90) : Color.get_Transparent()));
 			Panel row = val;
@@ -665,16 +674,16 @@ namespace Frtal.LorebookReader
 			Panel val2 = new Panel();
 			((Control)val2).set_Parent((Container)(object)row);
 			((Control)val2).set_Location(new Point(0, 0));
-			((Control)val2).set_Width(5);
-			((Control)val2).set_Height(46);
+			((Control)val2).set_Width(6);
+			((Control)val2).set_Height(58);
 			((Control)val2).set_BackgroundColor(new Color(cr, cg, cb));
 			if (!entry.Opened)
 			{
 				Panel val3 = new Panel();
 				((Control)val3).set_Parent((Container)(object)row);
 				((Control)val3).set_Location(new Point(0, 0));
-				((Control)val3).set_Width(5);
-				((Control)val3).set_Height(46);
+				((Control)val3).set_Width(6);
+				((Control)val3).set_Height(58);
 				((Control)val3).set_BackgroundColor(new Color(233, 201, 106));
 				Panel glow = val3;
 				Tween tween = ((TweenerImpl)GameService.Animation.get_Tweener()).Tween<Panel>(glow, (object)new
@@ -686,43 +695,44 @@ namespace Frtal.LorebookReader
 					tween.Cancel();
 				});
 			}
-			int titleX = 12;
+			int titleX = 14;
 			Texture2D xpIcon = _module.GetExpansionIcon(entry.Expansion);
 			if (xpIcon != null)
 			{
 				Image val4 = new Image(AsyncTexture2D.op_Implicit(xpIcon));
 				((Control)val4).set_Parent((Container)(object)row);
-				((Control)val4).set_Location(new Point(10, 13));
-				((Control)val4).set_Size(new Point(20, 20));
-				titleX = 34;
+				((Control)val4).set_Location(new Point(12, 15));
+				((Control)val4).set_Size(new Point(28, 28));
+				titleX = 46;
 			}
 			Label val5 = new Label();
 			((Control)val5).set_Parent((Container)(object)row);
-			((Control)val5).set_Location(new Point(titleX, 4));
-			((Control)val5).set_Width(((Control)row).get_Width() - titleX - (entry.Opened ? 8 : 46));
-			((Control)val5).set_Height(22);
+			((Control)val5).set_Location(new Point(titleX, 6));
+			((Control)val5).set_Width(((Control)row).get_Width() - titleX - (entry.Opened ? 8 : 54));
+			((Control)val5).set_Height(26);
 			val5.set_Text(entry.DisplayTitle);
-			val5.set_Font(GameService.Content.get_DefaultFont16());
+			val5.set_Font(GameService.Content.get_DefaultFont18());
 			if (!entry.Opened)
 			{
 				Label val6 = new Label();
 				((Control)val6).set_Parent((Container)(object)row);
-				((Control)val6).set_Location(new Point(((Control)row).get_Width() - 42, 5));
-				((Control)val6).set_Width(36);
-				((Control)val6).set_Height(16);
+				((Control)val6).set_Location(new Point(((Control)row).get_Width() - 50, 8));
+				((Control)val6).set_Width(44);
+				((Control)val6).set_Height(20);
 				val6.set_Text("NEW");
 				val6.set_HorizontalAlignment((HorizontalAlignment)2);
 				val6.set_TextColor(new Color(233, 201, 106));
-				val6.set_Font(GameService.Content.get_DefaultFont12());
+				val6.set_Font(GameService.Content.get_DefaultFont14());
 			}
 			string meta = entry.MetadataLine;
 			Label val7 = new Label();
 			((Control)val7).set_Parent((Container)(object)row);
-			((Control)val7).set_Location(new Point(titleX, 26));
+			((Control)val7).set_Location(new Point(titleX, 32));
 			((Control)val7).set_Width(((Control)row).get_Width() - titleX - 8);
-			((Control)val7).set_Height(16);
+			((Control)val7).set_Height(20);
 			val7.set_Text(string.IsNullOrEmpty(meta) ? entry.TimestampLocal.ToString("g") : meta);
-			val7.set_TextColor(new Color(160, 160, 160));
+			val7.set_TextColor(new Color(165, 165, 165));
+			val7.set_Font(GameService.Content.get_DefaultFont14());
 			((Control)row).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				_selected = entry;
@@ -762,7 +772,7 @@ namespace Frtal.LorebookReader
 			Panel val = new Panel();
 			((Control)val).set_Parent((Container)(object)_listPanel);
 			((Control)val).set_Width(((Control)_listPanel).get_Width() - 20);
-			((Control)val).set_Height(46);
+			((Control)val).set_Height(58);
 			((Control)val).set_BackgroundColor(Color.get_Transparent());
 			Panel row = val;
 			((Control)row).add_MouseEntered((EventHandler<MouseEventArgs>)delegate
@@ -777,20 +787,20 @@ namespace Frtal.LorebookReader
 			});
 			Label val2 = new Label();
 			((Control)val2).set_Parent((Container)(object)row);
-			((Control)val2).set_Location(new Point(12, 4));
-			((Control)val2).set_Width(((Control)row).get_Width() - 20);
-			((Control)val2).set_Height(22);
+			((Control)val2).set_Location(new Point(14, 6));
+			((Control)val2).set_Width(((Control)row).get_Width() - 22);
+			((Control)val2).set_Height(26);
 			val2.set_Text(story.Title);
-			val2.set_Font(GameService.Content.get_DefaultFont16());
+			val2.set_Font(GameService.Content.get_DefaultFont18());
 			val2.set_TextColor(new Color(190, 190, 190));
 			Label val3 = new Label();
 			((Control)val3).set_Parent((Container)(object)row);
-			((Control)val3).set_Location(new Point(12, 26));
-			((Control)val3).set_Width(((Control)row).get_Width() - 20);
-			((Control)val3).set_Height(16);
+			((Control)val3).set_Location(new Point(14, 32));
+			((Control)val3).set_Width(((Control)row).get_Width() - 22);
+			((Control)val3).set_Height(20);
 			val3.set_Text("Not downloaded · " + story.Timeline);
-			val3.set_TextColor(new Color(140, 140, 140));
-			val3.set_Font(GameService.Content.get_DefaultFont12());
+			val3.set_TextColor(new Color(145, 145, 145));
+			val3.set_Font(GameService.Content.get_DefaultFont14());
 			((Control)row).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
 				ShowStoryOffer(story);
@@ -833,10 +843,32 @@ namespace Frtal.LorebookReader
 			//IL_01d8: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01e2: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01ec: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01fe: Unknown result type (might be due to invalid IL or missing references)
-			//IL_020e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0218: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0211: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0226: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022e: Expected O, but got Unknown
+			//IL_022e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0233: Unknown result type (might be due to invalid IL or missing references)
+			//IL_023a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0249: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0250: Unknown result type (might be due to invalid IL or missing references)
+			//IL_025b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_027a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0284: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0289: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0290: Unknown result type (might be due to invalid IL or missing references)
+			//IL_029f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ad: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02f3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_030a: Unknown result type (might be due to invalid IL or missing references)
 			_mode = DetailMode.Empty;
 			_selected = null;
 			((Container)_detailPanel).ClearChildren();
@@ -869,14 +901,36 @@ namespace Frtal.LorebookReader
 			val4.set_Text("");
 			val4.set_TextColor(new Color(170, 200, 170));
 			Label status = val4;
-			Label val5 = new Label();
+			FlowPanel val5 = new FlowPanel();
 			((Control)val5).set_Parent((Container)(object)_detailPanel);
-			((Control)val5).set_Location(new Point(12, 112));
+			((Control)val5).set_Location(new Point(12, 116));
 			((Control)val5).set_Width(w - 24);
-			((Control)val5).set_Height(130);
-			val5.set_WrapText(true);
-			val5.set_TextColor(new Color(160, 160, 160));
-			val5.set_Text("Why isn't this already here?\n\nThe short stories were written and published by ArenaNet, so the module does not ship copies of them. Instead it fetches this one from the Guild Wars 2 Wiki when you ask for it, and stores it in your own codex together with a link back to the source.\n\nYou need an internet connection for this step only — once downloaded, the story is yours to read offline.");
+			((Control)val5).set_Height(Math.Max(60, ((Control)_detailPanel).get_Height() - 128));
+			val5.set_FlowDirection((ControlFlowDirection)3);
+			val5.set_ControlPadding(new Vector2(0f, 8f));
+			((Panel)val5).set_CanScroll(true);
+			FlowPanel whyBox = val5;
+			Label val6 = new Label();
+			((Control)val6).set_Parent((Container)(object)whyBox);
+			((Control)val6).set_Width(((Control)whyBox).get_Width() - 20);
+			val6.set_AutoSizeHeight(true);
+			val6.set_Text("Why isn't this already here?");
+			val6.set_Font(GameService.Content.get_DefaultFont16());
+			val6.set_TextColor(new Color(200, 200, 200));
+			Label val7 = new Label();
+			((Control)val7).set_Parent((Container)(object)whyBox);
+			((Control)val7).set_Width(((Control)whyBox).get_Width() - 20);
+			val7.set_AutoSizeHeight(true);
+			val7.set_WrapText(true);
+			val7.set_TextColor(new Color(160, 160, 160));
+			val7.set_Text("The short stories were written and published by ArenaNet, so the module does not ship copies of them. Instead it fetches this one from the Guild Wars 2 Wiki when you ask for it, and stores it in your own codex together with a link back to the source.");
+			Label val8 = new Label();
+			((Control)val8).set_Parent((Container)(object)whyBox);
+			((Control)val8).set_Width(((Control)whyBox).get_Width() - 20);
+			val8.set_AutoSizeHeight(true);
+			val8.set_WrapText(true);
+			val8.set_TextColor(new Color(160, 160, 160));
+			val8.set_Text("You need an internet connection for this step only — once downloaded, the story is yours to read offline.");
 			string text;
 			((Control)getBtn).add_Click((EventHandler<MouseEventArgs>)delegate
 			{
@@ -1174,6 +1228,17 @@ namespace Frtal.LorebookReader
 			bookReaderPanel.FontSize = _textFontSize;
 			BookReaderPanel reader = bookReaderPanel;
 			reader.SetEntry(entry, body, _module.GetExpansionStampIcon(entry.Expansion));
+			TextBox searchBox = _searchBox;
+			string needle = (_lastSearch = ((searchBox != null) ? ((TextInputBase)searchBox).get_Text() : null) ?? _lastSearch);
+			if (!string.IsNullOrWhiteSpace(needle))
+			{
+				reader.Highlight = needle;
+				int hitPage = reader.FirstPageWith(needle.Trim());
+				if (hitPage > 0)
+				{
+					reader.GoToPage(hitPage);
+				}
+			}
 			reader.FullscreenToggled += delegate
 			{
 				_readerFullscreen = true;
@@ -1541,38 +1606,38 @@ namespace Frtal.LorebookReader
 		private void BuildFullscreenReader(int totalW, int totalH)
 		{
 			//IL_008e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0152: Unknown result type (might be due to invalid IL or missing references)
 			//IL_015e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0163: Unknown result type (might be due to invalid IL or missing references)
-			//IL_016d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0175: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0192: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0197: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0174: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0186: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01a3: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ba: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01de: Expected O, but got Unknown
-			//IL_01f5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01fa: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01b9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01cb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ef: Expected O, but got Unknown
 			//IL_0206: Unknown result type (might be due to invalid IL or missing references)
-			//IL_020e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0218: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0220: Unknown result type (might be due to invalid IL or missing references)
-			//IL_023c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0241: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0217: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0229: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0231: Unknown result type (might be due to invalid IL or missing references)
 			//IL_024d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0255: Unknown result type (might be due to invalid IL or missing references)
-			//IL_025f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0267: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0273: Expected O, but got Unknown
-			//IL_0273: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0252: Unknown result type (might be due to invalid IL or missing references)
+			//IL_025e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0266: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0270: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0278: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0284: Expected O, but got Unknown
 			//IL_0284: Unknown result type (might be due to invalid IL or missing references)
-			//IL_028c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0296: Unknown result type (might be due to invalid IL or missing references)
-			//IL_029e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0289: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0295: Unknown result type (might be due to invalid IL or missing references)
+			//IL_029d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02af: Unknown result type (might be due to invalid IL or missing references)
 			BookReaderPanel bookReaderPanel = new BookReaderPanel(_textRenderer, _parchment, _module.GetRefTexture("arrow_left.png"), _module.GetRefTexture("arrow_right.png"), _module.GetRefTexture("ornament_corner.png"), _module.GetRefTexture("seal.png"), _module.GetRefTexture("expand.png"), _module.GetRefTexture("collapse.png"));
 			((Control)bookReaderPanel).set_Parent(_root);
 			((Control)bookReaderPanel).set_Location(new Point(8, 6));
@@ -1581,6 +1646,7 @@ namespace Frtal.LorebookReader
 			bookReaderPanel.FontSize = _textFontSize;
 			BookReaderPanel reader = bookReaderPanel;
 			reader.SetEntry(_selected, BuildBody(_selected), _module.GetExpansionStampIcon(_selected.Expansion));
+			reader.Highlight = _lastSearch;
 			reader.IsFullscreen = true;
 			reader.FullscreenToggled += delegate
 			{

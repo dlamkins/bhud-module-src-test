@@ -265,6 +265,8 @@ namespace Frtal.LorebookReader
 
 		private bool _isFullscreen;
 
+		private string _highlight;
+
 		public bool IsFullscreen
 		{
 			get
@@ -278,6 +280,23 @@ namespace Frtal.LorebookReader
 				{
 					_fsBtn.Collapse = value;
 					((Control)_fsBtn).set_BasicTooltipText(value ? "Exit full-window reading" : "Read across the whole window");
+				}
+			}
+		}
+
+		public string Highlight
+		{
+			get
+			{
+				return _highlight;
+			}
+			set
+			{
+				string v = (string.IsNullOrWhiteSpace(value) ? null : value.Trim());
+				if (!(_highlight == v))
+				{
+					_highlight = v;
+					((Control)this).Invalidate();
 				}
 			}
 		}
@@ -397,6 +416,36 @@ namespace Frtal.LorebookReader
 			return (Control)val;
 		}
 
+		public int FirstPageWith(string needle)
+		{
+			if (string.IsNullOrWhiteSpace(needle))
+			{
+				return 0;
+			}
+			for (int p = 0; p < _pages.Count; p++)
+			{
+				foreach (Line ln in _pages[p])
+				{
+					if (!string.IsNullOrEmpty(ln.Text) && ln.Text.IndexOf(needle, StringComparison.OrdinalIgnoreCase) >= 0)
+					{
+						return p + 1;
+					}
+				}
+			}
+			return 0;
+		}
+
+		public void GoToPage(int page)
+		{
+			if (page >= 0 && page <= _pages.Count)
+			{
+				_turning = false;
+				_page = page;
+				UpdateButtons();
+				((Control)this).Invalidate();
+			}
+		}
+
 		public void SetEntry(LorebookEntry entry, string body, Texture2D xpIcon)
 		{
 			_entry = entry;
@@ -459,6 +508,10 @@ namespace Frtal.LorebookReader
 							scale = 1f;
 						}
 						int ih = Math.Max(1, (int)((float)tex.get_Height() * scale));
+						if ((float)ih > availH * 0.9f)
+						{
+							ih = (int)(availH * 0.9f);
+						}
 						if (used + (float)ih + gapH > availH && cur.Count > 0)
 						{
 							_pages.Add(cur);
@@ -745,12 +798,14 @@ namespace Frtal.LorebookReader
 			//IL_009f: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00c6: Unknown result type (might be due to invalid IL or missing references)
 			//IL_00d5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0174: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ac: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01b2: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01dc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01dd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01e2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_020e: Unknown result type (might be due to invalid IL or missing references)
 			List<Line> list = _pages[_page - 1];
 			float y = bounds.Y + 64;
 			foreach (Line ln in list)
@@ -775,6 +830,8 @@ namespace Frtal.LorebookReader
 				}
 				if (ln.Text.Length > 0)
 				{
+					float fs = (ln.Head ? (_fontSize + 2f) : _fontSize);
+					PaintHighlights(sb, bounds, page, f, anchorLeft, ln, fs, y, lh);
 					Texture2D tex = (ln.Head ? _tr.RenderLine(ln.Text, _fontSize + 2f, HeadInk, bold: true) : _tr.RenderLine(ln.Text, _fontSize, InkColor));
 					if (tex != null)
 					{
@@ -783,6 +840,36 @@ namespace Frtal.LorebookReader
 					}
 				}
 				y += lh;
+			}
+		}
+
+		private void PaintHighlights(SpriteBatch sb, Rectangle bounds, Rectangle page, float f, bool anchorLeft, Line ln, float fs, float y, float lh)
+		{
+			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00b7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00d2: Unknown result type (might be due to invalid IL or missing references)
+			if (string.IsNullOrEmpty(_highlight))
+			{
+				return;
+			}
+			int from = 0;
+			while (true)
+			{
+				int hit = ln.Text.IndexOf(_highlight, from, StringComparison.OrdinalIgnoreCase);
+				if (hit >= 0)
+				{
+					float pre = _tr.MeasureWidth(ln.Text.Substring(0, hit), fs, ln.Head);
+					float wide = _tr.MeasureWidth(ln.Text.Substring(hit, _highlight.Length), fs, ln.Head);
+					float x = (float)(bounds.X + 46) + pre;
+					int dx = SqueezeX(bounds, page, f, anchorLeft, x);
+					SpriteBatchExtensions.DrawOnCtrl(sb, (Control)(object)this, Textures.get_Pixel(), new Rectangle(dx, (int)y - 1, Math.Max(2, (int)(wide * f)), (int)lh), new Color(255, 214, 41) * 0.85f);
+					from = hit + _highlight.Length;
+					continue;
+				}
+				break;
 			}
 		}
 
