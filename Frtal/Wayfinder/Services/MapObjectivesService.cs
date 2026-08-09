@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
@@ -18,6 +19,10 @@ namespace Frtal.Wayfinder.Services
 		private static readonly Logger Logger = Logger.GetLogger<MapObjectivesService>();
 
 		private readonly Gw2ApiManager _api;
+
+		private readonly Dictionary<int, (int Floor, int Region)> _locationCache = new Dictionary<int, (int, int)>();
+
+		private readonly List<int> _hotRegions = new List<int>();
 
 		private int _loadedMapId = -1;
 
@@ -51,6 +56,9 @@ namespace Frtal.Wayfinder.Services
 		{
 			if (currentMapId > 0 && currentMapId != _loadedMapId && !_loading)
 			{
+				Targets = new List<CompassTarget>();
+				MapName = "";
+				_loadedMapId = currentMapId;
 				_loading = true;
 				LoadMapAsync(currentMapId);
 			}
@@ -61,7 +69,6 @@ namespace Frtal.Wayfinder.Services
 			_ = 1;
 			try
 			{
-				List<CompassTarget> results = new List<CompassTarget>();
 				Map map = await ((IBulkExpandableClient<Map, int>)(object)_api.get_Gw2ApiClient().get_V2().get_Maps()).GetAsync(mapId, default(CancellationToken));
 				MapName = map.get_Name() ?? "";
 				ContinentId = map.get_ContinentId();
@@ -122,23 +129,22 @@ namespace Frtal.Wayfinder.Services
 				{
 					Logger.Warn(ex2, "Map calibration failed - distances may be inaccurate.");
 				}
-				ContinentFloorRegionMap details = await ((IBlobClient<ContinentFloorRegionMap>)(object)_api.get_Gw2ApiClient().get_V2().get_Continents()
-					.get_Item(map.get_ContinentId())
-					.get_Floors()
-					.get_Item(map.get_DefaultFloor())
-					.get_Regions()
-					.get_Item(map.get_RegionId())
-					.get_Maps()
-					.get_Item(map.get_Id())).GetAsync(default(CancellationToken));
-				Vector2 pos2 = default(Vector2);
+				ContinentFloorRegionMap details = await LoadDetailsAsync(map);
+				if (details == null)
+				{
+					Logger.Warn($"Could not locate map {mapId} ({MapName}) in any floor/region - no objectives shown.");
+					return;
+				}
+				List<CompassTarget> results = new List<CompassTarget>();
+				Vector2 pos3 = default(Vector2);
 				foreach (ContinentFloorRegionMapPoi poi in details.get_PointsOfInterest().Values)
 				{
 					TargetKind kind = MapPoiType(((object)poi.get_Type())?.ToString());
 					val2 = poi.get_Coord();
 					float num3 = (float)((Coordinates2)(ref val2)).get_X();
 					val2 = poi.get_Coord();
-					((Vector2)(ref pos2))._002Ector(num3, (float)((Coordinates2)(ref val2)).get_Y());
-					results.Add(new CompassTarget($"poi:{poi.get_Id()}", poi.get_Name() ?? kind.ToString(), kind, pos2));
+					((Vector2)(ref pos3))._002Ector(num3, (float)((Coordinates2)(ref val2)).get_Y());
+					results.Add(new CompassTarget($"poi:{poi.get_Id()}", poi.get_Name() ?? kind.ToString(), kind, pos3));
 				}
 				Vector2 pos = default(Vector2);
 				foreach (ContinentFloorRegionMapTask task in details.get_Tasks().Values)
@@ -149,13 +155,13 @@ namespace Frtal.Wayfinder.Services
 					((Vector2)(ref pos))._002Ector(num4, (float)((Coordinates2)(ref val2)).get_Y());
 					results.Add(new CompassTarget($"heart:{task.get_Id()}", task.get_Objective() ?? "Heart", TargetKind.Heart, pos));
 				}
-				Vector2 pos3 = default(Vector2);
+				Vector2 pos2 = default(Vector2);
 				foreach (ContinentFloorRegionMapSkillChallenge skill in details.get_SkillChallenges())
 				{
 					val2 = skill.get_Coord();
 					float num5 = (float)((Coordinates2)(ref val2)).get_X();
 					val2 = skill.get_Coord();
-					((Vector2)(ref pos3))._002Ector(num5, (float)((Coordinates2)(ref val2)).get_Y());
+					((Vector2)(ref pos2))._002Ector(num5, (float)((Coordinates2)(ref val2)).get_Y());
 					string sid = null;
 					try
 					{
@@ -164,12 +170,11 @@ namespace Frtal.Wayfinder.Services
 					catch
 					{
 					}
-					string id = ((!string.IsNullOrEmpty(sid)) ? ("hp:" + sid) : $"skill:{pos3.X},{pos3.Y}");
-					results.Add(new CompassTarget(id, "Hero point", TargetKind.SkillPoint, pos3));
+					string id = ((!string.IsNullOrEmpty(sid)) ? ("hp:" + sid) : $"skill:{pos2.X},{pos2.Y}");
+					results.Add(new CompassTarget(id, "Hero point", TargetKind.SkillPoint, pos2));
 				}
 				Targets = results;
-				_loadedMapId = mapId;
-				Logger.Info($"Loaded {results.Count} objectives for map {mapId}.");
+				Logger.Info($"Loaded {results.Count} objectives for map {mapId} ({MapName}).");
 			}
 			catch (Exception ex)
 			{
@@ -178,6 +183,114 @@ namespace Frtal.Wayfinder.Services
 			finally
 			{
 				_loading = false;
+			}
+		}
+
+		private async Task<ContinentFloorRegionMap> LoadDetailsAsync(Map map)
+		{
+			int mapId = map.get_Id();
+			int cid = map.get_ContinentId();
+			if (_locationCache.TryGetValue(mapId, out var known))
+			{
+				ContinentFloorRegionMap cached = await TryGetAsync(cid, known.Floor, known.Region, mapId);
+				if (cached != null)
+				{
+					(Floor, _) = known;
+					return cached;
+				}
+				_locationCache.Remove(mapId);
+			}
+			ContinentFloorRegionMap direct = await TryGetAsync(cid, map.get_DefaultFloor(), map.get_RegionId(), mapId);
+			if (direct != null)
+			{
+				_locationCache[mapId] = (map.get_DefaultFloor(), map.get_RegionId());
+				return direct;
+			}
+			List<int> floors = new List<int> { map.get_DefaultFloor() };
+			try
+			{
+				foreach (int f in map.get_Floors())
+				{
+					if (!floors.Contains(f))
+					{
+						floors.Add(f);
+					}
+				}
+			}
+			catch
+			{
+			}
+			foreach (int floor in floors)
+			{
+				IEnumerable<int> regionIds;
+				try
+				{
+					regionIds = (IEnumerable<int>)(await ((IBulkExpandableClient<ContinentFloorRegion, int>)(object)_api.get_Gw2ApiClient().get_V2().get_Continents()
+						.get_Item(cid)
+						.get_Floors()
+						.get_Item(floor)
+						.get_Regions()).IdsAsync(default(CancellationToken)));
+				}
+				catch (Exception ex)
+				{
+					Logger.Debug($"Could not list regions for continent {cid} floor {floor}: {ex.Message}");
+					continue;
+				}
+				List<int> ordered = ((IEnumerable<int>)_hotRegions).Where((Func<int, bool>)regionIds.Contains).Concat(regionIds.Where((int r) => !_hotRegions.Contains(r))).ToList();
+				foreach (int rid in ordered)
+				{
+					if (rid == map.get_RegionId() && floor == map.get_DefaultFloor())
+					{
+						continue;
+					}
+					try
+					{
+						if (!((IEnumerable<int>)(await ((IBulkExpandableClient<ContinentFloorRegionMap, int>)(object)_api.get_Gw2ApiClient().get_V2().get_Continents()
+							.get_Item(cid)
+							.get_Floors()
+							.get_Item(floor)
+							.get_Regions()
+							.get_Item(rid)
+							.get_Maps()).IdsAsync(default(CancellationToken)))).Contains(mapId))
+						{
+							continue;
+						}
+					}
+					catch
+					{
+						continue;
+					}
+					ContinentFloorRegionMap found = await TryGetAsync(cid, floor, rid, mapId);
+					if (found != null)
+					{
+						Logger.Info($"Map {mapId} resolved to floor {floor}, region {rid} " + $"(the API reported region {map.get_RegionId()}).");
+						_locationCache[mapId] = (floor, rid);
+						_hotRegions.Remove(rid);
+						_hotRegions.Insert(0, rid);
+						Floor = floor;
+						return found;
+					}
+				}
+			}
+			return null;
+		}
+
+		private async Task<ContinentFloorRegionMap> TryGetAsync(int continentId, int floor, int regionId, int mapId)
+		{
+			try
+			{
+				return await ((IBlobClient<ContinentFloorRegionMap>)(object)_api.get_Gw2ApiClient().get_V2().get_Continents()
+					.get_Item(continentId)
+					.get_Floors()
+					.get_Item(floor)
+					.get_Regions()
+					.get_Item(regionId)
+					.get_Maps()
+					.get_Item(mapId)).GetAsync(default(CancellationToken));
+			}
+			catch
+			{
+				return null;
 			}
 		}
 

@@ -185,12 +185,12 @@ namespace Frtal.Wayfinder
 			//IL_011e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01ad: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01f3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0449: Unknown result type (might be due to invalid IL or missing references)
-			//IL_044b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0473: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0479: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05ea: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_049d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_049f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04c7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04cd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_063e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0640: Unknown result type (might be due to invalid IL or missing references)
 			Gw2MumbleService mumble = GameService.Gw2Mumble;
 			if (_view == null)
 			{
@@ -263,6 +263,9 @@ namespace Frtal.Wayfinder
 			_view.ScaleDistance = scaleDist;
 			_view.ShowCardinals = cardinals;
 			_view.Monochrome = mono;
+			_view.MarkUndiscovered = _settings.GreyUndiscovered.get_Value();
+			_view.IsDiscovered = (string id) => _discovery.IsSeen(id);
+			_view.EdgeFade = (float)_settings.EdgeFadePercent.get_Value() / 100f;
 			_view.BackgroundOpacity = bgOpacity;
 			_view.DragEnabled = _settings.DragMode.get_Value() && !radial;
 			((Control)_view).set_Opacity(opacity);

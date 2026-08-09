@@ -47,6 +47,10 @@ namespace Frtal.Wayfinder
 
 		public SettingEntry<bool> MonochromeIcons { get; }
 
+		public SettingEntry<bool> GreyUndiscovered { get; }
+
+		public SettingEntry<int> EdgeFadePercent { get; }
+
 		public SettingEntry<bool> ScaleWithDistance { get; }
 
 		public SettingEntry<int> IconScaleNear { get; }
@@ -122,6 +126,8 @@ namespace Frtal.Wayfinder
 			ShowNames = appearance.DefineSetting<bool>("names", false, (Func<string>)(() => "Show names under icons"), (Func<string>)null);
 			ShowCardinals = appearance.DefineSetting<bool>("cardinals", true, (Func<string>)(() => "Show cardinal directions (N/E/S/W)"), (Func<string>)null);
 			MonochromeIcons = appearance.DefineSetting<bool>("monoicons", false, (Func<string>)(() => "Monochrome icons"), (Func<string>)null);
+			GreyUndiscovered = appearance.DefineSetting<bool>("greyundisc", false, (Func<string>)(() => "Grey out undiscovered objectives"), (Func<string>)null);
+			EdgeFadePercent = appearance.DefineSetting<int>("edgefade", 14, (Func<string>)(() => "Edge fade"), (Func<string>)null);
 			ScaleWithDistance = appearance.DefineSetting<bool>("scaledist", true, (Func<string>)(() => "Nearer icons appear larger"), (Func<string>)null);
 			IconScaleNear = appearance.DefineSetting<int>("scalenear", 200, (Func<string>)(() => "Icon size when close"), (Func<string>)null);
 			IconScaleFar = appearance.DefineSetting<int>("scalefar", 45, (Func<string>)(() => "Icon size when far"), (Func<string>)null);
@@ -135,6 +141,7 @@ namespace Frtal.Wayfinder
 			SettingComplianceExtensions.SetRange(IconScaleNear, 100, 400);
 			SettingComplianceExtensions.SetRange(IconScaleFar, 10, 100);
 			SettingComplianceExtensions.SetRange(IconScaleDistance, 20, 2000);
+			SettingComplianceExtensions.SetRange(EdgeFadePercent, 0, 40);
 			SettingCollection radial = settings.AddSubCollection("radial", true, (Func<string>)(() => "Radial mode (experimental)"));
 			RadialMode = radial.DefineSetting<bool>("radialmode", false, (Func<string>)(() => "Ring at the character's feet instead of a bar"), (Func<string>)null);
 			RadialRadius = radial.DefineSetting<int>("radialradius", 10, (Func<string>)(() => "Ring radius"), (Func<string>)null);

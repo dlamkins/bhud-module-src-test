@@ -47,15 +47,15 @@ namespace Frtal.Wayfinder.UI
 			//IL_010c: Expected O, but got Unknown
 			//IL_022a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0236: Expected O, but got Unknown
-			//IL_034a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0356: Expected O, but got Unknown
-			//IL_03da: Unknown result type (might be due to invalid IL or missing references)
-			//IL_03e6: Expected O, but got Unknown
-			//IL_0419: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0425: Expected O, but got Unknown
-			//IL_04c6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04d2: Expected O, but got Unknown
-			//IL_0544: Expected O, but got Unknown
+			//IL_038a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0396: Expected O, but got Unknown
+			//IL_041a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0426: Expected O, but got Unknown
+			//IL_0459: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0465: Expected O, but got Unknown
+			//IL_0506: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0512: Expected O, but got Unknown
+			//IL_0584: Expected O, but got Unknown
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Parent(buildPanel);
 			Rectangle contentRegion = buildPanel.get_ContentRegion();
@@ -97,6 +97,8 @@ namespace Frtal.Wayfinder.UI
 			Check((Container)(object)p3, "Show names under icons", _s.ShowNames, w);
 			Check((Container)(object)p3, "Show cardinal directions", _s.ShowCardinals, w, "N / E / S / W markers.");
 			Check((Container)(object)p3, "Monochrome icons", _s.MonochromeIcons, w);
+			Check((Container)(object)p3, "Grey out undiscovered objectives", _s.GreyUndiscovered, w, "Undiscovered objectives are drawn greyed out, the way the in-game map shows them.");
+			Slider((Container)(object)p3, "Edge fade", _s.EdgeFadePercent, 0, 40, "%", w, "Fades the bar towards its left and right ends. 0 turns it off.");
 			FlowPanel p4 = Section((Container)val, "Distance scaling", w);
 			Check((Container)(object)p4, "Nearer icons appear larger", _s.ScaleWithDistance, w);
 			Slider((Container)(object)p4, "Size when close", _s.IconScaleNear, 100, 400, "%", w);
