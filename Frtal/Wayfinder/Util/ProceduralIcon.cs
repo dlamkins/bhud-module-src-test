@@ -6,6 +6,32 @@ namespace Frtal.Wayfinder.Util
 {
 	public static class ProceduralIcon
 	{
+		public static Texture2D CreateBarFade(GraphicsDevice device, int width, float edgeFade)
+		{
+			//IL_007e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0095: Unknown result type (might be due to invalid IL or missing references)
+			//IL_009a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_00a2: Expected O, but got Unknown
+			Color[] data = (Color[])(object)new Color[width];
+			float fade = MathHelper.Clamp(edgeFade, 0f, 0.5f);
+			for (int i = 0; i < width; i++)
+			{
+				float a = 1f;
+				if (fade > 0.0001f)
+				{
+					float t = ((float)i + 0.5f) / (float)width;
+					a = MathHelper.Clamp(Math.Min(t, 1f - t) / fade, 0f, 1f);
+					a = a * a * (3f - 2f * a);
+				}
+				byte v = (byte)(255f * a);
+				data[i] = new Color(v, v, v, v);
+			}
+			Texture2D val = new Texture2D(device, width, 1, false, (SurfaceFormat)0);
+			val.SetData<Color>(data);
+			return val;
+		}
+
 		public static Texture2D CreatePositionMarker(GraphicsDevice device, int size = 48)
 		{
 			//IL_00e4: Unknown result type (might be due to invalid IL or missing references)
