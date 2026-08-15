@@ -42,6 +42,12 @@ namespace GW2app
 
 			private readonly ConcurrentQueue<string> _outbound = new ConcurrentQueue<string>();
 
+			private string _fragId;
+
+			private int _fragNextSeq;
+
+			private StringBuilder _fragData;
+
 			public string SessionId { get; }
 
 			public bool Superseded => _superseded;
@@ -65,6 +71,50 @@ namespace GW2app
 				}
 			}
 
+			public string AcceptFragment(JObject msg)
+			{
+				JObject f = msg["__frag"] as JObject;
+				if (f == null)
+				{
+					return null;
+				}
+				string id = f["id"]?.Value<string>();
+				if (string.IsNullOrEmpty(id))
+				{
+					return null;
+				}
+				int seq = f["seq"]?.Value<int>() ?? (-1);
+				bool final = ((f["final"]?.Value<bool>() ?? false) ? ((byte)1) : ((byte)0)) != 0;
+				string data = msg["data"]?.Value<string>() ?? "";
+				if (id != _fragId)
+				{
+					if (seq != 0)
+					{
+						_fragId = null;
+						return null;
+					}
+					_fragId = id;
+					_fragNextSeq = 0;
+					_fragData = new StringBuilder();
+				}
+				if (seq != _fragNextSeq)
+				{
+					_fragId = null;
+					_fragData = null;
+					return null;
+				}
+				_fragData.Append(data);
+				_fragNextSeq++;
+				if (!final)
+				{
+					return null;
+				}
+				string result = _fragData.ToString();
+				_fragId = null;
+				_fragData = null;
+				return result;
+			}
+
 			public List<string> DrainOutbound()
 			{
 				List<string> list = new List<string>();
@@ -83,7 +133,7 @@ namespace GW2app
 
 		private const int BaseDisplayWidth = 400;
 
-		private const int ProtocolVersion = 1;
+		private const int ProtocolVersion = 2;
 
 		private const int HandshakeTimeoutMs = 5000;
 
@@ -93,7 +143,7 @@ namespace GW2app
 
 		private const int CloseCodeProtocolViolation = 4002;
 
-		private static readonly TimeSpan PollSessionTimeout = TimeSpan.FromSeconds(5.0);
+		private static readonly TimeSpan PollSessionTimeout = TimeSpan.FromSeconds(20.0);
 
 		internal const int Gw2ChatMaxLength = 199;
 
@@ -276,6 +326,12 @@ namespace GW2app
 		private const int ImagesBottomMargin = 10;
 
 		private const int WindowVerticalChrome = 40;
+
+		private static readonly TimeSpan ListenerRestartCooldown = TimeSpan.FromSeconds(5.0);
+
+		private DateTime _lastListenerRestartUtc = DateTime.MinValue;
+
+		private static int _wsDetectionState;
 
 		private int DisplayWidth => (int)Math.Round(400f * UiScale);
 
@@ -513,9 +569,22 @@ namespace GW2app
 
 		protected override void Update(GameTime gameTime)
 		{
+			try
+			{
+				UpdateTick(gameTime);
+			}
+			catch (Exception e)
+			{
+				Logger.Warn(e, "Unhandled error in Update tick.");
+			}
+		}
+
+		private void UpdateTick(GameTime gameTime)
+		{
 			bool catalogChanged = false;
 			HashSet<string> dirtyLists = new HashSet<string>();
 			ReapStalePollSession();
+			EnsureHttpListenerAlive();
 			IncomingMessage msg;
 			while (_incomingMessages.TryDequeue(out msg))
 			{
@@ -1306,7 +1375,7 @@ namespace GW2app
 				bool connected = _hasActiveConnection != 0;
 				int listCount = (_catalog?.Lists?.Count).GetValueOrDefault();
 				_infoStatusDot.set_Texture(AsyncTexture2D.op_Implicit(connected ? _dotConnectedTexture : _dotNotConnectedTexture));
-				_infoStatusLabel.set_Text(connected ? ("connected (" + listCount + ((listCount == 1) ? " list)" : " lists)")) : "not connected");
+				_infoStatusLabel.set_Text(connected ? ("Connected (" + listCount + ((listCount == 1) ? " list)" : " lists)")) : "Not connected");
 				_infoStatusLabel.set_TextColor(connected ? new Color(50, 205, 50) : new Color(220, 20, 60));
 				int visualWidth = 18 + ((Control)_infoStatusLabel).get_Width();
 				int num = (((Container)_infoWindow).get_ContentRegion().Width - visualWidth) / 2;
@@ -2897,33 +2966,154 @@ namespace GW2app
 				_httpListener.Start();
 			}
 			_httpCts = new CancellationTokenSource();
-			Task.Run(() => HttpListenLoop(_httpCts.Token));
+			HttpListener listener = _httpListener;
+			CancellationToken token = _httpCts.Token;
+			Task.Run(() => HttpListenLoop(listener, token));
 			Logger.Info($"GW2.app HTTP listener started on port {38473}");
 		}
 
-		private async Task HttpListenLoop(CancellationToken ct)
+		private async Task HttpListenLoop(HttpListener listener, CancellationToken ct)
 		{
-			while (!ct.IsCancellationRequested && _httpListener != null && _httpListener.IsListening)
+			while (!ct.IsCancellationRequested && listener.IsListening)
 			{
 				HttpListenerContext ctx;
 				try
 				{
-					ctx = await _httpListener.GetContextAsync();
+					ctx = await listener.GetContextAsync();
 				}
-				catch (Exception)
+				catch (Exception e)
 				{
+					if (!ct.IsCancellationRequested && listener.IsListening)
+					{
+						Logger.Warn(e, "Failed to accept an HTTP request; still listening.");
+						await Task.Delay(250);
+						continue;
+					}
 					return;
 				}
 				Task.Run(() => HandleHttpRequest(ctx));
 			}
 		}
 
-		private async Task HandleHttpRequest(HttpListenerContext ctx)
+		private void RestartHttpListener()
 		{
-			_ = 2;
+			if (_unloading)
+			{
+				return;
+			}
+			DateTime now = DateTime.UtcNow;
+			if (!(now - _lastListenerRestartUtc < ListenerRestartCooldown))
+			{
+				_lastListenerRestartUtc = now;
+				Logger.Info("Recreating the HTTP listener to recover a wedged connection.");
+				try
+				{
+					_httpCts?.Cancel();
+				}
+				catch
+				{
+				}
+				try
+				{
+					_httpListener?.Stop();
+				}
+				catch
+				{
+				}
+				try
+				{
+					_httpListener?.Close();
+				}
+				catch
+				{
+				}
+				_httpListener = null;
+				try
+				{
+					_httpCts?.Dispose();
+				}
+				catch
+				{
+				}
+				_httpCts = null;
+				try
+				{
+					StartHttpServer();
+				}
+				catch (Exception e)
+				{
+					Logger.Warn(e, "Failed to recreate the HTTP listener.");
+				}
+			}
+		}
+
+		private void EnsureHttpListenerAlive()
+		{
+			if (!_unloading && (_httpListener == null || !_httpListener.IsListening))
+			{
+				RestartHttpListener();
+			}
+		}
+
+		private static bool IsWebSocketRequestSafe(HttpListenerContext ctx)
+		{
+			if (Volatile.Read(ref _wsDetectionState) == 2)
+			{
+				return false;
+			}
 			try
 			{
-				if (ctx.Request.IsWebSocketRequest)
+				bool isWebSocketRequest = ctx.Request.IsWebSocketRequest;
+				Volatile.Write(ref _wsDetectionState, 1);
+				return isWebSocketRequest;
+			}
+			catch (Exception e)
+			{
+				if (Interlocked.Exchange(ref _wsDetectionState, 2) != 2)
+				{
+					Logger.Info(e, "WebSocket detection unavailable on this platform; serving HTTP polling only.");
+				}
+				return false;
+			}
+		}
+
+		private static void CloseResponse(HttpListenerContext ctx, int status, string contentType = null, byte[] body = null)
+		{
+			try
+			{
+				ctx.Response.StatusCode = status;
+				ctx.Response.KeepAlive = false;
+				if (contentType != null)
+				{
+					ctx.Response.ContentType = contentType;
+				}
+				ctx.Response.ContentLength64 = ((body != null) ? body.Length : 0);
+				if (body != null && body.Length != 0)
+				{
+					ctx.Response.OutputStream.Write(body, 0, body.Length);
+				}
+				ctx.Response.Close();
+				Logger.Debug($"HTTP response {status} sent ({((body != null) ? body.Length : 0)} bytes).");
+			}
+			catch (Exception e)
+			{
+				Logger.Debug(e, $"Writing HTTP response {status} ({((body != null) ? body.Length : 0)} bytes) failed.");
+				try
+				{
+					ctx.Response.Abort();
+				}
+				catch
+				{
+				}
+			}
+		}
+
+		private async Task HandleHttpRequest(HttpListenerContext ctx)
+		{
+			Logger.Debug("HTTP " + ctx.Request.HttpMethod + " " + ctx.Request.Url?.AbsolutePath + " " + $"len={ctx.Request.ContentLength64} from {ctx.Request.RemoteEndPoint}");
+			try
+			{
+				if (IsWebSocketRequestSafe(ctx))
 				{
 					string wsOrigin = ctx.Request.Headers["Origin"];
 					if (IsAllowedOrigin(wsOrigin))
@@ -2932,15 +3122,13 @@ namespace GW2app
 						return;
 					}
 					Logger.Warn($"Rejecting WS handshake from disallowed origin '{wsOrigin}' ({ctx.Request.RemoteEndPoint})");
-					ctx.Response.StatusCode = 403;
-					ctx.Response.Close();
+					CloseResponse(ctx, 403);
 					return;
 				}
 				ApplyCorsHeaders(ctx);
 				if (ctx.Request.HttpMethod == "OPTIONS")
 				{
-					ctx.Response.StatusCode = 204;
-					ctx.Response.Close();
+					CloseResponse(ctx, 204);
 				}
 				else if (ctx.Request.HttpMethod == "POST" && ctx.Request.Url.AbsolutePath == "/poll")
 				{
@@ -2951,28 +3139,17 @@ namespace GW2app
 						return;
 					}
 					Logger.Warn($"Rejecting poll from disallowed origin '{pollOrigin}' ({ctx.Request.RemoteEndPoint})");
-					ctx.Response.StatusCode = 403;
-					ctx.Response.Close();
+					CloseResponse(ctx, 403);
 				}
 				else
 				{
-					ctx.Response.StatusCode = 426;
-					byte[] msg = Encoding.UTF8.GetBytes("This endpoint expects a WebSocket connection.");
-					await ctx.Response.OutputStream.WriteAsync(msg, 0, msg.Length);
-					ctx.Response.Close();
+					CloseResponse(ctx, 426, "text/plain; charset=utf-8", Encoding.UTF8.GetBytes("This endpoint expects a WebSocket connection."));
 				}
 			}
 			catch (Exception e)
 			{
 				Logger.Warn(e, "Error handling HTTP request.");
-				try
-				{
-					ctx.Response.StatusCode = 500;
-					ctx.Response.Close();
-				}
-				catch
-				{
-				}
+				CloseResponse(ctx, 500);
 			}
 		}
 
@@ -2987,6 +3164,7 @@ namespace GW2app
 			ctx.Response.Headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS";
 			ctx.Response.Headers["Access-Control-Allow-Headers"] = "Upgrade, Connection, Content-Type";
 			ctx.Response.Headers["Access-Control-Allow-Private-Network"] = "true";
+			ctx.Response.Headers["Access-Control-Max-Age"] = "86400";
 		}
 
 		private static bool IsAllowedOrigin(string origin)
@@ -3412,7 +3590,7 @@ namespace GW2app
 			case "state":
 			{
 				int proto = (root["protocol"] ?? throw new ProtocolException("state missing 'protocol' field")).Value<int>();
-				if (proto != 1)
+				if (proto < 1 || proto > 2)
 				{
 					throw new ProtocolException($"unsupported protocol version {proto}");
 				}
@@ -3474,8 +3652,7 @@ namespace GW2app
 			catch (Exception e)
 			{
 				Logger.Warn(e, "Failed to read poll body.");
-				ctx.Response.StatusCode = 400;
-				ctx.Response.Close();
+				CloseResponse(ctx, 400);
 				return;
 			}
 			string session;
@@ -3491,14 +3668,12 @@ namespace GW2app
 			catch (Exception e3)
 			{
 				Logger.Warn(e3, "Bad poll request JSON.");
-				ctx.Response.StatusCode = 400;
-				ctx.Response.Close();
+				CloseResponse(ctx, 400);
 				return;
 			}
 			if (string.IsNullOrEmpty(session))
 			{
-				ctx.Response.StatusCode = 400;
-				ctx.Response.Close();
+				CloseResponse(ctx, 400);
 				return;
 			}
 			if (closeTok != null && closeTok.Type != JTokenType.Null)
@@ -3518,7 +3693,7 @@ namespace GW2app
 				{
 					MarkPollDisconnected();
 				}
-				await WritePollResponse(ctx, null, null);
+				WritePollResponse(ctx, null, null);
 				return;
 			}
 			PollChannel channel = null;
@@ -3558,7 +3733,7 @@ namespace GW2app
 			}
 			if (returnSuperseded)
 			{
-				await WritePollResponse(ctx, null, MakeClose(4000, "superseded"));
+				WritePollResponse(ctx, null, MakeClose(4000, "superseded"));
 				return;
 			}
 			if (replacedPrevious)
@@ -3575,10 +3750,25 @@ namespace GW2app
 			bool superseded = false;
 			foreach (JToken tok in inbound)
 			{
+				JObject fobj = tok as JObject;
+				string messageJson;
+				if (fobj != null && fobj["__frag"] != null)
+				{
+					string reassembled = channel.AcceptFragment(fobj);
+					if (reassembled == null)
+					{
+						continue;
+					}
+					messageJson = reassembled;
+				}
+				else
+				{
+					messageJson = tok.ToString(Formatting.None);
+				}
 				IncomingMessage parsed;
 				try
 				{
-					parsed = ParseMessage(tok.ToString(Formatting.None));
+					parsed = ParseMessage(messageJson);
 				}
 				catch (Exception e2)
 				{
@@ -3605,7 +3795,7 @@ namespace GW2app
 				break;
 			}
 			List<string> outMsgs = channel.DrainOutbound();
-			await WritePollResponse(ctx, outMsgs, superseded ? MakeClose(4000, "superseded") : null, resync);
+			WritePollResponse(ctx, outMsgs, superseded ? MakeClose(4000, "superseded") : null, resync);
 		}
 
 		private static JObject MakeClose(int code, string reason)
@@ -3617,7 +3807,7 @@ namespace GW2app
 			};
 		}
 
-		private static async Task WritePollResponse(HttpListenerContext ctx, List<string> messages, JObject close, bool resync = false)
+		private static void WritePollResponse(HttpListenerContext ctx, List<string> messages, JObject close, bool resync = false)
 		{
 			JArray arr = new JArray();
 			if (messages != null)
@@ -3638,31 +3828,13 @@ namespace GW2app
 				["messages"] = arr,
 				["close"] = (JToken?)(((object)close) ?? ((object)JValue.CreateNull()))
 			};
+			root["serverProtocol"] = (JToken)2;
 			if (resync)
 			{
 				root["resync"] = (JToken)true;
 			}
 			byte[] bytes = Encoding.UTF8.GetBytes(root.ToString(Formatting.None));
-			try
-			{
-				ctx.Response.StatusCode = 200;
-				ctx.Response.ContentType = "application/json";
-				await ctx.Response.OutputStream.WriteAsync(bytes, 0, bytes.Length);
-			}
-			catch (Exception e)
-			{
-				Logger.Warn(e, "Failed to write poll response.");
-			}
-			finally
-			{
-				try
-				{
-					ctx.Response.Close();
-				}
-				catch
-				{
-				}
-			}
+			CloseResponse(ctx, 200, "application/json", bytes);
 		}
 
 		private void MarkPollDisconnected()
@@ -3693,6 +3865,7 @@ namespace GW2app
 			if (reaped)
 			{
 				MarkPollDisconnected();
+				RestartHttpListener();
 			}
 		}
 	}
