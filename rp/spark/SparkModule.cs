@@ -144,7 +144,7 @@ namespace rp.spark
 				service.Start();
 			});
 			_windows = new SparkWindows(new WindowBuilder(), _profileRepository, _profileCache, _notes, _playerState, _globalOocInfo, _iconIndex, _sparkSettings, _profileLoader, _profileActions, _nearbyPresenceService, _rollGroups, RefreshPresenceSoon, SetNearbySharing);
-			_cornerIcon = new SparkCornerIcon(_sparkSettings, ContentsManager, _windows.OpenMyProfile, _windows.OpenProfileManager, _windows.OpenOnlineList, _windows.OpenNearby, _windows.OpenRollGroup, _windows.OpenSavedProfiles, _windows.OpenBlocklist, _windows.OpenSettings, RefreshPresenceSoon, SetNearbySharing, GetServerSyncStatus, GetImportantSettingsNotice, WatchServerSyncStatus, UnwatchServerSyncStatus);
+			_cornerIcon = new SparkCornerIcon(_sparkSettings, ContentsManager, _windows.OpenMyProfile, _windows.OpenProfileManager, _windows.OpenChatSplitter, _windows.OpenOnlineList, _windows.OpenNearby, _windows.OpenRollGroup, _windows.OpenSavedProfiles, _windows.OpenBlocklist, _windows.OpenSettings, _windows.OpenAbout, RefreshPresenceSoon, SetNearbySharing, GetServerSyncStatus, GetImportantSettingsNotice, WatchServerSyncStatus, UnwatchServerSyncStatus);
 		}
 
 		protected override Task LoadAsync()
@@ -204,7 +204,7 @@ namespace rp.spark
 		public override IView GetSettingsView()
 		{
 			EnsurePlayerStateLoad();
-			return (IView)(object)new SparkSettingsView(_windows.OpenProfileManager, _windows.OpenMyProfile, _windows.OpenOnlineList, _windows.OpenNearby, _windows.OpenSavedProfiles, _windows.OpenAbout, _windows.OpenSettings, _windows.OpenBlocklist, WaitForPlayerStateAsync, GetPlayerStateMessage, ReloadPlayerState, _sparkSettings, GetServerSyncStatus, WatchServerSyncStatus, UnwatchServerSyncStatus, RefreshPresenceSoon, GetImportantSettingsNotice, _windows.ShouldHideGameplayWindows, _profileActions.WatchBlockedAccounts, _profileActions.UnwatchBlockedAccounts, _windows.HandleMaturePreferenceChanged);
+			return (IView)(object)new SparkSettingsView(_cornerIcon.ShowMenu);
 		}
 
 		private void GlobalOocInfoChanged(string accountName)

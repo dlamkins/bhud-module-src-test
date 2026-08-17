@@ -66,6 +66,8 @@ namespace rp.spark.Services
 
 		public SettingCollection UiSettings { get; }
 
+		internal ChatSplitterSettings ChatSplitter { get; }
+
 		public SettingEntry<bool> BroadcastProfile { get; }
 
 		public SettingEntry<bool> HideLocation { get; }
@@ -107,6 +109,7 @@ namespace rp.spark.Services
 			ShowMatureProfiles = DiscoverySettings.DefineSetting<bool>("ShowMatureProfiles", false, (Func<string>)(() => "Show mature/18+ profiles"), (Func<string>)(() => "Allows profiles marked as mature/18+ to appear in online and saved profile lists."));
 			PrivacySettings = settings.AddSubCollection("privacy", true, (Func<string>)(() => "Privacy"));
 			UiSettings = settings.AddSubCollection("ui", true, (Func<string>)(() => "Interface"));
+			ChatSplitter = new ChatSplitterSettings(settings);
 			BroadcastProfile = SharingSettings.DefineSetting<bool>("BroadcastProfile", false, (Func<string>)(() => "Share my profile online"), (Func<string>)(() => "When enabled, SPARK will periodically publish your public profile to other players and show you on the online list."));
 			HideLocation = SharingSettings.DefineSetting<bool>("HideLocation", false, (Func<string>)(() => "Hide my location"), (Func<string>)(() => "When enabled, SPARK will show your location as Hidden instead of showing where you are."));
 			ShowNearbyPresence = SharingSettings.DefineSetting<bool>("ShowNearbyPresence", false, (Func<string>)(() => "Show me to nearby players"), (Func<string>)(() => "When enabled, SPARK will publish your nearby RP presence to other opted-in SPARK users."));
