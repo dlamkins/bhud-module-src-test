@@ -51,6 +51,10 @@ namespace Frtal.Wayfinder.UI
 
 		private float _fadeTexBuiltFor = -1f;
 
+		private readonly List<(CompassTarget Target, Rectangle Rect)> _hitAreas = new List<(CompassTarget, Rectangle)>();
+
+		private Point _pressLocation;
+
 		public double HalfFovRadians { get; set; } = Math.PI;
 
 
@@ -86,6 +90,10 @@ namespace Frtal.Wayfinder.UI
 
 		public Func<string, bool> IsDiscovered { get; set; }
 
+		public bool ClickToComplete { get; set; }
+
+		public Action<CompassTarget> Completed { get; set; }
+
 		public float BackgroundOpacity { get; set; } = 0.45f;
 
 
@@ -110,22 +118,49 @@ namespace Frtal.Wayfinder.UI
 
 		protected override CaptureType CapturesInput()
 		{
-			if (DragEnabled)
+			if (!DragEnabled && !ClickToComplete)
 			{
-				return (CaptureType)4;
+				return (CaptureType)0;
 			}
-			return (CaptureType)0;
+			return (CaptureType)4;
 		}
 
 		protected override void OnLeftMouseButtonPressed(MouseEventArgs e)
 		{
-			//IL_0019: Unknown result type (might be due to invalid IL or missing references)
-			//IL_001e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0009: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
 			((Control)this).OnLeftMouseButtonPressed(e);
+			_pressLocation = ((Control)this).get_Location();
 			if (DragEnabled)
 			{
 				_dragging = true;
 				_dragOffset = ((Control)this).get_RelativeMousePosition();
+			}
+		}
+
+		protected override void OnClick(MouseEventArgs e)
+		{
+			//IL_0011: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0017: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0025: Unknown result type (might be due to invalid IL or missing references)
+			//IL_002a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_004f: Unknown result type (might be due to invalid IL or missing references)
+			((Control)this).OnClick(e);
+			if (!ClickToComplete || ((Control)this).get_Location() != _pressLocation)
+			{
+				return;
+			}
+			Point mouse = ((Control)this).get_RelativeMousePosition();
+			for (int i = _hitAreas.Count - 1; i >= 0; i--)
+			{
+				(CompassTarget, Rectangle) tuple = _hitAreas[i];
+				if (((Rectangle)(ref tuple.Item2)).Contains(mouse))
+				{
+					Completed?.Invoke(_hitAreas[i].Target);
+					break;
+				}
 			}
 		}
 
@@ -229,31 +264,34 @@ namespace Frtal.Wayfinder.UI
 			//IL_027d: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0291: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0298: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02e6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02ed: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02f3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0312: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0319: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0383: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0393: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0426: Unknown result type (might be due to invalid IL or missing references)
-			//IL_043b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0440: Unknown result type (might be due to invalid IL or missing references)
-			//IL_044a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_044c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0463: Unknown result type (might be due to invalid IL or missing references)
-			//IL_046f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0476: Unknown result type (might be due to invalid IL or missing references)
-			//IL_054d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0552: Unknown result type (might be due to invalid IL or missing references)
-			//IL_055f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05ad: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05b5: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05ba: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05c4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05e8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_05f9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02f8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02fe: Unknown result type (might be due to invalid IL or missing references)
+			//IL_031d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0324: Unknown result type (might be due to invalid IL or missing references)
+			//IL_038e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_039e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0431: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0446: Unknown result type (might be due to invalid IL or missing references)
+			//IL_044b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0455: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0457: Unknown result type (might be due to invalid IL or missing references)
+			//IL_046e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_047a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0481: Unknown result type (might be due to invalid IL or missing references)
+			//IL_049b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04a5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04af: Unknown result type (might be due to invalid IL or missing references)
+			//IL_058b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0590: Unknown result type (might be due to invalid IL or missing references)
+			//IL_059d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05eb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05f3: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05f8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0602: Unknown result type (might be due to invalid IL or missing references)
+			//IL_061c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0626: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0637: Unknown result type (might be due to invalid IL or missing references)
 			int barH = _barHeight;
 			float halfWidth = (float)bounds.Width / 2f;
 			float centerX = (float)bounds.Width / 2f;
@@ -302,6 +340,7 @@ namespace Frtal.Wayfinder.UI
 			}
 			int baseIcon = Math.Max(14, barH - 14);
 			float lastCaption = float.NegativeInfinity;
+			_hitAreas.Clear();
 			Rectangle iconRect = default(Rectangle);
 			foreach (CompassTarget t in _targets)
 			{
@@ -339,6 +378,10 @@ namespace Frtal.Wayfinder.UI
 				else
 				{
 					SpriteBatchExtensions.DrawOnCtrl(spriteBatch, (Control)(object)this, pixel, new Rectangle((int)x - 2, 0, 4, barH - 10), CompassTarget.ColorFor(t.Kind) * alpha);
+				}
+				if (ClickToComplete)
+				{
+					_hitAreas.Add((t, new Rectangle(iconRect.X - 3, 0, iconRect.Width + 6, barH)));
 				}
 				string distStr = ((ShowDistance && t.ShowDistance && !double.IsNaN(distMeters)) ? $"{(int)distMeters}m" : null);
 				string caption;

@@ -79,6 +79,10 @@ namespace Frtal.Wayfinder
 
 		public SettingEntry<int> MaxPerCategory { get; }
 
+		public SettingEntry<bool> ContentGuideLite { get; }
+
+		public SettingEntry<bool> ClickToComplete { get; }
+
 		public SettingEntry<int> Smoothing { get; }
 
 		public SettingEntry<int> DiscoveryThresholdMeters { get; }
@@ -157,6 +161,8 @@ namespace Frtal.Wayfinder
 			FovDegrees = behavior.DefineSetting<int>("fov", 180, (Func<string>)(() => "Manual field of view"), (Func<string>)null);
 			MaxDistanceMeters = behavior.DefineSetting<int>("maxdist", 750, (Func<string>)(() => "Max distance"), (Func<string>)null);
 			MaxPerCategory = behavior.DefineSetting<int>("maxpercat", 50, (Func<string>)(() => "Max icons per category"), (Func<string>)null);
+			ContentGuideLite = behavior.DefineSetting<bool>("cglite", false, (Func<string>)(() => "Content guide - lite (nearest objective only)"), (Func<string>)null);
+			ClickToComplete = behavior.DefineSetting<bool>("clickdone", false, (Func<string>)(() => "Click an icon to mark it found"), (Func<string>)null);
 			Smoothing = behavior.DefineSetting<int>("smoothing", 55, (Func<string>)(() => "Motion smoothing"), (Func<string>)null);
 			DiscoveryThresholdMeters = behavior.DefineSetting<int>("discthreshold", 25, (Func<string>)(() => "Discovery radius"), (Func<string>)null);
 			OnlyUndiscovered = behavior.DefineSetting<bool>("onlyundiscovered", false, (Func<string>)(() => "Show only undiscovered (local tracking)"), (Func<string>)null);

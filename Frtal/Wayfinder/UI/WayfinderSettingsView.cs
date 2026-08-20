@@ -45,17 +45,17 @@ namespace Frtal.Wayfinder.UI
 			//IL_0081: Expected O, but got Unknown
 			//IL_0100: Unknown result type (might be due to invalid IL or missing references)
 			//IL_010c: Expected O, but got Unknown
-			//IL_022a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0236: Expected O, but got Unknown
-			//IL_038a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0396: Expected O, but got Unknown
-			//IL_041a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0426: Expected O, but got Unknown
-			//IL_0459: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0465: Expected O, but got Unknown
-			//IL_0506: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0512: Expected O, but got Unknown
-			//IL_0584: Expected O, but got Unknown
+			//IL_0262: Unknown result type (might be due to invalid IL or missing references)
+			//IL_026e: Expected O, but got Unknown
+			//IL_03c2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03ce: Expected O, but got Unknown
+			//IL_0452: Unknown result type (might be due to invalid IL or missing references)
+			//IL_045e: Expected O, but got Unknown
+			//IL_0491: Unknown result type (might be due to invalid IL or missing references)
+			//IL_049d: Expected O, but got Unknown
+			//IL_053e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_054a: Expected O, but got Unknown
+			//IL_05bc: Expected O, but got Unknown
 			FlowPanel val = new FlowPanel();
 			((Control)val).set_Parent(buildPanel);
 			Rectangle contentRegion = buildPanel.get_ContentRegion();
@@ -81,6 +81,8 @@ namespace Frtal.Wayfinder.UI
 			Check((Container)(object)p2, "Skill / Hero points", _s.ShowSkillPoints, w);
 			Slider((Container)(object)p2, "Max distance", _s.MaxDistanceMeters, 50, 10000, "m", w, "Objectives further away than this are hidden.");
 			Slider((Container)(object)p2, "Max per category", _s.MaxPerCategory, 1, 50, "", w, "Shows only the nearest N icons of each category, to keep the compass readable.");
+			Check((Container)(object)p2, "Content guide - lite", _s.ContentGuideLite, w, "Shows only the single nearest objective, so the compass points at one thing at a time.");
+			Check((Container)(object)p2, "Click an icon to mark it found", _s.ClickToComplete, w, "Lets you tick an objective off straight from the bar - handy for hearts that finish\nbefore you reach the NPC. While enabled the bar captures mouse clicks.");
 			Check((Container)(object)p2, "Show only undiscovered", _s.OnlyUndiscovered, w, "Uses local tracking: an objective counts as discovered once you have been near it.");
 			Slider((Container)(object)p2, "Discovery radius", _s.DiscoveryThresholdMeters, 5, 200, "m", w, "How close you must get for an objective to count as discovered.");
 			Button((Container)(object)p2, "Manage discovered...", w, delegate

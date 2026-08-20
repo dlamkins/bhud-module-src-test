@@ -41,6 +41,8 @@ namespace Frtal.Wayfinder
 
 		private DiscoveryWindow _discoveryWindow;
 
+		private QuickActionsPanel _quickActions;
+
 		private CompassView _view;
 
 		private RadialCompassView _radialView;
@@ -107,6 +109,18 @@ namespace Frtal.Wayfinder
 			{
 				_discoveryWindow.Toggle();
 			};
+			_quickActions = new QuickActionsPanel(_settings)
+			{
+				GetEnabled = () => _enabled,
+				SetEnabled = delegate(bool v)
+				{
+					_enabled = v;
+				},
+				OpenDiscovery = delegate
+				{
+					_discoveryWindow.Toggle();
+				}
+			};
 			_view.PositionChanged = delegate(Point p)
 			{
 				//IL_000b: Unknown result type (might be due to invalid IL or missing references)
@@ -135,7 +149,7 @@ namespace Frtal.Wayfinder
 				wayfinderModule._cornerIcon = val;
 				((Control)_cornerIcon).add_Click((EventHandler<MouseEventArgs>)delegate
 				{
-					_enabled = !_enabled;
+					_quickActions.ToggleAt(((Control)_cornerIcon).get_Left(), ((Control)_cornerIcon).get_Bottom() + 6);
 				});
 			}
 			catch (Exception ex)
@@ -185,12 +199,12 @@ namespace Frtal.Wayfinder
 			//IL_011e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01ad: Unknown result type (might be due to invalid IL or missing references)
 			//IL_01f3: Unknown result type (might be due to invalid IL or missing references)
-			//IL_049d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_049f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04c7: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04cd: Unknown result type (might be due to invalid IL or missing references)
-			//IL_063e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0640: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04cf: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04f9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04ff: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0670: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0672: Unknown result type (might be due to invalid IL or missing references)
 			Gw2MumbleService mumble = GameService.Gw2Mumble;
 			if (_view == null)
 			{
@@ -265,6 +279,12 @@ namespace Frtal.Wayfinder
 			_view.Monochrome = mono;
 			_view.MarkUndiscovered = _settings.GreyUndiscovered.get_Value();
 			_view.IsDiscovered = (string id) => _discovery.IsSeen(id);
+			_view.ClickToComplete = _settings.ClickToComplete.get_Value();
+			_view.Completed = delegate(CompassTarget t)
+			{
+				_discovery.SetSeen(t.Id, seen: true);
+				_sinceRebuild = double.MaxValue;
+			};
 			_view.EdgeFade = (float)_settings.EdgeFadePercent.get_Value() / 100f;
 			_view.BackgroundOpacity = bgOpacity;
 			_view.DragEnabled = _settings.DragMode.get_Value() && !radial;
@@ -425,20 +445,22 @@ namespace Frtal.Wayfinder
 		{
 			//IL_0007: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0008: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0194: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019b: Unknown result type (might be due to invalid IL or missing references)
 			List<CompassTarget> list = new List<CompassTarget>();
 			bool onlyUndiscovered = _settings.OnlyUndiscovered.get_Value();
 			int maxPerCategory = _settings.MaxPerCategory.get_Value();
 			Dictionary<TargetKind, List<CompassTarget>> byKind = new Dictionary<TargetKind, List<CompassTarget>>();
-			foreach (CompassTarget t in _objectives.Targets)
+			foreach (CompassTarget t2 in _objectives.Targets)
 			{
-				if (KindEnabled(t.Kind) && (!onlyUndiscovered || !_discovery.IsSeen(t.Id)))
+				if (KindEnabled(t2.Kind) && (!onlyUndiscovered || !_discovery.IsSeen(t2.Id)))
 				{
-					if (!byKind.TryGetValue(t.Kind, out var kindList))
+					if (!byKind.TryGetValue(t2.Kind, out var kindList))
 					{
 						kindList = new List<CompassTarget>();
-						byKind[t.Kind] = kindList;
+						byKind[t2.Kind] = kindList;
 					}
-					kindList.Add(t);
+					kindList.Add(t2);
 				}
 			}
 			foreach (KeyValuePair<TargetKind, List<CompassTarget>> kv in byKind)
@@ -449,6 +471,21 @@ namespace Frtal.Wayfinder
 				{
 					list.Add(kv.Value[i]);
 				}
+			}
+			if (_settings.ContentGuideLite.get_Value() && list.Count > 1)
+			{
+				CompassTarget nearest = null;
+				float best = float.MaxValue;
+				foreach (CompassTarget t in list)
+				{
+					float d = Vector2.DistanceSquared(playerCont, t.ContinentPosition);
+					if (d < best)
+					{
+						best = d;
+						nearest = t;
+					}
+				}
+				list = new List<CompassTarget> { nearest };
 			}
 			return list;
 		}
@@ -539,6 +576,11 @@ namespace Frtal.Wayfinder
 			if (discoveryWindow != null)
 			{
 				((Control)discoveryWindow).Dispose();
+			}
+			QuickActionsPanel quickActions = _quickActions;
+			if (quickActions != null)
+			{
+				((Control)quickActions).Dispose();
 			}
 			CornerIcon cornerIcon = _cornerIcon;
 			if (cornerIcon != null)
