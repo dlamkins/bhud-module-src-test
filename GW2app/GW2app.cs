@@ -135,6 +135,8 @@ namespace GW2app
 
 		private const int ProtocolVersion = 2;
 
+		private const string ModuleId = "blish";
+
 		private const int HandshakeTimeoutMs = 5000;
 
 		private const int CloseCodeSuperseded = 4000;
@@ -222,6 +224,8 @@ namespace GW2app
 		private bool _unloading;
 
 		private SettingEntry<string> _persistedOpenListsJson;
+
+		private SettingEntry<string> _persistedCollapsedCompletedJson;
 
 		private SettingEntry<int> _maxWaypointsPerCopy;
 
@@ -429,6 +433,7 @@ namespace GW2app
 			_toggleListsKeybind = controls.DefineSetting<KeyBinding>("toggleListsVisibility", new KeyBinding((Keys)0), (Func<string>)(() => "Show/hide all lists"), (Func<string>)(() => "Hides or restores every open list window. Purely visual: hidden lists stay connected and reappear instantly."));
 			SettingCollection internalSettings = settings.AddSubCollection("internal", false);
 			_persistedOpenListsJson = internalSettings.DefineSetting<string>("openLists", "[]", (Func<string>)null, (Func<string>)null);
+			_persistedCollapsedCompletedJson = internalSettings.DefineSetting<string>("collapsedCompleted", "[]", (Func<string>)null, (Func<string>)null);
 			_maxWaypointsPerCopy = internalSettings.DefineSetting<int>("maxWaypointsPerCopy", 15, (Func<string>)null, (Func<string>)null);
 		}
 
@@ -448,6 +453,7 @@ namespace GW2app
 			_iconTexture = ContentsManager.GetTexture("gw2app-icon.png");
 			CreateCornerIcon();
 			RebuildContextMenu();
+			RestoreCollapsedCompleted();
 			if (_toggleListsKeybind?.get_Value() != null)
 			{
 				_toggleListsKeybind.get_Value().set_Enabled(true);
@@ -1862,6 +1868,7 @@ namespace GW2app
 						{
 							_completedSectionCollapsed.Remove(capturedListId);
 						}
+						WriteCollapsedCompleted();
 						RefreshListWindow(capturedListId);
 					});
 					y += btnHeight + 6;
@@ -2791,6 +2798,44 @@ namespace GW2app
 			}
 		}
 
+		private void RestoreCollapsedCompleted()
+		{
+			if (_persistedCollapsedCompletedJson == null)
+			{
+				return;
+			}
+			string raw = _persistedCollapsedCompletedJson.get_Value() ?? "[]";
+			try
+			{
+				foreach (string id in (JsonConvert.DeserializeObject<List<string>>(raw) ?? new List<string>())!)
+				{
+					if (!string.IsNullOrEmpty(id))
+					{
+						_completedSectionCollapsed.Add(id);
+					}
+				}
+			}
+			catch (Exception e)
+			{
+				Logger.Warn(e, "Restore: failed to parse collapsed sections (" + raw + ").");
+			}
+		}
+
+		private void WriteCollapsedCompleted()
+		{
+			if (_persistedCollapsedCompletedJson != null)
+			{
+				try
+				{
+					_persistedCollapsedCompletedJson.set_Value(JsonConvert.SerializeObject(_completedSectionCollapsed.ToList()));
+				}
+				catch (Exception e)
+				{
+					Logger.Warn(e, "Failed to persist collapsed sections.");
+				}
+			}
+		}
+
 		private async void CopyChatLinkToClipboard(string chatLink)
 		{
 			if (string.IsNullOrEmpty(chatLink))
@@ -3530,7 +3575,8 @@ namespace GW2app
 			SubscribeMessage payload = new SubscribeMessage
 			{
 				Type = "subscribe",
-				ListIds = (listIds ?? new List<string>())
+				ListIds = (listIds ?? new List<string>()),
+				Module = "blish"
 			};
 			if (await SendToClientAsync(JsonConvert.SerializeObject(payload)))
 			{
@@ -3829,6 +3875,7 @@ namespace GW2app
 				["close"] = (JToken?)(((object)close) ?? ((object)JValue.CreateNull()))
 			};
 			root["serverProtocol"] = (JToken)2;
+			root["module"] = (JToken)"blish";
 			if (resync)
 			{
 				root["resync"] = (JToken)true;

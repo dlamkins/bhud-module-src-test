@@ -10,5 +10,8 @@ namespace GW2app
 
 		[JsonProperty("listIds")]
 		public List<string> ListIds;
+
+		[JsonProperty("module")]
+		public string Module;
 	}
 }
