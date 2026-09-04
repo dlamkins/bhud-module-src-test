@@ -67,9 +67,27 @@ namespace Oberyn.AnglerAssociate.Services
 			{
 				return false;
 			}
-			if (_completedBits.TryGetValue(fish.CollectionId.Value, out var bits))
+			return IsBitCaught(fish.CollectionId.Value, fish.BitIndex.Value);
+		}
+
+		public bool IsFishCaughtForAvid(Fish fish)
+		{
+			if (!fish.AvidCollectionId.HasValue || !fish.BitIndex.HasValue)
 			{
-				return bits.Contains(fish.BitIndex.Value);
+				return false;
+			}
+			return IsBitCaught(fish.AvidCollectionId.Value, fish.BitIndex.Value);
+		}
+
+		private bool IsBitCaught(int collectionId, int bitIndex)
+		{
+			if (_achievementDone.TryGetValue(collectionId, out var done) && done)
+			{
+				return true;
+			}
+			if (_completedBits.TryGetValue(collectionId, out var bits))
+			{
+				return bits.Contains(bitIndex);
 			}
 			return false;
 		}

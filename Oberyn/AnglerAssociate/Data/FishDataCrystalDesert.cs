@@ -3,7 +3,7 @@ using Oberyn.AnglerAssociate.Models;
 
 namespace Oberyn.AnglerAssociate.Data
 {
-	public static class CrystalDesertFishData
+	public static class FishDataCrystalDesert
 	{
 		public static readonly List<Fish> All = new List<Fish>
 		{
@@ -15,9 +15,16 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.CrystalDesert,
 				Location = Location.CrystalDesert,
 				Hole1 = FishingHole.OpenWater,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.FracturedFreshwaterFish,
+						Power = 500
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "500",
 				Collection = "Desert Fisher",
 				CollectionId = 6317,
 				AvidCollection = "Avid Desert Fisher",
@@ -33,9 +40,16 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.CrystalDesert,
 				Location = Location.CrystalDesert,
 				Hole1 = FishingHole.OpenWater,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.FracturedFreshwaterFish,
+						Power = 500
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "500",
 				Collection = "Desert Fisher",
 				CollectionId = 6317,
 				AvidCollection = "Avid Desert Fisher",
@@ -51,9 +65,16 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.CrystalDesert,
 				Location = Location.CrystalDesert,
 				Hole1 = FishingHole.OpenWater,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.FracturedFreshwaterFish,
+						Power = 500
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "500",
 				Collection = "Desert Fisher",
 				CollectionId = 6317,
 				AvidCollection = "Avid Desert Fisher",
@@ -70,9 +91,21 @@ namespace Oberyn.AnglerAssociate.Data
 				Location = Location.CrystalDesert,
 				Hole1 = FishingHole.DesertFish,
 				Hole2 = FishingHole.OpenWater,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.DesertFish,
+						Power = 550
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.FracturedDesertFish,
+						Power = 550
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "550, 500",
 				Collection = "Desert Fisher",
 				CollectionId = 6317,
 				AvidCollection = "Avid Desert Fisher",
@@ -89,9 +122,21 @@ namespace Oberyn.AnglerAssociate.Data
 				Location = Location.CrystalDesert,
 				Hole1 = FishingHole.DesertFish,
 				Hole2 = FishingHole.OpenWater,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.DesertFish,
+						Power = 550
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.FracturedDesertFish,
+						Power = 550
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "550, 500",
 				Collection = "Desert Fisher",
 				CollectionId = 6317,
 				AvidCollection = "Avid Desert Fisher",
@@ -108,9 +153,21 @@ namespace Oberyn.AnglerAssociate.Data
 				Location = Location.CrystalDesert,
 				Hole1 = FishingHole.DesertFish,
 				Hole2 = FishingHole.OpenWater,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.DesertFish,
+						Power = 550
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.FracturedDesertFish,
+						Power = 550
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "550, 500",
 				Collection = "Desert Fisher",
 				CollectionId = 6317,
 				AvidCollection = "Avid Desert Fisher",
@@ -126,9 +183,21 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.CrystalDesert,
 				Location = Location.CrystalDesert,
 				Hole1 = FishingHole.DesertFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.DesertFish,
+						Power = 550
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.FracturedDesertFish,
+						Power = 550
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "550",
 				Collection = "Desert Fisher",
 				CollectionId = 6317,
 				AvidCollection = "Avid Desert Fisher",
@@ -144,9 +213,16 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.CrystalDesert,
 				Location = Location.CrystalDesert,
 				Hole1 = FishingHole.DesertFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.DesertFish,
+						Power = 550
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Day,
-				FishingPower = "550",
 				Collection = "Desert Fisher",
 				CollectionId = 6317,
 				AvidCollection = "Avid Desert Fisher",
@@ -162,9 +238,21 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.CrystalDesert,
 				Location = Location.CrystalDesert,
 				Hole1 = FishingHole.DesertFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.DesertFish,
+						Power = 550
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.FracturedDesertFish,
+						Power = 550
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "550",
 				Collection = "Desert Fisher",
 				CollectionId = 6317,
 				AvidCollection = "Avid Desert Fisher",
@@ -180,9 +268,21 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.CrystalDesert,
 				Location = Location.CrystalDesert,
 				Hole1 = FishingHole.DesertFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.DesertFish,
+						Power = 550
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.FracturedDesertFish,
+						Power = 550
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "550",
 				Collection = "Desert Fisher",
 				CollectionId = 6317,
 				AvidCollection = "Avid Desert Fisher",
@@ -198,9 +298,21 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.CrystalDesert,
 				Location = Location.CrystalDesert,
 				Hole1 = FishingHole.DesertFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.DesertFish,
+						Power = 550
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.FracturedDesertFish,
+						Power = 550
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "550",
 				Collection = "Desert Fisher",
 				CollectionId = 6317,
 				AvidCollection = "Avid Desert Fisher",
@@ -216,9 +328,21 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.CrystalDesert,
 				Location = Location.CrystalDesert,
 				Hole1 = FishingHole.DesertFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.DesertFish,
+						Power = 550
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.FracturedDesertFish,
+						Power = 550
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "550",
 				Collection = "Desert Fisher",
 				CollectionId = 6317,
 				AvidCollection = "Avid Desert Fisher",
@@ -234,9 +358,21 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.CrystalDesert,
 				Location = Location.CrystalDesert,
 				Hole1 = FishingHole.DesertFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.DesertFish,
+						Power = 550
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.FracturedDesertFish,
+						Power = 550
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Day,
-				FishingPower = "550",
 				Collection = "Desert Fisher",
 				CollectionId = 6317,
 				AvidCollection = "Avid Desert Fisher",
@@ -252,9 +388,21 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.CrystalDesert,
 				Location = Location.CrystalDesert,
 				Hole1 = FishingHole.DesertFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.DesertFish,
+						Power = 550
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.FracturedDesertFish,
+						Power = 550
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Day,
-				FishingPower = "550",
 				Collection = "Desert Fisher",
 				CollectionId = 6317,
 				AvidCollection = "Avid Desert Fisher",
@@ -270,9 +418,16 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.CrystalDesert,
 				Location = Location.CrystalDesert,
 				Hole1 = FishingHole.DesertFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.DesertFish,
+						Power = 550
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Night,
-				FishingPower = "550",
 				Collection = "Desert Fisher",
 				CollectionId = 6317,
 				AvidCollection = "Avid Desert Fisher",
@@ -288,9 +443,16 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.CrystalDesert,
 				Location = Location.CrystalDesert,
 				Hole1 = FishingHole.DesertFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.DesertFish,
+						Power = 550
+					}
+				},
 				Bait = Bait.Scorpion,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "550",
 				Collection = "Desert Fisher",
 				CollectionId = 6317,
 				AvidCollection = "Avid Desert Fisher",
@@ -306,9 +468,16 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.CrystalDesert,
 				Location = Location.CrystalDesert,
 				Hole1 = FishingHole.DesertFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.DesertFish,
+						Power = 550
+					}
+				},
 				Bait = Bait.Scorpion,
 				TimeOfDay = TimeOfDay.Night,
-				FishingPower = "550",
 				Collection = "Desert Fisher",
 				CollectionId = 6317,
 				AvidCollection = "Avid Desert Fisher",
@@ -324,9 +493,16 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.CrystalDesert,
 				Location = Location.CrystalDesert,
 				Hole1 = FishingHole.DesertFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.DesertFish,
+						Power = 550
+					}
+				},
 				Bait = Bait.Mackerel,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "550",
 				Collection = "Desert Fisher",
 				CollectionId = 6317,
 				AvidCollection = "Avid Desert Fisher",
@@ -342,9 +518,21 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.CrystalDesert,
 				Location = Location.CrystalDesert,
 				Hole1 = FishingHole.DesertFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.DesertFish,
+						Power = 550
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.FracturedDesertFish,
+						Power = 550
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Day,
-				FishingPower = "550",
 				Collection = "Desert Fisher",
 				CollectionId = 6317,
 				AvidCollection = "Avid Desert Fisher",
@@ -360,9 +548,21 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.CrystalDesert,
 				Location = Location.CrystalDesert,
 				Hole1 = FishingHole.DesertFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.DesertFish,
+						Power = 550
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.FracturedDesertFish,
+						Power = 550
+					}
+				},
 				Bait = Bait.Mackerel,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "550",
 				Collection = "Desert Fisher",
 				CollectionId = 6317,
 				AvidCollection = "Avid Desert Fisher",
@@ -378,9 +578,16 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.CrystalDesert,
 				Location = Location.CrystalDesert,
 				Hole1 = FishingHole.DesertFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.DesertFish,
+						Power = 550
+					}
+				},
 				Bait = Bait.Scorpion,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "550",
 				Collection = "Desert Fisher",
 				CollectionId = 6317,
 				AvidCollection = "Avid Desert Fisher",
@@ -398,7 +605,6 @@ namespace Oberyn.AnglerAssociate.Data
 				Hole1 = FishingHole.OpenWater,
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "550",
 				Collection = "Desert Isles Fisher",
 				CollectionId = 6106,
 				AvidCollection = "Avid Desert Isles Fisher",
@@ -416,7 +622,6 @@ namespace Oberyn.AnglerAssociate.Data
 				Hole1 = FishingHole.OpenWater,
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "550",
 				Collection = "Desert Isles Fisher",
 				CollectionId = 6106,
 				AvidCollection = "Avid Desert Isles Fisher",
@@ -433,9 +638,16 @@ namespace Oberyn.AnglerAssociate.Data
 				Location = Location.DesertIsles,
 				Hole1 = FishingHole.Any,
 				Hole2 = FishingHole.OpenWater,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.ShoreFish,
+						Power = 150
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "550",
 				Collection = "Desert Isles Fisher",
 				CollectionId = 6106,
 				AvidCollection = "Avid Desert Isles Fisher",
@@ -452,9 +664,21 @@ namespace Oberyn.AnglerAssociate.Data
 				Location = Location.DesertIsles,
 				Hole1 = FishingHole.Any,
 				Hole2 = FishingHole.OpenWater,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.OffshoreFish,
+						Power = 200
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.ShoreFish,
+						Power = 150
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "550",
 				Collection = "Desert Isles Fisher",
 				CollectionId = 6106,
 				AvidCollection = "Avid Desert Isles Fisher",
@@ -470,9 +694,16 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.CrystalDesert,
 				Location = Location.DesertIsles,
 				Hole1 = FishingHole.ShoreFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.ShoreFish,
+						Power = 150
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "600",
 				Collection = "Desert Isles Fisher",
 				CollectionId = 6106,
 				AvidCollection = "Avid Desert Isles Fisher",
@@ -488,9 +719,16 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.CrystalDesert,
 				Location = Location.DesertIsles,
 				Hole1 = FishingHole.OffshoreFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.OffshoreFish,
+						Power = 200
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "650",
 				Collection = "Desert Isles Fisher",
 				CollectionId = 6106,
 				AvidCollection = "Avid Desert Isles Fisher",
@@ -506,9 +744,16 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.CrystalDesert,
 				Location = Location.DesertIsles,
 				Hole1 = FishingHole.ShoreFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.ShoreFish,
+						Power = 150
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Day,
-				FishingPower = "600",
 				Collection = "Desert Isles Fisher",
 				CollectionId = 6106,
 				AvidCollection = "Avid Desert Isles Fisher",
@@ -524,9 +769,16 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.CrystalDesert,
 				Location = Location.DesertIsles,
 				Hole1 = FishingHole.OffshoreFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.OffshoreFish,
+						Power = 200
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "650",
 				Collection = "Desert Isles Fisher",
 				CollectionId = 6106,
 				AvidCollection = "Avid Desert Isles Fisher",
@@ -542,9 +794,16 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.CrystalDesert,
 				Location = Location.DesertIsles,
 				Hole1 = FishingHole.ShoreFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.ShoreFish,
+						Power = 150
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "600",
 				Collection = "Desert Isles Fisher",
 				CollectionId = 6106,
 				AvidCollection = "Avid Desert Isles Fisher",
@@ -560,10 +819,17 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.CrystalDesert,
 				Location = Location.DesertIsles,
 				Hole1 = FishingHole.OffshoreFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.OffshoreFish,
+						Power = 200
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Dusk,
 				TimeOfDay2 = TimeOfDay.Dawn,
-				FishingPower = "650",
 				Collection = "Desert Isles Fisher",
 				CollectionId = 6106,
 				AvidCollection = "Avid Desert Isles Fisher",
@@ -579,9 +845,16 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.CrystalDesert,
 				Location = Location.DesertIsles,
 				Hole1 = FishingHole.ShoreFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.ShoreFish,
+						Power = 150
+					}
+				},
 				Bait = Bait.Mackerel,
 				TimeOfDay = TimeOfDay.Night,
-				FishingPower = "600",
 				Collection = "Desert Isles Fisher",
 				CollectionId = 6106,
 				AvidCollection = "Avid Desert Isles Fisher",
@@ -597,9 +870,16 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.CrystalDesert,
 				Location = Location.DesertIsles,
 				Hole1 = FishingHole.OffshoreFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.OffshoreFish,
+						Power = 200
+					}
+				},
 				Bait = Bait.Mackerel,
 				TimeOfDay = TimeOfDay.Day,
-				FishingPower = "650",
 				Collection = "Desert Isles Fisher",
 				CollectionId = 6106,
 				AvidCollection = "Avid Desert Isles Fisher",
@@ -615,9 +895,16 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.CrystalDesert,
 				Location = Location.DesertIsles,
 				Hole1 = FishingHole.ShoreFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.ShoreFish,
+						Power = 150
+					}
+				},
 				Bait = Bait.FishEgg,
 				TimeOfDay = TimeOfDay.Day,
-				FishingPower = "600",
 				Collection = "Desert Isles Fisher",
 				CollectionId = 6106,
 				AvidCollection = "Avid Desert Isles Fisher",
@@ -633,9 +920,16 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.CrystalDesert,
 				Location = Location.DesertIsles,
 				Hole1 = FishingHole.OffshoreFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.OffshoreFish,
+						Power = 200
+					}
+				},
 				Bait = Bait.FishEgg,
 				TimeOfDay = TimeOfDay.Night,
-				FishingPower = "650",
 				Collection = "Desert Isles Fisher",
 				CollectionId = 6106,
 				AvidCollection = "Avid Desert Isles Fisher",

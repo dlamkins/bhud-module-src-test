@@ -8,10 +8,12 @@ namespace Oberyn.AnglerAssociate.Services
 {
 	public static class FishCatalog
 	{
-		public static IEnumerable<Fish> All => TyriaFishData.All.Concat(CanthaFishData.All).Concat(CastoraFishData.All).Concat(CrystalDesertFishData.All)
-			.Concat(GlobalFishData.All)
-			.Concat(HornOfMaguumaFishData.All)
-			.Concat(JanthirFishData.All);
+		public static IEnumerable<Fish> All => FishDataTyria.All.Concat(FishDataOrr.All).Concat(FishDataMaguumaJungle.All).Concat(FishDataCantha.All)
+			.Concat(FishDataCastora.All)
+			.Concat(FishDataCrystalDesert.All)
+			.Concat(FishDataGlobal.All)
+			.Concat(FishDataHornOfMaguuma.All)
+			.Concat(FishDataJanthir.All);
 
 		[IteratorStateMachine(typeof(_003CGetCatchableNow_003Ed__2))]
 		public static IEnumerable<Fish> GetCatchableNow()

@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Oberyn.AnglerAssociate.Models
 {
 	public class Fish
@@ -20,6 +22,9 @@ namespace Oberyn.AnglerAssociate.Models
 
 		public FishingHole? Hole4 { get; set; }
 
+		public List<FishHoleEntry> AllHoles { get; set; } = new List<FishHoleEntry>();
+
+
 		public Bait Bait { get; set; }
 
 		public TimeOfDay TimeOfDay { get; set; }
@@ -27,8 +32,6 @@ namespace Oberyn.AnglerAssociate.Models
 		public TimeOfDay? TimeOfDay2 { get; set; }
 
 		public TimeOfDay? HigherChance { get; set; }
-
-		public string FishingPower { get; set; }
 
 		public string Collection { get; set; }
 

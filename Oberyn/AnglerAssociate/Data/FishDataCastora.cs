@@ -3,7 +3,7 @@ using Oberyn.AnglerAssociate.Models;
 
 namespace Oberyn.AnglerAssociate.Data
 {
-	public static class CastoraFishData
+	public static class FishDataCastora
 	{
 		public static readonly List<Fish> All = new List<Fish>
 		{
@@ -15,6 +15,19 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Castora,
 				Location = Location.Castora,
 				Hole1 = FishingHole.Any,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.SaltwaterTropicalFish,
+						Power = 650
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.FreshwaterTropicalFish,
+						Power = 650
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
 				Collection = "Castora Fisher",
@@ -32,6 +45,19 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Castora,
 				Location = Location.Castora,
 				Hole1 = FishingHole.Any,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.SaltwaterTropicalFish,
+						Power = 650
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.FreshwaterTropicalFish,
+						Power = 650
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
 				Collection = "Castora Fisher",
@@ -49,6 +75,14 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Castora,
 				Location = Location.Castora,
 				Hole1 = FishingHole.SaltwaterFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.SaltwaterTropicalFish,
+						Power = 650
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
 				Collection = "Castora Fisher",
@@ -66,6 +100,14 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Castora,
 				Location = Location.Castora,
 				Hole1 = FishingHole.SaltwaterFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.SaltwaterTropicalFish,
+						Power = 650
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
 				Collection = "Castora Fisher",
@@ -83,6 +125,19 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Castora,
 				Location = Location.Castora,
 				Hole1 = FishingHole.Any,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.SaltwaterTropicalFish,
+						Power = 650
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.FreshwaterTropicalFish,
+						Power = 650
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
 				Collection = "Castora Fisher",
@@ -100,6 +155,19 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Castora,
 				Location = Location.Castora,
 				Hole1 = FishingHole.Any,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.SaltwaterTropicalFish,
+						Power = 650
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.FreshwaterTropicalFish,
+						Power = 650
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
 				Collection = "Castora Fisher",
@@ -117,6 +185,14 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Castora,
 				Location = Location.Castora,
 				Hole1 = FishingHole.SaltwaterFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.SaltwaterTropicalFish,
+						Power = 650
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
 				HigherChance = TimeOfDay.Night,
@@ -135,6 +211,14 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Castora,
 				Location = Location.Castora,
 				Hole1 = FishingHole.SaltwaterFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.SaltwaterTropicalFish,
+						Power = 650
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
 				HigherChance = TimeOfDay.Day,
@@ -153,6 +237,14 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Castora,
 				Location = Location.Castora,
 				Hole1 = FishingHole.SaltwaterFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.SaltwaterTropicalFish,
+						Power = 650
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
 				Collection = "Castora Fisher",
@@ -170,6 +262,19 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Castora,
 				Location = Location.Castora,
 				Hole1 = FishingHole.Any,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.SaltwaterTropicalFish,
+						Power = 650
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.FreshwaterTropicalFish,
+						Power = 650
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Day,
 				Collection = "Castora Fisher",
@@ -187,6 +292,19 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Castora,
 				Location = Location.Castora,
 				Hole1 = FishingHole.Any,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.SaltwaterTropicalFish,
+						Power = 650
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.FreshwaterTropicalFish,
+						Power = 650
+					}
+				},
 				Bait = Bait.Shrimpling,
 				TimeOfDay = TimeOfDay.Night,
 				Collection = "Castora Fisher",
@@ -204,6 +322,14 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Castora,
 				Location = Location.Castora,
 				Hole1 = FishingHole.Any,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.FreshwaterTropicalFish,
+						Power = 650
+					}
+				},
 				Bait = Bait.SparkflyLarva,
 				TimeOfDay = TimeOfDay.Any,
 				Collection = "Castora Fisher",
@@ -221,6 +347,14 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Castora,
 				Location = Location.Castora,
 				Hole1 = FishingHole.Any,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.SaltwaterTropicalFish,
+						Power = 650
+					}
+				},
 				Bait = Bait.Nightcrawler,
 				TimeOfDay = TimeOfDay.Any,
 				HigherChance = TimeOfDay.Day,
@@ -239,6 +373,14 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Castora,
 				Location = Location.Castora,
 				Hole1 = FishingHole.Any,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.FreshwaterTropicalFish,
+						Power = 650
+					}
+				},
 				Bait = Bait.Nightcrawler,
 				TimeOfDay = TimeOfDay.Any,
 				Collection = "Castora Fisher",

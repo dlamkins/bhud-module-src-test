@@ -3,7 +3,7 @@ using Oberyn.AnglerAssociate.Models;
 
 namespace Oberyn.AnglerAssociate.Data
 {
-	public static class CanthaFishData
+	public static class FishDataCantha
 	{
 		public static readonly List<Fish> All = new List<Fish>
 		{
@@ -17,7 +17,6 @@ namespace Oberyn.AnglerAssociate.Data
 				Hole1 = FishingHole.OpenWater,
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "50",
 				Collection = "Seitung Province Fisher",
 				CollectionId = 6336,
 				AvidCollection = "Avid Seitung Province Fisher",
@@ -35,7 +34,6 @@ namespace Oberyn.AnglerAssociate.Data
 				Hole1 = FishingHole.OpenWater,
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "50",
 				Collection = "Seitung Province Fisher",
 				CollectionId = 6336,
 				AvidCollection = "Avid Seitung Province Fisher",
@@ -53,7 +51,6 @@ namespace Oberyn.AnglerAssociate.Data
 				Hole1 = FishingHole.OpenWater,
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "50",
 				Collection = "Seitung Province Fisher",
 				CollectionId = 6336,
 				AvidCollection = "Avid Seitung Province Fisher",
@@ -70,9 +67,36 @@ namespace Oberyn.AnglerAssociate.Data
 				Location = Location.SeitungProvince,
 				Hole1 = FishingHole.Any,
 				Hole2 = FishingHole.OpenWater,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.LowlandOffshoreFish,
+						Power = 600
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.MysteriousWatersFish,
+						Power = 300
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.OffshoreFish,
+						Power = 200
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.OffshoreSaltwaterJanthirFish,
+						Power = 650
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.ShoreFish,
+						Power = 150
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "50",
 				Collection = "Seitung Province Fisher",
 				CollectionId = 6336,
 				AvidCollection = "Avid Seitung Province Fisher",
@@ -89,9 +113,26 @@ namespace Oberyn.AnglerAssociate.Data
 				Location = Location.SeitungProvince,
 				Hole1 = FishingHole.Any,
 				Hole2 = FishingHole.OpenWater,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.MysteriousWatersFish,
+						Power = 300
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.OffshoreFish,
+						Power = 200
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.ShoreFish,
+						Power = 150
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "50",
 				Collection = "Seitung Province Fisher",
 				CollectionId = 6336,
 				AvidCollection = "Avid Seitung Province Fisher",
@@ -108,9 +149,26 @@ namespace Oberyn.AnglerAssociate.Data
 				Location = Location.SeitungProvince,
 				Hole1 = FishingHole.Any,
 				Hole2 = FishingHole.OpenWater,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.MysteriousWatersFish,
+						Power = 300
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.OffshoreFish,
+						Power = 200
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.ShoreFish,
+						Power = 150
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "50",
 				Collection = "Seitung Province Fisher",
 				CollectionId = 6336,
 				AvidCollection = "Avid Seitung Province Fisher",
@@ -126,9 +184,51 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Cantha,
 				Location = Location.SeitungProvince,
 				Hole1 = FishingHole.ShoreFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.BarrensFreshwaterFish,
+						Power = 550
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.BloodstoneInfusedPondFish,
+						Power = 550
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.BrackishJanthirFish,
+						Power = 650
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.FreshwaterJanthirFish,
+						Power = 600
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.LowlandBrackishFish,
+						Power = 550
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.LowlandFreshwaterFish,
+						Power = 550
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.MysteriousWatersFish,
+						Power = 300
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.ShoreFish,
+						Power = 150
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "150",
 				Collection = "Seitung Province Fisher",
 				CollectionId = 6336,
 				AvidCollection = "Avid Seitung Province Fisher",
@@ -144,9 +244,21 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Cantha,
 				Location = Location.SeitungProvince,
 				Hole1 = FishingHole.OffshoreFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.MysteriousWatersFish,
+						Power = 300
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.OffshoreFish,
+						Power = 200
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "200",
 				Collection = "Seitung Province Fisher",
 				CollectionId = 6336,
 				AvidCollection = "Avid Seitung Province Fisher",
@@ -162,9 +274,21 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Cantha,
 				Location = Location.SeitungProvince,
 				Hole1 = FishingHole.OffshoreFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.MysteriousWatersFish,
+						Power = 300
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.OffshoreFish,
+						Power = 200
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "200",
 				Collection = "Seitung Province Fisher",
 				CollectionId = 6336,
 				AvidCollection = "Avid Seitung Province Fisher",
@@ -181,9 +305,21 @@ namespace Oberyn.AnglerAssociate.Data
 				Location = Location.SeitungProvince,
 				Hole1 = FishingHole.ShoreFish,
 				Hole2 = FishingHole.RareFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.MysteriousWatersFish,
+						Power = 300
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.ShoreFish,
+						Power = 150
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "150",
 				Collection = "Seitung Province Fisher",
 				CollectionId = 6336,
 				AvidCollection = "Avid Seitung Province Fisher",
@@ -199,9 +335,21 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Cantha,
 				Location = Location.SeitungProvince,
 				Hole1 = FishingHole.OffshoreFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.MysteriousWatersFish,
+						Power = 300
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.OffshoreFish,
+						Power = 200
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "200",
 				Collection = "Seitung Province Fisher",
 				CollectionId = 6336,
 				AvidCollection = "Avid Seitung Province Fisher",
@@ -217,9 +365,21 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Cantha,
 				Location = Location.SeitungProvince,
 				Hole1 = FishingHole.OffshoreFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.MysteriousWatersFish,
+						Power = 300
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.OffshoreFish,
+						Power = 200
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "200",
 				Collection = "Seitung Province Fisher",
 				CollectionId = 6336,
 				AvidCollection = "Avid Seitung Province Fisher",
@@ -235,9 +395,16 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Cantha,
 				Location = Location.SeitungProvince,
 				Hole1 = FishingHole.ShoreFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.ShoreFish,
+						Power = 150
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Night,
-				FishingPower = "150",
 				Collection = "Seitung Province Fisher",
 				CollectionId = 6336,
 				AvidCollection = "Avid Seitung Province Fisher",
@@ -253,9 +420,21 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Cantha,
 				Location = Location.SeitungProvince,
 				Hole1 = FishingHole.OffshoreFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.MysteriousWatersFish,
+						Power = 300
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.OffshoreFish,
+						Power = 200
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Day,
-				FishingPower = "200",
 				Collection = "Seitung Province Fisher",
 				CollectionId = 6336,
 				AvidCollection = "Avid Seitung Province Fisher",
@@ -271,9 +450,21 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Cantha,
 				Location = Location.SeitungProvince,
 				Hole1 = FishingHole.OffshoreFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.MysteriousWatersFish,
+						Power = 300
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.OffshoreFish,
+						Power = 200
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "200",
 				Collection = "Seitung Province Fisher",
 				CollectionId = 6336,
 				AvidCollection = "Avid Seitung Province Fisher",
@@ -289,9 +480,21 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Cantha,
 				Location = Location.SeitungProvince,
 				Hole1 = FishingHole.ShoreFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.SaltwaterTropicalFish,
+						Power = 650
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.ShoreFish,
+						Power = 150
+					}
+				},
 				Bait = Bait.Shrimpling,
 				TimeOfDay = TimeOfDay.Day,
-				FishingPower = "150",
 				Collection = "Seitung Province Fisher",
 				CollectionId = 6336,
 				AvidCollection = "Avid Seitung Province Fisher",
@@ -307,9 +510,16 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Cantha,
 				Location = Location.SeitungProvince,
 				Hole1 = FishingHole.OffshoreFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.OffshoreFish,
+						Power = 200
+					}
+				},
 				Bait = Bait.Sardine,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "200",
 				Collection = "Seitung Province Fisher",
 				CollectionId = 6336,
 				AvidCollection = "Avid Seitung Province Fisher",
@@ -325,9 +535,16 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Cantha,
 				Location = Location.SeitungProvince,
 				Hole1 = FishingHole.OffshoreFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.OffshoreFish,
+						Power = 200
+					}
+				},
 				Bait = Bait.Sardine,
 				TimeOfDay = TimeOfDay.Night,
-				FishingPower = "200",
 				Collection = "Seitung Province Fisher",
 				CollectionId = 6336,
 				AvidCollection = "Avid Seitung Province Fisher",
@@ -343,9 +560,21 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Cantha,
 				Location = Location.SeitungProvince,
 				Hole1 = FishingHole.ShoreFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.SaltwaterTropicalFish,
+						Power = 650
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.ShoreFish,
+						Power = 150
+					}
+				},
 				Bait = Bait.Shrimpling,
 				TimeOfDay = TimeOfDay.Night,
-				FishingPower = "150",
 				Collection = "Seitung Province Fisher",
 				CollectionId = 6336,
 				AvidCollection = "Avid Seitung Province Fisher",
@@ -361,9 +590,16 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Cantha,
 				Location = Location.SeitungProvince,
 				Hole1 = FishingHole.OffshoreFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.OffshoreFish,
+						Power = 200
+					}
+				},
 				Bait = Bait.Sardine,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "200",
 				Collection = "Seitung Province Fisher",
 				CollectionId = 6336,
 				AvidCollection = "Avid Seitung Province Fisher",
@@ -379,9 +615,16 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Cantha,
 				Location = Location.SeitungProvince,
 				Hole1 = FishingHole.OffshoreFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.OffshoreFish,
+						Power = 200
+					}
+				},
 				Bait = Bait.Shrimpling,
 				TimeOfDay = TimeOfDay.Day,
-				FishingPower = "200",
 				Collection = "Seitung Province Fisher",
 				CollectionId = 6336,
 				AvidCollection = "Avid Seitung Province Fisher",
@@ -399,7 +642,6 @@ namespace Oberyn.AnglerAssociate.Data
 				Hole1 = FishingHole.ShinotaBlackfins,
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "0",
 				Collection = null,
 				CollectionId = null,
 				AvidCollection = null,
@@ -417,7 +659,6 @@ namespace Oberyn.AnglerAssociate.Data
 				Hole1 = FishingHole.OpenWater,
 				Bait = Bait.HaijuMinnow,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "50",
 				Collection = null,
 				CollectionId = null,
 				AvidCollection = null,
@@ -433,9 +674,16 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Cantha,
 				Location = Location.NewKainengCity,
 				Hole1 = FishingHole.OpenWater,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.FracturedFreshwaterFish,
+						Power = 500
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "150",
 				Collection = "Kaineng Fisher",
 				CollectionId = 6342,
 				AvidCollection = "Avid Kaineng Fisher",
@@ -453,7 +701,6 @@ namespace Oberyn.AnglerAssociate.Data
 				Hole1 = FishingHole.OpenWater,
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "150",
 				Collection = "Kaineng Fisher",
 				CollectionId = 6342,
 				AvidCollection = "Avid Kaineng Fisher",
@@ -469,9 +716,16 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Cantha,
 				Location = Location.NewKainengCity,
 				Hole1 = FishingHole.OpenWater,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.FracturedFreshwaterFish,
+						Power = 500
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "150",
 				Collection = "Kaineng Fisher",
 				CollectionId = 6342,
 				AvidCollection = "Avid Kaineng Fisher",
@@ -488,9 +742,26 @@ namespace Oberyn.AnglerAssociate.Data
 				Location = Location.NewKainengCity,
 				Hole1 = FishingHole.Any,
 				Hole2 = FishingHole.OpenWater,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.ChannelFish,
+						Power = 250
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.CoastalFish,
+						Power = 200
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.FracturedChannelFish,
+						Power = 250
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Night,
-				FishingPower = "150",
 				Collection = "Kaineng Fisher",
 				CollectionId = 6342,
 				AvidCollection = "Avid Kaineng Fisher",
@@ -507,9 +778,31 @@ namespace Oberyn.AnglerAssociate.Data
 				Location = Location.NewKainengCity,
 				Hole1 = FishingHole.Any,
 				Hole2 = FishingHole.OpenWater,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.ChannelFish,
+						Power = 250
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.CoastalFish,
+						Power = 200
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.FracturedChannelFish,
+						Power = 250
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.MysteriousWatersFish,
+						Power = 300
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "150",
 				Collection = "Kaineng Fisher",
 				CollectionId = 6342,
 				AvidCollection = "Avid Kaineng Fisher",
@@ -526,9 +819,31 @@ namespace Oberyn.AnglerAssociate.Data
 				Location = Location.NewKainengCity,
 				Hole1 = FishingHole.Any,
 				Hole2 = FishingHole.OpenWater,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.ChannelFish,
+						Power = 250
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.CoastalFish,
+						Power = 200
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.FracturedChannelFish,
+						Power = 250
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.MysteriousWatersFish,
+						Power = 300
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "150",
 				Collection = "Kaineng Fisher",
 				CollectionId = 6342,
 				AvidCollection = "Avid Kaineng Fisher",
@@ -544,9 +859,21 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Cantha,
 				Location = Location.NewKainengCity,
 				Hole1 = FishingHole.CoastalFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.CoastalFish,
+						Power = 200
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.MysteriousWatersFish,
+						Power = 300
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "200",
 				Collection = "Kaineng Fisher",
 				CollectionId = 6342,
 				AvidCollection = "Avid Kaineng Fisher",
@@ -562,9 +889,21 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Cantha,
 				Location = Location.NewKainengCity,
 				Hole1 = FishingHole.CoastalFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.CoastalFish,
+						Power = 200
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.MysteriousWatersFish,
+						Power = 300
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "200",
 				Collection = "Kaineng Fisher",
 				CollectionId = 6342,
 				AvidCollection = "Avid Kaineng Fisher",
@@ -580,9 +919,26 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Cantha,
 				Location = Location.NewKainengCity,
 				Hole1 = FishingHole.ChannelFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.ChannelFish,
+						Power = 250
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.FracturedChannelFish,
+						Power = 250
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.MysteriousWatersFish,
+						Power = 300
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Day,
-				FishingPower = "250",
 				Collection = "Kaineng Fisher",
 				CollectionId = 6342,
 				AvidCollection = "Avid Kaineng Fisher",
@@ -599,9 +955,21 @@ namespace Oberyn.AnglerAssociate.Data
 				Location = Location.NewKainengCity,
 				Hole1 = FishingHole.CoastalFish,
 				Hole2 = FishingHole.RareFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.CoastalFish,
+						Power = 200
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.MysteriousWatersFish,
+						Power = 300
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Day,
-				FishingPower = "200",
 				Collection = "Kaineng Fisher",
 				CollectionId = 6342,
 				AvidCollection = "Avid Kaineng Fisher",
@@ -618,9 +986,16 @@ namespace Oberyn.AnglerAssociate.Data
 				Location = Location.NewKainengCity,
 				Hole1 = FishingHole.CoastalFish,
 				Hole2 = FishingHole.RareFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.CoastalFish,
+						Power = 200
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Night,
-				FishingPower = "200",
 				Collection = "Kaineng Fisher",
 				CollectionId = 6342,
 				AvidCollection = "Avid Kaineng Fisher",
@@ -637,9 +1012,26 @@ namespace Oberyn.AnglerAssociate.Data
 				Location = Location.NewKainengCity,
 				Hole1 = FishingHole.ChannelFish,
 				Hole2 = FishingHole.RareFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.ChannelFish,
+						Power = 250
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.FracturedChannelFish,
+						Power = 250
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.MysteriousWatersFish,
+						Power = 300
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "250",
 				Collection = "Kaineng Fisher",
 				CollectionId = 6342,
 				AvidCollection = "Avid Kaineng Fisher",
@@ -655,9 +1047,16 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Cantha,
 				Location = Location.NewKainengCity,
 				Hole1 = FishingHole.CoastalFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.CoastalFish,
+						Power = 200
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Night,
-				FishingPower = "200",
 				Collection = "Kaineng Fisher",
 				CollectionId = 6342,
 				AvidCollection = "Avid Kaineng Fisher",
@@ -673,9 +1072,26 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Cantha,
 				Location = Location.NewKainengCity,
 				Hole1 = FishingHole.ChannelFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.ChannelFish,
+						Power = 250
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.FracturedChannelFish,
+						Power = 250
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.MysteriousWatersFish,
+						Power = 300
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "250",
 				Collection = "Kaineng Fisher",
 				CollectionId = 6342,
 				AvidCollection = "Avid Kaineng Fisher",
@@ -691,10 +1107,22 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Cantha,
 				Location = Location.NewKainengCity,
 				Hole1 = FishingHole.ChannelFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.ChannelFish,
+						Power = 250
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.FracturedChannelFish,
+						Power = 250
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Dusk,
 				TimeOfDay2 = TimeOfDay.Dawn,
-				FishingPower = "250",
 				Collection = "Kaineng Fisher",
 				CollectionId = 6342,
 				AvidCollection = "Avid Kaineng Fisher",
@@ -710,9 +1138,16 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Cantha,
 				Location = Location.NewKainengCity,
 				Hole1 = FishingHole.CoastalFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.CoastalFish,
+						Power = 200
+					}
+				},
 				Bait = Bait.Sardine,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "200",
 				Collection = "Kaineng Fisher",
 				CollectionId = 6342,
 				AvidCollection = "Avid Kaineng Fisher",
@@ -728,9 +1163,16 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Cantha,
 				Location = Location.NewKainengCity,
 				Hole1 = FishingHole.CoastalFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.CoastalFish,
+						Power = 200
+					}
+				},
 				Bait = Bait.Shrimpling,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "200",
 				Collection = "Kaineng Fisher",
 				CollectionId = 6342,
 				AvidCollection = "Avid Kaineng Fisher",
@@ -746,9 +1188,16 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Cantha,
 				Location = Location.NewKainengCity,
 				Hole1 = FishingHole.ChannelFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.ChannelFish,
+						Power = 250
+					}
+				},
 				Bait = Bait.Sardine,
 				TimeOfDay = TimeOfDay.Night,
-				FishingPower = "250",
 				Collection = "Kaineng Fisher",
 				CollectionId = 6342,
 				AvidCollection = "Avid Kaineng Fisher",
@@ -764,9 +1213,31 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Cantha,
 				Location = Location.NewKainengCity,
 				Hole1 = FishingHole.CoastalFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.CoastalFish,
+						Power = 200
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.OffshoreSaltwaterJanthirFish,
+						Power = 650
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.BrackishJanthirFish,
+						Power = 650
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.LowlandOffshoreFish,
+						Power = 600
+					}
+				},
 				Bait = Bait.Mackerel,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "200",
 				Collection = "Kaineng Fisher",
 				CollectionId = 6342,
 				AvidCollection = "Avid Kaineng Fisher",
@@ -782,9 +1253,16 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Cantha,
 				Location = Location.NewKainengCity,
 				Hole1 = FishingHole.CoastalFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.CoastalFish,
+						Power = 200
+					}
+				},
 				Bait = Bait.Mackerel,
 				TimeOfDay = TimeOfDay.Day,
-				FishingPower = "200",
 				Collection = "Kaineng Fisher",
 				CollectionId = 6342,
 				AvidCollection = "Avid Kaineng Fisher",
@@ -800,9 +1278,16 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Cantha,
 				Location = Location.NewKainengCity,
 				Hole1 = FishingHole.ChannelFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.ChannelFish,
+						Power = 250
+					}
+				},
 				Bait = Bait.Shrimpling,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "250",
 				Collection = "Kaineng Fisher",
 				CollectionId = 6342,
 				AvidCollection = "Avid Kaineng Fisher",
@@ -818,9 +1303,21 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Cantha,
 				Location = Location.EchovaldWilds,
 				Hole1 = FishingHole.OpenWater,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.DeepFishingHole,
+						Power = 250
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.GrottoFish,
+						Power = 300
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Night,
-				FishingPower = "200",
 				Collection = "Echovald Wilds Fisher",
 				CollectionId = 6258,
 				AvidCollection = "Avid Echovald Wilds Fisher",
@@ -836,9 +1333,16 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Cantha,
 				Location = Location.EchovaldWilds,
 				Hole1 = FishingHole.OpenWater,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.GrottoFish,
+						Power = 300
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "200",
 				Collection = "Echovald Wilds Fisher",
 				CollectionId = 6258,
 				AvidCollection = "Avid Echovald Wilds Fisher",
@@ -855,9 +1359,31 @@ namespace Oberyn.AnglerAssociate.Data
 				Location = Location.EchovaldWilds,
 				Hole1 = FishingHole.Any,
 				Hole2 = FishingHole.OpenWater,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.DeepFishingHole,
+						Power = 250
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.FreshwaterTropicalFish,
+						Power = 650
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.GrottoFish,
+						Power = 300
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.LakeFish,
+						Power = 250
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "200",
 				Collection = "Echovald Wilds Fisher",
 				CollectionId = 6258,
 				AvidCollection = "Avid Echovald Wilds Fisher",
@@ -874,9 +1400,26 @@ namespace Oberyn.AnglerAssociate.Data
 				Location = Location.EchovaldWilds,
 				Hole1 = FishingHole.Any,
 				Hole2 = FishingHole.OpenWater,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.DeepFishingHole,
+						Power = 250
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.GrottoFish,
+						Power = 300
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.LakeFish,
+						Power = 250
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "200",
 				Collection = "Echovald Wilds Fisher",
 				CollectionId = 6258,
 				AvidCollection = "Avid Echovald Wilds Fisher",
@@ -893,9 +1436,26 @@ namespace Oberyn.AnglerAssociate.Data
 				Location = Location.EchovaldWilds,
 				Hole1 = FishingHole.LakeFish,
 				Hole2 = FishingHole.DeepFishingHole,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.DeepFishingHole,
+						Power = 250
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.GrottoFish,
+						Power = 300
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.LakeFish,
+						Power = 250
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Night,
-				FishingPower = "250",
 				Collection = "Echovald Wilds Fisher",
 				CollectionId = 6258,
 				AvidCollection = "Avid Echovald Wilds Fisher",
@@ -911,9 +1471,16 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Cantha,
 				Location = Location.EchovaldWilds,
 				Hole1 = FishingHole.GrottoFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.GrottoFish,
+						Power = 300
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Day,
-				FishingPower = "300",
 				Collection = "Echovald Wilds Fisher",
 				CollectionId = 6258,
 				AvidCollection = "Avid Echovald Wilds Fisher",
@@ -931,9 +1498,26 @@ namespace Oberyn.AnglerAssociate.Data
 				Hole1 = FishingHole.LakeFish,
 				Hole2 = FishingHole.DeepFishingHole,
 				Hole3 = FishingHole.RareFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.DeepFishingHole,
+						Power = 250
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.GrottoFish,
+						Power = 300
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.LakeFish,
+						Power = 250
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "250",
 				Collection = "Echovald Wilds Fisher",
 				CollectionId = 6258,
 				AvidCollection = "Avid Echovald Wilds Fisher",
@@ -949,9 +1533,16 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Cantha,
 				Location = Location.EchovaldWilds,
 				Hole1 = FishingHole.GrottoFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.GrottoFish,
+						Power = 300
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "300",
 				Collection = "Echovald Wilds Fisher",
 				CollectionId = 6258,
 				AvidCollection = "Avid Echovald Wilds Fisher",
@@ -968,9 +1559,26 @@ namespace Oberyn.AnglerAssociate.Data
 				Location = Location.EchovaldWilds,
 				Hole1 = FishingHole.LakeFish,
 				Hole2 = FishingHole.DeepFishingHole,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.DeepFishingHole,
+						Power = 250
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.GrottoFish,
+						Power = 300
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.LakeFish,
+						Power = 250
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Day,
-				FishingPower = "250",
 				Collection = "Echovald Wilds Fisher",
 				CollectionId = 6258,
 				AvidCollection = "Avid Echovald Wilds Fisher",
@@ -986,9 +1594,16 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Cantha,
 				Location = Location.EchovaldWilds,
 				Hole1 = FishingHole.GrottoFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.GrottoFish,
+						Power = 300
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "300",
 				Collection = "Echovald Wilds Fisher",
 				CollectionId = 6258,
 				AvidCollection = "Avid Echovald Wilds Fisher",
@@ -1005,9 +1620,26 @@ namespace Oberyn.AnglerAssociate.Data
 				Location = Location.EchovaldWilds,
 				Hole1 = FishingHole.LakeFish,
 				Hole2 = FishingHole.DeepFishingHole,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.DeepFishingHole,
+						Power = 250
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.GrottoFish,
+						Power = 300
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.LakeFish,
+						Power = 250
+					}
+				},
 				Bait = Bait.FreshwaterMinnow,
 				TimeOfDay = TimeOfDay.Night,
-				FishingPower = "250",
 				Collection = "Echovald Wilds Fisher",
 				CollectionId = 6258,
 				AvidCollection = "Avid Echovald Wilds Fisher",
@@ -1023,9 +1655,16 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Cantha,
 				Location = Location.EchovaldWilds,
 				Hole1 = FishingHole.GrottoFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.GrottoFish,
+						Power = 300
+					}
+				},
 				Bait = Bait.GlowWorm,
 				TimeOfDay = TimeOfDay.Night,
-				FishingPower = "300",
 				Collection = "Echovald Wilds Fisher",
 				CollectionId = 6258,
 				AvidCollection = "Avid Echovald Wilds Fisher",
@@ -1042,9 +1681,26 @@ namespace Oberyn.AnglerAssociate.Data
 				Location = Location.EchovaldWilds,
 				Hole1 = FishingHole.LakeFish,
 				Hole2 = FishingHole.DeepFishingHole,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.DeepFishingHole,
+						Power = 250
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.GrottoFish,
+						Power = 300
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.LakeFish,
+						Power = 250
+					}
+				},
 				Bait = Bait.FreshwaterMinnow,
 				TimeOfDay = TimeOfDay.Day,
-				FishingPower = "250",
 				Collection = "Echovald Wilds Fisher",
 				CollectionId = 6258,
 				AvidCollection = "Avid Echovald Wilds Fisher",
@@ -1060,9 +1716,16 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Cantha,
 				Location = Location.EchovaldWilds,
 				Hole1 = FishingHole.GrottoFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.GrottoFish,
+						Power = 300
+					}
+				},
 				Bait = Bait.GlowWorm,
 				TimeOfDay = TimeOfDay.Day,
-				FishingPower = "300",
 				Collection = "Echovald Wilds Fisher",
 				CollectionId = 6258,
 				AvidCollection = "Avid Echovald Wilds Fisher",
@@ -1080,7 +1743,6 @@ namespace Oberyn.AnglerAssociate.Data
 				Hole1 = FishingHole.OpenWater,
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Day,
-				FishingPower = "250",
 				Collection = "Dragon's End Fisher",
 				CollectionId = 6506,
 				AvidCollection = "Avid Dragon's End Fisher",
@@ -1098,7 +1760,6 @@ namespace Oberyn.AnglerAssociate.Data
 				Hole1 = FishingHole.OpenWater,
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "250",
 				Collection = "Dragon's End Fisher",
 				CollectionId = 6506,
 				AvidCollection = "Avid Dragon's End Fisher",
@@ -1115,9 +1776,21 @@ namespace Oberyn.AnglerAssociate.Data
 				Location = Location.DragonsEnd,
 				Hole1 = FishingHole.Any,
 				Hole2 = FishingHole.OpenWater,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.CavernFish,
+						Power = 350
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.QuarryFish,
+						Power = 300
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "250",
 				Collection = "Dragon's End Fisher",
 				CollectionId = 6506,
 				AvidCollection = "Avid Dragon's End Fisher",
@@ -1134,9 +1807,21 @@ namespace Oberyn.AnglerAssociate.Data
 				Location = Location.DragonsEnd,
 				Hole1 = FishingHole.Any,
 				Hole2 = FishingHole.OpenWater,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.CavernFish,
+						Power = 350
+					},
+					new FishHoleEntry
+					{
+						Hole = FishingHole.QuarryFish,
+						Power = 300
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "250",
 				Collection = "Dragon's End Fisher",
 				CollectionId = 6506,
 				AvidCollection = "Avid Dragon's End Fisher",
@@ -1152,9 +1837,16 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Cantha,
 				Location = Location.DragonsEnd,
 				Hole1 = FishingHole.QuarryFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.QuarryFish,
+						Power = 300
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "300",
 				Collection = "Dragon's End Fisher",
 				CollectionId = 6506,
 				AvidCollection = "Avid Dragon's End Fisher",
@@ -1170,9 +1862,16 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Cantha,
 				Location = Location.DragonsEnd,
 				Hole1 = FishingHole.CavernFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.CavernFish,
+						Power = 350
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "350",
 				Collection = "Dragon's End Fisher",
 				CollectionId = 6506,
 				AvidCollection = "Avid Dragon's End Fisher",
@@ -1188,9 +1887,16 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Cantha,
 				Location = Location.DragonsEnd,
 				Hole1 = FishingHole.QuarryFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.QuarryFish,
+						Power = 300
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Night,
-				FishingPower = "300",
 				Collection = "Dragon's End Fisher",
 				CollectionId = 6506,
 				AvidCollection = "Avid Dragon's End Fisher",
@@ -1206,9 +1912,16 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Cantha,
 				Location = Location.DragonsEnd,
 				Hole1 = FishingHole.CavernFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.CavernFish,
+						Power = 350
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "350",
 				Collection = "Dragon's End Fisher",
 				CollectionId = 6506,
 				AvidCollection = "Avid Dragon's End Fisher",
@@ -1224,9 +1937,16 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Cantha,
 				Location = Location.DragonsEnd,
 				Hole1 = FishingHole.QuarryFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.QuarryFish,
+						Power = 300
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "300",
 				Collection = "Dragon's End Fisher",
 				CollectionId = 6506,
 				AvidCollection = "Avid Dragon's End Fisher",
@@ -1242,9 +1962,16 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Cantha,
 				Location = Location.DragonsEnd,
 				Hole1 = FishingHole.CavernFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.CavernFish,
+						Power = 350
+					}
+				},
 				Bait = Bait.Any,
 				TimeOfDay = TimeOfDay.Day,
-				FishingPower = "350",
 				Collection = "Dragon's End Fisher",
 				CollectionId = 6506,
 				AvidCollection = "Avid Dragon's End Fisher",
@@ -1260,9 +1987,16 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Cantha,
 				Location = Location.DragonsEnd,
 				Hole1 = FishingHole.QuarryFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.QuarryFish,
+						Power = 300
+					}
+				},
 				Bait = Bait.Nightcrawler,
 				TimeOfDay = TimeOfDay.Day,
-				FishingPower = "300",
 				Collection = "Dragon's End Fisher",
 				CollectionId = 6506,
 				AvidCollection = "Avid Dragon's End Fisher",
@@ -1278,9 +2012,16 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Cantha,
 				Location = Location.DragonsEnd,
 				Hole1 = FishingHole.CavernFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.CavernFish,
+						Power = 350
+					}
+				},
 				Bait = Bait.Nightcrawler,
 				TimeOfDay = TimeOfDay.Night,
-				FishingPower = "350",
 				Collection = "Dragon's End Fisher",
 				CollectionId = 6506,
 				AvidCollection = "Avid Dragon's End Fisher",
@@ -1296,9 +2037,16 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Cantha,
 				Location = Location.DragonsEnd,
 				Hole1 = FishingHole.QuarryFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.QuarryFish,
+						Power = 300
+					}
+				},
 				Bait = Bait.Shrimpling,
 				TimeOfDay = TimeOfDay.Night,
-				FishingPower = "300",
 				Collection = "Dragon's End Fisher",
 				CollectionId = 6506,
 				AvidCollection = "Avid Dragon's End Fisher",
@@ -1314,9 +2062,16 @@ namespace Oberyn.AnglerAssociate.Data
 				Region = Region.Cantha,
 				Location = Location.DragonsEnd,
 				Hole1 = FishingHole.CavernFish,
+				AllHoles = new List<FishHoleEntry>
+				{
+					new FishHoleEntry
+					{
+						Hole = FishingHole.CavernFish,
+						Power = 350
+					}
+				},
 				Bait = Bait.Shrimpling,
 				TimeOfDay = TimeOfDay.Any,
-				FishingPower = "350",
 				Collection = "Dragon's End Fisher",
 				CollectionId = 6506,
 				AvidCollection = "Avid Dragon's End Fisher",

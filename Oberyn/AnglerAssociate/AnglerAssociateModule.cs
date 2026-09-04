@@ -29,7 +29,7 @@ namespace Oberyn.AnglerAssociate
 
 		private MainView _mainView;
 
-		private Timer _bannerRefreshTimer;
+		private Timer _liveDataRefreshTimer;
 
 		private const int ContentWidth = 1052;
 
@@ -78,11 +78,11 @@ namespace Oberyn.AnglerAssociate
 				BuildWindow();
 				BuildContent();
 				BuildCornerIcon();
-				_bannerRefreshTimer = new Timer(delegate
+				_liveDataRefreshTimer = new Timer(delegate
 				{
 					GameService.Graphics.QueueMainThreadRender((Action<GraphicsDevice>)delegate
 					{
-						_mainView.RefreshBanners();
+						_mainView.RefreshLiveData();
 					});
 				}, null, TimeSpan.FromSeconds(1.0), TimeSpan.FromSeconds(1.0));
 				Gw2ApiManager.add_SubtokenUpdated((EventHandler<ValueEventArgs<IEnumerable<TokenPermission>>>)async delegate
@@ -106,14 +106,16 @@ namespace Oberyn.AnglerAssociate
 			//IL_003c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_004c: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0057: Unknown result type (might be due to invalid IL or missing references)
-			//IL_005c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0066: Unknown result type (might be due to invalid IL or missing references)
 			//IL_006d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_007d: Expected O, but got Unknown
+			//IL_0072: Unknown result type (might be due to invalid IL or missing references)
+			//IL_007c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0083: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0093: Expected O, but got Unknown
 			Texture2D windowBackground = ContentsManager.GetTexture("icons/background2.png");
 			StandardWindow val = new StandardWindow(windowBackground, new Rectangle(0, 0, 1172, 667), new Rectangle(60, 50, 1052, 568));
 			((Control)val).set_Parent((Container)(object)GameService.Graphics.get_SpriteScreen());
 			((WindowBase2)val).set_Title("Angler Associate");
+			((WindowBase2)val).set_Emblem(ContentsManager.GetTexture("icons/angler_associate.png"));
 			((Control)val).set_Location(new Point(50, 50));
 			((WindowBase2)val).set_SavesPosition(true);
 			((WindowBase2)val).set_Id("FishingBuddy_MainWindow");
@@ -162,7 +164,7 @@ namespace Oberyn.AnglerAssociate
 
 		protected override void Unload()
 		{
-			_bannerRefreshTimer?.Dispose();
+			_liveDataRefreshTimer?.Dispose();
 			CornerIcon cornerIcon = _cornerIcon;
 			if (cornerIcon != null)
 			{
