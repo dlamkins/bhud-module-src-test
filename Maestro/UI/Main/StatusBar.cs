@@ -141,6 +141,8 @@ namespace Maestro.UI.Main
 
 		private readonly IconButton _communityButton;
 
+		private readonly IconButton _supportButton;
+
 		private readonly StandardButton _createButton;
 
 		private readonly IconButton _importButton;
@@ -183,6 +185,8 @@ namespace Maestro.UI.Main
 
 		public event EventHandler CommunityClicked;
 
+		public event EventHandler SupportClicked;
+
 		public event EventHandler<InstrumentType> CreateClicked;
 
 		public StatusBar(int width)
@@ -210,9 +214,12 @@ namespace Maestro.UI.Main
 			//IL_014a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_015e: Unknown result type (might be due to invalid IL or missing references)
 			//IL_016d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01a9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01cc: Unknown result type (might be due to invalid IL or missing references)
 			((Control)this).set_Size(new Point(width, Layout.Height));
 			((Control)this).set_BackgroundColor(Color.get_Transparent());
-			int buttonsWidth = 130;
+			int buttonsWidth = 175;
 			Label val = new Label();
 			((Control)val).set_Parent((Container)(object)this);
 			((Control)val).set_Location(new Point(0, 0));
@@ -252,6 +259,17 @@ namespace Maestro.UI.Main
 			{
 				this.CommunityClicked?.Invoke(this, EventArgs.Empty);
 			});
+			x -= 45;
+			IconButton iconButton4 = new IconButton(MaestroIcons.Support, MaestroTheme.IconGlyph);
+			((Control)iconButton4).set_Parent((Container)(object)this);
+			((Control)iconButton4).set_Location(new Point(x, 0));
+			((Control)iconButton4).set_Size(new Point(40, 26));
+			((Control)iconButton4).set_BasicTooltipText("Support Maestro");
+			_supportButton = iconButton4;
+			((Control)_supportButton).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				this.SupportClicked?.Invoke(this, EventArgs.Empty);
+			});
 		}
 
 		private void OnCreateButtonClick(object sender, MouseEventArgs e)
@@ -288,6 +306,11 @@ namespace Maestro.UI.Main
 			_communityButton.Selected = active;
 		}
 
+		public void SetSupportActive(bool active)
+		{
+			_supportButton.Selected = active;
+		}
+
 		private void UpdateText()
 		{
 			_statusLabel.set_Text((_visibleCount == _totalCount) ? $"  {_totalCount} songs" : $"  {_visibleCount} of {_totalCount} songs");
@@ -309,6 +332,11 @@ namespace Maestro.UI.Main
 			if (communityButton != null)
 			{
 				((Control)communityButton).Dispose();
+			}
+			IconButton supportButton = _supportButton;
+			if (supportButton != null)
+			{
+				((Control)supportButton).Dispose();
 			}
 			StandardButton createButton = _createButton;
 			if (createButton != null)

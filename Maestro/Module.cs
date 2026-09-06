@@ -21,6 +21,7 @@ using Maestro.UI.Import;
 using Maestro.UI.MaestroCreator;
 using Maestro.UI.Main;
 using Maestro.UI.Practice;
+using Maestro.UI.Support;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -60,6 +61,8 @@ namespace Maestro
 		private CommunityWindow _communityWindow;
 
 		private UploadWindow _uploadWindow;
+
+		private SupportWindow _supportWindow;
 
 		private MaestroCreatorWindow _maestroCreatorWindow;
 
@@ -205,6 +208,7 @@ namespace Maestro
 				_maestroWindow = new MaestroWindow(_songPlayer, _songs, _favoriteService);
 				_maestroWindow.ImportRequested += OnImportRequested;
 				_maestroWindow.CommunityRequested += OnCommunityRequested;
+				_maestroWindow.SupportRequested += OnSupportRequested;
 				_maestroWindow.CreateRequested += OnCreateRequested;
 				_maestroWindow.SongDeleteRequested += OnSongDeleteRequested;
 				_maestroWindow.EditRequested += OnEditRequested;
@@ -261,6 +265,30 @@ namespace Maestro
 			}
 			((Control)_communityWindow).Show();
 			_communityWindow.LoadContent();
+		}
+
+		private void OnSupportRequested(object sender, EventArgs e)
+		{
+			if (_supportWindow == null)
+			{
+				_supportWindow = new SupportWindow();
+				((Control)_supportWindow).add_Shown((EventHandler<EventArgs>)delegate
+				{
+					_maestroWindow?.SetSupportActive(active: true);
+				});
+				((Control)_supportWindow).add_Hidden((EventHandler<EventArgs>)delegate
+				{
+					_maestroWindow?.SetSupportActive(active: false);
+				});
+			}
+			if (((Control)_supportWindow).get_Visible())
+			{
+				((Control)_supportWindow).Hide();
+			}
+			else
+			{
+				((Control)_supportWindow).Show();
+			}
 		}
 
 		private void OnCreateRequested(object sender, InstrumentType instrument)
@@ -573,6 +601,11 @@ namespace Maestro
 			if (uploadWindow != null)
 			{
 				((Control)uploadWindow).Dispose();
+			}
+			SupportWindow supportWindow = _supportWindow;
+			if (supportWindow != null)
+			{
+				((Control)supportWindow).Dispose();
 			}
 			CommunityWindow communityWindow = _communityWindow;
 			if (communityWindow != null)

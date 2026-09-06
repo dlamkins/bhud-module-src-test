@@ -1,3 +1,6 @@
+using Blish_HUD;
+using Blish_HUD.Graphics;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Maestro.UI.Controls
@@ -52,6 +55,8 @@ namespace Maestro.UI.Controls
 
 		private static Texture2D _practice;
 
+		private static Texture2D _support;
+
 		public static Texture2D Play => _play ?? (_play = Load("play-icon.png"));
 
 		public static Texture2D Pause => _pause ?? (_pause = Load("pause-icon.png"));
@@ -100,9 +105,57 @@ namespace Maestro.UI.Controls
 
 		public static Texture2D Practice => _practice ?? (_practice = Load("practice-icon.png"));
 
+		public static Texture2D Support => _support ?? (_support = CreateHeartIcon());
+
 		private static Texture2D Load(string fileName)
 		{
 			return Module.Instance.ContentsManager.GetTexture(fileName);
+		}
+
+		private static Texture2D CreateHeartIcon()
+		{
+			//IL_0005: Unknown result type (might be due to invalid IL or missing references)
+			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0016: Unknown result type (might be due to invalid IL or missing references)
+			//IL_001c: Expected O, but got Unknown
+			//IL_0119: Unknown result type (might be due to invalid IL or missing references)
+			//IL_011e: Unknown result type (might be due to invalid IL or missing references)
+			GraphicsDeviceContext context = GameService.Graphics.LendGraphicsDeviceContext();
+			try
+			{
+				Texture2D texture = new Texture2D(((GraphicsDeviceContext)(ref context)).get_GraphicsDevice(), 32, 32);
+				Color[] pixels = (Color[])(object)new Color[1024];
+				for (int y = 0; y < 32; y++)
+				{
+					for (int x = 0; x < 32; x++)
+					{
+						int coveredSamples = 0;
+						for (int sampleY = 0; sampleY < 4; sampleY++)
+						{
+							for (int sampleX = 0; sampleX < 4; sampleX++)
+							{
+								float num = ((float)x + ((float)sampleX + 0.5f) / 4f) / 32f;
+								float samplePositionY = ((float)y + ((float)sampleY + 0.5f) / 4f) / 32f;
+								float normalizedX = (num * 2f - 1f) * 1.35f;
+								float normalizedY = 1.35f - samplePositionY * 2.55f;
+								float baseValue = normalizedX * normalizedX + normalizedY * normalizedY - 1f;
+								if (baseValue * baseValue * baseValue - normalizedX * normalizedX * normalizedY * normalizedY * normalizedY <= 0f)
+								{
+									coveredSamples++;
+								}
+							}
+						}
+						int alpha = 255 * coveredSamples / 16;
+						pixels[y * 32 + x] = Color.FromNonPremultiplied(255, 255, 255, alpha);
+					}
+				}
+				texture.SetData<Color>(pixels);
+				return texture;
+			}
+			finally
+			{
+				((GraphicsDeviceContext)(ref context)).Dispose();
+			}
 		}
 	}
 }
