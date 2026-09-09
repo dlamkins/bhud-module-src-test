@@ -196,6 +196,14 @@ namespace EmoteTome
 
 		public static readonly List<string> HAPPYDANCE = new List<string> { "HappyDance", "HappyDance", "Freudentanz", "HappyDance" };
 
+		public static readonly List<string> WHISTLE = new List<string> { "Whistle", "Siffler", "Pfeifen", "Silbido" };
+
+		public static readonly List<string> MASTERPIECE = new List<string> { "Masterpiece", "Chefdoeuvre", "Meisterwerk", "Unaobramaestra" };
+
+		public static readonly List<string> TRANSFORM = new List<string> { "Transform", "Transformemoi", "Verwandeln", "Transformacion" };
+
+		public static readonly List<string> POPCORN = new List<string> { "Popcorn", "Popcorn", "Popcorn", "Popcorn" };
+
 		public static readonly List<string> BEAR = new List<string> { "Bear", "Ours", "Baer", "Osa" };
 
 		public static readonly List<string> DEER = new List<string> { "Deer", "Daim", "Hirsch", "Ciervo" };
