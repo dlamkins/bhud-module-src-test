@@ -11,6 +11,7 @@ namespace KpRefresher.Domain
 		OldLionsCourt = 1485,
 		CosmicObservatory = 1515,
 		TempleOfFebe = 1520,
-		GuardiansGlade = 1609
+		GuardiansGlade = 1609,
+		NexusOfEternity = 1638
 	}
 }
