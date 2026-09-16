@@ -1359,6 +1359,14 @@ namespace Frtal.LorebookReader
 			});
 		}
 
+		internal void SetWindowClosesWithEscape(bool enabled)
+		{
+			if (_historyWindow != null)
+			{
+				((WindowBase2)_historyWindow).set_CanCloseWithEscape(enabled);
+			}
+		}
+
 		private void ShowEncyclopedia()
 		{
 			_encyclopediaView = new EncyclopediaView(this, _parchmentTexture);

@@ -8,7 +8,7 @@ using System.Security.Permissions;
 [assembly: AssemblyCompany("LorebookReader")]
 [assembly: AssemblyConfiguration("Release")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
-[assembly: AssemblyInformationalVersion("1.0.0+d2d5937055e0ac4ca66e4a42306d6dbf600b42d0")]
+[assembly: AssemblyInformationalVersion("1.0.0+6cb580a092263f80de991c22a7df5c31227436b0")]
 [assembly: AssemblyProduct("LorebookReader")]
 [assembly: AssemblyTitle("LorebookReader")]
 [assembly: AssemblyVersion("1.0.0.0")]

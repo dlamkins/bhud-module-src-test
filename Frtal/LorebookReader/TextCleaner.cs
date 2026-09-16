@@ -12,6 +12,12 @@ namespace Frtal.LorebookReader
 
 		private static readonly Regex NonLetters = new Regex("[^A-Za-z']");
 
+		private static readonly (string Wrong, string Right)[] KnownNames = new(string, string)[2]
+		{
+			("lsgarren", "Isgarren"),
+			("Vioxx", "Vloxx")
+		};
+
 		private static bool IsValidWord(string w)
 		{
 			if (NonLetters.Replace(w, "").Length >= 2)
@@ -79,6 +85,29 @@ namespace Frtal.LorebookReader
 			return string.Join("\n\n", outParas).Trim();
 		}
 
+		private static string FixSlashedEls(string text)
+		{
+			text = Regex.Replace(text, "(?<=\\p{L})/{2,}(?=\\p{L}|\\b)", (Match m) => new string('l', m.Value.Length));
+			text = Regex.Replace(text, "(?<=\\p{L})/(?=\\p{Ll}\\b)", "l");
+			text = Regex.Replace(text, "(?<=\\b\\p{L})/(?=\\p{L})", "l");
+			text = Regex.Replace(text, "(?<![\\p{L}/])/(?=\\p{Ll}{2,})", "l");
+			text = Regex.Replace(text, "(?<!\\p{L})l(?=\\s)", "I");
+			return text;
+		}
+
+		private static string FixKnownNames(string text)
+		{
+			(string, string)[] knownNames = KnownNames;
+			for (int i = 0; i < knownNames.Length; i++)
+			{
+				(string, string) tuple = knownNames[i];
+				string wrong = tuple.Item1;
+				string right = tuple.Item2;
+				text = Regex.Replace(text, "\\b" + Regex.Escape(wrong) + "\\b", right);
+			}
+			return text;
+		}
+
 		private static bool LooksLikeVerse(string raw)
 		{
 			List<string> lines = (from l in raw.Split('\n')
@@ -128,7 +157,9 @@ namespace Frtal.LorebookReader
 			text = Regex.Replace(text, " {2,}", " ");
 			text = Regex.Replace(text, "(?<!\\w)1(?=\\s+[a-z])", "I");
 			text = Regex.Replace(text, "(?<![A-Za-z])J(?=\\s+[a-z])", "I");
+			text = FixSlashedEls(text);
 			text = FixConfusableChars(text);
+			text = FixKnownNames(text);
 			return text.Trim();
 		}
 
