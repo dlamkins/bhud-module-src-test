@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>Quarry</AssemblyName>
+    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+    <TargetFramework>net472</TargetFramework>
+  </PropertyGroup>
+  <PropertyGroup>
+    <LangVersion>Preview</LangVersion>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemGroup />
+  <ItemGroup>
+    <Reference Include="Blish HUD" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="Quarry.WikiData">
+      <HintPath>..\..\working\Quarry.WikiData.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoGame.Framework" />
+    <Reference Include="Gw2Sharp" />
+    <Reference Include="MonoGame.Extended" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Text.Json">
+      <HintPath>..\..\working\System.Text.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.Tasks.Extensions">
+      <HintPath>..\..\working\System.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="Flurl.Http">
+      <HintPath>..\..\working\Flurl.Http.dll</HintPath>
+    </Reference>
+    <Reference Include="HtmlAgilityPack">
+      <HintPath>..\..\working\HtmlAgilityPack.dll</HintPath>
+    </Reference>
+    <Reference Include="TmfLib">
+      <HintPath>..\..\working\TmfLib.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Numerics" />
+    <Reference Include="AsyncClipboardService" />
+    <Reference Include="System.Net.Http" />
+  </ItemGroup>
+</Project>
