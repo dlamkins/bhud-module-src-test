@@ -151,7 +151,7 @@ namespace Quarry.Services
 			if (!loggedShapeMismatch)
 			{
 				loggedShapeMismatch = true;
-				logger.Warn(ex, "Pathing bridge: Pathing's CategoryStates shape didn't match what we expect; hunt mode will do nothing until this is fixed.");
+				logger.Error(ex, "Pathing bridge: Pathing's CategoryStates shape didn't match what we expect; hunt mode will do nothing until this is fixed.");
 			}
 		}
 	}

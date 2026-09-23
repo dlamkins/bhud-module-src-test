@@ -170,6 +170,19 @@ namespace Quarry.Services
 			return false;
 		}
 
+		private static string ReadDataVersion(string dataFolder)
+		{
+			try
+			{
+				AchievementDataMetadata metadata = JsonSerializer.Deserialize<AchievementDataMetadata>(File.ReadAllText(Path.Combine(dataFolder, "version.json")));
+				return (metadata == null) ? "unknown" : metadata.Version.ToString();
+			}
+			catch (Exception)
+			{
+				return "unknown";
+			}
+		}
+
 		private static void TryDeleteQuietly(string path)
 		{
 			try
@@ -331,7 +344,14 @@ namespace Quarry.Services
 					}
 					if (!hasCachedFiles)
 					{
-						logger.Error(ex2, "Failed to download achievement data and no cached copy exists; the module cannot load achievement information. Retrying in 5 minutes.");
+						if (ex2 is FlurlHttpException || ex2 is UnauthorizedAccessException || ex2 is IOException || ex2 is OperationCanceledException)
+						{
+							logger.Warn(ex2, "Failed to download achievement data and no cached copy exists; the module cannot load achievement information. Retrying in 5 minutes.");
+						}
+						else
+						{
+							logger.Error(ex2, "Failed to download achievement data and no cached copy exists; the module cannot load achievement information. Retrying in 5 minutes.");
+						}
 						ScheduleLoadRetry(cancellationToken);
 						return;
 					}
@@ -368,7 +388,7 @@ namespace Quarry.Services
 				logger.Error(ex, "Exception occured on deserializing cached achievement data!");
 				throw;
 			}
-			logger.Info(string.Format("Startup timing: achievement data ready in {0} ms ({1}); {2} achievements.", overallStopwatch.ElapsedMilliseconds, downloadData ? "downloaded" : "cached", Achievements.Count));
+			logger.Info(string.Format("Startup timing: achievement data ready in {0} ms ({1}); {2} achievements; data version {3}.", overallStopwatch.ElapsedMilliseconds, downloadData ? "downloaded" : "cached", Achievements.Count, ReadDataVersion(dataFolder)));
 			ManualCompletedAchievements = getPersistenceService().Get().ManualCompletedAchievements;
 			Stopwatch apiStopwatch = Stopwatch.StartNew();
 			Task.Run(async delegate
@@ -499,9 +519,10 @@ namespace Quarry.Services
 				logger.Debug("Refreshing Player Achievements");
 				try
 				{
-					PlayerAchievements = (IEnumerable<AccountAchievement>)(await ((IBlobClient<IApiV2ObjectList<AccountAchievement>>)(object)gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
-						.get_Achievements()).GetAsync(cancellationToken));
-					PlayerAchievementsById = PlayerAchievements.ToDictionary((AccountAchievement a) => a.get_Id(), (AccountAchievement a) => a);
+					Dictionary<int, AccountAchievement> byId = DeduplicateAccountAchievements((IEnumerable<AccountAchievement>)(await ((IBlobClient<IApiV2ObjectList<AccountAchievement>>)(object)gw2ApiManager.get_Gw2ApiClient().get_V2().get_Account()
+						.get_Achievements()).GetAsync(cancellationToken)));
+					PlayerAchievements = byId.Values.ToList();
+					PlayerAchievementsById = byId;
 					lock (ManualCompletedSync)
 					{
 						foreach (AccountAchievement item in PlayerAchievements)
@@ -547,6 +568,19 @@ namespace Quarry.Services
 				permissionsWarningLogged = true;
 				logger.Warn("API key permissions 'account' and 'progression' not granted (yet): achievement progress is unavailable until they are. Normal for a moment at startup, before the subtoken arrives; a problem if it persists.");
 			}
+		}
+
+		internal static Dictionary<int, AccountAchievement> DeduplicateAccountAchievements(IEnumerable<AccountAchievement> achievements)
+		{
+			Dictionary<int, AccountAchievement> byId = new Dictionary<int, AccountAchievement>();
+			foreach (AccountAchievement achievement in achievements ?? Enumerable.Empty<AccountAchievement>())
+			{
+				if (achievement != null && (!byId.TryGetValue(achievement.get_Id(), out var existing) || ((!existing.get_Done() || achievement.get_Done()) && (existing.get_Done() != achievement.get_Done() || existing.get_Current() <= achievement.get_Current()))))
+				{
+					byId[achievement.get_Id()] = achievement;
+				}
+			}
+			return byId;
 		}
 
 		private void TrackAchievementProgress()

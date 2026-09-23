@@ -158,7 +158,7 @@ namespace Quarry.Services
 			}
 			catch (UnauthorizedAccessException ex2)
 			{
-				logger.Error((Exception)ex2, "Access denied writing persistanceStorage.json; nothing tracked this session will survive a restart.");
+				logger.Warn((Exception)ex2, "Access denied writing persistanceStorage.json; nothing tracked this session will survive a restart.");
 				Contingency.NotifyFileSaveAccessDenied(file, "save your tracked achievements", false);
 			}
 			catch (Exception ex)
