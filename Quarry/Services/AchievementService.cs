@@ -4,11 +4,13 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Blish_HUD;
@@ -417,6 +419,7 @@ namespace Quarry.Services
 					textureService.GetTexture(RenderUrl.op_Implicit(category.get_Icon()));
 				}
 				logger.Debug("Finished getting achievement data from api");
+				await AddApiOnlyAchievementsAsync(cancellationToken);
 				this.ApiAchievementsLoaded?.Invoke();
 			}
 			catch (OperationCanceledException)
@@ -437,6 +440,166 @@ namespace Quarry.Services
 				{
 					await InitializeApiAchievements(cancellationToken);
 				}, cancellationToken);
+			}
+		}
+
+		private async Task AddApiOnlyAchievementsAsync(CancellationToken cancellationToken)
+		{
+			try
+			{
+				IReadOnlyDictionary<int, AchievementTableEntry> known = AchievementsById;
+				List<int> missingIds = (from id in AchievementCategories.SelectMany((AchievementCategory c) => c.get_Achievements())
+					where !known.ContainsKey(id)
+					select id).Distinct().ToList();
+				if (missingIds.Count == 0)
+				{
+					return;
+				}
+				List<Achievement> apiAchievements = new List<Achievement>();
+				for (int i = 0; i < missingIds.Count; i += 200)
+				{
+					List<Achievement> list = apiAchievements;
+					list.AddRange(await ((IBulkExpandableClient<Achievement, int>)(object)gw2ApiManager.get_Gw2ApiClient().get_V2().get_Achievements()).ManyAsync(missingIds.Skip(i).Take(200), cancellationToken));
+				}
+				List<AchievementBit> bits = apiAchievements.Where((Achievement a) => a.get_Bits() != null).SelectMany((Achievement a) => a.get_Bits()).ToList();
+				IReadOnlyDictionary<int, string> itemNames = await FetchNamesAsync(from b in bits.OfType<AchievementItemBit>()
+					select b.get_Id(), (IEnumerable<int> ids) => ((IBulkExpandableClient<Item, int>)(object)gw2ApiManager.get_Gw2ApiClient().get_V2().get_Items()).ManyAsync(ids, cancellationToken), (Item x) => x.get_Id(), (Item x) => x.get_Name());
+				IReadOnlyDictionary<int, string> skinNames = await FetchNamesAsync(from b in bits.OfType<AchievementSkinBit>()
+					select b.get_Id(), (IEnumerable<int> ids) => ((IBulkExpandableClient<Skin, int>)(object)gw2ApiManager.get_Gw2ApiClient().get_V2().get_Skins()).ManyAsync(ids, cancellationToken), (Skin x) => x.get_Id(), (Skin x) => x.get_Name());
+				IReadOnlyDictionary<int, string> miniNames = await FetchNamesAsync(from b in bits.OfType<AchievementMinipetBit>()
+					select b.get_Id(), (IEnumerable<int> ids) => ((IBulkExpandableClient<Mini, int>)(object)gw2ApiManager.get_Gw2ApiClient().get_V2().get_Minis()).ManyAsync(ids, cancellationToken), (Mini x) => x.get_Id(), (Mini x) => x.get_Name());
+				List<AchievementTableEntry> added = apiAchievements.Select((Achievement a) => BuildApiOnlyEntry(a, itemNames, skinNames, miniNames)).ToList();
+				List<AchievementTableEntry> achievements = Achievements.Concat(added).ToList();
+				Dictionary<int, AchievementTableEntry> achievementsById = new Dictionary<int, AchievementTableEntry>(known.Count + added.Count);
+				foreach (AchievementTableEntry achievement in achievements)
+				{
+					achievementsById[achievement.Id] = achievement;
+				}
+				Achievements = achievements.AsReadOnly();
+				AchievementsById = achievementsById;
+				logger.Debug($"Added {added.Count} achievement(s) from the API that the wiki data doesn't have.");
+			}
+			catch (OperationCanceledException)
+			{
+				throw;
+			}
+			catch (Exception ex)
+			{
+				logger.Warn(ex, "Failed to add achievements missing from the wiki data; showing the wiki data only.");
+			}
+		}
+
+		private async Task<IReadOnlyDictionary<int, string>> FetchNamesAsync<T>(IEnumerable<int> ids, Func<IEnumerable<int>, Task<IReadOnlyList<T>>> fetch, Func<T, int> getId, Func<T, string> getName)
+		{
+			List<int> idList = ids.Distinct().ToList();
+			Dictionary<int, string> names = new Dictionary<int, string>();
+			for (int i = 0; i < idList.Count; i += 200)
+			{
+				try
+				{
+					foreach (T fetched in await fetch(idList.Skip(i).Take(200)))
+					{
+						names[getId(fetched)] = getName(fetched);
+					}
+				}
+				catch (Exception ex) when (!(ex is OperationCanceledException))
+				{
+					logger.Warn(ex, "Failed to fetch names for API-only achievement objectives.");
+				}
+			}
+			return names;
+		}
+
+		private static string ToLabelHtml(string apiText)
+		{
+			if (string.IsNullOrWhiteSpace(apiText))
+			{
+				return null;
+			}
+			string[] lines = Regex.Split(Regex.Replace(apiText, "</?c(=[^>]*)?>", string.Empty, RegexOptions.IgnoreCase), "<br\\s*/?>|\\r?\\n", RegexOptions.IgnoreCase);
+			return string.Join("<br>", lines.Select((string line) => WebUtility.HtmlEncode(line.Trim()))).Trim();
+		}
+
+		private static AchievementTableEntry BuildApiOnlyEntry(Achievement api, IReadOnlyDictionary<int, string> itemNames, IReadOnlyDictionary<int, string> skinNames, IReadOnlyDictionary<int, string> miniNames)
+		{
+			string name = (api.get_Name() ?? string.Empty).Trim();
+			IReadOnlyList<AchievementBit> apiBits = api.get_Bits() ?? Array.Empty<AchievementBit>();
+			AchievementTableEntryDescription description = (apiBits.Any((AchievementBit b) => !(b is AchievementTextBit)) ? new CollectionDescription
+			{
+				EntryList = apiBits.Select(delegate(AchievementBit b)
+				{
+					AchievementItemBit val = (AchievementItemBit)(object)((b is AchievementItemBit) ? b : null);
+					if (val != null)
+					{
+						return new CollectionDescriptionEntry
+						{
+							DisplayName = NameOf(itemNames, val.get_Id(), "Item"),
+							Id = val.get_Id()
+						};
+					}
+					AchievementSkinBit val2 = (AchievementSkinBit)(object)((b is AchievementSkinBit) ? b : null);
+					if (val2 != null)
+					{
+						return new CollectionDescriptionEntry
+						{
+							DisplayName = NameOf(skinNames, val2.get_Id(), "Skin")
+						};
+					}
+					AchievementMinipetBit val3 = (AchievementMinipetBit)(object)((b is AchievementMinipetBit) ? b : null);
+					if (val3 != null)
+					{
+						return new CollectionDescriptionEntry
+						{
+							DisplayName = NameOf(miniNames, val3.get_Id(), "Miniature")
+						};
+					}
+					AchievementTextBit val4 = (AchievementTextBit)(object)((b is AchievementTextBit) ? b : null);
+					return (val4 != null) ? new CollectionDescriptionEntry
+					{
+						DisplayName = (val4.get_Text() ?? string.Empty)
+					} : new CollectionDescriptionEntry();
+				}).ToList()
+			} : ((apiBits.Count <= 0) ? ((AchievementTableEntryDescription)new StringDescription()) : ((AchievementTableEntryDescription)new ObjectivesDescription
+			{
+				EntryList = apiBits.Select((AchievementBit b) => new TableDescriptionEntry
+				{
+					DisplayName = (((AchievementTextBit)b).get_Text() ?? string.Empty)
+				}).ToList()
+			})));
+			string requirement = api.get_Requirement() ?? string.Empty;
+			IReadOnlyList<AchievementTier> tiers = api.get_Tiers();
+			int? obj;
+			if (tiers == null)
+			{
+				obj = null;
+			}
+			else
+			{
+				AchievementTier obj2 = tiers.LastOrDefault();
+				obj = ((obj2 != null) ? new int?(obj2.get_Count()) : null);
+			}
+			int? lastTierCount = obj;
+			int countSlot = requirement.IndexOf("  ", StringComparison.Ordinal);
+			if (lastTierCount.HasValue && countSlot >= 0)
+			{
+				requirement = requirement.Substring(0, countSlot) + " " + lastTierCount.Value + " " + requirement.Substring(countSlot + 2);
+			}
+			description.GameText = ToLabelHtml(requirement);
+			description.GameHint = ToLabelHtml(api.get_Description());
+			return new AchievementTableEntry
+			{
+				Id = api.get_Id(),
+				Name = name,
+				Link = "/index.php?title=Special:Search&go=Go&search=" + Uri.EscapeDataString(name),
+				Description = description
+			};
+			static string NameOf(IReadOnlyDictionary<int, string> names, int id, string kind)
+			{
+				if (!names.TryGetValue(id, out var found) || string.IsNullOrWhiteSpace(found))
+				{
+					return $"{kind} {id}";
+				}
+				return found;
 			}
 		}
 

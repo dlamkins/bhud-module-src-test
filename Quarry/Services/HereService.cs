@@ -368,6 +368,7 @@ namespace Quarry.Services
 				}
 			}
 			HashSet<int> candidateIds = new HashSet<int>(categoryByAchievementId.Keys);
+			HashSet<int> categoryLinkedIds = new HashSet<int>(categoryByAchievementId.Keys);
 			HashSet<int> guidedIds = new HashSet<int>();
 			if (markerPackIndexService.Ready)
 			{
@@ -412,9 +413,13 @@ namespace Quarry.Services
 			List<HereCandidate> candidates = new List<HereCandidate>();
 			foreach (int id in candidateIds)
 			{
-				if (apiAchievements.TryGetValue(id, out var apiAchievement) && PassesHereRules(apiAchievement, out var wikiAchievement, out var current, out var progressMax))
+				if (!apiAchievements.TryGetValue(id, out var apiAchievement) || !PassesHereRules(apiAchievement, out var wikiAchievement, out var current, out var progressMax))
 				{
-					GuidanceInfo guidance = nearestObjectiveService.GetGuidance(id, mapId);
+					continue;
+				}
+				GuidanceInfo guidance = nearestObjectiveService.GetGuidance(id, mapId);
+				if (categoryLinkedIds.Contains(id) || guidance.Tier != 0)
+				{
 					bool hasBits = apiAchievement.get_Bits() != null && apiAchievement.get_Bits().Count > 0;
 					candidates.Add(new HereCandidate
 					{

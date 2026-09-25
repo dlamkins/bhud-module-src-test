@@ -168,6 +168,7 @@ namespace Quarry.UserInterface.Windows
 			};
 			this.sessionSummaryService.Changed += sessionSummaryChangedHandler;
 			this.achievementService.PlayerAchievementsLoaded += AchievementService_PlayerAchievementsLoaded;
+			this.achievementService.ApiAchievementsLoaded += AchievementService_ApiAchievementsLoaded;
 			this.currentMapService.Changed += CurrentMapService_Changed;
 			this.markerPackIndexService.Changed += MarkerPackIndexService_Changed;
 			this.hereExclusionService.Changed += HereExclusionService_Changed;
@@ -396,6 +397,20 @@ namespace Quarry.UserInterface.Windows
 				RefreshProgress();
 				SortTrackedPanels();
 				RefreshNearestObjectives();
+			});
+		}
+
+		private void AchievementService_ApiAchievementsLoaded()
+		{
+			GameService.Overlay.QueueMainThreadUpdate((Action<GameTime>)delegate
+			{
+				foreach (int current in achievementTrackerService.ActiveAchievements.ToList())
+				{
+					if (!trackedAchievements.ContainsKey(current))
+					{
+						AchievementTrackerService_AchievementTracked(current);
+					}
+				}
 			});
 		}
 
@@ -1178,6 +1193,7 @@ namespace Quarry.UserInterface.Windows
 			achievementTrackerService.AchievementUntracked -= AchievementTrackerService_AchievementUntracked;
 			sessionSummaryService.Changed -= sessionSummaryChangedHandler;
 			achievementService.PlayerAchievementsLoaded -= AchievementService_PlayerAchievementsLoaded;
+			achievementService.ApiAchievementsLoaded -= AchievementService_ApiAchievementsLoaded;
 			currentMapService.Changed -= CurrentMapService_Changed;
 			markerPackIndexService.Changed -= MarkerPackIndexService_Changed;
 			hereExclusionService.Changed -= HereExclusionService_Changed;
