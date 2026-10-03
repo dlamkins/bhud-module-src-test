@@ -285,6 +285,9 @@ namespace KpRefresher.Domain
 		[Display(Description = "NexusOfEternity", ResourceType = typeof(tokens))]
 		[Sort(12, 4)]
 		NexusOfEternity = 110231,
+		[Display(Description = "NexusOfEternityCM", ResourceType = typeof(tokens))]
+		[Sort(12, 5)]
+		NexusOfEternityCM = 110245,
 		[Display(Description = "IcebroodCoffer", ResourceType = typeof(tokens))]
 		[Sort(13, 1)]
 		IcebroodCoffer = 106909,

@@ -150,6 +150,8 @@ namespace KpRefresher.Ressources
 
 		public static string NexusOfEternity => ResourceManager.GetString("NexusOfEternity", resourceCulture);
 
+		public static string NexusOfEternityCM => ResourceManager.GetString("NexusOfEternityCM", resourceCulture);
+
 		public static string OldLionsCourt => ResourceManager.GetString("OldLionsCourt", resourceCulture);
 
 		public static string OldLionsCourt_Old => ResourceManager.GetString("OldLionsCourt_Old", resourceCulture);
