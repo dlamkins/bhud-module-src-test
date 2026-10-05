@@ -79,6 +79,24 @@ namespace MysticCrafting.Module.Repositories
 				Id = 112345678,
 				RewardItemId = 109141,
 				Name = "Eternity's Garden: Eternity's Garden Mastery"
+			},
+			new Achievement
+			{
+				Id = 122345678,
+				RewardItemId = 110148,
+				Name = "Leyspring Hollows: Leyspring Hollows Mastery"
+			},
+			new Achievement
+			{
+				Id = 132345678,
+				RewardItemId = 110133,
+				Name = "Rare Collections: Shining Ward Weapon Collector"
+			},
+			new Achievement
+			{
+				Id = 142345678,
+				RewardItemId = 110033,
+				Name = "Castora: Tenebral Ward Armor Collection"
 			}
 		};
 

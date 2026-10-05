@@ -30,6 +30,12 @@ namespace MysticCrafting.Module.Repositories
 					ItemId = 123456698,
 					ContainedItemId = 102958,
 					Name = "Map completion of Janthir Syntri"
+				},
+				new MysticItemContainer
+				{
+					ItemId = 123456697,
+					ContainedItemId = 110122,
+					Name = " Leyspring Hollows"
 				}
 			};
 		}

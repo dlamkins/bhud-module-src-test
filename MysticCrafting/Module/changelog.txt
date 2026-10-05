@@ -1,4 +1,7 @@
-﻿#1.5.10 Data update to add all the new items
+﻿#1.5.11 Data update to add all the new items
+- New legendary sword Wages of Stars has been added
+
+#1.5.10 Data update to add all the new items
 - Sorry for the long wait everyone! <3 Atzie
 
 #1.5.9 Bug fixes
