@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>Gw2Tldr</AssemblyName>
+    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+    <TargetFramework>net48</TargetFramework>
+  </PropertyGroup>
+  <PropertyGroup>
+    <LangVersion>Preview</LangVersion>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace />
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="SeaStove\Gw2Tldr\Assets.icons.combat.png" />
+    <None Remove="SeaStove\Gw2Tldr\Assets.icons.danger.png" />
+    <None Remove="SeaStove\Gw2Tldr\Assets.icons.group.png" />
+    <None Remove="SeaStove\Gw2Tldr\Assets.icons.info.png" />
+    <None Remove="SeaStove\Gw2Tldr\Assets.icons.movement.png" />
+    <None Remove="SeaStove\Gw2Tldr\Assets.icons.shield.png" />
+    <None Remove="SeaStove\Gw2Tldr\Assets.icons.timer.png" />
+    <None Remove="SeaStove\Gw2Tldr\logo.png" />
+    <None Remove="SeaStove\Gw2Tldr\contributors.json" />
+    <None Remove="SeaStove\Gw2Tldr\guides.json" />
+    <EmbeddedResource Include="SeaStove\Gw2Tldr\Assets.icons.combat.png" />
+    <EmbeddedResource Include="SeaStove\Gw2Tldr\Assets.icons.danger.png" />
+    <EmbeddedResource Include="SeaStove\Gw2Tldr\Assets.icons.group.png" />
+    <EmbeddedResource Include="SeaStove\Gw2Tldr\Assets.icons.info.png" />
+    <EmbeddedResource Include="SeaStove\Gw2Tldr\Assets.icons.movement.png" />
+    <EmbeddedResource Include="SeaStove\Gw2Tldr\Assets.icons.shield.png" />
+    <EmbeddedResource Include="SeaStove\Gw2Tldr\Assets.icons.timer.png" />
+    <EmbeddedResource Include="SeaStove\Gw2Tldr\logo.png" />
+    <EmbeddedResource Include="SeaStove\Gw2Tldr\contributors.json" />
+    <EmbeddedResource Include="SeaStove\Gw2Tldr\guides.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Blish HUD" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="MonoGame.Framework" />
+    <Reference Include="Newtonsoft.Json" />
+    <Reference Include="MonoGame.Extended" />
+    <Reference Include="System.Core" />
+    <Reference Include="AsyncClipboardService" />
+  </ItemGroup>
+</Project>
