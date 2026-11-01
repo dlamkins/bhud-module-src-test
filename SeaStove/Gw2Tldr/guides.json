@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "sourceCommit": "4dd45e38a86adb5604936f9a51b8208ba7499595",
-  "contentSha256": "1976f64c48e0ac3534077551000f68dfd47b2fc88e8ac0853dc6cdf2cc69c230",
+  "sourceCommit": "1457b6e6dc92e73819b87666960f2a341e2ae329",
+  "contentSha256": "3f96695c26ddea09c44853d42cb1cc2f0629efeeac9a9eb94168ac71512bfd32",
   "data": {
     "raids": {
       "Wing 1": {
@@ -1628,6 +1628,9 @@
               "guildjen": "https://guildjen.com/mount-balrior-wing-8-guide/",
               "hardstuck": "https://hardstuck.gg/gw2/guides/w8-mount-balrior/decima-the-stormsinger/",
               "mukluk": "https://mukluklabs.com/gw2-raid-guides"
+            },
+            "cm": {
+              "Ley Keep": "https://leykeep.com/guides/decima-cm"
             }
           }
         },
@@ -1692,6 +1695,9 @@
               "wiki": "https://wiki.guildwars2.com/wiki/Greer",
               "guildjen": "https://guildjen.com/mount-balrior-wing-8-guide/",
               "mukluk": "https://mukluklabs.com/gw2-raid-guides"
+            },
+            "cm": {
+              "Ley Keep": "https://leykeep.com/guides/greer-cm"
             }
           }
         },
@@ -2342,6 +2348,7 @@
               "mukluk": "https://mukluklabs.com/gw2-strike-mission-guides"
             },
             "cm": {
+              "Ley Keep": "https://leykeep.com/guides/harvest-temple-cm",
               "wiki": "https://wiki.guildwars2.com/wiki/Harvest_Temple",
               "guildjen": "https://guildjen.com/harvest-temple-temple-strike-mission-guide/",
               "hardstuck": "https://hardstuck.gg/gw2/guides/end-of-dragons/harvest-temple-cm/",
@@ -2692,6 +2699,7 @@
               "mukluk": "https://mukluklabs.com/gw2-strike-mission-guides"
             },
             "cm": {
+              "Ley Keep": "https://leykeep.com/guides/temple-of-febe-cm",
               "wiki": "https://wiki.guildwars2.com/wiki/Temple_of_Febe_%28Cerus%29",
               "guildjen": "https://guildjen.com/temple-of-febe-strike-mission-guide/",
               "mukluk": "https://mukluklabs.com/gw2-strike-mission-guides"
@@ -2782,6 +2790,7 @@
               "Phandrel": "https://www.youtube.com/watch?v=aepBZwNHXUQ"
             },
             "cm": {
+              "Ley Keep": "https://leykeep.com/guides/guardians-glade-cm",
               "wiki": "https://wiki.guildwars2.com/wiki/Guardian%27s_Glade",
               "guildjen": "https://guildjen.com/guardians-glade-raid-guide/",
               "Phandrel": "https://www.youtube.com/watch?v=aepBZwNHXUQ"
@@ -2865,7 +2874,8 @@
             },
             "cm": {
               "wiki": "https://wiki.guildwars2.com/wiki/Nexus_of_Eternity",
-              "Ley Keep": "https://leykeep.com/guides/nexus-of-eternity-cm"
+              "Ley Keep": "https://leykeep.com/guides/nexus-of-eternity-cm",
+              "Ley Keep (Scourge Stack)": "https://leykeep.com/guides/nexus-of-eternity-cm-scourge-stack-strategy"
             }
           }
         }
