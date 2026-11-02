@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Threading.Tasks;
@@ -31,6 +32,12 @@ namespace SeaStove.Gw2Tldr
 		private SettingEntry<string> _lastGuide;
 
 		private KeyBinding _boundKey;
+
+		private KeyBinding _escapeKey;
+
+		private SettingEntry<bool> _closeOnEscape;
+
+		private readonly Dictionary<string, SettingEntry<bool>> _autoShowCategories = new Dictionary<string, SettingEntry<bool>>();
 
 		private CornerIcon _icon;
 
@@ -80,8 +87,8 @@ namespace SeaStove.Gw2Tldr
 		{
 			//IL_000a: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0052: Expected O, but got Unknown
-			//IL_04b6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_04ec: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05ca: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0600: Unknown result type (might be due to invalid IL or missing references)
 			_toggleSetting = settings.DefineSetting<KeyBinding>("ToggleGuides", new KeyBinding((ModifierKeys)5, (Keys)71), (Func<string>)(() => "Toggle guide window"), (Func<string>)(() => "Open or close GW2 TLDR. Defaults to Ctrl+Shift+G."));
 			_textSize = settings.DefineSetting<int>("TextSize", 1, (Func<string>)(() => "Guide text size"), (Func<string>)(() => "0 = small, 1 = medium, 2 = large."));
 			_fontStyle = settings.DefineSetting<int>("GuideFontStyle", 0, (Func<string>)(() => "Guide font style"), (Func<string>)(() => "0 = regular, 1 = bold, 2 = italic."));
@@ -92,6 +99,13 @@ namespace SeaStove.Gw2Tldr
 			_fadeHeader = settings.DefineSetting<bool>("FadeHeader", true, (Func<string>)(() => "Fade header buttons"), (Func<string>)(() => "Fade header controls until you hover over the header."));
 			_hideUnmapped = settings.DefineSetting<bool>("HideUnmapped", true, (Func<string>)(() => "Hide on unmapped maps"), (Func<string>)(() => "Hide the guide when entering a map without an encounter guide."));
 			_showMapped = settings.DefineSetting<bool>("ShowMapped", true, (Func<string>)(() => "Show on mapped maps"), (Func<string>)(() => "Show the guide when entering a map with an encounter guide."));
+			_closeOnEscape = settings.DefineSetting<bool>("CloseOnEscape", false, (Func<string>)(() => "Esc closes guide"), (Func<string>)(() => "Hide the guide when Escape is pressed."));
+			string[] array = new string[4] { "raids", "fractals", "metas", "dungeons" };
+			foreach (string category in array)
+			{
+				string label = char.ToUpperInvariant(category[0]) + category.Substring(1);
+				_autoShowCategories[category] = settings.DefineSetting<bool>("AutoShow_" + category, true, (Func<string>)(() => "Auto-show: " + label), (Func<string>)(() => "Show the guide automatically for " + category + "."));
+			}
 			_hideLoading = settings.DefineSetting<bool>("HideDuringLoading", false, (Func<string>)(() => "Hide during loading screens"), (Func<string>)(() => "Temporarily hide the guide during loading screens, cinematics, and character selection."));
 			_autoSelect = settings.DefineSetting<bool>("AutoSelect", true, (Func<string>)(() => "Auto-select guides"), (Func<string>)(() => "Select the first guide for your map and keep the current guide when there is no match."));
 			_autoHeight = settings.DefineSetting<bool>("AutoHeight", false, (Func<string>)(() => "Fit guide height to content"), (Func<string>)(() => "Automatically resize guide height to fit its notes."));
@@ -121,9 +135,13 @@ namespace SeaStove.Gw2Tldr
 			{
 				//IL_0058: Unknown result type (might be due to invalid IL or missing references)
 				//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-				//IL_044b: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0450: Unknown result type (might be due to invalid IL or missing references)
-				//IL_0460: Expected O, but got Unknown
+				//IL_04cd: Unknown result type (might be due to invalid IL or missing references)
+				//IL_04d2: Unknown result type (might be due to invalid IL or missing references)
+				//IL_04e2: Expected O, but got Unknown
+				//IL_0538: Unknown result type (might be due to invalid IL or missing references)
+				//IL_053d: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0544: Unknown result type (might be due to invalid IL or missing references)
+				//IL_0550: Expected O, but got Unknown
 				try
 				{
 					_lastTextSize = _textSize.get_Value();
@@ -183,6 +201,12 @@ namespace SeaStove.Gw2Tldr
 					}, () => _autoHeight.get_Value(), delegate(bool enabled)
 					{
 						_autoHeight.set_Value(enabled);
+					}, () => _closeOnEscape.get_Value(), delegate(bool enabled)
+					{
+						_closeOnEscape.set_Value(enabled);
+					}, (string category) => _autoShowCategories.TryGetValue(MapVisibility.AutoShowCategory(category), out var value2) && value2.get_Value(), delegate(string category, bool enabled)
+					{
+						_autoShowCategories[category].set_Value(enabled);
 					});
 					MechanicIcon.LoadTextures();
 					_logoTexture = LoadLogo();
@@ -193,6 +217,12 @@ namespace SeaStove.Gw2Tldr
 					((Control)_icon).add_Click((EventHandler<MouseEventArgs>)ToggleWindow);
 					((Control)_icon).add_RightMouseButtonReleased((EventHandler<MouseEventArgs>)OpenGuideSettings);
 					BindHotkey();
+					Gw2TldrModule gw2TldrModule2 = this;
+					KeyBinding val2 = new KeyBinding((ModifierKeys)0, (Keys)27);
+					val2.set_IgnoreWhenInTextField(true);
+					val2.set_Enabled(true);
+					gw2TldrModule2._escapeKey = val2;
+					_escapeKey.add_Activated((EventHandler<EventArgs>)CloseOnEscape);
 				}
 				catch
 				{
@@ -262,6 +292,17 @@ namespace SeaStove.Gw2Tldr
 			});
 		}
 
+		private void CloseOnEscape(object sender, EventArgs args)
+		{
+			_lifetime.TryUse(delegate
+			{
+				if (_closeOnEscape.get_Value())
+				{
+					_window?.Hide();
+				}
+			});
+		}
+
 		private void BindHotkey()
 		{
 			if (_boundKey != _toggleSetting.get_Value())
@@ -306,6 +347,12 @@ namespace SeaStove.Gw2Tldr
 
 		private void CleanupResources()
 		{
+			if (_escapeKey != null)
+			{
+				_escapeKey.remove_Activated((EventHandler<EventArgs>)CloseOnEscape);
+				_escapeKey.set_Enabled(false);
+				_escapeKey = null;
+			}
 			if (_boundKey != null)
 			{
 				_boundKey.remove_Activated((EventHandler<EventArgs>)ToggleWindow);

@@ -39,6 +39,14 @@ namespace SeaStove.Gw2Tldr.UI
 
 		private Point _expandedSize;
 
+		private readonly Func<bool> _readCloseOnEscape;
+
+		private readonly Action<bool> _writeCloseOnEscape;
+
+		private readonly Func<string, bool> _readAutoShowCategory;
+
+		private readonly Action<string, bool> _writeAutoShowCategory;
+
 		private readonly Func<bool> _readAutoHeight;
 
 		private readonly Action<bool> _writeAutoHeight;
@@ -201,59 +209,63 @@ namespace SeaStove.Gw2Tldr.UI
 			}
 		}
 
-		public CompactGuideWindow(GuideCatalog catalog, string error, string selectedId, int fontIndex, Point position, Point size, bool locked, Action<string> rememberGuide, Action<int> rememberTextSize, Action<Point> rememberPosition, Action<Point> rememberSize, Action<bool> rememberLocked, Func<string> readCustom, Action<string> writeCustom, Func<bool> readAutoSelect, Action<bool> writeAutoSelect, Action<int> setOpacity, Action<bool> setColorCoding, Func<bool> readFadeHeader, Action<bool> writeFadeHeader, Func<bool> readLightMode, Action<bool> writeLightMode, Func<bool> readShowCopy, Action<bool> writeShowCopy, Func<bool> readColorText, Action<bool> writeColorText, Func<bool> readHideUnmapped, Action<bool> writeHideUnmapped, Func<bool> readShowMapped, Action<bool> writeShowMapped, Func<int> readFontStyle, Action<int> writeFontStyle, Func<bool> readHideLoading, Action<bool> writeHideLoading, Func<bool> readAutoHeight, Action<bool> writeAutoHeight)
+		public CompactGuideWindow(GuideCatalog catalog, string error, string selectedId, int fontIndex, Point position, Point size, bool locked, Action<string> rememberGuide, Action<int> rememberTextSize, Action<Point> rememberPosition, Action<Point> rememberSize, Action<bool> rememberLocked, Func<string> readCustom, Action<string> writeCustom, Func<bool> readAutoSelect, Action<bool> writeAutoSelect, Action<int> setOpacity, Action<bool> setColorCoding, Func<bool> readFadeHeader, Action<bool> writeFadeHeader, Func<bool> readLightMode, Action<bool> writeLightMode, Func<bool> readShowCopy, Action<bool> writeShowCopy, Func<bool> readColorText, Action<bool> writeColorText, Func<bool> readHideUnmapped, Action<bool> writeHideUnmapped, Func<bool> readShowMapped, Action<bool> writeShowMapped, Func<int> readFontStyle, Action<int> writeFontStyle, Func<bool> readHideLoading, Action<bool> writeHideLoading, Func<bool> readAutoHeight, Action<bool> writeAutoHeight, Func<bool> readCloseOnEscape, Action<bool> writeCloseOnEscape, Func<string, bool> readAutoShowCategory, Action<string, bool> writeAutoShowCategory)
 		{
-			//IL_0068: Unknown result type (might be due to invalid IL or missing references)
-			//IL_006a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_012f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0131: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0136: Unknown result type (might be due to invalid IL or missing references)
-			//IL_019e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01a8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01de: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01f6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_01fb: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0207: Unknown result type (might be due to invalid IL or missing references)
-			//IL_020a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0214: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0219: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0223: Unknown result type (might be due to invalid IL or missing references)
-			//IL_022e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_023e: Expected O, but got Unknown
-			//IL_0256: Unknown result type (might be due to invalid IL or missing references)
-			//IL_025b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0267: Unknown result type (might be due to invalid IL or missing references)
-			//IL_026b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0275: Unknown result type (might be due to invalid IL or missing references)
-			//IL_027d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0088: Unknown result type (might be due to invalid IL or missing references)
+			//IL_008a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_014f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0151: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0156: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01be: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_01fe: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0216: Unknown result type (might be due to invalid IL or missing references)
+			//IL_021b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0227: Unknown result type (might be due to invalid IL or missing references)
+			//IL_022a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0234: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0239: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0243: Unknown result type (might be due to invalid IL or missing references)
+			//IL_024e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_025e: Expected O, but got Unknown
+			//IL_0276: Unknown result type (might be due to invalid IL or missing references)
+			//IL_027b: Unknown result type (might be due to invalid IL or missing references)
 			//IL_0287: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0288: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0297: Expected O, but got Unknown
-			//IL_02af: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02b4: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c0: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02c5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_028b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0295: Unknown result type (might be due to invalid IL or missing references)
+			//IL_029d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02b7: Expected O, but got Unknown
 			//IL_02cf: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02d6: Unknown result type (might be due to invalid IL or missing references)
-			//IL_02e6: Expected O, but got Unknown
-			//IL_0419: Unknown result type (might be due to invalid IL or missing references)
-			//IL_041e: Unknown result type (might be due to invalid IL or missing references)
-			//IL_042a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_042f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02d4: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02e5: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02ef: Unknown result type (might be due to invalid IL or missing references)
+			//IL_02f6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0306: Expected O, but got Unknown
 			//IL_0439: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0444: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0454: Expected O, but got Unknown
-			//IL_04fc: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0501: Unknown result type (might be due to invalid IL or missing references)
-			//IL_050d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0519: Expected O, but got Unknown
-			//IL_051a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0524: Expected O, but got Unknown
-			//IL_0525: Unknown result type (might be due to invalid IL or missing references)
-			//IL_052f: Expected O, but got Unknown
-			//IL_05eb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_043e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_044a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_044f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0459: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0464: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0474: Expected O, but got Unknown
+			//IL_051c: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0521: Unknown result type (might be due to invalid IL or missing references)
+			//IL_052d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0539: Expected O, but got Unknown
+			//IL_053a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0544: Expected O, but got Unknown
+			//IL_0545: Unknown result type (might be due to invalid IL or missing references)
+			//IL_054f: Expected O, but got Unknown
+			//IL_060b: Unknown result type (might be due to invalid IL or missing references)
 			_catalog = catalog;
+			_readCloseOnEscape = readCloseOnEscape;
+			_writeCloseOnEscape = writeCloseOnEscape;
+			_readAutoShowCategory = readAutoShowCategory;
+			_writeAutoShowCategory = writeAutoShowCategory;
 			_readAutoHeight = readAutoHeight;
 			_writeAutoHeight = writeAutoHeight;
 			_lastAutoHeight = readAutoHeight();
@@ -405,6 +417,11 @@ namespace SeaStove.Gw2Tldr.UI
 			{
 				AddText(error ?? "The bundled guides could not be loaded.", Color.get_White(), 6);
 			}
+		}
+
+		public void Hide()
+		{
+			((Control)_panel).Hide();
 		}
 
 		public void Toggle()
@@ -635,7 +652,7 @@ namespace SeaStove.Gw2Tldr.UI
 					Layout();
 				}
 				Render();
-			});
+			}, _readCloseOnEscape, _writeCloseOnEscape, _readAutoShowCategory, _writeAutoShowCategory);
 		}
 
 		private static Point ClampSize(Point size)
@@ -778,18 +795,20 @@ namespace SeaStove.Gw2Tldr.UI
 				return;
 			}
 			int mapId = GameService.Gw2Mumble.get_CurrentMap().get_Id();
-			if (mapId > 0 && _lastVisibilityMap != mapId)
+			if (mapId <= 0 || _lastVisibilityMap == mapId)
 			{
-				_lastVisibilityMap = mapId;
-				switch (MapVisibility.Decide(MapGuideIndex.Find(_catalog, mapId).Count > 0, _readHideUnmapped(), _readShowMapped(), ((Control)_panel).get_Visible()))
-				{
-				case VisibilityAction.Hide:
-					((Control)_panel).Hide();
-					break;
-				case VisibilityAction.Show:
-					((Control)_panel).Show();
-					break;
-				}
+				return;
+			}
+			_lastVisibilityMap = mapId;
+			List<GuideEntry> matches = MapGuideIndex.Find(_catalog, mapId);
+			switch (MapVisibility.Decide(matches.Count > 0, _readHideUnmapped(), _readShowMapped() && matches.Any((GuideEntry guide) => _readAutoShowCategory(guide.Category)), ((Control)_panel).get_Visible()))
+			{
+			case VisibilityAction.Hide:
+				((Control)_panel).Hide();
+				break;
+			case VisibilityAction.Show:
+				((Control)_panel).Show();
+				break;
 			}
 		}
 

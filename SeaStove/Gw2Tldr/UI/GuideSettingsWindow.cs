@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Blish_HUD.Controls;
 using Blish_HUD.Input;
 using Microsoft.Xna.Framework;
@@ -61,6 +62,18 @@ namespace SeaStove.Gw2Tldr.UI
 
 		private readonly Action<bool> _setAutoHeight;
 
+		private readonly Func<bool> _closeOnEscape;
+
+		private readonly Action<bool> _setCloseOnEscape;
+
+		private readonly Func<string, bool> _categoryEnabled;
+
+		private readonly Action<string, bool> _setCategoryEnabled;
+
+		private readonly Dictionary<string, Checkbox> _categoryButtons = new Dictionary<string, Checkbox>();
+
+		private readonly DarkButton _escapeValue;
+
 		private Panel _opacityMenu;
 
 		private readonly DarkButton _opacityValue;
@@ -89,34 +102,64 @@ namespace SeaStove.Gw2Tldr.UI
 
 		private readonly DarkButton _autoHeightValue;
 
-		public GuideSettingsWindow(Func<int> opacity, Action<int> setOpacity, Func<int> textSize, Action<int> setTextSize, Func<bool> colors, Action<bool> setColors, Func<bool> fade, Action<bool> setFade, Func<bool> auto, Action<bool> setAuto, Func<bool> light, Action<bool> setLight, Func<bool> showCopy, Action<bool> setShowCopy, Func<bool> colorText, Action<bool> setColorText, Func<bool> hideUnmapped, Action<bool> setHideUnmapped, Func<bool> showMapped, Action<bool> setShowMapped, Func<int> fontStyle, Action<int> setFontStyle, Func<bool> hideLoading, Action<bool> setHideLoading, Func<bool> autoHeight, Action<bool> setAutoHeight)
+		public GuideSettingsWindow(Func<int> opacity, Action<int> setOpacity, Func<int> textSize, Action<int> setTextSize, Func<bool> colors, Action<bool> setColors, Func<bool> fade, Action<bool> setFade, Func<bool> auto, Action<bool> setAuto, Func<bool> light, Action<bool> setLight, Func<bool> showCopy, Action<bool> setShowCopy, Func<bool> colorText, Action<bool> setColorText, Func<bool> hideUnmapped, Action<bool> setHideUnmapped, Func<bool> showMapped, Action<bool> setShowMapped, Func<int> fontStyle, Action<int> setFontStyle, Func<bool> hideLoading, Action<bool> setHideLoading, Func<bool> autoHeight, Action<bool> setAutoHeight, Func<bool> closeOnEscape, Action<bool> setCloseOnEscape, Func<string, bool> categoryEnabled, Action<string, bool> setCategoryEnabled)
 		{
-			//IL_00e8: Unknown result type (might be due to invalid IL or missing references)
-			//IL_011d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0122: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0133: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0138: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0142: Unknown result type (might be due to invalid IL or missing references)
-			//IL_014a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0154: Unknown result type (might be due to invalid IL or missing references)
-			//IL_015f: Unknown result type (might be due to invalid IL or missing references)
-			//IL_033c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0341: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0352: Unknown result type (might be due to invalid IL or missing references)
-			//IL_035a: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0364: Unknown result type (might be due to invalid IL or missing references)
-			//IL_036c: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0376: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0381: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0453: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0458: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0469: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0471: Unknown result type (might be due to invalid IL or missing references)
-			//IL_047b: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0483: Unknown result type (might be due to invalid IL or missing references)
-			//IL_048d: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0498: Unknown result type (might be due to invalid IL or missing references)
-			//IL_0499: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0113: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0159: Unknown result type (might be due to invalid IL or missing references)
+			//IL_015e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_016f: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0174: Unknown result type (might be due to invalid IL or missing references)
+			//IL_017e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0186: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0190: Unknown result type (might be due to invalid IL or missing references)
+			//IL_019b: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0378: Unknown result type (might be due to invalid IL or missing references)
+			//IL_037d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_038e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0396: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03a0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03a8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03b2: Unknown result type (might be due to invalid IL or missing references)
+			//IL_03bd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04c1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04c6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04d7: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04df: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04e9: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04f1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_04fb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0506: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05b6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05bb: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05cc: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05d1: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05db: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05e0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_05ea: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0601: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0630: Expected O, but got Unknown
+			//IL_0630: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0635: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0646: Unknown result type (might be due to invalid IL or missing references)
+			//IL_064e: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0658: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0660: Unknown result type (might be due to invalid IL or missing references)
+			//IL_066a: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0671: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0672: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06c8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06cd: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06de: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06e6: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06f0: Unknown result type (might be due to invalid IL or missing references)
+			//IL_06f8: Unknown result type (might be due to invalid IL or missing references)
+			//IL_0702: Unknown result type (might be due to invalid IL or missing references)
+			//IL_070d: Unknown result type (might be due to invalid IL or missing references)
+			//IL_070e: Unknown result type (might be due to invalid IL or missing references)
+			_closeOnEscape = closeOnEscape;
+			_setCloseOnEscape = setCloseOnEscape;
+			_categoryEnabled = categoryEnabled;
+			_setCategoryEnabled = setCategoryEnabled;
 			_autoHeight = autoHeight;
 			_setAutoHeight = setAutoHeight;
 			_hideLoading = hideLoading;
@@ -146,6 +189,7 @@ namespace SeaStove.Gw2Tldr.UI
 			_window = new UtilityWindow("Settings", "GW2 TLDR", new Point(280, 180));
 			((Control)_window).set_Height(735);
 			((Control)_window.Body).set_Height(675);
+			_window.Body.set_CanScroll(true);
 			Label val = new Label();
 			((Control)val).set_Parent((Container)(object)_window.Body);
 			((Control)val).set_Location(new Point(15, 10));
@@ -236,13 +280,55 @@ namespace SeaStove.Gw2Tldr.UI
 				_setHideLoading(!_hideLoading());
 				Refresh();
 			});
+			_escapeValue = AddRow("Esc closes guide", 575, "Hide the guide when Escape is pressed");
+			((Control)_escapeValue).add_Click((EventHandler<MouseEventArgs>)delegate
+			{
+				_setCloseOnEscape(!_closeOnEscape());
+				Refresh();
+			});
 			Label val3 = new Label();
 			((Control)val3).set_Parent((Container)(object)_window.Body);
-			((Control)val3).set_Location(new Point(15, 580));
-			((Control)val3).set_Size(new Point(480, 60));
-			val3.set_Text("To change the shortcut, open the GW2 TLDR module settings in Blish HUD.");
-			val3.set_TextColor(Color.get_LightGray());
-			val3.set_WrapText(true);
+			((Control)val3).set_Location(new Point(15, 615));
+			((Control)val3).set_Size(new Point(470, 30));
+			val3.set_Text("Auto-show content types");
+			val3.set_TextColor(Color.get_White());
+			string[] categories = new string[4] { "raids", "fractals", "metas", "dungeons" };
+			for (int index = 0; index < categories.Length; index++)
+			{
+				string category = categories[index];
+				string label = ((category == "metas") ? "Meta events" : (char.ToUpperInvariant(category[0]) + category.Substring(1)));
+				int x = 24 + index % 2 * 220;
+				int y = 650 + index / 2 * 38;
+				Checkbox val4 = new Checkbox();
+				((Control)val4).set_Parent((Container)(object)_window.Body);
+				((Control)val4).set_Location(new Point(x, y));
+				((Control)val4).set_Size(new Point(24, 28));
+				val4.set_Checked(_categoryEnabled(category));
+				((Control)val4).set_BasicTooltipText("Auto-show guides for " + ((category == "raids") ? "raids and strikes" : label));
+				Checkbox checkbox = val4;
+				Label val5 = new Label();
+				((Control)val5).set_Parent((Container)(object)_window.Body);
+				((Control)val5).set_Location(new Point(x + 26, y));
+				((Control)val5).set_Size(new Point(180, 28));
+				val5.set_Text(label);
+				val5.set_TextColor(Color.get_LightGray());
+				((Control)val5).add_Click((EventHandler<MouseEventArgs>)delegate
+				{
+					checkbox.set_Checked(!checkbox.get_Checked());
+				});
+				_categoryButtons[category] = checkbox;
+				checkbox.add_CheckedChanged((EventHandler<CheckChangedEvent>)delegate(object s, CheckChangedEvent e)
+				{
+					_setCategoryEnabled(category, e.get_Checked());
+				});
+			}
+			Label val6 = new Label();
+			((Control)val6).set_Parent((Container)(object)_window.Body);
+			((Control)val6).set_Location(new Point(15, 740));
+			((Control)val6).set_Size(new Point(480, 60));
+			val6.set_Text("To change the shortcut, open the GW2 TLDR module settings in Blish HUD.");
+			val6.set_TextColor(Color.get_LightGray());
+			val6.set_WrapText(true);
 			Refresh();
 			((Control)_window).Show();
 		}
@@ -275,6 +361,11 @@ namespace SeaStove.Gw2Tldr.UI
 
 		private void Refresh()
 		{
+			((Label)_escapeValue).set_Text(_closeOnEscape() ? "On" : "Off");
+			foreach (KeyValuePair<string, Checkbox> item in _categoryButtons)
+			{
+				item.Value.set_Checked(_categoryEnabled(item.Key));
+			}
 			((Label)_autoHeightValue).set_Text(_autoHeight() ? "On" : "Off");
 			((Label)_hideLoadingValue).set_Text(_hideLoading() ? "On" : "Off");
 			((Label)_hideUnmappedValue).set_Text(_hideUnmapped() ? "On" : "Off");

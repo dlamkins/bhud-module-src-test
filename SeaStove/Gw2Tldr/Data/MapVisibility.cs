@@ -2,6 +2,15 @@ namespace SeaStove.Gw2Tldr.Data
 {
 	internal static class MapVisibility
 	{
+		public static string AutoShowCategory(string category)
+		{
+			if (!(category == "strikes"))
+			{
+				return category;
+			}
+			return "raids";
+		}
+
 		public static VisibilityAction Decide(bool hasGuide, bool hideUnmapped, bool showMapped, bool visible)
 		{
 			if (!hasGuide && hideUnmapped && visible)
