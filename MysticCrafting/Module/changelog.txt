@@ -1,4 +1,8 @@
-﻿#1.5.11 Data update to add all the new items
+﻿#1.5.12 Missing recipes fix
+- Fixed issue with missing recipes such as Gift of Magic / Might
+- Fixed trading post permission error
+
+#1.5.11 Data update to add all the new items
 - New legendary sword Wages of Stars has been added
 
 #1.5.10 Data update to add all the new items

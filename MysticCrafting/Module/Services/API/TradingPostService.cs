@@ -24,7 +24,7 @@ namespace MysticCrafting.Module.Services.API
 
 		private SQLiteAsyncConnection Connection { get; }
 
-		public override List<TokenPermission> Permissions => new List<TokenPermission> { (TokenPermission)8 };
+		public override List<TokenPermission> Permissions => new List<TokenPermission>();
 
 		public new bool CanReloadManually => false;
 
@@ -43,11 +43,6 @@ namespace MysticCrafting.Module.Services.API
 			if (_gw2ApiManager == null)
 			{
 				Logger.Error("Gw2ApiManager is null.");
-				return false;
-			}
-			if (!_gw2ApiManager.HasPermission((TokenPermission)8))
-			{
-				Logger.Error("Failed to retrieve Trading Post prices due missing permission 'Tradingpost'.");
 				return false;
 			}
 			return true;
