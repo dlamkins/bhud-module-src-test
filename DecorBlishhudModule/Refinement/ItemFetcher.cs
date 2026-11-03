@@ -108,6 +108,7 @@ namespace DecorBlishhudModule.Refinement
 			try
 			{
 				request.get_Headers().get_Accept().ParseAdd("application/json");
+				request.get_Headers().get_UserAgent().ParseAdd("DecorBlishhudModule/1.0 (contact: discord -> terter)");
 				HttpResponseMessage response = await DecorModule.DecorModuleInstance.Client.SendAsync(request);
 				try
 				{
